@@ -239,11 +239,25 @@ $perColumn = ceil($totalAttrs / $columns);
                                     <div class="card-body p-2 content-detail">
                                         <?php if ($contentCode === 'sports'): ?>
                                             <?php if (!empty($eventSports)):
+                                                $sportsMap = array();
+                                                foreach ($sportsItems as $s) {
+                                                    $sId = isset($s['id']) ? $s['id'] : (isset($s->id) ? $s->id : null);
+                                                    $sportsMap[$sId] = $s;
+                                                }
                                                 $sportsByParent = array();
                                                 $parentNames = array();
                                                 foreach ($eventSports as $es) {
-                                                    $parentId = isset($es['parent_id']) ? $es['parent_id'] : 0;
-                                                    $parentName = isset($es['parent_name']) ? $es['parent_name'] : '';
+                                                    $sportId = $es['sport_id'];
+                                                    $parentId = 0;
+                                                    $parentName = '';
+                                                    if (isset($sportsMap[$sportId])) {
+                                                        $sport = $sportsMap[$sportId];
+                                                        $parentId = isset($sport['parent_id']) ? $sport['parent_id'] : (isset($sport->parent_id) ? $sport->parent_id : 0);
+                                                        if ($parentId && isset($sportsMap[$parentId])) {
+                                                            $parent = $sportsMap[$parentId];
+                                                            $parentName = isset($parent['name']) ? $parent['name'] : (isset($parent->name) ? $parent->name : '');
+                                                        }
+                                                    }
                                                     if (!isset($sportsByParent[$parentId])) {
                                                         $sportsByParent[$parentId] = array();
                                                         $parentNames[$parentId] = $parentName;
