@@ -284,8 +284,7 @@ $perColumn = ceil($totalAttrs / $columns);
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <select name="sport_id" class="form-select">
-                        <option value="">-- Chọn môn thể thao --</option>
+                    <select name="sport_ids[]" class="form-select" multiple size="10">
                         <?php foreach ($sportsItems as $s):
                             $sId = isset($s['id']) ? $s['id'] : (isset($s->id) ? $s->id : null);
                             $sName = isset($s['name']) ? $s['name'] : (isset($s->name) ? $s->name : '');
@@ -301,6 +300,7 @@ $perColumn = ceil($totalAttrs / $columns);
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </select>
+                    <small class="text-muted">Giữ Ctrl để chọn nhiều môn</small>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
