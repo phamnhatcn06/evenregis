@@ -80,14 +80,24 @@ class EventsController extends AdminController
 			return;
 		}
 
-		$sportId = Yii::app()->getRequest()->getPost('sport_id');
-		if ($sportId) {
-			$result = EventSports::storeViaApi($id, $sportId);
-			if ($result['success']) {
-				Yii::app()->user->setFlash('success', 'Thêm môn thể thao thành công.');
-			} else {
-				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể thêm môn thể thao.');
+		$sportIds = Yii::app()->getRequest()->getPost('sport_ids', array());
+		$successCount = 0;
+		$errorCount = 0;
+		foreach ($sportIds as $sportId) {
+			if ($sportId) {
+				$result = EventSports::storeViaApi($id, $sportId);
+				if ($result['success']) {
+					$successCount++;
+				} else {
+					$errorCount++;
+				}
 			}
+		}
+		if ($successCount > 0) {
+			Yii::app()->user->setFlash('success', "Đã thêm {$successCount} môn thể thao.");
+		}
+		if ($errorCount > 0) {
+			Yii::app()->user->setFlash('error', "Có {$errorCount} môn không thể thêm.");
 		}
 		$this->redirect(array('view', 'id' => $id));
 	}
