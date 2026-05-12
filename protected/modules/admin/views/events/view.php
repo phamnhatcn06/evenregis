@@ -201,35 +201,72 @@ $perColumn = ceil($totalAttrs / $columns);
                         <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-plus me-1"></i>Thêm</button>
                     </form>
                 <?php endif; ?>
-                <div class="card-body">
+                <?php
+                $existingSportIds = array();
+                if (!empty($eventSports)) {
+                    foreach ($eventSports as $es) {
+                        $existingSportIds[$es['sport_id']] = $es;
+                    }
+                }
+                $availableSports = array();
+                foreach ($allSports as $s) {
+                    $sId = isset($s['id']) ? $s['id'] : (isset($s->id) ? $s->id : null);
+                    if ($sId && !isset($existingSportIds[$sId])) {
+                        $availableSports[$sId] = isset($s['name']) ? $s['name'] : (isset($s->name) ? $s->name : '');
+                    }
+                }
+                ?>
+                <div class="row">
                     <?php if (!empty($eventContents)): ?>
-                        <div class="row">
-                            <?php foreach ($eventContents as $ec):
-                            ?>
-                                <div class="col-md-4 mb-3 event-content">
-                                    <div class="card h-100 border">
-                                        <div class="card-header py-2 d-flex justify-content-between align-items-center bg-light">
-                                            <span class="fw-semibold"><?php echo CHtml::encode(isset($ec['content_name']) ? $ec['content_name'] : ''); ?></span>
-                                            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeContent', array('id' => $model->id, 'contentId' => $ec['id'])); ?>" style="display:inline;" id="form-remove-<?php echo $ec['id']; ?>">
-                                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-<?php echo $ec['id']; ?>')">
-                                                    <i class="fa fa-times"></i>
+                        <?php foreach ($eventContents as $ec):
+                            $contentCode = isset($ec['content_code']) ? $ec['content_code'] : '';
+                        ?>
+                            <div class="col-md-4 mb-3 event-content">
+                                <div class="card h-100 border">
+                                    <div class="card-header py-2 d-flex justify-content-between align-items-center bg-light">
+                                        <span class="fw-semibold"><?php echo CHtml::encode(isset($ec['content_name']) ? $ec['content_name'] : ''); ?></span>
+                                        <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeContent', array('id' => $model->id, 'contentId' => $ec['id'])); ?>" style="display:inline;" id="form-remove-<?php echo $ec['id']; ?>">
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-<?php echo $ec['id']; ?>')">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="card-body p-2 content-detail">
+                                        <?php if ($contentCode === 'sports'): ?>
+                                            <?php if (!empty($eventSports)): ?>
+                                                <ul class="list-unstyled mb-2">
+                                                    <?php foreach ($eventSports as $es): ?>
+                                                        <li class="d-flex justify-content-between align-items-center mb-1">
+                                                            <span><i class="fa fa-futbol-o me-1"></i><?php echo CHtml::encode($es['sport_name']); ?></span>
+                                                            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeSport', array('id' => $model->id, 'sportId' => $es['id'])); ?>" style="display:inline;" id="form-remove-sport-<?php echo $es['id']; ?>">
+                                                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-sport-<?php echo $es['id']; ?>')">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            <?php endif; ?>
+                                            <?php if (!empty($availableSports)): ?>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAddSport">
+                                                    <i class="fa fa-plus me-1"></i>Thêm môn
                                                 </button>
-                                            </form>
-                                        </div>
-                                        <div class="card-body p-2 content-detail">
+                                            <?php endif; ?>
+                                        <?php else: ?>
                                             <small class="text-muted">Chưa có chi tiết</small>
-                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <p class="text-muted mb-0">Chưa có nội dung nào được thêm.</p>
-                    <?php endif; ?>
-                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="text-muted mb-0">Chưa có nội dung nào được thêm.</p>
+                <?php endif; ?>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <?php
