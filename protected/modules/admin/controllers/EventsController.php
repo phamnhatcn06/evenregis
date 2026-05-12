@@ -73,6 +73,38 @@ class EventsController extends AdminController
 		}
 	}
 
+	public function actionAddSport($id)
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			$this->redirect(array('view', 'id' => $id));
+			return;
+		}
+
+		$sportId = Yii::app()->getRequest()->getPost('sport_id');
+		if ($sportId) {
+			$result = EventSports::storeViaApi($id, $sportId);
+			if ($result['success']) {
+				Yii::app()->user->setFlash('success', 'Thêm môn thể thao thành công.');
+			} else {
+				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể thêm môn thể thao.');
+			}
+		}
+		$this->redirect(array('view', 'id' => $id));
+	}
+
+	public function actionRemoveSport($id, $sportId)
+	{
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$result = EventSports::deleteViaApi($sportId);
+			if ($result['success']) {
+				Yii::app()->user->setFlash('success', 'Xóa môn thể thao thành công.');
+			} else {
+				Yii::app()->user->setFlash('error', $result['error'] ?: 'Không thể xóa môn thể thao.');
+			}
+			$this->redirect(array('view', 'id' => $id));
+		}
+	}
+
 	public function actionSyncUnits($id)
 	{
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
