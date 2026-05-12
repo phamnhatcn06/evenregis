@@ -18,11 +18,15 @@ class EventsController extends AdminController
 		$model = $this->loadModelById($id);
 		$eventContents = EventContents::getByEventId($id);
 		$allContents = Contents::getApiDataProvider(array(), 100)->getData();
+		$eventUnits = EventUnits::getByEventId($id);
+		$allProperties = Properties::getApiDataProvider(array(), 100)->getData();
 
 		$this->render('view', array(
 			'model' => $model,
 			'eventContents' => $eventContents,
 			'allContents' => $allContents,
+			'eventUnits' => $eventUnits,
+			'allProperties' => $allProperties,
 		));
 	}
 
@@ -63,6 +67,56 @@ class EventsController extends AdminController
 			}
 			$this->redirect(array('view', 'id' => $id));
 		}
+	}
+
+	public function actionSyncUnits($id)
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			$this->redirect(array('view', 'id' => $id));
+			return;
+		}
+
+		$propertyIds = Yii::app()->getRequest()->getPost('property_ids', array());
+		$currentUnits = EventUnits::getByEventId($id);
+
+		$currentPropertyIds = array();
+		$unitMap = array();
+		foreach ($currentUnits as $eu) {
+			$currentPropertyIds[] = $eu['property_id'];
+			$unitMap[$eu['property_id']] = $eu['id'];
+		}
+
+		$toAdd = array_diff($propertyIds, $currentPropertyIds);
+		$toRemove = array_diff($currentPropertyIds, $propertyIds);
+
+		$success = true;
+		foreach ($toAdd as $propertyId) {
+			$eventUnit = new EventUnits;
+			$eventUnit->event_id = $id;
+			$eventUnit->property_id = $propertyId;
+			$eventUnit->status = 1;
+			$result = $eventUnit->storeViaApi();
+			if (!$result['success']) {
+				$success = false;
+			}
+		}
+
+		foreach ($toRemove as $propertyId) {
+			if (isset($unitMap[$propertyId])) {
+				$result = EventUnits::deleteViaApi($unitMap[$propertyId]);
+				if (!$result['success']) {
+					$success = false;
+				}
+			}
+		}
+
+		if ($success) {
+			Yii::app()->user->setFlash('success', 'Cập nhật đơn vị thành công.');
+		} else {
+			Yii::app()->user->setFlash('error', 'Có lỗi khi cập nhật đơn vị.');
+		}
+
+		$this->redirect(array('view', 'id' => $id));
 	}
 
 	public function actionCreate()

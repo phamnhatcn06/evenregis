@@ -107,6 +107,20 @@ class ApiEndpoints
     const EVENT_CONTENT_UPDATE = '/api/event-contents/update/{id}';
     const EVENT_CONTENT_DESTROY = '/api/event-contents/destroy/{id}';
 
+    // Event Unit
+    const EVENT_UNIT_LIST = '/api/event-units';
+    const EVENT_UNIT_STORE = '/api/event-units/store';
+    const EVENT_UNIT_DETAIL = '/api/event-units/detail/{id}';
+    const EVENT_UNIT_UPDATE = '/api/event-units/update/{id}';
+    const EVENT_UNIT_DESTROY = '/api/event-units/destroy/{id}';
+
+    // Sport
+    const SPORT_LIST = '/api/sports';
+    const SPORT_STORE = '/api/sports/store';
+    const SPORT_DETAIL = '/api/sports/detail/{id}';
+    const SPORT_UPDATE = '/api/sports/update/{id}';
+    const SPORT_DESTROY = '/api/sports/destroy/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;

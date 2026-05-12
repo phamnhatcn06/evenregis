@@ -2342,6 +2342,7 @@ textarea.form-control-lg {
 .form-select[size]:not([size="1"]) {
   padding-right: 1rem;
   background-image: none;
+  border: 1px solid #ccc;
 }
 
 .form-select:disabled {
@@ -12225,6 +12226,7 @@ fieldset:disabled .btn {
 .card .card-header {
   margin-bottom: 0;
   border: 0;
+  border-bottom: 1px solid #ccc;
 }
 
 .card .card-header .header-title .card-title {

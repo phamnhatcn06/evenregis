@@ -561,3 +561,15 @@ body.uikit .btn-download {
 .top-1 {
   top: 1rem;
 }
+
+/* Form input text color - darker */
+.form-control,
+.form-control:focus,
+.form-select,
+.form-select:focus {
+  color: #232D42;
+}
+
+.form-control::placeholder {
+  color: #8a92a6;
+}

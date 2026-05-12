@@ -2871,3 +2871,339 @@ Phase 4: Reports + Polish + Deploy
 ### Timeline
 
 **~41 ngày (~8 tuần)** cho full implementation.
+
+---
+
+## 14. Module Liên Quân & Đăng Ký Chi Tiết (Cập nhật 2026-05-12)
+
+### 14.1 Tổng quan
+
+Mở rộng module đăng ký với 2 tính năng chính:
+1. **Liên quân (Alliance)**: Cho phép 2 đơn vị ghép chung thành viên vào đội
+2. **Đăng ký chi tiết**: Hỗ trợ 2 cách đăng ký (số lượng đội / danh sách cụ thể)
+
+### 14.2 User Stories
+
+#### Epic: Đăng ký nội dung tham gia
+
+**US-REG-01: Chọn nội dung tham gia**
+- **As a** Đại diện đơn vị
+- **I want to** chọn danh sách các bộ môn (thể thao, nghiệp vụ, văn nghệ, miss) đơn vị sẽ tham gia
+- **So that** BTC biết đơn vị tham gia những hoạt động nào
+
+**Acceptance Criteria:**
+- [ ] Hiển thị danh sách nội dung từ `event_contents` + `event_sports` + `event_competitions`
+- [ ] Đơn vị tick chọn các môn muốn tham gia
+- [ ] Lưu vào `registration_details`
+
+---
+
+**US-REG-02: Đăng ký theo số lượng đội**
+- **As a** Đại diện đơn vị
+- **I want to** đăng ký số đội tham gia mỗi môn thể thao (VD: 2 đội bóng đá nam)
+- **So that** BTC biết cần chuẩn bị bao nhiêu đội từ đơn vị
+
+**Acceptance Criteria:**
+- [ ] Với môn thể thao team-based, nhập số lượng đội (quantity)
+- [ ] Không cần khai tên từng người ở bước này
+- [ ] Sau khi đăng ký được duyệt, BTC hoặc đơn vị mới tạo đội chi tiết
+
+---
+
+**US-REG-03: Đăng ký danh sách chi tiết**
+- **As a** Đại diện đơn vị
+- **I want to** đăng ký danh sách cụ thể ai tham gia thi nghiệp vụ
+- **So that** BTC có danh sách chính xác để cấp số báo danh
+
+**Acceptance Criteria:**
+- [ ] Với nội dung cần danh sách chi tiết (competition, miss), phải chọn attendee cụ thể
+- [ ] Giới hạn số lượng theo `max_per_org` của từng cuộc thi
+- [ ] Lưu vào bảng `registration_detail_attendees`
+
+---
+
+#### Epic: Liên quân
+
+**US-ALLY-01: Gửi yêu cầu liên quân**
+- **As a** Đại diện đơn vị A
+- **I want to** gửi yêu cầu liên quân tới đơn vị B
+- **So that** hai đơn vị có thể ghép chung thành viên vào đội
+
+**Acceptance Criteria:**
+- [ ] Mỗi đơn vị chỉ được liên quân với TỐI ĐA 1 đơn vị khác
+- [ ] Nếu đã có liên quân active, không cho gửi thêm
+- [ ] Ghi nhận request vào bảng `alliance_requests`
+
+---
+
+**US-ALLY-02: Phê duyệt yêu cầu liên quân**
+- **As a** Đại diện đơn vị B (hoặc Admin)
+- **I want to** chấp nhận/từ chối yêu cầu liên quân
+- **So that** xác nhận quan hệ liên quân giữa 2 đơn vị
+
+**Acceptance Criteria:**
+- [ ] Hiển thị danh sách request pending
+- [ ] Approve → tạo record `alliances` với status=active
+- [ ] Reject → cập nhật request status=rejected
+
+---
+
+**US-ALLY-03: Tạo đội với thành viên liên quân**
+- **As a** Đại diện đơn vị
+- **I want to** chọn thành viên từ đơn vị liên quân khi tạo đội
+- **So that** đội có thể bao gồm nhân viên từ cả 2 đơn vị
+
+**Acceptance Criteria:**
+- [ ] Kiểm tra đơn vị có alliance active không
+- [ ] Nếu có, danh sách chọn attendee bao gồm cả 2 đơn vị
+- [ ] Nếu không, chỉ hiển thị attendee đơn vị mình
+
+---
+
+### 14.3 Database Schema - Tables mới
+
+#### Bảng `alliance_requests` (Yêu cầu liên quân)
+
+```sql
+CREATE TABLE `alliance_requests` (
+  `id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id`            INT UNSIGNED NOT NULL,
+  `requester_org_id`    INT UNSIGNED NOT NULL COMMENT 'Đơn vị gửi yêu cầu',
+  `target_org_id`       INT UNSIGNED NOT NULL COMMENT 'Đơn vị nhận yêu cầu',
+  `status`              ENUM('pending','approved','rejected','cancelled') NOT NULL DEFAULT 'pending',
+  `requested_by`        INT UNSIGNED NOT NULL COMMENT 'unit_accounts.id',
+  `requested_at`        INT UNSIGNED,
+  `reviewed_by`         INT UNSIGNED COMMENT 'unit_accounts.id hoặc users.id',
+  `reviewed_at`         INT UNSIGNED,
+  `rejection_reason`    TEXT,
+  `note`                TEXT,
+  `created_at`          INT UNSIGNED,
+  `updated_at`          INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_alliance_request` (`event_id`, `requester_org_id`, `target_org_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Yêu cầu liên quân giữa các đơn vị';
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | INT UNSIGNED | Primary key |
+| `event_id` | INT UNSIGNED | FK → events |
+| `requester_org_id` | INT UNSIGNED | Đơn vị gửi yêu cầu |
+| `target_org_id` | INT UNSIGNED | Đơn vị nhận yêu cầu |
+| `status` | ENUM | pending/approved/rejected/cancelled |
+| `requested_by` | INT UNSIGNED | Người gửi (unit_accounts.id) |
+| `reviewed_by` | INT UNSIGNED | Người duyệt |
+| `rejection_reason` | TEXT | Lý do từ chối |
+
+---
+
+#### Bảng `alliances` (Quan hệ liên quân đã xác nhận)
+
+```sql
+CREATE TABLE `alliances` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id`        INT UNSIGNED NOT NULL,
+  `org_a_id`        INT UNSIGNED NOT NULL COMMENT 'Đơn vị A (requester)',
+  `org_b_id`        INT UNSIGNED NOT NULL COMMENT 'Đơn vị B (target)',
+  `request_id`      INT UNSIGNED COMMENT 'alliance_requests.id gốc',
+  `status`          ENUM('active','dissolved') NOT NULL DEFAULT 'active',
+  `confirmed_at`    INT UNSIGNED,
+  `dissolved_at`    INT UNSIGNED,
+  `dissolved_by`    INT UNSIGNED,
+  `dissolved_reason` TEXT,
+  `note`            TEXT,
+  `created_at`      INT UNSIGNED,
+  `updated_at`      INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_alliance_event_orgs` (`event_id`, `org_a_id`, `org_b_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Liên quân đã xác nhận';
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | INT UNSIGNED | Primary key |
+| `event_id` | INT UNSIGNED | FK → events |
+| `org_a_id` | INT UNSIGNED | Đơn vị A |
+| `org_b_id` | INT UNSIGNED | Đơn vị B |
+| `request_id` | INT UNSIGNED | FK → alliance_requests |
+| `status` | ENUM | active/dissolved |
+| `dissolved_reason` | TEXT | Lý do hủy liên quân |
+
+**Constraint quan trọng:** Mỗi đơn vị chỉ có 1 liên quân active per event.
+
+---
+
+#### Bảng `registration_detail_attendees` (Chi tiết người đăng ký)
+
+```sql
+CREATE TABLE `registration_detail_attendees` (
+  `id`                      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `registration_detail_id`  INT UNSIGNED NOT NULL,
+  `attendee_id`             INT UNSIGNED NOT NULL,
+  `status`                  ENUM('pending','confirmed','cancelled') NOT NULL DEFAULT 'pending',
+  `note`                    TEXT,
+  `created_at`              INT UNSIGNED,
+  `updated_at`              INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_rd_attendee` (`registration_detail_id`, `attendee_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Chi tiết người tham gia khi đăng ký detailed';
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `registration_detail_id` | INT UNSIGNED | FK → registration_details |
+| `attendee_id` | INT UNSIGNED | FK → attendees |
+| `status` | ENUM | pending/confirmed/cancelled |
+
+---
+
+#### Sửa bảng `registration_details`
+
+Thêm cột `registration_type`:
+
+```sql
+ALTER TABLE `registration_details` ADD COLUMN 
+  `registration_type` ENUM('quantity','detailed') NOT NULL DEFAULT 'quantity' 
+  COMMENT 'quantity=số lượng đội, detailed=danh sách cụ thể';
+```
+
+| Type | Khi nào dùng |
+|------|--------------|
+| `quantity` | Thể thao team-based (đăng ký số đội) |
+| `detailed` | Thi nghiệp vụ, Miss (đăng ký danh sách cụ thể) |
+
+---
+
+### 14.4 Entity Relationship (Mở rộng)
+
+```
+organizations (1) ─── (N) alliance_requests (N) ─── (1) organizations
+                              │
+                              │ approved
+                              ▼
+                         alliances
+                    (org_a_id, org_b_id)
+                              │
+                              │ enables
+                              ▼
+                    ┌─────────────────────┐
+                    │ sport_team_members  │
+                    │ can select from     │
+                    │ both orgs           │
+                    └─────────────────────┘
+
+registration_details ─── (N) registration_detail_attendees ─── (1) attendees
+  (registration_type)
+```
+
+---
+
+### 14.5 Wireframe Flow đăng ký
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 1: Chọn nội dung tham gia                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  ☑ Thể thao                                                     │
+│     ☑ Bóng đá nam    [Số đội: 2 ▼]   ← registration_type=quantity│
+│     ☑ Cầu lông đôi   [Số đội: 1 ▼]                              │
+│     ☐ Kéo co                                                    │
+│                                                                 │
+│  ☑ Thi nghiệp vụ                                                │
+│     ☑ Thi Lễ tân     [Chọn người ▼]  ← registration_type=detailed│
+│        ├─ Nguyễn Văn A                                          │
+│        └─ Trần Thị B                                            │
+│                                                                 │
+│  ☑ Miss                                                         │
+│     [Chọn thí sinh ▼]                ← registration_type=detailed│
+│        └─ Lê Thị C                                              │
+│                                                                 │
+│  ☐ Văn nghệ                                                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 2: Liên quân (Optional)                                   │
+├─────────────────────────────────────────────────────────────────┤
+│  Trạng thái liên quân: [Chưa có liên quân]                      │
+│                                                                 │
+│  [+ Gửi yêu cầu liên quân]                                      │
+│     Chọn đơn vị: [Khách sạn ABC      ▼]                         │
+│     Ghi chú:     [_____________________]                        │
+│                              [Gửi yêu cầu]                      │
+│                                                                 │
+│  ── HOẶC ──                                                     │
+│                                                                 │
+│  Yêu cầu đang chờ duyệt:                                        │
+│  ┌──────────────────────────────────────────┐                   │
+│  │ KS XYZ gửi yêu cầu liên quân             │                   │
+│  │ Ngày gửi: 10/05/2026                     │                   │
+│  │         [Chấp nhận]  [Từ chối]           │                   │
+│  └──────────────────────────────────────────┘                   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 3: Tạo đội (sau khi đăng ký được duyệt)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  Môn: Bóng đá nam | Đội 1 / 2                                   │
+│                                                                 │
+│  Tên đội: [Đội Bóng Sông Hồng_________]                         │
+│                                                                 │
+│  Chọn thành viên:                                               │
+│  ┌────────────────────────────────────────────────────┐         │
+│  │ 📍 Đơn vị: KS Mường Thanh Hà Nội                   │         │
+│  │   ☑ Nguyễn Văn A (Tiền đạo)                        │         │
+│  │   ☑ Trần Văn B (Thủ môn)                           │         │
+│  │   ☐ Lê Văn C                                       │         │
+│  │                                                    │         │
+│  │ 📍 Đơn vị liên quân: KS Mường Thanh Nha Trang      │  ← NEW  │
+│  │   ☑ Phạm Văn D (Hậu vệ)                            │         │
+│  │   ☐ Hoàng Văn E                                    │         │
+│  └────────────────────────────────────────────────────┘         │
+│                                                                 │
+│                              [Lưu đội]                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 14.6 Edge Cases
+
+#### Liên quân
+
+| Case | Xử lý |
+|------|-------|
+| Đơn vị A gửi request cho B, B đã có liên quân với C | Reject request, thông báo "Đơn vị B đã có liên quân" |
+| Đơn vị A gửi request cho B, A đã có liên quân với C | Không cho gửi, thông báo "Đơn vị đã có liên quân" |
+| A và B liên quân, sau đó B muốn hủy | Cần confirm từ cả 2 bên hoặc Admin quyết định |
+| A gửi request cho B, B gửi request cho A cùng lúc | Accept 1 trong 2, auto-cancel cái còn lại |
+| Liên quân sau khi đã tạo đội | Không ảnh hưởng đội đã tạo, chỉ áp dụng cho đội mới |
+| Hủy liên quân khi đã có đội ghép | Giữ nguyên đội đã tạo, không cho sửa thành viên từ đơn vị kia |
+
+#### Đăng ký
+
+| Case | Xử lý |
+|------|-------|
+| Đăng ký quantity nhưng event đòi detailed | Báo lỗi validation |
+| Số người đăng ký vượt max_per_org | Không cho thêm, hiển thị warning |
+| Attendee chưa được approve | Không hiển thị trong danh sách chọn |
+| Sửa đăng ký sau khi submitted | Chỉ Admin mới sửa được, đơn vị không được sửa |
+| Đăng ký cùng người cho nhiều cuộc thi conflict giờ | Warning nhưng vẫn cho đăng ký (BTC sắp xếp) |
+
+#### Tạo đội
+
+| Case | Xử lý |
+|------|-------|
+| Attendee đã có trong đội khác cùng môn | Không cho thêm, thông báo "Đã có trong đội X" |
+| Số thành viên vượt quá limit môn | Validation error |
+| Thành viên từ đơn vị không liên quân | Không hiển thị trong danh sách chọn |
+
+---
+
+### 14.7 Business Rules tóm tắt
+
+1. **Mỗi đơn vị tối đa 1 liên quân active** per event
+2. **Đăng ký quantity**: chỉ nhập số đội, tạo đội chi tiết sau khi approved
+3. **Đăng ký detailed**: phải chọn attendee cụ thể ngay khi đăng ký
+4. **Liên quân cho phép chọn attendee từ cả 2 đơn vị** khi tạo đội
+5. **Mặc định**: manager đơn vị nào chỉ được chọn nhân viên đơn vị đó
+6. **Sau khi hủy liên quân**: đội đã tạo giữ nguyên, không cho sửa thêm người từ đơn vị kia

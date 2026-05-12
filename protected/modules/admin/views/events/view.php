@@ -101,56 +101,140 @@ $perColumn = ceil($totalAttrs / $columns);
         </div>
     </div>
 </div>
+<div class="row mt-3">
+    <div class="col-md-6 d-flex">
+        <div class="card flex-fill">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fa fa-building me-2"></i>Đơn vị tham gia</h5>
+            </div>
+            <div class="card-body">
+                <?php
+                $availableProperties = array();
+                $selectedProperties = array();
+                $eventUnitMap = array();
 
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="fa fa-list-alt me-2"></i>Nội dung sự kiện</h5>
-    </div>
-    <div class="card-body pb-2">
-        <?php
-        $existingContentIds = array();
-        if (!empty($eventContents)) {
-            foreach ($eventContents as $ec) {
-                $existingContentIds[] = $ec['content_id'];
-            }
-        }
-        $availableContents = array();
-        foreach ($allContents as $c) {
-            $cId = isset($c['id']) ? $c['id'] : (isset($c->id) ? $c->id : null);
-            if ($cId && !in_array($cId, $existingContentIds)) {
-                $availableContents[$cId] = isset($c['name']) ? $c['name'] : (isset($c->name) ? $c->name : '');
-            }
-        }
-        ?>
-        <?php if (!empty($availableContents)): ?>
-        <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/addContent', array('id' => $model->id)); ?>" class="d-flex align-items-center gap-2 mb-3">
-            <?php echo CHtml::dropDownList('content_id', '', $availableContents, array('class' => 'form-select form-select-sm', 'style' => 'width:250px;', 'prompt' => '-- Chọn nội dung --')); ?>
-            <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-plus me-1"></i>Thêm</button>
-        </form>
-        <?php endif; ?>
-    <div class="card-body">
-        <?php if (!empty($eventContents)): ?>
-        <div class="row">
-            <?php foreach ($eventContents as $ec): ?>
-            <div class="col-md-4 mb-3">
-                <div class="card h-100 border">
-                    <div class="card-header py-2 d-flex justify-content-between align-items-center bg-light">
-                        <span class="fw-semibold"><?php echo CHtml::encode(isset($ec['content']['name']) ? $ec['content']['name'] : ''); ?></span>
-                        <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeContent', array('id' => $model->id, 'contentId' => $ec['id'])); ?>" style="display:inline;" id="form-remove-<?php echo $ec['id']; ?>">
-                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-<?php echo $ec['id']; ?>')">
-                                <i class="fa fa-times"></i>
+                foreach ($allProperties as $p) {
+                    $pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
+                    $pName = isset($p['name']) ? $p['name'] : (isset($p->name) ? $p->name : '');
+                    if ($pId) {
+                        $availableProperties[$pId] = $pName;
+                    }
+                }
+
+                if (!empty($eventUnits)) {
+                    foreach ($eventUnits as $eu) {
+                        $pId = $eu['property_id'];
+                        $eventUnitMap[$pId] = $eu['id'];
+                        if (isset($availableProperties[$pId])) {
+                            $selectedProperties[$pId] = $availableProperties[$pId];
+                            unset($availableProperties[$pId]);
+                        }
+                    }
+                }
+                ?>
+                <form id="form-units" method="post" action="<?php echo Yii::app()->createUrl('admin/events/syncUnits', array('id' => $model->id)); ?>">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold">Đơn vị chưa chọn</label>
+                            <select id="available-units" class="form-select" multiple size="10">
+                                <?php foreach ($availableProperties as $id => $name): ?>
+                                    <option value="<?php echo $id; ?>"><?php echo CHtml::encode($name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex flex-column justify-content-center align-items-center gap-2">
+                            <button type="button" class="btn btn-outline-primary" style="width:30px;height:30px;padding:0;" onclick="moveSelected('available-units', 'selected-units')" title="Thêm">
+                                <i class="fa fa-angle-right"></i>
                             </button>
-                        </form>
+                            <button type="button" class="btn btn-outline-primary" style="width:30px;height:30px;padding:0;" onclick="moveAll('available-units', 'selected-units')" title="Thêm tất cả">
+                                <i class="fa fa-angle-double-right"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" style="width:30px;height:30px;padding:0;" onclick="moveSelected('selected-units', 'available-units')" title="Xóa">
+                                <i class="fa fa-angle-left"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" style="width:30px;height:30px;padding:0;" onclick="moveAll('selected-units', 'available-units')" title="Xóa tất cả">
+                                <i class="fa fa-angle-double-left"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold">Đơn vị đã chọn <span class="badge bg-primary" id="selected-count"><?php echo count($selectedProperties); ?></span></label>
+                            <select id="selected-units" name="property_ids[]" class="form-select" multiple size="10">
+                                <?php foreach ($selectedProperties as $id => $name): ?>
+                                    <option value="<?php echo $id; ?>"><?php echo CHtml::encode($name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
-                    <div class="card-body p-2">
-                        <small class="text-muted">Chưa có chi tiết</small>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary btn-sm" onclick="selectAllSelected()">
+                            <i class="fa fa-save me-1"></i>Lưu thay đổi
+                        </button>
                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 d-flex">
+        <div class="card flex-fill">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fa fa-list-alt me-2"></i>Nội dung sự kiện</h5>
+            </div>
+            <div class="card-body pb-2">
+                <?php
+                $existingContentIds = array();
+                if (!empty($eventContents)) {
+                    foreach ($eventContents as $ec) {
+                        $existingContentIds[] = $ec['content_id'];
+                    }
+                }
+                $availableContents = array();
+                foreach ($allContents as $c) {
+                    $cId = isset($c['id']) ? $c['id'] : (isset($c->id) ? $c->id : null);
+                    if ($cId && !in_array($cId, $existingContentIds)) {
+                        $availableContents[$cId] = isset($c['name']) ? $c['name'] : (isset($c->name) ? $c->name : '');
+                    }
+                }
+                ?>
+                <?php if (!empty($availableContents)): ?>
+                    <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/addContent', array('id' => $model->id)); ?>" class="d-flex align-items-center gap-2 mb-3">
+                        <?php echo CHtml::dropDownList('content_id', '', $availableContents, array('class' => 'form-select form-select-sm', 'style' => 'width:250px;', 'prompt' => '-- Chọn nội dung --')); ?>
+                        <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-plus me-1"></i>Thêm</button>
+                    </form>
+                <?php endif; ?>
+                <div class="card-body">
+                    <?php if (!empty($eventContents)): ?>
+                        <div class="row">
+                            <?php foreach ($eventContents as $ec):
+                            ?>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 border">
+                                        <div class="card-header py-2 d-flex justify-content-between align-items-center bg-light">
+                                            <span class="fw-semibold"><?php echo CHtml::encode(isset($ec['content_name']) ? $ec['content_name'] : ''); ?></span>
+                                            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeContent', array('id' => $model->id, 'contentId' => $ec['id'])); ?>" style="display:inline;" id="form-remove-<?php echo $ec['id']; ?>">
+                                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-<?php echo $ec['id']; ?>')">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="card-body p-2">
+                                            <small class="text-muted">Chưa có chi tiết</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted mb-0">Chưa có nội dung nào được thêm.</p>
+                    <?php endif; ?>
                 </div>
             </div>
-            <?php endforeach; ?>
         </div>
-        <?php else: ?>
-        <p class="text-muted mb-0">Chưa có nội dung nào được thêm.</p>
-        <?php endif; ?>
     </div>
 </div>
+
+<?php
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/events-view.js',
+    CClientScript::POS_END
+);
+?>

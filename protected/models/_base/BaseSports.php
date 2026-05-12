@@ -31,40 +31,47 @@
  * @property Sports $parent
  * @property Sports[] $sports
  */
-abstract class BaseSports extends GxActiveRecord {
+abstract class BaseSports extends GxActiveRecord
+{
 
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+	{
 		return 'sports';
 	}
 
-	public static function label($n = 1) {
-		return Yii::t('app', 'Sports|Sports', $n);
+	public static function label($n = 1)
+	{
+		return Yii::t('app', 'Nội dung Thể thao', $n);
 	}
 
-	public static function representingColumn() {
+	public static function representingColumn()
+	{
 		return 'name';
 	}
 
-	public function rules() {
+	public function rules()
+	{
 		return array(
 			array('name', 'required'),
-			array('is_active, sort_order', 'numerical', 'integerOnly'=>true),
-			array('code', 'length', 'max'=>50),
-			array('name', 'length', 'max'=>100),
-			array('parent_id', 'length', 'max'=>20),
-			array('type', 'length', 'max'=>10),
-			array('document', 'length', 'max'=>500),
+			array('is_active, sort_order', 'numerical', 'integerOnly' => true),
+			array('code', 'length', 'max' => 50),
+			array('name', 'length', 'max' => 100),
+			array('parent_id', 'length', 'max' => 20),
+			array('type', 'length', 'max' => 10),
+			array('document', 'length', 'max' => 500),
 			array('description, created_at, updated_at, deleted_at', 'safe'),
 			array('code, parent_id, type, description, document, is_active, sort_order, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, code, name, parent_id, type, description, document, is_active, sort_order, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
+			array('id, code, name, parent_id, type, description, document, is_active, sort_order, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+	{
 		return array(
 			'eventSports' => array(self::HAS_MANY, 'EventSports', 'sport_id'),
 			'registrationDetails' => array(self::HAS_MANY, 'RegistrationDetails', 'sport_id'),
@@ -77,17 +84,18 @@ abstract class BaseSports extends GxActiveRecord {
 		);
 	}
 
-	public function pivotModels() {
-		return array(
-		);
+	public function pivotModels()
+	{
+		return array();
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+	{
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'code' => Yii::t('app', 'Code'),
 			'name' => Yii::t('app', 'Name'),
-			'parent_id' => null,
+			'parent_id' =>  Yii::t('app', 'Parent'),
 			'type' => Yii::t('app', 'Type'),
 			'description' => Yii::t('app', 'Description'),
 			'document' => Yii::t('app', 'Document'),
@@ -107,7 +115,8 @@ abstract class BaseSports extends GxActiveRecord {
 		);
 	}
 
-	public function search() {
+	public function search()
+	{
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);

@@ -23,6 +23,7 @@ $appName = Yii::app()->name;
 
     <!-- Hope UI CSS -->
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/core/libs.min.css" />
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/font-awesome/font-awesome.min.css" />
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/hope-ui-thangvc.css?v=2.0.0" />
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/custom.min.css?v=2.0.0" />
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/dark.min.css" />

@@ -22,10 +22,30 @@ Hệ thống quản lý sự kiện đại hội (~600 người tham dự) sử 
 | PHP Version | 7.4+ |
 | Database | MySQL (InnoDB, utf8mb4) |
 | UI Theme | Hope UI (Bootstrap 5) |
+| Icons | Font Awesome 4.7 (local) |
 | Authentication | JWT từ Portal SSO |
 | QR Code | php-qrcode extension |
 | Excel Export | PHPExcel |
 | Email | yii-mail (SwiftMailer) |
+
+### Asset Rules
+
+- **KHÔNG sử dụng CDN** cho CSS/JS libraries. Tải file về local và đặt trong `themes/hope-ui/assets/`
+- Font Awesome 4.7: `themes/hope-ui/assets/css/font-awesome/font-awesome.min.css`
+- Fonts: `themes/hope-ui/assets/fonts/`
+
+### JavaScript Rules
+
+- **KHÔNG viết inline JS** trong file view (không dùng `<script>` tag trực tiếp)
+- Tạo file JS riêng cho từng page trong `themes/hope-ui/assets/js/pages/`
+- Đặt tên file theo format: `{controller}-{action}.js` (vd: `events-view.js`)
+- Register JS bằng Yii:
+```php
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/events-view.js',
+    CClientScript::POS_END
+);
+```
 
 ---
 
@@ -482,6 +502,34 @@ $dataProvider = new ApiDataProvider('/api/events', array(...));
 // ✅ ĐÚNG — Luôn gọi qua Model
 $model = Events::fetchFromApi($id);
 $dataProvider = Events::getApiDataProvider($params);
+```
+
+### ❌ KHÔNG được làm trong View
+
+**QUAN TRỌNG**: View chỉ hiển thị dữ liệu, **KHÔNG được gọi Model** để lấy dữ liệu. Tất cả dữ liệu cần thiết phải được truyền từ Controller qua `render()`.
+
+```php
+// ❌ SAI — Gọi Model trong View để lấy dữ liệu
+// protected/modules/admin/views/sports/_form.php
+$sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
+
+// ❌ SAI — Query trực tiếp trong View
+$categories = Categories::model()->findAll();
+
+// ✅ ĐÚNG — Controller truyền dữ liệu qua render()
+// Controller:
+$parentSports = Sports::getActiveList();
+$this->render('_form', array(
+    'model' => $model,
+    'parentSports' => $parentSports,
+));
+
+// View:
+echo $form->dropDownListGroup($model, 'parent_id', array(
+    'widgetOptions' => array(
+        'data' => $parentSports,
+    )
+));
 ```
 
 ---
