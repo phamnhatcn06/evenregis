@@ -206,7 +206,7 @@ $perColumn = ceil($totalAttrs / $columns);
                         <div class="row">
                             <?php foreach ($eventContents as $ec):
                             ?>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-4 mb-3 event-content">
                                     <div class="card h-100 border">
                                         <div class="card-header py-2 d-flex justify-content-between align-items-center bg-light">
                                             <span class="fw-semibold"><?php echo CHtml::encode(isset($ec['content_name']) ? $ec['content_name'] : ''); ?></span>
@@ -216,7 +216,7 @@ $perColumn = ceil($totalAttrs / $columns);
                                                 </button>
                                             </form>
                                         </div>
-                                        <div class="card-body p-2">
+                                        <div class="card-body p-2 content-detail">
                                             <small class="text-muted">Chưa có chi tiết</small>
                                         </div>
                                     </div>

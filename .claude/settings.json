@@ -10,5 +10,18 @@
   "rules_dir": ".claude/rules",
   "commands_dir": ".claude/commands",
   "skills_dir": ".claude/skills",
-  "agents_dir": ".claude/agents"
+  "agents_dir": ".claude/agents",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git add -A && git commit -m \"Auto-commit: $(date +%Y-%m-%d_%H:%M:%S)\" --no-verify || true"
+          }
+        ]
+      }
+    ]
+  }
 }

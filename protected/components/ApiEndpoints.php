@@ -121,6 +121,13 @@ class ApiEndpoints
     const SPORT_UPDATE = '/api/sports/update/{id}';
     const SPORT_DESTROY = '/api/sports/destroy/{id}';
 
+    // Event Sport
+    const EVENT_SPORT_LIST = '/api/event-sports';
+    const EVENT_SPORT_STORE = '/api/event-sports/store';
+    const EVENT_SPORT_DETAIL = '/api/event-sports/detail/{id}';
+    const EVENT_SPORT_UPDATE = '/api/event-sports/update/{id}';
+    const EVENT_SPORT_DESTROY = '/api/event-sports/destroy/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;

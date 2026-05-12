@@ -11,6 +11,16 @@
     <?php echo $form->errorSummary($model); ?>
 
     <?php
+    echo $form->textFieldGroup($model, 'code', array(
+        'maxlength' => 255,
+        'widgetOptions' => array(
+            'htmlOptions' => array(
+                'class' => 'input w-full border mt-2'
+            )
+        )
+    ));
+    ?>
+    <?php
     echo $form->textFieldGroup($model, 'name', array(
         'maxlength' => 255,
         'widgetOptions' => array(
