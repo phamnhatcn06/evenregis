@@ -209,11 +209,15 @@ $perColumn = ceil($totalAttrs / $columns);
                         $existingSportIds[$es['sport_id']] = $es;
                     }
                 }
-                $availableSports = array();
-                foreach ($allSports as $s) {
+                $sportsItems = isset($sportsTreeData['items']) ? $sportsTreeData['items'] : array();
+                $levelMap = isset($sportsTreeData['levelMap']) ? $sportsTreeData['levelMap'] : array();
+                $hasAvailableSports = false;
+                foreach ($sportsItems as $s) {
                     $sId = isset($s['id']) ? $s['id'] : (isset($s->id) ? $s->id : null);
-                    if ($sId && !isset($existingSportIds[$sId])) {
-                        $availableSports[$sId] = isset($s['name']) ? $s['name'] : (isset($s->name) ? $s->name : '');
+                    $level = isset($levelMap[$sId]) ? $levelMap[$sId] : 0;
+                    if ($level > 0 && !isset($existingSportIds[$sId])) {
+                        $hasAvailableSports = true;
+                        break;
                     }
                 }
                 ?>
