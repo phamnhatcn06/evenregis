@@ -195,7 +195,8 @@ $perColumn = ceil($totalAttrs / $columns);
                     }
                 }
                 ?>
-                <?php if (!empty($availableContents)): ?>
+                <?php
+                if (!empty($availableContents)): ?>
                     <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/addContent', array('id' => $model->id)); ?>" class="d-flex align-items-center gap-2 mb-3">
                         <?php echo CHtml::dropDownList('content_id', '', $availableContents, array('class' => 'form-select form-select-sm', 'style' => 'width:250px;', 'prompt' => '-- Chọn nội dung --')); ?>
                         <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-plus me-1"></i>Thêm</button>
