@@ -311,7 +311,7 @@ $perColumn = ceil($totalAttrs / $columns);
 <div class="modal fade" id="modalAddSport" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/addSport', array('id' => $model->id)); ?>">
+            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/addSport', array('id' => $model->id)); ?>" id="formAddSport">
                 <div class="modal-header">
                     <h5 class="modal-title">Thêm môn thể thao</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -336,8 +336,11 @@ $perColumn = ceil($totalAttrs / $columns);
                     <small class="text-muted">Giữ Ctrl để chọn nhiều môn</small>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Thêm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCancelSport">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmitSport">
+                        <span class="spinner-border spinner-border-sm d-none me-1" role="status"></span>
+                        <span class="btn-text">Thêm</span>
+                    </button>
                 </div>
             </form>
         </div>
