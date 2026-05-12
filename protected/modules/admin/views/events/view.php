@@ -252,7 +252,7 @@ $perColumn = ceil($totalAttrs / $columns);
                                                     <?php endforeach; ?>
                                                 </ul>
                                             <?php endif; ?>
-                                            <?php if (!empty($availableSports)): ?>
+                                            <?php if ($hasAvailableSports): ?>
                                                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAddSport">
                                                     <i class="fa fa-plus me-1"></i>Thêm môn
                                                 </button>
