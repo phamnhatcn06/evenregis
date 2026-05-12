@@ -216,8 +216,8 @@ $perColumn = ceil($totalAttrs / $columns);
                     }
                 }
                 ?>
-                <div class="row">
-                    <?php if (!empty($eventContents)): ?>
+                <?php if (!empty($eventContents)): ?>
+                    <div class="row">
                         <?php foreach ($eventContents as $ec):
                             $contentCode = isset($ec['content_code']) ? $ec['content_code'] : '';
                         ?>
