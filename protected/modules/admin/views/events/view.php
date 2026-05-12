@@ -284,10 +284,23 @@ $perColumn = ceil($totalAttrs / $columns);
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <?php echo CHtml::dropDownList('sport_id', '', $availableSports, array(
-                        'class' => 'form-select',
-                        'prompt' => '-- Chọn môn thể thao --'
-                    )); ?>
+                    <select name="sport_id" class="form-select">
+                        <option value="">-- Chọn môn thể thao --</option>
+                        <?php foreach ($sportsItems as $s):
+                            $sId = isset($s['id']) ? $s['id'] : (isset($s->id) ? $s->id : null);
+                            $sName = isset($s['name']) ? $s['name'] : (isset($s->name) ? $s->name : '');
+                            $level = isset($levelMap[$sId]) ? $levelMap[$sId] : 0;
+                            $isParent = ($level === 0);
+                            $isSelected = isset($existingSportIds[$sId]);
+                            $prefix = $level > 0 ? str_repeat('---', $level) . ' ' : '';
+                        ?>
+                            <?php if ($isParent): ?>
+                                <option value="" disabled style="font-weight:bold;background:#f0f0f0;"><?php echo CHtml::encode($sName); ?></option>
+                            <?php elseif (!$isSelected): ?>
+                                <option value="<?php echo $sId; ?>"><?php echo CHtml::encode($prefix . $sName); ?></option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
