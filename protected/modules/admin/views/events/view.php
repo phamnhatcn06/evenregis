@@ -269,6 +269,30 @@ $perColumn = ceil($totalAttrs / $columns);
 </div>
 </div>
 
+<!-- Modal Add Sport -->
+<div class="modal fade" id="modalAddSport" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/addSport', array('id' => $model->id)); ?>">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm môn thể thao</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <?php echo CHtml::dropDownList('sport_id', '', $availableSports, array(
+                        'class' => 'form-select',
+                        'prompt' => '-- Chọn môn thể thao --'
+                    )); ?>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <?php
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/pages/events-view.js',
