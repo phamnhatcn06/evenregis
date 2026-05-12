@@ -269,8 +269,10 @@ $perColumn = ceil($totalAttrs / $columns);
                                                     <?php foreach ($sportsByParent as $parentId => $sports):
                                                         if ($parentId && isset($parentNames[$parentId]) && $parentNames[$parentId]):
                                                     ?>
-                                                        <li class="mb-1">
-                                                            <strong><i class="fa fa-folder-open-o me-1"></i><?php echo CHtml::encode($parentNames[$parentId]); ?></strong>
+                                                        <li class="mb-2">
+                                                            <div class="px-2 py-1 rounded" style="background:#e9ecef;">
+                                                                <strong><i class="fa fa-folder-open-o me-1"></i><?php echo CHtml::encode($parentNames[$parentId]); ?></strong>
+                                                            </div>
                                                             <ul class="list-unstyled ms-3">
                                                                 <?php foreach ($sports as $es): ?>
                                                                     <li class="d-flex justify-content-between align-items-center mb-1">
