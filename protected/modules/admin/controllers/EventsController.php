@@ -20,6 +20,8 @@ class EventsController extends AdminController
 		$allContents = Contents::getApiDataProvider(array(), 100)->getData();
 		$eventUnits = EventUnits::getByEventId($id);
 		$allProperties = Properties::getApiDataProvider(array(), 100)->getData();
+		$eventSports = EventSports::getByEventId($id);
+		$allSports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
 
 		$this->render('view', array(
 			'model' => $model,
@@ -27,6 +29,8 @@ class EventsController extends AdminController
 			'allContents' => $allContents,
 			'eventUnits' => $eventUnits,
 			'allProperties' => $allProperties,
+			'eventSports' => $eventSports,
+			'allSports' => $allSports,
 		));
 	}
 

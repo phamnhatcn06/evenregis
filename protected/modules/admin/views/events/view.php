@@ -179,7 +179,7 @@ $perColumn = ceil($totalAttrs / $columns);
             <div class="card-header">
                 <h5 class="mb-0"><i class="fa fa-list-alt me-2"></i>Nội dung sự kiện</h5>
             </div>
-            <div class="card-body pb-2">
+            <div class="card-body">
                 <?php
                 $existingContentIds = array();
                 if (!empty($eventContents)) {
