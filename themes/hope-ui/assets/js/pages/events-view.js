@@ -41,3 +41,20 @@ function selectAllSelected() {
         select.options[i].selected = true;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    var formAddSport = document.getElementById('formAddSport');
+    if (formAddSport) {
+        formAddSport.addEventListener('submit', function() {
+            var btnSubmit = document.getElementById('btnSubmitSport');
+            var btnCancel = document.getElementById('btnCancelSport');
+            var spinner = btnSubmit.querySelector('.spinner-border');
+            var btnText = btnSubmit.querySelector('.btn-text');
+
+            spinner.classList.remove('d-none');
+            btnText.textContent = 'Đang xử lý...';
+            btnSubmit.disabled = true;
+            btnCancel.disabled = true;
+        });
+    }
+});
