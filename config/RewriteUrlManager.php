@@ -1,0 +1,47 @@
+<?php
+
+$urlRewrite = array(
+    'danh-muc-tin/<title>_<id:\d+>-<page:\d+>' => 'frontend/news/category',
+    'danh-muc-tin/<title>_<id:\d+>' => 'frontend/news/category',
+    'thu-vien-video/<title>_<id:\d+>-<page:\d+>' => 'frontend/video/index',
+    'thu-vien-video/<title>_<id:\d+>' => 'frontend/video/index',
+    'thu-vien-video' => 'frontend/video/index',
+    'thu-vien-anh/<title>_<id:\d+>-<page:\d+>' => 'frontend/news/photo',
+    'thu-vien-anh/<title>_<id:\d+>' => 'frontend/news/photo',
+    'thu-vien-anh' => 'frontend/news/photo',
+    'tho-bong-da/<title>_<id:\d+>-<page:\d+>' => 'frontend/news/poetics',
+    'tho-bong-da/<title>_<id:\d+>' => 'frontend/news/poetics',
+    'tho-bong-da' => 'frontend/news/poetics',
+    '<controller:\w+>/<id:\d+>' => '<controller>/view',
+    '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
+    '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
+    'tin-bong-da' => 'frontend/news/index',
+    'tin-tuc/<title>_<id:\d+>' => 'frontend/news/detail',
+    'chu-de/<title>_<id:\d+>-<page:\d+>' => 'frontend/news/topic',
+    'chu-de/<title>_<id:\d+>' => 'frontend/news/topic',
+    'tag/<title>_<id:\d+>-<page:\d+>' => 'frontend/news/tag',
+    'tag/<title>_<id:\d+>' => 'frontend/news/tag',
+    'post/<id:\d+>/<title:.*?>' => 'post/view',
+    'posts/<tag:.*?>' => 'post/index',
+
+    'worldcup' => 'frontend/worldcup',
+    'du-lieu-bong-da' => 'frontend/livescore/index',
+    'doi-bong/<team_name>-<team_id:\d+>' => 'frontend/teams/index',
+    'cau-thu/<player_name>-<player_id:\d+>' => 'frontend/players/info',
+    'huan-luyen-vien/<player_name>-<player_id:\d+>' => 'frontend/players/coach',
+    '<competition>/<season_name>-<season_id:\d+>' => 'frontend/comparison/tables',
+    '<competition>/<home>-<away>/<match_id:\d+>' => 'frontend/comparison/matchs',
+    '<competition>/<home>-<away>/<match_id:\d+>' => 'frontend/match/index',
+    '<competition>/<season_name>-<season_id:\d+>' => 'frontend/worldcup/index',
+    'nhan-dinh' => 'frontend/judge/index',
+    '/login' => 'frontend/users/login',
+    // REST patterns
+    array('api/list', 'pattern' => 'api/<model:\w+>', 'verb' => 'GET'),
+    array('api/view', 'pattern' => 'api/<model:\w+>/<id:\d+>', 'verb' => 'GET'),
+    array('api/update', 'pattern' => 'api/<model:\w+>/<id:\d+>', 'verb' => 'PUT'),
+    array('api/delete', 'pattern' => 'api/<model:\w+>/<id:\d+>', 'verb' => 'DELETE'),
+    array('api/create', 'pattern' => 'api/<model:\w+>', 'verb' => 'POST'),
+    // Other controllers
+    '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
+);
+

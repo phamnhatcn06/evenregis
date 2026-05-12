@@ -1,0 +1,2 @@
+* * * * * php /var/www/livescore/app/yiicmd.php test 'datetime'
+0 0 * * * php /var/www/livescore/app/yiicmd.php test 'date'

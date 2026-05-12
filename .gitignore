@@ -1,0 +1,49 @@
+# Git ignore rules
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Claude local settings
+.claude/settings.local.json
+.claude/CLAUDE.local.md
+
+# Yii Framework
+/framework/*
+!/framework/.gitkeep
+/protected/runtime/*
+!/protected/runtime/.gitkeep
+/assets/*
+!/assets/.gitkeep
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+dist/
+build/
+out/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/

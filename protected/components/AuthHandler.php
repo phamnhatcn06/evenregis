@@ -1,0 +1,288 @@
+<?php
+
+/**
+ * AuthHandler - Handle SSO authentication from Portal
+ *
+ * JWT Payload format from Portal:
+ * {
+ *   "sub": "12345",
+ *   "username": "nguyenvana",
+ *   "full_name": "Nguyen Van A",
+ *   "email": "nguyenvana@muongthanh.vn",
+ *   "unit_code": "HN01",
+ *   "permissions": {
+ *     "event": "1 1 1 1",
+ *     "registration": "1 1 1 0",
+ *     ...
+ *   },
+ *   "iat": 1714838400,
+ *   "exp": 1714842000
+ * }
+ */
+class AuthHandler extends CApplicationComponent
+{
+    const SESSION_USER_KEY = 'sso_user';
+    const SESSION_PERMISSIONS_KEY = 'sso_permissions';
+    const SESSION_TOKEN_KEY = 'sso_token';
+    const SESSION_LAST_ACTIVITY_KEY = 'sso_last_activity';
+
+    /**
+     * Handle SSO callback with JWT token
+     * @param string $token JWT token from Portal
+     * @return array|false User data or false on failure
+     */
+    public static function handleCallback($token)
+    {
+        if (empty($token)) {
+            return false;
+        }
+
+        $params = self::getParams();
+        $secret = $params['portal']['jwt_secret'];
+        $algorithm = $params['portal']['jwt_algorithm'];
+
+        require_once Yii::getPathOfAlias('application.extensions.jwt') . '/JWT.php';
+
+        $payload = JWT::decode($token, $secret, $algorithm);
+        if (!$payload) {
+            Yii::log('JWT decode failed', CLogger::LEVEL_WARNING, 'auth');
+            return false;
+        }
+
+        // Create session
+        $userData = self::createSession($payload, $token);
+        return $userData;
+    }
+
+    /**
+     * Create user session from JWT payload
+     */
+    private static function createSession($payload, $token)
+    {
+        $session = Yii::app()->session;
+
+        // Convert to array for easier access with special claim keys
+        $data = (array)$payload;
+
+        // SAML-style claim keys from Portal
+        $claimSid = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid';
+        $claimEmail = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress';
+        $claimName = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name';
+
+        $userData = array(
+            'id' => isset($data[$claimSid]) ? $data[$claimSid] : null,
+            'email' => isset($data[$claimEmail]) ? $data[$claimEmail] : null,
+            'full_name' => isset($data[$claimName]) ? $data[$claimName] : null,
+            'software_id' => isset($data['software_id']) ? $data['software_id'] : null,
+            'exp' => isset($data['exp']) ? $data['exp'] : null,
+        );
+
+        // Decode permissions (encrypted/encoded string from Portal)
+        $permissionsData = isset($data['perm']) ? self::decodePermissions($data['perm']) : array();
+
+        // Extract CRUD permissions (key => "C R U D") and menu permissions (array format)
+        $crudPermissions = array();
+        $menuPermissions = array();
+
+        // Check if permission is "*" (full access)
+        if ($permissionsData === '*' || (is_array($permissionsData) && count($permissionsData) === 1 && reset($permissionsData) === '*')) {
+            $crudPermissions = array('*' => '1 1 1 1');
+        } elseif (is_array($permissionsData)) {
+            foreach ($permissionsData as $item) {
+                if (is_array($item) && isset($item['controller'])) {
+                    // New format: {name, module, controller, action, root}
+                    $menuPermissions[] = $item;
+                    // Also create CRUD entry if action is defined
+                    if (isset($item['action'])) {
+                        $crudPermissions[$item['controller']] = $item['action'];
+                    }
+                } else {
+                    // Old format: key => "C R U D"
+                    // Keep as is
+                }
+            }
+
+            // If no menu permissions extracted, assume old format
+            if (empty($menuPermissions) && !empty($permissionsData)) {
+                $crudPermissions = $permissionsData;
+            }
+        }
+
+        $session[self::SESSION_USER_KEY] = $userData;
+        $session[self::SESSION_PERMISSIONS_KEY] = $crudPermissions;
+        $session['sso_menu_permissions'] = $menuPermissions;
+        $session[self::SESSION_TOKEN_KEY] = $token;
+        $session[self::SESSION_LAST_ACTIVITY_KEY] = time();
+
+        Yii::log('SSO login successful for user: ' . $userData['email'], CLogger::LEVEL_INFO, 'auth');
+
+        return $userData;
+    }
+
+    /**
+     * Check if user is authenticated via SSO
+     * @return bool
+     */
+    public static function isAuthenticated()
+    {
+        $session = Yii::app()->session;
+        $userData = isset($session[self::SESSION_USER_KEY]) ? $session[self::SESSION_USER_KEY] : null;
+
+        if (!$userData) {
+            return false;
+        }
+
+        // Check session timeout
+        $params = self::getParams();
+        $timeout = $params['session']['timeout'];
+        $lastActivity = isset($session[self::SESSION_LAST_ACTIVITY_KEY]) ? $session[self::SESSION_LAST_ACTIVITY_KEY] : 0;
+
+        if (time() - $lastActivity > $timeout) {
+            self::logout();
+            return false;
+        }
+
+        // Check token expiration
+        if (isset($userData['exp']) && $userData['exp'] < time()) {
+            self::logout();
+            return false;
+        }
+
+        // Update last activity
+        $session[self::SESSION_LAST_ACTIVITY_KEY] = time();
+
+        return true;
+    }
+
+    /**
+     * Get current authenticated user data
+     * @return array|null
+     */
+    public static function getUser()
+    {
+        if (!self::isAuthenticated()) {
+            return null;
+        }
+        return Yii::app()->session[self::SESSION_USER_KEY];
+    }
+
+    /**
+     * Get user permissions
+     * @return array
+     */
+    public static function getPermissions()
+    {
+        $session = Yii::app()->session;
+        return isset($session[self::SESSION_PERMISSIONS_KEY]) ? $session[self::SESSION_PERMISSIONS_KEY] : array();
+    }
+
+    /**
+     * Logout - destroy SSO session
+     */
+    public static function logout()
+    {
+        $session = Yii::app()->session;
+        unset($session[self::SESSION_USER_KEY]);
+        unset($session[self::SESSION_PERMISSIONS_KEY]);
+        unset($session[self::SESSION_TOKEN_KEY]);
+        unset($session[self::SESSION_LAST_ACTIVITY_KEY]);
+    }
+
+    /**
+     * Get params from config
+     */
+    private static function getParams()
+    {
+        static $params = null;
+        if ($params === null) {
+            $params = require Yii::getPathOfAlias('application.config') . '/params.php';
+        }
+        return $params;
+    }
+
+    /**
+     * Decode permissions string from Portal (AES encrypted)
+     * @param string $permString Base64 encoded AES encrypted string
+     * @return array
+     */
+    private static function decodePermissions($permString)
+    {
+        $params = self::getParams();
+        $secretKey = $params['portal']['jwt_secret'];
+
+        try {
+            // Derive key using SHA256 (same as C# DeriveKey)
+            $key = hash('sha256', $secretKey, true);
+
+            // Decode base64
+            $encrypted = base64_decode($permString);
+            if ($encrypted === false || strlen($encrypted) < 16) {
+                return array();
+            }
+
+            // Extract IV (first 16 bytes) and ciphertext
+            $iv = substr($encrypted, 0, 16);
+            $ciphertext = substr($encrypted, 16);
+
+            // Decrypt using AES-256-CBC
+            $decrypted = openssl_decrypt($ciphertext, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+            if ($decrypted === false) {
+                Yii::log('Permission decryption failed', CLogger::LEVEL_WARNING, 'auth');
+                return array();
+            }
+
+            // Parse JSON
+            $permissions = json_decode($decrypted, true);
+            if (!is_array($permissions)) {
+                return array();
+            }
+
+            return $permissions;
+        } catch (Exception $e) {
+            Yii::log('Permission decode error: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'auth');
+            return array();
+        }
+    }
+
+    /**
+     * Debug: decrypt and show permissions
+     * @param string $permString
+     * @return array
+     */
+    public static function debugPermissions($permString)
+    {
+        return self::decodePermissions($permString);
+    }
+
+    /**
+     * Debug: decode token without validation to see raw payload
+     * @param string $token
+     * @return array
+     */
+    public static function debugToken($token)
+    {
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) {
+            return array('error' => 'Invalid token format');
+        }
+
+        $header = json_decode(base64_decode(strtr($parts[0], '-_', '+/')), true);
+        $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
+
+        return array(
+            'header' => $header,
+            'payload' => $payload,
+        );
+    }
+
+    /**
+     * Redirect to Portal login page
+     */
+    public static function redirectToPortal()
+    {
+        $params = self::getParams();
+        $returnUrl = Yii::app()->request->hostInfo . Yii::app()->request->baseUrl;
+        $portalUrl = $params['portal']['url'] . '/login?redirect=' . urlencode($returnUrl);
+        Yii::app()->request->redirect($portalUrl);
+    }
+}

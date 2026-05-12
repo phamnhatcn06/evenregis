@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đại hội Mường Thanh 2026</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png" />
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/lato.css" rel="stylesheet" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Lato", sans-serif;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .maintenance-wrapper {
+        height: 100vh;
+        width: 100vw;
+        background:
+          linear-gradient(1deg, rgba(139, 90, 43, 0.85), rgb(0 0 0)),
+          url(assets/images/bg_daihoi.jpg) center / cover no-repeat fixed;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .logo-wrapper {
+        padding: 1.5rem 2.5rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+      }
+
+      .logo-wrapper img {
+        max-width: 280px;
+        height: auto;
+      }
+
+      .countdown-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+        letter-spacing: 3px;
+      }
+
+      .countdown-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 3rem;
+        opacity: 0.95;
+        font-weight: 400;
+      }
+
+      .countdown-container {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .countdown-box {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(15px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 2rem 2.5rem;
+        min-width: 160px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      }
+
+      .countdown-value {
+        font-size: 5rem;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .countdown-label {
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-top: 0.75rem;
+        opacity: 0.9;
+        font-weight: 700;
+      }
+
+      @media (max-width: 768px) {
+        .countdown-title {
+          font-size: 1.8rem;
+          letter-spacing: 1px;
+        }
+        .countdown-subtitle {
+          font-size: 0.95rem;
+          margin-bottom: 2rem;
+        }
+        .countdown-container {
+          gap: 1rem;
+          flex-wrap: nowrap;
+        }
+        .countdown-box {
+          min-width: 0;
+          flex: 1 1 0;
+          padding: 1.5rem 0.8rem;
+        }
+        .countdown-value {
+          font-size: 3rem;
+        }
+        .countdown-label {
+          font-size: 0.85rem;
+          letter-spacing: 2px;
+        }
+        .logo-wrapper img {
+          max-width: 180px;
+        }
+        .logo-wrapper {
+          padding: 1rem 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .countdown-title {
+          font-size: 1.4rem;
+          letter-spacing: 1px;
+        }
+        .countdown-subtitle {
+          font-size: 0.85rem;
+          margin-bottom: 1.5rem;
+        }
+        .countdown-container {
+          gap: 0.6rem;
+        }
+        .countdown-box {
+          padding: 1.2rem 0.5rem;
+          border-radius: 12px;
+        }
+        .countdown-value {
+          font-size: 2.4rem;
+        }
+        .countdown-label {
+          font-size: 0.7rem;
+          letter-spacing: 1px;
+        }
+        .logo-wrapper img {
+          max-width: 150px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="maintenance-wrapper">
+      <div class="logo-wrapper">
+        <img src="assets/images/logo_daihoi.png" alt="Logo" />
+      </div>
+      <h1 class="countdown-title">
+        ĐẠI HỘI <br />
+        MƯỜNG THANH 2026
+      </h1>
+      <p class="countdown-subtitle">
+        Hệ thống đăng ký đại hội sẽ sẵn sàng vào ngày
+        <b
+          style="
+            color: #f00;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            font-weight: 900;
+          "
+          >01/06/2026</b
+        >
+      </p>
+
+      <div class="countdown-container">
+        <div class="countdown-box">
+          <div class="countdown-value" id="days">00</div>
+          <div class="countdown-label">Ngày</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-value" id="hours">00</div>
+          <div class="countdown-label">Giờ</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-value" id="minutes">00</div>
+          <div class="countdown-label">Phút</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-value" id="seconds">00</div>
+          <div class="countdown-label">Giây</div>
+        </div>
+      </div>
+
+      <p class="countdown-subtitle" style="margin-top: 2rem">
+        Anh/Chị vui lòng truy cập sau thời gian trên để đăng ký.
+      </p>
+    </div>
+
+    <script>
+      const targetDate = new Date(2026, 5, 1, 0, 0, 0); // 01/06/2026 00:00
+
+      function updateCountdown() {
+        const now = new Date();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+          document.getElementById("days").textContent = "00";
+          document.getElementById("hours").textContent = "00";
+          document.getElementById("minutes").textContent = "00";
+          document.getElementById("seconds").textContent = "00";
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById("days").textContent = String(days).padStart(
+          2,
+          "0",
+        );
+        document.getElementById("hours").textContent = String(hours).padStart(
+          2,
+          "0",
+        );
+        document.getElementById("minutes").textContent = String(
+          minutes,
+        ).padStart(2, "0");
+        document.getElementById("seconds").textContent = String(
+          seconds,
+        ).padStart(2, "0");
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    </script>
+  </body>
+</html>
