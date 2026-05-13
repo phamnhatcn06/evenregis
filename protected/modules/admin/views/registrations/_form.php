@@ -70,19 +70,23 @@ $isAdmin = isset($isAdmin) ? $isAdmin : false;
                 <?php echo $form->dropDownList($model, 'property_id', $propertyList, array(
                     'class' => 'form-select',
                     'prompt' => '-- Chọn đơn vị --',
+                    'disabled' => !$isAdmin && count($propertyList) == 1,
                 )); ?>
+                <?php if (!$isAdmin && count($propertyList) == 1): ?>
+                    <input type="hidden" name="Registrations[property_id]" value="<?php echo $model->property_id; ?>">
+                <?php endif; ?>
                 <?php echo $form->error($model, 'property_id'); ?>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group mb-3">
                 <?php echo $form->labelEx($model, 'relation_property_id'); ?>
-                <?php echo $form->dropDownList($model, 'relation_property_id', $propertyList, array(
+                <?php echo $form->dropDownList($model, 'relation_property_id', $relationPropertyList, array(
                     'class' => 'form-select',
                     'prompt' => '-- Không có (liên quân) --',
                 )); ?>
                 <?php echo $form->error($model, 'relation_property_id'); ?>
-                <small class="text-muted">Chọn đơn vị liên quân nếu có</small>
+                <small class="text-muted">Chọn đơn vị liên quân trong cùng khu vực</small>
             </div>
         </div>
     </div>
