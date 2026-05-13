@@ -27143,3 +27143,18 @@ panel-title {
 #history-table_wrapper div.dataTables_scrollBody > table {
   margin-top: -32px !important;
 }
+
+/* Form input/select text color - black instead of gray */
+.form-control,
+.form-select {
+  color: #212529 !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  color: #212529 !important;
+}
+
+.form-control::placeholder {
+  color: #6c757d !important;
+}

@@ -75,6 +75,9 @@ class AuthHandler extends CApplicationComponent
             'full_name' => isset($data[$claimName]) ? $data[$claimName] : null,
             'software_id' => isset($data['software_id']) ? $data['software_id'] : null,
             'exp' => isset($data['exp']) ? $data['exp'] : null,
+            'property_id' => isset($data['property_id']) ? $data['property_id'] : null,
+            'property_code' => isset($data['property_code']) ? $data['property_code'] : null,
+            'regional_id' => isset($data['regional_id']) ? $data['regional_id'] : null,
         );
 
         // Decode permissions (encrypted/encoded string from Portal)
