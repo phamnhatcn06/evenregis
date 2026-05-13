@@ -7,6 +7,10 @@ class RegionalsController extends AdminController
 		$model = $this->loadModelById($id);
 		$organizations = Regionals::getOrganizations($id);
 
+		usort($organizations, function($a, $b) {
+			return strcmp($a['code'], $b['code']);
+		});
+
 		$this->render('view', array(
 			'model' => $model,
 			'organizations' => $organizations,
