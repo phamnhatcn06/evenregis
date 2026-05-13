@@ -99,18 +99,15 @@ if (isset($relationProperties)) {
 
     <div class="form-group mb-3">
         <?php echo $form->labelEx($model, 'document'); ?>
-        <input type="file" name="document_file" id="document_file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-        <?php if ($model->document): ?>
-            <div class="mt-2">
-                <small class="text-muted">Tài liệu hiện tại: </small>
-                <a href="<?php echo $model->document; ?>" target="_blank" class="text-primary">
-                    <i class="fa fa-file"></i> <?php echo basename($model->document); ?>
-                </a>
-            </div>
-        <?php endif; ?>
-        <?php echo $form->hiddenField($model, 'document'); ?>
+        <div class="upload-area border rounded p-3 text-center mb-2" id="uploadArea" style="border-style: dashed !important; cursor: pointer;">
+            <i class="fa fa-cloud-upload fa-2x text-muted mb-2"></i>
+            <p class="mb-1">Kéo thả file vào đây hoặc <span class="text-primary">chọn file</span></p>
+            <small class="text-muted">PDF, DOC, DOCX, JPG, PNG (tối đa 5MB mỗi file)</small>
+        </div>
+        <input type="file" name="document_files[]" id="documentFiles" class="d-none" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+        <div id="filePreview" class="row g-2 mt-2"></div>
+        <?php echo $form->hiddenField($model, 'document', array('id' => 'documentJson')); ?>
         <?php echo $form->error($model, 'document'); ?>
-        <small class="text-muted">Chấp nhận: PDF, DOC, DOCX, JPG, PNG (tối đa 5MB)</small>
     </div>
 
     <div class="form-group mb-3">
