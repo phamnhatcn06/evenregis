@@ -107,7 +107,7 @@ Yii::app()->clientScript->registerScriptFile(
                         </table>
                     </div>
                 <?php else: ?>
-                    <p class="text-muted text-center">Chua co don vi nao trong khu vuc nay.</p>
+                    <p class="text-muted text-center">Chưa có đơn vị nào trong khu vực này.</p>
                 <?php endif; ?>
             </div>
         </div>
