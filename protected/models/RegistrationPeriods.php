@@ -93,9 +93,15 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 	public static function getActiveList()
 	{
 		$list = array();
+		$now = time();
 		$items = self::getApiDataProvider(array('is_active' => 1), 100)->getData();
 		foreach ($items as $item) {
-			$list[$item->id] = $item->name;
+			$startTime = is_numeric($item->start_time) ? $item->start_time : strtotime($item->start_time);
+			$endTime = is_numeric($item->end_time) ? $item->end_time : strtotime($item->end_time);
+
+			if ($startTime <= $now && $endTime >= $now) {
+				$list[$item->id] = $item->name;
+			}
 		}
 		return $list;
 	}
