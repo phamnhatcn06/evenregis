@@ -125,3 +125,44 @@ if (isset($relationProperties) && !$isAdmin) {
 
     <?php $this->endWidget(); ?>
 </div>
+
+<?php if ($isAdmin): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var propertySelect = document.getElementById('Registrations_property_id');
+    var relationSelect = document.getElementById('Registrations_relation_property_id');
+    var ajaxUrl = '<?php echo $this->createUrl("getRelationProperties"); ?>';
+
+    propertySelect.addEventListener('change', function() {
+        var propertyId = this.value;
+        relationSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+
+        if (!propertyId) {
+            relationSelect.innerHTML = '<option value="">-- Chọn đơn vị trước --</option>';
+            return;
+        }
+
+        fetch(ajaxUrl + '?property_id=' + propertyId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                relationSelect.innerHTML = '<option value="">-- Không có (liên quân) --</option>';
+                if (data.success && data.data) {
+                    data.data.forEach(function(p) {
+                        var option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.code + ' - ' + p.name;
+                        relationSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(function() {
+                relationSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+            });
+    });
+
+    if (!propertySelect.value) {
+        relationSelect.innerHTML = '<option value="">-- Chọn đơn vị trước --</option>';
+    }
+});
+</script>
+<?php endif; ?>
