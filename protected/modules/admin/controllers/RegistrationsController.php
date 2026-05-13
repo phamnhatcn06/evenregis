@@ -102,6 +102,11 @@ class RegistrationsController extends AdminController
 		if (isset($_POST['Registrations'])) {
 			$model->setAttributes($_POST['Registrations']);
 
+			$uploadedFile = $this->handleDocumentUpload();
+			if ($uploadedFile) {
+				$model->document = $uploadedFile;
+			}
+
 			if ($model->validate()) {
 				$result = $model->updateViaApi();
 
