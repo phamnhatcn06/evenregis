@@ -54,6 +54,7 @@ class SiteController extends Controller
                     ),
                     CURLOPT_TIMEOUT => 10,
                     CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => false,
                 ));
                 $response = curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
