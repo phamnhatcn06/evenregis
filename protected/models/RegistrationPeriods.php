@@ -26,6 +26,14 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		return null;
 	}
 
+	public function setAttributes($values, $safeOnly = true)
+	{
+		parent::setAttributes($values, $safeOnly);
+		if (is_array($values)) {
+			$this->mapRelations($values);
+		}
+	}
+
 	protected function mapRelations($data)
 	{
 		if (isset($data['event']['name'])) {
