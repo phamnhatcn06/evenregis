@@ -342,6 +342,7 @@ class AuthHandler extends CApplicationComponent
             ),
             CURLOPT_TIMEOUT => 10,
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
         ));
 
         $response = curl_exec($ch);
