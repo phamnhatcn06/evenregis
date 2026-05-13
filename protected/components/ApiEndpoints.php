@@ -155,8 +155,6 @@ class ApiEndpoints
     const REGIONAL_DETAIL = '/api/properties/regionals/detail/{id}';
     const REGIONAL_UPDATE = '/api/properties/regionals/update/{id}';
     const REGIONAL_DESTROY = '/api/properties/regionals/destroy/{id}';
-    const REGIONAL_ORGANIZATIONS = '/api/properties/regionals/{id}/organizations';
-    const REGIONAL_ASSIGN_ORGANIZATIONS = '/api/properties/regionals/{id}/assign-organizations';
 
     public static function url($endpoint, $params = array())
     {
