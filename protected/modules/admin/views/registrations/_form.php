@@ -133,6 +133,13 @@ if (isset($relationProperties)) {
     <?php $this->endWidget(); ?>
 </div>
 
+<?php
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/registrations-form.js',
+    CClientScript::POS_END
+);
+?>
+
 <?php if ($isHO): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
