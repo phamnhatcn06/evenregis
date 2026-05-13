@@ -31,7 +31,7 @@
             'widgetOptions' => array(
                 'htmlOptions' => array(
                     'class' => 'form-control',
-                    'placeholder' => 'Ten khu vuc'
+                    'placeholder' => 'Tên khu vực'
                 )
             )
         ));
