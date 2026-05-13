@@ -46,11 +46,6 @@ class SiteController extends Controller
                 // Fetch full user profile from SSO API
                 $userProfile = AuthHandler::fetchUserProfile($ssoToken);
 
-                // Debug: xem SSO profile trả về gì
-                echo '<pre>SSO Profile: '; print_r($userProfile); echo '</pre>';
-                echo '<pre>Session User: '; print_r(AuthHandler::getUser()); echo '</pre>';
-                die();
-
                 // Update session with profile data (property_code, property_id, etc.)
                 AuthHandler::updateSessionWithProfile($userProfile);
                 // Render callback page to save profile to localStorage
