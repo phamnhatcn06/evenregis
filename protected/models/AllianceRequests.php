@@ -4,9 +4,9 @@ Yii::import('application.models._base.BaseAllianceRequests');
 
 class AllianceRequests extends BaseAllianceRequests
 {
-	const STATUS_PENDING = 0;
-	const STATUS_APPROVED = 1;
-	const STATUS_REJECTED = 2;
+	public const STATUS_PENDING = 0;
+	public const STATUS_APPROVED = 1;
+	public const STATUS_REJECTED = 2;
 
 	public static function model($className = __CLASS__)
 	{
