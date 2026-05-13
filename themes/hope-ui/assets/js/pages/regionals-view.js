@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 availableOrgs.innerHTML = '';
                 if (data.success && data.data) {
                     var properties = data.data;
+                    properties.sort(function(a, b) {
+                        return a.code.localeCompare(b.code);
+                    });
                     properties.forEach(function(prop) {
                         if (assignedOrgIds.indexOf(parseInt(prop.id)) === -1) {
                             var option = document.createElement('option');
