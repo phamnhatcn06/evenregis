@@ -70,7 +70,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function sortOptions(select) {
         var options = Array.from(select.options);
         options.sort(function(a, b) {
-            return a.textContent.localeCompare(b.textContent);
+            var codeA = a.textContent.split(' - ')[0];
+            var codeB = b.textContent.split(' - ')[0];
+            return codeA.localeCompare(codeB);
         });
         select.innerHTML = '';
         options.forEach(function(option) {
