@@ -267,6 +267,21 @@ class RegistrationsController extends AdminController
 		return $uploadedFiles ? json_encode($uploadedFiles) : null;
 	}
 
+	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId)
+	{
+		$existing = AllianceRequests::findByRegistration($eventId, $requesterOrgId, $targetOrgId);
+		if ($existing) {
+			return;
+		}
+
+		$alliance = new AllianceRequests;
+		$alliance->event_id = $eventId;
+		$alliance->requester_org_id = $requesterOrgId;
+		$alliance->target_org_id = $targetOrgId;
+		$alliance->requested_by = Yii::app()->user->id ?: 1;
+		$alliance->storeViaApi();
+	}
+
 	public function actionGetRelationProperties($property_id)
 	{
 		$property = Properties::fetchFromApi($property_id);
