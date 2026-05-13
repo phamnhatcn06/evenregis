@@ -4,7 +4,8 @@ Yii::import('application.models._base.BaseRegistrationPeriods');
 
 class RegistrationPeriods extends BaseRegistrationPeriods
 {
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
@@ -24,19 +25,34 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 
 	public function storeViaApi()
 	{
-		$data = array_filter($this->attributes, function ($value) {
-			return $value !== null && $value !== '';
-		});
+		$data = $this->prepareApiData();
 		return ApiClient::post(ApiEndpoints::REGISTRATION_PERIOD_STORE, $data);
 	}
 
 	public function updateViaApi()
 	{
-		$data = array_filter($this->attributes, function ($value) {
-			return $value !== null && $value !== '';
-		});
+		$data = $this->prepareApiData();
 		$url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_PERIOD_UPDATE, array('id' => $this->id));
 		return ApiClient::post($url, $data);
+	}
+
+	protected function prepareApiData()
+	{
+		$data = array();
+		$data['name'] = $this->name;
+		$data['event_id'] = (int) $this->event_id;
+		$data['is_active'] = (bool) $this->is_active;
+		$data['max_per_org'] = $this->max_per_org ? (int) $this->max_per_org : null;
+		$data['note'] = $this->note ?: null;
+
+		if ($this->start_time) {
+			$data['start_time'] = date('Y-m-d H:i:s', $this->start_time);
+		}
+		if ($this->end_time) {
+			$data['end_time'] = date('Y-m-d H:i:s', $this->end_time);
+		}
+
+		return $data;
 	}
 
 	public static function deleteViaApi($id)

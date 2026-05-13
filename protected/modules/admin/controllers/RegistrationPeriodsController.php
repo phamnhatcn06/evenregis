@@ -15,8 +15,7 @@ class RegistrationPeriodsController extends AdminController
 
 		if (isset($_POST['RegistrationPeriods'])) {
 			$model->setAttributes($_POST['RegistrationPeriods']);
-			$model->is_active = isset($_POST['RegistrationPeriods']['is_active']) ? 1 : 0;
-
+			$model->is_active = true;
 			if ($model->validate()) {
 				$result = $model->storeViaApi();
 
