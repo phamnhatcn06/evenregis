@@ -145,14 +145,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         var separator = ajaxUrl.indexOf('?') > -1 ? '&' : '?';
-        console.log('Fetching:', ajaxUrl + separator + 'property_id=' + propertyId);
         fetch(ajaxUrl + separator + 'property_id=' + propertyId)
-            .then(function(response) {
-                console.log('Response status:', response.status);
-                return response.json();
-            })
+            .then(function(response) { return response.json(); })
             .then(function(data) {
-                console.log('Data:', data);
                 relationSelect.innerHTML = '<option value="">-- Không có (liên quân) --</option>';
                 if (data.success && data.data && data.data.length > 0) {
                     data.data.forEach(function(p) {
@@ -163,8 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
             })
-            .catch(function(err) {
-                console.error('Error:', err);
+            .catch(function() {
                 relationSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
             });
     });
