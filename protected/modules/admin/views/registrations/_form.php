@@ -33,6 +33,7 @@ if (isset($relationProperties)) {
             $relationPropertyList[$pId] = "{$pCode} - {$pName}";
         }
     }
+    asort($relationPropertyList);
 }
 ?>
 
