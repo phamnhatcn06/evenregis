@@ -4,23 +4,26 @@ Yii::import('application.models._base.BaseRegionals');
 
 class Regionals extends BaseRegionals
 {
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public static function label($n = 1) {
-		return Yii::t('app', 'Khu vuc|Khu vuc', $n);
+	public static function label($n = 1)
+	{
+		return Yii::t('app', 'Khu vực|Khu vực', $n);
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+	{
 		return array(
 			'id' => 'ID',
-			'code' => 'Ma khu vuc',
-			'name' => 'Ten khu vuc',
-			'description' => 'Mo ta',
-			'status' => 'Trang thai',
-			'created_at' => 'Ngay tao',
-			'updated_at' => 'Ngay cap nhat',
+			'code' => 'Mã khu vực',
+			'name' => 'Tên khu vực',
+			'description' => 'Mô tả',
+			'status' => 'Trạng thái',
+			'created_at' => 'Ngày tạo',
+			'updated_at' => 'Ngày cập nhật',
 			'deleted_at' => 'Ngay xoa',
 		);
 	}
@@ -75,17 +78,40 @@ class Regionals extends BaseRegionals
 
 	public static function getOrganizations($regionalId)
 	{
-		$url = ApiEndpoints::url(ApiEndpoints::REGIONAL_ORGANIZATIONS, array('id' => $regionalId));
-		$result = ApiClient::get($url);
-		if ($result['success'] && isset($result['data'])) {
-			return isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
-		}
-		return array();
+		$dataProvider = Properties::getApiDataProvider(array('regional_id' => $regionalId), 500);
+		return $dataProvider->getData();
 	}
 
-	public static function assignOrganizations($regionalId, $organizationIds)
+	public static function assignOrganizations($regionalId, $newOrgIds)
 	{
-		$url = ApiEndpoints::url(ApiEndpoints::REGIONAL_ASSIGN_ORGANIZATIONS, array('id' => $regionalId));
-		return ApiClient::post($url, array('organization_ids' => $organizationIds));
+		$currentOrgs = self::getOrganizations($regionalId);
+		$currentOrgIds = array_column($currentOrgs, 'id');
+
+		$errors = array();
+
+		// Remove regional_id from properties no longer assigned
+		$toRemove = array_diff($currentOrgIds, $newOrgIds);
+		foreach ($toRemove as $propId) {
+			$url = ApiEndpoints::url(ApiEndpoints::PROPERTY_UPDATE, array('id' => $propId));
+			$result = ApiClient::post($url, array('regional_id' => null));
+			if (!$result['success']) {
+				$errors[] = "Failed to remove property $propId";
+			}
+		}
+
+		// Add regional_id to newly assigned properties
+		$toAdd = array_diff($newOrgIds, $currentOrgIds);
+		foreach ($toAdd as $propId) {
+			$url = ApiEndpoints::url(ApiEndpoints::PROPERTY_UPDATE, array('id' => $propId));
+			$result = ApiClient::post($url, array('regional_id' => $regionalId));
+			if (!$result['success']) {
+				$errors[] = "Failed to assign property $propId";
+			}
+		}
+
+		return array(
+			'success' => empty($errors),
+			'error' => implode(', ', $errors),
+		);
 	}
 }

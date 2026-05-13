@@ -43,40 +43,32 @@ Yii::app()->clientScript->registerScriptFile(
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Thong tin khu vuc</h5>
+                <h5 class="card-title mb-0">Thông tin khu vực</h5>
             </div>
             <div class="card-body">
                 <table class="table table-bordered table-striped">
                     <tbody>
                         <tr>
-                            <th style="width:35%;background:#f8f9fa;">ID</th>
-                            <td><?php echo CHtml::encode($model->id); ?></td>
-                        </tr>
-                        <tr>
-                            <th style="background:#f8f9fa;">Ma khu vuc</th>
+                            <th style="background:#f8f9fa;">Mã khu vực</th>
                             <td><?php echo CHtml::encode($model->code); ?></td>
                         </tr>
                         <tr>
-                            <th style="background:#f8f9fa;">Ten khu vuc</th>
+                            <th style="background:#f8f9fa;">Tên khu vực</th>
                             <td><?php echo CHtml::encode($model->name); ?></td>
                         </tr>
                         <tr>
-                            <th style="background:#f8f9fa;">Mo ta</th>
+                            <th style="background:#f8f9fa;">Mô tả</th>
                             <td><?php echo CHtml::encode($model->description); ?></td>
                         </tr>
                         <tr>
-                            <th style="background:#f8f9fa;">Trang thai</th>
+                            <th style="background:#f8f9fa;">Trạng thái</th>
                             <td>
                                 <?php if ($model->status == 1): ?>
-                                    <span class="badge bg-success">Hoat dong</span>
+                                    <span class="badge bg-success">Hoạt động</span>
                                 <?php else: ?>
-                                    <span class="badge bg-secondary">Khong hoat dong</span>
+                                    <span class="badge bg-secondary">Không hoạt động</span>
                                 <?php endif; ?>
                             </td>
-                        </tr>
-                        <tr>
-                            <th style="background:#f8f9fa;">Ngay tao</th>
-                            <td><?php echo CHtml::encode($model->created_at); ?></td>
                         </tr>
                     </tbody>
                 </table>
@@ -87,9 +79,9 @@ Yii::app()->clientScript->registerScriptFile(
     <div class="col-md-6">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Danh sach don vi (<?php echo count($organizations); ?>)</h5>
+                <h5 class="card-title mb-0">Danh sách đơn vị (<?php echo count($organizations); ?>)</h5>
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignOrganizationsModal">
-                    <i class="fa fa-plus"></i> Them don vi
+                    <i class="fa fa-plus"></i> Thêm đơn vị
                 </button>
             </div>
             <div class="card-body">
@@ -99,8 +91,8 @@ Yii::app()->clientScript->registerScriptFile(
                             <thead>
                                 <tr>
                                     <th>STT</th>
-                                    <th>Ma</th>
-                                    <th>Ten don vi</th>
+                                    <th>Mã đơn vị</th>
+                                    <th>Tên đơn vị</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -173,7 +165,7 @@ Yii::app()->clientScript->registerScriptFile(
 </div>
 
 <script>
-var regionalId = <?php echo $model->id; ?>;
-var assignedOrgIds = <?php echo json_encode(array_column($organizations, 'id')); ?>;
-var allPropertiesUrl = '<?php echo $this->createUrl('/admin/properties/listJson'); ?>';
+    var regionalId = <?php echo $model->id; ?>;
+    var assignedOrgIds = <?php echo json_encode(array_column($organizations, 'id')); ?>;
+    var allPropertiesUrl = '<?php echo $this->createUrl('/admin/properties/listJson'); ?>';
 </script>

@@ -150,13 +150,13 @@ class ApiEndpoints
     const REGISTRATION_DETAIL_DESTROY = '/api/registration-details/destroy/{id}';
 
     // Regional
-    const REGIONAL_LIST = '/api/regionals';
-    const REGIONAL_STORE = '/api/regionals/store';
-    const REGIONAL_DETAIL = '/api/regionals/detail/{id}';
-    const REGIONAL_UPDATE = '/api/regionals/update/{id}';
-    const REGIONAL_DESTROY = '/api/regionals/destroy/{id}';
-    const REGIONAL_ORGANIZATIONS = '/api/regionals/{id}/organizations';
-    const REGIONAL_ASSIGN_ORGANIZATIONS = '/api/regionals/{id}/assign-organizations';
+    const REGIONAL_LIST = '/api/properties/regionals';
+    const REGIONAL_STORE = '/api/properties/regionals/store';
+    const REGIONAL_DETAIL = '/api/properties/regionals/detail/{id}';
+    const REGIONAL_UPDATE = '/api/properties/regionals/update/{id}';
+    const REGIONAL_DESTROY = '/api/properties/regionals/destroy/{id}';
+    const REGIONAL_ORGANIZATIONS = '/api/properties/regionals/{id}/organizations';
+    const REGIONAL_ASSIGN_ORGANIZATIONS = '/api/properties/regionals/{id}/assign-organizations';
 
     public static function url($endpoint, $params = array())
     {
