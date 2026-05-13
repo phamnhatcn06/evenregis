@@ -45,6 +45,9 @@ class SiteController extends Controller
             if ($userData) {
                 // Fetch full user profile from SSO API
                 $userProfile = AuthHandler::fetchUserProfile($ssoToken);
+
+                // Update session with profile data (property_code, property_id, etc.)
+                AuthHandler::updateSessionWithProfile($userProfile);
                 // Render callback page to save profile to localStorage
                 Yii::app()->user->setFlash('success', 'Đăng nhập thành công. Xin chào ' . $userData['full_name']);
                 $this->render('callback', array(
