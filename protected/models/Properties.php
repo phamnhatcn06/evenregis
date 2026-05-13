@@ -19,6 +19,9 @@ class Properties extends BaseProperties
 			$model = new self;
 			$model->setAttributes($data, false);
 			$model->id = $id;
+			if (isset($data['regional_id'])) {
+				$model->regional_id = $data['regional_id'];
+			}
 			return $model;
 		}
 		return null;
