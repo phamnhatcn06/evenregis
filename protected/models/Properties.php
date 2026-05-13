@@ -4,6 +4,8 @@ Yii::import('application.models._base.BaseProperties');
 
 class Properties extends BaseProperties
 {
+	public $regional_id;
+
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}
