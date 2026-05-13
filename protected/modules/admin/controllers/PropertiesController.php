@@ -85,6 +85,19 @@ class PropertiesController extends AdminController
 		$this->redirect(array('admin'));
 	}
 
+	public function actionListJson()
+	{
+		$dataProvider = Properties::getApiDataProvider(array('status' => 1), 500);
+		$data = $dataProvider->getData();
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array(
+			'success' => true,
+			'data' => $data,
+		));
+		Yii::app()->end();
+	}
+
 	public function actionAdmin()
 	{
 		$model = new Properties('search');
