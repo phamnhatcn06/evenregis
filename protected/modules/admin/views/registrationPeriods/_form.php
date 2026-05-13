@@ -115,34 +115,33 @@ foreach ($events as $e) {
     <?php $this->endWidget(); ?>
 </div>
 
+<?php
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.js', CClientScript::POS_END);
+?>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var form = document.getElementById('registration-periods-form');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                var startInput = form.querySelector('input[name="RegistrationPeriods[start_time]"]');
-                var endInput = form.querySelector('input[name="RegistrationPeriods[end_time]"]');
+document.addEventListener('DOMContentLoaded', function() {
+    var config = {
+        enableTime: true,
+        dateFormat: 'd-m-Y H:i',
+        time_24hr: true,
+        allowInput: true
+    };
 
-                if (startInput.value) {
-                    var startTimestamp = Math.floor(new Date(startInput.value).getTime() / 1000);
-                    var hiddenStart = document.createElement('input');
-                    hiddenStart.type = 'hidden';
-                    hiddenStart.name = 'RegistrationPeriods[start_time]';
-                    hiddenStart.value = startTimestamp;
-                    startInput.name = '_start_time_display';
-                    form.appendChild(hiddenStart);
-                }
-
-                if (endInput.value) {
-                    var endTimestamp = Math.floor(new Date(endInput.value).getTime() / 1000);
-                    var hiddenEnd = document.createElement('input');
-                    hiddenEnd.type = 'hidden';
-                    hiddenEnd.name = 'RegistrationPeriods[end_time]';
-                    hiddenEnd.value = endTimestamp;
-                    endInput.name = '_end_time_display';
-                    form.appendChild(hiddenEnd);
-                }
-            });
+    flatpickr('#start_time_picker', Object.assign({}, config, {
+        onChange: function(selectedDates) {
+            if (selectedDates.length > 0) {
+                document.getElementById('start_time_hidden').value = Math.floor(selectedDates[0].getTime() / 1000);
+            }
         }
-    });
+    }));
+
+    flatpickr('#end_time_picker', Object.assign({}, config, {
+        onChange: function(selectedDates) {
+            if (selectedDates.length > 0) {
+                document.getElementById('end_time_hidden').value = Math.floor(selectedDates[0].getTime() / 1000);
+            }
+        }
+    }));
+});
 </script>
