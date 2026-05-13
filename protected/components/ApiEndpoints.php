@@ -156,6 +156,13 @@ class ApiEndpoints
     const REGIONAL_UPDATE = '/api/properties/regionals/update/{id}';
     const REGIONAL_DESTROY = '/api/properties/regionals/destroy/{id}';
 
+    // Alliance Request
+    const ALLIANCE_REQUEST_LIST = '/api/alliance-requests';
+    const ALLIANCE_REQUEST_STORE = '/api/alliance-requests/store';
+    const ALLIANCE_REQUEST_DETAIL = '/api/alliance-requests/detail/{id}';
+    const ALLIANCE_REQUEST_UPDATE = '/api/alliance-requests/update/{id}';
+    const ALLIANCE_REQUEST_DESTROY = '/api/alliance-requests/destroy/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
