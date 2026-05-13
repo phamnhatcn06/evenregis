@@ -180,6 +180,37 @@ class AuthHandler extends CApplicationComponent
     }
 
     /**
+     * Auto-inherit permissions for related controllers
+     * Controllers that are sub-modules of a main controller inherit its permissions
+     * @param array $permissions
+     * @return array
+     */
+    private static function inheritRelatedPermissions($permissions)
+    {
+        // If already has wildcard, no need to inherit
+        if (isset($permissions['*'])) {
+            return $permissions;
+        }
+
+        // Define inheritance rules: child => parent
+        $inheritanceRules = array(
+            'registrationperiods' => 'events',
+            'registrations' => 'events',
+            'eventsports' => 'events',
+            'eventcontents' => 'events',
+            'registrationdetails' => 'registrations',
+        );
+
+        foreach ($inheritanceRules as $child => $parent) {
+            if (!isset($permissions[$child]) && isset($permissions[$parent])) {
+                $permissions[$child] = $permissions[$parent];
+            }
+        }
+
+        return $permissions;
+    }
+
+    /**
      * Logout - destroy SSO session
      */
     public static function logout()
