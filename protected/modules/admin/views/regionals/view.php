@@ -120,13 +120,13 @@ Yii::app()->clientScript->registerScriptFile(
         <div class="modal-content">
             <form method="post" action="<?php echo $this->createUrl('assignOrganizations', array('id' => $model->id)); ?>">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="assignOrganizationsModalLabel">Quan ly don vi trong khu vuc</h5>
+                    <h5 class="modal-title" id="assignOrganizationsModalLabel">Quản lý đơn vị trong khu vực</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-5">
-                            <label class="form-label fw-bold">Don vi chua gan</label>
+                            <label class="form-label fw-bold">Đơn vị chưa gán</label>
                             <select id="availableOrgs" class="form-select" size="15" multiple>
                             </select>
                         </div>
@@ -145,7 +145,7 @@ Yii::app()->clientScript->registerScriptFile(
                             </button>
                         </div>
                         <div class="col-md-5">
-                            <label class="form-label fw-bold">Don vi da gan</label>
+                            <label class="form-label fw-bold">Đơn vị đã gán</label>
                             <select id="assignedOrgs" class="form-select" size="15" multiple>
                                 <?php foreach ($organizations as $org): ?>
                                     <option value="<?php echo $org['id']; ?>"><?php echo CHtml::encode($org['code'] . ' - ' . $org['name']); ?></option>
@@ -156,8 +156,8 @@ Yii::app()->clientScript->registerScriptFile(
                     <div id="hiddenInputs"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dong</button>
-                    <button type="submit" class="btn btn-primary" id="btnSave">Luu thay doi</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary" id="btnSave">Lưu thay đổi</button>
                 </div>
             </form>
         </div>

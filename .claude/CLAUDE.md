@@ -34,6 +34,11 @@ Hệ thống quản lý sự kiện đại hội (~600 người tham dự) sử 
 - Font Awesome 4.7: `themes/hope-ui/assets/css/font-awesome/font-awesome.min.css`
 - Fonts: `themes/hope-ui/assets/fonts/`
 
+### UI/Text Rules
+
+- **Tất cả text hiển thị** (labels, messages, placeholders, headers) phải là **tiếng Việt có dấu**
+- Ví dụ: "Tên khu vực", "Trạng thái", "Ngày tạo", "Thêm đơn vị", "Lưu thay đổi"
+
 ### JavaScript Rules
 
 - **KHÔNG viết inline JS** trong file view (không dùng `<script>` tag trực tiếp)
