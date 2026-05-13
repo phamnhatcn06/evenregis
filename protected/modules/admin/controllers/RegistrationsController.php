@@ -42,6 +42,12 @@ class RegistrationsController extends AdminController
 			$model->setAttributes($_POST['Registrations']);
 			$model->status = 'draft';
 			$model->submitted_by = Yii::app()->user->id ?: 1;
+
+			$uploadedFile = $this->handleDocumentUpload();
+			if ($uploadedFile) {
+				$model->document = $uploadedFile;
+			}
+
 			if ($model->validate()) {
 				$result = $model->storeViaApi();
 
