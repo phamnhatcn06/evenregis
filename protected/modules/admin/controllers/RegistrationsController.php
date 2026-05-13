@@ -53,8 +53,13 @@ class RegistrationsController extends AdminController
 				$result = $model->storeViaApi();
 
 				if ($result['success']) {
-					Yii::app()->user->setFlash('success', 'Tạo phiếu đăng ký thành công.');
 					$newId = isset($result['data']['id']) ? $result['data']['id'] : null;
+
+					if ($model->relation_property_id && $model->event_id && $model->property_id) {
+						$this->createAllianceRequest($model->event_id, $model->property_id, $model->relation_property_id);
+					}
+
+					Yii::app()->user->setFlash('success', 'Tạo phiếu đăng ký thành công.');
 					$this->redirect($newId ? array('view', 'id' => $newId) : array('admin'));
 				} else {
 					$errorMsg = isset($result['error']) ? $result['error'] : 'Không thể tạo phiếu đăng ký.';
