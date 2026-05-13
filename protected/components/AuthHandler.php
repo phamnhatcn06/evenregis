@@ -331,7 +331,8 @@ class AuthHandler extends CApplicationComponent
      */
     public static function fetchUserProfile($token)
     {
-        $url = 'https://api.portal.muongthanh.vn/api/sso/me';
+        $params = self::getParams();
+        $url = rtrim($params['portal']['api_url'], '/') . $params['portal']['sso_me_endpoint'];
 
         $ch = curl_init($url);
         curl_setopt_array($ch, array(
