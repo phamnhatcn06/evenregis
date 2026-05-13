@@ -43,31 +43,8 @@ class SiteController extends Controller
             AuthHandler::logout();
             $userData = AuthHandler::handleCallback($ssoToken);
             if ($userData) {
-                // Debug: test API call directly
-                $url = 'https://api.portal.muongthanh.vn/api/sso/me';
-                $ch = curl_init($url);
-                curl_setopt_array($ch, array(
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_HTTPHEADER => array(
-                        'Authorization: Bearer ' . $ssoToken,
-                        'Accept: application/json',
-                    ),
-                    CURLOPT_TIMEOUT => 10,
-                    CURLOPT_SSL_VERIFYPEER => false,
-                    CURLOPT_SSL_VERIFYHOST => false,
-                ));
-                $response = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                $error = curl_error($ch);
-                curl_close($ch);
-
-                echo '<h3>Debug SSO API</h3>';
-                echo '<p><strong>URL:</strong> ' . $url . '</p>';
-                echo '<p><strong>HTTP Code:</strong> ' . $httpCode . '</p>';
-                echo '<p><strong>Curl Error:</strong> ' . ($error ?: 'None') . '</p>';
-                echo '<p><strong>Token (first 100 chars):</strong> ' . substr($ssoToken, 0, 100) . '...</p>';
-                echo '<p><strong>Response:</strong></p><pre>' . htmlspecialchars($response) . '</pre>';
-                die();
+                // Fetch full user profile from SSO API
+                $userProfile = AuthHandler::fetchUserProfile($ssoToken);
                 // Render callback page to save profile to localStorage
                 Yii::app()->user->setFlash('success', 'Đăng nhập thành công. Xin chào ' . $userData['full_name']);
                 $this->render('callback', array(
