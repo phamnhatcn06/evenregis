@@ -99,4 +99,22 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		}
 		return $list;
 	}
+
+	public static function getStatusBadge($model)
+	{
+		$now = time();
+		$startTime = is_numeric($model->start_time) ? $model->start_time : strtotime($model->start_time);
+		$endTime = is_numeric($model->end_time) ? $model->end_time : strtotime($model->end_time);
+
+		if (!$model->is_active) {
+			return '<span class="badge bg-secondary"><i class="fa fa-ban me-1"></i>Tắt</span>';
+		}
+		if ($startTime > $now) {
+			return '<span class="badge bg-info"><i class="fa fa-clock-o me-1"></i>Sắp mở</span>';
+		}
+		if ($endTime < $now) {
+			return '<span class="badge bg-secondary"><i class="fa fa-times me-1"></i>Đã đóng</span>';
+		}
+		return '<span class="badge bg-success"><i class="fa fa-check me-1"></i>Đang mở</span>';
+	}
 }
