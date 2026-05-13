@@ -128,6 +128,27 @@ class ApiEndpoints
     const EVENT_SPORT_UPDATE = '/api/event-sports/update/{id}';
     const EVENT_SPORT_DESTROY = '/api/event-sports/destroy/{id}';
 
+    // Registration Period
+    const REGISTRATION_PERIOD_LIST = '/api/registration-periods';
+    const REGISTRATION_PERIOD_STORE = '/api/registration-periods/store';
+    const REGISTRATION_PERIOD_DETAIL = '/api/registration-periods/detail/{id}';
+    const REGISTRATION_PERIOD_UPDATE = '/api/registration-periods/update/{id}';
+    const REGISTRATION_PERIOD_DESTROY = '/api/registration-periods/destroy/{id}';
+
+    // Registration
+    const REGISTRATION_LIST = '/api/registrations';
+    const REGISTRATION_STORE = '/api/registrations/store';
+    const REGISTRATION_DETAIL = '/api/registrations/detail/{id}';
+    const REGISTRATION_UPDATE = '/api/registrations/update/{id}';
+    const REGISTRATION_DESTROY = '/api/registrations/destroy/{id}';
+
+    // Registration Detail
+    const REGISTRATION_DETAIL_LIST = '/api/registration-details';
+    const REGISTRATION_DETAIL_STORE = '/api/registration-details/store';
+    const REGISTRATION_DETAIL_ITEM = '/api/registration-details/detail/{id}';
+    const REGISTRATION_DETAIL_UPDATE = '/api/registration-details/update/{id}';
+    const REGISTRATION_DETAIL_DESTROY = '/api/registration-details/destroy/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
