@@ -1,4 +1,6 @@
 <?php
+$isAdmin = isset($isAdmin) ? $isAdmin : false;
+
 $eventList = array();
 foreach ($events as $e) {
     $eId = isset($e['id']) ? $e['id'] : (isset($e->id) ? $e->id : null);
@@ -14,7 +16,7 @@ foreach ($properties as $p) {
     $pCode = isset($p['code']) ? $p['code'] : (isset($p->code) ? $p->code : '');
     $pName = isset($p['name']) ? $p['name'] : (isset($p->name) ? $p->name : '');
     if ($pId) {
-        $propertyList[$pId] = $pCode . ' - ' . $pName;
+        $propertyList[$pId] = "{$pCode} - {$pName}";
     }
 }
 
@@ -25,12 +27,10 @@ if (isset($relationProperties) && !$isAdmin) {
         $pCode = isset($p['code']) ? $p['code'] : (isset($p->code) ? $p->code : '');
         $pName = isset($p['name']) ? $p['name'] : (isset($p->name) ? $p->name : '');
         if ($pId && $pId != $model->property_id) {
-            $relationPropertyList[$pId] = $pCode . ' - ' . $pName;
+            $relationPropertyList[$pId] = "{$pCode} - {$pName}";
         }
     }
 }
-
-$isAdmin = isset($isAdmin) ? $isAdmin : false;
 ?>
 
 <div class="form-wrap">
