@@ -48,11 +48,13 @@ foreach ($events as $e) {
                 <?php
                 $startValue = '';
                 if ($model->start_time) {
-                    $startValue = date('Y-m-d\TH:i', $model->start_time);
+                    $startValue = date('d-m-Y H:i', $model->start_time);
                 }
                 ?>
-                <input type="datetime-local" name="RegistrationPeriods[start_time]"
-                       class="form-control" value="<?php echo $startValue; ?>" required>
+                <input type="text" id="start_time_picker" class="form-control"
+                    value="<?php echo $startValue; ?>" placeholder="dd-mm-yyyy hh:mm" required>
+                <input type="hidden" name="RegistrationPeriods[start_time]" id="start_time_hidden"
+                    value="<?php echo $model->start_time; ?>">
                 <?php echo $form->error($model, 'start_time'); ?>
             </div>
         </div>
@@ -62,11 +64,13 @@ foreach ($events as $e) {
                 <?php
                 $endValue = '';
                 if ($model->end_time) {
-                    $endValue = date('Y-m-d\TH:i', $model->end_time);
+                    $endValue = date('d-m-Y H:i', $model->end_time);
                 }
                 ?>
-                <input type="datetime-local" name="RegistrationPeriods[end_time]"
-                       class="form-control" value="<?php echo $endValue; ?>" required>
+                <input type="text" id="end_time_picker" class="form-control"
+                    value="<?php echo $endValue; ?>" placeholder="dd-mm-yyyy hh:mm" required>
+                <input type="hidden" name="RegistrationPeriods[end_time]" id="end_time_hidden"
+                    value="<?php echo $model->end_time; ?>">
                 <?php echo $form->error($model, 'end_time'); ?>
             </div>
         </div>
@@ -84,32 +88,19 @@ foreach ($events as $e) {
                 <?php echo $form->error($model, 'max_per_org'); ?>
                 <small class="text-muted">Số người tối đa mỗi đơn vị được đăng ký</small>
             </div>
-        </div>
-        <div class="col-md-6">
             <div class="form-group mb-3">
-                <label class="form-label">&nbsp;</label>
-                <div class="form-check mt-2">
-                    <?php echo $form->checkBox($model, 'is_active', array(
-                        'class' => 'form-check-input',
-                        'uncheckValue' => 0,
-                    )); ?>
-                    <label class="form-check-label" for="RegistrationPeriods_is_active">
-                        Kích hoạt đợt đăng ký
-                    </label>
-                </div>
+                <?php echo $form->labelEx($model, 'note'); ?>
+                <?php echo $form->textArea($model, 'note', array(
+                    'class' => 'form-control',
+                    'rows' => 3,
+                    'placeholder' => 'Ghi chú thêm về đợt đăng ký',
+                )); ?>
+                <?php echo $form->error($model, 'note'); ?>
             </div>
         </div>
     </div>
 
-    <div class="form-group mb-3">
-        <?php echo $form->labelEx($model, 'note'); ?>
-        <?php echo $form->textArea($model, 'note', array(
-            'class' => 'form-control',
-            'rows' => 3,
-            'placeholder' => 'Ghi chú thêm về đợt đăng ký',
-        )); ?>
-        <?php echo $form->error($model, 'note'); ?>
-    </div>
+
 
     <hr />
     <div class="footer-action">
@@ -125,33 +116,33 @@ foreach ($events as $e) {
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('registration-periods-form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            var startInput = form.querySelector('input[name="RegistrationPeriods[start_time]"]');
-            var endInput = form.querySelector('input[name="RegistrationPeriods[end_time]"]');
+    document.addEventListener('DOMContentLoaded', function() {
+        var form = document.getElementById('registration-periods-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                var startInput = form.querySelector('input[name="RegistrationPeriods[start_time]"]');
+                var endInput = form.querySelector('input[name="RegistrationPeriods[end_time]"]');
 
-            if (startInput.value) {
-                var startTimestamp = Math.floor(new Date(startInput.value).getTime() / 1000);
-                var hiddenStart = document.createElement('input');
-                hiddenStart.type = 'hidden';
-                hiddenStart.name = 'RegistrationPeriods[start_time]';
-                hiddenStart.value = startTimestamp;
-                startInput.name = '_start_time_display';
-                form.appendChild(hiddenStart);
-            }
+                if (startInput.value) {
+                    var startTimestamp = Math.floor(new Date(startInput.value).getTime() / 1000);
+                    var hiddenStart = document.createElement('input');
+                    hiddenStart.type = 'hidden';
+                    hiddenStart.name = 'RegistrationPeriods[start_time]';
+                    hiddenStart.value = startTimestamp;
+                    startInput.name = '_start_time_display';
+                    form.appendChild(hiddenStart);
+                }
 
-            if (endInput.value) {
-                var endTimestamp = Math.floor(new Date(endInput.value).getTime() / 1000);
-                var hiddenEnd = document.createElement('input');
-                hiddenEnd.type = 'hidden';
-                hiddenEnd.name = 'RegistrationPeriods[end_time]';
-                hiddenEnd.value = endTimestamp;
-                endInput.name = '_end_time_display';
-                form.appendChild(hiddenEnd);
-            }
-        });
-    }
-});
+                if (endInput.value) {
+                    var endTimestamp = Math.floor(new Date(endInput.value).getTime() / 1000);
+                    var hiddenEnd = document.createElement('input');
+                    hiddenEnd.type = 'hidden';
+                    hiddenEnd.name = 'RegistrationPeriods[end_time]';
+                    hiddenEnd.value = endTimestamp;
+                    endInput.name = '_end_time_display';
+                    form.appendChild(hiddenEnd);
+                }
+            });
+        }
+    });
 </script>

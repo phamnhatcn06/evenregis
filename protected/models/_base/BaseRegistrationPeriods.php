@@ -24,59 +24,67 @@
  * @property Events $event
  * @property Registrations[] $registrations
  */
-abstract class BaseRegistrationPeriods extends GxActiveRecord {
+abstract class BaseRegistrationPeriods extends GxActiveRecord
+{
 
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+	{
 		return 'registration_periods';
 	}
 
-	public static function label($n = 1) {
+	public static function label($n = 1)
+	{
 		return Yii::t('app', 'RegistrationPeriods|RegistrationPeriods', $n);
 	}
 
-	public static function representingColumn() {
+	public static function representingColumn()
+	{
 		return 'name';
 	}
 
-	public function rules() {
+	public function rules()
+	{
 		return array(
 			array('event_id, name, start_time, end_time', 'required'),
-			array('max_per_org, is_active, note', 'numerical', 'integerOnly'=>true),
-			array('event_id', 'length', 'max'=>20),
-			array('name', 'length', 'max'=>255),
+			array('max_per_org, is_active, note', 'numerical', 'integerOnly' => true),
+			array('event_id', 'length', 'max' => 20),
+			array('name', 'length', 'max' => 255),
 			array('created_at, updated_at, deleted_at', 'safe'),
 			array('max_per_org, is_active, note, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, event_id, name, start_time, end_time, max_per_org, is_active, note, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
+			array('id, event_id, name, start_time, end_time, max_per_org, is_active, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+	{
 		return array(
 			'event' => array(self::BELONGS_TO, 'Events', 'event_id'),
 			'registrations' => array(self::HAS_MANY, 'Registrations', 'period_id'),
 		);
 	}
 
-	public function pivotModels() {
-		return array(
-		);
+	public function pivotModels()
+	{
+		return array();
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+	{
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'event_id' => null,
 			'name' => Yii::t('app', 'Name'),
-			'start_time' => Yii::t('app', 'Start Time'),
-			'end_time' => Yii::t('app', 'End Time'),
-			'max_per_org' => Yii::t('app', 'Max Per Org'),
-			'is_active' => Yii::t('app', 'Is Active'),
-			'note' => Yii::t('app', 'Note'),
-			'created_at' => Yii::t('app', 'Created At'),
+			'start_time' => Yii::t('app', 'Ngày bắt đầu'),
+			'end_time' => Yii::t('app', 'Ngày kết thúc'),
+			'max_per_org' => Yii::t('app', 'Số lượng tối đa'),
+			'is_active' => Yii::t('app', 'Kích hoạt'),
+			'note' => Yii::t('app', 'Ghi chú'),
+			'created_at' => Yii::t('app', 'Ngày tạo'),
 			'updated_at' => Yii::t('app', 'Updated At'),
 			'deleted_at' => Yii::t('app', 'Deleted At'),
 			'event' => null,
@@ -84,7 +92,8 @@ abstract class BaseRegistrationPeriods extends GxActiveRecord {
 		);
 	}
 
-	public function search() {
+	public function search()
+	{
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);
