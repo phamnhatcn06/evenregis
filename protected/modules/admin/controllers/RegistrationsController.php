@@ -23,8 +23,9 @@ class RegistrationsController extends AdminController
 
 		if (isset($_POST['Registrations'])) {
 			$model->setAttributes($_POST['Registrations']);
+			$model->status = 'draft';
+			$model->submitted_by = Yii::app()->user->id ?: 1;
 			if ($model->validate()) {
-				$model->status = 'draft';
 				$result = $model->storeViaApi();
 
 				if ($result['success']) {
