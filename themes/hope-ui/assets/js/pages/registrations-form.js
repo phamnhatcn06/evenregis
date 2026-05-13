@@ -1,0 +1,213 @@
+document.addEventListener('DOMContentLoaded', function() {
+    var uploadArea = document.getElementById('uploadArea');
+    var fileInput = document.getElementById('documentFiles');
+    var previewContainer = document.getElementById('filePreview');
+    var documentJson = document.getElementById('documentJson');
+
+    var selectedFiles = [];
+    var existingFiles = [];
+
+    // Parse existing documents
+    if (documentJson.value) {
+        try {
+            existingFiles = JSON.parse(documentJson.value);
+            if (!Array.isArray(existingFiles)) {
+                existingFiles = existingFiles ? [existingFiles] : [];
+            }
+            renderExistingFiles();
+        } catch (e) {
+            if (documentJson.value) {
+                existingFiles = [documentJson.value];
+                renderExistingFiles();
+            }
+        }
+    }
+
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('bg-light');
+    });
+
+    uploadArea.addEventListener('dragleave', function() {
+        uploadArea.classList.remove('bg-light');
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('bg-light');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', function() {
+        handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+        var allowedTypes = ['application/pdf', 'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'image/jpeg', 'image/png'];
+        var maxSize = 5 * 1024 * 1024;
+
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var ext = file.name.split('.').pop().toLowerCase();
+            var validExt = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+
+            if (validExt.indexOf(ext) === -1) {
+                Toast.error('File "' + file.name + '" không được hỗ trợ');
+                continue;
+            }
+            if (file.size > maxSize) {
+                Toast.error('File "' + file.name + '" vượt quá 5MB');
+                continue;
+            }
+            selectedFiles.push(file);
+        }
+        renderPreview();
+    }
+
+    function renderExistingFiles() {
+        existingFiles.forEach(function(url, index) {
+            var filename = url.split('/').pop();
+            var ext = filename.split('.').pop().toLowerCase();
+            var isImage = ['jpg', 'jpeg', 'png'].indexOf(ext) !== -1;
+
+            var col = document.createElement('div');
+            col.className = 'col-6 col-md-3';
+            col.id = 'existing-' + index;
+
+            var card = document.createElement('div');
+            card.className = 'card h-100 position-relative';
+
+            var preview = '';
+            if (isImage) {
+                preview = '<img src="' + url + '" class="card-img-top" style="height:80px;object-fit:cover;">';
+            } else {
+                preview = '<div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:80px;">' +
+                    '<i class="fa fa-file-' + getFileIcon(ext) + '-o fa-2x text-muted"></i></div>';
+            }
+
+            card.innerHTML = preview +
+                '<div class="card-body p-2">' +
+                    '<small class="text-truncate d-block" title="' + filename + '">' + filename + '</small>' +
+                    '<span class="badge bg-success">Đã lưu</span>' +
+                '</div>' +
+                '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 remove-existing" data-index="' + index + '">' +
+                    '<i class="fa fa-times"></i>' +
+                '</button>';
+
+            col.appendChild(card);
+            previewContainer.appendChild(col);
+        });
+
+        bindRemoveExisting();
+    }
+
+    function renderPreview() {
+        document.querySelectorAll('.new-file-preview').forEach(function(el) {
+            el.remove();
+        });
+
+        selectedFiles.forEach(function(file, index) {
+            var ext = file.name.split('.').pop().toLowerCase();
+            var isImage = ['jpg', 'jpeg', 'png'].indexOf(ext) !== -1;
+
+            var col = document.createElement('div');
+            col.className = 'col-6 col-md-3 new-file-preview';
+            col.id = 'new-' + index;
+
+            var card = document.createElement('div');
+            card.className = 'card h-100 position-relative';
+
+            if (isImage) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    card.querySelector('.preview-img').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                card.innerHTML = '<img src="" class="card-img-top preview-img" style="height:80px;object-fit:cover;">' +
+                    '<div class="card-body p-2">' +
+                        '<small class="text-truncate d-block" title="' + file.name + '">' + file.name + '</small>' +
+                        '<span class="badge bg-info">Mới</span>' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 remove-new" data-index="' + index + '">' +
+                        '<i class="fa fa-times"></i>' +
+                    '</button>';
+            } else {
+                card.innerHTML = '<div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:80px;">' +
+                        '<i class="fa fa-file-' + getFileIcon(ext) + '-o fa-2x text-muted"></i>' +
+                    '</div>' +
+                    '<div class="card-body p-2">' +
+                        '<small class="text-truncate d-block" title="' + file.name + '">' + file.name + '</small>' +
+                        '<span class="badge bg-info">Mới</span>' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 remove-new" data-index="' + index + '">' +
+                        '<i class="fa fa-times"></i>' +
+                    '</button>';
+            }
+
+            col.appendChild(card);
+            previewContainer.appendChild(col);
+        });
+
+        bindRemoveNew();
+        updateFileInput();
+    }
+
+    function getFileIcon(ext) {
+        if (ext === 'pdf') return 'pdf';
+        if (ext === 'doc' || ext === 'docx') return 'word';
+        return 'text';
+    }
+
+    function bindRemoveExisting() {
+        document.querySelectorAll('.remove-existing').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var index = parseInt(this.getAttribute('data-index'));
+                existingFiles.splice(index, 1);
+                document.getElementById('existing-' + index).remove();
+                reindexExisting();
+                updateDocumentJson();
+            });
+        });
+    }
+
+    function bindRemoveNew() {
+        document.querySelectorAll('.remove-new').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var index = parseInt(this.getAttribute('data-index'));
+                selectedFiles.splice(index, 1);
+                renderPreview();
+            });
+        });
+    }
+
+    function reindexExisting() {
+        var items = previewContainer.querySelectorAll('[id^="existing-"]');
+        existingFiles = [];
+        items.forEach(function(item, i) {
+            item.id = 'existing-' + i;
+            item.querySelector('.remove-existing').setAttribute('data-index', i);
+        });
+    }
+
+    function updateFileInput() {
+        var dt = new DataTransfer();
+        selectedFiles.forEach(function(file) {
+            dt.items.add(file);
+        });
+        fileInput.files = dt.files;
+    }
+
+    function updateDocumentJson() {
+        documentJson.value = existingFiles.length > 0 ? JSON.stringify(existingFiles) : '';
+    }
+
+    document.getElementById('registrations-form').addEventListener('submit', function() {
+        updateDocumentJson();
+    });
+});
