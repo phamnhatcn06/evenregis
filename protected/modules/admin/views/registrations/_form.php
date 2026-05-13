@@ -74,9 +74,9 @@ if (isset($relationProperties)) {
                 <?php echo $form->dropDownList($model, 'property_id', $propertyList, array(
                     'class' => 'form-select',
                     'prompt' => '-- Chọn đơn vị --',
-                    'disabled' => !$isAdmin && count($propertyList) == 1,
+                    'disabled' => !$isHO && count($propertyList) == 1,
                 )); ?>
-                <?php if (!$isAdmin && count($propertyList) == 1): ?>
+                <?php if (!$isHO && count($propertyList) == 1): ?>
                     <input type="hidden" name="Registrations[property_id]" value="<?php echo $model->property_id; ?>">
                 <?php endif; ?>
                 <?php echo $form->error($model, 'property_id'); ?>
@@ -128,8 +128,8 @@ if (isset($relationProperties)) {
     <?php $this->endWidget(); ?>
 </div>
 
-<!-- isAdmin: <?php echo $isAdmin ? 'true' : 'false'; ?> -->
-<?php if ($isAdmin): ?>
+<!-- isAdmin: <?php echo $isHO ? 'true' : 'false'; ?> -->
+<?php if ($isHO): ?>
 <script>
 console.log('Admin script loaded');
 document.addEventListener('DOMContentLoaded', function() {
