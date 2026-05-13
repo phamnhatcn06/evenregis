@@ -142,13 +142,13 @@ class MenuHelper
     {
         $configs = array(
             'data-center' => array(
-                'label' => 'Quản lý dữ liệu',
+                'label' => 'Dữ liệu chung',
                 'icon' => 'data',
                 'forceGroup' => true,
             ),
             'events' => array(
                 'label' => 'Triển khai sự kiện',
-                'icon' => 'data',
+                'icon' => 'activities',
                 'forceGroup' => true,
             ),
             'activities' => array(
@@ -213,7 +213,7 @@ class MenuHelper
 
                 $html .= '<li class="nav-item">';
                 $html .= '<a class="nav-link ' . $activeClass . '" data-bs-toggle="collapse" href="#menu-' . $key . '" role="button" aria-expanded="' . (!empty($item['active']) ? 'true' : 'false') . '" aria-controls="menu-' . $key . '">';
-                $html .= '<i class="icon">' . $item['icon'] . '</i>';
+                $html .= '<i class="icon" style="color:#000000;">' . $item['icon'] . '</i>';
                 $html .= '<span class="item-name">' . CHtml::encode($item['label']) . '</span>';
                 $html .= '<i class="right-icon"><svg width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-18"><path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></i>';
                 $html .= '</a>';
