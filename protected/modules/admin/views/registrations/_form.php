@@ -21,7 +21,7 @@ foreach ($properties as $p) {
 }
 
 $relationPropertyList = array();
-if (isset($relationProperties) && !$isAdmin) {
+if (isset($relationProperties)) {
     foreach ($relationProperties as $p) {
         $pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
         $pCode = isset($p['code']) ? $p['code'] : (isset($p->code) ? $p->code : '');
