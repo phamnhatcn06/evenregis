@@ -142,8 +142,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        console.log('Fetching:', ajaxUrl + '&property_id=' + propertyId);
-        fetch(ajaxUrl + '&property_id=' + propertyId)
+        var separator = ajaxUrl.indexOf('?') > -1 ? '&' : '?';
+        console.log('Fetching:', ajaxUrl + separator + 'property_id=' + propertyId);
+        fetch(ajaxUrl + separator + 'property_id=' + propertyId)
             .then(function(response) {
                 console.log('Response status:', response.status);
                 return response.json();
