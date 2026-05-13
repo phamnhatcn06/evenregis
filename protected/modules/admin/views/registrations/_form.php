@@ -128,10 +128,8 @@ if (isset($relationProperties)) {
     <?php $this->endWidget(); ?>
 </div>
 
-<!-- isAdmin: <?php echo $isHO ? 'true' : 'false'; ?> -->
 <?php if ($isHO): ?>
 <script>
-console.log('Admin script loaded');
 document.addEventListener('DOMContentLoaded', function() {
     var propertySelect = document.getElementById('Registrations_property_id');
     var relationSelect = document.getElementById('Registrations_relation_property_id');
