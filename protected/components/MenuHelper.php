@@ -145,6 +145,11 @@ class MenuHelper
                 'icon' => 'data',
                 'forceGroup' => true,
             ),
+            'events' => array(
+                'label' => 'Triển khai sự kiện',
+                'icon' => 'data',
+                'forceGroup' => true,
+            ),
             'activities' => array(
                 'label' => 'Hoạt động',
                 'icon' => 'activities',
