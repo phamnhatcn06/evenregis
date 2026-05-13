@@ -43,9 +43,15 @@ class SiteController extends Controller
             AuthHandler::logout();
             $userData = AuthHandler::handleCallback($ssoToken);
             if ($userData) {
-                // Login successful - redirect to admin dashboard
+                // Fetch full user profile from SSO API
+                $userProfile = AuthHandler::fetchUserProfile($ssoToken);
+
+                // Render callback page to save profile to localStorage
                 Yii::app()->user->setFlash('success', 'Đăng nhập thành công. Xin chào ' . $userData['full_name']);
-                $this->redirect(array('/admin/default/index'));
+                $this->render('callback', array(
+                    'userProfile' => $userProfile,
+                    'redirectUrl' => Yii::app()->createUrl('/admin/default/index'),
+                ));
                 return;
             } else {
                 // Login failed
