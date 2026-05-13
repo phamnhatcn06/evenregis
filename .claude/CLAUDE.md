@@ -139,7 +139,37 @@ Portal → /auth/callback?token=<JWT>
               ↓
     Create Yii session (user info, permissions)
               ↓
+    Call SSO API: GET https://api.portal.muongthanh.vn/api/sso/me
+              ↓
+    Return user profile → JS saves to localStorage
+              ↓
     Redirect → Dashboard
+```
+
+### SSO User Profile API
+
+Sau khi redirect từ Portal, hệ thống gọi SSO API để lấy đầy đủ thông tin người dùng:
+
+```
+GET https://api.portal.muongthanh.vn/api/sso/me
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Response:** Toàn bộ thông tin user profile từ Portal.
+
+**Sử dụng trong PHP:**
+```php
+// Lấy profile sau login
+$profile = AuthHandler::fetchUserProfile($token);
+
+// Hoặc lấy từ session token hiện tại
+$profile = AuthHandler::getUserProfileForClient();
+```
+
+**Lưu vào localStorage (JS):**
+```javascript
+// Trong callback page, nhận data từ PHP và lưu
+localStorage.setItem('sso_user_profile', JSON.stringify(userProfile));
 ```
 
 ### JWT Token Payload từ Portal
