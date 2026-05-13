@@ -84,26 +84,24 @@ class Regionals extends BaseRegionals
 
 	public static function assignOrganizations($regionalId, $newOrgIds)
 	{
+
 		$currentOrgs = self::getOrganizations($regionalId);
 		$currentOrgIds = array_column($currentOrgs, 'id');
-
 		$errors = array();
-
 		// Remove regional_id from properties no longer assigned
 		$toRemove = array_diff($currentOrgIds, $newOrgIds);
 		foreach ($toRemove as $propId) {
 			$url = ApiEndpoints::url(ApiEndpoints::PROPERTY_UPDATE, array('id' => $propId));
-			$result = ApiClient::post($url, array('regional_id' => null));
+			$result = ApiClient::post($url, array('region_id' => null));
 			if (!$result['success']) {
 				$errors[] = "Failed to remove property $propId";
 			}
 		}
-
 		// Add regional_id to newly assigned properties
 		$toAdd = array_diff($newOrgIds, $currentOrgIds);
 		foreach ($toAdd as $propId) {
 			$url = ApiEndpoints::url(ApiEndpoints::PROPERTY_UPDATE, array('id' => $propId));
-			$result = ApiClient::post($url, array('regional_id' => $regionalId));
+			$result = ApiClient::post($url, array('region_id' => $regionalId));
 			if (!$result['success']) {
 				$errors[] = "Failed to assign property $propId";
 			}

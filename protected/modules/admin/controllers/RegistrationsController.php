@@ -192,6 +192,33 @@ class RegistrationsController extends AdminController
 		return $model;
 	}
 
+	public function actionGetRelationProperties($property_id)
+	{
+		$property = Properties::fetchFromApi($property_id);
+		$result = array();
+
+		if ($property && $property->regional_id) {
+			$properties = Properties::getApiDataProvider(array('regional_id' => $property->regional_id), 500)->getData();
+			foreach ($properties as $p) {
+				$pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
+				if ($pId && $pId != $property_id) {
+					$result[] = array(
+						'id' => $pId,
+						'code' => isset($p['code']) ? $p['code'] : '',
+						'name' => isset($p['name']) ? $p['name'] : '',
+					);
+				}
+			}
+			usort($result, function($a, $b) {
+				return strcmp($a['code'], $b['code']);
+			});
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
 	public function actionAdmin()
 	{
 		$model = new Registrations('search');
