@@ -209,41 +209,55 @@ class RegistrationsController extends AdminController
 		return $model;
 	}
 
-	protected function handleDocumentUpload()
+	protected function handleDocumentUpload($existingDocument = null)
 	{
-		if (!isset($_FILES['document_file']) || $_FILES['document_file']['error'] === UPLOAD_ERR_NO_FILE) {
-			return null;
+		$uploadedFiles = array();
+
+		if ($existingDocument) {
+			$existing = json_decode($existingDocument, true);
+			if (is_array($existing)) {
+				$uploadedFiles = $existing;
+			} elseif ($existingDocument) {
+				$uploadedFiles[] = $existingDocument;
+			}
 		}
 
-		$file = $_FILES['document_file'];
-		if ($file['error'] !== UPLOAD_ERR_OK) {
-			return null;
+		if (!isset($_FILES['document_files']) || !is_array($_FILES['document_files']['name'])) {
+			return $uploadedFiles ? json_encode($uploadedFiles) : null;
 		}
 
 		$allowedTypes = array('pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png');
-		$ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-		if (!in_array($ext, $allowedTypes)) {
-			return null;
-		}
-
 		$maxSize = 5 * 1024 * 1024;
-		if ($file['size'] > $maxSize) {
-			return null;
-		}
 
 		$uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/registrations/';
 		if (!is_dir($uploadDir)) {
 			mkdir($uploadDir, 0755, true);
 		}
 
-		$filename = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
-		$filepath = $uploadDir . $filename;
+		$fileCount = count($_FILES['document_files']['name']);
+		for ($i = 0; $i < $fileCount; $i++) {
+			if ($_FILES['document_files']['error'][$i] !== UPLOAD_ERR_OK) {
+				continue;
+			}
 
-		if (move_uploaded_file($file['tmp_name'], $filepath)) {
-			return Yii::app()->baseUrl . '/uploads/registrations/' . $filename;
+			$ext = strtolower(pathinfo($_FILES['document_files']['name'][$i], PATHINFO_EXTENSION));
+			if (!in_array($ext, $allowedTypes)) {
+				continue;
+			}
+
+			if ($_FILES['document_files']['size'][$i] > $maxSize) {
+				continue;
+			}
+
+			$filename = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+			$filepath = $uploadDir . $filename;
+
+			if (move_uploaded_file($_FILES['document_files']['tmp_name'][$i], $filepath)) {
+				$uploadedFiles[] = Yii::app()->baseUrl . '/uploads/registrations/' . $filename;
+			}
 		}
 
-		return null;
+		return $uploadedFiles ? json_encode($uploadedFiles) : null;
 	}
 
 	public function actionGetRelationProperties($property_id)
