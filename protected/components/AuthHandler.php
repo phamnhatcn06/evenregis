@@ -341,7 +341,7 @@ class AuthHandler extends CApplicationComponent
                 'Accept: application/json',
             ),
             CURLOPT_TIMEOUT => 10,
-            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
         ));
 
         $response = curl_exec($ch);
@@ -349,19 +349,27 @@ class AuthHandler extends CApplicationComponent
         $error = curl_error($ch);
         curl_close($ch);
 
+        // Debug log
+        Yii::log('SSO /me API response: HTTP ' . $httpCode . ' | Error: ' . $error . ' | Body: ' . substr($response, 0, 500), CLogger::LEVEL_INFO, 'auth');
+
         if ($error || $httpCode !== 200) {
             Yii::log('SSO /me API failed: ' . ($error ?: 'HTTP ' . $httpCode), CLogger::LEVEL_WARNING, 'auth');
             return null;
         }
 
         $data = json_decode($response, true);
-        if (!$data || !isset($data['data'])) {
-            Yii::log('SSO /me API invalid response', CLogger::LEVEL_WARNING, 'auth');
-            return null;
+
+        // Try different response formats
+        if (is_array($data)) {
+            if (isset($data['data'])) {
+                return $data['data'];
+            }
+            // Maybe data is at root level
+            return $data;
         }
 
-        Yii::log('SSO /me API success for token', CLogger::LEVEL_INFO, 'auth');
-        return $data['data'];
+        Yii::log('SSO /me API invalid response: ' . $response, CLogger::LEVEL_WARNING, 'auth');
+        return null;
     }
 
     /**
