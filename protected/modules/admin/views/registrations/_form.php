@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
 
-    if (!propertySelect.value) {
+    if (!propertySelect.value && relationSelect.options.length <= 1) {
         relationSelect.innerHTML = '<option value="">-- Chọn đơn vị trước --</option>';
     }
 });
