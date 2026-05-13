@@ -576,6 +576,7 @@ body.uikit .btn-download {
 
 /* Form inputs border - gray for better visibility on light background */
 .form-control,
+select.form-select,
 .form-select,
 input[type="text"],
 input[type="email"],
@@ -588,10 +589,12 @@ input[type="datetime-local"],
 input[type="file"],
 textarea,
 select {
-  border: 1px solid #ced4da !important;
+  border: 1px solid #9ca3af !important;
+  background-color: #fff !important;
 }
 
 .form-control:focus,
+select.form-select:focus,
 .form-select:focus,
 input[type="text"]:focus,
 input[type="email"]:focus,
@@ -604,8 +607,8 @@ input[type="datetime-local"]:focus,
 input[type="file"]:focus,
 textarea:focus,
 select:focus {
-  border-color: #86b7fe !important;
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15) !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.2) !important;
 }
 
 /* Table borders */
