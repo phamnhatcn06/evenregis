@@ -138,29 +138,40 @@ class AuthHandler extends CApplicationComponent
         $session = Yii::app()->session;
         $userData = isset($session[self::SESSION_USER_KEY]) ? $session[self::SESSION_USER_KEY] : array();
 
-        // Merge profile fields into session
-        $fieldsToMerge = array(
-            'property_id', 'property_code', 'regional_id',
-            'hotel_code', 'hotel_id', 'hotel_name',
-            'department_id', 'department_name', 'position_name',
-        );
+        $employee = isset($profile['Employee']) ? $profile['Employee'] : array();
 
-        foreach ($fieldsToMerge as $field) {
-            if (isset($profile[$field]) && !empty($profile[$field])) {
-                $userData[$field] = $profile[$field];
-            }
+        // Hotel info
+        if (isset($employee['Hotel'])) {
+            $userData['property_code'] = isset($employee['Hotel']['Code']) ? $employee['Hotel']['Code'] : null;
+            $userData['hotel_symbol'] = isset($employee['Hotel']['Symbol']) ? $employee['Hotel']['Symbol'] : null;
+            $userData['hotel_name'] = isset($employee['Hotel']['Name']) ? $employee['Hotel']['Name'] : null;
         }
 
-        // Also check for HotelCode (might be different key)
-        if (isset($profile['HotelCode'])) {
-            $userData['property_code'] = $profile['HotelCode'];
+        // Area/Regional info
+        if (isset($employee['Area'])) {
+            $userData['regional_id'] = isset($employee['Area']['Id']) ? $employee['Area']['Id'] : null;
+            $userData['regional_name'] = isset($employee['Area']['Name']) ? $employee['Area']['Name'] : null;
         }
-        if (isset($profile['HotelId'])) {
-            $userData['property_id'] = $profile['HotelId'];
+
+        // Department info
+        if (isset($employee['Department'])) {
+            $userData['department_id'] = isset($employee['Department']['Id']) ? $employee['Department']['Id'] : null;
+            $userData['department_name'] = isset($employee['Department']['Name']) ? $employee['Department']['Name'] : null;
         }
+
+        // Position info
+        if (isset($employee['Position'])) {
+            $userData['position_id'] = isset($employee['Position']['Id']) ? $employee['Position']['Id'] : null;
+            $userData['position_name'] = isset($employee['Position']['Name']) ? $employee['Position']['Name'] : null;
+        }
+
+        // Employee info
+        $userData['employee_id'] = isset($employee['Id']) ? $employee['Id'] : null;
+        $userData['avatar'] = isset($employee['Avatar']) ? $employee['Avatar'] : null;
+        $userData['mobile'] = isset($employee['Mobile']) ? $employee['Mobile'] : null;
 
         $session[self::SESSION_USER_KEY] = $userData;
-        Yii::log('Session updated with SSO profile: ' . json_encode(array_keys($profile)), CLogger::LEVEL_INFO, 'auth');
+        Yii::log('Session updated with SSO profile, property_code: ' . $userData['property_code'], CLogger::LEVEL_INFO, 'auth');
     }
 
     /**
