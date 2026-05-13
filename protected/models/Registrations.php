@@ -28,8 +28,6 @@ class Registrations extends BaseRegistrations
 		$data = array_filter($this->attributes, function ($value) {
 			return $value !== null && $value !== '';
 		});
-		print_r($data);
-		die();
 		return ApiClient::post(ApiEndpoints::REGISTRATION_STORE, $data);
 	}
 

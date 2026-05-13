@@ -31,7 +31,7 @@ class RegistrationsController extends AdminController
 			$relationProperties = $properties;
 		} else {
 			$properties = $userPropertyId ? Properties::getApiDataProvider(array('id' => $userPropertyId), 100)->getData() : array();
-			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('regional_id' => $userRegionalId), 100)->getData() : array();
+			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('region_id' => $userRegionalId), 100)->getData() : array();
 		}
 
 		if ($userPropertyId && !$model->property_id) {
@@ -90,7 +90,7 @@ class RegistrationsController extends AdminController
 			}
 		} else {
 			$properties = $userPropertyId ? Properties::getApiDataProvider(array('id' => $userPropertyId), 100)->getData() : array();
-			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('regional_id' => $userRegionalId), 500)->getData() : array();
+			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('region_id' => $userRegionalId), 500)->getData() : array();
 		}
 
 		if (isset($_POST['Registrations'])) {
@@ -203,8 +203,8 @@ class RegistrationsController extends AdminController
 		$property = Properties::fetchFromApi($property_id);
 		$result = array();
 
-		if ($property && $property->regional_id) {
-			$properties = Properties::getApiDataProvider(array('regional_id' => $property->regional_id), 500)->getData();
+		if ($property && $property->region_id) {
+			$properties = Properties::getApiDataProvider(array('region_id' => $property->region_id), 500)->getData();
 			foreach ($properties as $p) {
 				$pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
 				if ($pId && $pId != $property_id) {
@@ -215,7 +215,7 @@ class RegistrationsController extends AdminController
 					);
 				}
 			}
-			usort($result, function($a, $b) {
+			usort($result, function ($a, $b) {
 				return strcmp($a['code'], $b['code']);
 			});
 		}

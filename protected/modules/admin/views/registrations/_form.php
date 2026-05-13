@@ -59,7 +59,7 @@ if (isset($relationProperties)) {
         </div>
         <div class="col-md-6">
             <div class="form-group mb-3">
-                <?php echo $form->labelEx($model, 'period_id'); ?>
+                <?php echo $form->labelEx($model, 'Đợt đăng ký'); ?>
                 <?php echo $form->dropDownList($model, 'period_id', $periods, array(
                     'class' => 'form-select',
                     'prompt' => '-- Chọn đợt đăng ký --',
@@ -86,25 +86,31 @@ if (isset($relationProperties)) {
         </div>
         <div class="col-md-6">
             <div class="form-group mb-3">
-                <?php echo $form->labelEx($model, 'relation_property_id'); ?>
+                <?php echo $form->labelEx($model, 'Đơn vị liên quân (nếu có)'); ?>
                 <?php echo $form->dropDownList($model, 'relation_property_id', $relationPropertyList, array(
                     'class' => 'form-select',
                     'prompt' => '-- Không có (liên quân) --',
                 )); ?>
                 <?php echo $form->error($model, 'relation_property_id'); ?>
-                <small class="text-muted">Chọn đơn vị liên quân trong cùng khu vực</small>
+                <small class="text-muted">Chọn đơn vị liên quân trong cùng khu vực. Cần xác nhận từ đơn vị được chọn mới được duyệt</small>
             </div>
         </div>
     </div>
 
     <div class="form-group mb-3">
         <?php echo $form->labelEx($model, 'document'); ?>
-        <?php echo $form->textField($model, 'document', array(
-            'class' => 'form-control',
-            'maxlength' => 500,
-            'placeholder' => 'Link tài liệu đính kèm (công văn)',
-        )); ?>
+        <input type="file" name="document_file" id="document_file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+        <?php if ($model->document): ?>
+            <div class="mt-2">
+                <small class="text-muted">Tài liệu hiện tại: </small>
+                <a href="<?php echo $model->document; ?>" target="_blank" class="text-primary">
+                    <i class="fa fa-file"></i> <?php echo basename($model->document); ?>
+                </a>
+            </div>
+        <?php endif; ?>
+        <?php echo $form->hiddenField($model, 'document'); ?>
         <?php echo $form->error($model, 'document'); ?>
+        <small class="text-muted">Chấp nhận: PDF, DOC, DOCX, JPG, PNG (tối đa 5MB)</small>
     </div>
 
     <div class="form-group mb-3">
@@ -131,43 +137,45 @@ if (isset($relationProperties)) {
 </div>
 
 <?php if ($isHO): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var propertySelect = document.getElementById('Registrations_property_id');
-    var relationSelect = document.getElementById('Registrations_relation_property_id');
-    var ajaxUrl = '<?php echo $this->createUrl("getRelationProperties"); ?>';
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var propertySelect = document.getElementById('Registrations_property_id');
+            var relationSelect = document.getElementById('Registrations_relation_property_id');
+            var ajaxUrl = '<?php echo $this->createUrl("getRelationProperties"); ?>';
 
-    propertySelect.addEventListener('change', function() {
-        var propertyId = this.value;
-        relationSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+            propertySelect.addEventListener('change', function() {
+                var propertyId = this.value;
+                relationSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
 
-        if (!propertyId) {
-            relationSelect.innerHTML = '<option value="">-- Chọn đơn vị trước --</option>';
-            return;
-        }
-
-        var separator = ajaxUrl.indexOf('?') > -1 ? '&' : '?';
-        fetch(ajaxUrl + separator + 'property_id=' + propertyId)
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                relationSelect.innerHTML = '<option value="">-- Không có (liên quân) --</option>';
-                if (data.success && data.data && data.data.length > 0) {
-                    data.data.forEach(function(p) {
-                        var option = document.createElement('option');
-                        option.value = p.id;
-                        option.textContent = p.code + ' - ' + p.name;
-                        relationSelect.appendChild(option);
-                    });
+                if (!propertyId) {
+                    relationSelect.innerHTML = '<option value="">-- Chọn đơn vị trước --</option>';
+                    return;
                 }
-            })
-            .catch(function() {
-                relationSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
-            });
-    });
 
-    if (!propertySelect.value && relationSelect.options.length <= 1) {
-        relationSelect.innerHTML = '<option value="">-- Chọn đơn vị trước --</option>';
-    }
-});
-</script>
+                var separator = ajaxUrl.indexOf('?') > -1 ? '&' : '?';
+                fetch(ajaxUrl + separator + 'property_id=' + propertyId)
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        relationSelect.innerHTML = '<option value="">-- Không có (liên quân) --</option>';
+                        if (data.success && data.data && data.data.length > 0) {
+                            data.data.forEach(function(p) {
+                                var option = document.createElement('option');
+                                option.value = p.id;
+                                option.textContent = p.code + ' - ' + p.name;
+                                relationSelect.appendChild(option);
+                            });
+                        }
+                    })
+                    .catch(function() {
+                        relationSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+                    });
+            });
+
+            if (!propertySelect.value && relationSelect.options.length <= 1) {
+                relationSelect.innerHTML = '<option value="">-- Chọn đơn vị trước --</option>';
+            }
+        });
+    </script>
 <?php endif; ?>

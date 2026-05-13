@@ -78,7 +78,7 @@ class Regionals extends BaseRegionals
 
 	public static function getOrganizations($regionalId)
 	{
-		$dataProvider = Properties::getApiDataProvider(array('regional_id' => $regionalId), 500);
+		$dataProvider = Properties::getApiDataProvider(array('region_id' => $regionalId), 500);
 		return $dataProvider->getData();
 	}
 

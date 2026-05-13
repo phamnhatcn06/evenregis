@@ -81,7 +81,7 @@ Yii::app()->clientScript->registerScriptFile(
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Danh sách đơn vị (<?php echo count($organizations); ?>)</h5>
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignOrganizationsModal">
-                    <i class="fa fa-plus"></i> Thêm đơn vị
+                    <i class="fa fa-plus"></i> Cập nhật đơn vị
                 </button>
             </div>
             <div class="card-body">

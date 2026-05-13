@@ -4,9 +4,10 @@ Yii::import('application.models._base.BaseProperties');
 
 class Properties extends BaseProperties
 {
-	public $regional_id;
+	public $region_id;
 
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
@@ -19,8 +20,8 @@ class Properties extends BaseProperties
 			$model = new self;
 			$model->setAttributes($data, false);
 			$model->id = $id;
-			if (isset($data['regional_id'])) {
-				$model->regional_id = $data['regional_id'];
+			if (isset($data['region_id'])) {
+				$model->region_id = $data['region_id'];
 			}
 			return $model;
 		}
