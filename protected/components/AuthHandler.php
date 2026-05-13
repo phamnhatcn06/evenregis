@@ -126,6 +126,44 @@ class AuthHandler extends CApplicationComponent
     }
 
     /**
+     * Update session with SSO profile data
+     * @param array $profile Profile data from SSO /me API
+     */
+    public static function updateSessionWithProfile($profile)
+    {
+        if (!$profile || !is_array($profile)) {
+            return;
+        }
+
+        $session = Yii::app()->session;
+        $userData = isset($session[self::SESSION_USER_KEY]) ? $session[self::SESSION_USER_KEY] : array();
+
+        // Merge profile fields into session
+        $fieldsToMerge = array(
+            'property_id', 'property_code', 'regional_id',
+            'hotel_code', 'hotel_id', 'hotel_name',
+            'department_id', 'department_name', 'position_name',
+        );
+
+        foreach ($fieldsToMerge as $field) {
+            if (isset($profile[$field]) && !empty($profile[$field])) {
+                $userData[$field] = $profile[$field];
+            }
+        }
+
+        // Also check for HotelCode (might be different key)
+        if (isset($profile['HotelCode'])) {
+            $userData['property_code'] = $profile['HotelCode'];
+        }
+        if (isset($profile['HotelId'])) {
+            $userData['property_id'] = $profile['HotelId'];
+        }
+
+        $session[self::SESSION_USER_KEY] = $userData;
+        Yii::log('Session updated with SSO profile: ' . json_encode(array_keys($profile)), CLogger::LEVEL_INFO, 'auth');
+    }
+
+    /**
      * Check if user is authenticated via SSO
      * @return bool
      */
