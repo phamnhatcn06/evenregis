@@ -80,11 +80,17 @@ class RegistrationsController extends AdminController
 		$periods = RegistrationPeriods::getActiveList();
 
 		if ($isAdmin) {
-			$properties = Properties::getApiDataProvider(array(), 100)->getData();
-			$relationProperties = $properties;
+			$properties = Properties::getApiDataProvider(array(), 500)->getData();
+			$relationProperties = array();
+			if ($model->property_id) {
+				$property = Properties::fetchFromApi($model->property_id);
+				if ($property && $property->regional_id) {
+					$relationProperties = Properties::getApiDataProvider(array('regional_id' => $property->regional_id), 500)->getData();
+				}
+			}
 		} else {
 			$properties = $userPropertyId ? Properties::getApiDataProvider(array('id' => $userPropertyId), 100)->getData() : array();
-			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('regional_id' => $userRegionalId), 100)->getData() : array();
+			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('regional_id' => $userRegionalId), 500)->getData() : array();
 		}
 
 		if (isset($_POST['Registrations'])) {
