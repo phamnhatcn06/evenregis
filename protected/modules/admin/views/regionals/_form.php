@@ -54,7 +54,7 @@ echo $form->textAreaGroup($model, 'description', array(
 <?php
 echo $form->dropDownListGroup($model, 'status', array(
     'widgetOptions' => array(
-        'data' => array(1 => 'Hoat dong', 0 => 'Khong hoat dong'),
+        'data' => array(1 => 'Hoạt động', 0 => 'Không hoạt động'),
         'htmlOptions' => array(
             'class' => 'form-select'
         )
