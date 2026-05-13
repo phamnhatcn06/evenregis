@@ -21,6 +21,7 @@ foreach ($properties as $p) {
         $propertyList[$pId] = "{$pCode} - {$pName}";
     }
 }
+asort($propertyList);
 
 $relationPropertyList = array();
 if (isset($relationProperties)) {
