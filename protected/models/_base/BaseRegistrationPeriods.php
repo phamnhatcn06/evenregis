@@ -51,12 +51,12 @@ abstract class BaseRegistrationPeriods extends GxActiveRecord
 	{
 		return array(
 			array('event_id, name, start_time, end_time', 'required'),
-			array('max_per_org, is_active, note', 'numerical', 'integerOnly' => true),
+			array('max_per_org, note', 'numerical', 'integerOnly' => true),
 			array('event_id', 'length', 'max' => 20),
 			array('name', 'length', 'max' => 255),
 			array('created_at, updated_at, deleted_at', 'safe'),
 			array('max_per_org, is_active, note, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, event_id, name, start_time, end_time, max_per_org, is_active, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
+			array('id, event_id,event_name, name, start_time, end_time, max_per_org, is_active, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 
@@ -78,7 +78,7 @@ abstract class BaseRegistrationPeriods extends GxActiveRecord
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'event_id' => null,
-			'name' => Yii::t('app', 'Name'),
+			'name' => Yii::t('app', 'Tên đợt đăng ký'),
 			'start_time' => Yii::t('app', 'Ngày bắt đầu'),
 			'end_time' => Yii::t('app', 'Ngày kết thúc'),
 			'max_per_org' => Yii::t('app', 'Số lượng tối đa'),
@@ -98,6 +98,7 @@ abstract class BaseRegistrationPeriods extends GxActiveRecord
 
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('event_id', $this->event_id);
+		$criteria->compare('event_name', $this->event_name);
 		$criteria->compare('name', $this->name, true);
 		$criteria->compare('start_time', $this->start_time, true);
 		$criteria->compare('end_time', $this->end_time, true);

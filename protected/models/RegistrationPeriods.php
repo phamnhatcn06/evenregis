@@ -4,6 +4,8 @@ Yii::import('application.models._base.BaseRegistrationPeriods');
 
 class RegistrationPeriods extends BaseRegistrationPeriods
 {
+	public $event_name;
+
 	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
@@ -18,9 +20,19 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 			$model = new self;
 			$model->setAttributes($data, false);
 			$model->id = $id;
+			$model->mapRelations($data);
 			return $model;
 		}
 		return null;
+	}
+
+	protected function mapRelations($data)
+	{
+		if (isset($data['event']['name'])) {
+			$this->event_name = $data['event']['name'];
+		} elseif (isset($data['event_name'])) {
+			$this->event_name = $data['event_name'];
+		}
 	}
 
 	public function storeViaApi()
