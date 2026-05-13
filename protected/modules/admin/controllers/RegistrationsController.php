@@ -70,9 +70,22 @@ class RegistrationsController extends AdminController
 	{
 		$model = $this->loadModelById($id);
 
+		$user = AuthHandler::getUser();
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
+		$userRegionalId = isset($user['regional_id']) ? $user['regional_id'] : null;
+		$isAdmin = ($userPropertyCode === '9999');
+
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
 		$periods = RegistrationPeriods::getActiveList();
-		$properties = Properties::getApiDataProvider(array(), 100)->getData();
+
+		if ($isAdmin) {
+			$properties = Properties::getApiDataProvider(array(), 100)->getData();
+			$relationProperties = $properties;
+		} else {
+			$properties = $userPropertyId ? Properties::getApiDataProvider(array('id' => $userPropertyId), 100)->getData() : array();
+			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('regional_id' => $userRegionalId), 100)->getData() : array();
+		}
 
 		if (isset($_POST['Registrations'])) {
 			$model->setAttributes($_POST['Registrations']);
@@ -94,6 +107,8 @@ class RegistrationsController extends AdminController
 			'events' => $events,
 			'periods' => $periods,
 			'properties' => $properties,
+			'relationProperties' => $relationProperties,
+			'isAdmin' => $isAdmin,
 		));
 	}
 
