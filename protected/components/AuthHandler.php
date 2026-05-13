@@ -108,6 +108,9 @@ class AuthHandler extends CApplicationComponent
             }
         }
 
+        // Auto-inherit permissions for related controllers
+        $crudPermissions = self::inheritRelatedPermissions($crudPermissions);
+
         $session[self::SESSION_USER_KEY] = $userData;
         $session[self::SESSION_PERMISSIONS_KEY] = $crudPermissions;
         $session['sso_menu_permissions'] = $menuPermissions;
