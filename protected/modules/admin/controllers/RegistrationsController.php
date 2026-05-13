@@ -118,6 +118,10 @@ class RegistrationsController extends AdminController
 				$result = $model->updateViaApi();
 
 				if ($result['success']) {
+					if ($model->relation_property_id && $model->event_id && $model->property_id) {
+						$this->createAllianceRequest($model->event_id, $model->property_id, $model->relation_property_id);
+					}
+
 					Yii::app()->user->setFlash('success', 'Cập nhật phiếu đăng ký thành công.');
 					$this->redirect(array('view', 'id' => $id));
 				} else {
