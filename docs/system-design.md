@@ -158,10 +158,30 @@ Hệ thống quản lý toàn bộ vòng đời của một sự kiện đại h
 
 ```sql
 -- ============================================================
+-- 0. REGIONALS — Phân khu vực
+-- ============================================================
+CREATE TABLE `regionals` (
+  `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code`        VARCHAR(50)  NOT NULL COMMENT 'Mã khu vực',
+  `name`        VARCHAR(255) NOT NULL COMMENT 'Tên khu vực',
+  `description` TEXT         COMMENT 'Mô tả',
+  `status`      TINYINT      NOT NULL DEFAULT 1 COMMENT '1=active, 0=inactive',
+  `created_at`  TIMESTAMP    NULL DEFAULT NULL,
+  `updated_at`  TIMESTAMP    NULL DEFAULT NULL,
+  `deleted_at`  TIMESTAMP    NULL DEFAULT NULL COMMENT 'Soft delete',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_regionals_code` (`code`),
+  KEY `idx_regionals_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Phân khu vực - mỗi đơn vị thuộc một khu vực';
+
+
+-- ============================================================
 -- 1. ORGANIZATIONS — Đơn vị
 -- ============================================================
 CREATE TABLE `organizations` (
   `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `regional_id` BIGINT UNSIGNED NULL COMMENT 'Khu vực đơn vị thuộc về',
   `name`        VARCHAR(255) NOT NULL COMMENT 'Tên đơn vị',
   `code`        VARCHAR(50)  NOT NULL COMMENT 'Mã đơn vị (viết tắt)',
   `address`     TEXT         COMMENT 'Địa chỉ',
@@ -172,7 +192,11 @@ CREATE TABLE `organizations` (
   `updated_at`  INT UNSIGNED,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_organizations_code` (`code`),
-  KEY `idx_organizations_active` (`is_active`)
+  KEY `idx_organizations_active` (`is_active`),
+  KEY `idx_organizations_regional` (`regional_id`),
+  CONSTRAINT `fk_organizations_regional`
+    FOREIGN KEY (`regional_id`) REFERENCES `regionals`(`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Danh sách đơn vị tham dự';
 
