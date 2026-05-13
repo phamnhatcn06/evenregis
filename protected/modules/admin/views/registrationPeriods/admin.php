@@ -52,10 +52,9 @@ $this->Tabletitle = 'Quản lý đợt đăng ký';
                     'headerHtmlOptions' => array('style' => 'width:120px'),
                 ),
                 array(
-                    'name' => 'is_active',
                     'header' => 'Trạng thái',
                     'type' => 'raw',
-                    'value' => '$data->is_active ? "<span class=\"badge bg-success\">Hoạt động</span>" : "<span class=\"badge bg-secondary\">Tắt</span>"',
+                    'value' => 'RegistrationPeriods::getStatusBadge($data)',
                     'headerHtmlOptions' => array('style' => 'width:100px'),
                 ),
                 array(
