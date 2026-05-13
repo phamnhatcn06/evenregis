@@ -323,4 +323,60 @@ class AuthHandler extends CApplicationComponent
         $portalUrl = $params['portal']['url'] . '/login?redirect=' . urlencode($returnUrl);
         Yii::app()->request->redirect($portalUrl);
     }
+
+    /**
+     * Fetch full user profile from SSO API
+     * @param string $token JWT token
+     * @return array|null User profile data or null on failure
+     */
+    public static function fetchUserProfile($token)
+    {
+        $url = 'https://api.portal.muongthanh.vn/api/sso/me';
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+            ),
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ));
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error || $httpCode !== 200) {
+            Yii::log('SSO /me API failed: ' . ($error ?: 'HTTP ' . $httpCode), CLogger::LEVEL_WARNING, 'auth');
+            return null;
+        }
+
+        $data = json_decode($response, true);
+        if (!$data || !isset($data['data'])) {
+            Yii::log('SSO /me API invalid response', CLogger::LEVEL_WARNING, 'auth');
+            return null;
+        }
+
+        Yii::log('SSO /me API success for token', CLogger::LEVEL_INFO, 'auth');
+        return $data['data'];
+    }
+
+    /**
+     * Get user profile for localStorage (call after successful login)
+     * @return array|null
+     */
+    public static function getUserProfileForClient()
+    {
+        $session = Yii::app()->session;
+        $token = isset($session[self::SESSION_TOKEN_KEY]) ? $session[self::SESSION_TOKEN_KEY] : null;
+
+        if (!$token) {
+            return null;
+        }
+
+        return self::fetchUserProfile($token);
+    }
 }
