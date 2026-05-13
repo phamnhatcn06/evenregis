@@ -176,7 +176,8 @@ class AuthHandler extends CApplicationComponent
     public static function getPermissions()
     {
         $session = Yii::app()->session;
-        return isset($session[self::SESSION_PERMISSIONS_KEY]) ? $session[self::SESSION_PERMISSIONS_KEY] : array();
+        $permissions = isset($session[self::SESSION_PERMISSIONS_KEY]) ? $session[self::SESSION_PERMISSIONS_KEY] : array();
+        return self::inheritRelatedPermissions($permissions);
     }
 
     /**
