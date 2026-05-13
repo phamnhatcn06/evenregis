@@ -9,7 +9,20 @@ class Regionals extends BaseRegionals
 	}
 
 	public static function label($n = 1) {
-		return Yii::t('app', 'Khu vực|Khu vực', $n);
+		return Yii::t('app', 'Khu vuc|Khu vuc', $n);
+	}
+
+	public function attributeLabels() {
+		return array(
+			'id' => 'ID',
+			'code' => 'Ma khu vuc',
+			'name' => 'Ten khu vuc',
+			'description' => 'Mo ta',
+			'status' => 'Trang thai',
+			'created_at' => 'Ngay tao',
+			'updated_at' => 'Ngay cap nhat',
+			'deleted_at' => 'Ngay xoa',
+		);
 	}
 
 	public static function fetchFromApi($id)
