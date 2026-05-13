@@ -11,19 +11,21 @@ foreach ($events as $e) {
 $propertyList = array();
 foreach ($properties as $p) {
     $pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
+    $pCode = isset($p['code']) ? $p['code'] : (isset($p->code) ? $p->code : '');
     $pName = isset($p['name']) ? $p['name'] : (isset($p->name) ? $p->name : '');
     if ($pId) {
-        $propertyList[$pId] = $pName;
+        $propertyList[$pId] = $pCode . ' - ' . $pName;
     }
 }
 
 $relationPropertyList = array();
-if (isset($relationProperties)) {
+if (isset($relationProperties) && !$isAdmin) {
     foreach ($relationProperties as $p) {
         $pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
+        $pCode = isset($p['code']) ? $p['code'] : (isset($p->code) ? $p->code : '');
         $pName = isset($p['name']) ? $p['name'] : (isset($p->name) ? $p->name : '');
         if ($pId && $pId != $model->property_id) {
-            $relationPropertyList[$pId] = $pName;
+            $relationPropertyList[$pId] = $pCode . ' - ' . $pName;
         }
     }
 }
