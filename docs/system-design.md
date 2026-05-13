@@ -150,6 +150,7 @@ Hệ thống quản lý toàn bộ vòng đời của một sự kiện đại h
 | 48  | `talent_entries`            | Tiết mục đăng ký                                    |
 | 49  | `talent_entry_members`      | Thành viên tiết mục (nếu tốp ca/nhóm múa)           |
 | 50  | `talent_scores`             | Điểm chấm văn nghệ                                  |
+| 51  | `regionals`                 | Phân khu vực (mỗi đơn vị thuộc một khu vực)         |
 
 ---
 
