@@ -45,7 +45,7 @@ echo $form->textAreaGroup($model, 'description', array(
         'htmlOptions' => array(
             'class' => 'form-control',
             'rows' => 3,
-            'placeholder' => 'Mo ta khu vuc (khong bat buoc)'
+            'placeholder' => 'Mô tả khu vực (không bắt buộc)'
         )
     )
 ));
