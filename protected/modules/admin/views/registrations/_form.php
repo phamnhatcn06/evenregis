@@ -1,5 +1,7 @@
 <?php
-$isAdmin = isset($isAdmin) ? $isAdmin : false;
+$user = AuthHandler::getUser();
+$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+$isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
 
 $eventList = array();
 foreach ($events as $e) {
