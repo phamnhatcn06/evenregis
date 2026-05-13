@@ -244,7 +244,7 @@ class MenuHelper
         $html = '<li class="nav-item">';
         $html .= '<a class="nav-link ' . $activeClass . '" href="' . $url . '">';
         if (isset($item['icon'])) {
-            $html .= '<i class="icon"><svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
+            $html .= '<i class="icon" style="color:#000000;"><svg class="icon-10" xmlns="http://www.w3.org/2000/svg" width="10" viewBox="0 0 24 24" fill="currentColor">
                                 <g>
                                     <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
                                 </g>
