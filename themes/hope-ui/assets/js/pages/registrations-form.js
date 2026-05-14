@@ -1,4 +1,47 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Load registration periods when event is selected
+    var eventSelect = document.getElementById('event-select');
+    var periodSelect = document.getElementById('period-select');
+
+    if (eventSelect && periodSelect) {
+        var apiUrl = periodSelect.getAttribute('data-api-url');
+        var apiKey = periodSelect.getAttribute('data-api-key');
+
+        eventSelect.addEventListener('change', function() {
+            var eventId = this.value;
+            periodSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+
+            if (!eventId) {
+                periodSelect.innerHTML = '<option value="">-- Chọn sự kiện trước --</option>';
+                return;
+            }
+
+            fetch(apiUrl + '?event_id=' + eventId, {
+                headers: {
+                    'Authorization': 'Bearer ' + apiKey,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                periodSelect.innerHTML = '<option value="">-- Chọn đợt đăng ký --</option>';
+                var items = data.data || data;
+                if (Array.isArray(items) && items.length > 0) {
+                    items.forEach(function(p) {
+                        var option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.name;
+                        periodSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(function() {
+                periodSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+            });
+        });
+    }
+
+    // File upload handling
     var uploadArea = document.getElementById('uploadArea');
     var fileInput = document.getElementById('documentFiles');
     var previewContainer = document.getElementById('filePreview');
