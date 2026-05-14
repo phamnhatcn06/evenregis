@@ -250,7 +250,52 @@ document.addEventListener('DOMContentLoaded', function() {
         documentJson.value = existingFiles.length > 0 ? JSON.stringify(existingFiles) : '';
     }
 
-    document.getElementById('registrations-form').addEventListener('submit', function() {
+    var form = document.getElementById('registrations-form');
+    var relationSelect = document.getElementById('relation-property-select');
+
+    form.addEventListener('submit', function(e) {
         updateDocumentJson();
+
+        // Kiểm tra nếu đang ở chế độ update (có data-original-value)
+        if (relationSelect && relationSelect.hasAttribute('data-original-value')) {
+            var originalValue = relationSelect.getAttribute('data-original-value') || '';
+            var currentValue = relationSelect.value || '';
+
+            // Nếu relation_property_id thay đổi, hiển thị cảnh báo
+            if (originalValue !== currentValue) {
+                e.preventDefault();
+
+                var message = 'Bạn có chắc chắn muốn cập nhật phiếu đăng ký này?';
+                if (currentValue && originalValue !== currentValue) {
+                    message = '<p>Bạn có chắc chắn muốn cập nhật phiếu đăng ký này?</p>' +
+                        '<div class="alert alert-warning text-start mt-3 mb-0">' +
+                        '<i class="fa fa-exclamation-triangle me-2"></i>' +
+                        '<strong>Lưu ý:</strong> Đơn vị liên quân đã thay đổi. ' +
+                        'Yêu cầu liên quân sẽ cần được duyệt lại từ đơn vị được chọn.' +
+                        '</div>';
+                } else if (!currentValue && originalValue) {
+                    message = '<p>Bạn có chắc chắn muốn cập nhật phiếu đăng ký này?</p>' +
+                        '<div class="alert alert-info text-start mt-3 mb-0">' +
+                        '<i class="fa fa-info-circle me-2"></i>' +
+                        'Yêu cầu liên quân hiện tại sẽ bị hủy.' +
+                        '</div>';
+                }
+
+                Swal.fire({
+                    title: 'Xác nhận cập nhật',
+                    html: message,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Cập nhật',
+                    cancelButtonText: 'Hủy'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            }
+        }
     });
 });
