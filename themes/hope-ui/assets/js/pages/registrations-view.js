@@ -6,6 +6,7 @@ var RegistrationView = (function() {
     var allStaff = [];
     var selectedStaff = [];
     var maxPerOrg = 0;
+    var competitionContentId = null;
 
     function init(config) {
         eventId = config.eventId;
@@ -16,37 +17,22 @@ var RegistrationView = (function() {
             loadContentsData();
         }
 
-        bindEvents();
         bindCompetitionEvents();
     }
 
     function loadContentsData() {
-        var contentSelect = document.getElementById('content_select');
-        if (!contentSelect) return;
-
         fetch(window.BASE_URL + '/admin/registrations/getEventContents?event_id=' + eventId)
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success && data.data) {
                     contentsData = data.data;
+                    contentsData.forEach(function(c) {
+                        if (c.code === 'competition') {
+                            competitionContentId = c.id;
+                        }
+                    });
                 }
             });
-    }
-
-    function bindEvents() {
-        var contentSelect = document.getElementById('content_select');
-        if (contentSelect) {
-            contentSelect.addEventListener('change', function() {
-                var selectedOpt = this.options[this.selectedIndex];
-                var contentCode = selectedOpt.getAttribute('data-code') || '';
-                var contentId = this.value;
-
-                document.getElementById('content_type').value = contentCode;
-                document.getElementById('content_id').value = contentId;
-
-                loadContentItems(contentCode);
-            });
-        }
     }
 
     function bindCompetitionEvents() {
@@ -329,30 +315,27 @@ var RegistrationView = (function() {
     }
 
     function resetAddModal() {
-        var contentSelect = document.getElementById('content_select');
         var itemSelect = document.getElementById('item_id');
-        var itemWrapper = document.getElementById('item_wrapper');
-        var quantityWrapper = document.getElementById('quantity_wrapper');
 
         document.getElementById('add-detail-form').reset();
-        document.getElementById('content_type').value = '';
-        document.getElementById('content_id').value = '';
         document.getElementById('quantity').value = '1';
 
-        contentSelect.innerHTML = '<option value="">-- Chọn loại nội dung --</option>';
-        contentsData.forEach(function(c) {
-            if (c.code === 'competition') return;
-            var opt = document.createElement('option');
-            opt.value = c.id;
-            opt.textContent = c.name;
-            opt.setAttribute('data-code', c.code || '');
-            contentSelect.appendChild(opt);
-        });
+        itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
 
-        itemWrapper.style.display = 'none';
-        quantityWrapper.style.display = 'block';
-        itemSelect.innerHTML = '<option value="">-- Chọn bộ môn --</option>';
-        itemSelect.removeAttribute('required');
+        var sportsContent = contentsData.find(function(c) { return c.code === 'sports'; });
+        if (sportsContent) {
+            document.getElementById('content_id').value = sportsContent.id;
+        }
+
+        fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=sports')
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data && data.data.length > 0) {
+                    itemSelect.innerHTML = renderSportsTree(data.data, registeredSports);
+                } else {
+                    itemSelect.innerHTML = '<option value="">-- Không có môn nào --</option>';
+                }
+            });
     }
 
     function resetCompetitionModal() {
@@ -363,6 +346,10 @@ var RegistrationView = (function() {
         compSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
         propSelect.innerHTML = '<option value="">-- Chọn cuộc thi trước --</option>';
         document.getElementById('comp_max_per_org').value = '-';
+
+        if (competitionContentId) {
+            document.getElementById('comp_content_id').value = competitionContentId;
+        }
 
         allStaff = [];
         selectedStaff = [];
@@ -383,48 +370,6 @@ var RegistrationView = (function() {
                     });
                 }
             });
-    }
-
-    function loadContentItems(contentCode) {
-        var itemLabel = document.getElementById('item_label');
-        var quantityLabel = document.getElementById('quantity_label');
-        var itemSelect = document.getElementById('item_id');
-        var itemWrapper = document.getElementById('item_wrapper');
-        var quantityWrapper = document.getElementById('quantity_wrapper');
-
-        itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
-
-        if (contentCode === 'sports') {
-            itemLabel.innerHTML = 'Môn thể thao <span class="text-danger">*</span>';
-            quantityLabel.innerHTML = 'Số đội/người <span class="text-danger">*</span>';
-            itemWrapper.style.display = 'block';
-            quantityWrapper.style.display = 'block';
-            itemSelect.setAttribute('required', 'required');
-
-            fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=sports')
-                .then(function(response) { return response.json(); })
-                .then(function(data) {
-                    if (data.success && data.data && data.data.length > 0) {
-                        itemSelect.innerHTML = renderSportsTree(data.data, registeredSports);
-                    } else {
-                        itemSelect.innerHTML = '<option value="">-- Đã đăng ký hết --</option>';
-                    }
-                });
-        } else if (contentCode === 'miss') {
-            quantityLabel.innerHTML = 'Số người dự thi <span class="text-danger">*</span>';
-            itemWrapper.style.display = 'none';
-            quantityWrapper.style.display = 'block';
-            itemSelect.removeAttribute('required');
-        } else if (contentCode === 'talent') {
-            quantityLabel.innerHTML = 'Số tiết mục <span class="text-danger">*</span>';
-            itemWrapper.style.display = 'none';
-            quantityWrapper.style.display = 'block';
-            itemSelect.removeAttribute('required');
-        } else {
-            itemWrapper.style.display = 'none';
-            quantityWrapper.style.display = 'block';
-            itemSelect.removeAttribute('required');
-        }
     }
 
     function viewDocument(url, type) {
