@@ -289,10 +289,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Cập nhật',
-                    cancelButtonText: 'Hủy'
-                }).then(function(result) {
-                    if (result.isConfirmed) {
-                        form.submit();
+                    cancelButtonText: 'Hủy',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    preConfirm: function() {
+                        Swal.showLoading();
+                        return new Promise(function() {
+                            form.submit();
+                        });
                     }
                 });
             }
