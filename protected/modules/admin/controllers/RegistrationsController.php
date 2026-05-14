@@ -609,6 +609,7 @@ class RegistrationsController extends AdminController
 		}
 
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$contentId = Yii::app()->getRequest()->getPost('content_id');
 		$competitionId = Yii::app()->getRequest()->getPost('competition_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
 		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
@@ -620,20 +621,41 @@ class RegistrationsController extends AdminController
 			return;
 		}
 
+		$detailData = array(
+			'registration_id' => $registrationId,
+			'content_id' => $contentId,
+			'competition_id' => $competitionId,
+			'quantity' => count($staffIds),
+			'note' => $note,
+		);
+
+		$detailResult = RegistrationDetails::storeViaApi($detailData);
+
+		if (!$detailResult['success']) {
+			Yii::app()->user->setFlash('error', isset($detailResult['error']) ? $detailResult['error'] : 'Không thể tạo chi tiết đăng ký.');
+			$this->redirect(array('view', 'id' => $registrationId));
+			return;
+		}
+
+		$detailId = isset($detailResult['data']['id']) ? $detailResult['data']['id'] : null;
+
+		if (!$detailId) {
+			Yii::app()->user->setFlash('error', 'Không lấy được ID chi tiết đăng ký.');
+			$this->redirect(array('view', 'id' => $registrationId));
+			return;
+		}
+
 		$successCount = 0;
 		$errorCount = 0;
 
 		foreach ($staffIds as $staffId) {
-			$data = array(
-				'competition_id' => $competitionId,
+			$attendeeData = array(
+				'registration_detail_id' => $detailId,
 				'staff_id' => $staffId,
-				'property_id' => $propertyId,
-				'registration_id' => $registrationId,
-				'status' => CompetitionRegistrations::STATUS_PENDING,
-				'note' => $note,
+				'status' => RegistrationDetailAttendees::STATUS_PENDING,
 			);
 
-			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $data);
+			$result = RegistrationDetailAttendees::storeViaApi($attendeeData);
 
 			if ($result['success']) {
 				$successCount++;
