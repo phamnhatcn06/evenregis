@@ -220,6 +220,22 @@ $perColumn = ceil($totalAttrs / $columns);
                         break;
                     }
                 }
+
+                $existingCompetitionIds = array();
+                if (!empty($eventCompetitions)) {
+                    foreach ($eventCompetitions as $ec) {
+                        $existingCompetitionIds[$ec['competition_id']] = $ec;
+                    }
+                }
+                $availableCompetitions = array();
+                foreach ($allCompetitions as $c) {
+                    $cId = isset($c['id']) ? $c['id'] : (isset($c->id) ? $c->id : null);
+                    if ($cId && !isset($existingCompetitionIds[$cId])) {
+                        $cName = isset($c['name']) ? $c['name'] : (isset($c->name) ? $c->name : '');
+                        $availableCompetitions[$cId] = $cName;
+                    }
+                }
+                $hasAvailableCompetitions = !empty($availableCompetitions);
                 ?>
                 <?php if (!empty($eventContents)): ?>
                     <div class="row">
