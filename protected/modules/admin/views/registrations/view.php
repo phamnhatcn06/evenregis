@@ -408,26 +408,21 @@ foreach ($registrationDetails as $detail) {
             <form method="post" action="<?php echo $this->createUrl('addDetail'); ?>" id="add-detail-form">
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                 <input type="hidden" name="content_type" id="content_type" value="">
+                <input type="hidden" name="content_id" id="content_id" value="">
                 <div class="modal-header">
-                    <h5 class="modal-title">Thêm nội dung đăng ký</h5>
+                    <h5 class="modal-title" id="modal-title">Thêm nội dung đăng ký</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Loại nội dung <span class="text-danger">*</span></label>
-                        <select class="form-select" id="content_id" name="content_id" required>
-                            <option value="">-- Chọn nội dung --</option>
-                        </select>
-                    </div>
-                    <div class="mb-3" id="item_wrapper" style="display:none;">
-                        <label class="form-label">Bộ môn <span class="text-danger">*</span></label>
-                        <select class="form-select" id="item_id" name="item_id">
-                            <option value="">-- Chọn bộ môn --</option>
+                    <div class="mb-3" id="item_wrapper">
+                        <label class="form-label" id="item_label">Bộ môn <span class="text-danger">*</span></label>
+                        <select class="form-select" id="item_id" name="item_id" required>
+                            <option value="">-- Đang tải... --</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Số lượng (người/đội) <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" name="quantity" value="1" min="1" required>
+                        <label class="form-label" id="quantity_label">Số lượng (người/đội) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="quantity" id="quantity" value="1" min="1" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ghi chú</label>
