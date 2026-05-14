@@ -153,7 +153,7 @@ Yii::app()->clientScript->registerScriptFile(
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var propertySelect = document.getElementById('Registrations_property_id');
-            var relationSelect = document.getElementById('Registrations_relation_property_id');
+            var relationSelect = document.getElementById('relation-property-select');
             var ajaxUrl = '<?php echo $this->createUrl("getRelationProperties"); ?>';
 
             propertySelect.addEventListener('change', function() {
