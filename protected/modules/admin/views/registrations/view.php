@@ -85,7 +85,7 @@ $perColumn = ceil($totalAttrs / $columns);
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin phiếu đăng ký</h5>
         <div class="btn-group">
-            <?php if ($model->status === 'draft'): ?>
+            <?php if ($model->status === '1'): ?>
                 <form method="post" action="<?php echo $this->createUrl('submit', array('id' => $model->id)); ?>" style="display:inline;">
                     <button type="submit" class="btn btn-sm btn-info" onclick="return confirm('Bạn có chắc muốn nộp phiếu đăng ký này?')">
                         <i class="fa fa-paper-plane me-1"></i>Nộp đăng ký
