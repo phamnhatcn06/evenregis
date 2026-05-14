@@ -445,6 +445,7 @@ $perColumn = ceil($totalAttrs / $columns);
             contentSelect.addEventListener('change', function() {
                 var selectedOpt = this.options[this.selectedIndex];
                 var contentCode = selectedOpt.getAttribute('data-code') || '';
+                console.log('Selected content code:', contentCode);
                 contentTypeInput.value = contentCode;
 
                 itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
