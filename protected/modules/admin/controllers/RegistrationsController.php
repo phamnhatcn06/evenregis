@@ -330,6 +330,19 @@ class RegistrationsController extends AdminController
 		return $uploadedFiles ? json_encode($uploadedFiles) : null;
 	}
 
+	protected function deleteAllianceRequest($eventId, $requesterOrgId, $targetOrgId)
+	{
+		$existing = AllianceRequests::findByRegistration($eventId, $requesterOrgId, $targetOrgId);
+		if ($existing && $existing->id) {
+			$result = AllianceRequests::deleteViaApi($existing->id);
+			if ($result['success']) {
+				Yii::log("Deleted alliance request id={$existing->id} for event=$eventId, requester=$requesterOrgId, target=$targetOrgId", 'info', 'application.alliance');
+			} else {
+				Yii::log("Failed to delete alliance request: " . json_encode($result), 'error', 'application.alliance');
+			}
+		}
+	}
+
 	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId)
 	{
 		$existing = AllianceRequests::findByRegistration($eventId, $requesterOrgId, $targetOrgId);
