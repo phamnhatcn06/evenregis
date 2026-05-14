@@ -396,7 +396,7 @@ $perColumn = ceil($totalAttrs / $columns);
                 itemWrapper.style.display = 'none';
 
                 if ((contentType === 'sports' || contentType === 'competition') && eventId) {
-                    fetch('<?php echo $this->createUrl("getContentItems"); ?>&event_id=' + eventId + '&content_type=' + contentType)
+                    fetch('<?php echo $this->createUrl("getContentItems"); ?>?event_id=' + eventId + '&content_type=' + contentType)
                         .then(function(response) { return response.json(); })
                         .then(function(data) {
                             itemSelect.innerHTML = '<option value="">-- Chọn bộ môn --</option>';
