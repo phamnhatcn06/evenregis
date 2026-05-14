@@ -122,6 +122,49 @@ class EventsController extends AdminController
 		}
 	}
 
+	public function actionAddCompetition($id)
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			$this->redirect(array('view', 'id' => $id));
+			return;
+		}
+
+		$competitionIds = Yii::app()->getRequest()->getPost('competition_ids', array());
+		$successCount = 0;
+		$errors = array();
+		foreach ($competitionIds as $competitionId) {
+			if ($competitionId) {
+				$result = EventCompetitions::storeViaApi($id, $competitionId);
+				if ($result['success']) {
+					$successCount++;
+				} else {
+					$errorMsg = isset($result['error']) ? $result['error'] : 'Lỗi không xác định';
+					$errors[] = $errorMsg;
+				}
+			}
+		}
+		if ($successCount > 0) {
+			Yii::app()->user->setFlash('success', "Đã thêm {$successCount} cuộc thi nghiệp vụ.");
+		}
+		if (!empty($errors)) {
+			Yii::app()->user->setFlash('error', implode('; ', $errors));
+		}
+		$this->redirect(array('view', 'id' => $id));
+	}
+
+	public function actionRemoveCompetition($id, $competitionId)
+	{
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$result = EventCompetitions::deleteViaApi($competitionId);
+			if ($result['success']) {
+				Yii::app()->user->setFlash('success', 'Xóa cuộc thi nghiệp vụ thành công.');
+			} else {
+				Yii::app()->user->setFlash('error', $result['error'] ?: 'Không thể xóa cuộc thi nghiệp vụ.');
+			}
+			$this->redirect(array('view', 'id' => $id));
+		}
+	}
+
 	public function actionSyncUnits($id)
 	{
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
