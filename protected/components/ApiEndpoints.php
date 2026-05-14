@@ -187,6 +187,12 @@ class ApiEndpoints
     const COMPETITION_REGISTRATION_DESTROY = '/api/competition-registrations/destroy/{id}';
     const COMPETITION_REGISTRATION_CONFIRM = '/api/competition-registrations/confirm/{id}';
 
+    // Registration Detail Attendee
+    const REGISTRATION_DETAIL_ATTENDEE_LIST = '/api/registration-detail-attendees';
+    const REGISTRATION_DETAIL_ATTENDEE_STORE = '/api/registration-detail-attendees/store';
+    const REGISTRATION_DETAIL_ATTENDEE_DETAIL = '/api/registration-detail-attendees/detail/{id}';
+    const REGISTRATION_DETAIL_ATTENDEE_DESTROY = '/api/registration-detail-attendees/destroy/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
