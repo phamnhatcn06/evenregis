@@ -239,7 +239,7 @@ class RegistrationsController extends AdminController
 	{
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
-			$model->status = 'approved';
+			$model->status = Registrations::STATUS_APPROVED;
 			$model->reviewed_at = time();
 			$result = $model->updateViaApi();
 
