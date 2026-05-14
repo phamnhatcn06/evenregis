@@ -86,10 +86,13 @@ class EventsController extends AdminController
 		foreach ($sportIds as $sportId) {
 			if ($sportId) {
 				$result = EventSports::storeViaApi($id, $sportId);
+				Yii::log('AddSport result: ' . print_r($result, true), CLogger::LEVEL_INFO, 'api.debug');
 				if ($result['success']) {
 					$successCount++;
 				} else {
-					$errors[] = isset($result['error']) ? $result['error'] : 'Lỗi không xác định';
+					$errorMsg = isset($result['error']) ? $result['error'] : 'Lỗi không xác định';
+					$errorMsg .= ' (code: ' . (isset($result['code']) ? $result['code'] : 'N/A') . ')';
+					$errors[] = $errorMsg;
 				}
 			}
 		}
