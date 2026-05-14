@@ -516,4 +516,139 @@ class RegistrationsController extends AdminController
 			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
 		}
 	}
+
+	public function actionGetOrganizations()
+	{
+		$user = AuthHandler::getUser();
+		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		$isAdmin = ($userPropertyCode === '9999');
+
+		$result = array();
+
+		if ($isAdmin) {
+			$properties = Properties::getApiDataProvider(array(), 500)->getData();
+			foreach ($properties as $p) {
+				$result[] = array(
+					'id' => isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null),
+					'code' => isset($p['code']) ? $p['code'] : (isset($p->code) ? $p->code : ''),
+					'name' => isset($p['name']) ? $p['name'] : (isset($p->name) ? $p->name : ''),
+				);
+			}
+			usort($result, function ($a, $b) {
+				return strcmp($a['code'], $b['code']);
+			});
+		} else {
+			if ($userPropertyId) {
+				$property = Properties::fetchFromApi($userPropertyId);
+				if ($property) {
+					$result[] = array(
+						'id' => $property->id,
+						'code' => $property->code,
+						'name' => $property->name,
+					);
+				}
+			}
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionGetStaffByProperty($property_id)
+	{
+		$result = array();
+
+		$property = Properties::fetchFromApi($property_id);
+		if ($property && $property->code) {
+			$staffs = Staffs::getApiDataProvider(array('hotel_code' => $property->code), 500)->getData();
+			foreach ($staffs as $staff) {
+				$id = isset($staff['id']) ? $staff['id'] : (isset($staff->id) ? $staff->id : null);
+				$name = isset($staff['name']) ? $staff['name'] : (isset($staff->name) ? $staff->name : '');
+				$position = isset($staff['position_name']) ? $staff['position_name'] : (isset($staff->position_name) ? $staff->position_name : '');
+				$code = isset($staff['code']) ? $staff['code'] : (isset($staff->code) ? $staff->code : '');
+
+				$result[] = array(
+					'id' => $id,
+					'name' => $name,
+					'position' => $position,
+					'code' => $code,
+					'display' => $code ? ($code . ' - ' . $name) : $name,
+				);
+			}
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionGetCompetitionInfo($competition_id)
+	{
+		$competition = Competitions::fetchFromApi($competition_id);
+		$result = array();
+
+		if ($competition) {
+			$result = array(
+				'id' => $competition->id,
+				'name' => $competition->name,
+				'max_per_org' => $competition->max_per_org ? (int)$competition->max_per_org : 0,
+			);
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionAddCompetitionRegistration()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$competitionId = Yii::app()->getRequest()->getPost('competition_id');
+		$propertyId = Yii::app()->getRequest()->getPost('property_id');
+		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
+		$note = Yii::app()->getRequest()->getPost('note', '');
+
+		if (empty($staffIds) || !is_array($staffIds)) {
+			Yii::app()->user->setFlash('error', 'Vui lòng chọn ít nhất một nhân viên.');
+			$this->redirect(array('view', 'id' => $registrationId));
+			return;
+		}
+
+		$successCount = 0;
+		$errorCount = 0;
+
+		foreach ($staffIds as $staffId) {
+			$data = array(
+				'competition_id' => $competitionId,
+				'staff_id' => $staffId,
+				'property_id' => $propertyId,
+				'registration_id' => $registrationId,
+				'status' => CompetitionRegistrations::STATUS_PENDING,
+				'note' => $note,
+			);
+
+			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $data);
+
+			if ($result['success']) {
+				$successCount++;
+			} else {
+				$errorCount++;
+			}
+		}
+
+		if ($successCount > 0) {
+			Yii::app()->user->setFlash('success', "Đã đăng ký thành công {$successCount} người tham dự thi nghiệp vụ.");
+		}
+		if ($errorCount > 0) {
+			Yii::app()->user->setFlash('warning', "Có {$errorCount} người không đăng ký được.");
+		}
+
+		$this->redirect(array('view', 'id' => $registrationId));
+	}
 }
