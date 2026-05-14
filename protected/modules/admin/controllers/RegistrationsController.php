@@ -70,7 +70,7 @@ class RegistrationsController extends AdminController
 
 		if (isset($_POST['Registrations'])) {
 			$model->setAttributes($_POST['Registrations']);
-			$model->status = 0; //  	0: draft, 1: submitted, 2: approved, 3: rejected	
+			$model->status = Registrations::STATUS_DRAFT;	
 			$ssoUser = AuthHandler::getUser();
 			$model->submitted_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
 			$existingDoc = isset($_POST['Registrations']['document']) ? $_POST['Registrations']['document'] : null;
