@@ -205,11 +205,11 @@ $contentConfig = array(
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-list me-2"></i>Chi tiết đăng ký</h5>
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-            <div class="btn-group">
+            <div class="">
                 <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addDetailModal" onclick="resetAddModal()">
                     <i class="fa fa-futbol-o me-1"></i>Đăng ký thể thao
                 </button>
-                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
+                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
                     <i class="fa fa-trophy me-1"></i>Đăng ký nghiệp vụ
                 </button>
             </div>

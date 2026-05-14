@@ -562,19 +562,21 @@ class RegistrationsController extends AdminController
 
 		$property = Properties::fetchFromApi($property_id);
 		if ($property && $property->code) {
-			$staffs = Staffs::getApiDataProvider(array('hotel_code' => $property->code), 500)->getData();
+			$staffs = Staffs::getApiDataProvider(array('property_code' => $property->code), 500)->getData();
 			foreach ($staffs as $staff) {
 				$id = isset($staff['id']) ? $staff['id'] : (isset($staff->id) ? $staff->id : null);
-				$name = isset($staff['name']) ? $staff['name'] : (isset($staff->name) ? $staff->name : '');
-				$position = isset($staff['position_name']) ? $staff['position_name'] : (isset($staff->position_name) ? $staff->position_name : '');
+				$fullName = isset($staff['full_name']) ? $staff['full_name'] : (isset($staff->full_name) ? $staff->full_name : '');
+				$positionName = isset($staff['position_name']) ? $staff['position_name'] : (isset($staff->position_name) ? $staff->position_name : '');
 				$code = isset($staff['code']) ? $staff['code'] : (isset($staff->code) ? $staff->code : '');
+
+				if (!$id) continue;
 
 				$result[] = array(
 					'id' => $id,
-					'name' => $name,
-					'position' => $position,
+					'name' => $fullName,
+					'position' => $positionName,
 					'code' => $code,
-					'display' => $code ? ($code . ' - ' . $name) : $name,
+					'display' => $code ? ($code . ' - ' . $fullName) : $fullName,
 				);
 			}
 		}
