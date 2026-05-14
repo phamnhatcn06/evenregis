@@ -130,6 +130,59 @@ $perColumn = ceil($totalAttrs / $columns);
     </div>
 </div>
 
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fa fa-file-text me-2"></i>Tài liệu đính kèm</h5>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($documents)): ?>
+            <div class="row g-3">
+                <?php foreach ($documents as $index => $docUrl):
+                    $filename = basename($docUrl);
+                    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                    $isImage = in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'webp'));
+                    $isPdf = ($ext === 'pdf');
+                ?>
+                    <div class="col-6 col-md-3">
+                        <div class="card h-100">
+                            <?php if ($isImage): ?>
+                                <img src="<?php echo CHtml::encode($docUrl); ?>" class="card-img-top" style="height:120px;object-fit:cover;cursor:pointer;"
+                                     onclick="viewDocument('<?php echo CHtml::encode($docUrl); ?>', 'image')" title="Click để xem">
+                            <?php else: ?>
+                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:120px;">
+                                    <?php if ($isPdf): ?>
+                                        <i class="fa fa-file-pdf-o fa-3x text-danger"></i>
+                                    <?php elseif (in_array($ext, array('doc', 'docx'))): ?>
+                                        <i class="fa fa-file-word-o fa-3x text-primary"></i>
+                                    <?php else: ?>
+                                        <i class="fa fa-file-o fa-3x text-muted"></i>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                            <div class="card-body p-2 text-center">
+                                <small class="text-truncate d-block mb-2" title="<?php echo CHtml::encode($filename); ?>">
+                                    <?php echo CHtml::encode($filename); ?>
+                                </small>
+                                <?php if ($isImage || $isPdf): ?>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            onclick="viewDocument('<?php echo CHtml::encode($docUrl); ?>', '<?php echo $isImage ? 'image' : 'pdf'; ?>')">
+                                        <i class="fa fa-eye me-1"></i>Xem
+                                    </button>
+                                <?php endif; ?>
+                                <a href="<?php echo CHtml::encode($docUrl); ?>" class="btn btn-sm btn-outline-secondary" download>
+                                    <i class="fa fa-download me-1"></i>Tải
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <p class="text-muted mb-0">Không có tài liệu đính kèm.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header">
         <h5 class="mb-0"><i class="fa fa-list me-2"></i>Chi tiết đăng ký</h5>
