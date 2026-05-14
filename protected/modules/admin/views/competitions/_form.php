@@ -101,36 +101,6 @@
             ?>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <?php
-            echo $form->textFieldGroup($model, 'registration_open_at', array(
-                'widgetOptions' => array(
-                    'htmlOptions' => array(
-                        'class' => 'form-control datepicker',
-                        'placeholder' => 'dd/mm/yyyy HH:ii',
-                        'value' => $model->registration_open_at ? date('d/m/Y H:i', $model->registration_open_at) : ''
-                    )
-                )
-            ));
-            ?>
-        </div>
-        <div class="col-md-6">
-            <?php
-            echo $form->textFieldGroup($model, 'registration_close_at', array(
-                'widgetOptions' => array(
-                    'htmlOptions' => array(
-                        'class' => 'form-control datepicker',
-                        'placeholder' => 'dd/mm/yyyy HH:ii',
-                        'value' => $model->registration_close_at ? date('d/m/Y H:i', $model->registration_close_at) : ''
-                    )
-                )
-            ));
-            ?>
-        </div>
-    </div>
-
     <?php
     echo $form->textAreaGroup($model, 'description', array(
         'widgetOptions' => array(

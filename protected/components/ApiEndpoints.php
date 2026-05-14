@@ -172,6 +172,13 @@ class ApiEndpoints
     const COMPETITION_DESTROY = '/api/competitions/destroy/{id}';
     const COMPETITION_ASSIGN_NUMBERS = '/api/competitions/assign-numbers/{id}';
 
+    // Event Competition
+    const EVENT_COMPETITION_LIST = '/api/event-competitions';
+    const EVENT_COMPETITION_STORE = '/api/event-competitions/store';
+    const EVENT_COMPETITION_DETAIL = '/api/event-competitions/detail/{id}';
+    const EVENT_COMPETITION_UPDATE = '/api/event-competitions/update/{id}';
+    const EVENT_COMPETITION_DESTROY = '/api/event-competitions/destroy/{id}';
+
     // Competition Registration
     const COMPETITION_REGISTRATION_LIST = '/api/competition-registrations';
     const COMPETITION_REGISTRATION_STORE = '/api/competition-registrations/store';
