@@ -671,6 +671,40 @@ if (!PermissionHelper::can('attendee', 'create')) {
 
 ---
 
+## User ID từ SSO Token — submitted_by / created_by
+
+**QUAN TRỌNG**: Khi cần lưu thông tin người thực hiện (`submitted_by`, `created_by`, `updated_by`, `approved_by`...), **PHẢI lấy từ SSO token** qua `AuthHandler::getUser()`, **KHÔNG dùng** `Yii::app()->user->id`.
+
+### Lý do
+
+- `Yii::app()->user->id` là user ID của hệ thống local (nếu có)
+- User thực tế đăng nhập qua Portal SSO, ID nằm trong JWT token
+- Cần đồng bộ với hệ thống Portal để tracking và audit
+
+### Cách sử dụng đúng
+
+```php
+// ✅ ĐÚNG — Lấy từ SSO token
+$ssoUser = AuthHandler::getUser();
+$model->submitted_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+$model->created_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+
+// ❌ SAI — Dùng local user
+$model->submitted_by = Yii::app()->user->id;
+```
+
+### Các trường thường gặp
+
+| Field | Mô tả | Lấy từ |
+|-------|-------|--------|
+| `submitted_by` | Người nộp/submit | `AuthHandler::getUser()['id']` |
+| `created_by` | Người tạo | `AuthHandler::getUser()['id']` |
+| `updated_by` | Người cập nhật | `AuthHandler::getUser()['id']` |
+| `approved_by` | Người phê duyệt | `AuthHandler::getUser()['id']` |
+| `deleted_by` | Người xóa | `AuthHandler::getUser()['id']` |
+
+---
+
 ## Toast Notification — Thay thế Alert
 
 **QUAN TRỌNG**: Sau các thao tác CRUD (create, update, delete), **KHÔNG dùng** Bootstrap Alert (`alert alert-success alert-dismissible`). Thay vào đó, sử dụng **Toast JS** với auto close sau 5 giây.
