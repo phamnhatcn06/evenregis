@@ -370,7 +370,7 @@ $perColumn = ceil($totalAttrs / $columns);
         var contentsData = [];
 
         if (eventId && contentSelect) {
-            fetch('<?php echo $this->createUrl("getEventContents"); ?>&event_id=' + eventId)
+            fetch('<?php echo $this->createUrl("getEventContents"); ?>?event_id=' + eventId)
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
                     if (data.success && data.data) {
