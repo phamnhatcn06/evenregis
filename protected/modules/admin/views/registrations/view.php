@@ -403,38 +403,38 @@ $perColumn = ceil($totalAttrs / $columns);
 
         function renderSportsTree(data, excludeIds) {
             var html = '<option value="">-- Chọn môn thể thao --</option>';
-            var roots = [];
-            var children = {};
 
-            // Phân loại root và children
+            // Nhóm theo prefix tên (Bóng bàn, Bóng đá, Cầu lông, Bơi, Kéo co, Pickerball...)
+            var groups = {};
+            var prefixes = ['Bóng bàn', 'Bóng đá', 'Cầu lông', 'Pickerball', 'Bơi ếch', 'Bơi tự do', 'Kéo co', 'Tennis', 'Cờ vua', 'Cờ tướng'];
+
             data.forEach(function(item) {
-                var pid = parseInt(item.parent_id) || 0;
-                if (pid === 0) {
-                    roots.push(item);
-                } else {
-                    if (!children[pid]) children[pid] = [];
-                    children[pid].push(item);
+                if (excludeIds.indexOf(parseInt(item.id)) !== -1) return;
+
+                var groupName = 'Khác';
+                for (var i = 0; i < prefixes.length; i++) {
+                    if (item.name.indexOf(prefixes[i]) === 0) {
+                        groupName = prefixes[i];
+                        break;
+                    }
                 }
+                if (!groups[groupName]) groups[groupName] = [];
+                groups[groupName].push(item);
             });
 
-            // Render theo cấu trúc tree
-            roots.forEach(function(root) {
-                var rootId = parseInt(root.id);
-                var hasChildren = children[rootId] && children[rootId].length > 0;
-
-                if (hasChildren) {
-                    // Môn cha có con: hiển thị disabled, render các con bên dưới
-                    html += '<option value="" disabled style="font-weight:bold;background:#f0f0f0;">▸ ' + root.name + '</option>';
-                    children[rootId].forEach(function(child) {
-                        if (excludeIds.indexOf(parseInt(child.id)) === -1) {
-                            html += '<option value="' + child.id + '">&nbsp;&nbsp;&nbsp;&nbsp;' + child.name + '</option>';
-                        }
+            // Sắp xếp và render
+            var sortedGroups = Object.keys(groups).sort();
+            sortedGroups.forEach(function(groupName) {
+                var items = groups[groupName];
+                if (items.length > 1) {
+                    // Nhiều môn cùng nhóm: hiển thị header
+                    html += '<option value="" disabled style="font-weight:bold;background:#e9ecef;">▸ ' + groupName + '</option>';
+                    items.forEach(function(item) {
+                        html += '<option value="' + item.id + '">&nbsp;&nbsp;&nbsp;' + item.name + '</option>';
                     });
                 } else {
-                    // Môn không có con: cho phép chọn (nếu chưa đăng ký)
-                    if (excludeIds.indexOf(rootId) === -1) {
-                        html += '<option value="' + root.id + '">' + root.name + '</option>';
-                    }
+                    // Chỉ 1 môn: hiển thị trực tiếp
+                    html += '<option value="' + items[0].id + '">' + items[0].name + '</option>';
                 }
             });
 
