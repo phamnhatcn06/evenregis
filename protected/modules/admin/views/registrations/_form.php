@@ -97,6 +97,8 @@ if (isset($relationProperties)) {
                 <?php echo $form->dropDownList($model, 'relation_property_id', $relationPropertyList, array(
                     'class' => 'form-select',
                     'prompt' => '-- Không có (liên quân) --',
+                    'id' => 'relation-property-select',
+                    'data-original-value' => $model->relation_property_id,
                 )); ?>
                 <?php echo $form->error($model, 'relation_property_id'); ?>
                 <small class="text-muted">Chọn đơn vị liên quân trong cùng khu vực. Cần xác nhận từ đơn vị được chọn mới được duyệt</small>
