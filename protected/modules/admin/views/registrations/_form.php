@@ -145,6 +145,48 @@ Yii::app()->clientScript->registerScriptFile(
 );
 ?>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var eventSelect = document.getElementById('event-select');
+        var periodSelect = document.getElementById('period-select');
+        var periodApiUrl = '<?php echo Yii::app()->params['externalApiUrl']; ?>/api/registration-periods/list-active';
+        var apiKey = '<?php echo Yii::app()->params['externalApiKey']; ?>';
+
+        eventSelect.addEventListener('change', function() {
+            var eventId = this.value;
+            periodSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+
+            if (!eventId) {
+                periodSelect.innerHTML = '<option value="">-- Chọn sự kiện trước --</option>';
+                return;
+            }
+
+            fetch(periodApiUrl + '?event_id=' + eventId, {
+                headers: {
+                    'Authorization': 'Bearer ' + apiKey,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                periodSelect.innerHTML = '<option value="">-- Chọn đợt đăng ký --</option>';
+                var items = data.data || data;
+                if (Array.isArray(items) && items.length > 0) {
+                    items.forEach(function(p) {
+                        var option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.name;
+                        periodSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(function() {
+                periodSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+            });
+        });
+    });
+</script>
+
 <?php if ($isHO): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
