@@ -82,22 +82,22 @@ class EventsController extends AdminController
 
 		$sportIds = Yii::app()->getRequest()->getPost('sport_ids', array());
 		$successCount = 0;
-		$errorCount = 0;
+		$errors = array();
 		foreach ($sportIds as $sportId) {
 			if ($sportId) {
 				$result = EventSports::storeViaApi($id, $sportId);
 				if ($result['success']) {
 					$successCount++;
 				} else {
-					$errorCount++;
+					$errors[] = isset($result['error']) ? $result['error'] : 'Lỗi không xác định';
 				}
 			}
 		}
 		if ($successCount > 0) {
 			Yii::app()->user->setFlash('success', "Đã thêm {$successCount} môn thể thao.");
 		}
-		if ($errorCount > 0) {
-			Yii::app()->user->setFlash('error', "Có {$errorCount} môn không thể thêm.");
+		if (!empty($errors)) {
+			Yii::app()->user->setFlash('error', implode('; ', $errors));
 		}
 		$this->redirect(array('view', 'id' => $id));
 	}
