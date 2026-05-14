@@ -824,50 +824,71 @@ Khi dropdown B phụ thuộc vào giá trị của dropdown A, sử dụng AJAX 
 |----------|--------|--------|----------|
 | `/api/registration-periods/list-active` | GET | `event_id` | Danh sách periods đang active của event |
 
-### Code mẫu trong View
+### Code mẫu
+
+**View (PHP)** — Truyền config qua data attributes:
 
 ```php
-<script>
+<?php echo $form->dropDownList($model, 'event_id', $eventList, array(
+    'class' => 'form-select',
+    'prompt' => '-- Chọn sự kiện --',
+    'id' => 'event-select',
+)); ?>
+
+<?php echo $form->dropDownList($model, 'period_id', $periods, array(
+    'class' => 'form-select',
+    'prompt' => $model->event_id ? '-- Chọn đợt đăng ký --' : '-- Chọn sự kiện trước --',
+    'id' => 'period-select',
+    'data-api-url' => Yii::app()->params['externalApiUrl'] . '/api/registration-periods/list-active',
+    'data-api-key' => Yii::app()->params['externalApiKey'],
+)); ?>
+```
+
+**JS file** (`themes/hope-ui/assets/js/pages/registrations-form.js`):
+
+```javascript
 document.addEventListener('DOMContentLoaded', function() {
     var eventSelect = document.getElementById('event-select');
     var periodSelect = document.getElementById('period-select');
-    var apiUrl = '<?php echo Yii::app()->params['externalApiUrl']; ?>/api/registration-periods/list-active';
-    var apiKey = '<?php echo Yii::app()->params['externalApiKey']; ?>';
 
-    eventSelect.addEventListener('change', function() {
-        var eventId = this.value;
-        periodSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+    if (eventSelect && periodSelect) {
+        var apiUrl = periodSelect.getAttribute('data-api-url');
+        var apiKey = periodSelect.getAttribute('data-api-key');
 
-        if (!eventId) {
-            periodSelect.innerHTML = '<option value="">-- Chọn sự kiện trước --</option>';
-            return;
-        }
+        eventSelect.addEventListener('change', function() {
+            var eventId = this.value;
+            periodSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
 
-        fetch(apiUrl + '?event_id=' + eventId, {
-            headers: {
-                'Authorization': 'Bearer ' + apiKey,
-                'Accept': 'application/json'
+            if (!eventId) {
+                periodSelect.innerHTML = '<option value="">-- Chọn sự kiện trước --</option>';
+                return;
             }
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            periodSelect.innerHTML = '<option value="">-- Chọn đợt đăng ký --</option>';
-            var items = data.data || data;
-            if (Array.isArray(items) && items.length > 0) {
-                items.forEach(function(p) {
-                    var option = document.createElement('option');
-                    option.value = p.id;
-                    option.textContent = p.name;
-                    periodSelect.appendChild(option);
-                });
-            }
-        })
-        .catch(function() {
-            periodSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+
+            fetch(apiUrl + '?event_id=' + eventId, {
+                headers: {
+                    'Authorization': 'Bearer ' + apiKey,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                periodSelect.innerHTML = '<option value="">-- Chọn đợt đăng ký --</option>';
+                var items = data.data || data;
+                if (Array.isArray(items) && items.length > 0) {
+                    items.forEach(function(p) {
+                        var option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.name;
+                        periodSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(function() {
+                periodSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+            });
         });
-    });
+    }
 });
-</script>
 ```
 
 ### Các trường hợp tương tự
