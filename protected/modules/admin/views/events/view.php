@@ -359,6 +359,32 @@ $perColumn = ceil($totalAttrs / $columns);
 </div>
 </div>
 
+<!-- Modal Add Competition -->
+<div class="modal fade" id="modalAddCompetition" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/addCompetition', array('id' => $model->id)); ?>" id="formAddCompetition">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm cuộc thi nghiệp vụ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <select name="competition_ids[]" class="form-select" multiple size="8">
+                        <?php foreach ($availableCompetitions as $cId => $cName): ?>
+                            <option value="<?php echo $cId; ?>"><?php echo CHtml::encode($cName); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small class="text-muted">Giữ Ctrl để chọn nhiều cuộc thi</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Add Sport -->
 <div class="modal fade" id="modalAddSport" tabindex="-1">
     <div class="modal-dialog">
