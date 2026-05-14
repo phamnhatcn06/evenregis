@@ -343,4 +343,77 @@ $perColumn = ceil($totalAttrs / $columns);
         var modal = new bootstrap.Modal(document.getElementById('documentModal'));
         modal.show();
     }
+
+    function confirmDeleteDetail(detailId) {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: 'Bạn có chắc chắn muốn xóa nội dung này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById('delete-detail-form-' + detailId).submit();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var eventId = <?php echo $model->event_id ? $model->event_id : 'null'; ?>;
+        var contentSelect = document.getElementById('content_id');
+        var itemSelect = document.getElementById('item_id');
+        var itemWrapper = document.getElementById('item_wrapper');
+        var contentTypeInput = document.getElementById('content_type');
+        var contentsData = [];
+
+        if (eventId && contentSelect) {
+            fetch('<?php echo $this->createUrl("getEventContents"); ?>&event_id=' + eventId)
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success && data.data) {
+                        contentsData = data.data;
+                        data.data.forEach(function(c) {
+                            var opt = document.createElement('option');
+                            opt.value = c.id;
+                            opt.textContent = c.name;
+                            opt.setAttribute('data-type', c.type);
+                            contentSelect.appendChild(opt);
+                        });
+                    }
+                });
+        }
+
+        if (contentSelect) {
+            contentSelect.addEventListener('change', function() {
+                var selectedOpt = this.options[this.selectedIndex];
+                var contentType = selectedOpt.getAttribute('data-type') || '';
+                contentTypeInput.value = contentType;
+
+                itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+                itemWrapper.style.display = 'none';
+
+                if ((contentType === 'sports' || contentType === 'competition') && eventId) {
+                    fetch('<?php echo $this->createUrl("getContentItems"); ?>&event_id=' + eventId + '&content_type=' + contentType)
+                        .then(function(response) { return response.json(); })
+                        .then(function(data) {
+                            itemSelect.innerHTML = '<option value="">-- Chọn bộ môn --</option>';
+                            if (data.success && data.data && data.data.length > 0) {
+                                data.data.forEach(function(item) {
+                                    var opt = document.createElement('option');
+                                    opt.value = item.id;
+                                    opt.textContent = item.name;
+                                    itemSelect.appendChild(opt);
+                                });
+                                itemWrapper.style.display = 'block';
+                            }
+                        });
+                } else {
+                    itemSelect.innerHTML = '<option value="">-- Chọn bộ môn --</option>';
+                }
+            });
+        }
+    });
 </script>
