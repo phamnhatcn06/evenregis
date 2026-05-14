@@ -7,6 +7,25 @@ class RegistrationsController extends AdminController
 		$model = $this->loadModelById($id);
 		$registrationDetails = RegistrationDetails::getByRegistrationId($id);
 
+		// Load related names nếu API không trả về
+		if (empty($model->event_name) && $model->event_id) {
+			$event = Events::fetchFromApi($model->event_id);
+			$model->event_name = $event ? $event->name : '';
+		}
+		if (empty($model->property_name) && $model->property_id) {
+			$property = Properties::fetchFromApi($model->property_id);
+			$model->property_name = $property ? $property->name : '';
+			$model->property_code = $property ? $property->code : '';
+		}
+		if (empty($model->relation_property_name) && $model->relation_property_id) {
+			$relationProperty = Properties::fetchFromApi($model->relation_property_id);
+			$model->relation_property_name = $relationProperty ? $relationProperty->name : '';
+		}
+		if (empty($model->period_name) && $model->period_id) {
+			$period = RegistrationPeriods::fetchFromApi($model->period_id);
+			$model->period_name = $period ? $period->name : '';
+		}
+
 		$this->render('view', array(
 			'model' => $model,
 			'registrationDetails' => $registrationDetails,
