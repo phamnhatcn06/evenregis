@@ -30,7 +30,15 @@ var RegistrationView = (function() {
                         if (c.code === 'competition') {
                             competitionContentId = c.id;
                         }
+                        if (c.code === 'sports') {
+                            var contentIdField = document.getElementById('content_id');
+                            if (contentIdField) {
+                                contentIdField.value = c.id;
+                            }
+                        }
                     });
+                    console.log('Contents loaded:', contentsData);
+                    console.log('Competition content ID:', competitionContentId);
                 }
             });
     }
