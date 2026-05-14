@@ -129,84 +129,6 @@ $perColumn = ceil($totalAttrs / $columns);
     </div>
 </div>
 
-<?php if ($model->relation_property_id): ?>
-    <div class="card mb-3">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fa fa-handshake-o me-2"></i>Thông tin liên quân</h5>
-            <?php if (isset($allianceRequest) && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_PENDING): ?>
-                <span class="badge bg-warning">Đang chờ xác nhận</span>
-            <?php endif; ?>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <table class="table table-bordered table-striped mb-0">
-                        <tbody>
-                            <tr>
-                                <th style="width:40%;background:#f8f9fa;">Đơn vị liên quân</th>
-                                <td><?php echo CHtml::encode($model->relation_property_name ?: '-'); ?></td>
-                            </tr>
-                            <tr>
-                                <th style="background:#f8f9fa;">Trạng thái</th>
-                                <td>
-                                    <?php if (isset($allianceRequest) && $allianceRequest): ?>
-                                        <?php echo AllianceRequests::getStatusLabel($allianceRequest->status); ?>
-                                    <?php else: ?>
-                                        <span class="badge bg-secondary">Chưa có yêu cầu</span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th style="background:#f8f9fa;">Ngày yêu cầu</th>
-                                <td>
-                                    <?php echo (isset($allianceRequest) && $allianceRequest && $allianceRequest->requested_at)
-                                        ? MyHelper::formatDateTime($allianceRequest->requested_at) : '-'; ?>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <table class="table table-bordered table-striped mb-0">
-                        <tbody>
-                            <tr>
-                                <th style="width:40%;background:#f8f9fa;">Người duyệt</th>
-                                <td>
-                                    <?php echo (isset($allianceRequest) && $allianceRequest && !empty($allianceRequest->reviewed_by_name))
-                                        ? CHtml::encode($allianceRequest->reviewed_by_name) : '-'; ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th style="background:#f8f9fa;">Ngày duyệt</th>
-                                <td>
-                                    <?php echo (isset($allianceRequest) && $allianceRequest && $allianceRequest->reviewed_at)
-                                        ? MyHelper::formatDateTime($allianceRequest->reviewed_at) : '-'; ?>
-                                </td>
-                            </tr>
-                            <?php if (isset($allianceRequest) && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_REJECTED): ?>
-                                <tr>
-                                    <th style="background:#f8f9fa;">Lý do từ chối</th>
-                                    <td class="text-danger">
-                                        <?php echo CHtml::encode($allianceRequest->rejection_reason ?: '-'); ?>
-                                    </td>
-                                </tr>
-                            <?php else: ?>
-                                <tr>
-                                    <th style="background:#f8f9fa;">Ghi chú</th>
-                                    <td>
-                                        <?php echo (isset($allianceRequest) && $allianceRequest && !empty($allianceRequest->note))
-                                            ? CHtml::encode($allianceRequest->note) : '-'; ?>
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
-
 <div class="card mb-3">
     <div class="card-header">
         <h5 class="mb-0"><i class="fa fa-file-text me-2"></i>Tài liệu đính kèm</h5>
@@ -220,13 +142,13 @@ $perColumn = ceil($totalAttrs / $columns);
                     $isImage = in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'webp'));
                     $isPdf = ($ext === 'pdf');
                 ?>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
                         <div class="card h-100">
                             <?php if ($isImage): ?>
-                                <img src="<?php echo CHtml::encode($docUrl); ?>" class="card-img-top" style="height:120px;object-fit:cover;cursor:pointer;"
+                                <img src="<?php echo CHtml::encode($docUrl); ?>" class="card-img-top" style="height:220px;object-fit:cover;cursor:pointer;"
                                     onclick="viewDocument('<?php echo CHtml::encode($docUrl); ?>', 'image')" title="Click để xem">
                             <?php else: ?>
-                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:120px;">
+                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:220px;">
                                     <?php if ($isPdf): ?>
                                         <i class="fa fa-file-pdf-o fa-3x text-danger"></i>
                                     <?php elseif (in_array($ext, array('doc', 'docx'))): ?>

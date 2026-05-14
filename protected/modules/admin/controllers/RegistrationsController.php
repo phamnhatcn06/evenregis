@@ -416,4 +416,102 @@ class RegistrationsController extends AdminController
 			'dataProvider' => $dataProvider,
 		));
 	}
+
+	public function actionGetEventContents($event_id)
+	{
+		$contents = EventContents::getByEventId($event_id);
+		$result = array();
+		foreach ($contents as $item) {
+			$result[] = array(
+				'id' => isset($item['content_id']) ? $item['content_id'] : $item['id'],
+				'name' => isset($item['content_name']) ? $item['content_name'] : '',
+				'type' => isset($item['content_type']) ? $item['content_type'] : '',
+			);
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionGetContentItems($event_id, $content_type)
+	{
+		$result = array();
+
+		if ($content_type === 'sports') {
+			$sports = EventSports::getByEventId($event_id);
+			foreach ($sports as $item) {
+				$result[] = array(
+					'id' => isset($item['sport_id']) ? $item['sport_id'] : $item['id'],
+					'name' => isset($item['sport_name']) ? $item['sport_name'] : '',
+				);
+			}
+		} elseif ($content_type === 'competition') {
+			$competitions = EventCompetitions::getByEventId($event_id);
+			foreach ($competitions as $item) {
+				$result[] = array(
+					'id' => isset($item['competition_id']) ? $item['competition_id'] : $item['id'],
+					'name' => isset($item['competition_name']) ? $item['competition_name'] : '',
+				);
+			}
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionAddDetail()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$contentId = Yii::app()->getRequest()->getPost('content_id');
+		$contentType = Yii::app()->getRequest()->getPost('content_type');
+		$itemId = Yii::app()->getRequest()->getPost('item_id');
+		$quantity = Yii::app()->getRequest()->getPost('quantity', 1);
+		$note = Yii::app()->getRequest()->getPost('note', '');
+
+		$data = array(
+			'registration_id' => $registrationId,
+			'content_id' => $contentId,
+			'quantity' => $quantity,
+			'note' => $note,
+		);
+
+		if ($contentType === 'sports' && $itemId) {
+			$data['sport_id'] = $itemId;
+		} elseif ($contentType === 'competition' && $itemId) {
+			$data['competition_id'] = $itemId;
+		}
+
+		$result = RegistrationDetails::storeViaApi($data);
+
+		if ($result['success']) {
+			Yii::app()->user->setFlash('success', 'Thêm nội dung đăng ký thành công.');
+		} else {
+			Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể thêm nội dung.');
+		}
+
+		$this->redirect(array('view', 'id' => $registrationId));
+	}
+
+	public function actionDeleteDetail($id, $registration_id)
+	{
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$result = RegistrationDetails::deleteViaApi($id);
+
+			if ($result['success']) {
+				Yii::app()->user->setFlash('success', 'Xóa nội dung đăng ký thành công.');
+			} else {
+				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể xóa.');
+			}
+
+			$this->redirect(array('view', 'id' => $registration_id));
+		} else {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+	}
 }

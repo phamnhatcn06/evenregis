@@ -4963,7 +4963,7 @@ fieldset:disabled .btn {
   word-wrap: break-word;
   background-color: #fff;
   background-clip: border-box;
-  border: 0 solid rgba(0, 0, 0, 0.125);
+  border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.5rem;
   box-shadow: 0 10px 30px 0 rgba(17, 38, 146, 0.05);
 }
