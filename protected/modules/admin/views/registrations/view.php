@@ -310,6 +310,7 @@ $contentConfig = array(
         <div class="modal-content">
             <form method="post" action="<?php echo $this->createUrl('addCompetitionRegistration'); ?>" id="add-competition-form">
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
+                <input type="hidden" name="content_id" id="comp_content_id" value="">
                 <div class="modal-header">
                     <h5 class="modal-title">Đăng ký thi nghiệp vụ</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
