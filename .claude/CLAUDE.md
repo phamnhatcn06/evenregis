@@ -705,6 +705,71 @@ $model->submitted_by = Yii::app()->user->id;
 
 ---
 
+## Status Constants — Sử dụng hằng số thay vì magic numbers
+
+**QUAN TRỌNG**: Khi so sánh hoặc gán giá trị cho các trường `status`, **PHẢI dùng hằng số (constants)** được khai báo trong Model, **KHÔNG được dùng** magic numbers hoặc strings trực tiếp.
+
+### Cách khai báo trong Model
+
+```php
+class Registrations extends BaseRegistrations
+{
+    const STATUS_DRAFT = 0;
+    const STATUS_SUBMITTED = 1;
+    const STATUS_APPROVED = 2;
+    const STATUS_REJECTED = 3;
+
+    public static function getStatusLabel($status)
+    {
+        $labels = array(
+            self::STATUS_DRAFT => '<span class="badge bg-secondary">Nháp</span>',
+            self::STATUS_SUBMITTED => '<span class="badge bg-info">Đã nộp</span>',
+            self::STATUS_APPROVED => '<span class="badge bg-success">Đã duyệt</span>',
+            self::STATUS_REJECTED => '<span class="badge bg-danger">Từ chối</span>',
+        );
+        return isset($labels[$status]) ? $labels[$status] : $status;
+    }
+}
+```
+
+### Cách sử dụng đúng
+
+```php
+// ✅ ĐÚNG — Dùng constants
+$model->status = Registrations::STATUS_DRAFT;
+if ($model->status == Registrations::STATUS_SUBMITTED) { ... }
+
+// ❌ SAI — Dùng magic numbers
+$model->status = 0;
+if ($model->status == 1) { ... }
+
+// ❌ SAI — Dùng strings
+$model->status = 'draft';
+if ($model->status === 'submitted') { ... }
+```
+
+### Trong View
+
+```php
+// ✅ ĐÚNG
+<?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+    <button>Nộp đăng ký</button>
+<?php endif; ?>
+
+// ❌ SAI
+<?php if ($model->status === 'draft'): ?>
+<?php if ($model->status == 0): ?>
+```
+
+### Các Model có status constants
+
+| Model | Constants |
+|-------|-----------|
+| `Registrations` | `STATUS_DRAFT`, `STATUS_SUBMITTED`, `STATUS_APPROVED`, `STATUS_REJECTED` |
+| `AllianceRequests` | `STATUS_PENDING`, `STATUS_APPROVED`, `STATUS_REJECTED` |
+
+---
+
 ## Toast Notification — Thay thế Alert
 
 **QUAN TRỌNG**: Sau các thao tác CRUD (create, update, delete), **KHÔNG dùng** Bootstrap Alert (`alert alert-success alert-dismissible`). Thay vào đó, sử dụng **Toast JS** với auto close sau 5 giây.
