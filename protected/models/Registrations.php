@@ -4,6 +4,15 @@ Yii::import('application.models._base.BaseRegistrations');
 
 class Registrations extends BaseRegistrations
 {
+	// Virtual properties từ API (joined data)
+	public $event_name;
+	public $property_name;
+	public $property_code;
+	public $relation_property_name;
+	public $period_name;
+	public $submitted_by_name;
+	public $reviewed_by_name;
+
 	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
@@ -28,8 +37,6 @@ class Registrations extends BaseRegistrations
 		$data = array_filter($this->attributes, function ($value) {
 			return $value !== null && $value !== '';
 		});
-		print_r($data);
-		die();
 		return ApiClient::post(ApiEndpoints::REGISTRATION_STORE, $data);
 	}
 
@@ -60,10 +67,10 @@ class Registrations extends BaseRegistrations
 	public static function getStatusLabel($status)
 	{
 		$labels = array(
-			'draft' => '<span class="badge bg-secondary">Nháp</span>',
-			'submitted' => '<span class="badge bg-info">Đã nộp</span>',
-			'approved' => '<span class="badge bg-success">Đã duyệt</span>',
-			'rejected' => '<span class="badge bg-danger">Từ chối</span>',
+			0 => '<span class="badge bg-secondary">Nháp</span>',
+			1 => '<span class="badge bg-info">Đã nộp</span>',
+			2 => '<span class="badge bg-success">Đã duyệt</span>',
+			3 => '<span class="badge bg-danger">Từ chối</span>',
 		);
 		return isset($labels[$status]) ? $labels[$status] : $status;
 	}
@@ -71,10 +78,10 @@ class Registrations extends BaseRegistrations
 	public static function getStatusList()
 	{
 		return array(
-			'draft' => 'Nháp',
-			'submitted' => 'Đã nộp',
-			'approved' => 'Đã duyệt',
-			'rejected' => 'Từ chối',
+			0 => 'Nháp',
+			1 => 'Đã nộp',
+			2 => 'Đã duyệt',
+			3 => 'Từ chối',
 		);
 	}
 }
