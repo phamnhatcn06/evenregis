@@ -130,7 +130,7 @@ class ApiEndpoints
 
     // Registration Period
     const REGISTRATION_PERIOD_LIST = '/api/registration-periods';
-    const REGISTRATION_PERIOD_LIST_ACTIVE = 'api/registration-periods/list-active';
+    const REGISTRATION_PERIOD_LIST_ACTIVE = '/api/registration-periods/list-active';
     const REGISTRATION_PERIOD_STORE = '/api/registration-periods/store';
     const REGISTRATION_PERIOD_DETAIL = '/api/registration-periods/detail/{id}';
     const REGISTRATION_PERIOD_UPDATE = '/api/registration-periods/update/{id}';
