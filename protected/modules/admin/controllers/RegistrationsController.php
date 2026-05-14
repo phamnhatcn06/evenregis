@@ -143,13 +143,13 @@ class RegistrationsController extends AdminController
 			$relationProperties = array();
 			if ($model->property_id) {
 				$property = Properties::fetchFromApi($model->property_id);
-				if ($property && $property->regional_id) {
-					$relationProperties = Properties::getApiDataProvider(array('regional_id' => $property->regional_id), 500)->getData();
+				if ($property && $property->region_id) {
+					$relationProperties = Properties::getApiDataProvider(array('region_id' => $property->region_id), 500)->getData();
 				}
 			}
 		} else {
 			$properties = $userPropertyId ? Properties::getApiDataProvider(array('id' => $userPropertyId), 100)->getData() : array();
-			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('regional_id' => $userRegionalId), 500)->getData() : array();
+			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('region_id' => $userRegionalId), 500)->getData() : array();
 		}
 
 		if (isset($_POST['Registrations'])) {
@@ -322,15 +322,23 @@ class RegistrationsController extends AdminController
 	{
 		$existing = AllianceRequests::findByRegistration($eventId, $requesterOrgId, $targetOrgId);
 		if ($existing) {
+			Yii::log("Alliance request already exists for event=$eventId, requester=$requesterOrgId, target=$targetOrgId", 'info', 'application.alliance');
 			return;
 		}
 
+		$ssoUser = AuthHandler::getUser();
 		$alliance = new AllianceRequests;
 		$alliance->event_id = $eventId;
 		$alliance->requester_org_id = $requesterOrgId;
 		$alliance->target_org_id = $targetOrgId;
-		$alliance->requested_by = Yii::app()->user->id ?: 1;
-		$alliance->storeViaApi();
+		$alliance->requested_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+
+		$result = $alliance->storeViaApi();
+		if (!$result['success']) {
+			Yii::log("Failed to create alliance request: " . json_encode($result), 'error', 'application.alliance');
+		} else {
+			Yii::log("Created alliance request for event=$eventId, requester=$requesterOrgId, target=$targetOrgId", 'info', 'application.alliance');
+		}
 	}
 
 	public function actionGetRelationProperties($property_id)
