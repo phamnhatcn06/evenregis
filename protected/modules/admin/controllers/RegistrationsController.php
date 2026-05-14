@@ -222,7 +222,7 @@ class RegistrationsController extends AdminController
 	{
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
-			$model->status = 'submitted';
+			$model->status = Registrations::STATUS_SUBMITTED;
 			$model->submitted_at = time();
 			$result = $model->updateViaApi();
 
