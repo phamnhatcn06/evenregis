@@ -26,9 +26,20 @@ class RegistrationsController extends AdminController
 			$model->period_name = $period ? $period->name : '';
 		}
 
+		// Load alliance request nếu có liên quân
+		$allianceRequest = null;
+		if ($model->relation_property_id && $model->event_id && $model->property_id) {
+			$allianceRequest = AllianceRequests::findByRegistration(
+				$model->event_id,
+				$model->property_id,
+				$model->relation_property_id
+			);
+		}
+
 		$this->render('view', array(
 			'model' => $model,
 			'registrationDetails' => $registrationDetails,
+			'allianceRequest' => $allianceRequest,
 		));
 	}
 
