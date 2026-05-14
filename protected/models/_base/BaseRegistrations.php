@@ -33,38 +33,45 @@
  * @property Properties $property
  * @property Properties $relationProperty
  */
-abstract class BaseRegistrations extends GxActiveRecord {
+abstract class BaseRegistrations extends GxActiveRecord
+{
 
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+	{
 		return 'registrations';
 	}
 
-	public static function label($n = 1) {
-		return Yii::t('app', 'Registrations|Registrations', $n);
+	public static function label($n = 1)
+	{
+		return Yii::t('app', 'Phiếu đăng ký', $n);
 	}
 
-	public static function representingColumn() {
+	public static function representingColumn()
+	{
 		return 'status';
 	}
 
-	public function rules() {
+	public function rules()
+	{
 		return array(
 			array('property_id, period_id, submitted_by', 'required'),
-			array('event_id, property_id, relation_property_id, period_id, submitted_by', 'length', 'max'=>20),
-			array('status', 'length', 'max'=>9),
-			array('document', 'length', 'max'=>500),
-			array('submitted_at, reviewed_by, reviewed_at', 'length', 'max'=>10),
+			array('event_id, property_id, relation_property_id, period_id, submitted_by', 'length', 'max' => 20),
+			array('status', 'length', 'max' => 9),
+			array('document', 'length', 'max' => 500),
+			array('submitted_at, reviewed_by, reviewed_at', 'length', 'max' => 10),
 			array('rejection_reason, note, created_at, updated_at, deleted_at', 'safe'),
 			array('event_id, relation_property_id, status, document, submitted_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, event_id, property_id, relation_property_id, period_id, submitted_by, status, document, submitted_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
+			array('id, event_id, property_id, relation_property_id, period_id, submitted_by, status, document, submitted_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+	{
 		return array(
 			'attendees' => array(self::HAS_MANY, 'Attendees', 'registration_id'),
 			'registrationDetails' => array(self::HAS_MANY, 'RegistrationDetails', 'registration_id'),
@@ -75,12 +82,13 @@ abstract class BaseRegistrations extends GxActiveRecord {
 		);
 	}
 
-	public function pivotModels() {
-		return array(
-		);
+	public function pivotModels()
+	{
+		return array();
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+	{
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'event_id' => null,
@@ -107,7 +115,8 @@ abstract class BaseRegistrations extends GxActiveRecord {
 		);
 	}
 
-	public function search() {
+	public function search()
+	{
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);

@@ -120,8 +120,24 @@ class RegistrationsController extends AdminController
 		$isAdmin = ($userPropertyCode === '9999');
 
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
-		$periods = RegistrationPeriods::getActiveList();
 
+		// Load periods theo event_id hiện có
+		$periods = array();
+		if ($model->event_id) {
+			$periodsData = RegistrationPeriods::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'is_active' => 1,
+			), 100)->getData();
+			foreach ($periodsData as $p) {
+				$pId = isset($p->id) ? $p->id : (isset($p['id']) ? $p['id'] : null);
+				$pName = isset($p->name) ? $p->name : (isset($p['name']) ? $p['name'] : '');
+				if ($pId) {
+					$periods[$pId] = $pName;
+				}
+			}
+		}
+
+		// Load properties và relationProperties
 		if ($isAdmin) {
 			$properties = Properties::getApiDataProvider(array(), 500)->getData();
 			$relationProperties = array();
@@ -133,7 +149,7 @@ class RegistrationsController extends AdminController
 			}
 		} else {
 			$properties = $userPropertyId ? Properties::getApiDataProvider(array('id' => $userPropertyId), 100)->getData() : array();
-			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('region_id' => $userRegionalId), 500)->getData() : array();
+			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('regional_id' => $userRegionalId), 500)->getData() : array();
 		}
 
 		if (isset($_POST['Registrations'])) {
