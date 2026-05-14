@@ -256,7 +256,7 @@ class RegistrationsController extends AdminController
 	{
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
-			$model->status = 'rejected';
+			$model->status = Registrations::STATUS_REJECTED;
 			$model->reviewed_at = time();
 			$model->rejection_reason = Yii::app()->getRequest()->getPost('rejection_reason', '');
 			$result = $model->updateViaApi();
