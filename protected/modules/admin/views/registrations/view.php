@@ -385,12 +385,13 @@ $perColumn = ceil($totalAttrs / $columns);
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getEventContents"); ?>?event_id=' + eventId)
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
+                    console.log('Contents data:', data);
                     if (data.success && data.data) {
                         data.data.forEach(function(c) {
                             var opt = document.createElement('option');
                             opt.value = c.id;
                             opt.textContent = c.name;
-                            opt.setAttribute('data-code', c.code);
+                            opt.setAttribute('data-code', c.code || '');
                             contentSelect.appendChild(opt);
                         });
                     }
