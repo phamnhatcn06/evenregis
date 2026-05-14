@@ -8,6 +8,12 @@ class AllianceRequests extends BaseAllianceRequests
 	public const STATUS_APPROVED = 1;
 	public const STATUS_REJECTED = 2;
 
+	// Virtual properties từ API (joined data)
+	public $requester_org_name;
+	public $target_org_name;
+	public $requested_by_name;
+	public $reviewed_by_name;
+
 	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
