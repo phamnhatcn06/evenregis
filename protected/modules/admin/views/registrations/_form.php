@@ -68,6 +68,8 @@ if (isset($relationProperties)) {
                     'class' => 'form-select',
                     'prompt' => $periodPrompt,
                     'id' => 'period-select',
+                    'data-api-url' => Yii::app()->params['externalApiUrl'] . '/api/registration-periods/list-active',
+                    'data-api-key' => Yii::app()->params['externalApiKey'],
                 )); ?>
                 <?php echo $form->error($model, 'period_id'); ?>
             </div>
