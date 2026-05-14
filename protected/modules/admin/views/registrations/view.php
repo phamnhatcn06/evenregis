@@ -454,12 +454,19 @@ $perColumn = ceil($totalAttrs / $columns);
                     fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=sports')
                         .then(function(response) { return response.json(); })
                         .then(function(data) {
+                            console.log('Sports data:', data);
                             if (data.success && data.data && data.data.length > 0) {
                                 itemSelect.innerHTML = renderSportsTree(data.data, registeredSports);
                                 itemWrapper.style.display = 'block';
                             } else {
                                 itemSelect.innerHTML = '<option value="">-- Không có môn nào --</option>';
+                                itemWrapper.style.display = 'block';
                             }
+                        })
+                        .catch(function(err) {
+                            console.error('Error loading sports:', err);
+                            itemSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+                            itemWrapper.style.display = 'block';
                         });
                 } else if (contentCode === 'competition' && eventId) {
                     if (itemLabel) itemLabel.textContent = 'Cuộc thi nghiệp vụ *';
