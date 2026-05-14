@@ -631,12 +631,17 @@ foreach ($registrationDetails as $detail) {
             modalTitle.textContent = 'Đăng ký thi sắc đẹp';
             quantityLabel.innerHTML = 'Số người dự thi <span class="text-danger">*</span>';
             itemWrapper.style.display = 'none';
-            itemSelect.innerHTML = '<option value="">-- Không áp dụng --</option>';
+            itemSelect.removeAttribute('required');
         } else if (contentCode === 'talent') {
             modalTitle.textContent = 'Đăng ký văn nghệ';
             quantityLabel.innerHTML = 'Số tiết mục <span class="text-danger">*</span>';
             itemWrapper.style.display = 'none';
-            itemSelect.innerHTML = '<option value="">-- Không áp dụng --</option>';
+            itemSelect.removeAttribute('required');
+        }
+
+        // Set required cho item khi sports/competition
+        if (contentCode === 'sports' || contentCode === 'competition') {
+            itemSelect.setAttribute('required', 'required');
         }
 
         modal.show();
