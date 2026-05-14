@@ -26,6 +26,17 @@ class RegistrationsController extends AdminController
 			$model->period_name = $period ? $period->name : '';
 		}
 
+		// Load attendees cho từng registration detail (nghiệp vụ)
+		$detailAttendees = array();
+		foreach ($registrationDetails as $detail) {
+			$detailId = isset($detail['id']) ? $detail['id'] : null;
+			$contentCode = isset($detail['content_code']) ? $detail['content_code'] : '';
+			if ($detailId && $contentCode === 'competition') {
+				$attendees = RegistrationDetailAttendees::getByDetailId($detailId);
+				$detailAttendees[$detailId] = $attendees;
+			}
+		}
+
 		// Load alliance request nếu có liên quân
 		$allianceRequest = null;
 		if ($model->relation_property_id && $model->event_id && $model->property_id) {
@@ -39,6 +50,7 @@ class RegistrationsController extends AdminController
 		$this->render('view', array(
 			'model' => $model,
 			'registrationDetails' => $registrationDetails,
+			'detailAttendees' => $detailAttendees,
 			'allianceRequest' => $allianceRequest,
 		));
 	}
