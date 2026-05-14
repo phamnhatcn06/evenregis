@@ -674,7 +674,10 @@ class RegistrationsController extends AdminController
 				'status' => RegistrationDetailAttendees::STATUS_PENDING,
 			);
 
+			Yii::log("AddCompetitionRegistration - attendeeData: " . json_encode($attendeeData), 'info', 'application.registration');
+
 			$result = RegistrationDetailAttendees::storeViaApi($attendeeData);
+			Yii::log("AddCompetitionRegistration - attendeeResult: " . json_encode($result), 'info', 'application.registration');
 
 			if ($result['success']) {
 				$successCount++;
