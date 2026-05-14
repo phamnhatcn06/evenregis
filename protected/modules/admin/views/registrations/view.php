@@ -258,3 +258,21 @@ $perColumn = ceil($totalAttrs / $columns);
         </div>
     </div>
 </div>
+
+<script>
+function viewDocument(url, type) {
+    var modalBody = document.getElementById('documentModalBody');
+    var downloadLink = document.getElementById('documentDownloadLink');
+
+    downloadLink.href = url;
+
+    if (type === 'image') {
+        modalBody.innerHTML = '<div class="text-center p-3"><img src="' + url + '" class="img-fluid" style="max-height:80vh;"></div>';
+    } else if (type === 'pdf') {
+        modalBody.innerHTML = '<iframe src="' + url + '" style="width:100%;height:80vh;border:none;"></iframe>';
+    }
+
+    var modal = new bootstrap.Modal(document.getElementById('documentModal'));
+    modal.show();
+}
+</script>
