@@ -43,11 +43,29 @@ $this->Tabletitle = 'Chi tiết phiếu đăng ký #' . $model->id;
 ?>
 
 <?php
+// Build alliance info
+$allianceValue = '-';
+if ($model->relation_property_id && isset($model->relation_property_name)) {
+    $allianceValue = CHtml::encode($model->relation_property_name);
+    if (isset($allianceRequest) && $allianceRequest) {
+        $allianceValue .= '<br>' . AllianceRequests::getStatusLabel($allianceRequest->status);
+        if ($allianceRequest->reviewed_at) {
+            $allianceValue .= '<br><small class="text-muted">Ngày duyệt: ' . MyHelper::formatDateTime($allianceRequest->reviewed_at) . '</small>';
+        }
+        if (!empty($allianceRequest->reviewed_by_name)) {
+            $allianceValue .= '<br><small class="text-muted">Người duyệt: ' . CHtml::encode($allianceRequest->reviewed_by_name) . '</small>';
+        }
+        if ($allianceRequest->status == AllianceRequests::STATUS_REJECTED && !empty($allianceRequest->rejection_reason)) {
+            $allianceValue .= '<br><small class="text-danger">Lý do: ' . CHtml::encode($allianceRequest->rejection_reason) . '</small>';
+        }
+    }
+}
+
 $attributes = array(
     array('label' => 'ID', 'value' => $model->id),
     array('label' => 'Sự kiện', 'value' => isset($model->event_name) ? $model->event_name : ''),
     array('label' => 'Đơn vị', 'value' => isset($model->property_name) ? $model->property_name : ''),
-    array('label' => 'Đơn vị liên quân', 'value' => isset($model->relation_property_name) ? $model->relation_property_name : '-'),
+    array('label' => 'Đơn vị liên quân', 'value' => $allianceValue, 'raw' => true),
     array('label' => 'Đợt đăng ký', 'value' => isset($model->period_name) ? $model->period_name : ''),
     array('label' => 'Trạng thái', 'value' => Registrations::getStatusLabel($model->status), 'raw' => true),
     array('label' => 'Ngày nộp', 'value' => $model->submitted_at ? MyHelper::formatDateTime($model->submitted_at) : '-'),
