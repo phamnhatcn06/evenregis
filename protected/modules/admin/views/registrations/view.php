@@ -182,23 +182,50 @@ $perColumn = ceil($totalAttrs / $columns);
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fa fa-list me-2"></i>Chi tiết đăng ký</h5>
+<?php
+// Nhóm chi tiết đăng ký theo loại nội dung
+$detailsByContent = array();
+$contentIcons = array(
+    'sports' => 'fa-futbol-o',
+    'competition' => 'fa-trophy',
+    'miss' => 'fa-star',
+    'talent' => 'fa-music',
+    'ceremony' => 'fa-flag',
+);
+$contentLabels = array(
+    'sports' => 'Thi đấu thể thao',
+    'competition' => 'Thi nghiệp vụ',
+    'miss' => 'Hội thi sắc đẹp',
+    'talent' => 'Hội diễn văn nghệ',
+    'ceremony' => 'Lễ khai/bế mạc',
+);
+
+foreach ($registrationDetails as $detail) {
+    $code = isset($detail['content_code']) ? $detail['content_code'] : 'other';
+    if (!isset($detailsByContent[$code])) {
+        $detailsByContent[$code] = array();
+    }
+    $detailsByContent[$code][] = $detail;
+}
+?>
+
+<!-- Thể thao -->
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center bg-primary bg-opacity-10">
+        <h5 class="mb-0"><i class="fa fa-futbol-o me-2"></i>Thi đấu thể thao</h5>
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addDetailModal">
-                <i class="fa fa-plus me-1"></i>Thêm nội dung
+            <button type="button" class="btn btn-sm btn-success" onclick="openAddModal('sports')">
+                <i class="fa fa-plus me-1"></i>Thêm môn
             </button>
         <?php endif; ?>
     </div>
     <div class="card-body">
-        <?php if (!empty($registrationDetails)): ?>
-            <table class="table table-bordered table-striped">
+        <?php if (!empty($detailsByContent['sports'])): ?>
+            <table class="table table-bordered table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Nội dung</th>
-                        <th>Môn/Bộ môn</th>
-                        <th>Số lượng</th>
+                        <th>Môn thể thao</th>
+                        <th style="width:120px;">Số đội/người</th>
                         <th>Ghi chú</th>
                         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                             <th style="width:80px;">Thao tác</th>
@@ -206,24 +233,13 @@ $perColumn = ceil($totalAttrs / $columns);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($registrationDetails as $detail): ?>
+                    <?php foreach ($detailsByContent['sports'] as $detail): ?>
                         <tr>
-                            <td><?php echo CHtml::encode(isset($detail['content_name']) ? $detail['content_name'] : ''); ?></td>
-                            <td>
-                                <?php
-                                    $itemName = '-';
-                                    if (!empty($detail['sport_name'])) {
-                                        $itemName = $detail['sport_name'];
-                                    } elseif (!empty($detail['competition_name'])) {
-                                        $itemName = $detail['competition_name'];
-                                    }
-                                    echo CHtml::encode($itemName);
-                                ?>
-                            </td>
-                            <td><?php echo CHtml::encode(isset($detail['quantity']) ? $detail['quantity'] : 1); ?></td>
+                            <td><?php echo CHtml::encode(isset($detail['sport_name']) ? $detail['sport_name'] : '-'); ?></td>
+                            <td class="text-center"><?php echo CHtml::encode(isset($detail['quantity']) ? $detail['quantity'] : 1); ?></td>
                             <td><?php echo CHtml::encode(isset($detail['note']) ? $detail['note'] : ''); ?></td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                                <td>
+                                <td class="text-center">
                                     <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detail['id'], 'registration_id' => $model->id)); ?>" style="display:inline;" id="delete-detail-form-<?php echo $detail['id']; ?>">
                                         <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeleteDetail(<?php echo $detail['id']; ?>)">
                                             <i class="fa fa-trash"></i>
@@ -236,7 +252,151 @@ $perColumn = ceil($totalAttrs / $columns);
                 </tbody>
             </table>
         <?php else: ?>
-            <p class="text-muted">Chưa có chi tiết đăng ký.</p>
+            <p class="text-muted mb-0">Chưa đăng ký môn thể thao nào.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Nghiệp vụ -->
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center bg-warning bg-opacity-10">
+        <h5 class="mb-0"><i class="fa fa-trophy me-2"></i>Thi nghiệp vụ</h5>
+        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+            <button type="button" class="btn btn-sm btn-success" onclick="openAddModal('competition')">
+                <i class="fa fa-plus me-1"></i>Thêm cuộc thi
+            </button>
+        <?php endif; ?>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($detailsByContent['competition'])): ?>
+            <table class="table table-bordered table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Cuộc thi</th>
+                        <th style="width:120px;">Số người</th>
+                        <th>Ghi chú</th>
+                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <th style="width:80px;">Thao tác</th>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($detailsByContent['competition'] as $detail): ?>
+                        <tr>
+                            <td><?php echo CHtml::encode(isset($detail['competition_name']) ? $detail['competition_name'] : '-'); ?></td>
+                            <td class="text-center"><?php echo CHtml::encode(isset($detail['quantity']) ? $detail['quantity'] : 1); ?></td>
+                            <td><?php echo CHtml::encode(isset($detail['note']) ? $detail['note'] : ''); ?></td>
+                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                                <td class="text-center">
+                                    <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detail['id'], 'registration_id' => $model->id)); ?>" style="display:inline;" id="delete-detail-form-<?php echo $detail['id']; ?>">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeleteDetail(<?php echo $detail['id']; ?>)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p class="text-muted mb-0">Chưa đăng ký cuộc thi nghiệp vụ nào.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Sắc đẹp -->
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center bg-danger bg-opacity-10">
+        <h5 class="mb-0"><i class="fa fa-star me-2"></i>Hội thi sắc đẹp</h5>
+        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+            <button type="button" class="btn btn-sm btn-success" onclick="openAddModal('miss')">
+                <i class="fa fa-plus me-1"></i>Thêm
+            </button>
+        <?php endif; ?>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($detailsByContent['miss'])): ?>
+            <table class="table table-bordered table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Nội dung</th>
+                        <th style="width:120px;">Số người</th>
+                        <th>Ghi chú</th>
+                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <th style="width:80px;">Thao tác</th>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($detailsByContent['miss'] as $detail): ?>
+                        <tr>
+                            <td><?php echo CHtml::encode(isset($detail['content_name']) ? $detail['content_name'] : 'Hội thi sắc đẹp'); ?></td>
+                            <td class="text-center"><?php echo CHtml::encode(isset($detail['quantity']) ? $detail['quantity'] : 1); ?></td>
+                            <td><?php echo CHtml::encode(isset($detail['note']) ? $detail['note'] : ''); ?></td>
+                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                                <td class="text-center">
+                                    <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detail['id'], 'registration_id' => $model->id)); ?>" style="display:inline;" id="delete-detail-form-<?php echo $detail['id']; ?>">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeleteDetail(<?php echo $detail['id']; ?>)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p class="text-muted mb-0">Chưa đăng ký thi sắc đẹp.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Văn nghệ -->
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center bg-info bg-opacity-10">
+        <h5 class="mb-0"><i class="fa fa-music me-2"></i>Hội diễn văn nghệ</h5>
+        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+            <button type="button" class="btn btn-sm btn-success" onclick="openAddModal('talent')">
+                <i class="fa fa-plus me-1"></i>Thêm
+            </button>
+        <?php endif; ?>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($detailsByContent['talent'])): ?>
+            <table class="table table-bordered table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Nội dung</th>
+                        <th style="width:120px;">Số tiết mục</th>
+                        <th>Ghi chú</th>
+                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <th style="width:80px;">Thao tác</th>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($detailsByContent['talent'] as $detail): ?>
+                        <tr>
+                            <td><?php echo CHtml::encode(isset($detail['content_name']) ? $detail['content_name'] : 'Hội diễn văn nghệ'); ?></td>
+                            <td class="text-center"><?php echo CHtml::encode(isset($detail['quantity']) ? $detail['quantity'] : 1); ?></td>
+                            <td><?php echo CHtml::encode(isset($detail['note']) ? $detail['note'] : ''); ?></td>
+                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                                <td class="text-center">
+                                    <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detail['id'], 'registration_id' => $model->id)); ?>" style="display:inline;" id="delete-detail-form-<?php echo $detail['id']; ?>">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeleteDetail(<?php echo $detail['id']; ?>)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p class="text-muted mb-0">Chưa đăng ký tiết mục văn nghệ.</p>
         <?php endif; ?>
     </div>
 </div>
@@ -371,19 +531,21 @@ $perColumn = ceil($totalAttrs / $columns);
 
         // Danh sách đã đăng ký để loại trừ
         var registeredSports = <?php
-            $sportIds = array();
-            $competitionIds = array();
-            foreach ($registrationDetails as $d) {
-                if (!empty($d['sport_id'])) $sportIds[] = (int)$d['sport_id'];
-                if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
-            }
-            echo json_encode($sportIds);
-        ?>;
+                                $sportIds = array();
+                                $competitionIds = array();
+                                foreach ($registrationDetails as $d) {
+                                    if (!empty($d['sport_id'])) $sportIds[] = (int)$d['sport_id'];
+                                    if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
+                                }
+                                echo json_encode($sportIds);
+                                ?>;
         var registeredCompetitions = <?php echo json_encode($competitionIds); ?>;
 
         if (eventId && contentSelect) {
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getEventContents"); ?>?event_id=' + eventId)
-                .then(function(response) { return response.json(); })
+                .then(function(response) {
+                    return response.json();
+                })
                 .then(function(data) {
                     console.log('Contents data:', data);
                     if (data.success && data.data) {
@@ -454,7 +616,9 @@ $perColumn = ceil($totalAttrs / $columns);
                 if (contentCode === 'sports' && eventId) {
                     if (itemLabel) itemLabel.textContent = 'Môn thể thao *';
                     fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=sports')
-                        .then(function(response) { return response.json(); })
+                        .then(function(response) {
+                            return response.json();
+                        })
                         .then(function(data) {
                             console.log('Sports data:', data);
                             if (data.success && data.data && data.data.length > 0) {
@@ -473,7 +637,9 @@ $perColumn = ceil($totalAttrs / $columns);
                 } else if (contentCode === 'competition' && eventId) {
                     if (itemLabel) itemLabel.textContent = 'Cuộc thi nghiệp vụ *';
                     fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=competition')
-                        .then(function(response) { return response.json(); })
+                        .then(function(response) {
+                            return response.json();
+                        })
                         .then(function(data) {
                             var html = '<option value="">-- Chọn cuộc thi --</option>';
                             if (data.success && data.data && data.data.length > 0) {
