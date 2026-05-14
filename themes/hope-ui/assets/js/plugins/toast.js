@@ -76,10 +76,10 @@ var Toast = (function () {
 
     function getIconClass(type) {
         var icons = {
-            success: 'fas fa-check-circle',
-            error: 'fas fa-times-circle',
-            warning: 'fas fa-exclamation-triangle',
-            info: 'fas fa-info-circle'
+            success: 'fa fa-check-circle',
+            error: 'fa fa-times-circle',
+            warning: 'fa fa-exclamation-triangle',
+            info: 'fa fa-info-circle'
         };
         return icons[type] || icons.info;
     }

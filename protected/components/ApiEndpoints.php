@@ -164,6 +164,22 @@ class ApiEndpoints
     const ALLIANCE_REQUEST_UPDATE = '/api/alliance-requests/update/{id}';
     const ALLIANCE_REQUEST_DESTROY = '/api/alliance-requests/destroy/{id}';
 
+    // Competition
+    const COMPETITION_LIST = '/api/competitions';
+    const COMPETITION_STORE = '/api/competitions/store';
+    const COMPETITION_DETAIL = '/api/competitions/detail/{id}';
+    const COMPETITION_UPDATE = '/api/competitions/update/{id}';
+    const COMPETITION_DESTROY = '/api/competitions/destroy/{id}';
+    const COMPETITION_ASSIGN_NUMBERS = '/api/competitions/assign-numbers/{id}';
+
+    // Competition Registration
+    const COMPETITION_REGISTRATION_LIST = '/api/competition-registrations';
+    const COMPETITION_REGISTRATION_STORE = '/api/competition-registrations/store';
+    const COMPETITION_REGISTRATION_DETAIL = '/api/competition-registrations/detail/{id}';
+    const COMPETITION_REGISTRATION_UPDATE = '/api/competition-registrations/update/{id}';
+    const COMPETITION_REGISTRATION_DESTROY = '/api/competition-registrations/destroy/{id}';
+    const COMPETITION_REGISTRATION_CONFIRM = '/api/competition-registrations/confirm/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
