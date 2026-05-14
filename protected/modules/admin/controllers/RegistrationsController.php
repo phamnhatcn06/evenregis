@@ -40,9 +40,9 @@ class RegistrationsController extends AdminController
 
 		if (isset($_POST['Registrations'])) {
 			$model->setAttributes($_POST['Registrations']);
-			$model->status = 'draft';
-			$model->submitted_by = Yii::app()->user->id ?: 1;
-
+			$model->status = 0; //  	0: draft, 1: submitted, 2: approved, 3: rejected	
+			$ssoUser = AuthHandler::getUser();
+				$model->submitted_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
 			$existingDoc = isset($_POST['Registrations']['document']) ? $_POST['Registrations']['document'] : null;
 			$uploadedFiles = $this->handleDocumentUpload($existingDoc);
 			if ($uploadedFiles) {
@@ -50,6 +50,7 @@ class RegistrationsController extends AdminController
 			}
 
 			if ($model->validate()) {
+
 				$result = $model->storeViaApi();
 
 				if ($result['success']) {
