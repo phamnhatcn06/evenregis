@@ -629,6 +629,8 @@ class RegistrationsController extends AdminController
 		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
 		$note = Yii::app()->getRequest()->getPost('note', '');
 
+		Yii::log("AddCompetitionRegistration - POST data: " . json_encode($_POST), 'info', 'application.registration');
+
 		if (empty($staffIds) || !is_array($staffIds)) {
 			Yii::app()->user->setFlash('error', 'Vui lòng chọn ít nhất một nhân viên.');
 			$this->redirect(array('view', 'id' => $registrationId));
@@ -643,7 +645,10 @@ class RegistrationsController extends AdminController
 			'note' => $note,
 		);
 
+		Yii::log("AddCompetitionRegistration - detailData: " . json_encode($detailData), 'info', 'application.registration');
+
 		$detailResult = RegistrationDetails::storeViaApi($detailData);
+		Yii::log("AddCompetitionRegistration - detailResult: " . json_encode($detailResult), 'info', 'application.registration');
 
 		if (!$detailResult['success']) {
 			Yii::app()->user->setFlash('error', isset($detailResult['error']) ? $detailResult['error'] : 'Không thể tạo chi tiết đăng ký.');
