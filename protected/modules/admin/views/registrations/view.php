@@ -183,8 +183,13 @@ $perColumn = ceil($totalAttrs / $columns);
 </div>
 
 <div class="card">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-list me-2"></i>Chi tiết đăng ký</h5>
+        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addDetailModal">
+                <i class="fa fa-plus me-1"></i>Thêm nội dung
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
         <?php if (!empty($registrationDetails)): ?>
@@ -192,18 +197,40 @@ $perColumn = ceil($totalAttrs / $columns);
                 <thead>
                     <tr>
                         <th>Nội dung</th>
-                        <th>Môn thể thao</th>
+                        <th>Môn/Bộ môn</th>
                         <th>Số lượng</th>
                         <th>Ghi chú</th>
+                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <th style="width:80px;">Thao tác</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($registrationDetails as $detail): ?>
                         <tr>
                             <td><?php echo CHtml::encode(isset($detail['content_name']) ? $detail['content_name'] : ''); ?></td>
-                            <td><?php echo CHtml::encode(isset($detail['sport_name']) ? $detail['sport_name'] : '-'); ?></td>
+                            <td>
+                                <?php
+                                    $itemName = '-';
+                                    if (!empty($detail['sport_name'])) {
+                                        $itemName = $detail['sport_name'];
+                                    } elseif (!empty($detail['competition_name'])) {
+                                        $itemName = $detail['competition_name'];
+                                    }
+                                    echo CHtml::encode($itemName);
+                                ?>
+                            </td>
                             <td><?php echo CHtml::encode(isset($detail['quantity']) ? $detail['quantity'] : 1); ?></td>
                             <td><?php echo CHtml::encode(isset($detail['note']) ? $detail['note'] : ''); ?></td>
+                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                                <td>
+                                    <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detail['id'], 'registration_id' => $model->id)); ?>" style="display:inline;" id="delete-detail-form-<?php echo $detail['id']; ?>">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeleteDetail(<?php echo $detail['id']; ?>)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -211,6 +238,48 @@ $perColumn = ceil($totalAttrs / $columns);
         <?php else: ?>
             <p class="text-muted">Chưa có chi tiết đăng ký.</p>
         <?php endif; ?>
+    </div>
+</div>
+
+<!-- Modal Add Detail -->
+<div class="modal fade" id="addDetailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="<?php echo $this->createUrl('addDetail'); ?>" id="add-detail-form">
+                <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
+                <input type="hidden" name="content_type" id="content_type" value="">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm nội dung đăng ký</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Loại nội dung <span class="text-danger">*</span></label>
+                        <select class="form-select" id="content_id" name="content_id" required>
+                            <option value="">-- Chọn nội dung --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="item_wrapper" style="display:none;">
+                        <label class="form-label">Bộ môn <span class="text-danger">*</span></label>
+                        <select class="form-select" id="item_id" name="item_id">
+                            <option value="">-- Chọn bộ môn --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số lượng (người/đội) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="quantity" value="1" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success">Thêm</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
