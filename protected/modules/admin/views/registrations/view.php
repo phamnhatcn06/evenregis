@@ -384,7 +384,7 @@ $contentConfig = array(
     }
 
     var eventId = <?php echo $model->event_id ? $model->event_id : 'null'; ?>;
-    var contentsData = {};
+    var contentsData = [];
 
     // Danh sách đã đăng ký để loại trừ
     var registeredSports = <?php
@@ -400,16 +400,27 @@ $contentConfig = array(
 
     // Load contents data khi page load
     document.addEventListener('DOMContentLoaded', function() {
-        if (eventId) {
+        var contentSelect = document.getElementById('content_select');
+
+        if (eventId && contentSelect) {
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getEventContents"); ?>?event_id=' + eventId)
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
                     if (data.success && data.data) {
-                        data.data.forEach(function(c) {
-                            contentsData[c.code] = c.id;
-                        });
+                        contentsData = data.data;
                     }
                 });
+
+            contentSelect.addEventListener('change', function() {
+                var selectedOpt = this.options[this.selectedIndex];
+                var contentCode = selectedOpt.getAttribute('data-code') || '';
+                var contentId = this.value;
+
+                document.getElementById('content_type').value = contentCode;
+                document.getElementById('content_id').value = contentId;
+
+                loadContentItems(contentCode);
+            });
         }
     });
 
@@ -446,25 +457,45 @@ $contentConfig = array(
         return html;
     }
 
-    function openAddModal(contentCode) {
-        var modal = new bootstrap.Modal(document.getElementById('addDetailModal'));
-        var modalTitle = document.getElementById('modal-title');
+    function resetAddModal() {
+        var contentSelect = document.getElementById('content_select');
+        var itemSelect = document.getElementById('item_id');
+        var itemWrapper = document.getElementById('item_wrapper');
+
+        // Reset form
+        document.getElementById('add-detail-form').reset();
+        document.getElementById('content_type').value = '';
+        document.getElementById('content_id').value = '';
+        document.getElementById('quantity').value = '1';
+
+        // Populate content dropdown
+        contentSelect.innerHTML = '<option value="">-- Chọn loại nội dung --</option>';
+        contentsData.forEach(function(c) {
+            var opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.name;
+            opt.setAttribute('data-code', c.code || '');
+            contentSelect.appendChild(opt);
+        });
+
+        itemWrapper.style.display = 'none';
+        itemSelect.innerHTML = '<option value="">-- Chọn bộ môn --</option>';
+        itemSelect.removeAttribute('required');
+    }
+
+    function loadContentItems(contentCode) {
         var itemLabel = document.getElementById('item_label');
         var quantityLabel = document.getElementById('quantity_label');
         var itemSelect = document.getElementById('item_id');
         var itemWrapper = document.getElementById('item_wrapper');
-        var contentTypeInput = document.getElementById('content_type');
-        var contentIdInput = document.getElementById('content_id');
 
-        contentTypeInput.value = contentCode;
-        contentIdInput.value = contentsData[contentCode] || '';
         itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
 
         if (contentCode === 'sports') {
-            modalTitle.textContent = 'Thêm môn thể thao';
             itemLabel.innerHTML = 'Môn thể thao <span class="text-danger">*</span>';
             quantityLabel.innerHTML = 'Số đội/người <span class="text-danger">*</span>';
             itemWrapper.style.display = 'block';
+            itemSelect.setAttribute('required', 'required');
 
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=sports')
                 .then(function(response) { return response.json(); })
@@ -476,10 +507,10 @@ $contentConfig = array(
                     }
                 });
         } else if (contentCode === 'competition') {
-            modalTitle.textContent = 'Thêm cuộc thi nghiệp vụ';
             itemLabel.innerHTML = 'Cuộc thi <span class="text-danger">*</span>';
             quantityLabel.innerHTML = 'Số người <span class="text-danger">*</span>';
             itemWrapper.style.display = 'block';
+            itemSelect.setAttribute('required', 'required');
 
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=competition')
                 .then(function(response) { return response.json(); })
@@ -495,22 +526,16 @@ $contentConfig = array(
                     itemSelect.innerHTML = html;
                 });
         } else if (contentCode === 'miss') {
-            modalTitle.textContent = 'Đăng ký thi sắc đẹp';
             quantityLabel.innerHTML = 'Số người dự thi <span class="text-danger">*</span>';
             itemWrapper.style.display = 'none';
             itemSelect.removeAttribute('required');
         } else if (contentCode === 'talent') {
-            modalTitle.textContent = 'Đăng ký văn nghệ';
             quantityLabel.innerHTML = 'Số tiết mục <span class="text-danger">*</span>';
             itemWrapper.style.display = 'none';
             itemSelect.removeAttribute('required');
+        } else {
+            itemWrapper.style.display = 'none';
+            itemSelect.removeAttribute('required');
         }
-
-        // Set required cho item khi sports/competition
-        if (contentCode === 'sports' || contentCode === 'competition') {
-            itemSelect.setAttribute('required', 'required');
-        }
-
-        modal.show();
     }
 </script>
