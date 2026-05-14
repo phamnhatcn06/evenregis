@@ -790,6 +790,95 @@ IconHelper::actionButtons($data, array('view', 'update', 'delete'), '/admin/even
 
 ---
 
+## Dependent Dropdown — Load dữ liệu phụ thuộc qua AJAX
+
+Khi dropdown B phụ thuộc vào giá trị của dropdown A, sử dụng AJAX để load dữ liệu.
+
+### Ví dụ: Registration Form — Event → Period
+
+```
+┌─────────────────┐        AJAX GET                    ┌─────────────────┐
+│  Chọn Event     │  ────────────────────────────────► │  API Backend    │
+│  (event_id)     │  /api/registration-periods/        │                 │
+└────────┬────────┘  list-active?event_id=X            └────────┬────────┘
+         │                                                      │
+         │           JSON Response                              │
+         │  ◄────────────────────────────────────────────────── │
+         ▼                                                      
+┌─────────────────┐
+│  Load Periods   │
+│  vào dropdown   │
+└─────────────────┘
+```
+
+### Luồng xử lý
+
+1. **Khởi tạo**: Dropdown Period hiển thị "-- Chọn sự kiện trước --"
+2. **User chọn Event**: Trigger `change` event
+3. **AJAX Request**: Gọi API với `event_id` param
+4. **Response**: Populate dropdown Period với dữ liệu trả về
+
+### API Endpoint
+
+| Endpoint | Method | Params | Response |
+|----------|--------|--------|----------|
+| `/api/registration-periods/list-active` | GET | `event_id` | Danh sách periods đang active của event |
+
+### Code mẫu trong View
+
+```php
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var eventSelect = document.getElementById('event-select');
+    var periodSelect = document.getElementById('period-select');
+    var apiUrl = '<?php echo Yii::app()->params['externalApiUrl']; ?>/api/registration-periods/list-active';
+    var apiKey = '<?php echo Yii::app()->params['externalApiKey']; ?>';
+
+    eventSelect.addEventListener('change', function() {
+        var eventId = this.value;
+        periodSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+
+        if (!eventId) {
+            periodSelect.innerHTML = '<option value="">-- Chọn sự kiện trước --</option>';
+            return;
+        }
+
+        fetch(apiUrl + '?event_id=' + eventId, {
+            headers: {
+                'Authorization': 'Bearer ' + apiKey,
+                'Accept': 'application/json'
+            }
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            periodSelect.innerHTML = '<option value="">-- Chọn đợt đăng ký --</option>';
+            var items = data.data || data;
+            if (Array.isArray(items) && items.length > 0) {
+                items.forEach(function(p) {
+                    var option = document.createElement('option');
+                    option.value = p.id;
+                    option.textContent = p.name;
+                    periodSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(function() {
+            periodSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+        });
+    });
+});
+</script>
+```
+
+### Các trường hợp tương tự
+
+| Parent Dropdown | Child Dropdown | API Endpoint |
+|-----------------|----------------|--------------|
+| Event | Registration Period | `/api/registration-periods/list-active?event_id=X` |
+| Property | Relation Properties | `/admin/registrations/getRelationProperties?property_id=X` |
+
+---
+
 ## View Layout — Multi-Column Display
 
 **QUAN TRỌNG**: Trong trang view chi tiết, **KHÔNG dùng** CDetailView mặc định (hiển thị 1 cột dài). Thay vào đó, tự động chia thành nhiều cột dựa trên số lượng thuộc tính.
