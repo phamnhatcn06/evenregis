@@ -53,10 +53,20 @@ $attributes = array(
     array('label' => 'Ngày nộp', 'value' => $model->submitted_at ? MyHelper::formatDateTime($model->submitted_at) : '-'),
     array('label' => 'Ngày duyệt', 'value' => $model->reviewed_at ? MyHelper::formatDateTime($model->reviewed_at) : '-'),
     array('label' => 'Lý do từ chối', 'value' => $model->rejection_reason ?: '-'),
-    array('label' => 'Tài liệu', 'value' => $model->document ?: '-'),
     array('label' => 'Ghi chú', 'value' => $model->note ?: '-'),
     array('label' => 'Ngày tạo', 'value' => MyHelper::formatDateTime($model->created_at)),
 );
+
+// Parse documents
+$documents = array();
+if (!empty($model->document)) {
+    $parsed = json_decode($model->document, true);
+    if (is_array($parsed)) {
+        $documents = $parsed;
+    } elseif (is_string($model->document)) {
+        $documents = array($model->document);
+    }
+}
 
 $totalAttrs = count($attributes);
 if ($totalAttrs <= 4) {
