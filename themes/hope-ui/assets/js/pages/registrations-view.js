@@ -349,14 +349,25 @@ var RegistrationView = (function() {
     function resetCompetitionModal() {
         var compSelect = document.getElementById('comp_competition_id');
         var propSelect = document.getElementById('comp_property_id');
+        var contentIdField = document.getElementById('comp_content_id');
 
         document.getElementById('add-competition-form').reset();
         compSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
         propSelect.innerHTML = '<option value="">-- Chọn cuộc thi trước --</option>';
         document.getElementById('comp_max_per_org').value = '-';
 
-        if (competitionContentId) {
-            document.getElementById('comp_content_id').value = competitionContentId;
+        if (competitionContentId && contentIdField) {
+            contentIdField.value = competitionContentId;
+            console.log('Set content_id to:', competitionContentId);
+        } else {
+            console.log('competitionContentId not found, searching in contentsData...');
+            contentsData.forEach(function(c) {
+                if (c.code === 'competition' && contentIdField) {
+                    contentIdField.value = c.id;
+                    competitionContentId = c.id;
+                    console.log('Found and set content_id to:', c.id);
+                }
+            });
         }
 
         allStaff = [];
