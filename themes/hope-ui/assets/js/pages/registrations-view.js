@@ -3,6 +3,9 @@ var RegistrationView = (function() {
     var contentsData = [];
     var registeredSports = [];
     var registeredCompetitions = [];
+    var allStaff = [];
+    var selectedStaff = [];
+    var maxPerOrg = 0;
 
     function init(config) {
         eventId = config.eventId;
@@ -14,6 +17,7 @@ var RegistrationView = (function() {
         }
 
         bindEvents();
+        bindCompetitionEvents();
     }
 
     function loadContentsData() {
@@ -43,6 +47,252 @@ var RegistrationView = (function() {
                 loadContentItems(contentCode);
             });
         }
+    }
+
+    function bindCompetitionEvents() {
+        var compSelect = document.getElementById('comp_competition_id');
+        var propSelect = document.getElementById('comp_property_id');
+
+        if (compSelect) {
+            compSelect.addEventListener('change', function() {
+                var competitionId = this.value;
+                if (competitionId) {
+                    loadCompetitionInfo(competitionId);
+                    loadOrganizations();
+                } else {
+                    propSelect.innerHTML = '<option value="">-- Chọn cuộc thi trước --</option>';
+                    document.getElementById('comp_max_per_org').value = '-';
+                    hideDualListbox();
+                }
+            });
+        }
+
+        if (propSelect) {
+            propSelect.addEventListener('change', function() {
+                var propertyId = this.value;
+                if (propertyId) {
+                    loadStaffByProperty(propertyId);
+                } else {
+                    hideDualListbox();
+                }
+            });
+        }
+
+        var searchInput = document.getElementById('staff_search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                filterStaffList(this.value);
+            });
+        }
+
+        document.getElementById('btn_add_staff')?.addEventListener('click', addSelectedStaff);
+        document.getElementById('btn_add_all_staff')?.addEventListener('click', addAllStaff);
+        document.getElementById('btn_remove_staff')?.addEventListener('click', removeSelectedStaff);
+        document.getElementById('btn_remove_all_staff')?.addEventListener('click', removeAllStaff);
+
+        var form = document.getElementById('add-competition-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (selectedStaff.length === 0) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn ít nhất một nhân viên.');
+                    return false;
+                }
+            });
+        }
+    }
+
+    function loadCompetitionInfo(competitionId) {
+        fetch(window.BASE_URL + '/admin/registrations/getCompetitionInfo?competition_id=' + competitionId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data) {
+                    maxPerOrg = data.data.max_per_org || 0;
+                    document.getElementById('comp_max_per_org').value = maxPerOrg > 0 ? maxPerOrg : 'Không giới hạn';
+                    document.getElementById('max_count').textContent = maxPerOrg > 0 ? maxPerOrg : '∞';
+                }
+            });
+    }
+
+    function loadOrganizations() {
+        var propSelect = document.getElementById('comp_property_id');
+        propSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+
+        fetch(window.BASE_URL + '/admin/registrations/getOrganizations')
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                propSelect.innerHTML = '<option value="">-- Chọn đơn vị --</option>';
+                if (data.success && data.data && data.data.length > 0) {
+                    data.data.forEach(function(org) {
+                        var opt = document.createElement('option');
+                        opt.value = org.id;
+                        opt.textContent = org.code + ' - ' + org.name;
+                        propSelect.appendChild(opt);
+                    });
+                }
+            });
+    }
+
+    function loadStaffByProperty(propertyId) {
+        document.getElementById('staff_placeholder').style.display = 'none';
+        document.getElementById('dual_listbox_wrapper').style.display = 'flex';
+
+        var availableList = document.getElementById('available_staff_list');
+        availableList.innerHTML = '<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
+
+        fetch(window.BASE_URL + '/admin/registrations/getStaffByProperty?property_id=' + propertyId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                allStaff = data.success && data.data ? data.data : [];
+                selectedStaff = [];
+                renderAvailableStaff();
+                renderSelectedStaff();
+            });
+    }
+
+    function hideDualListbox() {
+        document.getElementById('staff_placeholder').style.display = 'block';
+        document.getElementById('dual_listbox_wrapper').style.display = 'none';
+        allStaff = [];
+        selectedStaff = [];
+    }
+
+    function renderAvailableStaff() {
+        var list = document.getElementById('available_staff_list');
+        var searchTerm = (document.getElementById('staff_search')?.value || '').toLowerCase();
+
+        var available = allStaff.filter(function(s) {
+            return selectedStaff.findIndex(function(sel) { return sel.id == s.id; }) === -1;
+        });
+
+        if (searchTerm) {
+            available = available.filter(function(s) {
+                return s.display.toLowerCase().indexOf(searchTerm) !== -1;
+            });
+        }
+
+        if (available.length === 0) {
+            list.innerHTML = '<div class="text-center text-muted p-3">Không có nhân viên</div>';
+            return;
+        }
+
+        list.innerHTML = '';
+        available.forEach(function(staff) {
+            var item = document.createElement('a');
+            item.href = '#';
+            item.className = 'list-group-item list-group-item-action py-2';
+            item.setAttribute('data-id', staff.id);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
+                (staff.position ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(staff.position) + '</span>' : '');
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.classList.toggle('active');
+            });
+            list.appendChild(item);
+        });
+    }
+
+    function renderSelectedStaff() {
+        var list = document.getElementById('selected_staff_list');
+        document.getElementById('selected_count').textContent = selectedStaff.length;
+
+        removeHiddenInputs();
+
+        if (selectedStaff.length === 0) {
+            list.innerHTML = '<div class="text-center text-muted p-3">Chưa chọn nhân viên nào</div>';
+            return;
+        }
+
+        list.innerHTML = '';
+        selectedStaff.forEach(function(staff) {
+            var item = document.createElement('a');
+            item.href = '#';
+            item.className = 'list-group-item list-group-item-action py-2';
+            item.setAttribute('data-id', staff.id);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>';
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.classList.toggle('active');
+            });
+            list.appendChild(item);
+
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'staff_ids[]';
+            hidden.value = staff.id;
+            document.getElementById('add-competition-form').appendChild(hidden);
+        });
+    }
+
+    function removeHiddenInputs() {
+        var form = document.getElementById('add-competition-form');
+        var inputs = form.querySelectorAll('input[name="staff_ids[]"]');
+        inputs.forEach(function(input) { input.remove(); });
+    }
+
+    function addSelectedStaff() {
+        var list = document.getElementById('available_staff_list');
+        var actives = list.querySelectorAll('.active');
+
+        actives.forEach(function(el) {
+            var id = el.getAttribute('data-id');
+            var staff = allStaff.find(function(s) { return s.id == id; });
+            if (staff && canAddMore()) {
+                selectedStaff.push(staff);
+            }
+            el.classList.remove('active');
+        });
+
+        renderAvailableStaff();
+        renderSelectedStaff();
+    }
+
+    function addAllStaff() {
+        var available = allStaff.filter(function(s) {
+            return selectedStaff.findIndex(function(sel) { return sel.id == s.id; }) === -1;
+        });
+
+        available.forEach(function(staff) {
+            if (canAddMore()) {
+                selectedStaff.push(staff);
+            }
+        });
+
+        renderAvailableStaff();
+        renderSelectedStaff();
+    }
+
+    function removeSelectedStaff() {
+        var list = document.getElementById('selected_staff_list');
+        var actives = list.querySelectorAll('.active');
+
+        actives.forEach(function(el) {
+            var id = el.getAttribute('data-id');
+            selectedStaff = selectedStaff.filter(function(s) { return s.id != id; });
+        });
+
+        renderAvailableStaff();
+        renderSelectedStaff();
+    }
+
+    function removeAllStaff() {
+        selectedStaff = [];
+        renderAvailableStaff();
+        renderSelectedStaff();
+    }
+
+    function canAddMore() {
+        return maxPerOrg === 0 || selectedStaff.length < maxPerOrg;
+    }
+
+    function filterStaffList(term) {
+        renderAvailableStaff();
+    }
+
+    function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     function renderSportsTree(data, excludeIds) {
@@ -82,6 +332,7 @@ var RegistrationView = (function() {
         var contentSelect = document.getElementById('content_select');
         var itemSelect = document.getElementById('item_id');
         var itemWrapper = document.getElementById('item_wrapper');
+        var quantityWrapper = document.getElementById('quantity_wrapper');
 
         document.getElementById('add-detail-form').reset();
         document.getElementById('content_type').value = '';
@@ -90,6 +341,7 @@ var RegistrationView = (function() {
 
         contentSelect.innerHTML = '<option value="">-- Chọn loại nội dung --</option>';
         contentsData.forEach(function(c) {
+            if (c.code === 'competition') return;
             var opt = document.createElement('option');
             opt.value = c.id;
             opt.textContent = c.name;
@@ -98,8 +350,39 @@ var RegistrationView = (function() {
         });
 
         itemWrapper.style.display = 'none';
+        quantityWrapper.style.display = 'block';
         itemSelect.innerHTML = '<option value="">-- Chọn bộ môn --</option>';
         itemSelect.removeAttribute('required');
+    }
+
+    function resetCompetitionModal() {
+        var compSelect = document.getElementById('comp_competition_id');
+        var propSelect = document.getElementById('comp_property_id');
+
+        document.getElementById('add-competition-form').reset();
+        compSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+        propSelect.innerHTML = '<option value="">-- Chọn cuộc thi trước --</option>';
+        document.getElementById('comp_max_per_org').value = '-';
+
+        allStaff = [];
+        selectedStaff = [];
+        maxPerOrg = 0;
+        hideDualListbox();
+        removeHiddenInputs();
+
+        fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=competition')
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                compSelect.innerHTML = '<option value="">-- Chọn cuộc thi --</option>';
+                if (data.success && data.data && data.data.length > 0) {
+                    data.data.forEach(function(item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.name;
+                        compSelect.appendChild(opt);
+                    });
+                }
+            });
     }
 
     function loadContentItems(contentCode) {
@@ -107,6 +390,7 @@ var RegistrationView = (function() {
         var quantityLabel = document.getElementById('quantity_label');
         var itemSelect = document.getElementById('item_id');
         var itemWrapper = document.getElementById('item_wrapper');
+        var quantityWrapper = document.getElementById('quantity_wrapper');
 
         itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
 
@@ -114,6 +398,7 @@ var RegistrationView = (function() {
             itemLabel.innerHTML = 'Môn thể thao <span class="text-danger">*</span>';
             quantityLabel.innerHTML = 'Số đội/người <span class="text-danger">*</span>';
             itemWrapper.style.display = 'block';
+            quantityWrapper.style.display = 'block';
             itemSelect.setAttribute('required', 'required');
 
             fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=sports')
@@ -125,35 +410,19 @@ var RegistrationView = (function() {
                         itemSelect.innerHTML = '<option value="">-- Đã đăng ký hết --</option>';
                     }
                 });
-        } else if (contentCode === 'competition') {
-            itemLabel.innerHTML = 'Cuộc thi <span class="text-danger">*</span>';
-            quantityLabel.innerHTML = 'Số người <span class="text-danger">*</span>';
-            itemWrapper.style.display = 'block';
-            itemSelect.setAttribute('required', 'required');
-
-            fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=competition')
-                .then(function(response) { return response.json(); })
-                .then(function(data) {
-                    var html = '<option value="">-- Chọn cuộc thi --</option>';
-                    if (data.success && data.data && data.data.length > 0) {
-                        data.data.forEach(function(item) {
-                            if (registeredCompetitions.indexOf(parseInt(item.id)) === -1) {
-                                html += '<option value="' + item.id + '">' + item.name + '</option>';
-                            }
-                        });
-                    }
-                    itemSelect.innerHTML = html;
-                });
         } else if (contentCode === 'miss') {
             quantityLabel.innerHTML = 'Số người dự thi <span class="text-danger">*</span>';
             itemWrapper.style.display = 'none';
+            quantityWrapper.style.display = 'block';
             itemSelect.removeAttribute('required');
         } else if (contentCode === 'talent') {
             quantityLabel.innerHTML = 'Số tiết mục <span class="text-danger">*</span>';
             itemWrapper.style.display = 'none';
+            quantityWrapper.style.display = 'block';
             itemSelect.removeAttribute('required');
         } else {
             itemWrapper.style.display = 'none';
+            quantityWrapper.style.display = 'block';
             itemSelect.removeAttribute('required');
         }
     }
@@ -194,6 +463,7 @@ var RegistrationView = (function() {
     return {
         init: init,
         resetAddModal: resetAddModal,
+        resetCompetitionModal: resetCompetitionModal,
         viewDocument: viewDocument,
         confirmDeleteDetail: confirmDeleteDetail
     };
