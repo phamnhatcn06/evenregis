@@ -443,7 +443,9 @@ class RegistrationsController extends AdminController
 			foreach ($sports as $item) {
 				$result[] = array(
 					'id' => isset($item['sport_id']) ? $item['sport_id'] : $item['id'],
-					'name' => isset($item['sport_name']) ? $item['sport_name'] : '',
+					'name' => isset($item['sport_name']) ? $item['sport_name'] : (isset($item['name']) ? $item['name'] : ''),
+					'parent_id' => isset($item['parent_id']) ? $item['parent_id'] : 0,
+					'parent_name' => isset($item['parent_name']) ? $item['parent_name'] : '',
 				);
 			}
 		} elseif ($content_type === 'competition') {
@@ -451,7 +453,7 @@ class RegistrationsController extends AdminController
 			foreach ($competitions as $item) {
 				$result[] = array(
 					'id' => isset($item['competition_id']) ? $item['competition_id'] : $item['id'],
-					'name' => isset($item['competition_name']) ? $item['competition_name'] : '',
+					'name' => isset($item['competition_name']) ? $item['competition_name'] : (isset($item['name']) ? $item['name'] : ''),
 				);
 			}
 		}
