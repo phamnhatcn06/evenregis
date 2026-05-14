@@ -253,7 +253,27 @@ $perColumn = ceil($totalAttrs / $columns);
                                         </form>
                                     </div>
                                     <div class="card-body p-2 content-detail">
-                                        <?php if ($contentCode === 'sports'): ?>
+                                        <?php if ($contentCode === 'competition'): ?>
+                                            <?php if (!empty($eventCompetitions)): ?>
+                                                <ul class="list-unstyled mb-2">
+                                                    <?php foreach ($eventCompetitions as $ecomp): ?>
+                                                        <li class="d-flex justify-content-between align-items-center mb-1">
+                                                            <span><i class="fa fa-trophy me-1"></i><?php echo CHtml::encode($ecomp['competition_name']); ?></span>
+                                                            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeCompetition', array('id' => $model->id, 'competitionId' => $ecomp['id'])); ?>" style="display:inline;" id="form-remove-comp-<?php echo $ecomp['id']; ?>">
+                                                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-comp-<?php echo $ecomp['id']; ?>')">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            <?php endif; ?>
+                                            <?php if ($hasAvailableCompetitions): ?>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAddCompetition">
+                                                    <i class="fa fa-plus me-1"></i>Thêm cuộc thi
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php elseif ($contentCode === 'sports'): ?>
                                             <?php if (!empty($eventSports)):
                                                 $sportsMap = array();
                                                 foreach ($sportsItems as $s) {
