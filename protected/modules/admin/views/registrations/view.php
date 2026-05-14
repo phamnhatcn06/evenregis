@@ -243,9 +243,27 @@ $contentConfig = array(
                                 if (!empty($detail['sport_name'])) $itemName = $detail['sport_name'];
                                 elseif (!empty($detail['competition_name'])) $itemName = $detail['competition_name'];
                                 elseif (!empty($detail['content_name'])) $itemName = $detail['content_name'];
+                                $detailId = isset($detail['id']) ? $detail['id'] : null;
+                                $attendees = ($code === 'competition' && $detailId && isset($detailAttendees[$detailId])) ? $detailAttendees[$detailId] : array();
                             ?>
                                 <tr>
-                                    <td><?php echo CHtml::encode($itemName); ?></td>
+                                    <td>
+                                        <?php echo CHtml::encode($itemName); ?>
+                                        <?php if ($code === 'competition' && !empty($attendees)): ?>
+                                            <div class="mt-2">
+                                                <small class="text-muted d-block mb-1">Danh sách thí sinh:</small>
+                                                <?php foreach ($attendees as $idx => $att):
+                                                    $staffName = isset($att['staff_name']) ? $att['staff_name'] : (isset($att['staff_full_name']) ? $att['staff_full_name'] : '');
+                                                    $staffCode = isset($att['staff_code']) ? $att['staff_code'] : '';
+                                                ?>
+                                                    <span class="badge bg-light text-dark border me-1 mb-1">
+                                                        <?php echo ($idx + 1) . '. '; ?>
+                                                        <?php echo CHtml::encode($staffCode ? $staffCode . ' - ' . $staffName : $staffName); ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="text-center"><?php echo CHtml::encode(isset($detail['quantity']) ? $detail['quantity'] : 1); ?></td>
                                     <td><?php echo CHtml::encode(isset($detail['note']) ? $detail['note'] : ''); ?></td>
                                     <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
