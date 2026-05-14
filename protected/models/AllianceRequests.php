@@ -4,9 +4,11 @@ Yii::import('application.models._base.BaseAllianceRequests');
 
 class AllianceRequests extends BaseAllianceRequests
 {
-	public const STATUS_PENDING = 0;
-	public const STATUS_APPROVED = 1;
-	public const STATUS_REJECTED = 2;
+	// 	1:pending, 2:approved, 3:rejected, 4:cancelled	
+	public const STATUS_PENDING = 1;
+	public const STATUS_APPROVED = 2;
+	public const STATUS_REJECTED = 3;
+	public const STATUS_CANCELLED = 4;
 
 	// Virtual properties từ API (joined data)
 	public $requester_org_name;

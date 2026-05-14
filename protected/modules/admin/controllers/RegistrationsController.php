@@ -113,6 +113,9 @@ class RegistrationsController extends AdminController
 	{
 		$model = $this->loadModelById($id);
 
+		// Lưu lại relation_property_id cũ để so sánh
+		$oldRelationPropertyId = $model->relation_property_id;
+
 		$user = AuthHandler::getUser();
 		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
 		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
@@ -165,8 +168,17 @@ class RegistrationsController extends AdminController
 				$result = $model->updateViaApi();
 
 				if ($result['success']) {
-					if ($model->relation_property_id && $model->event_id && $model->property_id) {
-						$this->createAllianceRequest($model->event_id, $model->property_id, $model->relation_property_id);
+					// Xử lý alliance request khi relation_property_id thay đổi
+					$newRelationPropertyId = $model->relation_property_id;
+					if ($oldRelationPropertyId != $newRelationPropertyId) {
+						// Xóa alliance request cũ nếu có
+						if ($oldRelationPropertyId && $model->event_id && $model->property_id) {
+							$this->deleteAllianceRequest($model->event_id, $model->property_id, $oldRelationPropertyId);
+						}
+						// Tạo alliance request mới nếu có chọn đơn vị liên quân mới
+						if ($newRelationPropertyId && $model->event_id && $model->property_id) {
+							$this->createAllianceRequest($model->event_id, $model->property_id, $newRelationPropertyId);
+						}
 					}
 
 					Yii::app()->user->setFlash('success', 'Cập nhật phiếu đăng ký thành công.');
@@ -331,7 +343,7 @@ class RegistrationsController extends AdminController
 		$alliance->event_id = $eventId;
 		$alliance->requester_org_id = $requesterOrgId;
 		$alliance->target_org_id = $targetOrgId;
-		$alliance->requested_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+		$alliance->requested_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
 		$result = $alliance->storeViaApi();
 		if (!$result['success']) {
