@@ -516,143 +516,129 @@ foreach ($registrationDetails as $detail) {
         });
     }
 
+    var eventId = <?php echo $model->event_id ? $model->event_id : 'null'; ?>;
+    var contentsData = {};
+
+    // Danh sách đã đăng ký để loại trừ
+    var registeredSports = <?php
+        $sportIds = array();
+        $competitionIds = array();
+        foreach ($registrationDetails as $d) {
+            if (!empty($d['sport_id'])) $sportIds[] = (int)$d['sport_id'];
+            if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
+        }
+        echo json_encode($sportIds);
+    ?>;
+    var registeredCompetitions = <?php echo json_encode($competitionIds); ?>;
+
+    // Load contents data khi page load
     document.addEventListener('DOMContentLoaded', function() {
-        var eventId = <?php echo $model->event_id ? $model->event_id : 'null'; ?>;
-        var contentSelect = document.getElementById('content_id');
-        var itemSelect = document.getElementById('item_id');
-        var itemWrapper = document.getElementById('item_wrapper');
-        var itemLabel = itemWrapper ? itemWrapper.querySelector('label') : null;
-        var contentTypeInput = document.getElementById('content_type');
-
-        // Danh sách đã đăng ký để loại trừ
-        var registeredSports = <?php
-                                $sportIds = array();
-                                $competitionIds = array();
-                                foreach ($registrationDetails as $d) {
-                                    if (!empty($d['sport_id'])) $sportIds[] = (int)$d['sport_id'];
-                                    if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
-                                }
-                                echo json_encode($sportIds);
-                                ?>;
-        var registeredCompetitions = <?php echo json_encode($competitionIds); ?>;
-
-        if (eventId && contentSelect) {
+        if (eventId) {
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getEventContents"); ?>?event_id=' + eventId)
-                .then(function(response) {
-                    return response.json();
-                })
+                .then(function(response) { return response.json(); })
                 .then(function(data) {
-                    console.log('Contents data:', data);
                     if (data.success && data.data) {
                         data.data.forEach(function(c) {
-                            var opt = document.createElement('option');
-                            opt.value = c.id;
-                            opt.textContent = c.name;
-                            opt.setAttribute('data-code', c.code || '');
-                            contentSelect.appendChild(opt);
+                            contentsData[c.code] = c.id;
                         });
                     }
-                })
-                .catch(function(err) {
-                    console.error('Error loading contents:', err);
                 });
         }
-
-        function renderSportsTree(data, excludeIds) {
-            var html = '<option value="">-- Chọn môn thể thao --</option>';
-
-            // Nhóm theo prefix tên (Bóng bàn, Bóng đá, Cầu lông, Bơi, Kéo co, Pickerball...)
-            var groups = {};
-            var prefixes = ['Bóng bàn', 'Bóng đá', 'Cầu lông', 'Pickerball', 'Bơi ếch', 'Bơi tự do', 'Kéo co', 'Tennis', 'Cờ vua', 'Cờ tướng'];
-
-            data.forEach(function(item) {
-                if (excludeIds.indexOf(parseInt(item.id)) !== -1) return;
-
-                var groupName = 'Khác';
-                for (var i = 0; i < prefixes.length; i++) {
-                    if (item.name.indexOf(prefixes[i]) === 0) {
-                        groupName = prefixes[i];
-                        break;
-                    }
-                }
-                if (!groups[groupName]) groups[groupName] = [];
-                groups[groupName].push(item);
-            });
-
-            // Sắp xếp và render
-            var sortedGroups = Object.keys(groups).sort();
-            sortedGroups.forEach(function(groupName) {
-                var items = groups[groupName];
-                if (items.length > 1) {
-                    // Nhiều môn cùng nhóm: hiển thị header
-                    html += '<option value="" disabled style="font-weight:bold;background:#e9ecef;">▸ ' + groupName + '</option>';
-                    items.forEach(function(item) {
-                        html += '<option value="' + item.id + '">&nbsp;&nbsp;&nbsp;' + item.name + '</option>';
-                    });
-                } else {
-                    // Chỉ 1 môn: hiển thị trực tiếp
-                    html += '<option value="' + items[0].id + '">' + items[0].name + '</option>';
-                }
-            });
-
-            return html;
-        }
-
-        if (contentSelect) {
-            contentSelect.addEventListener('change', function() {
-                var selectedOpt = this.options[this.selectedIndex];
-                var contentCode = selectedOpt.getAttribute('data-code') || '';
-                console.log('Selected content code:', contentCode);
-                contentTypeInput.value = contentCode;
-
-                itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
-                itemWrapper.style.display = 'none';
-
-                if (contentCode === 'sports' && eventId) {
-                    if (itemLabel) itemLabel.textContent = 'Môn thể thao *';
-                    fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=sports')
-                        .then(function(response) {
-                            return response.json();
-                        })
-                        .then(function(data) {
-                            console.log('Sports data:', data);
-                            if (data.success && data.data && data.data.length > 0) {
-                                itemSelect.innerHTML = renderSportsTree(data.data, registeredSports);
-                                itemWrapper.style.display = 'block';
-                            } else {
-                                itemSelect.innerHTML = '<option value="">-- Không có môn nào --</option>';
-                                itemWrapper.style.display = 'block';
-                            }
-                        })
-                        .catch(function(err) {
-                            console.error('Error loading sports:', err);
-                            itemSelect.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
-                            itemWrapper.style.display = 'block';
-                        });
-                } else if (contentCode === 'competition' && eventId) {
-                    if (itemLabel) itemLabel.textContent = 'Cuộc thi nghiệp vụ *';
-                    fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=competition')
-                        .then(function(response) {
-                            return response.json();
-                        })
-                        .then(function(data) {
-                            var html = '<option value="">-- Chọn cuộc thi --</option>';
-                            if (data.success && data.data && data.data.length > 0) {
-                                data.data.forEach(function(item) {
-                                    if (registeredCompetitions.indexOf(parseInt(item.id)) === -1) {
-                                        html += '<option value="' + item.id + '">' + item.name + '</option>';
-                                    }
-                                });
-                                itemSelect.innerHTML = html;
-                                itemWrapper.style.display = 'block';
-                            } else {
-                                itemSelect.innerHTML = '<option value="">-- Không có cuộc thi nào --</option>';
-                            }
-                        });
-                } else {
-                    itemSelect.innerHTML = '<option value="">-- Không áp dụng --</option>';
-                }
-            });
-        }
     });
+
+    function renderSportsTree(data, excludeIds) {
+        var html = '<option value="">-- Chọn môn thể thao --</option>';
+        var groups = {};
+        var prefixes = ['Bóng bàn', 'Bóng đá', 'Cầu lông', 'Pickerball', 'Bơi ếch', 'Bơi tự do', 'Kéo co', 'Tennis', 'Cờ vua', 'Cờ tướng'];
+
+        data.forEach(function(item) {
+            if (excludeIds.indexOf(parseInt(item.id)) !== -1) return;
+            var groupName = 'Khác';
+            for (var i = 0; i < prefixes.length; i++) {
+                if (item.name.indexOf(prefixes[i]) === 0) {
+                    groupName = prefixes[i];
+                    break;
+                }
+            }
+            if (!groups[groupName]) groups[groupName] = [];
+            groups[groupName].push(item);
+        });
+
+        var sortedGroups = Object.keys(groups).sort();
+        sortedGroups.forEach(function(groupName) {
+            var items = groups[groupName];
+            if (items.length > 1) {
+                html += '<option value="" disabled style="font-weight:bold;background:#e9ecef;">▸ ' + groupName + '</option>';
+                items.forEach(function(item) {
+                    html += '<option value="' + item.id + '">&nbsp;&nbsp;&nbsp;' + item.name + '</option>';
+                });
+            } else {
+                html += '<option value="' + items[0].id + '">' + items[0].name + '</option>';
+            }
+        });
+        return html;
+    }
+
+    function openAddModal(contentCode) {
+        var modal = new bootstrap.Modal(document.getElementById('addDetailModal'));
+        var modalTitle = document.getElementById('modal-title');
+        var itemLabel = document.getElementById('item_label');
+        var quantityLabel = document.getElementById('quantity_label');
+        var itemSelect = document.getElementById('item_id');
+        var itemWrapper = document.getElementById('item_wrapper');
+        var contentTypeInput = document.getElementById('content_type');
+        var contentIdInput = document.getElementById('content_id');
+
+        contentTypeInput.value = contentCode;
+        contentIdInput.value = contentsData[contentCode] || '';
+        itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+
+        if (contentCode === 'sports') {
+            modalTitle.textContent = 'Thêm môn thể thao';
+            itemLabel.innerHTML = 'Môn thể thao <span class="text-danger">*</span>';
+            quantityLabel.innerHTML = 'Số đội/người <span class="text-danger">*</span>';
+            itemWrapper.style.display = 'block';
+
+            fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=sports')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success && data.data && data.data.length > 0) {
+                        itemSelect.innerHTML = renderSportsTree(data.data, registeredSports);
+                    } else {
+                        itemSelect.innerHTML = '<option value="">-- Đã đăng ký hết --</option>';
+                    }
+                });
+        } else if (contentCode === 'competition') {
+            modalTitle.textContent = 'Thêm cuộc thi nghiệp vụ';
+            itemLabel.innerHTML = 'Cuộc thi <span class="text-danger">*</span>';
+            quantityLabel.innerHTML = 'Số người <span class="text-danger">*</span>';
+            itemWrapper.style.display = 'block';
+
+            fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=competition')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    var html = '<option value="">-- Chọn cuộc thi --</option>';
+                    if (data.success && data.data && data.data.length > 0) {
+                        data.data.forEach(function(item) {
+                            if (registeredCompetitions.indexOf(parseInt(item.id)) === -1) {
+                                html += '<option value="' + item.id + '">' + item.name + '</option>';
+                            }
+                        });
+                    }
+                    itemSelect.innerHTML = html;
+                });
+        } else if (contentCode === 'miss') {
+            modalTitle.textContent = 'Đăng ký thi sắc đẹp';
+            quantityLabel.innerHTML = 'Số người dự thi <span class="text-danger">*</span>';
+            itemWrapper.style.display = 'none';
+            itemSelect.innerHTML = '<option value="">-- Không áp dụng --</option>';
+        } else if (contentCode === 'talent') {
+            modalTitle.textContent = 'Đăng ký văn nghệ';
+            quantityLabel.innerHTML = 'Số tiết mục <span class="text-danger">*</span>';
+            itemWrapper.style.display = 'none';
+            itemSelect.innerHTML = '<option value="">-- Không áp dụng --</option>';
+        }
+
+        modal.show();
+    }
 </script>
