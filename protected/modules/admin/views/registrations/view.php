@@ -402,35 +402,41 @@ $perColumn = ceil($totalAttrs / $columns);
 
         function renderSportsTree(data, excludeIds) {
             var html = '<option value="">-- Chọn môn thể thao --</option>';
-            var byParent = {};
-            var parentNames = {};
+            var roots = [];
+            var children = {};
 
+            // Phân loại root và children
             data.forEach(function(item) {
-                if (excludeIds.indexOf(parseInt(item.id)) !== -1) return;
-                var pid = item.parent_id || 0;
-                if (!byParent[pid]) {
-                    byParent[pid] = [];
-                    parentNames[pid] = item.parent_name || '';
+                var pid = parseInt(item.parent_id) || 0;
+                if (pid === 0) {
+                    roots.push(item);
+                } else {
+                    if (!children[pid]) children[pid] = [];
+                    children[pid].push(item);
                 }
-                byParent[pid].push(item);
             });
 
-            // Render parent groups
-            for (var pid in byParent) {
-                if (pid != 0 && parentNames[pid]) {
-                    html += '<optgroup label="' + parentNames[pid] + '">';
-                    byParent[pid].forEach(function(item) {
-                        html += '<option value="' + item.id + '">' + item.name + '</option>';
+            // Render theo cấu trúc tree
+            roots.forEach(function(root) {
+                var rootId = parseInt(root.id);
+                var hasChildren = children[rootId] && children[rootId].length > 0;
+
+                if (hasChildren) {
+                    // Môn cha có con: hiển thị disabled, render các con bên dưới
+                    html += '<option value="" disabled style="font-weight:bold;background:#f0f0f0;">▸ ' + root.name + '</option>';
+                    children[rootId].forEach(function(child) {
+                        if (excludeIds.indexOf(parseInt(child.id)) === -1) {
+                            html += '<option value="' + child.id + '">&nbsp;&nbsp;&nbsp;&nbsp;' + child.name + '</option>';
+                        }
                     });
-                    html += '</optgroup>';
+                } else {
+                    // Môn không có con: cho phép chọn (nếu chưa đăng ký)
+                    if (excludeIds.indexOf(rootId) === -1) {
+                        html += '<option value="' + root.id + '">' + root.name + '</option>';
+                    }
                 }
-            }
-            // Render items without parent
-            if (byParent[0]) {
-                byParent[0].forEach(function(item) {
-                    html += '<option value="' + item.id + '">' + item.name + '</option>';
-                });
-            }
+            });
+
             return html;
         }
 
