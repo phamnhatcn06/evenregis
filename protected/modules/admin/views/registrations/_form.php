@@ -53,16 +53,21 @@ if (isset($relationProperties)) {
                 <?php echo $form->dropDownList($model, 'event_id', $eventList, array(
                     'class' => 'form-select',
                     'prompt' => '-- Chọn sự kiện --',
+                    'id' => 'event-select',
                 )); ?>
                 <?php echo $form->error($model, 'event_id'); ?>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group mb-3">
-                <?php echo $form->labelEx($model, 'Đợt đăng ký'); ?>
+                <?php echo $form->labelEx($model, 'period_id'); ?>
+                <?php
+                $periodPrompt = $model->event_id ? '-- Chọn đợt đăng ký --' : '-- Chọn sự kiện trước --';
+                ?>
                 <?php echo $form->dropDownList($model, 'period_id', $periods, array(
                     'class' => 'form-select',
-                    'prompt' => '-- Chọn đợt đăng ký --',
+                    'prompt' => $periodPrompt,
+                    'id' => 'period-select',
                 )); ?>
                 <?php echo $form->error($model, 'period_id'); ?>
             </div>
