@@ -32,6 +32,7 @@ $this->Tabletitle = 'Cập nhật phiếu đăng ký #' . $model->id;
             'events' => $events,
             'periods' => $periods,
             'properties' => $properties,
+            'relationProperties' => $relationProperties,
         )); ?>
     </div>
 </div>
