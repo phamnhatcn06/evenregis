@@ -211,11 +211,21 @@ $perColumn = ceil($totalAttrs / $columns);
                 }
                 $sportsItems = isset($sportsTreeData['items']) ? $sportsTreeData['items'] : array();
                 $levelMap = isset($sportsTreeData['levelMap']) ? $sportsTreeData['levelMap'] : array();
+
+                // Build map of sports that have children
+                $hasChildrenMap = array();
+                foreach ($sportsItems as $s) {
+                    $parentId = isset($s['parent_id']) ? $s['parent_id'] : (isset($s->parent_id) ? $s->parent_id : null);
+                    if ($parentId) {
+                        $hasChildrenMap[$parentId] = true;
+                    }
+                }
+
                 $hasAvailableSports = false;
                 foreach ($sportsItems as $s) {
                     $sId = isset($s['id']) ? $s['id'] : (isset($s->id) ? $s->id : null);
-                    $level = isset($levelMap[$sId]) ? $levelMap[$sId] : 0;
-                    if ($level > 0 && !isset($existingSportIds[$sId])) {
+                    $hasChildren = isset($hasChildrenMap[$sId]);
+                    if (!$hasChildren && !isset($existingSportIds[$sId])) {
                         $hasAvailableSports = true;
                         break;
                     }
