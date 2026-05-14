@@ -424,8 +424,8 @@ class RegistrationsController extends AdminController
 		foreach ($contents as $item) {
 			$result[] = array(
 				'id' => isset($item['content_id']) ? $item['content_id'] : $item['id'],
-				'name' => isset($item['content_name']) ? $item['content_name'] : '',
-				'type' => isset($item['content_type']) ? $item['content_type'] : '',
+				'name' => isset($item['content_name']) ? $item['content_name'] : (isset($item['name']) ? $item['name'] : ''),
+				'code' => isset($item['content_code']) ? $item['content_code'] : (isset($item['code']) ? $item['code'] : ''),
 			);
 		}
 
