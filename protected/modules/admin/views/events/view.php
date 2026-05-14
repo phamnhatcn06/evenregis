@@ -253,7 +253,7 @@ $perColumn = ceil($totalAttrs / $columns);
                                         </form>
                                     </div>
                                     <div class="card-body p-2 content-detail">
-                                        <?php if ($contentCode === 'competition'): ?>
+                                        <?php if ($contentCode === 'competitions'): ?>
                                             <?php if (!empty($eventCompetitions)): ?>
                                                 <ul class="list-unstyled mb-2">
                                                     <?php foreach ($eventCompetitions as $ecomp): ?>
@@ -270,7 +270,7 @@ $perColumn = ceil($totalAttrs / $columns);
                                             <?php endif; ?>
                                             <?php if ($hasAvailableCompetitions): ?>
                                                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAddCompetition">
-                                                    <i class="fa fa-plus me-1"></i>Thêm cuộc thi
+                                                    <i class="fa fa-plus me-1"></i>Thêm nghiệp vụ
                                                 </button>
                                             <?php endif; ?>
                                         <?php elseif ($contentCode === 'sports'): ?>
@@ -305,35 +305,35 @@ $perColumn = ceil($totalAttrs / $columns);
                                                     <?php foreach ($sportsByParent as $parentId => $sports):
                                                         if ($parentId && isset($parentNames[$parentId]) && $parentNames[$parentId]):
                                                     ?>
-                                                        <li class="mb-2">
-                                                            <div class="px-2 py-1 rounded" style="background:#e9ecef;">
-                                                                <strong><i class="fa fa-folder-open-o me-1"></i><?php echo CHtml::encode($parentNames[$parentId]); ?></strong>
-                                                            </div>
-                                                            <ul class="list-unstyled ms-3">
-                                                                <?php foreach ($sports as $es): ?>
-                                                                    <li class="d-flex justify-content-between align-items-center mb-1">
-                                                                        <span><i class="fa fa-futbol-o me-1"></i><?php echo CHtml::encode($es['sport_name']); ?></span>
-                                                                        <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeSport', array('id' => $model->id, 'sportId' => $es['id'])); ?>" style="display:inline;" id="form-remove-sport-<?php echo $es['id']; ?>">
-                                                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-sport-<?php echo $es['id']; ?>')">
-                                                                                <i class="fa fa-times"></i>
-                                                                            </button>
-                                                                        </form>
-                                                                    </li>
-                                                                <?php endforeach; ?>
-                                                            </ul>
-                                                        </li>
-                                                    <?php else: ?>
-                                                        <?php foreach ($sports as $es): ?>
-                                                            <li class="d-flex justify-content-between align-items-center mb-1">
-                                                                <span><i class="fa fa-futbol-o me-1"></i><?php echo CHtml::encode($es['sport_name']); ?></span>
-                                                                <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeSport', array('id' => $model->id, 'sportId' => $es['id'])); ?>" style="display:inline;" id="form-remove-sport-<?php echo $es['id']; ?>">
-                                                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-sport-<?php echo $es['id']; ?>')">
-                                                                        <i class="fa fa-times"></i>
-                                                                    </button>
-                                                                </form>
+                                                            <li class="mb-2">
+                                                                <div class="px-2 py-1 rounded" style="background:#e9ecef;">
+                                                                    <strong><i class="fa fa-folder-open-o me-1"></i><?php echo CHtml::encode($parentNames[$parentId]); ?></strong>
+                                                                </div>
+                                                                <ul class="list-unstyled ms-3">
+                                                                    <?php foreach ($sports as $es): ?>
+                                                                        <li class="d-flex justify-content-between align-items-center mb-1">
+                                                                            <span><i class="fa fa-futbol-o me-1"></i><?php echo CHtml::encode($es['sport_name']); ?></span>
+                                                                            <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeSport', array('id' => $model->id, 'sportId' => $es['id'])); ?>" style="display:inline;" id="form-remove-sport-<?php echo $es['id']; ?>">
+                                                                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-sport-<?php echo $es['id']; ?>')">
+                                                                                    <i class="fa fa-times"></i>
+                                                                                </button>
+                                                                            </form>
+                                                                        </li>
+                                                                    <?php endforeach; ?>
+                                                                </ul>
                                                             </li>
-                                                        <?php endforeach; ?>
-                                                    <?php endif; ?>
+                                                        <?php else: ?>
+                                                            <?php foreach ($sports as $es): ?>
+                                                                <li class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <span><i class="fa fa-futbol-o me-1"></i><?php echo CHtml::encode($es['sport_name']); ?></span>
+                                                                    <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeSport', array('id' => $model->id, 'sportId' => $es['id'])); ?>" style="display:inline;" id="form-remove-sport-<?php echo $es['id']; ?>">
+                                                                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-sport-<?php echo $es['id']; ?>')">
+                                                                            <i class="fa fa-times"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
+                                                            <?php endforeach; ?>
+                                                        <?php endif; ?>
                                                     <?php endforeach; ?>
                                                 </ul>
                                             <?php endif; ?>

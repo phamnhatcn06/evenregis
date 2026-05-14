@@ -3232,3 +3232,208 @@ registration_details ─── (N) registration_detail_attendees ─── (1) a
 4. **Liên quân cho phép chọn attendee từ cả 2 đơn vị** khi tạo đội
 5. **Mặc định**: manager đơn vị nào chỉ được chọn nhân viên đơn vị đó
 6. **Sau khi hủy liên quân**: đội đã tạo giữ nguyên, không cho sửa thêm người từ đơn vị kia
+
+---
+
+### 14.8 Liên quân theo nội dung (Content-level Alliance)
+
+> **Yêu cầu mới**: Liên quân không áp dụng chung cho tất cả nội dung trong event, mà được chọn **riêng biệt theo từng nội dung**.
+
+#### Sự khác biệt với thiết kế cũ
+
+| Tiêu chí | Thiết kế cũ (Event-level) | Thiết kế mới (Content-level) |
+|----------|---------------------------|------------------------------|
+| Phạm vi | 1 liên quân cho toàn bộ event | Liên quân riêng cho từng nội dung |
+| Giới hạn | Tối đa 1 đơn vị liên quân | Cấu hình số đơn vị tối đa theo nội dung |
+| Ví dụ | A liên quân với B → áp dụng cho Bóng đá, Văn nghệ,... | A liên quân với B cho Bóng đá, với C cho Văn nghệ |
+
+#### Cấu hình số đơn vị liên quân tối đa
+
+Thêm cột `max_alliance_orgs` vào bảng `event_contents`:
+
+```sql
+ALTER TABLE `event_contents` ADD COLUMN 
+  `max_alliance_orgs` TINYINT UNSIGNED NOT NULL DEFAULT 0 
+  COMMENT 'Số đơn vị tối đa được liên quân cho nội dung này (0=không cho phép liên quân)';
+```
+
+| Giá trị | Ý nghĩa |
+|---------|---------|
+| 0 | Không cho phép liên quân cho nội dung này |
+| 1 | Cho phép liên quân với tối đa 1 đơn vị |
+| 2 | Cho phép liên quân với tối đa 2 đơn vị |
+| N | Cho phép liên quân với tối đa N đơn vị |
+
+#### Bảng `content_alliance_requests` (Yêu cầu liên quân theo nội dung)
+
+```sql
+CREATE TABLE `content_alliance_requests` (
+  `id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_content_id`    INT UNSIGNED NOT NULL COMMENT 'FK → event_contents',
+  `registration_id`     INT UNSIGNED NOT NULL COMMENT 'FK → registrations (đơn vị gửi yêu cầu)',
+  `target_org_id`       INT UNSIGNED NOT NULL COMMENT 'FK → organizations (đơn vị nhận yêu cầu)',
+  `status`              ENUM('pending','approved','rejected','cancelled') NOT NULL DEFAULT 'pending',
+  `requested_by`        INT UNSIGNED NOT NULL COMMENT 'users.id (SSO) người gửi',
+  `requested_at`        INT UNSIGNED,
+  `reviewed_by`         INT UNSIGNED COMMENT 'users.id (SSO) người duyệt',
+  `reviewed_at`         INT UNSIGNED,
+  `rejection_reason`    TEXT,
+  `note`                TEXT,
+  `created_at`          INT UNSIGNED,
+  `updated_at`          INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_content_alliance_req` (`event_content_id`, `registration_id`, `target_org_id`),
+  KEY `idx_target_org` (`target_org_id`, `status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Yêu cầu liên quân theo từng nội dung';
+```
+
+#### Bảng `content_alliances` (Liên quân đã xác nhận theo nội dung)
+
+```sql
+CREATE TABLE `content_alliances` (
+  `id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_content_id`    INT UNSIGNED NOT NULL COMMENT 'FK → event_contents',
+  `registration_id`     INT UNSIGNED NOT NULL COMMENT 'FK → registrations (đơn vị chủ)',
+  `ally_org_id`         INT UNSIGNED NOT NULL COMMENT 'FK → organizations (đơn vị liên quân)',
+  `request_id`          INT UNSIGNED COMMENT 'FK → content_alliance_requests',
+  `status`              ENUM('active','dissolved') NOT NULL DEFAULT 'active',
+  `confirmed_at`        INT UNSIGNED,
+  `dissolved_at`        INT UNSIGNED,
+  `dissolved_by`        INT UNSIGNED,
+  `dissolved_reason`    TEXT,
+  `created_at`          INT UNSIGNED,
+  `updated_at`          INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_content_alliance` (`event_content_id`, `registration_id`, `ally_org_id`),
+  KEY `idx_ally_org` (`ally_org_id`, `status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Liên quân đã xác nhận theo từng nội dung';
+```
+
+#### Entity Relationship (Content-level Alliance)
+
+```
+event_contents (1) ─── max_alliance_orgs
+       │
+       │ (1)
+       ▼
+content_alliance_requests (N) ─── status: pending/approved/rejected
+       │
+       │ approved
+       ▼
+content_alliances (N)
+  ├── registration_id → registrations → organizations (đơn vị chủ)
+  └── ally_org_id → organizations (đơn vị liên quân)
+              │
+              │ enables
+              ▼
+     Khi tạo đội cho nội dung này,
+     có thể chọn attendee từ các đơn vị liên quân
+```
+
+#### User Stories mới
+
+**US-ALLY-04: Cấu hình số đơn vị liên quân theo nội dung**
+- **As a** Admin HO
+- **I want to** cấu hình số đơn vị tối đa được liên quân cho từng nội dung
+- **So that** kiểm soát được quy mô liên quân theo từng loại hoạt động
+
+**Acceptance Criteria:**
+- [ ] Trong form edit Event Content, có field "Số đơn vị liên quân tối đa"
+- [ ] Giá trị mặc định = 0 (không cho liên quân)
+- [ ] Validation: số nguyên >= 0
+
+---
+
+**US-ALLY-05: Gửi yêu cầu liên quân theo nội dung**
+- **As a** Đại diện đơn vị A
+- **I want to** gửi yêu cầu liên quân cho từng nội dung riêng biệt
+- **So that** có thể liên quân với đơn vị khác nhau cho các nội dung khác nhau
+
+**Acceptance Criteria:**
+- [ ] Trong form đăng ký, mỗi nội dung có section "Chọn đơn vị liên quân"
+- [ ] Chỉ hiển thị nếu `max_alliance_orgs > 0`
+- [ ] Cho phép chọn tối đa = `max_alliance_orgs` đơn vị
+- [ ] Dropdown hiển thị danh sách đơn vị khác đã đăng ký event
+- [ ] Ghi nhận vào bảng `content_alliance_requests`
+
+---
+
+**US-ALLY-06: Phê duyệt yêu cầu liên quân theo nội dung**
+- **As a** Đại diện đơn vị B
+- **I want to** xem và phê duyệt các yêu cầu liên quân cho từng nội dung
+- **So that** xác nhận liên quân cho nội dung cụ thể
+
+**Acceptance Criteria:**
+- [ ] Hiển thị danh sách request pending theo từng nội dung
+- [ ] Approve → tạo record `content_alliances`
+- [ ] Reject → cập nhật status, ghi reason
+
+---
+
+**US-ALLY-07: Tạo đội với thành viên từ nhiều đơn vị liên quân**
+- **As a** Đại diện đơn vị
+- **I want to** chọn thành viên từ các đơn vị liên quân khi tạo đội
+- **So that** đội bao gồm nhân viên từ nhiều đơn vị đã liên quân cho nội dung đó
+
+**Acceptance Criteria:**
+- [ ] Lấy danh sách `content_alliances` active cho nội dung
+- [ ] Danh sách chọn attendee bao gồm: đơn vị mình + các đơn vị liên quân
+- [ ] Nhóm theo đơn vị để dễ phân biệt
+
+---
+
+#### Wireframe Flow mới
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ĐĂNG KÝ THAM GIA SỰ KIỆN                                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ☑ Bóng đá nam                                                  │
+│     Số đội: [2 ▼]                                                │
+│     ┌─────────────────────────────────────────────────────┐     │
+│     │ Liên quân (tối đa 2 đơn vị):                        │     │
+│     │   ☑ KS Mường Thanh Nha Trang     [Đã duyệt ✓]       │     │
+│     │   ☑ KS Mường Thanh Đà Nẵng       [Chờ duyệt...]     │     │
+│     │   [+ Thêm đơn vị liên quân]                         │     │
+│     └─────────────────────────────────────────────────────┘     │
+│                                                                 │
+│  ☑ Văn nghệ - Tốp ca                                            │
+│     Số tiết mục: [1 ▼]                                          │
+│     ┌─────────────────────────────────────────────────────┐     │
+│     │ Liên quân (tối đa 3 đơn vị):                        │     │
+│     │   ☑ KS Grand Thanh Hóa           [Đã duyệt ✓]       │     │
+│     │   [+ Thêm đơn vị liên quân]                         │     │
+│     └─────────────────────────────────────────────────────┘     │
+│                                                                 │
+│  ☑ Thi Lễ tân                                                   │
+│     ┌─────────────────────────────────────────────────────┐     │
+│     │ Nội dung này không cho phép liên quân               │     │
+│     └─────────────────────────────────────────────────────┘     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+#### Edge Cases (Content-level Alliance)
+
+| Case | Xử lý |
+|------|-------|
+| Nội dung có `max_alliance_orgs = 0` | Ẩn section liên quân, không cho chọn |
+| Đơn vị chọn quá số lượng cho phép | Validation error: "Chỉ được liên quân tối đa X đơn vị" |
+| Đơn vị B từ chối liên quân | Đơn vị A có thể chọn đơn vị khác (nếu chưa đạt max) |
+| Đơn vị A liên quân với B cho Bóng đá, với C cho Văn nghệ | Hợp lệ - liên quân độc lập theo nội dung |
+| Hủy liên quân sau khi đã tạo đội | Đội giữ nguyên, không cho sửa thêm người từ đơn vị đã hủy |
+| Đơn vị B chưa đăng ký event | Không hiển thị trong dropdown chọn liên quân |
+
+---
+
+#### Business Rules (Content-level Alliance)
+
+1. **Liên quân theo nội dung**: Mỗi nội dung có cấu hình liên quân riêng
+2. **Số lượng liên quân**: Tối đa theo `event_contents.max_alliance_orgs`
+3. **Cần phê duyệt**: Đơn vị được chọn phải approve trước khi liên quân có hiệu lực
+4. **Phạm vi**: Liên quân chỉ áp dụng cho nội dung đã chọn, không ảnh hưởng nội dung khác
+5. **Chọn thành viên**: Khi tạo đội cho nội dung, có thể chọn attendee từ tất cả đơn vị liên quân đã approved
+6. **Backward compatibility**: Bảng `alliances`, `alliance_requests` cũ vẫn giữ nguyên cho các event đã tạo
