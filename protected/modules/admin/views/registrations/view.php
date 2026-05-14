@@ -388,14 +388,14 @@ $contentConfig = array(
 
     // Danh sách đã đăng ký để loại trừ
     var registeredSports = <?php
-        $sportIds = array();
-        $competitionIds = array();
-        foreach ($registrationDetails as $d) {
-            if (!empty($d['sport_id'])) $sportIds[] = (int)$d['sport_id'];
-            if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
-        }
-        echo json_encode($sportIds);
-    ?>;
+                            $sportIds = array();
+                            $competitionIds = array();
+                            foreach ($registrationDetails as $d) {
+                                if (!empty($d['sport_id'])) $sportIds[] = (int)$d['sport_id'];
+                                if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
+                            }
+                            echo json_encode($sportIds);
+                            ?>;
     var registeredCompetitions = <?php echo json_encode($competitionIds); ?>;
 
     // Load contents data khi page load
@@ -404,7 +404,9 @@ $contentConfig = array(
 
         if (eventId && contentSelect) {
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getEventContents"); ?>?event_id=' + eventId)
-                .then(function(response) { return response.json(); })
+                .then(function(response) {
+                    return response.json();
+                })
                 .then(function(data) {
                     if (data.success && data.data) {
                         contentsData = data.data;
@@ -498,7 +500,9 @@ $contentConfig = array(
             itemSelect.setAttribute('required', 'required');
 
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=sports')
-                .then(function(response) { return response.json(); })
+                .then(function(response) {
+                    return response.json();
+                })
                 .then(function(data) {
                     if (data.success && data.data && data.data.length > 0) {
                         itemSelect.innerHTML = renderSportsTree(data.data, registeredSports);
@@ -513,7 +517,9 @@ $contentConfig = array(
             itemSelect.setAttribute('required', 'required');
 
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=competition')
-                .then(function(response) { return response.json(); })
+                .then(function(response) {
+                    return response.json();
+                })
                 .then(function(data) {
                     var html = '<option value="">-- Chọn cuộc thi --</option>';
                     if (data.success && data.data && data.data.length > 0) {
