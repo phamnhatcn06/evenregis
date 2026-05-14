@@ -271,14 +271,20 @@ $contentConfig = array(
                 <input type="hidden" name="content_type" id="content_type" value="">
                 <input type="hidden" name="content_id" id="content_id" value="">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modal-title">Thêm nội dung đăng ký</h5>
+                    <h5 class="modal-title">Thêm nội dung đăng ký</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3" id="item_wrapper">
+                    <div class="mb-3">
+                        <label class="form-label">Loại nội dung <span class="text-danger">*</span></label>
+                        <select class="form-select" id="content_select" required>
+                            <option value="">-- Chọn loại nội dung --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="item_wrapper" style="display:none;">
                         <label class="form-label" id="item_label">Bộ môn <span class="text-danger">*</span></label>
-                        <select class="form-select" id="item_id" name="item_id" required>
-                            <option value="">-- Đang tải... --</option>
+                        <select class="form-select" id="item_id" name="item_id">
+                            <option value="">-- Chọn bộ môn --</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -287,7 +293,7 @@ $contentConfig = array(
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ghi chú</label>
-                        <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
+                        <textarea class="form-control" name="note" id="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
