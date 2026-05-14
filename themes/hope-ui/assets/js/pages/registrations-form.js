@@ -252,32 +252,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var form = document.getElementById('registrations-form');
     var relationSelect = document.getElementById('relation-property-select');
+    var isSubmitting = false;
 
     form.addEventListener('submit', function(e) {
         updateDocumentJson();
 
-        // Kiểm tra nếu đang ở chế độ update (có data-original-value)
-        if (relationSelect && relationSelect.hasAttribute('data-original-value')) {
-            var originalValue = relationSelect.getAttribute('data-original-value') || '';
-            var currentValue = relationSelect.value || '';
+        // Nếu đang submit sau khi xác nhận thì cho phép
+        if (isSubmitting) {
+            return true;
+        }
 
-            // Nếu relation_property_id thay đổi, hiển thị cảnh báo
-            if (originalValue !== currentValue) {
+        // Kiểm tra nếu đang ở chế độ update và có thay đổi relation_property_id
+        if (relationSelect && relationSelect.hasAttribute('data-original-value')) {
+            var originalValue = (relationSelect.getAttribute('data-original-value') || '').toString().trim();
+            var currentValue = (relationSelect.value || '').toString().trim();
+
+            // Chỉ hiển thị cảnh báo khi giá trị thực sự thay đổi
+            var hasOriginal = originalValue !== '' && originalValue !== 'null' && originalValue !== 'undefined';
+            var hasCurrent = currentValue !== '' && currentValue !== 'null' && currentValue !== 'undefined';
+            var isChanged = originalValue !== currentValue;
+
+            if (isChanged && (hasOriginal || hasCurrent)) {
                 e.preventDefault();
 
-                var message = 'Bạn có chắc chắn muốn cập nhật phiếu đăng ký này?';
-                if (currentValue && originalValue !== currentValue) {
+                var message = '';
+                if (hasCurrent && hasOriginal) {
                     message = '<p>Bạn có chắc chắn muốn cập nhật phiếu đăng ký này?</p>' +
                         '<div class="alert alert-warning text-start mt-3 mb-0">' +
                         '<i class="fa fa-exclamation-triangle me-2"></i>' +
                         '<strong>Lưu ý:</strong> Đơn vị liên quân đã thay đổi. ' +
                         'Yêu cầu liên quân sẽ cần được duyệt lại từ đơn vị được chọn.' +
                         '</div>';
-                } else if (!currentValue && originalValue) {
+                } else if (!hasCurrent && hasOriginal) {
                     message = '<p>Bạn có chắc chắn muốn cập nhật phiếu đăng ký này?</p>' +
                         '<div class="alert alert-info text-start mt-3 mb-0">' +
                         '<i class="fa fa-info-circle me-2"></i>' +
                         'Yêu cầu liên quân hiện tại sẽ bị hủy.' +
+                        '</div>';
+                } else if (hasCurrent && !hasOriginal) {
+                    message = '<p>Bạn có chắc chắn muốn cập nhật phiếu đăng ký này?</p>' +
+                        '<div class="alert alert-warning text-start mt-3 mb-0">' +
+                        '<i class="fa fa-exclamation-triangle me-2"></i>' +
+                        '<strong>Lưu ý:</strong> Đã chọn đơn vị liên quân. ' +
+                        'Yêu cầu liên quân sẽ cần được duyệt từ đơn vị được chọn.' +
                         '</div>';
                 }
 
@@ -291,11 +308,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     confirmButtonText: 'Cập nhật',
                     cancelButtonText: 'Hủy',
                     allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    preConfirm: function() {
-                        Swal.showLoading();
-                        return new Promise(function() {
-                            form.submit();
+                    allowEscapeKey: false
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Đang xử lý...',
+                            html: 'Vui lòng chờ trong giây lát',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            didOpen: function() {
+                                Swal.showLoading();
+                                isSubmitting = true;
+                                form.submit();
+                            }
                         });
                     }
                 });
