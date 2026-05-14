@@ -366,40 +366,59 @@ $perColumn = ceil($totalAttrs / $columns);
         var contentSelect = document.getElementById('content_id');
         var itemSelect = document.getElementById('item_id');
         var itemWrapper = document.getElementById('item_wrapper');
+        var itemLabel = itemWrapper ? itemWrapper.querySelector('label') : null;
         var contentTypeInput = document.getElementById('content_type');
-        var contentsData = [];
 
         if (eventId && contentSelect) {
             fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getEventContents"); ?>?event_id=' + eventId)
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
                     if (data.success && data.data) {
-                        contentsData = data.data;
                         data.data.forEach(function(c) {
                             var opt = document.createElement('option');
                             opt.value = c.id;
                             opt.textContent = c.name;
-                            opt.setAttribute('data-type', c.type);
+                            opt.setAttribute('data-code', c.code);
                             contentSelect.appendChild(opt);
                         });
                     }
+                })
+                .catch(function(err) {
+                    console.error('Error loading contents:', err);
                 });
         }
 
         if (contentSelect) {
             contentSelect.addEventListener('change', function() {
                 var selectedOpt = this.options[this.selectedIndex];
-                var contentType = selectedOpt.getAttribute('data-type') || '';
-                contentTypeInput.value = contentType;
+                var contentCode = selectedOpt.getAttribute('data-code') || '';
+                contentTypeInput.value = contentCode;
 
                 itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
                 itemWrapper.style.display = 'none';
 
-                if ((contentType === 'sports' || contentType === 'competition') && eventId) {
-                    fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=' + contentType)
+                if (contentCode === 'sports' && eventId) {
+                    if (itemLabel) itemLabel.textContent = 'Môn thể thao *';
+                    fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=sports')
                         .then(function(response) { return response.json(); })
                         .then(function(data) {
-                            itemSelect.innerHTML = '<option value="">-- Chọn bộ môn --</option>';
+                            itemSelect.innerHTML = '<option value="">-- Chọn môn thể thao --</option>';
+                            if (data.success && data.data && data.data.length > 0) {
+                                data.data.forEach(function(item) {
+                                    var opt = document.createElement('option');
+                                    opt.value = item.id;
+                                    opt.textContent = item.name;
+                                    itemSelect.appendChild(opt);
+                                });
+                                itemWrapper.style.display = 'block';
+                            }
+                        });
+                } else if (contentCode === 'competition' && eventId) {
+                    if (itemLabel) itemLabel.textContent = 'Cuộc thi nghiệp vụ *';
+                    fetch('<?php echo Yii::app()->createUrl("/admin/registrations/getContentItems"); ?>?event_id=' + eventId + '&content_type=competition')
+                        .then(function(response) { return response.json(); })
+                        .then(function(data) {
+                            itemSelect.innerHTML = '<option value="">-- Chọn cuộc thi --</option>';
                             if (data.success && data.data && data.data.length > 0) {
                                 data.data.forEach(function(item) {
                                     var opt = document.createElement('option');
@@ -411,7 +430,7 @@ $perColumn = ceil($totalAttrs / $columns);
                             }
                         });
                 } else {
-                    itemSelect.innerHTML = '<option value="">-- Chọn bộ môn --</option>';
+                    itemSelect.innerHTML = '<option value="">-- Không áp dụng --</option>';
                 }
             });
         }
