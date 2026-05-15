@@ -641,7 +641,7 @@ class RegistrationsController extends AdminController
 			'registration_id' => $registrationId,
 			'content_id' => $contentId,
 			'competition_id' => $competitionId,
-			'quantity' => count($staffIds),
+			'quantity' => count($staffCodes),
 			'note' => $note,
 		);
 
