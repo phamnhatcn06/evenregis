@@ -82,7 +82,7 @@ class RegistrationsController extends AdminController
 
 		if (isset($_POST['Registrations'])) {
 			$model->setAttributes($_POST['Registrations']);
-			$model->status = Registrations::STATUS_DRAFT;	
+			$model->status = Registrations::STATUS_DRAFT;
 			$ssoUser = AuthHandler::getUser();
 			$model->submitted_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
 			$existingDoc = isset($_POST['Registrations']['document']) ? $_POST['Registrations']['document'] : null;
@@ -623,7 +623,7 @@ class RegistrationsController extends AdminController
 		}
 
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
-		$contentId = Yii::app()->getRequest()->getPost('content_id');
+		$contentId = 2;
 		$competitionId = Yii::app()->getRequest()->getPost('competition_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
 		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
@@ -655,8 +655,7 @@ class RegistrationsController extends AdminController
 			$this->redirect(array('view', 'id' => $registrationId));
 			return;
 		}
-
-		$detailId = isset($detailResult['data']['id']) ? $detailResult['data']['id'] : null;
+		$detailId = isset($detailResult['data']['data']['id']) ? $detailResult['data']['data']['id'] : null;
 
 		if (!$detailId) {
 			Yii::app()->user->setFlash('error', 'Không lấy được ID chi tiết đăng ký.');
@@ -671,14 +670,8 @@ class RegistrationsController extends AdminController
 			$attendeeData = array(
 				'registration_detail_id' => $detailId,
 				'staff_id' => $staffId,
-				'status' => RegistrationDetailAttendees::STATUS_PENDING,
 			);
-
-			Yii::log("AddCompetitionRegistration - attendeeData: " . json_encode($attendeeData), 'info', 'application.registration');
-
 			$result = RegistrationDetailAttendees::storeViaApi($attendeeData);
-			Yii::log("AddCompetitionRegistration - attendeeResult: " . json_encode($result), 'info', 'application.registration');
-
 			if ($result['success']) {
 				$successCount++;
 			} else {
