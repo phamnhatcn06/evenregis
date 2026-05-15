@@ -212,8 +212,8 @@ var RegistrationView = (function() {
 
             var hidden = document.createElement('input');
             hidden.type = 'hidden';
-            hidden.name = 'staff_ids[]';
-            hidden.value = staff.id;
+            hidden.name = 'staff_codes[]';
+            hidden.value = staff.code;
             document.getElementById('add-competition-form').appendChild(hidden);
         });
     }
