@@ -8,7 +8,7 @@ class RegistrationDetailAttendees extends CModel
 
     public $id;
     public $registration_detail_id;
-    public $staff_id;
+    public $staff_code;
     public $status;
     public $note;
     public $created_at;
@@ -16,13 +16,13 @@ class RegistrationDetailAttendees extends CModel
 
     public function attributeNames()
     {
-        return array('id', 'registration_detail_id', 'staff_id', 'status', 'note', 'created_at', 'updated_at');
+        return array('id', 'registration_detail_id', 'staff_code', 'status', 'note', 'created_at', 'updated_at');
     }
 
     public function rules()
     {
         return array(
-            array('registration_detail_id, staff_id', 'required'),
+            array('registration_detail_id, staff_code', 'required'),
             array('status, note', 'safe'),
         );
     }
