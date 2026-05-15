@@ -626,12 +626,12 @@ class RegistrationsController extends AdminController
 		$contentId = 2;
 		$competitionId = Yii::app()->getRequest()->getPost('competition_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
-		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
+		$staffCodes = Yii::app()->getRequest()->getPost('staff_codes', array());
 		$note = Yii::app()->getRequest()->getPost('note', '');
 
 		Yii::log("AddCompetitionRegistration - POST data: " . json_encode($_POST), 'info', 'application.registration');
 
-		if (empty($staffIds) || !is_array($staffIds)) {
+		if (empty($staffCodes) || !is_array($staffCodes)) {
 			Yii::app()->user->setFlash('error', 'Vui lòng chọn ít nhất một nhân viên.');
 			$this->redirect(array('view', 'id' => $registrationId));
 			return;
