@@ -666,10 +666,10 @@ class RegistrationsController extends AdminController
 		$successCount = 0;
 		$errorCount = 0;
 
-		foreach ($staffIds as $staffId) {
+		foreach ($staffCodes as $staffCode) {
 			$attendeeData = array(
 				'registration_detail_id' => $detailId,
-				'staff_id' => $staffId,
+				'staff_code' => $staffCode,
 			);
 			$result = RegistrationDetailAttendees::storeViaApi($attendeeData);
 			if ($result['success']) {
