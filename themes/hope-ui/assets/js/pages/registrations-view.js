@@ -220,7 +220,7 @@ var RegistrationView = (function() {
 
     function removeHiddenInputs() {
         var form = document.getElementById('add-competition-form');
-        var inputs = form.querySelectorAll('input[name="staff_ids[]"]');
+        var inputs = form.querySelectorAll('input[name="staff_codes[]"]');
         inputs.forEach(function(input) { input.remove(); });
     }
 
