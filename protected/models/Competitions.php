@@ -110,4 +110,40 @@ class Competitions extends BaseCompetitions
         $close = $this->registration_close_at ? (int)$this->registration_close_at : PHP_INT_MAX;
         return $now >= $open && $now <= $close;
     }
+
+    /**
+     * BR-REG-06: Lấy danh sách phòng ban được phép thi
+     */
+    public function getAllowedDepartments()
+    {
+        return CompetitionDepartments::getDepartmentCodes($this->id);
+    }
+
+    /**
+     * BR-REG-06: Kiểm tra phòng ban có được phép thi không
+     */
+    public function isDepartmentAllowed($departmentCode)
+    {
+        $allowed = $this->getAllowedDepartments();
+        if (empty($allowed)) {
+            return true;
+        }
+        return in_array($departmentCode, $allowed);
+    }
+
+    /**
+     * BR-REG-06: Đồng bộ danh sách phòng ban cho cuộc thi
+     */
+    public function syncDepartments($departmentCodes)
+    {
+        CompetitionDepartments::syncDepartments($this->id, $departmentCodes);
+    }
+
+    /**
+     * BR-REG-06: Kiểm tra attendee có đủ điều kiện thi không
+     */
+    public function canAttendeeRegister($attendeeId)
+    {
+        return RegistrationValidator::canRegisterCompetition($attendeeId, $this->id);
+    }
 }
