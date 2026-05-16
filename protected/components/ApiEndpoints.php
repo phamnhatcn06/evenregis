@@ -193,6 +193,21 @@ class ApiEndpoints
     const REGISTRATION_DETAIL_ATTENDEE_DETAIL = '/api/registration-detail-attendees/detail/{id}';
     const REGISTRATION_DETAIL_ATTENDEE_DESTROY = '/api/registration-detail-attendees/destroy/{id}';
 
+    // Attendee
+    const ATTENDEE_LIST = '/api/attendees';
+    const ATTENDEE_STORE = '/api/attendees/store';
+    const ATTENDEE_DETAIL = '/api/attendees/detail/{id}';
+    const ATTENDEE_UPDATE = '/api/attendees/update/{id}';
+    const ATTENDEE_DESTROY = '/api/attendees/destroy/{id}';
+    const ATTENDEE_UPLOAD_DOCUMENTS = '/api/attendees/upload-documents/{id}';
+
+    // Competition Department
+    const COMPETITION_DEPARTMENT_LIST = '/api/competition-departments';
+    const COMPETITION_DEPARTMENT_STORE = '/api/competition-departments/store';
+    const COMPETITION_DEPARTMENT_DETAIL = '/api/competition-departments/detail/{id}';
+    const COMPETITION_DEPARTMENT_DESTROY = '/api/competition-departments/destroy/{id}';
+    const COMPETITION_DEPARTMENT_SYNC = '/api/competition-departments/sync/{competition_id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
