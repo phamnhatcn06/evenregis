@@ -3502,3 +3502,298 @@ content_alliances (N)
 4. **Phạm vi**: Liên quân chỉ áp dụng cho nội dung đã chọn, không ảnh hưởng nội dung khác
 5. **Chọn thành viên**: Khi tạo đội cho nội dung, có thể chọn attendee từ tất cả đơn vị liên quân đã approved
 6. **Backward compatibility**: Bảng `alliances`, `alliance_requests` cũ vẫn giữ nguyên cho các event đã tạo
+
+---
+
+## 15. Yêu cầu đăng ký mở rộng (Cập nhật 2026-05-16)
+
+### 15.1 Tổng quan
+
+Mở rộng quy trình đăng ký với các yêu cầu mới:
+1. **Chọn người tham dự**: Từ danh sách nhân viên hoặc tự điền
+2. **Tập tin đính kèm**: CCCD (2 mặt), ảnh chân dung 530×530px, hợp đồng lao động
+3. **Giới hạn môn thể thao**: Mỗi người tối đa 3 môn root (có thể cấu hình)
+4. **Thi nghiệp vụ theo phòng ban**: Chỉ những phòng ban được cấu hình mới được thi
+
+### 15.2 Schema Changes
+
+#### 15.2.1 Bảng `attendees` — Thêm cột file đính kèm
+
+```sql
+ALTER TABLE `attendees` ADD COLUMN `cccd_front_path` VARCHAR(500) COMMENT 'Ảnh mặt trước CCCD' AFTER `photo_full_path`;
+ALTER TABLE `attendees` ADD COLUMN `cccd_back_path` VARCHAR(500) COMMENT 'Ảnh mặt sau CCCD' AFTER `cccd_front_path`;
+ALTER TABLE `attendees` ADD COLUMN `portrait_path` VARCHAR(500) COMMENT 'Ảnh chân dung 530x530px' AFTER `cccd_back_path`;
+ALTER TABLE `attendees` ADD COLUMN `contract_path` VARCHAR(500) COMMENT 'File scan hợp đồng lao động' AFTER `portrait_path`;
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `cccd_front_path` | VARCHAR(500) | Đường dẫn ảnh mặt trước CCCD |
+| `cccd_back_path` | VARCHAR(500) | Đường dẫn ảnh mặt sau CCCD |
+| `portrait_path` | VARCHAR(500) | Ảnh chân dung 530×530px |
+| `contract_path` | VARCHAR(500) | File scan hợp đồng lao động (PDF/JPG) |
+
+---
+
+#### 15.2.2 Bảng `events` — Cấu hình giới hạn môn thể thao
+
+```sql
+ALTER TABLE `events` ADD COLUMN 
+  `max_sports_per_attendee` INT NOT NULL DEFAULT 3 
+  COMMENT 'Số môn thể thao tối đa mỗi người (tính root sports)';
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `max_sports_per_attendee` | INT | Số môn thể thao root tối đa (default=3) |
+
+---
+
+#### 15.2.3 Bảng `staff` — Thêm mã phòng ban
+
+```sql
+ALTER TABLE `staff` ADD COLUMN `department_code` VARCHAR(50) COMMENT 'Mã phòng ban (để filter thi nghiệp vụ)' AFTER `department`;
+CREATE INDEX `idx_staff_dept_code` ON `staff`(`department_code`);
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `department_code` | VARCHAR(50) | Mã phòng ban chuẩn hóa |
+
+---
+
+#### 15.2.4 Bảng mới `competition_departments`
+
+```sql
+CREATE TABLE `competition_departments` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `competition_id`  INT UNSIGNED NOT NULL,
+  `department_code` VARCHAR(50) NOT NULL COMMENT 'Mã phòng ban được phép thi',
+  `created_at`      INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_comp_dept` (`competition_id`, `department_code`),
+  KEY `idx_cd_dept` (`department_code`),
+  CONSTRAINT `fk_cd_comp` FOREIGN KEY (`competition_id`) REFERENCES `competitions`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Phòng ban được phép tham gia thi nghiệp vụ';
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `competition_id` | INT UNSIGNED | FK → competitions |
+| `department_code` | VARCHAR(50) | Mã phòng ban được phép thi nghiệp vụ này |
+
+---
+
+### 15.3 Business Rules
+
+| Rule ID | Mô tả | Validation |
+|---------|-------|------------|
+| **BR-REG-01** | Người tham dự có thể chọn từ `staff` hoặc tự điền | `staff_id` nullable; UI toggle |
+| **BR-REG-02** | Bắt buộc upload 4 file: CCCD (2 mặt), ảnh chân dung, hợp đồng | `Attendees::beforeSave()` validate |
+| **BR-REG-03** | Ảnh chân dung phải có kích thước 530×530px | Server-side image dimension check |
+| **BR-REG-04** | Đăng ký thể thao SAU KHI có danh sách attendees | Controller workflow check |
+| **BR-REG-05** | Mỗi attendee tối đa N môn root sports | N = `events.max_sports_per_attendee` |
+| **BR-REG-06** | Thi nghiệp vụ: attendee phải có `staff.department_code` trong `competition_departments` | Validation trước khi đăng ký |
+
+---
+
+### 15.4 Validation Queries
+
+#### BR-REG-05: Đếm số môn root đã đăng ký
+
+```sql
+-- Đếm số môn thể thao root mà attendee đã đăng ký
+SELECT COUNT(DISTINCT root_sport.id) AS root_sport_count
+FROM sport_team_members stm
+JOIN sport_teams st ON stm.team_id = st.id
+JOIN sports s ON st.sport_id = s.id
+LEFT JOIN sports root_sport ON (s.parent_id IS NULL AND root_sport.id = s.id)
+                            OR (s.parent_id IS NOT NULL AND root_sport.id = s.parent_id)
+WHERE stm.attendee_id = :attendee_id
+  AND root_sport.id IS NOT NULL;
+
+-- So sánh với events.max_sports_per_attendee
+-- Nếu >= max → block đăng ký thêm
+```
+
+#### BR-REG-06: Kiểm tra phòng ban thi nghiệp vụ
+
+```sql
+-- Kiểm tra attendee có được phép thi competition này không
+SELECT 1 
+FROM attendees a
+JOIN staff s ON a.staff_id = s.id
+JOIN competition_departments cd ON cd.department_code = s.department_code
+WHERE a.id = :attendee_id
+  AND cd.competition_id = :competition_id
+LIMIT 1;
+
+-- Nếu không có kết quả → attendee không đủ điều kiện
+```
+
+---
+
+### 15.5 User Stories
+
+#### US-REG-10: Chọn người tham dự từ danh sách nhân viên
+
+**As a** Đại diện đơn vị  
+**I want to** chọn người tham dự từ danh sách nhân viên đơn vị hoặc tự điền thông tin  
+**So that** tiết kiệm thời gian và đảm bảo chính xác thông tin
+
+**Acceptance Criteria:**
+- [ ] Dropdown hiển thị danh sách staff của đơn vị
+- [ ] Có nút "Tự điền thông tin" để nhập manual
+- [ ] Khi chọn từ staff: auto-fill full_name, position, department
+- [ ] Khi tự điền: staff_id = NULL
+
+**Estimate:** M (1 ngày)
+
+---
+
+#### US-REG-11: Upload giấy tờ đính kèm
+
+**As a** Đại diện đơn vị  
+**I want to** upload CCCD, ảnh chân dung, hợp đồng lao động cho mỗi người  
+**So that** đủ hồ sơ để phục vụ in thẻ và xác minh
+
+**Acceptance Criteria:**
+- [ ] Upload ảnh CCCD mặt trước (jpg/png, max 5MB)
+- [ ] Upload ảnh CCCD mặt sau (jpg/png, max 5MB)
+- [ ] Upload ảnh chân dung 530×530px (jpg/png, validate kích thước)
+- [ ] Upload scan hợp đồng lao động (pdf/jpg, max 10MB)
+- [ ] Hiển thị preview sau upload
+- [ ] Validation kích thước ảnh chân dung: phải đúng 530×530px
+
+**Estimate:** L (3 ngày)
+
+---
+
+#### US-REG-12: Giới hạn số môn thể thao
+
+**As a** Admin HO  
+**I want to** giới hạn mỗi người chỉ đăng ký tối đa N môn thể thao  
+**So that** đảm bảo công bằng và khả thi cho lịch thi đấu
+
+**Acceptance Criteria:**
+- [ ] Cấu hình `max_sports_per_attendee` trong form Event
+- [ ] Đếm số môn root (parent_id IS NULL) mà attendee đã đăng ký
+- [ ] Hiển thị warning khi đạt giới hạn
+- [ ] Block đăng ký môn thứ N+1 với thông báo lỗi
+- [ ] Bóng đá nam + Bóng đá nữ = 1 môn (tính theo parent "Bóng đá")
+
+**Estimate:** S (4 giờ)
+
+---
+
+#### US-REG-13: Kiểm tra phòng ban khi đăng ký thi nghiệp vụ
+
+**As a** BTC Thi nghiệp vụ  
+**I want to** chỉ cho phép nhân viên thuộc phòng ban phù hợp đăng ký thi  
+**So that** đảm bảo thí sinh có chuyên môn đúng lĩnh vực
+
+**Acceptance Criteria:**
+- [ ] Admin cấu hình danh sách `department_code` cho mỗi competition
+- [ ] Khi đơn vị chọn attendee đăng ký thi, kiểm tra `staff.department_code`
+- [ ] Chỉ hiển thị attendees có department_code hợp lệ trong dropdown
+- [ ] Thông báo lỗi nếu chọn người không đủ điều kiện
+
+**Estimate:** M (1 ngày)
+
+---
+
+### 15.6 Wireframe Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  BƯỚC 1: NHẬP DANH SÁCH NGƯỜI THAM DỰ                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  [+ Thêm người tham dự]                                         │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ ○ Chọn từ danh sách nhân viên                           │    │
+│  │   [Nguyễn Văn A - Phòng Lễ tân          ▼]              │    │
+│  │                                                         │    │
+│  │ ○ Tự điền thông tin                                     │    │
+│  │   Họ tên: [_________________________________]           │    │
+│  │   Chức vụ: [________________________________]           │    │
+│  │   Phòng ban: [______________________________]           │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                 │
+│  Upload giấy tờ:                                                │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌─────────┐│
+│  │ CCCD Trước   │ │ CCCD Sau     │ │ Ảnh chân dung│ │ Hợp đồng││
+│  │ [Chọn file]  │ │ [Chọn file]  │ │ 530×530px    │ │ [PDF]   ││
+│  │              │ │              │ │ [Chọn file]  │ │         ││
+│  └──────────────┘ └──────────────┘ └──────────────┘ └─────────┘│
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  BƯỚC 2: ĐĂNG KÝ THỂ THAO (sau khi có danh sách người)          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Nguyễn Văn A - Đã đăng ký: 2/3 môn                             │
+│  ☑ Bóng đá nam                                                  │
+│  ☑ Cầu lông đơn nam                                             │
+│  ☐ Bóng chuyền nam    ← Còn có thể đăng ký 1 môn nữa            │
+│  ☐ Kéo co                                                       │
+│                                                                 │
+│  ⚠️ Lưu ý: Mỗi người tối đa 3 môn thể thao                      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  BƯỚC 3: ĐĂNG KÝ THI NGHIỆP VỤ                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Cuộc thi: Lễ tân xuất sắc                                      │
+│  Phòng ban được phép: Lễ tân, CSKH                              │
+│                                                                 │
+│  Chọn người tham gia:                                           │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ ☑ Trần Thị B (Phòng Lễ tân)                             │    │
+│  │ ☑ Lê Văn C (Phòng CSKH)                                 │    │
+│  │ ✗ Nguyễn Văn A (Phòng Kế toán) ← Không đủ điều kiện     │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 15.7 Migration Script
+
+```sql
+-- Migration: 2026_05_16_add_attendee_documents_and_competition_departments
+
+-- 1. Thêm cột file đính kèm vào attendees
+ALTER TABLE `attendees` 
+  ADD COLUMN `cccd_front_path` VARCHAR(500) COMMENT 'Ảnh mặt trước CCCD' AFTER `photo_full_path`,
+  ADD COLUMN `cccd_back_path` VARCHAR(500) COMMENT 'Ảnh mặt sau CCCD' AFTER `cccd_front_path`,
+  ADD COLUMN `portrait_path` VARCHAR(500) COMMENT 'Ảnh chân dung 530x530px' AFTER `cccd_back_path`,
+  ADD COLUMN `contract_path` VARCHAR(500) COMMENT 'File scan hợp đồng lao động' AFTER `portrait_path`;
+
+-- 2. Thêm cấu hình giới hạn môn thể thao vào events
+ALTER TABLE `events` 
+  ADD COLUMN `max_sports_per_attendee` INT NOT NULL DEFAULT 3 
+  COMMENT 'Số môn thể thao tối đa mỗi người (tính root sports)';
+
+-- 3. Thêm mã phòng ban vào staff
+ALTER TABLE `staff` 
+  ADD COLUMN `department_code` VARCHAR(50) COMMENT 'Mã phòng ban (để filter thi nghiệp vụ)' AFTER `department`;
+CREATE INDEX `idx_staff_dept_code` ON `staff`(`department_code`);
+
+-- 4. Tạo bảng competition_departments
+CREATE TABLE `competition_departments` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `competition_id`  INT UNSIGNED NOT NULL,
+  `department_code` VARCHAR(50) NOT NULL COMMENT 'Mã phòng ban được phép thi',
+  `created_at`      INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_comp_dept` (`competition_id`, `department_code`),
+  KEY `idx_cd_dept` (`department_code`),
+  CONSTRAINT `fk_cd_comp` FOREIGN KEY (`competition_id`) REFERENCES `competitions`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Phòng ban được phép tham gia thi nghiệp vụ';
+```
