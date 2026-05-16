@@ -4,10 +4,27 @@ Yii::import('application.models._base.BaseEvents');
 
 class Events extends BaseEvents
 {
-	public static function model($className = __CLASS__)
-	{
-		return parent::model($className);
-	}
+    public $max_sports_per_attendee;
+
+    public static function model($className = __CLASS__)
+    {
+        return parent::model($className);
+    }
+
+    public function rules()
+    {
+        $rules = parent::rules();
+        $rules[] = array('max_sports_per_attendee', 'numerical', 'integerOnly' => true, 'min' => 1);
+        $rules[] = array('max_sports_per_attendee', 'default', 'setOnEmpty' => true, 'value' => 3);
+        return $rules;
+    }
+
+    public function attributeLabels()
+    {
+        $labels = parent::attributeLabels();
+        $labels['max_sports_per_attendee'] = Yii::t('app', 'Số môn thể thao tối đa/người');
+        return $labels;
+    }
 
 	public static function fetchFromApi($id)
 	{
