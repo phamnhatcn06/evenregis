@@ -1335,6 +1335,22 @@ CREATE TABLE `talent_scores` (
   CONSTRAINT `fk_tsc_entry` FOREIGN KEY (`entry_id`) REFERENCES `talent_entries`(`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_tsc_judge` FOREIGN KEY (`judge_id`) REFERENCES `users`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- ============================================================
+-- 52. COMPETITION_DEPARTMENTS — Phòng ban được phép thi nghiệp vụ
+-- ============================================================
+-- Mỗi cuộc thi nghiệp vụ chỉ cho phép một số phòng ban nhất định tham gia
+CREATE TABLE `competition_departments` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `competition_id`  INT UNSIGNED NOT NULL,
+  `department_code` VARCHAR(50) NOT NULL COMMENT 'Mã phòng ban được phép thi',
+  `created_at`      INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_comp_dept` (`competition_id`, `department_code`),
+  KEY `idx_cd_dept` (`department_code`),
+  CONSTRAINT `fk_cd_comp` FOREIGN KEY (`competition_id`) REFERENCES `competitions`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Phòng ban được phép tham gia thi nghiệp vụ';
 ```
 
 ---
