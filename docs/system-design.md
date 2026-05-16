@@ -961,6 +961,7 @@ CREATE TABLE `staff` (
   `full_name`       VARCHAR(255) NOT NULL,
   `organization_id` INT UNSIGNED,
   `department`      VARCHAR(255) COMMENT 'Phòng ban',
+  `department_code` VARCHAR(50)  COMMENT 'Mã phòng ban (để filter thi nghiệp vụ)',
   `position`        VARCHAR(255) COMMENT 'Chức vụ',
   `email`           VARCHAR(255),
   `phone`           VARCHAR(20),
