@@ -807,6 +807,7 @@ CREATE TABLE `events` (
   `to_date`     DATE         NOT NULL,
   `description` TEXT,
   `status`      ENUM('draft','active','completed','cancelled') NOT NULL DEFAULT 'draft',
+  `max_sports_per_attendee` INT NOT NULL DEFAULT 3 COMMENT 'Số môn thể thao tối đa mỗi người (tính root sports)',
   `created_at`  INT UNSIGNED,
   `updated_at`  INT UNSIGNED,
   PRIMARY KEY (`id`)
