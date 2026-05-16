@@ -974,6 +974,7 @@ CREATE TABLE `staff` (
   PRIMARY KEY (`id`),
   KEY `idx_staff_org` (`organization_id`),
   KEY `idx_staff_source` (`source`),
+  KEY `idx_staff_dept_code` (`department_code`),
   CONSTRAINT `fk_staff_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Danh sách nhân viên - sync từ SMILE hoặc CRUD';
 
