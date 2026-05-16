@@ -1,0 +1,95 @@
+<?php
+
+Yii::import('application.models._base.BaseCompetitionDepartments');
+
+class CompetitionDepartments extends BaseCompetitionDepartments
+{
+    public static function model($className = __CLASS__)
+    {
+        return parent::model($className);
+    }
+
+    public function beforeSave()
+    {
+        if ($this->isNewRecord && !$this->created_at) {
+            $this->created_at = time();
+        }
+        return parent::beforeSave();
+    }
+
+    /**
+     * Lấy danh sách department_code của một competition
+     */
+    public static function getDepartmentCodes($competitionId)
+    {
+        $models = self::model()->findAllByAttributes(array('competition_id' => $competitionId));
+        return CHtml::listData($models, 'id', 'department_code');
+    }
+
+    /**
+     * Kiểm tra department_code có được phép tham gia competition không
+     */
+    public static function isAllowed($competitionId, $departmentCode)
+    {
+        if (empty($departmentCode)) {
+            return false;
+        }
+
+        return self::model()->exists(
+            'competition_id = :cid AND department_code = :dcode',
+            array(':cid' => $competitionId, ':dcode' => $departmentCode)
+        );
+    }
+
+    /**
+     * Đồng bộ danh sách department_code cho competition
+     */
+    public static function syncDepartments($competitionId, $departmentCodes)
+    {
+        self::model()->deleteAllByAttributes(array('competition_id' => $competitionId));
+
+        foreach ($departmentCodes as $code) {
+            $model = new self;
+            $model->competition_id = $competitionId;
+            $model->department_code = $code;
+            $model->save();
+        }
+    }
+
+    public static function fetchFromApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::COMPETITION_DEPARTMENT_DETAIL, array('id' => $id));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            $model = new self;
+            $model->setAttributes($data, false);
+            $model->id = $id;
+            return $model;
+        }
+        return null;
+    }
+
+    public function storeViaApi()
+    {
+        $data = array_filter($this->attributes, function ($value) {
+            return $value !== null && $value !== '';
+        });
+        return ApiClient::post(ApiEndpoints::COMPETITION_DEPARTMENT_STORE, $data);
+    }
+
+    public static function deleteViaApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::COMPETITION_DEPARTMENT_DESTROY, array('id' => $id));
+        return ApiClient::delete($url);
+    }
+
+    public static function getApiDataProvider($params = array(), $pageSize = 100)
+    {
+        return new ApiDataProvider(ApiEndpoints::COMPETITION_DEPARTMENT_LIST, array(
+            'modelClass' => 'CompetitionDepartments',
+            'params' => $params,
+            'pagination' => array('pageSize' => $pageSize),
+        ));
+    }
+}
