@@ -4,13 +4,30 @@ Yii::import('application.models._base.BaseStaffs');
 
 class Staffs extends BaseStaffs
 {
-	public $property_name;
-	public $division_name;
-	public $position_name;
+    public $property_name;
+    public $division_name;
+    public $position_name;
+    public $department_code;
 
-	public static function model($className=__CLASS__) {
-		return parent::model($className);
-	}
+    public static function model($className = __CLASS__)
+    {
+        return parent::model($className);
+    }
+
+    public function rules()
+    {
+        $rules = parent::rules();
+        $rules[] = array('department_code', 'length', 'max' => 50);
+        $rules[] = array('department_code', 'safe');
+        return $rules;
+    }
+
+    public function attributeLabels()
+    {
+        $labels = parent::attributeLabels();
+        $labels['department_code'] = Yii::t('app', 'Mã phòng ban');
+        return $labels;
+    }
 
 	public static function fetchFromApi($id)
 	{
