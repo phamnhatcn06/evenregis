@@ -1464,6 +1464,47 @@ meals (1) ─────────────────  (N) meal_tables
 meals (1) ─────────────────  (N) meal_attendees
 meals (1) ─────────────────  (N) meal_cutoffs
 meals (1) ─────────────────  (N) meal_checkins
+
+# Competition departments
+competitions (1) ──────────  (N) competition_departments
+```
+
+### 3.5 Business Rules — Đăng ký sự kiện
+
+| Rule ID | Mô tả | Validation |
+|---------|-------|------------|
+| **BR-01** | Người tham dự có thể chọn từ `staff` (staff_id != NULL) hoặc tự điền (staff_id = NULL) | UI: dropdown + manual toggle |
+| **BR-02** | Mỗi attendee phải upload 4 file: cccd_front, cccd_back, portrait (530x530), contract | `Attendees::beforeSave()` validate required |
+| **BR-03** | Ảnh chân dung phải có kích thước 530×530px | Server-side image dimension check |
+| **BR-04** | Chỉ đăng ký thể thao sau khi registration.status = 'approved' | Controller check |
+| **BR-05** | Mỗi attendee tối đa **N môn thể thao root** (events.max_sports_per_attendee, default=3) | Count `sport_team_members` WHERE sport.parent_id IS NULL |
+| **BR-06** | Thi nghiệp vụ: attendee phải có `staff.department_code` nằm trong `competition_departments` | `CompetitionRegistrations` validation |
+
+#### BR-05: Giới hạn môn thể thao (chi tiết)
+
+```sql
+-- Đếm số môn root mà attendee đã đăng ký
+SELECT COUNT(DISTINCT s.id) AS root_sport_count
+FROM sport_team_members stm
+JOIN sport_teams st ON stm.team_id = st.id
+JOIN sports s ON st.sport_id = s.id OR st.sport_id IN (SELECT id FROM sports WHERE parent_id = s.id)
+WHERE stm.attendee_id = :attendee_id
+  AND s.parent_id IS NULL;
+
+-- Nếu root_sport_count >= events.max_sports_per_attendee → block đăng ký thêm
+```
+
+#### BR-06: Kiểm tra phòng ban thi nghiệp vụ
+
+```sql
+-- Kiểm tra attendee có được phép thi competition này không
+SELECT 1 FROM attendees a
+JOIN staff s ON a.staff_id = s.id
+JOIN competition_departments cd ON cd.department_code = s.department_code
+WHERE a.id = :attendee_id
+  AND cd.competition_id = :competition_id;
+
+-- Nếu không có kết quả → attendee không đủ điều kiện
 ```
 
 ---
