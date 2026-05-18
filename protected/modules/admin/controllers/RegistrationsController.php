@@ -739,7 +739,7 @@ class RegistrationsController extends AdminController
 			$attendee->approval_status = Attendees::APPROVAL_PENDING;
 			$attendee->join_hotel_date = isset($staff->join_hotel_date) ? $staff->join_hotel_date : null;
 			$attendee->check_in_date = $checkInDate;
-			$attendee->check_out_date = $departureDate;
+			$attendee->check_out_date = $checkOutDate;
 			$attendee->transport_id = $transportId;
 
 			$uploadedFiles = $this->handleAttendeeDocumentUpload();
@@ -806,7 +806,7 @@ class RegistrationsController extends AdminController
 		$attendee->approval_status = Attendees::APPROVAL_PENDING;
 		$attendee->join_hotel_date = $join_hotel_date;
 		$attendee->check_in_date = $checkInDate;
-		$attendee->check_out_date = $departureDate;
+		$attendee->check_out_date = $checkOutDate;
 		$attendee->transport_id = $transportId;
 
 		$uploadedFiles = $this->handleAttendeeDocumentUpload();
