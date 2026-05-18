@@ -651,6 +651,10 @@ $contentConfig = array(
                                 <input type="text" class="form-control bg-light" id="edit_position" readonly>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">Phòng ban</label>
+                                <input type="text" class="form-control bg-light" id="edit_department" readonly>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Vai trò <span class="text-danger">*</span></label>
                                 <select class="form-select" name="role_id" id="edit_role_id" required>
                                     <option value="">-- Chọn vai trò --</option>
