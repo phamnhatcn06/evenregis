@@ -738,7 +738,7 @@ class RegistrationsController extends AdminController
 			$attendee->position = isset($staff->position_name) ? $staff->position_name : '';
 			$attendee->approval_status = Attendees::APPROVAL_PENDING;
 			$attendee->join_hotel_date = isset($staff->join_hotel_date) ? $staff->join_hotel_date : null;
-			$attendee->check_in_date = $arrivalDate;
+			$attendee->check_in_date = $checkInDate;
 			$attendee->check_out_date = $departureDate;
 			$attendee->transport_id = $transportId;
 
@@ -805,7 +805,7 @@ class RegistrationsController extends AdminController
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
 		$attendee->approval_status = Attendees::APPROVAL_PENDING;
 		$attendee->join_hotel_date = $join_hotel_date;
-		$attendee->check_in_date = $arrivalDate;
+		$attendee->check_in_date = $checkInDate;
 		$attendee->check_out_date = $departureDate;
 		$attendee->transport_id = $transportId;
 
