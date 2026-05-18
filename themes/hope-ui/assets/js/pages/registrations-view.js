@@ -832,10 +832,10 @@ var RegistrationView = (function() {
                     // Re-init datepickers and set values after modal is shown
                     modal.addEventListener('shown.bs.modal', function initOnce() {
                         if (window.initDatePickers) window.initDatePickers();
-                        var arrivalEl = document.getElementById('edit_arrival_date');
-                        var departureEl = document.getElementById('edit_departure_date');
-                        if (arrivalEl._flatpickr && att.arrival_date) arrivalEl._flatpickr.setDate(att.arrival_date, true);
-                        if (departureEl._flatpickr && att.departure_date) departureEl._flatpickr.setDate(att.departure_date, true);
+                        var checkInEl = document.getElementById('edit_check_in_date');
+                        var checkOutEl = document.getElementById('edit_check_out_date');
+                        if (checkInEl._flatpickr && att.check_in_date) checkInEl._flatpickr.setDate(att.check_in_date, true);
+                        if (checkOutEl._flatpickr && att.check_out_date) checkOutEl._flatpickr.setDate(att.check_out_date, true);
                         modal.removeEventListener('shown.bs.modal', initOnce);
                     });
                 } else {
