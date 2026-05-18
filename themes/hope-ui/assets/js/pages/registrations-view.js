@@ -704,7 +704,7 @@ var RegistrationView = (function() {
             item.href = '#';
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', staff.id);
-            var startDateInfo = staff.start_date ? '<br><span class="text-muted" style="font-size:11px;">Ngày vào: ' + staff.start_date + '</span>' : '';
+            var joinDateInfo = staff.join_hotel_date ? '<br><span class="text-muted" style="font-size:11px;">Ngày vào: ' + formatDate(staff.join_hotel_date) + '</span>' : '';
             item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' + startDateInfo;
             item.addEventListener('click', function(e) {
                 e.preventDefault();
