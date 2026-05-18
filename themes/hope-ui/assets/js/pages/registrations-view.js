@@ -13,6 +13,7 @@ var RegistrationView = (function() {
     var competitionContentId = null;
     var attendeeAllStaff = [];
     var attendeeSelectedStaff = [];
+    var existingStaffIds = [];
 
     function init(config) {
         eventId = config.eventId;
