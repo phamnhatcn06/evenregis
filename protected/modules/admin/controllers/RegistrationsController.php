@@ -717,7 +717,7 @@ class RegistrationsController extends AdminController
 		$successCount = 0;
 		$errorCount = 0;
 
-		foreach ($staffIds as $index => $staffId) {
+		foreach ($staffIds as $staffId) {
 			$staff = Staffs::fetchFromApi($staffId);
 			if (!$staff) {
 				Yii::log("AddAttendeesFromStaff - Staff not found: {$staffId}", 'error', 'application.registration');
