@@ -451,7 +451,13 @@ var RegistrationView = (function() {
         var staffModal = document.getElementById('addAttendeeFromStaffModal');
         if (staffModal) {
             staffModal.addEventListener('shown.bs.modal', function() {
-                if (window.initDatePickers) window.initDatePickers();
+                console.log('Modal shown, calling initDatePickers');
+                if (window.initDatePickers) {
+                    window.initDatePickers();
+                    console.log('initDatePickers called');
+                    var checkInEl = document.getElementById('staff_check_in_date');
+                    console.log('After init - checkInEl._flatpickr:', checkInEl ? checkInEl._flatpickr : null);
+                }
             });
         }
 
