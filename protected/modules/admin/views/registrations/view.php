@@ -747,6 +747,39 @@ $contentConfig = array(
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Ngày bắt đầu làm việc <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" name="start_date" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Phương tiện <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="transport_id" required>
+                                            <option value="">-- Chọn --</option>
+                                            <?php foreach ($transports as $tId => $tName): ?>
+                                                <option value="<?php echo $tId; ?>"><?php echo CHtml::encode($tName); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Ngày đến <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" name="arrival_date" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" name="departure_date" required>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Ghi chú</label>
                                 <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
