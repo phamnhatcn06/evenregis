@@ -804,12 +804,6 @@ var RegistrationView = (function() {
                     document.getElementById('edit_start_date').value = formatDate(att.start_date);
                     document.getElementById('edit_transport_id').value = att.transport_id || '';
 
-                    // Set flatpickr dates
-                    var arrivalPicker = document.getElementById('edit_arrival_date')._flatpickr;
-                    var departurePicker = document.getElementById('edit_departure_date')._flatpickr;
-                    if (arrivalPicker && att.arrival_date) arrivalPicker.setDate(att.arrival_date, true);
-                    if (departurePicker && att.departure_date) departurePicker.setDate(att.departure_date, true);
-
                     if (att.portrait_path) {
                         showPreview('edit_portrait_preview', att.portrait_path);
                     }
