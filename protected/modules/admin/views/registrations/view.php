@@ -648,7 +648,7 @@ $contentConfig = array(
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Chức danh</label>
-                                <input type="text" class="form-control" name="position" id="edit_position">
+                                <input type="text" class="form-control bg-light" id="edit_position" readonly>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Vai trò <span class="text-danger">*</span></label>
