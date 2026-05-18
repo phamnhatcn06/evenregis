@@ -675,9 +675,46 @@ var RegistrationView = (function() {
         }
     }
 
+    function bindFilePreview() {
+        var fileInputs = document.querySelectorAll('input[type="file"][accept*="image"]');
+        fileInputs.forEach(function(input) {
+            input.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+
+                var previewId = input.name.replace('_file', '_preview');
+                if (input.closest('#editAttendeeModal')) {
+                    previewId = 'edit_' + previewId;
+                } else if (input.closest('#addAttendeeManualModal')) {
+                    previewId = 'add_' + previewId;
+                }
+
+                var previewEl = document.getElementById(previewId);
+                if (!previewEl) {
+                    previewEl = document.createElement('div');
+                    previewEl.id = previewId;
+                    previewEl.className = 'mb-2';
+                    input.parentNode.insertBefore(previewEl, input);
+                }
+
+                if (file.type.startsWith('image/')) {
+                    var reader = new FileReader();
+                    reader.onload = function(ev) {
+                        previewEl.innerHTML = '<img src="' + ev.target.result + '" class="img-thumbnail" style="max-height:100px;">';
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.type === 'application/pdf') {
+                    previewEl.innerHTML = '<span class="badge bg-secondary"><i class="fa fa-file-pdf-o me-1"></i>' + escapeHtml(file.name) + '</span>';
+                }
+            });
+        });
+    }
+
     function bindEditAttendeeForm() {
         var form = document.getElementById('edit-attendee-form');
         if (!form) return;
+
+        bindFilePreview();
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
