@@ -730,10 +730,9 @@ class RegistrationsController extends AdminController
 			$attendee->role_id = $roleId;
 			$attendee->full_name = $staff->full_name;
 			$attendee->position = isset($staff->position_name) ? $staff->position_name : '';
-			$attendee->department = isset($staff->division_name) ? $staff->division_name : '';
 			$attendee->approval_status = Attendees::APPROVAL_PENDING;
 
-			Yii::log("AddAttendeesFromStaff - Attendee data: position={$attendee->position}, department={$attendee->department}", 'info', 'application.registration');
+			Yii::log("AddAttendeesFromStaff - Attendee data: position={$attendee->position}", 'info', 'application.registration');
 
 			$result = $attendee->storeViaApi();
 			if ($result['success']) {
