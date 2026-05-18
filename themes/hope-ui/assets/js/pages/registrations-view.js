@@ -605,7 +605,15 @@ var RegistrationView = (function() {
         var searchTerm = (document.getElementById('attendee_staff_search')?.value || '').toLowerCase();
 
         var available = attendeeAllStaff.filter(function(s) {
-            return attendeeSelectedStaff.findIndex(function(sel) { return sel.id == s.id; }) === -1;
+            // Loại bỏ những người đã chọn trong session hiện tại
+            if (attendeeSelectedStaff.findIndex(function(sel) { return sel.id == s.id; }) !== -1) {
+                return false;
+            }
+            // Loại bỏ những người đã là attendee trước đó
+            if (existingStaffIds.indexOf(parseInt(s.id)) !== -1) {
+                return false;
+            }
+            return true;
         });
 
         if (searchTerm) {
