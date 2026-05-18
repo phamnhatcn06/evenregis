@@ -524,7 +524,7 @@ var RegistrationView = (function() {
         if (!tbody) return;
 
         var hasActionCol = document.querySelector('#attendees-table thead th:last-child:empty') !== null;
-        var colCount = hasActionCol ? 7 : 6;
+        var colCount = hasActionCol ? 11 : 10;
 
         if (attendees.length === 0) {
             tbody.innerHTML = '<tr><td colspan="' + colCount + '" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>';
@@ -535,8 +535,8 @@ var RegistrationView = (function() {
         var html = '';
         attendees.forEach(function(att, idx) {
             var photoHtml = att.portrait_path
-                ? '<img src="' + escapeHtml(att.portrait_path) + '" class="rounded" style="width:50px;height:50px;object-fit:cover;">'
-                : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:50px;height:50px;"><i class="fa fa-user text-muted"></i></div>';
+                ? '<img src="' + escapeHtml(att.portrait_path) + '" class="rounded" style="width:40px;height:40px;object-fit:cover;">'
+                : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:40px;height:40px;"><i class="fa fa-user text-muted"></i></div>';
 
             var statusLabel = getApprovalStatusLabel(att.approval_status);
             var positionDept = [];
@@ -549,6 +549,10 @@ var RegistrationView = (function() {
                 '<td>' + escapeHtml(att.full_name) + '</td>' +
                 '<td>' + escapeHtml(positionDept.join(' - ')) + '</td>' +
                 '<td>' + escapeHtml(att.role_name || '') + '</td>' +
+                '<td>' + formatDate(att.start_date) + '</td>' +
+                '<td>' + formatDate(att.arrival_date) + '</td>' +
+                '<td>' + formatDate(att.departure_date) + '</td>' +
+                '<td>' + escapeHtml(att.transport_name || '-') + '</td>' +
                 '<td>' + statusLabel + '</td>';
 
             if (hasActionCol) {
@@ -564,6 +568,16 @@ var RegistrationView = (function() {
 
         tbody.innerHTML = html;
         updateAttendeesCount(attendees.length);
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        var d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '-';
+        var day = ('0' + d.getDate()).slice(-2);
+        var month = ('0' + (d.getMonth() + 1)).slice(-2);
+        var year = d.getFullYear();
+        return day + '/' + month + '/' + year;
     }
 
     function getApprovalStatusLabel(status) {
