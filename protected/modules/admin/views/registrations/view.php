@@ -690,7 +690,8 @@ $contentConfig = array(
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Ngày vào làm</label>
-                                        <input type="date" class="form-control" name="start_date" id="edit_start_date">
+                                        <input type="text" class="form-control bg-light" id="edit_start_date" readonly>
+                                        <small class="text-muted">Dữ liệu từ hệ thống nhân sự</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -709,13 +710,13 @@ $contentConfig = array(
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Ngày đến</label>
-                                        <input type="date" class="form-control" name="arrival_date" id="edit_arrival_date">
+                                        <input type="text" class="form-control datepicker" name="arrival_date" id="edit_arrival_date" placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Ngày đi</label>
-                                        <input type="date" class="form-control" name="departure_date" id="edit_departure_date">
+                                        <input type="text" class="form-control datepicker" name="departure_date" id="edit_departure_date" placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
