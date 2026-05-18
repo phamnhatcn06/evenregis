@@ -705,7 +705,7 @@ var RegistrationView = (function() {
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', staff.id);
             var joinDateInfo = staff.join_hotel_date ? '<br><span class="text-muted" style="font-size:11px;">Ngày vào: ' + formatDate(staff.join_hotel_date) + '</span>' : '';
-            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' + startDateInfo;
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' + joinDateInfo;
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 this.classList.toggle('active');
