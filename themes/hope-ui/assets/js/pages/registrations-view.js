@@ -825,6 +825,16 @@ var RegistrationView = (function() {
 
                     var bsModal = new bootstrap.Modal(modal);
                     bsModal.show();
+
+                    // Re-init datepickers and set values after modal is shown
+                    modal.addEventListener('shown.bs.modal', function initOnce() {
+                        if (window.initDatePickers) window.initDatePickers();
+                        var arrivalEl = document.getElementById('edit_arrival_date');
+                        var departureEl = document.getElementById('edit_departure_date');
+                        if (arrivalEl._flatpickr && att.arrival_date) arrivalEl._flatpickr.setDate(att.arrival_date, true);
+                        if (departureEl._flatpickr && att.departure_date) departureEl._flatpickr.setDate(att.departure_date, true);
+                        modal.removeEventListener('shown.bs.modal', initOnce);
+                    });
                 } else {
                     Toast.error(data.error || 'Không thể tải thông tin.');
                 }
