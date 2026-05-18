@@ -562,12 +562,29 @@ $contentConfig = array(
                 </div>
                 <div class="modal-body">
                     <div class="row mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Vai trò <span class="text-danger">*</span></label>
                             <select class="form-select" name="role_id" id="staff_role_id" required>
                                 <option value="">-- Chọn vai trò --</option>
                                 <?php foreach ($roles as $rId => $rName): ?>
                                     <option value="<?php echo $rId; ?>"><?php echo CHtml::encode($rName); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ngày đến <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="arrival_date" id="staff_arrival_date" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="departure_date" id="staff_departure_date" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Phương tiện <span class="text-danger">*</span></label>
+                            <select class="form-select" name="transport_id" id="staff_transport_id" required>
+                                <option value="">-- Chọn --</option>
+                                <?php foreach ($transports as $tId => $tName): ?>
+                                    <option value="<?php echo $tId; ?>"><?php echo CHtml::encode($tName); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -579,7 +596,7 @@ $contentConfig = array(
                                     <small class="fw-bold">Danh sách nhân viên</small>
                                     <input type="text" class="form-control form-control-sm mt-2" id="attendee_staff_search" placeholder="Tìm kiếm theo tên, mã NV...">
                                 </div>
-                                <div class="card-body p-0" style="height:350px;overflow-y:auto;">
+                                <div class="card-body p-0" style="height:300px;overflow-y:auto;">
                                     <div class="list-group list-group-flush" id="attendee_available_staff_list">
                                         <div class="text-center text-muted py-5">Đang tải danh sách nhân viên...</div>
                                     </div>
@@ -605,7 +622,7 @@ $contentConfig = array(
                                 <div class="card-header py-2">
                                     <small class="fw-bold">Đã chọn (<span id="attendee_selected_count">0</span>)</small>
                                 </div>
-                                <div class="card-body p-0" style="height:390px;overflow-y:auto;">
+                                <div class="card-body p-0" style="height:340px;overflow-y:auto;">
                                     <div class="list-group list-group-flush" id="attendee_selected_staff_list">
                                     </div>
                                 </div>
