@@ -737,7 +737,7 @@ class RegistrationsController extends AdminController
 			$attendee->full_name = $staff->full_name;
 			$attendee->position = isset($staff->position_name) ? $staff->position_name : '';
 			$attendee->approval_status = Attendees::APPROVAL_PENDING;
-			$attendee->start_date = isset($startDates[$index]) ? $startDates[$index] : (isset($staff->start_date) ? $staff->start_date : null);
+			$attendee->start_date = isset($staff->join_hotel_date) ? $staff->join_hotel_date : null;
 			$attendee->arrival_date = $arrivalDate;
 			$attendee->departure_date = $departureDate;
 			$attendee->transport_id = $transportId;
