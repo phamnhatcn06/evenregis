@@ -699,8 +699,7 @@ class RegistrationsController extends AdminController
 			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
 			Yii::app()->end();
 		}
-		print_r($_POST);
-		exit;
+
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
 		$eventId = Yii::app()->getRequest()->getPost('event_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');

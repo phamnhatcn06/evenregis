@@ -485,11 +485,26 @@ var RegistrationView = (function() {
                     return false;
                 }
 
+                // Validate dates
+                var checkInEl = document.getElementById('staff_check_in_date');
+                var checkOutEl = document.getElementById('staff_check_out_date');
+                var checkInDate = checkInEl._flatpickr ? checkInEl._flatpickr.selectedDates[0] : null;
+                var checkOutDate = checkOutEl._flatpickr ? checkOutEl._flatpickr.selectedDates[0] : null;
+
+                if (!checkInDate || !checkOutDate) {
+                    Toast.error('Vui lòng chọn ngày đến và ngày đi.');
+                    return false;
+                }
+
                 var btn = document.getElementById('btn_submit_attendees_staff');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang thêm...';
 
                 var formData = new FormData(form);
+
+                // Ensure flatpickr dates are included (format Y-m-d)
+                formData.set('check_in_date', checkInEl._flatpickr.formatDate(checkInDate, 'Y-m-d'));
+                formData.set('check_out_date', checkOutEl._flatpickr.formatDate(checkOutDate, 'Y-m-d'));
 
                 fetch(form.action, {
                     method: 'POST',
