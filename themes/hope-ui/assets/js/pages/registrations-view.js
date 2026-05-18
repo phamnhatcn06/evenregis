@@ -30,6 +30,7 @@ var RegistrationView = (function() {
         bindCompetitionEvents();
         bindAttendeeEvents();
         bindEditAttendeeForm();
+        bindAddAttendeeModalReset();
 
         if (isHotel && propertyId) {
             loadAttendeeStaffList();
