@@ -581,6 +581,7 @@ class RegistrationsController extends AdminController
 				$positionName = isset($staff['position_name']) ? $staff['position_name'] : (isset($staff->position_name) ? $staff->position_name : '');
 				$divisionName = isset($staff['division_name']) ? $staff['division_name'] : (isset($staff->division_name) ? $staff->division_name : '');
 				$code = isset($staff['code']) ? $staff['code'] : (isset($staff->code) ? $staff->code : '');
+				$startDate = isset($staff['start_date']) ? $staff['start_date'] : (isset($staff->start_date) ? $staff->start_date : '');
 
 				if (!$id) continue;
 
@@ -591,6 +592,7 @@ class RegistrationsController extends AdminController
 					'department_name' => $divisionName,
 					'code' => $code,
 					'display' => $code ? ($code . ' - ' . $fullName) : $fullName,
+					'start_date' => $startDate,
 				);
 			}
 		}
