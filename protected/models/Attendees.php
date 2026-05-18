@@ -39,7 +39,58 @@ class Attendees extends BaseAttendees
         $labels['cccd_back_path'] = Yii::t('app', 'Ảnh CCCD mặt sau');
         $labels['portrait_path'] = Yii::t('app', 'Ảnh chân dung');
         $labels['contract_path'] = Yii::t('app', 'Hợp đồng lao động');
+        $labels['approval_status'] = Yii::t('app', 'Trạng thái duyệt');
+        $labels['rejection_reason'] = Yii::t('app', 'Lý do từ chối');
         return $labels;
+    }
+
+    public static function getApprovalStatusLabel($status)
+    {
+        $labels = array(
+            self::APPROVAL_PENDING => '<span class="badge bg-warning text-dark">Chờ duyệt</span>',
+            self::APPROVAL_APPROVED => '<span class="badge bg-success">Đã duyệt</span>',
+            self::APPROVAL_REJECTED => '<span class="badge bg-danger">Từ chối</span>',
+        );
+        return isset($labels[$status]) ? $labels[$status] : '<span class="badge bg-secondary">Chưa xác định</span>';
+    }
+
+    public static function getApprovalStatusOptions()
+    {
+        return array(
+            self::APPROVAL_PENDING => 'Chờ duyệt',
+            self::APPROVAL_APPROVED => 'Đã duyệt',
+            self::APPROVAL_REJECTED => 'Từ chối',
+        );
+    }
+
+    public static function getByRegistrationId($registrationId)
+    {
+        $result = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('registration_id' => $registrationId, 'per_page' => 500));
+        if ($result['success'] && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        return array();
+    }
+
+    public function approveViaApi()
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
+        return ApiClient::post($url, array(
+            'approval_status' => self::APPROVAL_APPROVED,
+            'approved_by' => $this->approved_by,
+            'approved_at' => time(),
+        ));
+    }
+
+    public function rejectViaApi($reason)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
+        return ApiClient::post($url, array(
+            'approval_status' => self::APPROVAL_REJECTED,
+            'rejection_reason' => $reason,
+            'approved_by' => $this->approved_by,
+            'approved_at' => time(),
+        ));
     }
 
     /**
