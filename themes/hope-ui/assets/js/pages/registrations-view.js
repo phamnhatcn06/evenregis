@@ -636,6 +636,7 @@ var RegistrationView = (function() {
             var subInfo = [];
             if (staff.department_name) subInfo.push(staff.department_name);
             if (staff.position) subInfo.push(staff.position);
+            if (staff.start_date) subInfo.push('Vào: ' + staff.start_date);
             item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
                 (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
