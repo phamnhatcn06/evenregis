@@ -992,7 +992,7 @@ class RegistrationsController extends AdminController
 		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
 		$attendee->join_hotel_date = Yii::app()->getRequest()->getPost('join_hotel_date');
-		$attendee->check_in_date = Yii::app()->getRequest()->getPost('arrival_date');
+		$attendee->check_in_date = Yii::app()->getRequest()->getPost('check_in_date');
 		$attendee->check_out_date = Yii::app()->getRequest()->getPost('check_out_date');
 		$attendee->transport_id = Yii::app()->getRequest()->getPost('transport_id');
 
