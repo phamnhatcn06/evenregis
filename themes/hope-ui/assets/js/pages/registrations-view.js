@@ -486,6 +486,12 @@ var RegistrationView = (function() {
 
                     if (data.success) {
                         Toast.success(data.message || 'Thêm thành công.');
+                        // Thêm các staff đã chọn vào existingStaffIds để không hiện lại
+                        attendeeSelectedStaff.forEach(function(staff) {
+                            if (existingStaffIds.indexOf(parseInt(staff.id)) === -1) {
+                                existingStaffIds.push(parseInt(staff.id));
+                            }
+                        });
                         bootstrap.Modal.getInstance(document.getElementById('addAttendeeFromStaffModal')).hide();
                         reloadAttendeesTable();
                         resetAttendeeStaffSelection();
