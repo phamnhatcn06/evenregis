@@ -439,11 +439,207 @@ var RegistrationView = (function() {
         });
     }
 
+    function bindAttendeeEvents() {
+        var searchInput = document.getElementById('attendee_staff_search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                filterAttendeeStaffList(this.value);
+            });
+        }
+
+        document.getElementById('btn_add_attendee_staff')?.addEventListener('click', addSelectedAttendeeStaff);
+        document.getElementById('btn_add_all_attendee_staff')?.addEventListener('click', addAllAttendeeStaff);
+        document.getElementById('btn_remove_attendee_staff')?.addEventListener('click', removeSelectedAttendeeStaff);
+        document.getElementById('btn_remove_all_attendee_staff')?.addEventListener('click', removeAllAttendeeStaff);
+
+        var form = document.getElementById('add-attendees-staff-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (attendeeSelectedStaff.length === 0) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn ít nhất một nhân viên.');
+                    return false;
+                }
+            });
+        }
+    }
+
+    function loadAttendeeStaffList() {
+        var availableList = document.getElementById('attendee_available_staff_list');
+        if (!availableList) return;
+
+        availableList.innerHTML = '<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
+
+        fetch(window.BASE_URL + '/admin/registrations/getStaffByProperty?property_id=' + propertyId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                attendeeAllStaff = data.success && data.data ? data.data : [];
+                attendeeSelectedStaff = [];
+                renderAttendeeAvailableStaff();
+                renderAttendeeSelectedStaff();
+            });
+    }
+
+    function renderAttendeeAvailableStaff() {
+        var list = document.getElementById('attendee_available_staff_list');
+        if (!list) return;
+
+        var searchTerm = (document.getElementById('attendee_staff_search')?.value || '').toLowerCase();
+
+        var available = attendeeAllStaff.filter(function(s) {
+            return attendeeSelectedStaff.findIndex(function(sel) { return sel.id == s.id; }) === -1;
+        });
+
+        if (searchTerm) {
+            available = available.filter(function(s) {
+                return s.display.toLowerCase().indexOf(searchTerm) !== -1;
+            });
+        }
+
+        if (available.length === 0) {
+            list.innerHTML = '<div class="text-center text-muted p-3">Không có nhân viên</div>';
+            return;
+        }
+
+        list.innerHTML = '';
+        available.forEach(function(staff) {
+            var item = document.createElement('a');
+            item.href = '#';
+            item.className = 'list-group-item list-group-item-action py-2';
+            item.setAttribute('data-id', staff.id);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
+                (staff.position ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(staff.position) + '</span>' : '');
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.classList.toggle('active');
+            });
+            list.appendChild(item);
+        });
+    }
+
+    function renderAttendeeSelectedStaff() {
+        var list = document.getElementById('attendee_selected_staff_list');
+        if (!list) return;
+
+        var countSpan = document.getElementById('attendee_selected_count');
+        if (countSpan) countSpan.textContent = attendeeSelectedStaff.length;
+
+        removeAttendeeHiddenInputs();
+
+        if (attendeeSelectedStaff.length === 0) {
+            list.innerHTML = '<div class="text-center text-muted p-3">Chưa chọn nhân viên nào</div>';
+            return;
+        }
+
+        list.innerHTML = '';
+        attendeeSelectedStaff.forEach(function(staff) {
+            var item = document.createElement('a');
+            item.href = '#';
+            item.className = 'list-group-item list-group-item-action py-2';
+            item.setAttribute('data-id', staff.id);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>';
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.classList.toggle('active');
+            });
+            list.appendChild(item);
+
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'staff_ids[]';
+            hidden.value = staff.id;
+            document.getElementById('add-attendees-staff-form').appendChild(hidden);
+        });
+    }
+
+    function removeAttendeeHiddenInputs() {
+        var form = document.getElementById('add-attendees-staff-form');
+        if (!form) return;
+        var inputs = form.querySelectorAll('input[name="staff_ids[]"]');
+        inputs.forEach(function(input) { input.remove(); });
+    }
+
+    function addSelectedAttendeeStaff() {
+        var list = document.getElementById('attendee_available_staff_list');
+        var actives = list.querySelectorAll('.active');
+
+        actives.forEach(function(el) {
+            var id = el.getAttribute('data-id');
+            var staff = attendeeAllStaff.find(function(s) { return s.id == id; });
+            if (staff) {
+                attendeeSelectedStaff.push(staff);
+            }
+            el.classList.remove('active');
+        });
+
+        renderAttendeeAvailableStaff();
+        renderAttendeeSelectedStaff();
+    }
+
+    function addAllAttendeeStaff() {
+        var available = attendeeAllStaff.filter(function(s) {
+            return attendeeSelectedStaff.findIndex(function(sel) { return sel.id == s.id; }) === -1;
+        });
+
+        available.forEach(function(staff) {
+            attendeeSelectedStaff.push(staff);
+        });
+
+        renderAttendeeAvailableStaff();
+        renderAttendeeSelectedStaff();
+    }
+
+    function removeSelectedAttendeeStaff() {
+        var list = document.getElementById('attendee_selected_staff_list');
+        var actives = list.querySelectorAll('.active');
+
+        actives.forEach(function(el) {
+            var id = el.getAttribute('data-id');
+            attendeeSelectedStaff = attendeeSelectedStaff.filter(function(s) { return s.id != id; });
+        });
+
+        renderAttendeeAvailableStaff();
+        renderAttendeeSelectedStaff();
+    }
+
+    function removeAllAttendeeStaff() {
+        attendeeSelectedStaff = [];
+        renderAttendeeAvailableStaff();
+        renderAttendeeSelectedStaff();
+    }
+
+    function filterAttendeeStaffList(term) {
+        renderAttendeeAvailableStaff();
+    }
+
+    function editAttendee(id) {
+        window.location.href = window.BASE_URL + '/admin/attendees/update/id/' + id;
+    }
+
+    function confirmDeleteAttendee(attId) {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: 'Bạn có chắc chắn muốn xóa người tham dự này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById('delete-attendee-form-' + attId).submit();
+            }
+        });
+    }
+
     return {
         init: init,
         resetAddModal: resetAddModal,
         resetCompetitionModal: resetCompetitionModal,
         viewDocument: viewDocument,
-        confirmDeleteDetail: confirmDeleteDetail
+        confirmDeleteDetail: confirmDeleteDetail,
+        editAttendee: editAttendee,
+        confirmDeleteAttendee: confirmDeleteAttendee
     };
 })();
