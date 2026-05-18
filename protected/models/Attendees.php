@@ -18,6 +18,11 @@ class Attendees extends BaseAttendees
     public $property_code;
     public $role_name;
     public $staff_code;
+    public $start_date;
+    public $arrival_date;
+    public $departure_date;
+    public $transport_id;
+    public $transport_name;
 
     public static function model($className = __CLASS__)
     {
