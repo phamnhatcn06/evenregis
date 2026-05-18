@@ -183,6 +183,102 @@ $perColumn = ceil($totalAttrs / $columns);
 </div>
 
 <?php
+// Load attendees
+$attendees = Attendees::getByRegistrationId($model->id);
+$property = Properties::fetchFromApi($model->property_id);
+$isHotel = $property && !empty($property->smile_code);
+
+// Load roles for dropdown
+$rolesData = Roles::getApiDataProvider(array(), 100)->getData();
+$roles = array();
+foreach ($rolesData as $r) {
+    $rId = isset($r['id']) ? $r['id'] : (isset($r->id) ? $r->id : null);
+    $rName = isset($r['name']) ? $r['name'] : (isset($r->name) ? $r->name : '');
+    if ($rId) $roles[$rId] = $rName;
+}
+?>
+
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự (<?php echo count($attendees); ?>)</h5>
+        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+            <div>
+                <?php if ($isHotel): ?>
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAttendeeFromStaffModal">
+                        <i class="fa fa-user-plus me-1"></i>Chọn từ danh sách nhân viên
+                    </button>
+                <?php else: ?>
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAttendeeManualModal">
+                        <i class="fa fa-user-plus me-1"></i>Thêm người tham dự
+                    </button>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <div class="card-body">
+        <?php if (empty($attendees)): ?>
+            <p class="text-muted mb-0">Chưa có người tham dự nào.</p>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:50px;">STT</th>
+                            <th style="width:80px;">Ảnh</th>
+                            <th>Họ tên</th>
+                            <th>Chức danh</th>
+                            <th>Vai trò</th>
+                            <th style="width:120px;">Trạng thái</th>
+                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                                <th style="width:80px;"></th>
+                            <?php endif; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($attendees as $idx => $att):
+                            $attId = isset($att['id']) ? $att['id'] : '';
+                            $fullName = isset($att['full_name']) ? $att['full_name'] : '';
+                            $position = isset($att['position']) ? $att['position'] : '';
+                            $roleName = isset($att['role_name']) ? $att['role_name'] : '';
+                            $photoPath = isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
+                            $approvalStatus = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
+                        ?>
+                            <tr>
+                                <td class="text-center"><?php echo $idx + 1; ?></td>
+                                <td class="text-center">
+                                    <?php if ($photoPath): ?>
+                                        <img src="<?php echo CHtml::encode($photoPath); ?>" class="rounded" style="width:50px;height:50px;object-fit:cover;">
+                                    <?php else: ?>
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:50px;height:50px;">
+                                            <i class="fa fa-user text-muted"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo CHtml::encode($fullName); ?></td>
+                                <td><?php echo CHtml::encode($position); ?></td>
+                                <td><?php echo CHtml::encode($roleName); ?></td>
+                                <td><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
+                                <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(<?php echo $attId; ?>)" title="Sửa">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAttendee(<?php echo $attId; ?>)" title="Xóa">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        <form method="post" action="<?php echo $this->createUrl('deleteAttendee', array('id' => $attId, 'registration_id' => $model->id)); ?>" id="delete-attendee-form-<?php echo $attId; ?>" style="display:none;"></form>
+                                    </td>
+                                <?php endif; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php
 // Nhóm chi tiết đăng ký theo loại nội dung
 $detailsByContent = array();
 foreach ($registrationDetails as $detail) {
