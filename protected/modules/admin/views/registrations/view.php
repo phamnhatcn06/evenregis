@@ -68,16 +68,16 @@ if (!empty($model->document)) {
 }
 
 $totalAttrs = count($attributes);
-if ($totalAttrs <= 4) {
-    $colClass = 'col-12';
-    $columns = 1;
-} elseif ($totalAttrs <= 8) {
-    $colClass = 'col-md-6';
-    $columns = 2;
-} else {
-    $colClass = 'col-md-4';
-    $columns = 3;
-}
+// if ($totalAttrs <= 4) {
+//     $colClass = 'col-12';
+//     $columns = 1;
+// } elseif ($totalAttrs <= 8) {
+//     $colClass = 'col-md-6';
+//     $columns = 2;
+// } else {
+$colClass = 'col-md-4';
+$columns = 3;
+// }
 $perColumn = ceil($totalAttrs / $columns);
 ?>
 

@@ -579,9 +579,8 @@ class RegistrationsController extends AdminController
 				$id = isset($staff['id']) ? $staff['id'] : (isset($staff->id) ? $staff->id : null);
 				$fullName = isset($staff['full_name']) ? $staff['full_name'] : (isset($staff->full_name) ? $staff->full_name : '');
 				$positionName = isset($staff['position_name']) ? $staff['position_name'] : (isset($staff->position_name) ? $staff->position_name : '');
+				$divisionName = isset($staff['division_name']) ? $staff['division_name'] : (isset($staff->division_name) ? $staff->division_name : '');
 				$code = isset($staff['code']) ? $staff['code'] : (isset($staff->code) ? $staff->code : '');
-				$divisionCode = isset($staff['division_code']) ? $staff['division_code'] : (isset($staff->division_code) ? $staff->division_code : '');
-				$departmentName = Departments::getDepartmentName($property->code, $divisionCode);
 
 				if (!$id) continue;
 
@@ -589,9 +588,8 @@ class RegistrationsController extends AdminController
 					'id' => $id,
 					'name' => $fullName,
 					'position' => $positionName,
+					'department_name' => $divisionName,
 					'code' => $code,
-					'division_code' => $divisionCode,
-					'department_name' => $departmentName,
 					'display' => $code ? ($code . ' - ' . $fullName) : $fullName,
 				);
 			}
