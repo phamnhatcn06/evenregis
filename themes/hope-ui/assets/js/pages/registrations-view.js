@@ -718,13 +718,6 @@ var RegistrationView = (function() {
             hiddenId.name = 'staff_ids[]';
             hiddenId.value = staff.id;
             form.appendChild(hiddenId);
-
-            // Hidden input for start_date
-            var hiddenStartDate = document.createElement('input');
-            hiddenStartDate.type = 'hidden';
-            hiddenStartDate.name = 'start_dates[]';
-            hiddenStartDate.value = staff.start_date || '';
-            form.appendChild(hiddenStartDate);
         });
     }
 
