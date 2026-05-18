@@ -198,7 +198,7 @@ foreach ($rolesData as $r) {
 }
 ?>
 
-<div class="card mb-3">
+<div class="card mb-3" id="attendees-card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự (<?php echo count($attendees); ?>)</h5>
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
@@ -216,25 +216,25 @@ foreach ($rolesData as $r) {
         <?php endif; ?>
     </div>
     <div class="card-body">
-        <?php if (empty($attendees)): ?>
-            <p class="text-muted mb-0">Chưa có người tham dự nào.</p>
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-sm mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width:50px;">STT</th>
-                            <th style="width:80px;">Ảnh</th>
-                            <th>Họ tên</th>
-                            <th>Chức danh</th>
-                            <th>Vai trò</th>
-                            <th style="width:120px;">Trạng thái</th>
-                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                                <th style="width:80px;"></th>
-                            <?php endif; ?>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-sm mb-0" id="attendees-table">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:50px;">STT</th>
+                        <th style="width:80px;">Ảnh</th>
+                        <th>Họ tên</th>
+                        <th>Phòng ban - Chức danh</th>
+                        <th>Vai trò</th>
+                        <th style="width:120px;">Trạng thái</th>
+                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <th style="width:80px;"></th>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($attendees)): ?>
+                        <tr><td colspan="7" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>
+                    <?php else: ?>
                         <?php foreach ($attendees as $idx => $att):
                             $attId = isset($att['id']) ? $att['id'] : '';
                             $fullName = isset($att['full_name']) ? $att['full_name'] : '';
@@ -271,10 +271,10 @@ foreach ($rolesData as $r) {
                                 <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
