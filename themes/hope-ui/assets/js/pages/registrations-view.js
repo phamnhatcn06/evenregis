@@ -801,10 +801,14 @@ var RegistrationView = (function() {
                     document.getElementById('edit_department').value = att.department_name || '';
                     document.getElementById('edit_role_id').value = att.role_id || '';
                     document.getElementById('edit_note').value = att.note || '';
-                    document.getElementById('edit_start_date').value = att.start_date || '';
-                    document.getElementById('edit_arrival_date').value = att.arrival_date || '';
-                    document.getElementById('edit_departure_date').value = att.departure_date || '';
+                    document.getElementById('edit_start_date').value = formatDateDisplay(att.start_date);
                     document.getElementById('edit_transport_id').value = att.transport_id || '';
+
+                    // Set flatpickr dates
+                    var arrivalPicker = document.getElementById('edit_arrival_date')._flatpickr;
+                    var departurePicker = document.getElementById('edit_departure_date')._flatpickr;
+                    if (arrivalPicker && att.arrival_date) arrivalPicker.setDate(att.arrival_date, true);
+                    if (departurePicker && att.departure_date) departurePicker.setDate(att.departure_date, true);
 
                     if (att.portrait_path) {
                         showPreview('edit_portrait_preview', att.portrait_path);
