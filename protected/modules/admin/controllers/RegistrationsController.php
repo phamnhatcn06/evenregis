@@ -688,4 +688,165 @@ class RegistrationsController extends AdminController
 
 		$this->redirect(array('view', 'id' => $registrationId));
 	}
+
+	public function actionAddAttendeesFromStaff()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$eventId = Yii::app()->getRequest()->getPost('event_id');
+		$propertyId = Yii::app()->getRequest()->getPost('property_id');
+		$roleId = Yii::app()->getRequest()->getPost('role_id');
+		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
+
+		if (empty($staffIds) || !is_array($staffIds)) {
+			Yii::app()->user->setFlash('error', 'Vui lòng chọn ít nhất một nhân viên.');
+			$this->redirect(array('view', 'id' => $registrationId));
+			return;
+		}
+
+		$successCount = 0;
+		$errorCount = 0;
+
+		foreach ($staffIds as $staffId) {
+			$staff = Staffs::fetchFromApi($staffId);
+			if (!$staff) {
+				$errorCount++;
+				continue;
+			}
+
+			$attendee = new Attendees;
+			$attendee->event_id = $eventId;
+			$attendee->registration_id = $registrationId;
+			$attendee->property_id = $propertyId;
+			$attendee->staff_id = $staffId;
+			$attendee->role_id = $roleId;
+			$attendee->full_name = $staff->full_name;
+			$attendee->position = isset($staff->position_name) ? $staff->position_name : '';
+			$attendee->approval_status = Attendees::APPROVAL_PENDING;
+
+			$result = $attendee->storeViaApi();
+			if ($result['success']) {
+				$successCount++;
+			} else {
+				$errorCount++;
+			}
+		}
+
+		if ($successCount > 0) {
+			Yii::app()->user->setFlash('success', "Đã thêm thành công {$successCount} người tham dự.");
+		}
+		if ($errorCount > 0) {
+			Yii::app()->user->setFlash('warning', "Có {$errorCount} người không thêm được.");
+		}
+
+		$this->redirect(array('view', 'id' => $registrationId));
+	}
+
+	public function actionAddAttendeeManual()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$eventId = Yii::app()->getRequest()->getPost('event_id');
+		$propertyId = Yii::app()->getRequest()->getPost('property_id');
+
+		$attendee = new Attendees;
+		$attendee->event_id = $eventId;
+		$attendee->registration_id = $registrationId;
+		$attendee->property_id = $propertyId;
+		$attendee->full_name = Yii::app()->getRequest()->getPost('full_name');
+		$attendee->position = Yii::app()->getRequest()->getPost('position');
+		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
+		$attendee->note = Yii::app()->getRequest()->getPost('note');
+		$attendee->approval_status = Attendees::APPROVAL_PENDING;
+
+		$uploadedFiles = $this->handleAttendeeDocumentUpload();
+		if (isset($uploadedFiles['portrait_path'])) {
+			$attendee->portrait_path = $uploadedFiles['portrait_path'];
+		}
+		if (isset($uploadedFiles['cccd_front_path'])) {
+			$attendee->cccd_front_path = $uploadedFiles['cccd_front_path'];
+		}
+		if (isset($uploadedFiles['cccd_back_path'])) {
+			$attendee->cccd_back_path = $uploadedFiles['cccd_back_path'];
+		}
+		if (isset($uploadedFiles['contract_path'])) {
+			$attendee->contract_path = $uploadedFiles['contract_path'];
+		}
+
+		$result = $attendee->storeViaApi();
+
+		if ($result['success']) {
+			Yii::app()->user->setFlash('success', 'Đã thêm người tham dự thành công.');
+		} else {
+			Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể thêm người tham dự.');
+		}
+
+		$this->redirect(array('view', 'id' => $registrationId));
+	}
+
+	protected function handleAttendeeDocumentUpload()
+	{
+		$result = array();
+		$uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/attendees/';
+		if (!is_dir($uploadDir)) {
+			mkdir($uploadDir, 0755, true);
+		}
+
+		$fileFields = array(
+			'portrait_file' => 'portrait_path',
+			'cccd_front_file' => 'cccd_front_path',
+			'cccd_back_file' => 'cccd_back_path',
+			'contract_file' => 'contract_path',
+		);
+
+		$allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
+		$maxSize = 5 * 1024 * 1024;
+
+		foreach ($fileFields as $fieldName => $attrName) {
+			if (!isset($_FILES[$fieldName]) || $_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
+				continue;
+			}
+
+			$ext = strtolower(pathinfo($_FILES[$fieldName]['name'], PATHINFO_EXTENSION));
+			if (!in_array($ext, $allowedTypes)) {
+				continue;
+			}
+
+			if ($_FILES[$fieldName]['size'] > $maxSize) {
+				continue;
+			}
+
+			$filename = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+			$filepath = $uploadDir . $filename;
+
+			if (move_uploaded_file($_FILES[$fieldName]['tmp_name'], $filepath)) {
+				$result[$attrName] = Yii::app()->baseUrl . '/uploads/attendees/' . $filename;
+			}
+		}
+
+		return $result;
+	}
+
+	public function actionDeleteAttendee($id, $registration_id)
+	{
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$result = Attendees::deleteViaApi($id);
+
+			if ($result['success']) {
+				Yii::app()->user->setFlash('success', 'Xóa người tham dự thành công.');
+			} else {
+				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể xóa.');
+			}
+
+			$this->redirect(array('view', 'id' => $registration_id));
+		} else {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+	}
 }
