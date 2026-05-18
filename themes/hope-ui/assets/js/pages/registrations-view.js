@@ -515,9 +515,9 @@ var RegistrationView = (function() {
 
                 var formData = new FormData(form);
 
-                // Ensure flatpickr dates are included (format Y-m-d)
-                formData.set('check_in_date', checkInEl._flatpickr.formatDate(checkInDate, 'Y-m-d'));
-                formData.set('check_out_date', checkOutEl._flatpickr.formatDate(checkOutDate, 'Y-m-d'));
+                // Ensure dates are included
+                formData.set('check_in_date', checkInValue);
+                formData.set('check_out_date', checkOutValue);
 
                 fetch(form.action, {
                     method: 'POST',
