@@ -694,7 +694,8 @@ class RegistrationsController extends AdminController
 	public function actionAddAttendeesFromStaff()
 	{
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
-			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
 		}
 
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
@@ -704,9 +705,8 @@ class RegistrationsController extends AdminController
 		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
 
 		if (empty($staffIds) || !is_array($staffIds)) {
-			Yii::app()->user->setFlash('error', 'Vui lòng chọn ít nhất một nhân viên.');
-			$this->redirect(array('view', 'id' => $registrationId));
-			return;
+			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một nhân viên.'));
+			Yii::app()->end();
 		}
 
 		$successCount = 0;
@@ -732,8 +732,6 @@ class RegistrationsController extends AdminController
 			$attendee->position = isset($staff->position_name) ? $staff->position_name : '';
 			$attendee->approval_status = Attendees::APPROVAL_PENDING;
 
-			Yii::log("AddAttendeesFromStaff - Attendee data: position={$attendee->position}", 'info', 'application.registration');
-
 			$result = $attendee->storeViaApi();
 			if ($result['success']) {
 				$successCount++;
@@ -743,14 +741,21 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		$message = '';
 		if ($successCount > 0) {
-			Yii::app()->user->setFlash('success', "Đã thêm thành công {$successCount} người tham dự.");
+			$message = "Đã thêm thành công {$successCount} người tham dự.";
 		}
 		if ($errorCount > 0) {
-			Yii::app()->user->setFlash('warning', "Có {$errorCount} người không thêm được.");
+			$message .= ($message ? ' ' : '') . "Có {$errorCount} người không thêm được.";
 		}
 
-		$this->redirect(array('view', 'id' => $registrationId));
+		echo CJSON::encode(array(
+			'success' => $successCount > 0,
+			'message' => $message,
+			'added' => $successCount,
+			'failed' => $errorCount,
+		));
+		Yii::app()->end();
 	}
 
 	public function actionAddAttendeeManual()
