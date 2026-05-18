@@ -713,6 +713,10 @@ foreach ($registrationDetails as $d) {
 
 $jsConfig = array(
     'eventId' => $model->event_id ? $model->event_id : null,
+    'registrationId' => $model->id,
+    'propertyId' => $model->property_id,
+    'propertyCode' => isset($model->property_code) ? $model->property_code : '',
+    'isHotel' => $isHotel,
     'registeredSports' => $sportIds,
     'registeredCompetitions' => $competitionIds,
 );
