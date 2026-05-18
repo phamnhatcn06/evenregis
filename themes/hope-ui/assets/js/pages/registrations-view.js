@@ -724,7 +724,7 @@ var RegistrationView = (function() {
     function removeAttendeeHiddenInputs() {
         var form = document.getElementById('add-attendees-staff-form');
         if (!form) return;
-        var inputs = form.querySelectorAll('input[name="staff_ids[]"], input[name="start_dates[]"]');
+        var inputs = form.querySelectorAll('input[name="staff_ids[]"]');
         inputs.forEach(function(input) { input.remove(); });
     }
 
