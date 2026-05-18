@@ -214,20 +214,24 @@ foreach ($transportsData as $t) {
             <table class="table table-bordered table-striped table-sm mb-0" id="attendees-table">
                 <thead class="table-light">
                     <tr>
-                        <th style="width:50px;">STT</th>
-                        <th style="width:80px;">Ảnh</th>
+                        <th style="width:40px;">STT</th>
+                        <th style="width:60px;">Ảnh</th>
                         <th>Họ tên</th>
                         <th>Phòng ban - Chức danh</th>
                         <th>Vai trò</th>
-                        <th style="width:120px;">Trạng thái</th>
+                        <th>Ngày vào làm</th>
+                        <th>Ngày đến</th>
+                        <th>Ngày đi</th>
+                        <th>Phương tiện</th>
+                        <th style="width:90px;">Trạng thái</th>
                         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                            <th style="width:80px;"></th>
+                            <th style="width:70px;"></th>
                         <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($attendees)): ?>
-                        <tr><td colspan="<?php echo $model->status == Registrations::STATUS_DRAFT ? 7 : 6; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>
+                        <tr><td colspan="<?php echo $model->status == Registrations::STATUS_DRAFT ? 11 : 10; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>
                     <?php else: ?>
                         <?php foreach ($attendees as $idx => $att):
                             $attId = isset($att['id']) ? $att['id'] : '';
@@ -236,14 +240,18 @@ foreach ($transportsData as $t) {
                             $roleName = isset($att['role_name']) ? $att['role_name'] : '';
                             $photoPath = isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
                             $approvalStatus = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
+                            $startDate = isset($att['start_date']) ? $att['start_date'] : '';
+                            $arrivalDate = isset($att['arrival_date']) ? $att['arrival_date'] : '';
+                            $departureDate = isset($att['departure_date']) ? $att['departure_date'] : '';
+                            $transportName = isset($att['transport_name']) ? $att['transport_name'] : '';
                         ?>
                             <tr>
                                 <td class="text-center"><?php echo $idx + 1; ?></td>
                                 <td class="text-center">
                                     <?php if ($photoPath): ?>
-                                        <img src="<?php echo CHtml::encode($photoPath); ?>" class="rounded" style="width:50px;height:50px;object-fit:cover;">
+                                        <img src="<?php echo CHtml::encode($photoPath); ?>" class="rounded" style="width:40px;height:40px;object-fit:cover;">
                                     <?php else: ?>
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:50px;height:50px;">
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
                                             <i class="fa fa-user text-muted"></i>
                                         </div>
                                     <?php endif; ?>
@@ -251,6 +259,10 @@ foreach ($transportsData as $t) {
                                 <td><?php echo CHtml::encode($fullName); ?></td>
                                 <td><?php echo CHtml::encode($position); ?></td>
                                 <td><?php echo CHtml::encode($roleName); ?></td>
+                                <td><?php echo $startDate ? date('d/m/Y', strtotime($startDate)) : '-'; ?></td>
+                                <td><?php echo $arrivalDate ? date('d/m/Y', strtotime($arrivalDate)) : '-'; ?></td>
+                                <td><?php echo $departureDate ? date('d/m/Y', strtotime($departureDate)) : '-'; ?></td>
+                                <td><?php echo CHtml::encode($transportName ?: '-'); ?></td>
                                 <td><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
                                 <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                                     <td class="text-center">
