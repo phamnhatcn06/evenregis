@@ -863,6 +863,40 @@ class RegistrationsController extends AdminController
 		}
 	}
 
+	public function actionGetAttendeesList($registration_id)
+	{
+		$attendees = Attendees::getByRegistrationId($registration_id);
+		$result = array();
+
+		foreach ($attendees as $att) {
+			$attId = isset($att['id']) ? $att['id'] : '';
+			$staffId = isset($att['staff_id']) ? $att['staff_id'] : null;
+			$positionName = isset($att['position']) ? $att['position'] : '';
+			$departmentName = '';
+
+			if ($staffId) {
+				$staff = Staffs::fetchFromApi($staffId);
+				if ($staff) {
+					$positionName = isset($staff->position_name) ? $staff->position_name : $positionName;
+					$departmentName = isset($staff->division_name) ? $staff->division_name : '';
+				}
+			}
+
+			$result[] = array(
+				'id' => $attId,
+				'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
+				'position' => $positionName,
+				'department_name' => $departmentName,
+				'role_name' => isset($att['role_name']) ? $att['role_name'] : '',
+				'portrait_path' => isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : ''),
+				'approval_status' => isset($att['approval_status']) ? (int)$att['approval_status'] : 0,
+			);
+		}
+
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
 	public function actionGetAttendeeDetail($id)
 	{
 		$attendee = Attendees::fetchFromApi($id);
