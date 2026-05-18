@@ -489,20 +489,27 @@ var RegistrationView = (function() {
                 var checkInEl = document.getElementById('staff_check_in_date');
                 var checkOutEl = document.getElementById('staff_check_out_date');
 
+                console.log('checkInEl:', checkInEl);
+                console.log('checkInEl._flatpickr:', checkInEl ? checkInEl._flatpickr : null);
+                console.log('checkInEl.value:', checkInEl ? checkInEl.value : null);
+
                 var checkInValue = '';
                 var checkOutValue = '';
 
-                if (checkInEl._flatpickr && checkInEl._flatpickr.selectedDates.length > 0) {
+                if (checkInEl && checkInEl._flatpickr && checkInEl._flatpickr.selectedDates.length > 0) {
                     checkInValue = checkInEl._flatpickr.formatDate(checkInEl._flatpickr.selectedDates[0], 'Y-m-d');
-                } else if (checkInEl.value) {
+                } else if (checkInEl && checkInEl.value) {
                     checkInValue = checkInEl.value;
                 }
 
-                if (checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates.length > 0) {
+                if (checkOutEl && checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates.length > 0) {
                     checkOutValue = checkOutEl._flatpickr.formatDate(checkOutEl._flatpickr.selectedDates[0], 'Y-m-d');
-                } else if (checkOutEl.value) {
+                } else if (checkOutEl && checkOutEl.value) {
                     checkOutValue = checkOutEl.value;
                 }
+
+                console.log('checkInValue:', checkInValue);
+                console.log('checkOutValue:', checkOutValue);
 
                 if (!checkInValue || !checkOutValue) {
                     Toast.error('Vui lòng chọn ngày đến và ngày đi.');
