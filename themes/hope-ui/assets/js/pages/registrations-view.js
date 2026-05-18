@@ -485,13 +485,26 @@ var RegistrationView = (function() {
                     return false;
                 }
 
-                // Validate dates
+                // Get date values - try flatpickr first, then raw value
                 var checkInEl = document.getElementById('staff_check_in_date');
                 var checkOutEl = document.getElementById('staff_check_out_date');
-                var checkInDate = checkInEl._flatpickr ? checkInEl._flatpickr.selectedDates[0] : null;
-                var checkOutDate = checkOutEl._flatpickr ? checkOutEl._flatpickr.selectedDates[0] : null;
 
-                if (!checkInDate || !checkOutDate) {
+                var checkInValue = '';
+                var checkOutValue = '';
+
+                if (checkInEl._flatpickr && checkInEl._flatpickr.selectedDates.length > 0) {
+                    checkInValue = checkInEl._flatpickr.formatDate(checkInEl._flatpickr.selectedDates[0], 'Y-m-d');
+                } else if (checkInEl.value) {
+                    checkInValue = checkInEl.value;
+                }
+
+                if (checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates.length > 0) {
+                    checkOutValue = checkOutEl._flatpickr.formatDate(checkOutEl._flatpickr.selectedDates[0], 'Y-m-d');
+                } else if (checkOutEl.value) {
+                    checkOutValue = checkOutEl.value;
+                }
+
+                if (!checkInValue || !checkOutValue) {
                     Toast.error('Vui lòng chọn ngày đến và ngày đi.');
                     return false;
                 }
