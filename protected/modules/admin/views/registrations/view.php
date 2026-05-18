@@ -233,7 +233,7 @@ foreach ($rolesData as $r) {
                 </thead>
                 <tbody>
                     <?php if (empty($attendees)): ?>
-                        <tr><td colspan="7" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>
+                        <tr><td colspan="<?php echo $model->status == Registrations::STATUS_DRAFT ? 7 : 6; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>
                     <?php else: ?>
                         <?php foreach ($attendees as $idx => $att):
                             $attId = isset($att['id']) ? $att['id'] : '';
