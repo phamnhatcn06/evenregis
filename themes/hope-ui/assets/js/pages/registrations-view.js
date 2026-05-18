@@ -661,23 +661,33 @@ var RegistrationView = (function() {
         }
 
         list.innerHTML = '';
+        var form = document.getElementById('add-attendees-staff-form');
         attendeeSelectedStaff.forEach(function(staff) {
             var item = document.createElement('a');
             item.href = '#';
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', staff.id);
-            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>';
+            var startDateInfo = staff.start_date ? '<br><span class="text-muted" style="font-size:11px;">Ngày vào: ' + staff.start_date + '</span>' : '';
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' + startDateInfo;
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 this.classList.toggle('active');
             });
             list.appendChild(item);
 
-            var hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = 'staff_ids[]';
-            hidden.value = staff.id;
-            document.getElementById('add-attendees-staff-form').appendChild(hidden);
+            // Hidden input for staff_id
+            var hiddenId = document.createElement('input');
+            hiddenId.type = 'hidden';
+            hiddenId.name = 'staff_ids[]';
+            hiddenId.value = staff.id;
+            form.appendChild(hiddenId);
+
+            // Hidden input for start_date
+            var hiddenStartDate = document.createElement('input');
+            hiddenStartDate.type = 'hidden';
+            hiddenStartDate.name = 'start_dates[]';
+            hiddenStartDate.value = staff.start_date || '';
+            form.appendChild(hiddenStartDate);
         });
     }
 
