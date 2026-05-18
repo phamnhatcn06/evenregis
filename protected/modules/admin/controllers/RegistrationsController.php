@@ -904,6 +904,10 @@ class RegistrationsController extends AdminController
 				'role_name' => isset($att['role_name']) ? $att['role_name'] : '',
 				'portrait_path' => isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : ''),
 				'approval_status' => isset($att['approval_status']) ? (int)$att['approval_status'] : 0,
+				'start_date' => isset($att['start_date']) ? $att['start_date'] : '',
+				'arrival_date' => isset($att['arrival_date']) ? $att['arrival_date'] : '',
+				'departure_date' => isset($att['departure_date']) ? $att['departure_date'] : '',
+				'transport_name' => isset($att['transport_name']) ? $att['transport_name'] : '',
 			);
 		}
 
