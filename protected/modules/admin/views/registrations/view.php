@@ -181,6 +181,15 @@ foreach ($rolesData as $r) {
     $rName = isset($r['name']) ? $r['name'] : (isset($r->name) ? $r->name : '');
     if ($rId) $roles[$rId] = $rName;
 }
+
+// Load transports for dropdown
+$transportsData = Transports::getApiDataProvider(array(), 100)->getData();
+$transports = array();
+foreach ($transportsData as $t) {
+    $tId = isset($t['id']) ? $t['id'] : (isset($t->id) ? $t->id : null);
+    $tName = isset($t['name']) ? $t['name'] : (isset($t->name) ? $t->name : '');
+    if ($tId) $transports[$tId] = $tName;
+}
 ?>
 
 <div class="card mb-3" id="attendees-card">
