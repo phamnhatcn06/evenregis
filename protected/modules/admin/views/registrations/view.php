@@ -776,6 +776,14 @@ foreach ($registrationDetails as $d) {
     if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
 }
 
+// Lấy danh sách staff_id đã là attendee
+$existingStaffIds = array();
+foreach ($attendees as $att) {
+    if (!empty($att['staff_id'])) {
+        $existingStaffIds[] = (int)$att['staff_id'];
+    }
+}
+
 $jsConfig = array(
     'eventId' => $model->event_id ? $model->event_id : null,
     'registrationId' => $model->id,
@@ -784,6 +792,7 @@ $jsConfig = array(
     'isHotel' => $isHotel,
     'registeredSports' => $sportIds,
     'registeredCompetitions' => $competitionIds,
+    'existingStaffIds' => $existingStaffIds,
 );
 
 // Register init script
