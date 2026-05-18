@@ -787,6 +787,10 @@ class RegistrationsController extends AdminController
 		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
 		$attendee->approval_status = Attendees::APPROVAL_PENDING;
+		$attendee->start_date = Yii::app()->getRequest()->getPost('start_date');
+		$attendee->arrival_date = Yii::app()->getRequest()->getPost('arrival_date');
+		$attendee->departure_date = Yii::app()->getRequest()->getPost('departure_date');
+		$attendee->transport_id = Yii::app()->getRequest()->getPost('transport_id');
 
 		$uploadedFiles = $this->handleAttendeeDocumentUpload();
 		if (isset($uploadedFiles['portrait_path'])) {
