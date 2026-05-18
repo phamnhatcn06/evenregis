@@ -146,21 +146,13 @@ return array(
         'log' => array(
             'class' => 'CLogRouter',
             'routes' => array(
-                // array(
-                //     'class' => 'CWebLogRoute',
-                // ),
-                // array(
-                //     'class' => 'ext.yii-debug-toolbar.YiiDebugToolbarRoute',
-                //     'ipFilters' => array('127.0.0.1', '::1'),
-                // ),
-                /*
-            array(
-            'class'=>'CFileLogRoute',
-            'levels'=>'trace,log',
-            'categories' => 'system.db.CDbCommand',
-            'logFile' => 'db.log',
+                array(
+                    'class' => 'CFileLogRoute',
+                    'levels' => 'error, warning, info',
+                    'categories' => 'application.*',
+                    'logFile' => 'application.log',
+                ),
             ),
-             */),
         ),
     ),
     // application-level parameters that can be accessed
