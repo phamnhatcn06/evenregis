@@ -554,6 +554,148 @@ $contentConfig = array(
     </div>
 </div>
 
+<!-- Modal Add Attendee from Staff (for Hotels) -->
+<div class="modal fade" id="addAttendeeFromStaffModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form method="post" action="<?php echo $this->createUrl('addAttendeesFromStaff'); ?>" id="add-attendees-staff-form">
+                <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
+                <input type="hidden" name="event_id" value="<?php echo $model->event_id; ?>">
+                <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa fa-users me-2"></i>Chọn nhân viên tham dự</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Vai trò <span class="text-danger">*</span></label>
+                            <select class="form-select" name="role_id" id="staff_role_id" required>
+                                <option value="">-- Chọn vai trò --</option>
+                                <?php foreach ($roles as $rId => $rName): ?>
+                                    <option value="<?php echo $rId; ?>"><?php echo CHtml::encode($rName); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="card h-100">
+                                <div class="card-header py-2">
+                                    <small class="fw-bold">Danh sách nhân viên</small>
+                                    <input type="text" class="form-control form-control-sm mt-2" id="attendee_staff_search" placeholder="Tìm kiếm theo tên, mã NV...">
+                                </div>
+                                <div class="card-body p-0" style="height:350px;overflow-y:auto;">
+                                    <div class="list-group list-group-flush" id="attendee_available_staff_list">
+                                        <div class="text-center text-muted py-5">Đang tải danh sách nhân viên...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+                            <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="btn_add_attendee_staff" title="Thêm">
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="btn_add_all_attendee_staff" title="Thêm tất cả">
+                                <i class="fa fa-angle-double-right"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger mb-2" id="btn_remove_attendee_staff" title="Xóa">
+                                <i class="fa fa-chevron-left"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="btn_remove_all_attendee_staff" title="Xóa tất cả">
+                                <i class="fa fa-angle-double-left"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card h-100">
+                                <div class="card-header py-2">
+                                    <small class="fw-bold">Đã chọn (<span id="attendee_selected_count">0</span>)</small>
+                                </div>
+                                <div class="card-body p-0" style="height:390px;overflow-y:auto;">
+                                    <div class="list-group list-group-flush" id="attendee_selected_staff_list">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success" id="btn_submit_attendees_staff">Thêm người tham dự</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Add Attendee Manual (for non-Hotels) -->
+<div class="modal fade" id="addAttendeeManualModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" action="<?php echo $this->createUrl('addAttendeeManual'); ?>" id="add-attendee-manual-form" enctype="multipart/form-data">
+                <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
+                <input type="hidden" name="event_id" value="<?php echo $model->event_id; ?>">
+                <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa fa-user-plus me-2"></i>Thêm người tham dự</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="full_name" required placeholder="Nhập họ và tên">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Chức danh</label>
+                                <input type="text" class="form-control" name="position" placeholder="Nhập chức danh">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Vai trò <span class="text-danger">*</span></label>
+                                <select class="form-select" name="role_id" required>
+                                    <option value="">-- Chọn vai trò --</option>
+                                    <?php foreach ($roles as $rId => $rName): ?>
+                                        <option value="<?php echo $rId; ?>"><?php echo CHtml::encode($rName); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ghi chú</label>
+                                <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Ảnh chân dung (530x530px) <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="portrait_file" accept="image/*" required>
+                                <small class="text-muted">Ảnh chân dung dùng để in thẻ</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ảnh CCCD mặt trước <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="cccd_front_file" accept="image/*" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ảnh CCCD mặt sau <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="cccd_back_file" accept="image/*" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Hợp đồng lao động</label>
+                                <input type="file" class="form-control" name="contract_file" accept="image/*,.pdf">
+                                <small class="text-muted">File ảnh hoặc PDF</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success">Thêm người tham dự</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <?php
 // Register JS file
 Yii::app()->clientScript->registerScriptFile(
