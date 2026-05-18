@@ -591,7 +591,7 @@ $contentConfig = array(
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control datepicker" name="departure_date" id="staff_departure_date" required placeholder="dd/mm/yyyy" autocomplete="off">
+                            <input type="text" class="form-control datepicker" name="check_out_date" id="staff_departure_date" required placeholder="dd/mm/yyyy" autocomplete="off">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Phương tiện <span class="text-danger">*</span></label>
@@ -718,7 +718,7 @@ $contentConfig = array(
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Ngày đi</label>
-                                        <input type="text" class="form-control datepicker" name="departure_date" id="edit_departure_date" placeholder="dd/mm/yyyy" autocomplete="off">
+                                        <input type="text" class="form-control datepicker" name="check_out_date" id="edit_departure_date" placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
@@ -824,7 +824,7 @@ $contentConfig = array(
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control datepicker" name="departure_date" id="add_departure_date" required placeholder="dd/mm/yyyy" autocomplete="off">
+                                        <input type="text" class="form-control datepicker" name="check_out_date" id="add_departure_date" required placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
