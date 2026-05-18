@@ -676,6 +676,17 @@ var RegistrationView = (function() {
         }
     }
 
+    function bindAddAttendeeModalReset() {
+        var modal = document.getElementById('addAttendeeManualModal');
+        if (!modal) return;
+        modal.addEventListener('show.bs.modal', function() {
+            ['add_portrait_preview', 'add_cccd_front_preview', 'add_cccd_back_preview', 'add_contract_preview'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+        });
+    }
+
     function bindFilePreview() {
         var selectors = '#editAttendeeModal input[type="file"], #addAttendeeManualModal input[type="file"]';
         var fileInputs = document.querySelectorAll(selectors);
