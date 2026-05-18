@@ -715,9 +715,12 @@ class RegistrationsController extends AdminController
 		foreach ($staffIds as $staffId) {
 			$staff = Staffs::fetchFromApi($staffId);
 			if (!$staff) {
+				Yii::log("AddAttendeesFromStaff - Staff not found: {$staffId}", 'error', 'application.registration');
 				$errorCount++;
 				continue;
 			}
+
+			Yii::log("AddAttendeesFromStaff - Staff data: " . json_encode($staff->attributes), 'info', 'application.registration');
 
 			$attendee = new Attendees;
 			$attendee->event_id = $eventId;
@@ -727,12 +730,16 @@ class RegistrationsController extends AdminController
 			$attendee->role_id = $roleId;
 			$attendee->full_name = $staff->full_name;
 			$attendee->position = isset($staff->position_name) ? $staff->position_name : '';
+			$attendee->department = isset($staff->division_name) ? $staff->division_name : '';
 			$attendee->approval_status = Attendees::APPROVAL_PENDING;
+
+			Yii::log("AddAttendeesFromStaff - Attendee data: position={$attendee->position}, department={$attendee->department}", 'info', 'application.registration');
 
 			$result = $attendee->storeViaApi();
 			if ($result['success']) {
 				$successCount++;
 			} else {
+				Yii::log("AddAttendeesFromStaff - Store failed: " . json_encode($result), 'error', 'application.registration');
 				$errorCount++;
 			}
 		}
