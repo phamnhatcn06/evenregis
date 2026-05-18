@@ -849,4 +849,73 @@ class RegistrationsController extends AdminController
 			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
 		}
 	}
+
+	public function actionGetAttendeeDetail($id)
+	{
+		$attendee = Attendees::fetchFromApi($id);
+		if (!$attendee) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$data = array(
+			'id' => $attendee->id,
+			'full_name' => $attendee->full_name,
+			'position' => $attendee->position,
+			'role_id' => $attendee->role_id,
+			'note' => $attendee->note,
+			'portrait_path' => $attendee->portrait_path,
+			'cccd_front_path' => $attendee->cccd_front_path,
+			'cccd_back_path' => $attendee->cccd_back_path,
+			'contract_path' => $attendee->contract_path,
+		);
+
+		echo CJSON::encode(array('success' => true, 'data' => $data));
+		Yii::app()->end();
+	}
+
+	public function actionUpdateAttendeeAjax()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$id = Yii::app()->getRequest()->getPost('attendee_id');
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+
+		$attendee = Attendees::fetchFromApi($id);
+		if (!$attendee) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$attendee->full_name = Yii::app()->getRequest()->getPost('full_name');
+		$attendee->position = Yii::app()->getRequest()->getPost('position');
+		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
+		$attendee->note = Yii::app()->getRequest()->getPost('note');
+
+		$uploadedFiles = $this->handleAttendeeDocumentUpload();
+		if (isset($uploadedFiles['portrait_path'])) {
+			$attendee->portrait_path = $uploadedFiles['portrait_path'];
+		}
+		if (isset($uploadedFiles['cccd_front_path'])) {
+			$attendee->cccd_front_path = $uploadedFiles['cccd_front_path'];
+		}
+		if (isset($uploadedFiles['cccd_back_path'])) {
+			$attendee->cccd_back_path = $uploadedFiles['cccd_back_path'];
+		}
+		if (isset($uploadedFiles['contract_path'])) {
+			$attendee->contract_path = $uploadedFiles['contract_path'];
+		}
+
+		$result = $attendee->updateViaApi();
+
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật thành công.'));
+		} else {
+			echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể cập nhật.'));
+		}
+		Yii::app()->end();
+	}
 }
