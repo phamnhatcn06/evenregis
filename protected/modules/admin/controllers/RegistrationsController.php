@@ -862,10 +862,21 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
+		$departmentName = '';
+		if ($attendee->staff_id) {
+			$staff = Staffs::fetchFromApi($attendee->staff_id);
+			if ($staff) {
+				$propertyCode = isset($staff->property_code) ? $staff->property_code : '';
+				$divisionCode = isset($staff->division_code) ? $staff->division_code : '';
+				$departmentName = Departments::getDepartmentName($propertyCode, $divisionCode);
+			}
+		}
+
 		$data = array(
 			'id' => $attendee->id,
 			'full_name' => $attendee->full_name,
 			'position' => $attendee->position,
+			'department_name' => $departmentName,
 			'role_id' => $attendee->role_id,
 			'note' => $attendee->note,
 			'portrait_path' => $attendee->portrait_path,
