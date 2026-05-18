@@ -731,5 +731,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     function confirmDeleteDetail(id) { RegistrationView.confirmDeleteDetail(id); }
     function resetAddModal() { RegistrationView.resetAddModal(); }
     function resetCompetitionModal() { RegistrationView.resetCompetitionModal(); }
+    function editAttendee(id) { RegistrationView.editAttendee(id); }
+    function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
 ', CClientScript::POS_END);
 ?>
