@@ -447,6 +447,22 @@ var RegistrationView = (function() {
     }
 
     function bindAttendeeEvents() {
+        // Init datepickers for Add Staff modal
+        var staffModal = document.getElementById('addAttendeeFromStaffModal');
+        if (staffModal) {
+            staffModal.addEventListener('shown.bs.modal', function() {
+                if (window.initDatePickers) window.initDatePickers();
+            });
+        }
+
+        // Init datepickers for Add Manual modal
+        var manualModal = document.getElementById('addAttendeeManualModal');
+        if (manualModal) {
+            manualModal.addEventListener('shown.bs.modal', function() {
+                if (window.initDatePickers) window.initDatePickers();
+            });
+        }
+
         var searchInput = document.getElementById('attendee_staff_search');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
