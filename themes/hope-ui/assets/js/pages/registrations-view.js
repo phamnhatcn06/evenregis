@@ -521,8 +521,11 @@ var RegistrationView = (function() {
         var tbody = document.querySelector('#attendees-table tbody');
         if (!tbody) return;
 
+        var hasActionCol = document.querySelector('#attendees-table thead th:last-child:empty') !== null;
+        var colCount = hasActionCol ? 7 : 6;
+
         if (attendees.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="' + colCount + '" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>';
             updateAttendeesCount(0);
             return;
         }
@@ -543,14 +546,18 @@ var RegistrationView = (function() {
                 '<td class="text-center">' + photoHtml + '</td>' +
                 '<td>' + escapeHtml(att.full_name) + '</td>' +
                 '<td>' + escapeHtml(positionDept.join(' - ')) + '</td>' +
-                '<td>' + escapeHtml(att.role_name) + '</td>' +
-                '<td>' + statusLabel + '</td>' +
-                '<td class="text-center">' +
+                '<td>' + escapeHtml(att.role_name || '') + '</td>' +
+                '<td>' + statusLabel + '</td>';
+
+            if (hasActionCol) {
+                html += '<td class="text-center">' +
                     '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(' + att.id + ')" title="Sửa"><i class="fa fa-pencil"></i></button>' +
                     '<button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAttendee(' + att.id + ')" title="Xóa"><i class="fa fa-trash"></i></button>' +
                     '<form method="post" action="' + window.BASE_URL + '/admin/registrations/deleteAttendee/id/' + att.id + '/registration_id/' + registrationId + '" id="delete-attendee-form-' + att.id + '" style="display:none;"></form>' +
-                '</td>' +
-            '</tr>';
+                '</td>';
+            }
+
+            html += '</tr>';
         });
 
         tbody.innerHTML = html;
