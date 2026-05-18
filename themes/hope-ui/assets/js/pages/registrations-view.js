@@ -632,6 +632,7 @@ var RegistrationView = (function() {
                     var att = data.data;
                     document.getElementById('edit_full_name').value = att.full_name || '';
                     document.getElementById('edit_position').value = att.position || '';
+                    document.getElementById('edit_department').value = att.department_name || '';
                     document.getElementById('edit_role_id').value = att.role_id || '';
                     document.getElementById('edit_note').value = att.note || '';
 
