@@ -574,7 +574,7 @@ class RegistrationsController extends AdminController
 
 		$property = Properties::fetchFromApi($property_id);
 		if ($property && $property->code) {
-			$staffs = Staffs::getApiDataProvider(array('property_code' => $property->code), 500)->getData();
+			$staffs = Staffs::getListBeforeJune2026($property->code);
 			foreach ($staffs as $staff) {
 				$id = isset($staff['id']) ? $staff['id'] : (isset($staff->id) ? $staff->id : null);
 				$fullName = isset($staff['full_name']) ? $staff['full_name'] : (isset($staff->full_name) ? $staff->full_name : '');
