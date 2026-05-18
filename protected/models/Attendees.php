@@ -4,10 +4,20 @@ Yii::import('application.models._base.BaseAttendees');
 
 class Attendees extends BaseAttendees
 {
+    const APPROVAL_PENDING = 0;
+    const APPROVAL_APPROVED = 1;
+    const APPROVAL_REJECTED = 2;
+
     public $cccd_front_path;
     public $cccd_back_path;
     public $portrait_path;
     public $contract_path;
+    public $approval_status;
+    public $rejection_reason;
+    public $property_name;
+    public $property_code;
+    public $role_name;
+    public $staff_code;
 
     public static function model($className = __CLASS__)
     {

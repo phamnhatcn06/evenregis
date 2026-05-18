@@ -146,16 +146,29 @@ class MenuHelper
                 'icon' => 'data',
                 'forceGroup' => true,
             ),
+            'properties' => array(
+                'label' => 'Đơn vị',
+                'icon' => 'property',
+                'forceGroup' => true,
+            ),
+
             'events' => array(
-                'label' => 'Triển khai sự kiện',
+                'label' => 'Sự kiện',
                 'icon' => 'activities',
                 'forceGroup' => true,
             ),
-            'activities' => array(
-                'label' => 'Hoạt động',
+
+            'sports' => array(
+                'label' => 'Hoạt động thể thao',
                 'icon' => 'activities',
                 'forceGroup' => true,
             ),
+            'competitions' => array(
+                'label' => 'Cuộc thi nghiệp vụ',
+                'icon' => 'activities',
+                'forceGroup' => true,
+            ),
+
             'reports' => array(
                 'label' => 'Báo cáo',
                 'icon' => 'reports',
