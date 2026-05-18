@@ -801,7 +801,7 @@ var RegistrationView = (function() {
                     document.getElementById('edit_department').value = att.department_name || '';
                     document.getElementById('edit_role_id').value = att.role_id || '';
                     document.getElementById('edit_note').value = att.note || '';
-                    document.getElementById('edit_start_date').value = formatDateDisplay(att.start_date);
+                    document.getElementById('edit_start_date').value = formatDate(att.start_date);
                     document.getElementById('edit_transport_id').value = att.transport_id || '';
 
                     // Set flatpickr dates
