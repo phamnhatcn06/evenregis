@@ -36,6 +36,7 @@ class ApiEndpoints
     const STAFF_DETAIL = '/api/staffs/detail/{id}';
     const STAFF_UPDATE = '/api/staffs/update/{id}';
     const STAFF_DESTROY = '/api/staffs/destroy/{id}';
+    const STAFF_BEFORE_JUNE_2026 = '/api/staffs/list-before-june-2026';
 
     // Banquet Event
     const BANQUET_EVENT_LIST = '/api/banquet-events';

@@ -76,6 +76,7 @@ class Staffs extends BaseStaffs
 		return $result;
 	}
 
+	
 	public static function getApiDataProvider($params = array(), $pageSize = 2500)
 	{
 		return new ApiDataProvider(ApiEndpoints::STAFF_LIST, array(
@@ -85,5 +86,16 @@ class Staffs extends BaseStaffs
 				'pageSize' => $pageSize,
 			),
 		));
+	}
+
+	public static function getListBeforeJune2026($propertyCode)
+	{
+		$result = ApiClient::get(ApiEndpoints::STAFF_BEFORE_JUNE_2026, array(
+			'property_code' => $propertyCode,
+		));
+		if ($result['success'] && isset($result['data'])) {
+			return isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+		}
+		return array();
 	}
 }
