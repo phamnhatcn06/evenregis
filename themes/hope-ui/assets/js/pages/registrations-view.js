@@ -1,5 +1,9 @@
 var RegistrationView = (function() {
     var eventId = null;
+    var registrationId = null;
+    var propertyId = null;
+    var propertyCode = null;
+    var isHotel = false;
     var contentsData = [];
     var registeredSports = [];
     var registeredCompetitions = [];
@@ -7,9 +11,15 @@ var RegistrationView = (function() {
     var selectedStaff = [];
     var maxPerOrg = 0;
     var competitionContentId = null;
+    var attendeeAllStaff = [];
+    var attendeeSelectedStaff = [];
 
     function init(config) {
         eventId = config.eventId;
+        registrationId = config.registrationId;
+        propertyId = config.propertyId;
+        propertyCode = config.propertyCode;
+        isHotel = config.isHotel || false;
         registeredSports = config.registeredSports || [];
         registeredCompetitions = config.registeredCompetitions || [];
 
@@ -18,6 +28,11 @@ var RegistrationView = (function() {
         }
 
         bindCompetitionEvents();
+        bindAttendeeEvents();
+
+        if (isHotel && propertyId) {
+            loadAttendeeStaffList();
+        }
     }
 
     function loadContentsData() {
