@@ -496,26 +496,33 @@ var RegistrationView = (function() {
                 var checkOutEl = document.getElementById('staff_check_out_date');
 
                 console.log('checkInEl:', checkInEl);
-                console.log('checkInEl._flatpickr:', checkInEl ? checkInEl._flatpickr : null);
-                console.log('checkInEl.value:', checkInEl ? checkInEl.value : null);
+                console.log('checkInEl.value:', checkInEl ? checkInEl.value : 'null');
+                console.log('checkInEl._flatpickr:', checkInEl ? checkInEl._flatpickr : 'null');
+                console.log('checkOutEl:', checkOutEl);
+                console.log('checkOutEl.value:', checkOutEl ? checkOutEl.value : 'null');
+                console.log('checkOutEl._flatpickr:', checkOutEl ? checkOutEl._flatpickr : 'null');
 
                 var checkInValue = '';
                 var checkOutValue = '';
 
                 if (checkInEl && checkInEl._flatpickr && checkInEl._flatpickr.selectedDates.length > 0) {
                     checkInValue = checkInEl._flatpickr.formatDate(checkInEl._flatpickr.selectedDates[0], 'Y-m-d');
+                    console.log('Got checkIn from flatpickr');
                 } else if (checkInEl && checkInEl.value) {
                     checkInValue = checkInEl.value;
+                    console.log('Got checkIn from raw value');
                 }
 
                 if (checkOutEl && checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates.length > 0) {
                     checkOutValue = checkOutEl._flatpickr.formatDate(checkOutEl._flatpickr.selectedDates[0], 'Y-m-d');
+                    console.log('Got checkOut from flatpickr');
                 } else if (checkOutEl && checkOutEl.value) {
                     checkOutValue = checkOutEl.value;
+                    console.log('Got checkOut from raw value');
                 }
 
-                console.log('checkInValue:', checkInValue);
-                console.log('checkOutValue:', checkOutValue);
+                console.log('Final checkInValue:', checkInValue);
+                console.log('Final checkOutValue:', checkOutValue);
 
                 if (!checkInValue || !checkOutValue) {
                     Toast.error('Vui lòng chọn ngày đến và ngày đi.');
