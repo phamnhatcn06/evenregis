@@ -262,8 +262,8 @@ foreach ($transportsData as $t) {
                                 <td><?php echo CHtml::encode($position); ?></td>
                                 <td><?php echo CHtml::encode($roleName); ?></td>
                                 <td><?php echo $startDate ? date('d/m/Y', strtotime($startDate)) : '-'; ?></td>
-                                <td><?php echo $arrivalDate ? date('d/m/Y', strtotime($arrivalDate)) : '-'; ?></td>
-                                <td><?php echo $departureDate ? date('d/m/Y', strtotime($departureDate)) : '-'; ?></td>
+                                <td><?php echo $checkInDate ? date('d/m/Y', strtotime($checkInDate)) : '-'; ?></td>
+                                <td><?php echo $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-'; ?></td>
                                 <td><?php echo CHtml::encode($transportName ?: '-'); ?></td>
                                 <td><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
                                 <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
