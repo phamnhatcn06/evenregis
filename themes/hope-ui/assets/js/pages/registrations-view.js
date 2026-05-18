@@ -572,8 +572,8 @@ var RegistrationView = (function() {
                 '<td>' + escapeHtml(positionDept.join(' - ')) + '</td>' +
                 '<td>' + escapeHtml(att.role_name || '') + '</td>' +
                 '<td>' + formatDate(att.start_date) + '</td>' +
-                '<td>' + formatDate(att.arrival_date) + '</td>' +
-                '<td>' + formatDate(att.departure_date) + '</td>' +
+                '<td>' + formatDate(att.check_in_date) + '</td>' +
+                '<td>' + formatDate(att.check_out_date) + '</td>' +
                 '<td>' + escapeHtml(att.transport_name || '-') + '</td>' +
                 '<td>' + statusLabel + '</td>';
 
