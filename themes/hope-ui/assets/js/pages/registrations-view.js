@@ -509,8 +509,11 @@ var RegistrationView = (function() {
             item.href = '#';
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', staff.id);
+            var subInfo = [];
+            if (staff.department_name) subInfo.push(staff.department_name);
+            if (staff.position) subInfo.push(staff.position);
             item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
-                (staff.position ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(staff.position) + '</span>' : '');
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 this.classList.toggle('active');
