@@ -200,6 +200,9 @@ class ApiEndpoints
     const ATTENDEE_UPDATE = '/api/attendees/update/{id}';
     const ATTENDEE_DESTROY = '/api/attendees/destroy/{id}';
     const ATTENDEE_UPLOAD_DOCUMENTS = '/api/attendees/upload-documents/{id}';
+    const ATTENDEE_APPROVE = '/api/attendees/approve/{id}';
+    const ATTENDEE_REJECT = '/api/attendees/reject/{id}';
+    const ATTENDEE_BULK_STORE = '/api/attendees/bulk-store';
 
     // Competition Department
     const COMPETITION_DEPARTMENT_LIST = '/api/competition-departments';
