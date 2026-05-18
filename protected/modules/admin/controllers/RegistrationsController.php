@@ -944,6 +944,10 @@ class RegistrationsController extends AdminController
 			'cccd_front_path' => $attendee->cccd_front_path,
 			'cccd_back_path' => $attendee->cccd_back_path,
 			'contract_path' => $attendee->contract_path,
+			'start_date' => $attendee->start_date,
+			'arrival_date' => $attendee->arrival_date,
+			'departure_date' => $attendee->departure_date,
+			'transport_id' => $attendee->transport_id,
 		);
 
 		echo CJSON::encode(array('success' => true, 'data' => $data));
