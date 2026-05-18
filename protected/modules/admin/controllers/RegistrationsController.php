@@ -706,8 +706,8 @@ class RegistrationsController extends AdminController
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
 		$roleId = Yii::app()->getRequest()->getPost('role_id');
 		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
-		$arrivalDate = Yii::app()->getRequest()->getPost('arrival_date');
-		$departureDate = Yii::app()->getRequest()->getPost('departure_date');
+		$checkInDate = Yii::app()->getRequest()->getPost('check_in_date');
+		$checkOutDate = Yii::app()->getRequest()->getPost('check_out_date');
 		$transportId = Yii::app()->getRequest()->getPost('transport_id');
 
 		if (empty($staffIds) || !is_array($staffIds)) {
@@ -790,8 +790,8 @@ class RegistrationsController extends AdminController
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
 		$eventId = Yii::app()->getRequest()->getPost('event_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
-		$arrivalDate = Yii::app()->getRequest()->getPost('arrival_date');
-		$departureDate = Yii::app()->getRequest()->getPost('departure_date');
+		$checkInDate = Yii::app()->getRequest()->getPost('check_in_date');
+		$checkOutDate = Yii::app()->getRequest()->getPost('check_out_date');
 		$transportId = Yii::app()->getRequest()->getPost('transport_id');
 		$join_hotel_date = Yii::app()->getRequest()->getPost('join_hotel_date');
 
