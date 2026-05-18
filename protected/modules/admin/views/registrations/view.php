@@ -67,118 +67,103 @@ if (!empty($model->document)) {
     }
 }
 
-$totalAttrs = count($attributes);
-// if ($totalAttrs <= 4) {
-//     $colClass = 'col-12';
-//     $columns = 1;
-// } elseif ($totalAttrs <= 8) {
-//     $colClass = 'col-md-6';
-//     $columns = 2;
-// } else {
-$colClass = 'col-md-4';
-$columns = 3;
-// }
-$perColumn = ceil($totalAttrs / $columns);
 ?>
 
-<div class="card mb-3">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin phiếu đăng ký</h5>
-        <div class="btn-group">
-            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                <form method="post" action="<?php echo $this->createUrl('submit', array('id' => $model->id)); ?>" style="display:inline;">
-                    <button type="submit" class="btn btn-sm btn-info" onclick="return confirm('Bạn có chắc muốn nộp phiếu đăng ký này?')">
-                        <i class="fa fa-paper-plane me-1"></i>Nộp đăng ký
-                    </button>
-                </form>
-            <?php endif; ?>
-            <?php if ($model->status == Registrations::STATUS_SUBMITTED): ?>
-                <form method="post" action="<?php echo $this->createUrl('approve', array('id' => $model->id)); ?>" style="display:inline;">
-                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Bạn có chắc muốn phê duyệt phiếu đăng ký này?')">
-                        <i class="fa fa-check me-1"></i>Phê duyệt
-                    </button>
-                </form>
-                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
-                    <i class="fa fa-times me-1"></i>Từ chối
-                </button>
-            <?php endif; ?>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <?php for ($col = 0; $col < $columns; $col++): ?>
-                <div class="<?php echo $colClass; ?>">
-                    <table class="table table-bordered table-striped mb-0">
-                        <tbody>
-                            <?php
-                            $start = $col * $perColumn;
-                            $end = min($start + $perColumn, $totalAttrs);
-                            for ($i = $start; $i < $end; $i++):
-                                $attr = $attributes[$i];
-                            ?>
-                                <tr>
-                                    <th style="width:40%;background:#f8f9fa;"><?php echo CHtml::encode($attr['label']); ?></th>
-                                    <td><?php echo isset($attr['raw']) && $attr['raw'] ? $attr['value'] : CHtml::encode($attr['value']); ?></td>
-                                </tr>
-                            <?php endfor; ?>
-                        </tbody>
-                    </table>
+<div class="row mb-3">
+    <!-- Thông tin chung -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin chung</h5>
+                <div class="btn-group">
+                    <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                        <form method="post" action="<?php echo $this->createUrl('submit', array('id' => $model->id)); ?>" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-info" onclick="return confirm('Bạn có chắc muốn nộp phiếu đăng ký này?')">
+                                <i class="fa fa-paper-plane me-1"></i>Nộp
+                            </button>
+                        </form>
+                    <?php endif; ?>
+                    <?php if ($model->status == Registrations::STATUS_SUBMITTED): ?>
+                        <form method="post" action="<?php echo $this->createUrl('approve', array('id' => $model->id)); ?>" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Bạn có chắc muốn phê duyệt phiếu đăng ký này?')">
+                                <i class="fa fa-check me-1"></i>Duyệt
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                            <i class="fa fa-times me-1"></i>Từ chối
+                        </button>
+                    <?php endif; ?>
                 </div>
-            <?php endfor; ?>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped mb-0">
+                    <tbody>
+                        <?php foreach ($attributes as $attr): ?>
+                            <tr>
+                                <th style="width:35%;background:#f8f9fa;"><?php echo CHtml::encode($attr['label']); ?></th>
+                                <td><?php echo isset($attr['raw']) && $attr['raw'] ? $attr['value'] : CHtml::encode($attr['value']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="card mb-3">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="fa fa-file-text me-2"></i>Tài liệu đính kèm</h5>
-    </div>
-    <div class="card-body">
-        <?php if (!empty($documents)): ?>
-            <div class="row g-3">
-                <?php foreach ($documents as $index => $docUrl):
-                    $filename = basename($docUrl);
-                    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-                    $isImage = in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'webp'));
-                    $isPdf = ($ext === 'pdf');
-                ?>
-                    <div class="col-6 col-md-2">
-                        <div class="card h-100">
-                            <?php if ($isImage): ?>
-                                <img src="<?php echo CHtml::encode($docUrl); ?>" class="card-img-top" style="height:220px;object-fit:cover;cursor:pointer;"
-                                    onclick="viewDocument('<?php echo CHtml::encode($docUrl); ?>', 'image')" title="Click để xem">
-                            <?php else: ?>
-                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:220px;">
-                                    <?php if ($isPdf): ?>
-                                        <i class="fa fa-file-pdf-o fa-3x text-danger"></i>
-                                    <?php elseif (in_array($ext, array('doc', 'docx'))): ?>
-                                        <i class="fa fa-file-word-o fa-3x text-primary"></i>
-                                    <?php else: ?>
-                                        <i class="fa fa-file-o fa-3x text-muted"></i>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endif; ?>
-                            <div class="card-body p-2 text-center">
-                                <small class="text-truncate d-block mb-2" title="<?php echo CHtml::encode($filename); ?>">
-                                    <?php echo CHtml::encode($filename); ?>
-                                </small>
-                                <?php if ($isImage || $isPdf): ?>
-                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                        onclick="viewDocument('<?php echo CHtml::encode($docUrl); ?>', '<?php echo $isImage ? 'image' : 'pdf'; ?>')">
-                                        <i class="fa fa-eye me-1"></i>Xem
-                                    </button>
-                                <?php endif; ?>
-                                <a href="<?php echo CHtml::encode($docUrl); ?>" class="btn btn-sm btn-outline-secondary" download>
-                                    <i class="fa fa-download me-1"></i>Tải
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+    <!-- Tệp đính kèm -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fa fa-file-text me-2"></i>Tệp đính kèm</h5>
             </div>
-        <?php else: ?>
-            <p class="text-muted mb-0">Không có tài liệu đính kèm.</p>
-        <?php endif; ?>
+            <div class="card-body">
+                <?php if (!empty($documents)): ?>
+                    <div class="row g-2">
+                        <?php foreach ($documents as $index => $docUrl):
+                            $filename = basename($docUrl);
+                            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                            $isImage = in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'webp'));
+                            $isPdf = ($ext === 'pdf');
+                        ?>
+                            <div class="col-6 col-md-4">
+                                <div class="card h-100">
+                                    <?php if ($isImage): ?>
+                                        <img src="<?php echo CHtml::encode($docUrl); ?>" class="card-img-top" style="height:120px;object-fit:cover;cursor:pointer;"
+                                            onclick="viewDocument('<?php echo CHtml::encode($docUrl); ?>', 'image')" title="Click để xem">
+                                    <?php else: ?>
+                                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:120px;">
+                                            <?php if ($isPdf): ?>
+                                                <i class="fa fa-file-pdf-o fa-2x text-danger"></i>
+                                            <?php elseif (in_array($ext, array('doc', 'docx'))): ?>
+                                                <i class="fa fa-file-word-o fa-2x text-primary"></i>
+                                            <?php else: ?>
+                                                <i class="fa fa-file-o fa-2x text-muted"></i>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="card-body p-2 text-center">
+                                        <small class="text-truncate d-block mb-1" title="<?php echo CHtml::encode($filename); ?>">
+                                            <?php echo CHtml::encode($filename); ?>
+                                        </small>
+                                        <?php if ($isImage || $isPdf): ?>
+                                            <button type="button" class="btn btn-xs btn-outline-primary"
+                                                onclick="viewDocument('<?php echo CHtml::encode($docUrl); ?>', '<?php echo $isImage ? 'image' : 'pdf'; ?>')">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                        <a href="<?php echo CHtml::encode($docUrl); ?>" class="btn btn-xs btn-outline-secondary" download>
+                                            <i class="fa fa-download"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="text-muted mb-0">Không có tệp đính kèm.</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>
 

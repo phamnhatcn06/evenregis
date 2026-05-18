@@ -4,30 +4,30 @@ Yii::import('application.models._base.BaseStaffs');
 
 class Staffs extends BaseStaffs
 {
-    public $property_name;
-    public $division_name;
-    public $position_name;
-    public $department_code;
+	public $property_name;
+	public $division_name;
+	public $position_name;
+	public $department_code;
 
-    public static function model($className = __CLASS__)
-    {
-        return parent::model($className);
-    }
+	public static function model($className = __CLASS__)
+	{
+		return parent::model($className);
+	}
 
-    public function rules()
-    {
-        $rules = parent::rules();
-        $rules[] = array('department_code', 'length', 'max' => 50);
-        $rules[] = array('department_code', 'safe');
-        return $rules;
-    }
+	public function rules()
+	{
+		$rules = parent::rules();
+		$rules[] = array('department_code', 'length', 'max' => 50);
+		$rules[] = array('department_code', 'safe');
+		return $rules;
+	}
 
-    public function attributeLabels()
-    {
-        $labels = parent::attributeLabels();
-        $labels['department_code'] = Yii::t('app', 'Mã phòng ban');
-        return $labels;
-    }
+	public function attributeLabels()
+	{
+		$labels = parent::attributeLabels();
+		$labels['department_code'] = Yii::t('app', 'Mã phòng ban');
+		return $labels;
+	}
 
 	public static function fetchFromApi($id)
 	{
@@ -37,6 +37,10 @@ class Staffs extends BaseStaffs
 			$data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
 			$model = new self;
 			$model->setAttributes($data, false);
+			$model->position_name = isset($data['position_name']) ? $data['position_name'] : '';
+			$model->division_name = isset($data['division_name']) ? $data['division_name'] : '';
+			$model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
+			$model->department_code = isset($data['department_code']) ? $data['department_code'] : '';
 			$model->id = $id;
 			return $model;
 		}
