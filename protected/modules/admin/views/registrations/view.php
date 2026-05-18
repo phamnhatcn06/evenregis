@@ -796,8 +796,8 @@ $contentConfig = array(
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Ngày bắt đầu làm việc <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" name="start_date" required>
+                                        <label class="form-label">Ngày vào làm <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control datepicker" name="start_date" id="add_start_date" required placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -816,13 +816,13 @@ $contentConfig = array(
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Ngày đến <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" name="arrival_date" required>
+                                        <input type="text" class="form-control datepicker" name="arrival_date" id="add_arrival_date" required placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" name="departure_date" required>
+                                        <input type="text" class="form-control datepicker" name="departure_date" id="add_departure_date" required placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
