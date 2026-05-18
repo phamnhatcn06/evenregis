@@ -613,7 +613,101 @@ var RegistrationView = (function() {
     }
 
     function editAttendee(id) {
-        window.location.href = window.BASE_URL + '/admin/attendees/update/id/' + id;
+        var modal = document.getElementById('editAttendeeModal');
+        if (!modal) {
+            window.location.href = window.BASE_URL + '/admin/attendees/update/id/' + id;
+            return;
+        }
+
+        document.getElementById('edit-attendee-form').reset();
+        document.getElementById('edit_attendee_id').value = id;
+        clearPreviews();
+
+        fetch(window.BASE_URL + '/admin/registrations/getAttendeeDetail?id=' + id)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data) {
+                    var att = data.data;
+                    document.getElementById('edit_full_name').value = att.full_name || '';
+                    document.getElementById('edit_position').value = att.position || '';
+                    document.getElementById('edit_role_id').value = att.role_id || '';
+                    document.getElementById('edit_note').value = att.note || '';
+
+                    if (att.portrait_path) {
+                        showPreview('edit_portrait_preview', att.portrait_path);
+                    }
+                    if (att.cccd_front_path) {
+                        showPreview('edit_cccd_front_preview', att.cccd_front_path);
+                    }
+                    if (att.cccd_back_path) {
+                        showPreview('edit_cccd_back_preview', att.cccd_back_path);
+                    }
+                    if (att.contract_path) {
+                        showPreview('edit_contract_preview', att.contract_path, att.contract_path.indexOf('.pdf') > -1);
+                    }
+
+                    var bsModal = new bootstrap.Modal(modal);
+                    bsModal.show();
+                } else {
+                    Toast.error(data.error || 'Không thể tải thông tin.');
+                }
+            })
+            .catch(function() {
+                Toast.error('Lỗi kết nối.');
+            });
+    }
+
+    function clearPreviews() {
+        ['edit_portrait_preview', 'edit_cccd_front_preview', 'edit_cccd_back_preview', 'edit_contract_preview'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.innerHTML = '';
+        });
+    }
+
+    function showPreview(elementId, url, isPdf) {
+        var el = document.getElementById(elementId);
+        if (!el) return;
+        if (isPdf) {
+            el.innerHTML = '<a href="' + url + '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-file-pdf-o me-1"></i>Xem PDF</a>';
+        } else {
+            el.innerHTML = '<img src="' + url + '" class="img-thumbnail" style="max-height:80px;cursor:pointer;" onclick="RegistrationView.viewDocument(\'' + url + '\', \'image\')">';
+        }
+    }
+
+    function bindEditAttendeeForm() {
+        var form = document.getElementById('edit-attendee-form');
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(form);
+            var btn = document.getElementById('btn_save_attendee');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+
+            fetch(window.BASE_URL + '/admin/registrations/updateAttendeeAjax', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa fa-save me-1"></i>Lưu thay đổi';
+
+                if (data.success) {
+                    Toast.success(data.message || 'Cập nhật thành công.');
+                    bootstrap.Modal.getInstance(document.getElementById('editAttendeeModal')).hide();
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    Toast.error(data.error || 'Không thể cập nhật.');
+                }
+            })
+            .catch(function() {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa fa-save me-1"></i>Lưu thay đổi';
+                Toast.error('Lỗi kết nối.');
+            });
+        });
     }
 
     function confirmDeleteAttendee(attId) {
