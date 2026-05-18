@@ -888,6 +888,27 @@ var RegistrationView = (function() {
                 if (el) el.innerHTML = '';
             });
         });
+
+        // Handle form submission for addAttendeeManualModal
+        var form = document.getElementById('add-attendee-manual-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                var checkInEl = document.getElementById('add_check_in_date');
+                var checkOutEl = document.getElementById('add_check_out_date');
+                var startDateEl = document.getElementById('add_start_date');
+
+                // Set values from flatpickr to hidden inputs
+                if (checkInEl._flatpickr && checkInEl._flatpickr.selectedDates[0]) {
+                    checkInEl.value = checkInEl._flatpickr.formatDate(checkInEl._flatpickr.selectedDates[0], 'Y-m-d');
+                }
+                if (checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates[0]) {
+                    checkOutEl.value = checkOutEl._flatpickr.formatDate(checkOutEl._flatpickr.selectedDates[0], 'Y-m-d');
+                }
+                if (startDateEl && startDateEl._flatpickr && startDateEl._flatpickr.selectedDates[0]) {
+                    startDateEl.value = startDateEl._flatpickr.formatDate(startDateEl._flatpickr.selectedDates[0], 'Y-m-d');
+                }
+            });
+        }
     }
 
     function bindFilePreview() {
