@@ -243,8 +243,8 @@ foreach ($transportsData as $t) {
                             $photoPath = isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
                             $approvalStatus = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
                             $startDate = isset($att['start_date']) ? $att['start_date'] : '';
-                            $arrivalDate = isset($att['arrival_date']) ? $att['arrival_date'] : '';
-                            $departureDate = isset($att['departure_date']) ? $att['departure_date'] : '';
+                            $checkInDate = isset($att['check_in_date']) ? $att['check_in_date'] : '';
+                            $checkOutDate = isset($att['check_out_date']) ? $att['check_out_date'] : '';
                             $transportName = isset($att['transport_name']) ? $att['transport_name'] : '';
                         ?>
                             <tr>
