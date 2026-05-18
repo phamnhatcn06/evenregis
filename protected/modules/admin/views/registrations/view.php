@@ -231,7 +231,9 @@ foreach ($transportsData as $t) {
                 </thead>
                 <tbody>
                     <?php if (empty($attendees)): ?>
-                        <tr><td colspan="<?php echo $model->status == Registrations::STATUS_DRAFT ? 11 : 10; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>
+                        <tr>
+                            <td colspan="<?php echo $model->status == Registrations::STATUS_DRAFT ? 11 : 10; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td>
+                        </tr>
                     <?php else: ?>
                         <?php foreach ($attendees as $idx => $att):
                             $attId = isset($att['id']) ? $att['id'] : '';
@@ -589,7 +591,7 @@ $contentConfig = array(
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control datepicker" name="departure_date" id="staff_departure_date" required placeholder="dd/mm/yyyy" autocomplete="off">
+                            <input type="text" class="form-control datepicker" name="check_out_date" id="staff_check_out_date" required placeholder="dd/mm/yyyy" autocomplete="off">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Phương tiện <span class="text-danger">*</span></label>

@@ -18,9 +18,9 @@ class Attendees extends BaseAttendees
     public $property_code;
     public $role_name;
     public $staff_code;
-    public $start_date;
-    public $arrival_date;
-    public $departure_date;
+    public $join_hotel_date;
+    public $check_in_date;
+    public $check_out_date;
     public $transport_id;
     public $transport_name;
 
@@ -35,7 +35,7 @@ class Attendees extends BaseAttendees
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path', 'length', 'max' => 500);
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path, approval_status, rejection_reason', 'safe');
         $rules[] = array('approval_status, transport_id', 'numerical', 'integerOnly' => true);
-        $rules[] = array('start_date, arrival_date, departure_date, transport_id, transport_name', 'safe');
+        $rules[] = array('join_hotel_date, check_in_date, check_out_date, transport_id, transport_name', 'safe');
         return $rules;
     }
 
@@ -48,6 +48,11 @@ class Attendees extends BaseAttendees
         $labels['contract_path'] = Yii::t('app', 'Hợp đồng lao động');
         $labels['approval_status'] = Yii::t('app', 'Trạng thái duyệt');
         $labels['rejection_reason'] = Yii::t('app', 'Lý do từ chối');
+        $labels['join_hotel_date'] = Yii::t('app', 'Ngày vào khách sạn');
+        $labels['check_in_date'] = Yii::t('app', 'Ngày check-in');
+        $labels['check_out_date'] = Yii::t('app', 'Ngày check-out');
+        $labels['transport_id'] = Yii::t('app', 'Phương tiện');
+        $labels['transport_name'] = Yii::t('app', 'Tên phương tiện');
         return $labels;
     }
 
@@ -156,15 +161,24 @@ class Attendees extends BaseAttendees
         });
         // Thêm các trường không nằm trong attributes
         $extraFields = array(
-            'portrait_path', 'cccd_front_path', 'cccd_back_path', 'contract_path',
-            'approval_status', 'rejection_reason', 'start_date', 'arrival_date',
-            'departure_date', 'transport_id'
+            'portrait_path',
+            'cccd_front_path',
+            'cccd_back_path',
+            'contract_path',
+            'approval_status',
+            'rejection_reason',
+            'join_hotel_date',
+            'check_in_date',
+            'check_out_date',
+            'transport_id'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
                 $data[$field] = $this->$field;
             }
         }
+        Yii::log("Attendees storeViaApi - JSON data: " . json_encode($data), 'info', 'application.registration');
+
         return ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
     }
 
@@ -175,9 +189,16 @@ class Attendees extends BaseAttendees
         });
         // Thêm các trường không nằm trong attributes
         $extraFields = array(
-            'portrait_path', 'cccd_front_path', 'cccd_back_path', 'contract_path',
-            'approval_status', 'rejection_reason', 'start_date', 'arrival_date',
-            'departure_date', 'transport_id'
+            'portrait_path',
+            'cccd_front_path',
+            'cccd_back_path',
+            'contract_path',
+            'approval_status',
+            'rejection_reason',
+            'join_hotel_date',
+            'check_in_date',
+            'check_out_date',
+            'transport_id'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {

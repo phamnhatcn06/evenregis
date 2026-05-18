@@ -699,7 +699,8 @@ class RegistrationsController extends AdminController
 			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
 			Yii::app()->end();
 		}
-
+		print_r($_POST);
+		exit;
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
 		$eventId = Yii::app()->getRequest()->getPost('event_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
@@ -736,11 +737,24 @@ class RegistrationsController extends AdminController
 			$attendee->full_name = $staff->full_name;
 			$attendee->position = isset($staff->position_name) ? $staff->position_name : '';
 			$attendee->approval_status = Attendees::APPROVAL_PENDING;
-			$attendee->start_date = isset($staff->join_hotel_date) ? $staff->join_hotel_date : null;
-			$attendee->arrival_date = $arrivalDate;
-			$attendee->departure_date = $departureDate;
+			$attendee->join_hotel_date = isset($staff->join_hotel_date) ? $staff->join_hotel_date : null;
+			$attendee->check_in_date = $arrivalDate;
+			$attendee->check_out_date = $departureDate;
 			$attendee->transport_id = $transportId;
 
+			$uploadedFiles = $this->handleAttendeeDocumentUpload();
+			if (isset($uploadedFiles['portrait_path'])) {
+				$attendee->portrait_path = $uploadedFiles['portrait_path'];
+			}
+			if (isset($uploadedFiles['cccd_front_path'])) {
+				$attendee->cccd_front_path = $uploadedFiles['cccd_front_path'];
+			}
+			if (isset($uploadedFiles['cccd_back_path'])) {
+				$attendee->cccd_back_path = $uploadedFiles['cccd_back_path'];
+			}
+			if (isset($uploadedFiles['contract_path'])) {
+				$attendee->contract_path = $uploadedFiles['contract_path'];
+			}
 			$result = $attendee->storeViaApi();
 			if ($result['success']) {
 				$successCount++;
@@ -776,6 +790,10 @@ class RegistrationsController extends AdminController
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
 		$eventId = Yii::app()->getRequest()->getPost('event_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
+		$arrivalDate = Yii::app()->getRequest()->getPost('arrival_date');
+		$departureDate = Yii::app()->getRequest()->getPost('departure_date');
+		$transportId = Yii::app()->getRequest()->getPost('transport_id');
+		$join_hotel_date = Yii::app()->getRequest()->getPost('join_hotel_date');
 
 		$attendee = new Attendees;
 		$attendee->event_id = $eventId;
@@ -786,10 +804,10 @@ class RegistrationsController extends AdminController
 		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
 		$attendee->approval_status = Attendees::APPROVAL_PENDING;
-		$attendee->start_date = Yii::app()->getRequest()->getPost('start_date');
-		$attendee->arrival_date = Yii::app()->getRequest()->getPost('arrival_date');
-		$attendee->departure_date = Yii::app()->getRequest()->getPost('departure_date');
-		$attendee->transport_id = Yii::app()->getRequest()->getPost('transport_id');
+		$attendee->join_hotel_date = $join_hotel_date;
+		$attendee->check_in_date = $arrivalDate;
+		$attendee->check_out_date = $departureDate;
+		$attendee->transport_id = $transportId;
 
 		$uploadedFiles = $this->handleAttendeeDocumentUpload();
 		if (isset($uploadedFiles['portrait_path'])) {
@@ -943,9 +961,9 @@ class RegistrationsController extends AdminController
 			'cccd_front_path' => $attendee->cccd_front_path,
 			'cccd_back_path' => $attendee->cccd_back_path,
 			'contract_path' => $attendee->contract_path,
-			'start_date' => $attendee->start_date,
-			'arrival_date' => $attendee->arrival_date,
-			'departure_date' => $attendee->departure_date,
+			'join_hotel_date' => $attendee->join_hotel_date,
+			'check_in_date' => $attendee->check_in_date,
+			'check_out_date' => $attendee->check_out_date,
 			'transport_id' => $attendee->transport_id,
 		);
 
@@ -973,9 +991,9 @@ class RegistrationsController extends AdminController
 		$attendee->position = Yii::app()->getRequest()->getPost('position');
 		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
-		$attendee->start_date = Yii::app()->getRequest()->getPost('start_date');
-		$attendee->arrival_date = Yii::app()->getRequest()->getPost('arrival_date');
-		$attendee->departure_date = Yii::app()->getRequest()->getPost('departure_date');
+		$attendee->join_hotel_date = Yii::app()->getRequest()->getPost('join_hotel_date');
+		$attendee->check_in_date = Yii::app()->getRequest()->getPost('arrival_date');
+		$attendee->check_out_date = Yii::app()->getRequest()->getPost('check_out_date');
 		$attendee->transport_id = Yii::app()->getRequest()->getPost('transport_id');
 
 		$uploadedFiles = $this->handleAttendeeDocumentUpload();
