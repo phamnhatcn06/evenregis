@@ -460,12 +460,116 @@ var RegistrationView = (function() {
         var form = document.getElementById('add-attendees-staff-form');
         if (form) {
             form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
                 if (attendeeSelectedStaff.length === 0) {
-                    e.preventDefault();
-                    alert('Vui lòng chọn ít nhất một nhân viên.');
+                    Toast.error('Vui lòng chọn ít nhất một nhân viên.');
                     return false;
                 }
+
+                var btn = document.getElementById('btn_submit_attendees_staff');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang thêm...';
+
+                var formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Thêm người tham dự';
+
+                    if (data.success) {
+                        Toast.success(data.message || 'Thêm thành công.');
+                        bootstrap.Modal.getInstance(document.getElementById('addAttendeeFromStaffModal')).hide();
+                        reloadAttendeesTable();
+                        resetAttendeeStaffSelection();
+                    } else {
+                        Toast.error(data.error || 'Không thể thêm.');
+                    }
+                })
+                .catch(function() {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Thêm người tham dự';
+                    Toast.error('Lỗi kết nối.');
+                });
             });
+        }
+    }
+
+    function resetAttendeeStaffSelection() {
+        attendeeSelectedStaff = [];
+        document.getElementById('staff_role_id').value = '';
+        renderAttendeeAvailableStaff();
+        renderAttendeeSelectedStaff();
+    }
+
+    function reloadAttendeesTable() {
+        fetch(window.BASE_URL + '/admin/registrations/getAttendeesList?registration_id=' + registrationId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data) {
+                    renderAttendeesTable(data.data);
+                }
+            });
+    }
+
+    function renderAttendeesTable(attendees) {
+        var tbody = document.querySelector('#attendees-table tbody');
+        if (!tbody) return;
+
+        if (attendees.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>';
+            updateAttendeesCount(0);
+            return;
+        }
+
+        var html = '';
+        attendees.forEach(function(att, idx) {
+            var photoHtml = att.portrait_path
+                ? '<img src="' + escapeHtml(att.portrait_path) + '" class="rounded" style="width:50px;height:50px;object-fit:cover;">'
+                : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:50px;height:50px;"><i class="fa fa-user text-muted"></i></div>';
+
+            var statusLabel = getApprovalStatusLabel(att.approval_status);
+            var positionDept = [];
+            if (att.department_name) positionDept.push(att.department_name);
+            if (att.position) positionDept.push(att.position);
+
+            html += '<tr>' +
+                '<td class="text-center">' + (idx + 1) + '</td>' +
+                '<td class="text-center">' + photoHtml + '</td>' +
+                '<td>' + escapeHtml(att.full_name) + '</td>' +
+                '<td>' + escapeHtml(positionDept.join(' - ')) + '</td>' +
+                '<td>' + escapeHtml(att.role_name) + '</td>' +
+                '<td>' + statusLabel + '</td>' +
+                '<td class="text-center">' +
+                    '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(' + att.id + ')" title="Sửa"><i class="fa fa-pencil"></i></button>' +
+                    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAttendee(' + att.id + ')" title="Xóa"><i class="fa fa-trash"></i></button>' +
+                    '<form method="post" action="' + window.BASE_URL + '/admin/registrations/deleteAttendee/id/' + att.id + '/registration_id/' + registrationId + '" id="delete-attendee-form-' + att.id + '" style="display:none;"></form>' +
+                '</td>' +
+            '</tr>';
+        });
+
+        tbody.innerHTML = html;
+        updateAttendeesCount(attendees.length);
+    }
+
+    function getApprovalStatusLabel(status) {
+        var labels = {
+            0: '<span class="badge bg-warning">Chờ duyệt</span>',
+            1: '<span class="badge bg-success">Đã duyệt</span>',
+            2: '<span class="badge bg-danger">Từ chối</span>'
+        };
+        return labels[status] || '<span class="badge bg-secondary">Không xác định</span>';
+    }
+
+    function updateAttendeesCount(count) {
+        var header = document.querySelector('#attendees-card .card-header h5');
+        if (header) {
+            header.innerHTML = '<i class="fa fa-users me-2"></i>Danh sách người tham dự (' + count + ')';
         }
     }
 
