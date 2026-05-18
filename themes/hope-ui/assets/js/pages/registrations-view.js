@@ -532,6 +532,12 @@ var RegistrationView = (function() {
                 formData.set('check_in_date', checkInValue);
                 formData.set('check_out_date', checkOutValue);
 
+                // Debug: log all FormData entries
+                console.log('FormData entries:');
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
                 fetch(form.action, {
                     method: 'POST',
                     body: formData
