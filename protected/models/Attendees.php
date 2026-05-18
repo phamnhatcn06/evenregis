@@ -34,7 +34,8 @@ class Attendees extends BaseAttendees
         $rules = parent::rules();
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path', 'length', 'max' => 500);
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path, approval_status, rejection_reason', 'safe');
-        $rules[] = array('approval_status', 'numerical', 'integerOnly' => true);
+        $rules[] = array('approval_status, transport_id', 'numerical', 'integerOnly' => true);
+        $rules[] = array('start_date, arrival_date, departure_date, transport_id, transport_name', 'safe');
         return $rules;
     }
 
