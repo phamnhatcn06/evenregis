@@ -676,26 +676,18 @@ var RegistrationView = (function() {
     }
 
     function bindFilePreview() {
-        var fileInputs = document.querySelectorAll('input[type="file"][accept*="image"]');
+        var selectors = '#editAttendeeModal input[type="file"], #addAttendeeManualModal input[type="file"]';
+        var fileInputs = document.querySelectorAll(selectors);
         fileInputs.forEach(function(input) {
             input.addEventListener('change', function(e) {
                 var file = e.target.files[0];
                 if (!file) return;
 
-                var previewId = input.name.replace('_file', '_preview');
-                if (input.closest('#editAttendeeModal')) {
-                    previewId = 'edit_' + previewId;
-                } else if (input.closest('#addAttendeeManualModal')) {
-                    previewId = 'add_' + previewId;
-                }
-
+                var baseName = input.name.replace('_file', '_preview');
+                var previewId = input.closest('#editAttendeeModal') ? 'edit_' + baseName : 'add_' + baseName;
                 var previewEl = document.getElementById(previewId);
-                if (!previewEl) {
-                    previewEl = document.createElement('div');
-                    previewEl.id = previewId;
-                    previewEl.className = 'mb-2';
-                    input.parentNode.insertBefore(previewEl, input);
-                }
+
+                if (!previewEl) return;
 
                 if (file.type.startsWith('image/')) {
                     var reader = new FileReader();
