@@ -867,6 +867,11 @@ $contentConfig = array(
 </div>
 
 <?php
+// Register flatpickr
+$baseUrl = Yii::app()->theme->baseUrl;
+Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.css');
+Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.js', CClientScript::POS_END);
+
 // Register JS file
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/pages/registrations-view.js',
