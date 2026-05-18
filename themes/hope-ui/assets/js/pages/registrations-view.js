@@ -947,6 +947,17 @@ var RegistrationView = (function() {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             var formData = new FormData(form);
+
+            // Ensure flatpickr dates are included
+            var checkInEl = document.getElementById('edit_check_in_date');
+            var checkOutEl = document.getElementById('edit_check_out_date');
+            if (checkInEl._flatpickr && checkInEl._flatpickr.selectedDates[0]) {
+                formData.set('check_in_date', checkInEl._flatpickr.formatDate(checkInEl._flatpickr.selectedDates[0], 'Y-m-d'));
+            }
+            if (checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates[0]) {
+                formData.set('check_out_date', checkOutEl._flatpickr.formatDate(checkOutEl._flatpickr.selectedDates[0], 'Y-m-d'));
+            }
+
             var btn = document.getElementById('btn_save_attendee');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
