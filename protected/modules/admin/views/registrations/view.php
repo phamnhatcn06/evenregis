@@ -585,11 +585,11 @@ $contentConfig = array(
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Ngày đến <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="arrival_date" id="staff_arrival_date" required>
+                            <input type="text" class="form-control datepicker" name="arrival_date" id="staff_arrival_date" required placeholder="dd/mm/yyyy" autocomplete="off">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="departure_date" id="staff_departure_date" required>
+                            <input type="text" class="form-control datepicker" name="departure_date" id="staff_departure_date" required placeholder="dd/mm/yyyy" autocomplete="off">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Phương tiện <span class="text-danger">*</span></label>
