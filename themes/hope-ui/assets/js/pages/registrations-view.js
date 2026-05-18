@@ -505,20 +505,34 @@ var RegistrationView = (function() {
                 var checkInValue = '';
                 var checkOutValue = '';
 
-                if (checkInEl && checkInEl._flatpickr && checkInEl._flatpickr.selectedDates.length > 0) {
-                    checkInValue = checkInEl._flatpickr.formatDate(checkInEl._flatpickr.selectedDates[0], 'Y-m-d');
-                    console.log('Got checkIn from flatpickr');
+                // Try multiple sources: selectedDates, hidden input value, or parse from altInput
+                if (checkInEl && checkInEl._flatpickr) {
+                    var fp = checkInEl._flatpickr;
+                    if (fp.selectedDates.length > 0) {
+                        checkInValue = fp.formatDate(fp.selectedDates[0], 'Y-m-d');
+                    } else if (fp.altInput && fp.altInput.value) {
+                        // Parse from altInput (dd/mm/yyyy) to Y-m-d
+                        var parts = fp.altInput.value.split('/');
+                        if (parts.length === 3) {
+                            checkInValue = parts[2] + '-' + parts[1] + '-' + parts[0];
+                        }
+                    }
                 } else if (checkInEl && checkInEl.value) {
                     checkInValue = checkInEl.value;
-                    console.log('Got checkIn from raw value');
                 }
 
-                if (checkOutEl && checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates.length > 0) {
-                    checkOutValue = checkOutEl._flatpickr.formatDate(checkOutEl._flatpickr.selectedDates[0], 'Y-m-d');
-                    console.log('Got checkOut from flatpickr');
+                if (checkOutEl && checkOutEl._flatpickr) {
+                    var fp2 = checkOutEl._flatpickr;
+                    if (fp2.selectedDates.length > 0) {
+                        checkOutValue = fp2.formatDate(fp2.selectedDates[0], 'Y-m-d');
+                    } else if (fp2.altInput && fp2.altInput.value) {
+                        var parts2 = fp2.altInput.value.split('/');
+                        if (parts2.length === 3) {
+                            checkOutValue = parts2[2] + '-' + parts2[1] + '-' + parts2[0];
+                        }
+                    }
                 } else if (checkOutEl && checkOutEl.value) {
                     checkOutValue = checkOutEl.value;
-                    console.log('Got checkOut from raw value');
                 }
 
                 console.log('Final checkInValue:', checkInValue);
