@@ -23,6 +23,7 @@ var RegistrationView = (function() {
         isHotel = config.isHotel || false;
         registeredSports = config.registeredSports || [];
         registeredCompetitions = config.registeredCompetitions || [];
+        existingStaffIds = config.existingStaffIds || [];
 
         if (eventId) {
             loadContentsData();
