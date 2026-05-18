@@ -705,6 +705,10 @@ class RegistrationsController extends AdminController
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
 		$roleId = Yii::app()->getRequest()->getPost('role_id');
 		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
+		$startDates = Yii::app()->getRequest()->getPost('start_dates', array());
+		$arrivalDate = Yii::app()->getRequest()->getPost('arrival_date');
+		$departureDate = Yii::app()->getRequest()->getPost('departure_date');
+		$transportId = Yii::app()->getRequest()->getPost('transport_id');
 
 		if (empty($staffIds) || !is_array($staffIds)) {
 			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một nhân viên.'));
@@ -714,7 +718,7 @@ class RegistrationsController extends AdminController
 		$successCount = 0;
 		$errorCount = 0;
 
-		foreach ($staffIds as $staffId) {
+		foreach ($staffIds as $index => $staffId) {
 			$staff = Staffs::fetchFromApi($staffId);
 			if (!$staff) {
 				Yii::log("AddAttendeesFromStaff - Staff not found: {$staffId}", 'error', 'application.registration');
@@ -733,6 +737,10 @@ class RegistrationsController extends AdminController
 			$attendee->full_name = $staff->full_name;
 			$attendee->position = isset($staff->position_name) ? $staff->position_name : '';
 			$attendee->approval_status = Attendees::APPROVAL_PENDING;
+			$attendee->start_date = isset($startDates[$index]) ? $startDates[$index] : (isset($staff->start_date) ? $staff->start_date : null);
+			$attendee->arrival_date = $arrivalDate;
+			$attendee->departure_date = $departureDate;
+			$attendee->transport_id = $transportId;
 
 			$result = $attendee->storeViaApi();
 			if ($result['success']) {
