@@ -707,7 +707,15 @@ var RegistrationView = (function() {
 
     function addAllAttendeeStaff() {
         var available = attendeeAllStaff.filter(function(s) {
-            return attendeeSelectedStaff.findIndex(function(sel) { return sel.id == s.id; }) === -1;
+            // Loại bỏ đã chọn trong session
+            if (attendeeSelectedStaff.findIndex(function(sel) { return sel.id == s.id; }) !== -1) {
+                return false;
+            }
+            // Loại bỏ đã là attendee
+            if (existingStaffIds.indexOf(parseInt(s.id)) !== -1) {
+                return false;
+            }
+            return true;
         });
 
         available.forEach(function(staff) {
