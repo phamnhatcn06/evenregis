@@ -705,7 +705,6 @@ class RegistrationsController extends AdminController
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
 		$roleId = Yii::app()->getRequest()->getPost('role_id');
 		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
-		$startDates = Yii::app()->getRequest()->getPost('start_dates', array());
 		$arrivalDate = Yii::app()->getRequest()->getPost('arrival_date');
 		$departureDate = Yii::app()->getRequest()->getPost('departure_date');
 		$transportId = Yii::app()->getRequest()->getPost('transport_id');
