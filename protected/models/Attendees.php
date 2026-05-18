@@ -148,6 +148,17 @@ class Attendees extends BaseAttendees
         $data = array_filter($this->attributes, function ($value) {
             return $value !== null && $value !== '';
         });
+        // Thêm các trường không nằm trong attributes
+        $extraFields = array(
+            'portrait_path', 'cccd_front_path', 'cccd_back_path', 'contract_path',
+            'approval_status', 'rejection_reason', 'start_date', 'arrival_date',
+            'departure_date', 'transport_id'
+        );
+        foreach ($extraFields as $field) {
+            if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
+                $data[$field] = $this->$field;
+            }
+        }
         return ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
     }
 
@@ -156,6 +167,17 @@ class Attendees extends BaseAttendees
         $data = array_filter($this->attributes, function ($value) {
             return $value !== null && $value !== '';
         });
+        // Thêm các trường không nằm trong attributes
+        $extraFields = array(
+            'portrait_path', 'cccd_front_path', 'cccd_back_path', 'contract_path',
+            'approval_status', 'rejection_reason', 'start_date', 'arrival_date',
+            'departure_date', 'transport_id'
+        );
+        foreach ($extraFields as $field) {
+            if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
+                $data[$field] = $this->$field;
+            }
+        }
         $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
         return ApiClient::post($url, $data);
     }
