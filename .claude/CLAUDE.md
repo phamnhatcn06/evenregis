@@ -52,6 +52,31 @@ Yii::app()->clientScript->registerScriptFile(
 );
 ```
 
+### View Partial Rules — Tách Modal thành View con
+
+**QUAN TRỌNG**: Khi file view có nhiều modal (Bootstrap Modal), **PHẢI tách** mỗi modal thành file partial riêng để giữ view chính gọn gàng và dễ maintain.
+
+**Quy tắc đặt tên:**
+- File partial: `_modal_{tên_chức_năng}.php` (vd: `_modal_add_sport.php`, `_modal_edit_attendee.php`)
+- Đặt cùng thư mục với view chính
+
+**Cách render:**
+```php
+// Trong view chính
+<?php $this->renderPartial('_modal_add_sport', array('model' => $model)); ?>
+<?php $this->renderPartial('_modal_edit_attendee', array('model' => $model, 'roles' => $roles)); ?>
+```
+
+**Khi nào tách:**
+- View chính có **≥ 2 modal**
+- Mỗi modal có **> 30 dòng HTML**
+- Modal có logic phức tạp (form, dropdown, dual listbox...)
+
+**Lợi ích:**
+- Dễ tìm và sửa modal cụ thể
+- Giảm conflict khi nhiều người cùng sửa
+- Tái sử dụng modal ở nhiều view
+
 ---
 
 ## Project Structure
