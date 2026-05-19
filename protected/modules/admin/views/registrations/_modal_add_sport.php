@@ -14,17 +14,17 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label class="form-label">Đơn vị liên quân <span class="text-danger">*</span></label>
-                                <select class="form-select" id="sport_alliance_id" name="alliance_property_id" required>
-                                    <option value="">-- Chọn đơn vị liên quân --</option>
-                                </select>
-                                <small class="text-muted">Chọn đơn vị để lập đội thi đấu chung</small>
-                            </div>
-                            <div class="mb-3">
                                 <label class="form-label">Môn thể thao <span class="text-danger">*</span></label>
                                 <select class="form-select" id="sport_item_id" name="sport_id" required>
                                     <option value="">-- Chọn môn thể thao --</option>
                                 </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Đơn vị liên quân</label>
+                                <div id="alliance_checkboxes" class="border rounded p-2" style="max-height:200px;overflow-y:auto;">
+                                    <div class="text-muted small">Đang tải...</div>
+                                </div>
+                                <small class="text-muted">Chọn các đơn vị cùng thi đấu (nếu có)</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Tên đội</label>
@@ -37,8 +37,8 @@
                         </div>
                         <div class="col-md-8">
                             <label class="form-label">Chọn người tham dự <span class="text-danger">*</span></label>
-                            <small class="text-muted d-block mb-2">Chỉ hiển thị người có vai trò "Thi đấu thể thao"</small>
-                            <div class="row" id="sport_dual_listbox_wrapper" style="display:none;">
+                            <small class="text-muted d-block mb-2">Danh sách người có vai trò "Thi đấu thể thao" của đơn vị</small>
+                            <div class="row" id="sport_dual_listbox_wrapper">
                                 <div class="col-md-5">
                                     <div class="card h-100">
                                         <div class="card-header py-2">
@@ -47,6 +47,7 @@
                                         </div>
                                         <div class="card-body p-0" style="height:300px;overflow-y:auto;">
                                             <div class="list-group list-group-flush" id="sport_available_attendee_list">
+                                                <div class="text-center text-muted p-3">Đang tải...</div>
                                             </div>
                                         </div>
                                     </div>
@@ -76,10 +77,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div id="sport_attendee_placeholder" class="text-center text-muted py-5">
-                                <i class="fa fa-users fa-3x mb-3"></i>
-                                <p>Vui lòng chọn đơn vị liên quân để hiển thị danh sách người tham dự</p>
                             </div>
                         </div>
                     </div>
