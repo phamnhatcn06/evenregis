@@ -1381,8 +1381,9 @@ var RegistrationView = (function() {
 
     return {
         init: init,
-        resetAddModal: resetAddModal,
+        resetAddModal: resetSportModal,
         resetCompetitionModal: resetCompetitionModal,
+        resetSportModal: resetSportModal,
         viewDocument: viewDocument,
         confirmDeleteDetail: confirmDeleteDetail,
         editAttendee: editAttendee,
