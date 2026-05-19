@@ -416,6 +416,10 @@ class RegistrationsController extends AdminController
 				$properties = Properties::getApiDataProvider(array('region_id' => $property->region_id), 500)->getData();
 				foreach ($properties as $p) {
 					$pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
+					// Loại bỏ đơn vị hiện tại
+					if ($pId == $registration->property_id) {
+						continue;
+					}
 					$result[] = array(
 						'id' => $pId,
 						'code' => isset($p['code']) ? $p['code'] : '',
