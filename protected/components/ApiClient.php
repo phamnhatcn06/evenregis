@@ -50,6 +50,17 @@ class ApiClient extends CComponent
     }
 
     /**
+     * POST multipart request for file uploads
+     * @param string $endpoint
+     * @param array $data Request body (files and data)
+     * @return array
+     */
+    public static function postMultipart($endpoint, $data = array())
+    {
+        return self::request('POST_MULTIPART', $endpoint, array(), $data);
+    }
+
+    /**
      * PUT request
      * @param string $endpoint
      * @param array $data Request body
@@ -101,10 +112,12 @@ class ApiClient extends CComponent
 
         $ch = curl_init($url);
 
-        $headers = array(
-            'Content-Type: application/json',
-            'Accept: application/json',
-        );
+        $headers = array();
+        
+        if ($method !== 'POST_MULTIPART') {
+            $headers[] = 'Content-Type: application/json';
+        }
+        $headers[] = 'Accept: application/json';
 
         if (!empty(self::$apiKey)) {
             $headers[] = 'Authorization: Bearer ' . self::$apiKey;
@@ -123,6 +136,12 @@ class ApiClient extends CComponent
                 $options[CURLOPT_POST] = true;
                 if ($data !== null) {
                     $options[CURLOPT_POSTFIELDS] = json_encode($data);
+                }
+                break;
+            case 'POST_MULTIPART':
+                $options[CURLOPT_POST] = true;
+                if ($data !== null) {
+                    $options[CURLOPT_POSTFIELDS] = $data; // cURL will automatically set Content-Type to multipart/form-data
                 }
                 break;
             case 'PUT':

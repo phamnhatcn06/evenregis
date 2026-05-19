@@ -505,34 +505,34 @@ var RegistrationView = (function() {
                 var checkInValue = '';
                 var checkOutValue = '';
 
-                // Try multiple sources: selectedDates, hidden input value, or parse from altInput
-                if (checkInEl && checkInEl._flatpickr) {
-                    var fp = checkInEl._flatpickr;
-                    if (fp.selectedDates.length > 0) {
-                        checkInValue = fp.formatDate(fp.selectedDates[0], 'Y-m-d');
-                    } else if (fp.altInput && fp.altInput.value) {
-                        // Parse from altInput (dd/mm/yyyy) to Y-m-d
-                        var parts = fp.altInput.value.split('/');
-                        if (parts.length === 3) {
-                            checkInValue = parts[2] + '-' + parts[1] + '-' + parts[0];
-                        }
+                if (checkInEl) {
+                    if (checkInEl._flatpickr && checkInEl._flatpickr.selectedDates.length > 0) {
+                        checkInValue = checkInEl._flatpickr.formatDate(checkInEl._flatpickr.selectedDates[0], 'Y-m-d');
+                    } else if (checkInEl._flatpickr && checkInEl._flatpickr.altInput && checkInEl._flatpickr.altInput.value) {
+                        checkInValue = checkInEl._flatpickr.altInput.value;
+                    } else {
+                        checkInValue = checkInEl.value;
                     }
-                } else if (checkInEl && checkInEl.value) {
-                    checkInValue = checkInEl.value;
                 }
 
-                if (checkOutEl && checkOutEl._flatpickr) {
-                    var fp2 = checkOutEl._flatpickr;
-                    if (fp2.selectedDates.length > 0) {
-                        checkOutValue = fp2.formatDate(fp2.selectedDates[0], 'Y-m-d');
-                    } else if (fp2.altInput && fp2.altInput.value) {
-                        var parts2 = fp2.altInput.value.split('/');
-                        if (parts2.length === 3) {
-                            checkOutValue = parts2[2] + '-' + parts2[1] + '-' + parts2[0];
-                        }
+                if (checkOutEl) {
+                    if (checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates.length > 0) {
+                        checkOutValue = checkOutEl._flatpickr.formatDate(checkOutEl._flatpickr.selectedDates[0], 'Y-m-d');
+                    } else if (checkOutEl._flatpickr && checkOutEl._flatpickr.altInput && checkOutEl._flatpickr.altInput.value) {
+                        checkOutValue = checkOutEl._flatpickr.altInput.value;
+                    } else {
+                        checkOutValue = checkOutEl.value;
                     }
-                } else if (checkOutEl && checkOutEl.value) {
-                    checkOutValue = checkOutEl.value;
+                }
+
+                // If dates are in dd/mm/yyyy format, convert them
+                if (checkInValue && checkInValue.indexOf('/') !== -1) {
+                    var parts = checkInValue.split('/');
+                    if (parts.length === 3) checkInValue = parts[2] + '-' + parts[1] + '-' + parts[0];
+                }
+                if (checkOutValue && checkOutValue.indexOf('/') !== -1) {
+                    var parts = checkOutValue.split('/');
+                    if (parts.length === 3) checkOutValue = parts[2] + '-' + parts[1] + '-' + parts[0];
                 }
 
                 console.log('Final checkInValue:', checkInValue);
@@ -625,8 +625,8 @@ var RegistrationView = (function() {
         var html = '';
         attendees.forEach(function(att, idx) {
             var photoHtml = att.portrait_path
-                ? '<img src="' + escapeHtml(att.portrait_path) + '" class="rounded" style="width:40px;height:40px;object-fit:cover;">'
-                : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:40px;height:40px;"><i class="fa fa-user text-muted"></i></div>';
+                ? '<img src="' + escapeHtml(att.portrait_path) + '" class="rounded" style="width:160px;height:160px;object-fit:cover;cursor:pointer;" onclick="viewDocument(\'' + escapeHtml(att.portrait_path) + '\', \'image\')" title="Click để xem">'
+                : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:160px;height:160px;"><i class="fa fa-user text-muted fa-3x"></i></div>';
 
             var statusLabel = getApprovalStatusLabel(att.approval_status);
             var positionDept = [];
@@ -646,7 +646,20 @@ var RegistrationView = (function() {
                 '<td>' + statusLabel + '</td>';
 
             if (hasActionCol) {
+                var docsBtn = '';
+                var docs = {
+                    portrait: att.portrait_path || att.photo_path || '',
+                    cccd_front: att.cccd_front_path || '',
+                    cccd_back: att.cccd_back_path || '',
+                    contract: att.contract_path || ''
+                };
+                if (docs.portrait || docs.cccd_front || docs.cccd_back || docs.contract) {
+                    var docsJson = escapeHtml(JSON.stringify(docs));
+                    docsBtn = '<button type="button" class="btn btn-sm btn-outline-info me-1" onclick="viewAllDocuments(this)" data-docs="' + docsJson + '" title="Xem tài liệu đính kèm"><i class="fa fa-folder-open-o"></i></button>';
+                }
+                
                 html += '<td class="text-center">' +
+                    docsBtn +
                     '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(' + att.id + ')" title="Sửa"><i class="fa fa-pencil"></i></button>' +
                     '<button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAttendee(' + att.id + ')" title="Xóa"><i class="fa fa-trash"></i></button>' +
                     '<form method="post" action="' + window.BASE_URL + '/admin/registrations/deleteAttendee/id/' + att.id + '/registration_id/' + registrationId + '" id="delete-attendee-form-' + att.id + '" style="display:none;"></form>' +
@@ -1056,6 +1069,47 @@ var RegistrationView = (function() {
             }
         });
     }
+
+    window.viewAllDocuments = function(btn) {
+        try {
+            var docsStr = btn.getAttribute('data-docs');
+            var docs = JSON.parse(docsStr);
+            var html = '';
+            
+            if (docs.portrait) {
+                html += '<div class="mb-4 text-center"><h6>Ảnh chân dung</h6>';
+                html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 530px; height: 530px; object-fit: cover; max-width: 100%;"></div>';
+            }
+            if (docs.cccd_front) {
+                html += '<div class="mb-4 text-center"><h6>Ảnh CCCD mặt trước</h6>';
+                html += '<img src="' + escapeHtml(docs.cccd_front) + '" class="img-fluid rounded" style="max-height: 500px;"></div>';
+            }
+            if (docs.cccd_back) {
+                html += '<div class="mb-4 text-center"><h6>Ảnh CCCD mặt sau</h6>';
+                html += '<img src="' + escapeHtml(docs.cccd_back) + '" class="img-fluid rounded" style="max-height: 500px;"></div>';
+            }
+            if (docs.contract) {
+                html += '<div class="mb-4 text-center"><h6>Hợp đồng lao động</h6>';
+                var isPdf = docs.contract.toLowerCase().indexOf('.pdf') > -1;
+                if (isPdf) {
+                    html += '<iframe src="' + escapeHtml(docs.contract) + '" style="width:100%; height:700px;" frameborder="0"></iframe>';
+                } else {
+                    html += '<img src="' + escapeHtml(docs.contract) + '" class="img-fluid rounded" style="max-height: 700px;">';
+                }
+                html += '</div>';
+            }
+            
+            if (html === '') {
+                html = '<div class="alert alert-info">Không có tài liệu nào.</div>';
+            }
+            
+            document.getElementById('all_documents_viewer').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('allDocumentsModal')).show();
+        } catch (e) {
+            console.error(e);
+            Toast.error('Không thể hiển thị tài liệu.');
+        }
+    };
 
     return {
         init: init,

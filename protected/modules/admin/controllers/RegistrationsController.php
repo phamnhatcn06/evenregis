@@ -742,6 +742,12 @@ class RegistrationsController extends AdminController
 			$attendee->transport_id = $transportId;
 
 			$uploadedFiles = $this->handleAttendeeDocumentUpload();
+			
+			if (isset($uploadedFiles['errors']) && !empty($uploadedFiles['errors'])) {
+				Yii::app()->user->setFlash('error', implode("\n", $uploadedFiles['errors']));
+				$this->redirect(array('view', 'id' => $registrationId));
+			}
+
 			if (isset($uploadedFiles['portrait_path'])) {
 				$attendee->portrait_path = $uploadedFiles['portrait_path'];
 			}
@@ -793,6 +799,9 @@ class RegistrationsController extends AdminController
 		$checkOutDate = Yii::app()->getRequest()->getPost('check_out_date');
 		$transportId = Yii::app()->getRequest()->getPost('transport_id');
 		$join_hotel_date = Yii::app()->getRequest()->getPost('join_hotel_date');
+		if ($join_hotel_date === null) {
+			$join_hotel_date = Yii::app()->getRequest()->getPost('start_date');
+		}
 
 		$attendee = new Attendees;
 		$attendee->event_id = $eventId;
@@ -849,10 +858,15 @@ class RegistrationsController extends AdminController
 		);
 
 		$allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
-		$maxSize = 5 * 1024 * 1024;
+		$maxSize = 10 * 1024 * 1024; // Increase to 10MB to support PDF contracts
 
 		foreach ($fileFields as $fieldName => $attrName) {
-			if (!isset($_FILES[$fieldName]) || $_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
+			if (!isset($_FILES[$fieldName]) || $_FILES[$fieldName]['error'] === UPLOAD_ERR_NO_FILE) {
+				continue;
+			}
+
+			if ($_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
+				$result['errors'][] = "Lỗi khi tải lên {$fieldName}: Mã lỗi " . $_FILES[$fieldName]['error'];
 				continue;
 			}
 
@@ -920,10 +934,11 @@ class RegistrationsController extends AdminController
 				'role_name' => isset($att['role_name']) ? $att['role_name'] : '',
 				'portrait_path' => isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : ''),
 				'approval_status' => isset($att['approval_status']) ? (int)$att['approval_status'] : 0,
-				'start_date' => isset($att['start_date']) ? $att['start_date'] : '',
+				'start_date' => isset($att['join_hotel_date']) ? $att['join_hotel_date'] : (isset($att['start_date']) ? $att['start_date'] : ''),
 				'check_in_date' => isset($att['check_in_date']) ? $att['check_in_date'] : '',
 				'check_out_date' => isset($att['check_out_date']) ? $att['check_out_date'] : '',
 				'transport_name' => isset($att['transport_name']) ? $att['transport_name'] : '',
+				'contract_path' => isset($att['contract_path']) ? $att['contract_path'] : '',
 			);
 		}
 
@@ -961,6 +976,7 @@ class RegistrationsController extends AdminController
 			'cccd_back_path' => $attendee->cccd_back_path,
 			'contract_path' => $attendee->contract_path,
 			'join_hotel_date' => $attendee->join_hotel_date,
+			'start_date' => $attendee->join_hotel_date,
 			'check_in_date' => $attendee->check_in_date,
 			'check_out_date' => $attendee->check_out_date,
 			'transport_id' => $attendee->transport_id,
@@ -990,12 +1006,26 @@ class RegistrationsController extends AdminController
 		$attendee->position = Yii::app()->getRequest()->getPost('position');
 		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
-		$attendee->join_hotel_date = Yii::app()->getRequest()->getPost('join_hotel_date');
+		
+		$joinHotelDate = Yii::app()->getRequest()->getPost('join_hotel_date');
+		if ($joinHotelDate === null) {
+			$joinHotelDate = Yii::app()->getRequest()->getPost('start_date');
+		}
+		if ($joinHotelDate !== null) {
+			$attendee->join_hotel_date = $joinHotelDate;
+		}
+		
 		$attendee->check_in_date = Yii::app()->getRequest()->getPost('check_in_date');
 		$attendee->check_out_date = Yii::app()->getRequest()->getPost('check_out_date');
 		$attendee->transport_id = Yii::app()->getRequest()->getPost('transport_id');
 
 		$uploadedFiles = $this->handleAttendeeDocumentUpload();
+		
+		if (isset($uploadedFiles['errors']) && !empty($uploadedFiles['errors'])) {
+			echo CJSON::encode(array('success' => false, 'error' => implode("\n", $uploadedFiles['errors'])));
+			Yii::app()->end();
+		}
+
 		if (isset($uploadedFiles['portrait_path'])) {
 			$attendee->portrait_path = $uploadedFiles['portrait_path'];
 		}

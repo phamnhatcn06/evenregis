@@ -148,6 +148,14 @@ class Attendees extends BaseAttendees
             $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
             $model = new self;
             $model->setAttributes($data, false);
+            // Map photo_path from API to portrait_path
+            if (isset($data['photo_path'])) {
+                $model->portrait_path = $data['photo_path'];
+            }
+            // Map start_date from API to join_hotel_date
+            if (isset($data['start_date'])) {
+                $model->join_hotel_date = $data['start_date'];
+            }
             $model->id = $id;
             return $model;
         }
@@ -177,6 +185,14 @@ class Attendees extends BaseAttendees
                 $data[$field] = $this->$field;
             }
         }
+        // Map portrait_path to photo_path for API
+        if (isset($this->portrait_path) && $this->portrait_path !== null && $this->portrait_path !== '') {
+            $data['photo_path'] = $this->portrait_path;
+        }
+        // Map join_hotel_date to start_date for API
+        if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
+            $data['start_date'] = $this->join_hotel_date;
+        }
         Yii::log("Attendees storeViaApi - JSON data: " . json_encode($data), 'info', 'application.registration');
 
         return ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
@@ -205,9 +221,21 @@ class Attendees extends BaseAttendees
                 $data[$field] = $this->$field;
             }
         }
+        // Map portrait_path to photo_path for API
+        if (isset($this->portrait_path) && $this->portrait_path !== null && $this->portrait_path !== '') {
+            $data['photo_path'] = $this->portrait_path;
+        }
+        // Map join_hotel_date to start_date for API
+        if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
+            $data['start_date'] = $this->join_hotel_date;
+        }
+
         $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
         return ApiClient::post($url, $data);
     }
+
+
+
 
     public static function deleteViaApi($id)
     {

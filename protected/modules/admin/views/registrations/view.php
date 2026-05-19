@@ -44,7 +44,6 @@ $this->Tabletitle = 'Chi tiết phiếu đăng ký của ' . $model->property_na
 
 <?php
 $attributes = array(
-    array('label' => 'ID', 'value' => $model->id),
     array('label' => 'Sự kiện', 'value' => isset($model->event_name) ? $model->event_name : ''),
     array('label' => 'Đơn vị', 'value' => isset($model->property_name) ? $model->property_name : ''),
     array('label' => 'Đợt đăng ký', 'value' => isset($model->period_name) ? $model->period_name : ''),
@@ -242,7 +241,7 @@ foreach ($transportsData as $t) {
                             $roleName = isset($att['role_name']) ? $att['role_name'] : '';
                             $photoPath = isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
                             $approvalStatus = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
-                            $startDate = isset($att['start_date']) ? $att['start_date'] : '';
+                            $startDate = isset($att['join_hotel_date']) ? $att['join_hotel_date'] : (isset($att['start_date']) ? $att['start_date'] : '');
                             $checkInDate = isset($att['check_in_date']) ? $att['check_in_date'] : '';
                             $checkOutDate = isset($att['check_out_date']) ? $att['check_out_date'] : '';
                             $transportName = isset($att['transport_name']) ? $att['transport_name'] : '';
@@ -251,10 +250,10 @@ foreach ($transportsData as $t) {
                                 <td class="text-center"><?php echo $idx + 1; ?></td>
                                 <td class="text-center">
                                     <?php if ($photoPath): ?>
-                                        <img src="<?php echo CHtml::encode($photoPath); ?>" class="rounded" style="width:40px;height:40px;object-fit:cover;">
+                                        <img src="<?php echo CHtml::encode($photoPath); ?>" class="rounded" style="width:160px;height:160px;object-fit:cover;cursor:pointer;" onclick="viewDocument('<?php echo CHtml::encode($photoPath); ?>', 'image')" title="Click để xem">
                                     <?php else: ?>
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-                                            <i class="fa fa-user text-muted"></i>
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:160px;height:160px;">
+                                            <i class="fa fa-user text-muted fa-3x"></i>
                                         </div>
                                     <?php endif; ?>
                                 </td>
@@ -268,6 +267,18 @@ foreach ($transportsData as $t) {
                                 <td><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
                                 <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                                     <td class="text-center">
+                                        <?php if (!empty($att['contract_path']) || !empty($att['portrait_path']) || !empty($att['cccd_front_path']) || !empty($att['cccd_back_path'])):
+                                            $docs = array(
+                                                'portrait' => isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : ''),
+                                                'cccd_front' => isset($att['cccd_front_path']) ? $att['cccd_front_path'] : '',
+                                                'cccd_back' => isset($att['cccd_back_path']) ? $att['cccd_back_path'] : '',
+                                                'contract' => isset($att['contract_path']) ? $att['contract_path'] : '',
+                                            );
+                                        ?>
+                                            <button type="button" class="btn btn-sm btn-outline-info me-1" onclick="viewAllDocuments(this)" data-docs="<?php echo CHtml::encode(CJSON::encode($docs)); ?>" title="Xem tài liệu đính kèm">
+                                                <i class="fa fa-folder-open-o"></i>
+                                            </button>
+                                        <?php endif; ?>
                                         <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(<?php echo $attId; ?>)" title="Sửa">
                                             <i class="fa fa-pencil"></i>
                                         </button>
@@ -608,6 +619,7 @@ $contentConfig = array(
                             <div class="card h-100">
                                 <div class="card-header py-2">
                                     <small class="fw-bold">Danh sách nhân viên</small>
+                                    <p style="color: red;font-size: 12px;font-weight: bold;">Lưu ý: Danh sách chỉ hiển thị những nhân viên có ngày gia nhập trước ngày 01/06/2026</p>
                                     <input type="text" class="form-control form-control-sm mt-2" id="attendee_staff_search" placeholder="Tìm kiếm theo tên, mã NV...">
                                 </div>
                                 <div class="card-body p-0" style="height:300px;overflow-y:auto;">
@@ -868,6 +880,21 @@ $contentConfig = array(
     </div>
 </div>
 
+<!-- Modal View All Documents -->
+<div class="modal fade" id="allDocumentsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tài liệu đính kèm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="all_documents_viewer">
+                <!-- Content will be injected dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
 // Register flatpickr
 $baseUrl = Yii::app()->theme->baseUrl;
@@ -876,7 +903,7 @@ Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/flatpick
 
 // Register JS file
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/registrations-view.js',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/registrations-view.js?v=' . time(),
     CClientScript::POS_END
 );
 
@@ -924,11 +951,12 @@ Yii::app()->clientScript->registerScript('flatpickr-locale', '
         console.log("initDatePickers called, found elements:", document.querySelectorAll(".datepicker").length);
         document.querySelectorAll(".datepicker").forEach(function(el) {
             console.log("Processing element:", el.id, "already has flatpickr:", !!el._flatpickr);
-            if (el._flatpickr) return;
+            if (el._flatpickr || el.classList.contains("flatpickr-input")) return;
             var fp = flatpickr(el, {
                 dateFormat: "Y-m-d",
                 altInput: true,
                 altFormat: "d/m/Y",
+                altInputClass: "form-control bg-white",
                 allowInput: true,
                 locale: Vietnamese
             });
