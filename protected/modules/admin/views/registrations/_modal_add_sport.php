@@ -18,8 +18,9 @@
                                 <select class="form-select" id="sport_item_id" name="sport_id" required>
                                     <option value="">-- Chọn môn thể thao --</option>
                                 </select>
+                                <div id="sport_selected_name" class="form-control bg-light d-none" style="pointer-events:none;"></div>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3" id="alliance_checkboxes_wrapper">
                                 <label class="form-label">Đơn vị liên quân</label>
                                 <div id="alliance_checkboxes" class="border rounded p-2" style="max-height:200px;overflow-y:auto;">
                                     <div class="text-muted small">Đang tải...</div>
