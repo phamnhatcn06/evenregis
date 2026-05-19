@@ -545,11 +545,11 @@ var RegistrationView = (function() {
 
         sportAllAttendees = [];
         sportSelectedAttendees = [];
-        hideSportDualListbox();
         removeSportHiddenInputs();
 
         loadAllianceProperties();
         loadSportsList();
+        loadSportAttendees();
     }
 
     function escapeHtml(text) {
