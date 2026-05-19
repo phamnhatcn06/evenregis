@@ -488,7 +488,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     });
     function viewDocument(url, type) { RegistrationView.viewDocument(url, type); }
     function confirmDeleteDetail(id) { RegistrationView.confirmDeleteDetail(id); }
-    function resetAddModal() { RegistrationView.resetAddModal(); }
+    function resetSportModal() { RegistrationView.resetSportModal(); }
     function resetCompetitionModal() { RegistrationView.resetCompetitionModal(); }
     function editAttendee(id) { RegistrationView.editAttendee(id); }
     function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
