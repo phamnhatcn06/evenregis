@@ -315,20 +315,6 @@ var RegistrationView = (function() {
     // ==================== SPORT REGISTRATION ====================
 
     function bindSportEvents() {
-        var allianceSelect = document.getElementById('sport_alliance_id');
-        var sportSelect = document.getElementById('sport_item_id');
-
-        if (allianceSelect) {
-            allianceSelect.addEventListener('change', function() {
-                var allianceId = this.value;
-                if (allianceId) {
-                    loadSportAttendees(allianceId);
-                } else {
-                    hideSportDualListbox();
-                }
-            });
-        }
-
         var searchInput = document.getElementById('sport_attendee_search');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
@@ -354,22 +340,25 @@ var RegistrationView = (function() {
     }
 
     function loadAllianceProperties() {
-        var allianceSelect = document.getElementById('sport_alliance_id');
-        if (!allianceSelect) return;
+        var container = document.getElementById('alliance_checkboxes');
+        if (!container) return;
 
-        allianceSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+        container.innerHTML = '<div class="text-muted small">Đang tải...</div>';
 
         fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId)
             .then(function(response) { return response.json(); })
             .then(function(data) {
-                allianceSelect.innerHTML = '<option value="">-- Chọn đơn vị liên quân --</option>';
                 if (data.success && data.data && data.data.length > 0) {
+                    var html = '';
                     data.data.forEach(function(item) {
-                        var opt = document.createElement('option');
-                        opt.value = item.id;
-                        opt.textContent = item.code + ' - ' + item.name;
-                        allianceSelect.appendChild(opt);
+                        html += '<div class="form-check">' +
+                            '<input class="form-check-input" type="checkbox" name="alliance_property_ids[]" value="' + item.id + '" id="alliance_' + item.id + '">' +
+                            '<label class="form-check-label small" for="alliance_' + item.id + '">' + escapeHtml(item.code + ' - ' + item.name) + '</label>' +
+                            '</div>';
                     });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="text-muted small">Không có đơn vị liên quân</div>';
                 }
             });
     }
@@ -391,15 +380,14 @@ var RegistrationView = (function() {
             });
     }
 
-    function loadSportAttendees(alliancePropertyId) {
-        document.getElementById('sport_attendee_placeholder').style.display = 'none';
-        document.getElementById('sport_dual_listbox_wrapper').style.display = 'flex';
-
+    function loadSportAttendees() {
         var availableList = document.getElementById('sport_available_attendee_list');
+        if (!availableList) return;
+
         availableList.innerHTML = '<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
 
-        // Load attendees with sports role from this registration + alliance
-        fetch(window.BASE_URL + '/admin/registrations/getSportAttendees?registration_id=' + registrationId + '&alliance_property_id=' + alliancePropertyId)
+        // Load attendees with sports role from current registration only
+        fetch(window.BASE_URL + '/admin/registrations/getSportAttendees?registration_id=' + registrationId)
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 sportAllAttendees = data.success && data.data ? data.data : [];
@@ -407,15 +395,6 @@ var RegistrationView = (function() {
                 renderSportAvailableAttendees();
                 renderSportSelectedAttendees();
             });
-    }
-
-    function hideSportDualListbox() {
-        var placeholder = document.getElementById('sport_attendee_placeholder');
-        var wrapper = document.getElementById('sport_dual_listbox_wrapper');
-        if (placeholder) placeholder.style.display = 'block';
-        if (wrapper) wrapper.style.display = 'none';
-        sportAllAttendees = [];
-        sportSelectedAttendees = [];
     }
 
     function renderSportAvailableAttendees() {
