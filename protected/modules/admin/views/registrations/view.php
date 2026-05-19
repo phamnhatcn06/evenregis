@@ -209,6 +209,41 @@ foreach ($transportsData as $t) {
         <?php endif; ?>
     </div>
     <div class="card-body">
+        <!-- Filter -->
+        <div class="row mb-3 g-2">
+            <div class="col-md-3">
+                <input type="text" class="form-control form-control-sm" id="filter_name" placeholder="Tìm theo tên...">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-select-sm" id="filter_role">
+                    <option value="">-- Vai trò --</option>
+                    <?php foreach ($roles as $rId => $rName): ?>
+                        <option value="<?php echo CHtml::encode($rName); ?>"><?php echo CHtml::encode($rName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-select-sm" id="filter_status">
+                    <option value="">-- Trạng thái --</option>
+                    <option value="Chờ duyệt">Chờ duyệt</option>
+                    <option value="Đã duyệt">Đã duyệt</option>
+                    <option value="Từ chối">Từ chối</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-select-sm" id="filter_transport">
+                    <option value="">-- Phương tiện --</option>
+                    <?php foreach ($transports as $tId => $tName): ?>
+                        <option value="<?php echo CHtml::encode($tName); ?>"><?php echo CHtml::encode($tName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-3 text-end">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn_reset_filter">
+                    <i class="fa fa-refresh me-1"></i>Xóa lọc
+                </button>
+            </div>
+        </div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-0" id="attendees-table">
                 <thead class="table-light">
