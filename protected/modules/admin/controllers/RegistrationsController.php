@@ -405,6 +405,123 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	public function actionGetAllianceProperties($registration_id)
+	{
+		$registration = Registrations::fetchFromApi($registration_id);
+		$result = array();
+
+		if ($registration && $registration->property_id) {
+			$property = Properties::fetchFromApi($registration->property_id);
+			if ($property && $property->region_id) {
+				$properties = Properties::getApiDataProvider(array('region_id' => $property->region_id), 500)->getData();
+				foreach ($properties as $p) {
+					$pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
+					$result[] = array(
+						'id' => $pId,
+						'code' => isset($p['code']) ? $p['code'] : '',
+						'name' => isset($p['name']) ? $p['name'] : '',
+					);
+				}
+				usort($result, function ($a, $b) {
+					return strcmp($a['code'], $b['code']);
+				});
+			}
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionGetSportAttendees($registration_id, $alliance_property_id)
+	{
+		$result = array();
+
+		// Lấy attendees từ registration hiện tại có role "Thi đấu thể thao"
+		$attendees = Attendees::getByRegistrationId($registration_id);
+		foreach ($attendees as $att) {
+			$roleName = isset($att['role_name']) ? $att['role_name'] : '';
+			if (stripos($roleName, 'thể thao') !== false || stripos($roleName, 'thi đấu') !== false) {
+				$result[] = array(
+					'id' => $att['id'],
+					'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
+					'position' => isset($att['position']) ? $att['position'] : '',
+					'property_id' => $registration_id,
+					'property_name' => 'Đơn vị hiện tại',
+				);
+			}
+		}
+
+		// Nếu có alliance_property_id, lấy thêm attendees từ đơn vị liên quân
+		if ($alliance_property_id) {
+			$allianceRegistrations = Registrations::getApiDataProvider(array('property_id' => $alliance_property_id), 100)->getData();
+			foreach ($allianceRegistrations as $reg) {
+				$regId = isset($reg['id']) ? $reg['id'] : (isset($reg->id) ? $reg->id : null);
+				if ($regId && $regId != $registration_id) {
+					$allianceAttendees = Attendees::getByRegistrationId($regId);
+					$propertyName = isset($reg['property_name']) ? $reg['property_name'] : '';
+					foreach ($allianceAttendees as $att) {
+						$roleName = isset($att['role_name']) ? $att['role_name'] : '';
+						if (stripos($roleName, 'thể thao') !== false || stripos($roleName, 'thi đấu') !== false) {
+							$result[] = array(
+								'id' => $att['id'],
+								'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
+								'position' => isset($att['position']) ? $att['position'] : '',
+								'property_id' => $regId,
+								'property_name' => $propertyName,
+							);
+						}
+					}
+				}
+			}
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionAddSportRegistration()
+	{
+		if (!Yii::app()->request->isPostRequest) {
+			throw new CHttpException(400, 'Bad Request');
+		}
+
+		$registrationId = Yii::app()->request->getPost('registration_id');
+		$sportId = Yii::app()->request->getPost('sport_id');
+		$alliancePropertyId = Yii::app()->request->getPost('alliance_property_id');
+		$teamName = Yii::app()->request->getPost('team_name');
+		$note = Yii::app()->request->getPost('note');
+		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
+		$contentId = Yii::app()->request->getPost('content_id');
+
+		if (!$registrationId || !$sportId || empty($attendeeIds)) {
+			Yii::app()->user->setFlash('error', 'Thiếu thông tin bắt buộc.');
+			$this->redirect(array('view', 'id' => $registrationId));
+			return;
+		}
+
+		$ssoUser = AuthHandler::getUser();
+		$createdBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+
+		// Tạo registration detail
+		$detail = new RegistrationDetails;
+		$detail->registration_id = $registrationId;
+		$detail->content_id = $contentId;
+		$detail->sport_id = $sportId;
+		$detail->quantity = count($attendeeIds);
+		$detail->note = $note;
+
+		$result = $detail->storeViaApi();
+		if ($result['success']) {
+			Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
+		} else {
+			Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể đăng ký.');
+		}
+
+		$this->redirect(array('view', 'id' => $registrationId));
+	}
+
 	public function actionAdmin()
 	{
 		$model = new Registrations('search');
