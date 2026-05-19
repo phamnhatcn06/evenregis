@@ -437,7 +437,7 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
-	public function actionGetSportAttendees($registration_id, $alliance_property_id)
+	public function actionGetSportAttendees($registration_id)
 	{
 		$result = array();
 
@@ -445,38 +445,14 @@ class RegistrationsController extends AdminController
 		$attendees = Attendees::getByRegistrationId($registration_id);
 		foreach ($attendees as $att) {
 			$roleName = isset($att['role_name']) ? $att['role_name'] : '';
+			// Kiểm tra role có chứa "thể thao" hoặc "thi đấu"
 			if (stripos($roleName, 'thể thao') !== false || stripos($roleName, 'thi đấu') !== false) {
 				$result[] = array(
 					'id' => $att['id'],
 					'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
 					'position' => isset($att['position']) ? $att['position'] : '',
-					'property_id' => $registration_id,
-					'property_name' => 'Đơn vị hiện tại',
+					'department_name' => isset($att['department_name']) ? $att['department_name'] : '',
 				);
-			}
-		}
-
-		// Nếu có alliance_property_id, lấy thêm attendees từ đơn vị liên quân
-		if ($alliance_property_id) {
-			$allianceRegistrations = Registrations::getApiDataProvider(array('property_id' => $alliance_property_id), 100)->getData();
-			foreach ($allianceRegistrations as $reg) {
-				$regId = isset($reg['id']) ? $reg['id'] : (isset($reg->id) ? $reg->id : null);
-				if ($regId && $regId != $registration_id) {
-					$allianceAttendees = Attendees::getByRegistrationId($regId);
-					$propertyName = isset($reg['property_name']) ? $reg['property_name'] : '';
-					foreach ($allianceAttendees as $att) {
-						$roleName = isset($att['role_name']) ? $att['role_name'] : '';
-						if (stripos($roleName, 'thể thao') !== false || stripos($roleName, 'thi đấu') !== false) {
-							$result[] = array(
-								'id' => $att['id'],
-								'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
-								'position' => isset($att['position']) ? $att['position'] : '',
-								'property_id' => $regId,
-								'property_name' => $propertyName,
-							);
-						}
-					}
-				}
 			}
 		}
 
