@@ -677,6 +677,9 @@ var RegistrationView = (function() {
         sportSelectedAttendees = [];
         removeSportHiddenInputs();
 
+        // Reset UI elements
+        resetSportModalUI();
+
         loadAllianceProperties();
         loadSportsList();
         loadSportAttendees();
