@@ -321,7 +321,7 @@ $contentConfig = array(
         <h5 class="mb-0"><i class="fa fa-list me-2"></i>Chi tiết đăng ký</h5>
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
             <div class="">
-                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addDetailModal" onclick="resetAddModal()">
+                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addDetailModal" onclick="resetSportModal()">
                     <i class="fa fa-futbol-o me-1"></i>Đăng ký thể thao
                 </button>
                 <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
