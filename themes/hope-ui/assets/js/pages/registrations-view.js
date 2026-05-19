@@ -11,9 +11,14 @@ var RegistrationView = (function() {
     var selectedStaff = [];
     var maxPerOrg = 0;
     var competitionContentId = null;
+    var sportsContentId = null;
     var attendeeAllStaff = [];
     var attendeeSelectedStaff = [];
     var existingStaffIds = [];
+
+    // Sport registration variables
+    var sportAllAttendees = [];
+    var sportSelectedAttendees = [];
 
     function init(config) {
         eventId = config.eventId;
