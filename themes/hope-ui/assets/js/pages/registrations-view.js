@@ -32,16 +32,113 @@ var RegistrationView = (function() {
 
         if (eventId) {
             loadContentsData();
+            loadMainSportsList();
+            loadAlliancePropertiesDropdown();
         }
 
         bindCompetitionEvents();
         bindSportEvents();
+        bindSportCardEvents();
         bindAttendeeEvents();
         bindEditAttendeeForm();
         bindAddAttendeeModalReset();
 
         if (isHotel && propertyId) {
             loadAttendeeStaffList();
+        }
+    }
+
+    // Load danh sách môn thể thao vào dropdown chính (ngoài card)
+    function loadMainSportsList() {
+        var sportSelect = document.getElementById('sport_select_main');
+        if (!sportSelect) return;
+
+        sportSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+
+        fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=sports')
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data && data.data.length > 0) {
+                    sportSelect.innerHTML = renderSportsTree(data.data, registeredSports);
+                } else {
+                    sportSelect.innerHTML = '<option value="">-- Không có môn nào --</option>';
+                }
+            });
+    }
+
+    // Load danh sách đơn vị có thể liên quân vào dropdown
+    function loadAlliancePropertiesDropdown() {
+        var allianceSelect = document.getElementById('sport_alliance_property');
+        if (!allianceSelect) return;
+
+        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                allianceSelect.innerHTML = '';
+                if (data.success && data.data && data.data.length > 0) {
+                    data.data.forEach(function(item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.code + ' - ' + item.name;
+                        allianceSelect.appendChild(opt);
+                    });
+                }
+            });
+    }
+
+    // Bind events cho sport card (dropdown chọn môn, liên quân, button mở modal)
+    function bindSportCardEvents() {
+        var sportSelect = document.getElementById('sport_select_main');
+        var btnOpen = document.getElementById('btn_open_sport_modal');
+        var allianceSelect = document.getElementById('sport_alliance_property');
+
+        if (sportSelect) {
+            sportSelect.addEventListener('change', function() {
+                if (btnOpen) {
+                    btnOpen.disabled = !this.value;
+                }
+            });
+        }
+
+        if (btnOpen) {
+            btnOpen.addEventListener('click', function() {
+                var sportId = sportSelect ? sportSelect.value : '';
+                if (!sportId) {
+                    Toast.error('Vui lòng chọn môn thể thao.');
+                    return;
+                }
+
+                // Lấy danh sách liên quân đã chọn
+                var allianceIds = [];
+                if (allianceSelect) {
+                    Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
+                        allianceIds.push(opt.value);
+                    });
+                }
+
+                // Set giá trị vào modal
+                var modalSportSelect = document.getElementById('sport_item_id');
+                if (modalSportSelect) {
+                    modalSportSelect.value = sportId;
+                    modalSportSelect.dispatchEvent(new Event('change'));
+                }
+
+                // Set alliance vào modal (hidden inputs)
+                var allianceContainer = document.getElementById('alliance_checkboxes');
+                if (allianceContainer) {
+                    var checkboxes = allianceContainer.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(function(cb) {
+                        cb.checked = allianceIds.includes(cb.value);
+                    });
+                }
+
+                // Mở modal
+                var modal = new bootstrap.Modal(document.getElementById('addDetailModal'));
+                modal.show();
+
+                // Load attendees
+                loadSportAttendees();
+            });
         }
     }
 
