@@ -56,7 +56,8 @@ var RegistrationView = (function() {
                             competitionContentId = c.id;
                         }
                         if (c.code === 'sports') {
-                            var contentIdField = document.getElementById('content_id');
+                            sportsContentId = c.id;
+                            var contentIdField = document.getElementById('sport_content_id');
                             if (contentIdField) {
                                 contentIdField.value = c.id;
                             }
