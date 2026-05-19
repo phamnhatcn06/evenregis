@@ -469,7 +469,7 @@ class RegistrationsController extends AdminController
 
 		$registrationId = Yii::app()->request->getPost('registration_id');
 		$sportId = Yii::app()->request->getPost('sport_id');
-		$alliancePropertyId = Yii::app()->request->getPost('alliance_property_id');
+		$alliancePropertyIds = Yii::app()->request->getPost('alliance_property_ids', array());
 		$teamName = Yii::app()->request->getPost('team_name');
 		$note = Yii::app()->request->getPost('note');
 		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
@@ -484,13 +484,25 @@ class RegistrationsController extends AdminController
 		$ssoUser = AuthHandler::getUser();
 		$createdBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
 
+		// Ghi chú thêm thông tin liên quân và tên đội
+		$noteArr = array();
+		if ($teamName) {
+			$noteArr[] = 'Tên đội: ' . $teamName;
+		}
+		if (!empty($alliancePropertyIds)) {
+			$noteArr[] = 'Liên quân với: ' . implode(', ', $alliancePropertyIds);
+		}
+		if ($note) {
+			$noteArr[] = $note;
+		}
+
 		// Tạo registration detail
 		$detail = new RegistrationDetails;
 		$detail->registration_id = $registrationId;
 		$detail->content_id = $contentId;
 		$detail->sport_id = $sportId;
 		$detail->quantity = count($attendeeIds);
-		$detail->note = $note;
+		$detail->note = implode(' | ', $noteArr);
 
 		$result = $detail->storeViaApi();
 		if ($result['success']) {
