@@ -108,6 +108,9 @@ var RegistrationView = (function() {
                     return;
                 }
 
+                // Lấy tên môn đã chọn
+                var sportName = sportSelect.options[sportSelect.selectedIndex].text;
+
                 // Lấy danh sách liên quân đã chọn
                 var allianceIds = [];
                 if (allianceSelect) {
@@ -116,20 +119,31 @@ var RegistrationView = (function() {
                     });
                 }
 
-                // Set giá trị vào modal
+                // Set giá trị vào modal - ẩn dropdown, hiện tên môn
                 var modalSportSelect = document.getElementById('sport_item_id');
+                var sportNameDiv = document.getElementById('sport_selected_name');
                 if (modalSportSelect) {
                     modalSportSelect.value = sportId;
-                    modalSportSelect.dispatchEvent(new Event('change'));
+                    modalSportSelect.classList.add('d-none');
+                }
+                if (sportNameDiv) {
+                    sportNameDiv.textContent = sportName;
+                    sportNameDiv.classList.remove('d-none');
                 }
 
-                // Set alliance vào modal (hidden inputs)
+                // Set alliance vào modal (checkboxes)
                 var allianceContainer = document.getElementById('alliance_checkboxes');
                 if (allianceContainer) {
                     var checkboxes = allianceContainer.querySelectorAll('input[type="checkbox"]');
                     checkboxes.forEach(function(cb) {
                         cb.checked = allianceIds.includes(cb.value);
                     });
+                }
+
+                // Ẩn phần chọn liên quân trong modal nếu đã chọn từ ngoài
+                var allianceWrapper = document.getElementById('alliance_checkboxes_wrapper');
+                if (allianceWrapper && allianceIds.length > 0) {
+                    allianceWrapper.style.display = 'none';
                 }
 
                 // Mở modal
@@ -139,6 +153,25 @@ var RegistrationView = (function() {
                 // Load attendees
                 loadSportAttendees();
             });
+        }
+    }
+
+    // Reset sport modal khi đóng
+    function resetSportModalUI() {
+        var modalSportSelect = document.getElementById('sport_item_id');
+        var sportNameDiv = document.getElementById('sport_selected_name');
+        var allianceWrapper = document.getElementById('alliance_checkboxes_wrapper');
+
+        if (modalSportSelect) {
+            modalSportSelect.classList.remove('d-none');
+            modalSportSelect.value = '';
+        }
+        if (sportNameDiv) {
+            sportNameDiv.classList.add('d-none');
+            sportNameDiv.textContent = '';
+        }
+        if (allianceWrapper) {
+            allianceWrapper.style.display = '';
         }
     }
 
