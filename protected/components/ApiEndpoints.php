@@ -212,6 +212,59 @@ class ApiEndpoints
     const COMPETITION_DEPARTMENT_DESTROY = '/api/competition-departments/destroy/{id}';
     const COMPETITION_DEPARTMENT_SYNC = '/api/competition-departments/sync/{competition_id}';
 
+    // Sport Team
+    const SPORT_TEAM_LIST = '/api/sport-teams';
+    const SPORT_TEAM_STORE = '/api/sport-teams/store';
+    const SPORT_TEAM_DETAIL = '/api/sport-teams/detail/{id}';
+    const SPORT_TEAM_UPDATE = '/api/sport-teams/update/{id}';
+    const SPORT_TEAM_DESTROY = '/api/sport-teams/destroy/{id}';
+
+    // Sport Team Member
+    const SPORT_TEAM_MEMBER_LIST = '/api/sport-team-members';
+    const SPORT_TEAM_MEMBER_STORE = '/api/sport-team-members/store';
+    const SPORT_TEAM_MEMBER_DETAIL = '/api/sport-team-members/detail/{id}';
+    const SPORT_TEAM_MEMBER_UPDATE = '/api/sport-team-members/update/{id}';
+    const SPORT_TEAM_MEMBER_DESTROY = '/api/sport-team-members/destroy/{id}';
+    const SPORT_TEAM_MEMBER_COUNT_BY_ATTENDEE = '/api/sport-team-members/count-by-attendee/{attendee_id}';
+
+    // Beauty Contest
+    const BEAUTY_CONTEST_LIST = '/api/beauty-contests';
+    const BEAUTY_CONTEST_STORE = '/api/beauty-contests/store';
+    const BEAUTY_CONTEST_DETAIL = '/api/beauty-contests/detail/{id}';
+    const BEAUTY_CONTEST_UPDATE = '/api/beauty-contests/update/{id}';
+    const BEAUTY_CONTEST_DESTROY = '/api/beauty-contests/destroy/{id}';
+
+    // Talent Show
+    const TALENT_SHOW_LIST = '/api/talent-shows';
+    const TALENT_SHOW_STORE = '/api/talent-shows/store';
+    const TALENT_SHOW_DETAIL = '/api/talent-shows/detail/{id}';
+    const TALENT_SHOW_UPDATE = '/api/talent-shows/update/{id}';
+    const TALENT_SHOW_DESTROY = '/api/talent-shows/destroy/{id}';
+
+    // Talent Category
+    const TALENT_CATEGORY_LIST = '/api/talent-categories';
+    const TALENT_CATEGORY_STORE = '/api/talent-categories/store';
+    const TALENT_CATEGORY_DETAIL = '/api/talent-categories/detail/{id}';
+    const TALENT_CATEGORY_UPDATE = '/api/talent-categories/update/{id}';
+    const TALENT_CATEGORY_DESTROY = '/api/talent-categories/destroy/{id}';
+
+    // Talent Entry
+    const TALENT_ENTRY_LIST = '/api/talent-entries';
+    const TALENT_ENTRY_STORE = '/api/talent-entries/store';
+    const TALENT_ENTRY_DETAIL = '/api/talent-entries/detail/{id}';
+    const TALENT_ENTRY_UPDATE = '/api/talent-entries/update/{id}';
+    const TALENT_ENTRY_DESTROY = '/api/talent-entries/destroy/{id}';
+
+    // Talent Entry Member
+    const TALENT_ENTRY_MEMBER_LIST = '/api/talent-entry-members';
+    const TALENT_ENTRY_MEMBER_STORE = '/api/talent-entry-members/store';
+    const TALENT_ENTRY_MEMBER_DETAIL = '/api/talent-entry-members/detail/{id}';
+    const TALENT_ENTRY_MEMBER_DESTROY = '/api/talent-entry-members/destroy/{id}';
+
+    // Alliance Request - Additional
+    const ALLIANCE_REQUEST_RESPOND = '/api/alliance-requests/respond/{id}';
+    const ALLIANCE_REQUEST_BY_TARGET = '/api/alliance-requests/by-target/{org_id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
