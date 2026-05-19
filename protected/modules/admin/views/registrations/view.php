@@ -514,12 +514,17 @@ Yii::app()->clientScript->registerScript('flatpickr-locale', '
     };
 ', CClientScript::POS_END);
 
+// Register DataTable
+Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/DataTables/datatables.min.css');
+Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/DataTables/datatables.min.js', CClientScript::POS_END);
+
 // Register init script
 Yii::app()->clientScript->registerScript('registrations-view-init', '
     window.BASE_URL = "' . Yii::app()->createUrl('/') . '";
     document.addEventListener("DOMContentLoaded", function() {
         RegistrationView.init(' . CJSON::encode($jsConfig) . ');
         window.initDatePickers();
+        initAttendeesDataTable();
     });
     function viewDocument(url, type) { RegistrationView.viewDocument(url, type); }
     function confirmDeleteDetail(id) { RegistrationView.confirmDeleteDetail(id); }
@@ -527,5 +532,48 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     function resetCompetitionModal() { RegistrationView.resetCompetitionModal(); }
     function editAttendee(id) { RegistrationView.editAttendee(id); }
     function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
+
+    function initAttendeesDataTable() {
+        if (typeof $.fn.DataTable === "undefined") return;
+        var table = $("#attendees-table").DataTable({
+            paging: true,
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Tất cả"]],
+            ordering: true,
+            searching: true,
+            dom: "lrtip",
+            language: {
+                lengthMenu: "Hiển thị _MENU_ dòng",
+                info: "Đang xem _START_ - _END_ / _TOTAL_ người",
+                infoEmpty: "Không có dữ liệu",
+                infoFiltered: "(lọc từ _MAX_ người)",
+                paginate: { first: "Đầu", last: "Cuối", next: "Sau", previous: "Trước" },
+                emptyTable: "Chưa có người tham dự nào."
+            },
+            columnDefs: [
+                { orderable: false, targets: [1, -1] }
+            ]
+        });
+
+        $("#filter_name").on("keyup", function() {
+            table.column(2).search(this.value).draw();
+        });
+        $("#filter_role").on("change", function() {
+            table.column(4).search(this.value).draw();
+        });
+        $("#filter_status").on("change", function() {
+            table.column(9).search(this.value).draw();
+        });
+        $("#filter_transport").on("change", function() {
+            table.column(8).search(this.value).draw();
+        });
+        $("#btn_reset_filter").on("click", function() {
+            $("#filter_name").val("");
+            $("#filter_role").val("");
+            $("#filter_status").val("");
+            $("#filter_transport").val("");
+            table.search("").columns().search("").draw();
+        });
+    }
 ', CClientScript::POS_END);
 ?>
