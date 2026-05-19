@@ -1,0 +1,109 @@
+<?php
+$this->breadcrumbs = array(
+    'Đội thể thao' => array('admin'),
+    $model->team_name,
+);
+
+$this->menu = array(
+    array(
+        'label' => 'Thêm thành viên',
+        'url' => $this->createUrl('addMember', array('teamId' => $model->id)),
+        'color' => 'success',
+        'icon' => 'fa-user-plus',
+    ),
+    array(
+        'label' => 'Cập nhật',
+        'url' => $this->createUrl('update', array('id' => $model->id)),
+        'color' => 'primary',
+        'icon' => 'fa-edit',
+    ),
+    array(
+        'label' => 'Danh sách',
+        'url' => $this->createUrl('admin'),
+        'color' => 'secondary',
+        'icon' => 'fa-list',
+    ),
+);
+$this->Tabletitle = 'Chi tiết đội: ' . CHtml::encode($model->team_name);
+?>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Thông tin đội</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th style="width:35%;background:#f8f9fa;">ID</th>
+                        <td><?php echo CHtml::encode($model->id); ?></td>
+                    </tr>
+                    <tr>
+                        <th style="background:#f8f9fa;">Tên đội</th>
+                        <td><?php echo CHtml::encode($model->team_name); ?></td>
+                    </tr>
+                    <tr>
+                        <th style="background:#f8f9fa;">Môn thể thao</th>
+                        <td><?php echo CHtml::encode($model->sport_name); ?></td>
+                    </tr>
+                    <tr>
+                        <th style="background:#f8f9fa;">Đơn vị</th>
+                        <td><?php echo CHtml::encode($model->property_name); ?></td>
+                    </tr>
+                    <tr>
+                        <th style="background:#f8f9fa;">Liên quân</th>
+                        <td><?php echo $model->is_alliance ? '<span class="badge bg-info">Có</span>' : '<span class="badge bg-secondary">Không</span>'; ?></td>
+                    </tr>
+                    <tr>
+                        <th style="background:#f8f9fa;">Trạng thái</th>
+                        <td><?php echo SportTeams::getStatusLabel($model->status); ?></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Danh sách thành viên (<?php echo count($members); ?>)</h5>
+            </div>
+            <div class="card-body">
+                <?php if (empty($members)): ?>
+                    <p class="text-muted text-center">Chưa có thành viên nào</p>
+                <?php else: ?>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th width="80">Số áo</th>
+                                <th width="80">Vị trí</th>
+                                <th width="60">Đội trưởng</th>
+                                <th width="80">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($members as $member): ?>
+                                <tr>
+                                    <td><?php echo CHtml::encode($member->attendee_name); ?></td>
+                                    <td><?php echo CHtml::encode($member->jersey_number); ?></td>
+                                    <td><?php echo CHtml::encode($member->position); ?></td>
+                                    <td><?php echo $member->is_captain ? '<i class="fa fa-star text-warning"></i>' : ''; ?></td>
+                                    <td>
+                                        <?php echo CHtml::beginForm(array('removeMember', 'id' => $member->id), 'post', array('style' => 'display:inline')); ?>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete('remove-member-<?php echo $member->id; ?>')">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        <?php echo CHtml::hiddenField('_method', 'delete'); ?>
+                                        <?php echo CHtml::endForm(); ?>
+                                        <form id="remove-member-<?php echo $member->id; ?>" method="post" action="<?php echo $this->createUrl('removeMember', array('id' => $member->id)); ?>" style="display:none;"></form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
