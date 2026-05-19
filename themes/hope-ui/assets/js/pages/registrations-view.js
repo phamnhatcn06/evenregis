@@ -612,30 +612,6 @@ var RegistrationView = (function() {
         return html;
     }
 
-    function resetAddModal() {
-        var itemSelect = document.getElementById('item_id');
-
-        document.getElementById('add-detail-form').reset();
-        document.getElementById('quantity').value = '1';
-
-        itemSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
-
-        var sportsContent = contentsData.find(function(c) { return c.code === 'sports'; });
-        if (sportsContent) {
-            document.getElementById('content_id').value = sportsContent.id;
-        }
-
-        fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=sports')
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                if (data.success && data.data && data.data.length > 0) {
-                    itemSelect.innerHTML = renderSportsTree(data.data, registeredSports);
-                } else {
-                    itemSelect.innerHTML = '<option value="">-- Không có môn nào --</option>';
-                }
-            });
-    }
-
     function resetCompetitionModal() {
         var compSelect = document.getElementById('comp_competition_id');
         var propSelect = document.getElementById('comp_property_id');
