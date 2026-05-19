@@ -497,14 +497,15 @@ class RegistrationsController extends AdminController
 		}
 
 		// Tạo registration detail
-		$detail = new RegistrationDetails;
-		$detail->registration_id = $registrationId;
-		$detail->content_id = $contentId;
-		$detail->sport_id = $sportId;
-		$detail->quantity = count($attendeeIds);
-		$detail->note = implode(' | ', $noteArr);
+		$detailData = array(
+			'registration_id' => $registrationId,
+			'content_id' => $contentId,
+			'sport_id' => $sportId,
+			'quantity' => count($attendeeIds),
+			'note' => implode(' | ', $noteArr),
+		);
 
-		$result = $detail->storeViaApi();
+		$result = RegistrationDetails::storeViaApi($detailData);
 		if ($result['success']) {
 			Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
 		} else {
