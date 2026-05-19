@@ -356,22 +356,22 @@ foreach ($registrationDetails as $detail) {
     <div class="card-body">
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
         <!-- Form chọn liên quân và môn thể thao -->
-        <div class="row mb-3 align-items-end">
+        <div class="row mb-3 g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label mb-1">Đơn vị liên quân</label>
+                <select class="form-select" id="sport_alliance_property" multiple style="height:42px;">
+                </select>
+                <small class="text-muted">Áp dụng cho môn đội > 3 người. Để trống nếu không liên quân.</small>
+            </div>
             <div class="col-md-4">
-                <label class="form-label">Đơn vị liên quân <small class="text-muted">(áp dụng cho môn đội > 3 người)</small></label>
-                <select class="form-select" id="sport_alliance_property" multiple data-placeholder="Chọn đơn vị liên quân...">
-                </select>
-                <small class="text-muted">Để trống nếu không liên quân</small>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Môn thể thao <span class="text-danger">*</span></label>
+                <label class="form-label mb-1">Môn thể thao <span class="text-danger">*</span></label>
                 <select class="form-select" id="sport_select_main">
-                    <option value="">-- Chọn môn --</option>
+                    <option value="">-- Chọn môn thể thao --</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <button type="button" class="btn btn-success" id="btn_open_sport_modal" disabled>
-                    <i class="fa fa-plus me-1"></i>Chọn VĐV & Đăng ký
+                <button type="button" class="btn btn-success w-100" id="btn_open_sport_modal" disabled>
+                    <i class="fa fa-users me-1"></i>Chọn VĐV & Đăng ký
                 </button>
             </div>
         </div>
