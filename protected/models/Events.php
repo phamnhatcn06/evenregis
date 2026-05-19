@@ -70,4 +70,14 @@ class Events extends BaseEvents
 			),
 		));
 	}
+
+	public static function getActiveList()
+	{
+		$list = array();
+		$items = self::getApiDataProvider(array('is_active' => 1), 100)->getData();
+		foreach ($items as $item) {
+			$list[$item->id] = $item->name;
+		}
+		return $list;
+	}
 }
