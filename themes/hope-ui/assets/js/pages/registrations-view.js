@@ -35,6 +35,7 @@ var RegistrationView = (function() {
         }
 
         bindCompetitionEvents();
+        bindSportEvents();
         bindAttendeeEvents();
         bindEditAttendeeForm();
         bindAddAttendeeModalReset();
