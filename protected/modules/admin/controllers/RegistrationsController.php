@@ -565,6 +565,10 @@ class RegistrationsController extends AdminController
 		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
 		$contentId = Yii::app()->request->getPost('content_id');
 
+		// DEBUG: Log received data
+		Yii::log('addSportRegistration - POST data: ' . print_r($_POST, true), CLogger::LEVEL_INFO, 'sports');
+		Yii::log('addSportRegistration - attendeeIds: ' . print_r($attendeeIds, true), CLogger::LEVEL_INFO, 'sports');
+
 		if (!$registrationId || !$sportId || empty($attendeeIds)) {
 			if ($isAjax) {
 				echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin bắt buộc.'));
