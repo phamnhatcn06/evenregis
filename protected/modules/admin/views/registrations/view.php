@@ -396,6 +396,7 @@ foreach ($registrationDetails as $detail) {
         </div>
 
         <!-- Danh sách đã đăng ký -->
+        <!-- DEBUG: <?php echo 'sportTeams count: ' . count($sportTeams) . ', sportTeamMembers keys: ' . implode(',', array_keys($sportTeamMembers)); ?> -->
         <?php if (empty($sportTeams)): ?>
             <p class="text-muted mb-0" id="no_sport_msg">Chưa đăng ký môn thể thao nào.</p>
         <?php else: ?>
