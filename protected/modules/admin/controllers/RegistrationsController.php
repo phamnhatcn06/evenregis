@@ -551,6 +551,8 @@ class RegistrationsController extends AdminController
 			throw new CHttpException(400, 'Bad Request');
 		}
 
+		$isAjax = Yii::app()->request->isAjaxRequest;
+
 		$registrationId = Yii::app()->request->getPost('registration_id');
 		$sportId = Yii::app()->request->getPost('sport_id');
 		$alliancePropertyIds = Yii::app()->request->getPost('alliance_property_ids', array());
@@ -560,6 +562,10 @@ class RegistrationsController extends AdminController
 		$contentId = Yii::app()->request->getPost('content_id');
 
 		if (!$registrationId || !$sportId || empty($attendeeIds)) {
+			if ($isAjax) {
+				echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin bắt buộc.'));
+				Yii::app()->end();
+			}
 			Yii::app()->user->setFlash('error', 'Thiếu thông tin bắt buộc.');
 			$this->redirect(array('view', 'id' => $registrationId));
 			return;
@@ -570,6 +576,10 @@ class RegistrationsController extends AdminController
 
         $registration = Registrations::fetchFromApi($registrationId);
         if (!$registration) {
+			if ($isAjax) {
+				echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy phiếu đăng ký.'));
+				Yii::app()->end();
+			}
             Yii::app()->user->setFlash('error', 'Không tìm thấy phiếu đăng ký.');
 			$this->redirect(array('admin'));
 			return;
@@ -600,8 +610,16 @@ class RegistrationsController extends AdminController
                     $member->storeViaApi();
                 }
             }
+			if ($isAjax) {
+				echo CJSON::encode(array('success' => true, 'message' => 'Đăng ký thể thao thành công.', 'team_id' => $teamId));
+				Yii::app()->end();
+			}
             Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
         } else {
+			if ($isAjax) {
+				echo CJSON::encode(array('success' => false, 'error' => isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.'));
+				Yii::app()->end();
+			}
             Yii::app()->user->setFlash('error', isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.');
             $this->redirect(array('view', 'id' => $registrationId));
             return;
