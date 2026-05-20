@@ -417,7 +417,6 @@ foreach ($registrationDetails as $detail) {
                         $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
                         $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
                         $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
-                        // DEBUG: echo "Team ID: $teamId, sportName: $sportName, teamName: $teamName";
                         $isAlliance = isset($team->is_alliance) ? $team->is_alliance : (isset($team['is_alliance']) ? $team['is_alliance'] : 0);
                         $allianceNames = isset($team->alliance_org_names) ? $team->alliance_org_names : ($isAlliance ? 'Có' : '-');
                         $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
