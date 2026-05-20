@@ -642,8 +642,16 @@ var RegistrationView = (function() {
 
     function addSportToPreview() {
         var sportSelect = document.getElementById('sport_select_main');
-        var sportId = sportSelect ? sportSelect.value : '';
-        var sportName = sportSelect && sportSelect.selectedIndex > 0 ? sportSelect.options[sportSelect.selectedIndex].text.trim() : '';
+        var modalSportSelect = document.getElementById('sport_item_id');
+        var sportId = modalSportSelect ? modalSportSelect.value : (sportSelect ? sportSelect.value : '');
+        var sportName = '';
+
+        if (modalSportSelect && modalSportSelect.value) {
+            var opt = modalSportSelect.querySelector('option[value="' + modalSportSelect.value + '"]');
+            sportName = opt ? opt.textContent.trim() : '';
+        } else if (sportSelect && sportSelect.selectedIndex > 0) {
+            sportName = sportSelect.options[sportSelect.selectedIndex].text.trim();
+        }
 
         if (!sportId) {
             Toast.error('Vui lòng chọn môn thể thao.');
@@ -654,11 +662,13 @@ var RegistrationView = (function() {
             return;
         }
 
-        // Check if sport already in pending list
-        var existingIdx = pendingSportRegistrations.findIndex(function(r) { return r.sportId == sportId; });
-        if (existingIdx !== -1) {
-            Toast.error('Môn "' + sportName + '" đã có trong danh sách. Vui lòng xóa trước khi thêm lại.');
-            return;
+        // Check if sport already in pending list (only when adding new)
+        if (editingSportIndex === -1) {
+            var existingIdx = pendingSportRegistrations.findIndex(function(r) { return r.sportId == sportId; });
+            if (existingIdx !== -1) {
+                Toast.error('Môn "' + sportName + '" đã có trong danh sách. Vui lòng xóa trước khi thêm lại.');
+                return;
+            }
         }
 
         // Get alliance info
@@ -674,15 +684,27 @@ var RegistrationView = (function() {
 
         var teamName = document.getElementById('sport_team_name')?.value || propertyCode;
 
-        // Add to pending list
-        pendingSportRegistrations.push({
+        var regData = {
             sportId: sportId,
             sportName: sportName,
             teamName: teamName,
             allianceIds: allianceIds,
             allianceCodes: allianceCodes,
             attendees: sportSelectedAttendees.slice() // clone array
-        });
+        };
+
+        if (editingSportIndex >= 0) {
+            // Update existing
+            pendingSportRegistrations[editingSportIndex] = regData;
+            Toast.success('Đã cập nhật "' + sportName + '".');
+        } else {
+            // Add new
+            pendingSportRegistrations.push(regData);
+            Toast.success('Đã thêm "' + sportName + '" vào danh sách.');
+        }
+
+        // Reset editing state
+        editingSportIndex = -1;
 
         // Close modal and render preview
         var modalEl = document.getElementById('addDetailModal');
@@ -692,11 +714,67 @@ var RegistrationView = (function() {
         }
 
         renderSportPreview();
-        Toast.success('Đã thêm "' + sportName + '" vào danh sách.');
 
         // Reset dropdown
         if (sportSelect) sportSelect.value = '';
         document.getElementById('btn_open_sport_modal').disabled = true;
+    }
+
+    function editPendingSport(idx) {
+        if (idx < 0 || idx >= pendingSportRegistrations.length) return;
+
+        var reg = pendingSportRegistrations[idx];
+        editingSportIndex = idx;
+
+        // Set sport in main dropdown
+        var sportSelect = document.getElementById('sport_select_main');
+        if (sportSelect) {
+            sportSelect.value = reg.sportId;
+        }
+
+        // Set modal sport select
+        var modalSportSelect = document.getElementById('sport_item_id');
+        var sportNameDiv = document.getElementById('sport_selected_name');
+        if (modalSportSelect) {
+            modalSportSelect.value = reg.sportId;
+            modalSportSelect.classList.add('d-none');
+        }
+        if (sportNameDiv) {
+            sportNameDiv.textContent = reg.sportName;
+            sportNameDiv.classList.remove('d-none');
+        }
+
+        // Set alliance
+        var allianceSelect = document.getElementById('sport_alliance_property');
+        if (allianceSelect) {
+            Array.from(allianceSelect.options).forEach(function(opt) {
+                opt.selected = reg.allianceIds.includes(opt.value);
+            });
+        }
+
+        // Set team name
+        var teamNameInput = document.getElementById('sport_team_name');
+        if (teamNameInput) {
+            teamNameInput.value = reg.teamName;
+        }
+
+        // Load attendees then pre-select
+        loadSportAttendees(function() {
+            // Pre-select attendees
+            sportSelectedAttendees = reg.attendees.slice();
+            renderSportAvailableAttendees();
+            renderSportSelectedAttendees();
+        });
+
+        // Change button text
+        var btnAdd = document.getElementById('btn_add_to_preview');
+        if (btnAdd) {
+            btnAdd.innerHTML = '<i class="fa fa-save me-1"></i>Cập nhật';
+        }
+
+        // Open modal
+        var modal = new bootstrap.Modal(document.getElementById('addDetailModal'));
+        modal.show();
     }
 
     function renderSportPreview() {
