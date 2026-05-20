@@ -756,6 +756,26 @@ var RegistrationView = (function() {
         }
     }
 
+    function removeAthleteFromSport(sportIdx, attendeeId) {
+        if (sportIdx >= 0 && sportIdx < pendingSportRegistrations.length) {
+            var reg = pendingSportRegistrations[sportIdx];
+            var originalLength = reg.attendees.length;
+            reg.attendees = reg.attendees.filter(function(att) { return att.id != attendeeId; });
+
+            if (reg.attendees.length < originalLength) {
+                Toast.info('Đã xóa VĐV khỏi danh sách.');
+
+                // Nếu không còn VĐV nào, xóa luôn môn
+                if (reg.attendees.length === 0) {
+                    pendingSportRegistrations.splice(sportIdx, 1);
+                    Toast.info('Môn "' + reg.sportName + '" đã bị xóa do không còn VĐV.');
+                }
+
+                renderSportPreview();
+            }
+        }
+    }
+
     function saveAllSportRegistrations() {
         if (pendingSportRegistrations.length === 0) {
             Toast.error('Không có môn nào để lưu.');
