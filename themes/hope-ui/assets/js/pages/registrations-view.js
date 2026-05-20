@@ -645,6 +645,14 @@ var RegistrationView = (function() {
 
         // Lưu tất cả
         document.getElementById('btn_save_all_sports')?.addEventListener('click', saveAllSportRegistrations);
+
+        // Reset khi đóng modal
+        var modalEl = document.getElementById('addDetailModal');
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function() {
+                resetSportModalUI();
+            });
+        }
     }
 
     function addSportToPreview() {
