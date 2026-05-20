@@ -699,7 +699,16 @@ var RegistrationView = (function() {
             });
         }
 
-        var teamName = document.getElementById('sport_team_name')?.value || propertyCode;
+        // Tự động sinh tên đội theo quy tắc
+        var teamName = document.getElementById('sport_team_name')?.value || '';
+        if (!teamName || teamName === propertyCode) {
+            if (allianceCodes.length > 0) {
+                var allCodes = [propertyCode].concat(allianceCodes);
+                teamName = 'Liên quân ' + allCodes.join(' - ');
+            } else {
+                teamName = propertyCode || 'Team';
+            }
+        }
 
         var regData = {
             sportId: sportId,
