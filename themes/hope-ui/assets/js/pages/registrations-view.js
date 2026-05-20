@@ -1874,6 +1874,7 @@ var RegistrationView = (function() {
         editAttendee: editAttendee,
         confirmDeleteAttendee: confirmDeleteAttendee,
         removeAllianceProperty: removeAllianceProperty,
-        confirmDeleteTeam: confirmDeleteTeam
+        confirmDeleteTeam: confirmDeleteTeam,
+        removePendingSport: removePendingSport
     };
 })();
