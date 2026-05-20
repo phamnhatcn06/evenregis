@@ -740,6 +740,8 @@ var RegistrationView = (function() {
 
             html += '</td>' +
                 '<td class="text-center">' +
+                '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editPendingSport(' + idx + ')" title="Sửa">' +
+                '<i class="fa fa-pencil"></i></button>' +
                 '<button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.removePendingSport(' + idx + ')" title="Xóa môn">' +
                 '<i class="fa fa-trash"></i></button></td></tr>';
         });
