@@ -1153,9 +1153,11 @@ var RegistrationView = (function() {
     }
 
     function removeAllianceProperty(id) {
+        // Bỏ chọn checkbox trong modal
         var cb = document.getElementById('modal_alliance_' + id);
         if (cb) cb.checked = false;
 
+        // Bỏ chọn option trong select
         var allianceSelect = document.getElementById('sport_alliance_property');
         if (allianceSelect) {
             Array.from(allianceSelect.options).forEach(function(opt) {
@@ -1165,33 +1167,21 @@ var RegistrationView = (function() {
             });
         }
 
-        // Re-render badges
-        var checkboxes = document.querySelectorAll('.alliance-modal-cb');
-        var selectedTexts = [];
-        var selectedIds = [];
-        checkboxes.forEach(function(cbEl) {
-            if (cbEl.checked) {
-                selectedIds.push(cbEl.value);
-                selectedTexts.push(cbEl.getAttribute('data-name'));
-            }
-        });
-
+        // Xóa badge trực tiếp từ DOM
         var displayText = document.getElementById('alliance_selected_texts');
         if (displayText) {
-            displayText.innerHTML = '';
-            if (selectedIds.length > 0) {
-                for (var i = 0; i < selectedIds.length; i++) {
-                    var selId = selectedIds[i];
-                    var selText = selectedTexts[i];
-                    var badge = document.createElement('span');
-                    badge.className = 'badge bg-primary me-1 mb-1 p-2 border';
-                    badge.style.fontSize = '12px';
-                    badge.innerHTML = selText + ' <i class="fa fa-times ms-1 text-white" style="cursor:pointer;" onclick="removeAllianceProperty(\'' + selId + '\')" title="Huỷ"></i>';
-                    displayText.appendChild(badge);
+            var badges = displayText.querySelectorAll('span.badge');
+            badges.forEach(function(badge) {
+                var closeIcon = badge.querySelector('i.fa-times');
+                if (closeIcon) {
+                    var onclickAttr = closeIcon.getAttribute('onclick') || '';
+                    if (onclickAttr.indexOf("'" + id + "'") !== -1 || onclickAttr.indexOf('"' + id + '"') !== -1) {
+                        badge.remove();
+                    }
                 }
-            }
+            });
         }
-        
+
         updateSportTeamName();
     }
 
