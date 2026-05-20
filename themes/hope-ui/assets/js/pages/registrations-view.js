@@ -909,7 +909,10 @@ var RegistrationView = (function() {
 
             return fetch(window.BASE_URL + '/admin/registrations/addSportRegistration', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             }).then(function(response) { return response.json(); });
         });
 
