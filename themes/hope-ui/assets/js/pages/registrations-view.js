@@ -950,7 +950,7 @@ var RegistrationView = (function() {
             });
     }
 
-    function loadSportAttendees() {
+    function loadSportAttendees(callback) {
         var availableList = document.getElementById('sport_available_attendee_list');
         if (!availableList) return;
 
@@ -964,6 +964,7 @@ var RegistrationView = (function() {
                 sportSelectedAttendees = [];
                 renderSportAvailableAttendees();
                 renderSportSelectedAttendees();
+                if (typeof callback === 'function') callback();
             });
     }
 
