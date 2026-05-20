@@ -22,6 +22,7 @@ var RegistrationView = (function() {
 
     // Pending sport registrations (preview before save)
     var pendingSportRegistrations = [];
+    var editingSportIndex = -1; // -1 = adding new, >= 0 = editing existing
 
     function init(config) {
         eventId = config.eventId;
