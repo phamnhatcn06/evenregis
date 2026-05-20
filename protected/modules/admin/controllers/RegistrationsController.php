@@ -12,10 +12,14 @@ class RegistrationsController extends AdminController
 			$event = Events::fetchFromApi($model->event_id);
 			$model->event_name = $event ? $event->name : '';
 		}
-		if (empty($model->property_name) && $model->property_id) {
+		if ($model->property_id) {
 			$property = Properties::fetchFromApi($model->property_id);
-			$model->property_name = $property ? $property->name : '';
-			$model->property_code = $property ? $property->code : '';
+			if ($property) {
+				if (empty($model->property_name)) {
+					$model->property_name = $property->name;
+				}
+				$model->property_code = $property->code;
+			}
 		}
 		if (empty($model->relation_property_name) && $model->relation_property_id) {
 			$relationProperty = Properties::fetchFromApi($model->relation_property_id);
