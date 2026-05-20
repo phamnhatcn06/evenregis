@@ -611,13 +611,12 @@ class RegistrationsController extends AdminController
             $teamId = isset($teamResult['data']['data']['id']) ? $teamResult['data']['data']['id'] : (isset($teamResult['data']['id']) ? $teamResult['data']['id'] : null);
             if ($teamId) {
                 // Tạo SportTeamMembers
-				Yii::log('Creating members for team ' . $teamId . ', count: ' . count($attendeeIds), CLogger::LEVEL_INFO, 'sports');
-                foreach ($attendeeIds as $attId) {
+                foreach ($attendeeIds as $idx => $attId) {
                     $member = new SportTeamMembers();
                     $member->sport_team_id = $teamId;
                     $member->attendee_id = $attId;
-                    $memberResult = $member->storeViaApi();
-					Yii::log('Member store result for attendee ' . $attId . ': ' . print_r($memberResult, true), CLogger::LEVEL_INFO, 'sports');
+                    $member->code = 'T' . $teamId . '-A' . $attId;
+                    $member->storeViaApi();
                 }
             }
 			if ($isAjax) {
