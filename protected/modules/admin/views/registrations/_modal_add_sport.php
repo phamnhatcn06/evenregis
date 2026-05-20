@@ -15,7 +15,7 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Môn thể thao <span class="text-danger">*</span></label>
-                                <select class="form-select" id="sport_item_id" name="sport_id" required>
+                                <select class="form-select" id="sport_item_id" name="sport_id">
                                     <option value="">-- Chọn môn thể thao --</option>
                                 </select>
                                 <div id="sport_selected_name" class="form-control bg-light d-none" style="pointer-events:none;"></div>

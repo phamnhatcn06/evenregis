@@ -197,11 +197,11 @@ foreach ($transportsData as $t) {
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
             <div>
                 <?php if ($isHotel): ?>
-                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAttendeeFromStaffModal">
+                    <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addAttendeeFromStaffModal">
                         <i class="fa fa-user-plus me-1"></i>Chọn từ danh sách nhân viên
                     </button>
                 <?php else: ?>
-                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addAttendeeManualModal">
+                    <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addAttendeeManualModal">
                         <i class="fa fa-user-plus me-1"></i>Thêm người tham dự
                     </button>
                 <?php endif; ?>
@@ -350,8 +350,8 @@ foreach ($registrationDetails as $detail) {
 
 <!-- 1. ĐĂNG KÝ THI ĐẤU THỂ THAO -->
 <div class="card mb-3" id="sports-registration-card">
-    <div class="card-header bg-success text-white">
-        <h5 class="mb-0"><i class="fa fa-futbol-o me-2"></i>Đăng ký thi đấu thể thao</h5>
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao</h5>
     </div>
     <div class="card-body">
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
@@ -359,9 +359,14 @@ foreach ($registrationDetails as $detail) {
         <div class="row mb-3 g-3 align-items-end">
             <div class="col-md-5">
                 <label class="form-label mb-1">Đơn vị liên quân</label>
-                <select class="form-select" id="sport_alliance_property" multiple style="height:42px;">
-                </select>
-                <small class="text-muted">Áp dụng cho môn đội > 3 người. Để trống nếu không liên quân.</small>
+                <div>
+                    <button type="button" class="btn btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#alliancePropertyModal" style="height:42px;">
+                        <i class="fa fa-handshake-o me-1"></i>Thêm đơn vị liên quân
+                    </button>
+                    <div id="alliance_selected_texts" class="mt-2 small text-primary fw-bold"></div>
+                </div>
+                <select class="d-none" id="sport_alliance_property" multiple></select>
+                <small class="text-muted mt-1 d-block">Áp dụng cho môn đội > 3 người. Để trống nếu không liên quân.</small>
             </div>
             <div class="col-md-4">
                 <label class="form-label mb-1">Môn thể thao <span class="text-danger">*</span></label>
@@ -370,22 +375,36 @@ foreach ($registrationDetails as $detail) {
                 </select>
             </div>
             <div class="col-md-3">
-                <button type="button" class="btn btn-success w-100" id="btn_open_sport_modal" disabled>
+                <button type="button" class="btn btn-primary text-white w-100" id="btn_open_sport_modal" disabled>
                     <i class="fa fa-users me-1"></i>Chọn VĐV & Đăng ký
                 </button>
             </div>
         </div>
         <?php endif; ?>
 
+        <!-- Preview: Danh sách đang chọn (chưa lưu) -->
+        <div id="sport_preview_container" class="mb-3" style="display:none;">
+            <div class="alert alert-info py-2 mb-2">
+                <i class="fa fa-info-circle me-1"></i>Danh sách đang chọn (chưa lưu vào hệ thống)
+            </div>
+            <div id="sport_preview_list"></div>
+            <div class="text-end mt-2">
+                <button type="button" class="btn btn-success" id="btn_save_all_sports">
+                    <i class="fa fa-save me-1"></i>Lưu tất cả đăng ký
+                </button>
+            </div>
+        </div>
+
         <!-- Danh sách đã đăng ký -->
-        <?php if (empty($detailsByContent['sports'])): ?>
-            <p class="text-muted mb-0">Chưa đăng ký môn thể thao nào.</p>
+        <?php if (empty($sportTeams)): ?>
+            <p class="text-muted mb-0" id="no_sport_msg">Chưa đăng ký môn thể thao nào.</p>
         <?php else: ?>
             <table class="table table-bordered table-striped table-sm mb-0">
                 <thead class="table-light">
                     <tr>
                         <th>Môn thi đấu</th>
-                        <th style="width:150px;">Liên quân với</th>
+                        <th>Tên đội</th>
+                        <th style="width:150px;">Liên quân</th>
                         <th style="width:100px;">Số VĐV</th>
                         <th>Danh sách VĐV</th>
                         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
@@ -394,25 +413,30 @@ foreach ($registrationDetails as $detail) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($detailsByContent['sports'] as $detail):
-                        $detailId = isset($detail['id']) ? $detail['id'] : null;
-                        $sportAtts = ($detailId && isset($detailAttendees[$detailId])) ? $detailAttendees[$detailId] : array();
+                    <?php foreach ($sportTeams as $team):
+                        $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+                        $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
+                        $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
+                        $isAlliance = isset($team->is_alliance) ? $team->is_alliance : (isset($team['is_alliance']) ? $team['is_alliance'] : 0);
+                        $allianceNames = isset($team->alliance_org_names) ? $team->alliance_org_names : ($isAlliance ? 'Có' : '-');
+                        $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
                     ?>
                         <tr>
-                            <td><?php echo CHtml::encode($detail['sport_name']); ?></td>
-                            <td><?php echo CHtml::encode(isset($detail['alliance_names']) ? $detail['alliance_names'] : '-'); ?></td>
-                            <td class="text-center"><?php echo count($sportAtts); ?></td>
+                            <td><?php echo CHtml::encode($sportName); ?></td>
+                            <td><span class="badge bg-primary"><?php echo CHtml::encode($teamName); ?></span></td>
+                            <td><?php echo CHtml::encode($allianceNames); ?></td>
+                            <td class="text-center"><?php echo count($members); ?></td>
                             <td>
-                                <?php foreach ($sportAtts as $idx => $att):
-                                    $name = isset($att['attendee_name']) ? $att['attendee_name'] : (isset($att['staff_name']) ? $att['staff_name'] : '');
+                                <?php foreach ($members as $idx => $member):
+                                    $name = isset($member->attendee_name) ? $member->attendee_name : (isset($member['attendee_name']) ? $member['attendee_name'] : '');
                                 ?>
                                     <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                                 <td class="text-center">
-                                    <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detailId, 'registration_id' => $model->id)); ?>" id="delete-detail-form-<?php echo $detailId; ?>" style="display:none;"></form>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDetail(<?php echo $detailId; ?>)">
+                                    <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamId, 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamId; ?>" style="display:none;"></form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamId; ?>)">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
@@ -427,13 +451,13 @@ foreach ($registrationDetails as $detail) {
 
 <!-- 2. ĐĂNG KÝ THI NGHIỆP VỤ -->
 <div class="card mb-3" id="competition-registration-card">
-    <div class="card-header bg-warning">
-        <h5 class="mb-0"><i class="fa fa-trophy me-2"></i>Đăng ký thi nghiệp vụ</h5>
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fa fa-trophy me-2 text-primary"></i>Đăng ký thi nghiệp vụ</h5>
     </div>
     <div class="card-body">
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
         <div class="mb-3">
-            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
+            <button type="button" class="btn btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
                 <i class="fa fa-plus me-1"></i>Đăng ký thi nghiệp vụ
             </button>
         </div>
@@ -489,13 +513,13 @@ foreach ($registrationDetails as $detail) {
 
 <!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
 <div class="card mb-3" id="miss-registration-card">
-    <div class="card-header bg-danger text-white">
-        <h5 class="mb-0"><i class="fa fa-star me-2"></i>Đăng ký thi sắc đẹp</h5>
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi sắc đẹp</h5>
     </div>
     <div class="card-body">
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
         <div class="mb-3">
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addMissModal">
+            <button type="button" class="btn btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addMissModal">
                 <i class="fa fa-plus me-1"></i>Đăng ký thi sắc đẹp
             </button>
         </div>
@@ -548,13 +572,13 @@ foreach ($registrationDetails as $detail) {
 
 <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
 <div class="card mb-3" id="talent-registration-card">
-    <div class="card-header bg-info text-white">
-        <h5 class="mb-0"><i class="fa fa-music me-2"></i>Đăng ký văn nghệ</h5>
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
     </div>
     <div class="card-body">
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
         <div class="mb-3">
-            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addTalentModal">
+            <button type="button" class="btn btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addTalentModal">
                 <i class="fa fa-plus me-1"></i>Đăng ký văn nghệ
             </button>
         </div>
@@ -615,6 +639,27 @@ foreach ($registrationDetails as $detail) {
 <?php $this->renderPartial('_modal_edit_attendee', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
 <?php $this->renderPartial('_modal_add_attendee_manual', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
 <?php $this->renderPartial('_modal_all_documents'); ?>
+
+<!-- Modal Chọn Đơn vị liên quân -->
+<div class="modal fade" id="alliancePropertyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-handshake-o me-2"></i>Chọn đơn vị liên quân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="alliance_modal_list" style="max-height: 300px; overflow-y: auto;">
+                    <div class="text-center text-muted"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="btn_confirm_alliance">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php
 // Register flatpickr
@@ -704,6 +749,8 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     function resetCompetitionModal() { RegistrationView.resetCompetitionModal(); }
     function editAttendee(id) { RegistrationView.editAttendee(id); }
     function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
+    function removeAllianceProperty(id) { RegistrationView.removeAllianceProperty(id); }
+    function confirmDeleteTeam(id) { RegistrationView.confirmDeleteTeam(id); }
 
     function initAttendeesDataTable() {
         if (typeof $.fn.DataTable === "undefined") return;

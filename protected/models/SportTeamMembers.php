@@ -20,7 +20,7 @@ class SportTeamMembers extends BaseSportTeamMembers
     {
         return array(
             'id' => 'ID',
-            'team_id' => 'Đội',
+            'sport_team_id' => 'Đội',
             'attendee_id' => 'Người tham dự',
             'jersey_number' => 'Số áo',
             'position' => 'Vị trí',

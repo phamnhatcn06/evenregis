@@ -37,6 +37,21 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+        // Load Sport Teams cho đơn vị
+        $sportTeams = array();
+        $sportTeamMembers = array();
+        if ($model->event_id && $model->property_id) {
+            $teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id), 100)->getData();
+            foreach ($teamsData as $team) {
+                $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+                if ($teamId) {
+                    $sportTeams[] = $team;
+                    $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+                    $sportTeamMembers[$teamId] = $members;
+                }
+            }
+        }
+
 		// Load alliance request nếu có liên quân
 		$allianceRequest = null;
 		if ($model->relation_property_id && $model->event_id && $model->property_id) {
@@ -52,6 +67,8 @@ class RegistrationsController extends AdminController
 			'registrationDetails' => $registrationDetails,
 			'detailAttendees' => $detailAttendees,
 			'allianceRequest' => $allianceRequest,
+            'sportTeams' => $sportTeams,
+            'sportTeamMembers' => $sportTeamMembers,
 		));
 	}
 
@@ -413,6 +430,19 @@ class RegistrationsController extends AdminController
 		if ($registration && $registration->property_id) {
 			$property = Properties::fetchFromApi($registration->property_id);
 			if ($property && $property->region_id) {
+                // Get existing alliance requests
+                $existingRequests = AllianceRequests::getApiDataProvider(array(
+                    'event_id' => $registration->event_id,
+                    'requester_org_id' => $registration->property_id,
+                ), 100)->getData();
+                $existingTargetIds = array();
+                foreach ($existingRequests as $req) {
+                    $targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
+                    if ($targetId) {
+                        $existingTargetIds[] = $targetId;
+                    }
+                }
+
 				$properties = Properties::getApiDataProvider(array('region_id' => $property->region_id), 500)->getData();
 				foreach ($properties as $p) {
 					$pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
@@ -424,6 +454,7 @@ class RegistrationsController extends AdminController
 						'id' => $pId,
 						'code' => isset($p['code']) ? $p['code'] : '',
 						'name' => isset($p['name']) ? $p['name'] : '',
+                        'is_selected' => in_array($pId, $existingTargetIds) ? 1 : 0,
 					);
 				}
 				usort($result, function ($a, $b) {
@@ -434,6 +465,59 @@ class RegistrationsController extends AdminController
 
 		header('Content-Type: application/json');
 		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionSaveAllianceProperties()
+	{
+		if (!Yii::app()->request->isPostRequest) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		$registrationId = Yii::app()->request->getPost('registration_id');
+		$targetOrgIds = Yii::app()->request->getPost('target_org_ids', array());
+
+		$model = Registrations::fetchFromApi($registrationId);
+		if (!$model || !$model->event_id || !$model->property_id) {
+			header('Content-Type: application/json');
+			echo CJSON::encode(array('success' => false, 'error' => 'Phiếu đăng ký không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$eventId = $model->event_id;
+		$requesterOrgId = $model->property_id;
+
+        // Get existing alliance requests
+        $existingRequests = AllianceRequests::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'requester_org_id' => $requesterOrgId,
+        ), 100)->getData();
+
+        $existingTargetIds = array();
+        foreach ($existingRequests as $req) {
+            $reqId = isset($req['id']) ? $req['id'] : (isset($req->id) ? $req->id : null);
+            $targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
+            
+            if ($targetId) {
+                $existingTargetIds[] = $targetId;
+                // If it's unchecked, we delete the alliance request
+                if (!in_array($targetId, $targetOrgIds)) {
+                    AllianceRequests::deleteViaApi($reqId);
+                }
+            }
+        }
+
+        // Add new ones
+        if (!empty($targetOrgIds)) {
+            foreach ($targetOrgIds as $targetId) {
+                if (!in_array($targetId, $existingTargetIds)) {
+                    $this->createAllianceRequest($eventId, $requesterOrgId, $targetId);
+                }
+            }
+        }
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true));
 		Yii::app()->end();
 	}
 
@@ -484,36 +568,65 @@ class RegistrationsController extends AdminController
 		$ssoUser = AuthHandler::getUser();
 		$createdBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
 
-		// Ghi chú thêm thông tin liên quân và tên đội
-		$noteArr = array();
-		if ($teamName) {
-			$noteArr[] = 'Tên đội: ' . $teamName;
-		}
-		if (!empty($alliancePropertyIds)) {
-			$noteArr[] = 'Liên quân với: ' . implode(', ', $alliancePropertyIds);
-		}
-		if ($note) {
-			$noteArr[] = $note;
-		}
+        $registration = Registrations::fetchFromApi($registrationId);
+        if (!$registration) {
+            Yii::app()->user->setFlash('error', 'Không tìm thấy phiếu đăng ký.');
+			$this->redirect(array('admin'));
+			return;
+        }
 
-		// Tạo registration detail
-		$detailData = array(
-			'registration_id' => $registrationId,
-			'content_id' => $contentId,
-			'sport_id' => $sportId,
-			'quantity' => count($attendeeIds),
-			'note' => implode(' | ', $noteArr),
-		);
+        // Tạo SportTeam
+        $teamModel = new SportTeams();
+        $teamModel->event_id = $registration->event_id;
+        $teamModel->sport_id = $sportId;
+        $teamModel->property_id = $registration->property_id;
+        $teamModel->name = $teamName ? $teamName : 'Team';
+        $teamModel->code = $teamName ? $teamName : 'TEAM';
+        // Set public custom property if needed
+        $teamModel->team_name = $teamName;
+        $teamModel->is_alliance = empty($alliancePropertyIds) ? 0 : 1;
+        $teamModel->alliance_property_ids = $alliancePropertyIds;
+        $teamModel->status = SportTeams::STATUS_CONFIRMED;
 
-		$result = RegistrationDetails::storeViaApi($detailData);
-		if ($result['success']) {
-			Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
-		} else {
-			Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể đăng ký.');
-		}
+        $teamResult = $teamModel->storeViaApi();
+        if ($teamResult['success']) {
+            $teamId = isset($teamResult['data']['data']['id']) ? $teamResult['data']['data']['id'] : (isset($teamResult['data']['id']) ? $teamResult['data']['id'] : null);
+            if ($teamId) {
+                // Tạo SportTeamMembers
+                foreach ($attendeeIds as $attId) {
+                    $member = new SportTeamMembers();
+                    $member->sport_team_id = $teamId;
+                    $member->attendee_id = $attId;
+                    $member->storeViaApi();
+                }
+            }
+            Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
+        } else {
+            Yii::app()->user->setFlash('error', isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.');
+            $this->redirect(array('view', 'id' => $registrationId));
+            return;
+        }
 
+		// Không tạo RegistrationDetails nữa, vì môn thể thao sẽ được quản lý bởi SportTeams
 		$this->redirect(array('view', 'id' => $registrationId));
 	}
+
+    public function actionDeleteSportTeam($id, $registration_id)
+    {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            $result = SportTeams::deleteViaApi($id);
+
+            if ($result['success']) {
+                Yii::app()->user->setFlash('success', 'Xóa đội thể thao thành công.');
+            } else {
+                Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể xóa đội.');
+            }
+
+            $this->redirect(array('view', 'id' => $registration_id));
+        } else {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+        }
+    }
 
 	public function actionAdmin()
 	{

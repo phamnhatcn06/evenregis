@@ -59,9 +59,19 @@ var RegistrationView = (function() {
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success && data.data && data.data.length > 0) {
-                    sportSelect.innerHTML = renderSportsTree(data.data, registeredSports);
+                    var html = renderSportsTree(data.data, registeredSports);
+                    sportSelect.innerHTML = html;
+                    var modalSportSelect = document.getElementById('sport_item_id');
+                    if (modalSportSelect) {
+                        modalSportSelect.innerHTML = html;
+                    }
                 } else {
-                    sportSelect.innerHTML = '<option value="">-- Không có môn nào --</option>';
+                    var emptyHtml = '<option value="">-- Không có môn nào --</option>';
+                    sportSelect.innerHTML = emptyHtml;
+                    var modalSportSelect = document.getElementById('sport_item_id');
+                    if (modalSportSelect) {
+                        modalSportSelect.innerHTML = emptyHtml;
+                    }
                 }
             });
     }
@@ -75,15 +85,94 @@ var RegistrationView = (function() {
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 allianceSelect.innerHTML = '';
+                var modalList = document.getElementById('alliance_modal_list');
+                if (modalList) modalList.innerHTML = '';
+
                 if (data.success && data.data && data.data.length > 0) {
                     data.data.forEach(function(item) {
                         var opt = document.createElement('option');
                         opt.value = item.id;
+                        opt.setAttribute('data-code', item.code);
                         opt.textContent = item.code + ' - ' + item.name;
                         allianceSelect.appendChild(opt);
+
+                        if (modalList) {
+                            var div = document.createElement('div');
+                            div.className = 'form-check mb-2';
+                            var escapedName = escapeHtml(item.code + ' - ' + item.name);
+                            var checked = item.is_selected == 1 ? 'checked' : '';
+                            div.innerHTML = '<input class="form-check-input alliance-modal-cb" type="checkbox" value="'+item.id+'" data-name="'+escapedName+'" data-code="'+escapeHtml(item.code)+'" id="modal_alliance_'+item.id+'" '+checked+'>' +
+                                            '<label class="form-check-label" for="modal_alliance_'+item.id+'">' + escapedName + '</label>';
+                            modalList.appendChild(div);
+                        }
                     });
+                    
+                    // Trigger a UI update to display previously selected
+                    setTimeout(function() {
+                        if (document.getElementById('btn_confirm_alliance')) {
+                            // Cập nhật lại UI hiển thị ở dưới nút
+                            var checkboxes = document.querySelectorAll('.alliance-modal-cb');
+                            var selectedTexts = [];
+                            var selectedIds = [];
+                            checkboxes.forEach(function(cb) {
+                                if (cb.checked) {
+                                    selectedIds.push(cb.value);
+                                    selectedTexts.push(cb.getAttribute('data-name'));
+                                }
+                            });
+                            
+                            var allianceSelect = document.getElementById('sport_alliance_property');
+                            if (allianceSelect) {
+                                Array.from(allianceSelect.options).forEach(function(opt) {
+                                    opt.selected = selectedIds.includes(opt.value);
+                                });
+                            }
+                            
+                            var displayText = document.getElementById('alliance_selected_texts');
+                            if (displayText) {
+                                displayText.innerHTML = '';
+                                if (selectedIds.length > 0) {
+                                    for (var i = 0; i < selectedIds.length; i++) {
+                                        var selId = selectedIds[i];
+                                        var selText = selectedTexts[i];
+                                        var badge = document.createElement('span');
+                                        badge.className = 'badge bg-primary me-1 mb-1 p-2 border';
+                                        badge.style.fontSize = '12px';
+                                        badge.innerHTML = selText + ' <i class="fa fa-times ms-1 text-white" style="cursor:pointer;" onclick="removeAllianceProperty(\'' + selId + '\')" title="Huỷ"></i>';
+                                        displayText.appendChild(badge);
+                                    }
+                                }
+                            }
+                        }
+                    }, 100);
+                } else {
+                    if (modalList) {
+                        modalList.innerHTML = '<p class="text-muted mb-0">Không có đơn vị nào để liên quân.</p>';
+                    }
                 }
             });
+    }
+
+    function updateSportTeamName() {
+        var teamNameInput = document.getElementById('sport_team_name');
+        if (!teamNameInput) return;
+
+        var allianceSelect = document.getElementById('sport_alliance_property');
+        var allianceCodes = [];
+        if (allianceSelect) {
+            Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
+                var code = opt.getAttribute('data-code');
+                if (code) {
+                    allianceCodes.push(code);
+                }
+            });
+        }
+
+        if (allianceCodes.length > 0) {
+            teamNameInput.value = 'Liên quân ' + propertyCode + ' - ' + allianceCodes.join(' - ');
+        } else {
+            teamNameInput.value = propertyCode;
+        }
     }
 
     // Bind events cho sport card (dropdown chọn môn, liên quân, button mở modal)
@@ -97,6 +186,87 @@ var RegistrationView = (function() {
                 if (btnOpen) {
                     btnOpen.disabled = !this.value;
                 }
+            });
+        }
+
+        var btnConfirmAlliance = document.getElementById('btn_confirm_alliance');
+        if (btnConfirmAlliance) {
+            btnConfirmAlliance.addEventListener('click', function() {
+                var checkboxes = document.querySelectorAll('.alliance-modal-cb');
+                var selectedTexts = [];
+                var selectedIds = [];
+                checkboxes.forEach(function(cb) {
+                    if (cb.checked) {
+                        selectedIds.push(cb.value);
+                        selectedTexts.push(cb.getAttribute('data-name'));
+                    }
+                });
+
+                if (allianceSelect) {
+                    Array.from(allianceSelect.options).forEach(function(opt) {
+                        opt.selected = selectedIds.includes(opt.value);
+                    });
+                }
+
+                var displayText = document.getElementById('alliance_selected_texts');
+                if (displayText) {
+                    displayText.innerHTML = '';
+                    if (selectedIds.length > 0) {
+                        for (var i = 0; i < selectedIds.length; i++) {
+                            var selId = selectedIds[i];
+                            var selText = selectedTexts[i];
+                            var badge = document.createElement('span');
+                            badge.className = 'badge bg-primary me-1 mb-1 p-2 border';
+                            badge.style.fontSize = '12px';
+                            badge.innerHTML = selText + ' <i class="fa fa-times ms-1 text-white" style="cursor:pointer;" onclick="removeAllianceProperty(\'' + selId + '\')" title="Huỷ"></i>';
+                            displayText.appendChild(badge);
+                        }
+                    }
+                }
+
+                // AJAX Save Alliance Properties
+                btnConfirmAlliance.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang lưu...';
+                btnConfirmAlliance.disabled = true;
+
+                var formData = new FormData();
+                formData.append('registration_id', registrationId);
+                selectedIds.forEach(function(id) {
+                    formData.append('target_org_ids[]', id);
+                });
+
+                fetch(window.BASE_URL + '/admin/registrations/saveAllianceProperties', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    btnConfirmAlliance.innerHTML = 'Xác nhận';
+                    btnConfirmAlliance.disabled = false;
+                    
+                    if (data.success) {
+                        Toast.success('Lưu đơn vị liên quân thành công');
+                        
+                        var modalEl = document.getElementById('alliancePropertyModal');
+                        if (modalEl) {
+                            var modal = bootstrap.Modal.getInstance(modalEl);
+                            if (modal) {
+                                modal.hide();
+                            } else {
+                                modal = new bootstrap.Modal(modalEl);
+                                modal.hide();
+                            }
+                        }
+                        
+                        updateSportTeamName();
+                    } else {
+                        Toast.error(data.error || 'Có lỗi xảy ra');
+                    }
+                })
+                .catch(function(err) {
+                    btnConfirmAlliance.innerHTML = 'Xác nhận';
+                    btnConfirmAlliance.disabled = false;
+                    Toast.error('Có lỗi xảy ra khi lưu đơn vị liên quân');
+                });
             });
         }
 
@@ -152,6 +322,8 @@ var RegistrationView = (function() {
 
                 // Load attendees
                 loadSportAttendees();
+                
+                updateSportTeamName();
             });
         }
     }
@@ -460,6 +632,12 @@ var RegistrationView = (function() {
         var form = document.getElementById('add-sport-form');
         if (form) {
             form.addEventListener('submit', function(e) {
+                var sportItem = document.getElementById('sport_item_id');
+                if (sportItem && !sportItem.value) {
+                    e.preventDefault();
+                    Toast.error('Vui lòng chọn môn thể thao.');
+                    return false;
+                }
                 if (sportSelectedAttendees.length === 0) {
                     e.preventDefault();
                     Toast.error('Vui lòng chọn ít nhất một người tham dự.');
@@ -680,9 +858,52 @@ var RegistrationView = (function() {
         // Reset UI elements
         resetSportModalUI();
 
-        loadAllianceProperties();
+        loadAlliancePropertiesDropdown();
         loadSportsList();
         loadSportAttendees();
+    }
+
+    function removeAllianceProperty(id) {
+        var cb = document.getElementById('modal_alliance_' + id);
+        if (cb) cb.checked = false;
+
+        var allianceSelect = document.getElementById('sport_alliance_property');
+        if (allianceSelect) {
+            Array.from(allianceSelect.options).forEach(function(opt) {
+                if (opt.value == id) {
+                    opt.selected = false;
+                }
+            });
+        }
+
+        // Re-render badges
+        var checkboxes = document.querySelectorAll('.alliance-modal-cb');
+        var selectedTexts = [];
+        var selectedIds = [];
+        checkboxes.forEach(function(cbEl) {
+            if (cbEl.checked) {
+                selectedIds.push(cbEl.value);
+                selectedTexts.push(cbEl.getAttribute('data-name'));
+            }
+        });
+
+        var displayText = document.getElementById('alliance_selected_texts');
+        if (displayText) {
+            displayText.innerHTML = '';
+            if (selectedIds.length > 0) {
+                for (var i = 0; i < selectedIds.length; i++) {
+                    var selId = selectedIds[i];
+                    var selText = selectedTexts[i];
+                    var badge = document.createElement('span');
+                    badge.className = 'badge bg-primary me-1 mb-1 p-2 border';
+                    badge.style.fontSize = '12px';
+                    badge.innerHTML = selText + ' <i class="fa fa-times ms-1 text-white" style="cursor:pointer;" onclick="removeAllianceProperty(\'' + selId + '\')" title="Huỷ"></i>';
+                    displayText.appendChild(badge);
+                }
+            }
+        }
+        
+        updateSportTeamName();
     }
 
     function escapeHtml(text) {
@@ -767,6 +988,24 @@ var RegistrationView = (function() {
                     });
                 }
             });
+    }
+
+    function confirmDeleteTeam(id) {
+        Swal.fire({
+            title: 'Xóa đội thể thao?',
+            text: "Toàn bộ thành viên và thông tin đội sẽ bị xóa. Thao tác này không thể hoàn tác!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Có, xóa ngay!',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var form = document.getElementById('delete-team-form-' + id);
+                if (form) form.submit();
+            }
+        });
     }
 
     function viewDocument(url, type) {
@@ -1475,6 +1714,8 @@ var RegistrationView = (function() {
         viewDocument: viewDocument,
         confirmDeleteDetail: confirmDeleteDetail,
         editAttendee: editAttendee,
-        confirmDeleteAttendee: confirmDeleteAttendee
+        confirmDeleteAttendee: confirmDeleteAttendee,
+        removeAllianceProperty: removeAllianceProperty,
+        confirmDeleteTeam: confirmDeleteTeam
     };
 })();

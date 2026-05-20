@@ -10,7 +10,7 @@ class SportTeamsController extends AdminController
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
-        $members = SportTeamMembers::getApiDataProvider(array('team_id' => $id), 100)->getData();
+        $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
 
         $this->render('view', array(
             'model' => $model,
@@ -140,7 +140,7 @@ class SportTeamsController extends AdminController
 
         if (isset($_POST['SportTeamMembers'])) {
             $model->setAttributes($_POST['SportTeamMembers']);
-            $model->team_id = $teamId;
+            $model->sport_team_id = $teamId;
 
             $attendeeId = $model->attendee_id;
             if (!SportTeamMembers::canRegisterMore($attendeeId)) {
@@ -172,7 +172,7 @@ class SportTeamsController extends AdminController
     {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             $member = SportTeamMembers::fetchFromApi($id);
-            $teamId = $member ? $member->team_id : null;
+            $teamId = $member ? $member->sport_team_id : null;
 
             $result = SportTeamMembers::deleteViaApi($id);
 

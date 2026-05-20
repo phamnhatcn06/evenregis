@@ -12,10 +12,21 @@ class SportTeams extends BaseSportTeams
     public $property_name;
     public $alliance_org_names;
     public $member_count;
+    public $team_name;
+    public $is_alliance;
+    public $alliance_property_ids;
+    public $status;
 
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
+    }
+
+    public function rules()
+    {
+        $rules = parent::rules();
+        $rules[] = array('sport_name, property_name, alliance_org_names, member_count, team_name, is_alliance, alliance_property_ids, status', 'safe');
+        return $rules;
     }
 
     public function attributeLabels()
@@ -51,7 +62,13 @@ class SportTeams extends BaseSportTeams
 
     public function storeViaApi()
     {
-        $data = array_filter($this->attributes, function ($value) {
+        $data = $this->attributes;
+        $data['team_name'] = $this->team_name;
+        $data['is_alliance'] = $this->is_alliance;
+        $data['alliance_property_ids'] = $this->alliance_property_ids;
+        $data['status'] = $this->status;
+
+        $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
         });
         return ApiClient::post(ApiEndpoints::SPORT_TEAM_STORE, $data);
@@ -59,8 +76,14 @@ class SportTeams extends BaseSportTeams
 
     public function updateViaApi()
     {
+        $data = $this->attributes;
+        $data['team_name'] = $this->team_name;
+        $data['is_alliance'] = $this->is_alliance;
+        $data['alliance_property_ids'] = $this->alliance_property_ids;
+        $data['status'] = $this->status;
+
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_TEAM_UPDATE, array('id' => $this->id));
-        return ApiClient::post($url, $this->attributes);
+        return ApiClient::post($url, $data);
     }
 
     public static function deleteViaApi($id)
