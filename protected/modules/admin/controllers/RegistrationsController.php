@@ -630,7 +630,9 @@ class RegistrationsController extends AdminController
         }
 
 		// Không tạo RegistrationDetails nữa, vì môn thể thao sẽ được quản lý bởi SportTeams
-		$this->redirect(array('view', 'id' => $registrationId));
+		if (!$isAjax) {
+			$this->redirect(array('view', 'id' => $registrationId));
+		}
 	}
 
     public function actionDeleteSportTeam($id, $registration_id)
