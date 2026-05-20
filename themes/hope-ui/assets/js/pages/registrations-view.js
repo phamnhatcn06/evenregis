@@ -20,6 +20,9 @@ var RegistrationView = (function() {
     var sportAllAttendees = [];
     var sportSelectedAttendees = [];
 
+    // Pending sport registrations (preview before save)
+    var pendingSportRegistrations = [];
+
     function init(config) {
         eventId = config.eventId;
         registrationId = config.registrationId;
