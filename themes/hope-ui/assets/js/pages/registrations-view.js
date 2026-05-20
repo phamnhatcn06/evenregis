@@ -632,22 +632,177 @@ var RegistrationView = (function() {
         document.getElementById('btn_remove_sport_attendee')?.addEventListener('click', removeSelectedSportAttendee);
         document.getElementById('btn_remove_all_sport_attendee')?.addEventListener('click', removeAllSportAttendees);
 
-        var form = document.getElementById('add-sport-form');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                var sportItem = document.getElementById('sport_item_id');
-                if (sportItem && !sportItem.value) {
-                    e.preventDefault();
-                    Toast.error('Vui lòng chọn môn thể thao.');
-                    return false;
-                }
-                if (sportSelectedAttendees.length === 0) {
-                    e.preventDefault();
-                    Toast.error('Vui lòng chọn ít nhất một người tham dự.');
-                    return false;
-                }
+        // Thêm vào danh sách preview
+        document.getElementById('btn_add_to_preview')?.addEventListener('click', addSportToPreview);
+
+        // Lưu tất cả
+        document.getElementById('btn_save_all_sports')?.addEventListener('click', saveAllSportRegistrations);
+    }
+
+    function addSportToPreview() {
+        var sportSelect = document.getElementById('sport_select_main');
+        var sportId = sportSelect ? sportSelect.value : '';
+        var sportName = sportSelect && sportSelect.selectedIndex > 0 ? sportSelect.options[sportSelect.selectedIndex].text.trim() : '';
+
+        if (!sportId) {
+            Toast.error('Vui lòng chọn môn thể thao.');
+            return;
+        }
+        if (sportSelectedAttendees.length === 0) {
+            Toast.error('Vui lòng chọn ít nhất một người tham dự.');
+            return;
+        }
+
+        // Check if sport already in pending list
+        var existingIdx = pendingSportRegistrations.findIndex(function(r) { return r.sportId == sportId; });
+        if (existingIdx !== -1) {
+            Toast.error('Môn "' + sportName + '" đã có trong danh sách. Vui lòng xóa trước khi thêm lại.');
+            return;
+        }
+
+        // Get alliance info
+        var allianceSelect = document.getElementById('sport_alliance_property');
+        var allianceIds = [];
+        var allianceCodes = [];
+        if (allianceSelect) {
+            Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
+                allianceIds.push(opt.value);
+                allianceCodes.push(opt.getAttribute('data-code'));
             });
         }
+
+        var teamName = document.getElementById('sport_team_name')?.value || propertyCode;
+
+        // Add to pending list
+        pendingSportRegistrations.push({
+            sportId: sportId,
+            sportName: sportName,
+            teamName: teamName,
+            allianceIds: allianceIds,
+            allianceCodes: allianceCodes,
+            attendees: sportSelectedAttendees.slice() // clone array
+        });
+
+        // Close modal and render preview
+        var modalEl = document.getElementById('addDetailModal');
+        if (modalEl) {
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+
+        renderSportPreview();
+        Toast.success('Đã thêm "' + sportName + '" vào danh sách.');
+
+        // Reset dropdown
+        if (sportSelect) sportSelect.value = '';
+        document.getElementById('btn_open_sport_modal').disabled = true;
+    }
+
+    function renderSportPreview() {
+        var container = document.getElementById('sport_preview_container');
+        var listEl = document.getElementById('sport_preview_list');
+        var noMsg = document.getElementById('no_sport_msg');
+
+        if (!container || !listEl) return;
+
+        if (pendingSportRegistrations.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'block';
+        if (noMsg) noMsg.style.display = 'none';
+
+        var html = '<table class="table table-bordered table-striped table-sm mb-0">' +
+            '<thead class="table-warning"><tr>' +
+            '<th>Môn thi đấu</th>' +
+            '<th>Tên đội</th>' +
+            '<th style="width:150px;">Liên quân</th>' +
+            '<th style="width:100px;">Số VĐV</th>' +
+            '<th>Danh sách VĐV</th>' +
+            '<th style="width:60px;"></th>' +
+            '</tr></thead><tbody>';
+
+        pendingSportRegistrations.forEach(function(reg, idx) {
+            html += '<tr>' +
+                '<td>' + escapeHtml(reg.sportName) + '</td>' +
+                '<td><span class="badge bg-warning text-dark">' + escapeHtml(reg.teamName) + '</span></td>' +
+                '<td>' + (reg.allianceCodes.length > 0 ? escapeHtml(reg.allianceCodes.join(', ')) : '-') + '</td>' +
+                '<td class="text-center">' + reg.attendees.length + '</td>' +
+                '<td>';
+
+            reg.attendees.forEach(function(att, i) {
+                html += '<span class="badge bg-light text-dark border me-1 mb-1">' + (i + 1) + '. ' + escapeHtml(att.full_name) + '</span>';
+            });
+
+            html += '</td>' +
+                '<td class="text-center">' +
+                '<button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.removePendingSport(' + idx + ')" title="Xóa">' +
+                '<i class="fa fa-trash"></i></button></td></tr>';
+        });
+
+        html += '</tbody></table>';
+        listEl.innerHTML = html;
+    }
+
+    function removePendingSport(idx) {
+        if (idx >= 0 && idx < pendingSportRegistrations.length) {
+            var removed = pendingSportRegistrations.splice(idx, 1)[0];
+            Toast.info('Đã xóa "' + removed.sportName + '" khỏi danh sách.');
+            renderSportPreview();
+        }
+    }
+
+    function saveAllSportRegistrations() {
+        if (pendingSportRegistrations.length === 0) {
+            Toast.error('Không có môn nào để lưu.');
+            return;
+        }
+
+        var btn = document.getElementById('btn_save_all_sports');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+
+        var promises = pendingSportRegistrations.map(function(reg) {
+            var formData = new FormData();
+            formData.append('registration_id', registrationId);
+            formData.append('content_type', 'sports');
+            formData.append('content_id', sportsContentId || '');
+            formData.append('sport_id', reg.sportId);
+            formData.append('team_name', reg.teamName);
+            reg.allianceIds.forEach(function(id) {
+                formData.append('alliance_property_ids[]', id);
+            });
+            reg.attendees.forEach(function(att) {
+                formData.append('attendee_ids[]', att.id);
+            });
+
+            return fetch(window.BASE_URL + '/admin/registrations/addSportRegistration', {
+                method: 'POST',
+                body: formData
+            }).then(function(response) { return response.json(); });
+        });
+
+        Promise.all(promises)
+            .then(function(results) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa fa-save me-1"></i>Lưu tất cả đăng ký';
+
+                var successCount = results.filter(function(r) { return r.success; }).length;
+                if (successCount === pendingSportRegistrations.length) {
+                    Toast.success('Đã lưu thành công ' + successCount + ' môn thể thao.');
+                    pendingSportRegistrations = [];
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    Toast.warning('Lưu được ' + successCount + '/' + pendingSportRegistrations.length + ' môn.');
+                    location.reload();
+                }
+            })
+            .catch(function() {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa fa-save me-1"></i>Lưu tất cả đăng ký';
+                Toast.error('Có lỗi xảy ra khi lưu.');
+            });
     }
 
     function loadAllianceProperties() {
