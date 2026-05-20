@@ -173,7 +173,9 @@ var RegistrationView = (function() {
         }
 
         if (allianceCodes.length > 0) {
-            teamNameInput.value = 'Liên quân ' + propertyCode + ' - ' + allianceCodes.join(' - ');
+            // Liên quân + tất cả prefix đơn vị (bao gồm đơn vị hiện tại)
+            var allCodes = [propertyCode].concat(allianceCodes);
+            teamNameInput.value = 'Liên quân ' + allCodes.join(' - ');
         } else {
             teamNameInput.value = propertyCode;
         }
