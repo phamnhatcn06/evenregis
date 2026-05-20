@@ -349,6 +349,13 @@ var RegistrationView = (function() {
         if (allianceWrapper) {
             allianceWrapper.style.display = '';
         }
+
+        // Reset button text and editing state
+        var btnAdd = document.getElementById('btn_add_to_preview');
+        if (btnAdd) {
+            btnAdd.innerHTML = '<i class="fa fa-plus me-1"></i>Thêm vào danh sách';
+        }
+        editingSportIndex = -1;
     }
 
     function loadContentsData() {
