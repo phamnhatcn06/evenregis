@@ -1200,7 +1200,37 @@ var RegistrationView = (function() {
         }
 
         updateSportTeamName();
-        Toast.success('Đã xóa đơn vị liên quân.');
+
+        // Lưu lại danh sách liên quân còn lại vào server
+        var checkboxes = document.querySelectorAll('.alliance-modal-cb');
+        var remainingIds = [];
+        checkboxes.forEach(function(cbEl) {
+            if (cbEl.checked) {
+                remainingIds.push(cbEl.value);
+            }
+        });
+
+        var formData = new FormData();
+        formData.append('registration_id', registrationId);
+        remainingIds.forEach(function(rid) {
+            formData.append('target_org_ids[]', rid);
+        });
+
+        fetch(window.BASE_URL + '/admin/registrations/saveAllianceProperties', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.success) {
+                Toast.success('Đã xóa đơn vị liên quân.');
+            } else {
+                Toast.error(data.error || 'Có lỗi xảy ra.');
+            }
+        })
+        .catch(function() {
+            Toast.error('Lỗi kết nối.');
+        });
     }
 
     function escapeHtml(text) {
