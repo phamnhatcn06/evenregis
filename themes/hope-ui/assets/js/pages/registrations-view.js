@@ -1981,6 +1981,7 @@ var RegistrationView = (function() {
         removeAllianceProperty: removeAllianceProperty,
         confirmDeleteTeam: confirmDeleteTeam,
         removePendingSport: removePendingSport,
-        removeAthleteFromSport: removeAthleteFromSport
+        removeAthleteFromSport: removeAthleteFromSport,
+        editPendingSport: editPendingSport
     };
 })();
