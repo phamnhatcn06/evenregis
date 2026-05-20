@@ -1153,6 +1153,23 @@ var RegistrationView = (function() {
     }
 
     function removeAllianceProperty(id) {
+        Swal.fire({
+            title: 'Xác nhận',
+            text: 'Bạn có chắc muốn xóa đơn vị liên quân này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                doRemoveAllianceProperty(id);
+            }
+        });
+    }
+
+    function doRemoveAllianceProperty(id) {
         // Bỏ chọn checkbox trong modal
         var cb = document.getElementById('modal_alliance_' + id);
         if (cb) cb.checked = false;
@@ -1183,6 +1200,7 @@ var RegistrationView = (function() {
         }
 
         updateSportTeamName();
+        Toast.success('Đã xóa đơn vị liên quân.');
     }
 
     function escapeHtml(text) {
