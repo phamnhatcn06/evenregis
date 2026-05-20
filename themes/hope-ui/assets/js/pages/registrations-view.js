@@ -732,12 +732,15 @@ var RegistrationView = (function() {
                 '<td>';
 
             reg.attendees.forEach(function(att, i) {
-                html += '<span class="badge bg-light text-dark border me-1 mb-1">' + (i + 1) + '. ' + escapeHtml(att.full_name) + '</span>';
+                html += '<span class="badge bg-light text-dark border me-1 mb-1 d-inline-flex align-items-center">' +
+                    (i + 1) + '. ' + escapeHtml(att.full_name) +
+                    ' <i class="fa fa-times ms-1 text-danger" style="cursor:pointer;" onclick="RegistrationView.removeAthleteFromSport(' + idx + ',' + att.id + ')" title="Xóa VĐV"></i>' +
+                    '</span>';
             });
 
             html += '</td>' +
                 '<td class="text-center">' +
-                '<button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.removePendingSport(' + idx + ')" title="Xóa">' +
+                '<button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.removePendingSport(' + idx + ')" title="Xóa môn">' +
                 '<i class="fa fa-trash"></i></button></td></tr>';
         });
 
