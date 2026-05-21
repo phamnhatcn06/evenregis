@@ -47,17 +47,22 @@ class CompetitionDepartments extends BaseCompetitionDepartments
     }
 
     /**
-     * Đồng bộ danh sách department_code cho competition
+     * Đồng bộ danh sách department_code cho competition (qua API)
      */
     public static function syncDepartments($competitionId, $departmentCodes)
     {
-        self::model()->deleteAllByAttributes(array('competition_id' => $competitionId));
+        // Xóa tất cả department cũ qua API
+        $existing = self::getApiDataProvider(array('competition_id' => $competitionId), 100)->getData();
+        foreach ($existing as $item) {
+            self::deleteViaApi($item->id);
+        }
 
+        // Thêm mới qua API
         foreach ($departmentCodes as $code) {
             $model = new self;
             $model->competition_id = $competitionId;
             $model->department_code = $code;
-            $model->save();
+            $model->storeViaApi();
         }
     }
 
