@@ -613,6 +613,7 @@ class RegistrationsController extends AdminController
                     $member->sport_team_id = $teamId;
                     $member->attendee_id = $attId;
                     $member->code = 'T' . $teamId . '-A' . $attId;
+                    $member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
                     $member->storeViaApi();
                 }
             }
