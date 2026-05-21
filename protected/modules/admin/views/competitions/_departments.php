@@ -48,7 +48,6 @@ Yii::app()->clientScript->registerScriptFile(
                                    <?php echo in_array($code, $selectedDepartments) ? 'checked' : ''; ?>>
                             <label class="form-check-label" for="dept_<?php echo CHtml::encode($code); ?>">
                                 <?php echo CHtml::encode($name); ?>
-                                <small class="text-muted">(<?php echo CHtml::encode($code); ?>)</small>
                             </label>
                         </div>
                     </div>
