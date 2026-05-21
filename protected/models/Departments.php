@@ -26,17 +26,18 @@ class Departments extends BaseDepartments
 	}
 
 	/**
-	 * Lấy danh sách tất cả phòng ban dạng array(unique_code => name)
+	 * Lấy danh sách phòng ban theo division_code (distinct)
+	 * @return array(division_code => "division_code - name")
 	 */
 	public static function getActiveList()
 	{
 		$list = array();
-		$models = self::model()->findAll(array(
-			'condition' => 'deleted_at IS NULL AND status = 1',
-			'order' => 'name ASC',
-		));
-		foreach ($models as $model) {
-			$list[$model->unique_code] = $model->name;
+		$sql = "SELECT DISTINCT division_code, name FROM departments
+				WHERE deleted_at IS NULL AND status = 1
+				ORDER BY division_code ASC";
+		$rows = Yii::app()->db->createCommand($sql)->queryAll();
+		foreach ($rows as $row) {
+			$list[$row['division_code']] = $row['division_code'] . ' - ' . $row['name'];
 		}
 		return $list;
 	}
