@@ -2800,6 +2800,68 @@ var RegistrationView = (function() {
         });
     }
 
+    function editMissContestant(id) {
+        fetch(window.BASE_URL + '/admin/registrations/getMissContestant?id=' + id)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data) {
+                    var d = data.data;
+                    document.getElementById('edit_miss_id').value = d.id;
+                    document.getElementById('edit_miss_name').value = d.attendee_name || '';
+                    document.getElementById('edit_miss_candidate_number').value = d.candidate_number || '';
+                    document.getElementById('edit_miss_height').value = d.height_cm || '';
+                    document.getElementById('edit_miss_weight').value = d.weight_kg || '';
+                    document.getElementById('edit_miss_measurements').value = d.measurements || '';
+                    document.getElementById('edit_miss_talent').value = d.talent || '';
+                    document.getElementById('edit_miss_bio').value = d.bio || '';
+
+                    var modal = new bootstrap.Modal(document.getElementById('editMissModal'));
+                    modal.show();
+                } else {
+                    Toast.error(data.error || 'Không thể tải thông tin.');
+                }
+            })
+            .catch(function() { Toast.error('Lỗi kết nối.'); });
+    }
+
+    function bindEditMissForm() {
+        var form = document.getElementById('edit-miss-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var submitBtn = document.getElementById('btn_submit_edit_miss');
+                var originalHtml = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang cập nhật...';
+
+                var formData = new FormData(form);
+                fetch(window.BASE_URL + '/admin/registrations/updateMissContestant', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                    if (data.success) {
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('editMissModal'));
+                        if (modal) modal.hide();
+                        Toast.success(data.message || 'Cập nhật thành công!');
+                        location.reload();
+                    } else {
+                        Toast.error(data.error || 'Có lỗi xảy ra.');
+                    }
+                })
+                .catch(function() {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                    Toast.error('Lỗi kết nối.');
+                });
+            });
+        }
+    }
+
     // ==================== TALENT REGISTRATION ====================
     var talentAllAttendees = [];
     var talentSelectedAttendees = [];
