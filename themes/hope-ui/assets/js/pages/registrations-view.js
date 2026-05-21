@@ -475,8 +475,11 @@ var RegistrationView = (function() {
 
                         Toast.success(data.message || 'Đăng ký thi nghiệp vụ thành công!');
 
-                        // Reload trang để hiển thị danh sách đã đăng ký
-                        setTimeout(function() { location.reload(); }, 800);
+                        // Append row mới vào bảng
+                        appendCompetitionRow(data);
+
+                        // Reset form
+                        resetCompetitionModal();
                     } else {
                         Toast.error(data.error || 'Có lỗi xảy ra khi đăng ký.');
                     }
