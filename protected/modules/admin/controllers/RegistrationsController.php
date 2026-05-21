@@ -981,7 +981,6 @@ class RegistrationsController extends AdminController
 		$competitionId = isset($_GET['competition_id']) ? $_GET['competition_id'] : null;
 
 		$attendees = Attendees::getByRegistrationId($registration_id);
-
 		// Lọc theo phòng ban được phép thi nếu có competition_id
 		$allowedDepartments = array();
 		if ($competitionId) {
@@ -1064,8 +1063,6 @@ class RegistrationsController extends AdminController
 				'status'          => CompetitionRegistrations::STATUS_PENDING,
 				'note'            => $note,
 			);
-			print_r(json_encode($regData));
-			exit;
 			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $regData);
 			if ($result['success']) {
 				$successCount++;
@@ -1117,9 +1114,9 @@ class RegistrationsController extends AdminController
 			'competitionName' => $competitionName,
 			'attendees'       => $attendeeList,
 			'debug'           => array(
-				'staffCodesReceived' => $staffCodes,
-				'debugErrors'        => $debugErrors,
-				'createdIds'         => $createdIds,
+				'staffIdsReceived' => $staffIds,
+				'debugErrors'      => $debugErrors,
+				'createdIds'       => $createdIds,
 			),
 		));
 		Yii::app()->end();
