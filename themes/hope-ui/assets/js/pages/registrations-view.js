@@ -517,8 +517,6 @@ var RegistrationView = (function() {
         if (competitionId) {
             url += '&competition_id=' + competitionId;
         }
-        console.log('Loading attendees from:', url);
-
         fetch(url)
             .then(function(response) { return response.json(); })
             .then(function(data) {
