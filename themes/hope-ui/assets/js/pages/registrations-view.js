@@ -3099,6 +3099,7 @@ var RegistrationView = (function() {
         editSportTeam: editSportTeam,
         editCompetitionRegistration: editCompetitionRegistration,
         deleteCompetitionRegistration: deleteCompetitionRegistration,
-        editMissContestant: editMissContestant
+        editMissContestant: editMissContestant,
+        deleteMissContestant: deleteMissContestant
     };
 })();
