@@ -76,8 +76,9 @@ class MenuHelper
             'url' => Yii::app()->createUrl('/admin/default/index'),
             'active' => Yii::app()->controller->id == 'default',
             'children' => array(),
+            'sort' => -99999, // Dashboard always at top
         );
-
+        // print_r($permissions);die();
         // Group permissions by root
         $grouped = array();
         foreach ($permissions as $perm) {
@@ -95,7 +96,11 @@ class MenuHelper
             if (count($items) == 1 && empty($rootConfig['forceGroup'])) {
                 // Single item - add directly without parent
                 $item = $items[0];
-                $menu[$item['controller']] = self::buildMenuItem($item);
+                $menuItem = self::buildMenuItem($item);
+                if (isset($rootConfig['sort'])) {
+                    $menuItem['sort'] = (int)$rootConfig['sort'];
+                }
+                $menu[$item['controller']] = $menuItem;
             } else {
                 // Multiple items - create group with children
                 $children = array();
@@ -103,14 +108,41 @@ class MenuHelper
                     $children[$item['controller']] = self::buildMenuItem($item);
                 }
 
+                // Sort children by 'sort' field
+                uasort($children, function ($a, $b) {
+                    $sortA = isset($a['sort']) ? (int)$a['sort'] : 100;
+                    $sortB = isset($b['sort']) ? (int)$b['sort'] : 100;
+                    if ($sortA == $sortB) return 0;
+                    return ($sortA < $sortB) ? -1 : 1;
+                });
+
+                // Group sort is the defined sort in config, or fallback to the minimum of its children's sort values
+                $groupSort = isset($rootConfig['sort']) ? (int)$rootConfig['sort'] : 100;
+                if (!isset($rootConfig['sort']) && !empty($children)) {
+                    $sorts = array();
+                    foreach ($children as $child) {
+                        $sorts[] = isset($child['sort']) ? $child['sort'] : 100;
+                    }
+                    $groupSort = min($sorts);
+                }
+
                 $menu[$root] = array(
                     'label' => $rootConfig['label'],
                     'icon' => self::getIcon($rootConfig['icon']),
                     'children' => $children,
                     'active' => self::isGroupActive($children),
+                    'sort' => $groupSort,
                 );
             }
         }
+
+        // Sort top-level menu by 'sort' field
+        uasort($menu, function ($a, $b) {
+            $sortA = isset($a['sort']) ? (int)$a['sort'] : 100;
+            $sortB = isset($b['sort']) ? (int)$b['sort'] : 100;
+            if ($sortA == $sortB) return 0;
+            return ($sortA < $sortB) ? -1 : 1;
+        });
 
         return $menu;
     }
@@ -132,6 +164,7 @@ class MenuHelper
             'controller' => $controller,
             'module' => $module,
             'action' => isset($perm['action']) ? $perm['action'] : '*',
+            'sort' => isset($perm['sort']) ? (int)$perm['sort'] : 100,
         );
     }
 
@@ -145,51 +178,60 @@ class MenuHelper
                 'label' => 'Dữ liệu chung',
                 'icon' => 'data',
                 'forceGroup' => true,
+                'sort' => 10,
             ),
             'properties' => array(
                 'label' => 'Đơn vị',
                 'icon' => 'property',
                 'forceGroup' => true,
+                'sort' => 20,
             ),
 
             'events' => array(
                 'label' => 'Sự kiện',
                 'icon' => 'activities',
                 'forceGroup' => true,
+                'sort' => 30,
             ),
 
             'sports' => array(
                 'label' => 'Thể thao',
                 'icon' => 'activities',
                 'forceGroup' => true,
+                'sort' => 40,
             ),
             'competitions' => array(
                 'label' => 'Thi nghiệp vụ',
                 'icon' => 'activities',
                 'forceGroup' => true,
+                'sort' => 50,
             ),
 
             'miss' => array(
                 'label' => 'Thi Miss',
                 'icon' => 'activities',
                 'forceGroup' => true,
+                'sort' => 60,
             ),
 
             'talent' => array(
                 'label' => 'Thi Văn nghệ',
                 'icon' => 'activities',
                 'forceGroup' => true,
+                'sort' => 70,
             ),
 
             'reports' => array(
                 'label' => 'Báo cáo',
                 'icon' => 'reports',
                 'forceGroup' => true,
+                'sort' => 80,
             ),
             'settings' => array(
                 'label' => 'Cài đặt',
                 'icon' => 'settings',
                 'forceGroup' => true,
+                'sort' => 90,
             ),
         );
 

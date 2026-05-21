@@ -252,6 +252,11 @@ class AuthHandler extends CApplicationComponent
             'eventsports' => 'events',
             'eventcontents' => 'events',
             'registrationdetails' => 'registrations',
+            'beautycontests' => 'events',
+            'beautycontestants' => 'events',
+            'talententries' => 'events',
+            'sportteams' => 'events',
+            'competitionregistrations' => 'events',
         );
 
         foreach ($inheritanceRules as $child => $parent) {

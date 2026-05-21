@@ -12,6 +12,7 @@ class TalentEntries extends BaseTalentEntries
     public $category_name;
     public $show_name;
     public $member_count;
+    public $registration_id;
 
     public static function model($className = __CLASS__)
     {
@@ -59,6 +60,9 @@ class TalentEntries extends BaseTalentEntries
         $data = array_filter($this->attributes, function ($value) {
             return $value !== null && $value !== '';
         });
+        if ($this->registration_id) {
+            $data['registration_id'] = $this->registration_id;
+        }
         return ApiClient::post(ApiEndpoints::TALENT_ENTRY_STORE, $data);
     }
 

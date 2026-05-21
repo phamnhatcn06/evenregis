@@ -23,10 +23,15 @@ $this->menu = array(
         'color' => 'info',
         'icon' => 'fa-users',
     ),
+    array(
+        'label' => 'Xóa',
+        'url' => $this->createUrl('delete', array('id' => $model->id)),
+        'color' => 'danger',
+        'icon' => 'fa-trash',
+        'id' => 'btn_delete'
+    ),
 );
 $this->Tabletitle = 'Chi tiết cuộc thi: ' . CHtml::encode($model->name);
-
-echo MyHelper::renderDeleteButton($this, $model->id);
 ?>
 
 <div class="card">

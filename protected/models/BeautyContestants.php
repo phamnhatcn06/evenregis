@@ -11,10 +11,27 @@ class BeautyContestants extends BaseBeautyContestants
     public $attendee_name;
     public $property_name;
     public $contest_name;
+    public $registration_id;
+    public $note;
 
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
+    }
+
+    public function rules()
+    {
+        return array(
+            array('contest_id, attendee_id', 'required'),
+            array('final_rank', 'numerical', 'integerOnly' => true),
+            array('height_cm, weight_kg', 'numerical'),
+            array('contest_id, attendee_id, candidate_number', 'length', 'max' => 20),
+            array('measurements', 'length', 'max' => 50),
+            array('talent, award', 'length', 'max' => 255),
+            array('photo_portrait, photo_full_body', 'length', 'max' => 500),
+            array('status', 'length', 'max' => 12),
+            array('candidate_number, height_cm, weight_kg, measurements, talent, bio, photo_portrait, photo_full_body, award, final_rank, registered_at, status', 'safe'),
+        );
     }
 
     public function attributeLabels()
@@ -59,6 +76,12 @@ class BeautyContestants extends BaseBeautyContestants
         $data = array_filter($this->attributes, function ($value) {
             return $value !== null && $value !== '';
         });
+        if ($this->registration_id) {
+            $data['registration_id'] = $this->registration_id;
+        }
+        if ($this->note) {
+            $data['note'] = $this->note;
+        }
         return ApiClient::post(ApiEndpoints::BEAUTY_CONTESTANT_STORE, $data);
     }
 
