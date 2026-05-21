@@ -987,10 +987,10 @@ class RegistrationsController extends AdminController
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
 		$competitionId = Yii::app()->getRequest()->getPost('competition_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
-		$staffCodes = Yii::app()->getRequest()->getPost('staff_codes', array());
+		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
 		$note = Yii::app()->getRequest()->getPost('note', '');
 
-		if (empty($staffCodes) || !is_array($staffCodes)) {
+		if (empty($staffIds) || !is_array($staffIds)) {
 			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một nhân viên.'));
 			Yii::app()->end();
 		}
@@ -1000,17 +1000,15 @@ class RegistrationsController extends AdminController
 		$debugErrors  = array();
 		$createdIds   = array();
 
-		foreach ($staffCodes as $staffCode) {
+		foreach ($staffIds as $staffId) {
 			$regData = array(
 				'registration_id' => $registrationId,
 				'competition_id'  => $competitionId,
 				'property_id'     => $propertyId,
-				'staff_code'      => $staffCode,
+				'attendee_id'     => $staffId,
 				'status'          => CompetitionRegistrations::STATUS_PENDING,
 				'note'            => $note,
 			);
-			print_r(json_encode($regData));
-			exit;
 			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $regData);
 			if ($result['success']) {
 				$successCount++;
