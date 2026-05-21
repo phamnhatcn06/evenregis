@@ -19,6 +19,12 @@ $selectedDepartments = isset($selectedDepartments) ? $selectedDepartments : arra
         <small class="text-muted">BR-REG-06: Chỉ nhân viên thuộc phòng ban này mới được đăng ký</small>
     </div>
     <div class="card-body">
+        <?php
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/competitions-form.js',
+    CClientScript::POS_END
+);
+?>
         <?php if (empty($allDepartments)): ?>
             <div class="alert alert-warning">
                 <i class="fa fa-exclamation-triangle"></i>
