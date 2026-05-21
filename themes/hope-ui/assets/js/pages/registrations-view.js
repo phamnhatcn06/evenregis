@@ -2534,6 +2534,7 @@ var RegistrationView = (function() {
     var missAllAttendees = [];
     var missSelectedAttendees = [];
     var missMaxPerOrg = 0;
+    var missRegisteredCount = 0;
 
     function bindMissEvents() {
         var contestSelect = document.getElementById('miss_contest_id');
