@@ -625,15 +625,22 @@ var RegistrationView = (function() {
         if (!card) return;
 
         var cardBody = card.querySelector('.card-body');
-        var table = cardBody.querySelector('table');
+        var table = cardBody.querySelector('table#competition-list-table');
         var emptyMsg = cardBody.querySelector('p.text-muted');
 
         // Tạo badges cho danh sách thí sinh
         var badgesHtml = '';
         if (data.attendees && data.attendees.length > 0) {
             data.attendees.forEach(function(att, idx) {
-                var display = att.staff_code ? (att.staff_code + ' - ' + att.staff_name) : att.staff_name;
-                badgesHtml += '<span class="badge bg-light text-dark border me-1 mb-1">' + (idx + 1) + '. ' + escapeHtml(display) + '</span>';
+                var name = att.attendee_name || att.name || '';
+                var position = att.position_name || '';
+                var division = att.division_name || '';
+                var info = name;
+                if (position || division) {
+                    var extra = (position && division) ? (position + ' - ' + division) : (position || division);
+                    info += ' (' + extra + ')';
+                }
+                badgesHtml += '<span class="badge bg-light text-dark border me-1 mb-1">' + (idx + 1) + '. ' + escapeHtml(info) + '</span>';
             });
         }
 
