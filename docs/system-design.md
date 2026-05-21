@@ -3857,9 +3857,8 @@ ALTER TABLE `sports`
 -- Cấu hình liên quân cho từng môn trong sự kiện
 ALTER TABLE `event_sports`
   ADD COLUMN `allow_alliance` TINYINT(1) NOT NULL DEFAULT 0 
-    COMMENT 'Cho phép liên quân: 0=không, 1=có',
-  ADD COLUMN `alliance_max_per_org` INT UNSIGNED DEFAULT NULL 
-    COMMENT 'Số người tối đa từ mỗi đơn vị trong đội liên quân';
+    COMMENT 'Cho phép liên quân: 0=không, 1=có';
+-- Lưu ý: Số người tối đa từ mỗi đơn vị được cài đặt riêng trong bảng alliance_team_orgs.max_members
 ```
 
 #### 16.4.3 Thêm cột vào bảng `sport_teams`
