@@ -431,8 +431,16 @@ foreach ($registrationDetails as $detail) {
                                         (isset($member['attendee_name']) ? $member['attendee_name'] :
                                         (isset($member->name) ? $member->name :
                                         (isset($member['name']) ? $member['name'] : '')));
+                                    $memberPosition = isset($member->position_name) ? $member->position_name :
+                                        (isset($member['position_name']) ? $member['position_name'] : '');
+                                    $memberDivision = isset($member->division_name) ? $member->division_name :
+                                        (isset($member['division_name']) ? $member['division_name'] : '');
+                                    $memberInfo = $memberName;
+                                    if ($memberPosition || $memberDivision) {
+                                        $memberInfo .= ' (' . trim($memberPosition . ' - ' . $memberDivision, ' -') . ')';
+                                    }
                                 ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($memberName); ?></span>
+                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($memberInfo); ?></span>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
