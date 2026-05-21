@@ -1124,15 +1124,27 @@ class RegistrationsController extends AdminController
 			'competition_id'  => $competitionId,
 		), 100)->getData();
 
+		// Load attendees map để lấy thông tin chi tiết
+		$attendeesMap = array();
+		$attendeesData = Attendees::getByRegistrationId($registrationId);
+		foreach ($attendeesData as $att) {
+			$attId = isset($att['id']) ? $att['id'] : null;
+			if ($attId) {
+				$attendeesMap[$attId] = $att;
+			}
+		}
+
 		$attendeeList = array();
 		foreach ($registrations as $reg) {
-			$attendeeName = isset($reg->attendee_name) ? $reg->attendee_name : (isset($reg['attendee_name']) ? $reg['attendee_name'] : '');
-			$positionName = isset($reg->position_name) ? $reg->position_name : (isset($reg['position_name']) ? $reg['position_name'] : '');
-			$divisionName = isset($reg->division_name) ? $reg->division_name : (isset($reg['division_name']) ? $reg['division_name'] : '');
+			$attendeeId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
+			$attendeeInfo = isset($attendeesMap[$attendeeId]) ? $attendeesMap[$attendeeId] : array();
+
 			$attendeeList[] = array(
-				'attendee_name' => $attendeeName,
-				'position_name' => $positionName,
-				'division_name' => $divisionName,
+				'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
+				'attendee_id' => $attendeeId,
+				'attendee_name' => isset($attendeeInfo['full_name']) ? $attendeeInfo['full_name'] : '',
+				'position_name' => isset($attendeeInfo['position_name']) ? $attendeeInfo['position_name'] : '',
+				'division_name' => isset($attendeeInfo['division_name']) ? $attendeeInfo['division_name'] : '',
 			);
 		}
 
