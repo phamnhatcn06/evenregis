@@ -1774,12 +1774,27 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
+		$contest = BeautyContests::fetchFromApi($contestId);
+		if (!$contest) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy cuộc thi.'));
+			Yii::app()->end();
+		}
+
+		$prefix = $contest->candidate_prefix ?: 'MS';
+		$startNum = $contest->candidate_start ?: 1;
+
+		$existingContestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 1000)->getData();
+		$nextNum = $startNum + count($existingContestants);
+
 		$successCount = 0;
 		$errors = array();
 		foreach ($attendeeIds as $attendeeId) {
+			$candidateNumber = $prefix . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+
 			$model = new BeautyContestants;
 			$model->contest_id = $contestId;
 			$model->attendee_id = $attendeeId;
+			$model->candidate_number = $candidateNumber;
 			$model->registration_id = $registrationId;
 			$model->note = $note;
 			$model->status = BeautyContestants::STATUS_REGISTERED;
@@ -1787,6 +1802,7 @@ class RegistrationsController extends AdminController
 			$result = $model->storeViaApi();
 			if ($result['success']) {
 				$successCount++;
+				$nextNum++;
 			} else {
 				$errors[] = isset($result['error']) ? $result['error'] : 'Lỗi không xác định';
 			}
