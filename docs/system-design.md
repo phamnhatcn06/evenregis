@@ -3797,3 +3797,434 @@ CREATE TABLE `competition_departments` (
   CONSTRAINT `fk_cd_comp` FOREIGN KEY (`competition_id`) REFERENCES `competitions`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Phòng ban được phép tham gia thi nghiệp vụ';
 ```
+
+---
+
+## 16. Liên Quân (Alliance Teams)
+
+### 16.1 Mô tả nghiệp vụ
+
+**Liên quân** là cơ chế cho phép nhiều đơn vị kết hợp thành viên để tạo thành một đội thi đấu chung. Tính năng này áp dụng cho các môn thể thao đồng đội có số lượng người chơi tối thiểu từ 3 người trở lên (VD: Bóng đá, Bóng chuyền, Kéo co).
+
+**Lý do cần liên quân:**
+- Một số đơn vị nhỏ không đủ người để thành lập đội riêng
+- Cho phép các đơn vị cùng khu vực hoặc cùng nhóm liên kết thi đấu
+- Tăng tính cạnh tranh và sự tham gia của nhiều đơn vị
+
+### 16.2 Use Cases
+
+```
+[Admin HO / BTC Thể thao]
+  ├── UC-AL01: Cấu hình cho phép liên quân cho môn thể thao trong sự kiện
+  ├── UC-AL02: Thiết lập số người tối đa từ mỗi đơn vị trong đội liên quân
+  ├── UC-AL03: Xem danh sách đội liên quân và thành phần
+  └── UC-AL04: Phê duyệt / Từ chối yêu cầu liên quân
+
+[Đại diện đơn vị]
+  ├── UC-AL05: Gửi yêu cầu liên quân đến đơn vị khác
+  ├── UC-AL06: Xem / Chấp nhận / Từ chối yêu cầu liên quân
+  ├── UC-AL07: Đăng ký thành viên vào đội liên quân (trong giới hạn cho phép)
+  └── UC-AL08: Hủy tham gia liên quân (nếu chưa được phê duyệt)
+```
+
+### 16.3 Business Rules
+
+| # | Quy tắc | Mô tả |
+|---|---------|-------|
+| BR-AL01 | Điều kiện bật liên quân | Chỉ môn thể thao có `min_players >= 3` mới được phép bật liên quân |
+| BR-AL02 | Cấu hình tại event_sports | Mỗi sự kiện cấu hình riêng việc cho phép liên quân cho từng môn |
+| BR-AL03 | Giới hạn người/đơn vị | Khi bật liên quân, **bắt buộc** phải cài đặt `alliance_max_per_org` |
+| BR-AL04 | Validate đăng ký | Số thành viên từ mỗi đơn vị trong đội liên quân **không được vượt quá** `alliance_max_per_org` |
+| BR-AL05 | Yêu cầu liên quân | Một đơn vị gửi yêu cầu, các đơn vị khác phải chấp nhận mới thành lập được đội |
+| BR-AL06 | Trạng thái yêu cầu | Yêu cầu liên quân có các trạng thái: `pending`, `approved`, `rejected`, `cancelled` |
+| BR-AL07 | Đội liên quân | Đội liên quân được đánh dấu `is_alliance = 1` trong `sport_teams` |
+| BR-AL08 | Tối thiểu 2 đơn vị | Một đội liên quân phải có thành viên từ **ít nhất 2 đơn vị** khác nhau |
+
+### 16.4 Database Schema Changes
+
+#### 16.4.1 Thêm cột vào bảng `sports`
+
+```sql
+-- Thêm số người chơi tối thiểu/tối đa vào môn thể thao
+ALTER TABLE `sports`
+  ADD COLUMN `min_players` INT UNSIGNED DEFAULT NULL COMMENT 'Số người chơi tối thiểu (NULL=cá nhân)',
+  ADD COLUMN `max_players` INT UNSIGNED DEFAULT NULL COMMENT 'Số người chơi tối đa';
+```
+
+#### 16.4.2 Thêm cột vào bảng `event_sports`
+
+```sql
+-- Cấu hình liên quân cho từng môn trong sự kiện
+ALTER TABLE `event_sports`
+  ADD COLUMN `allow_alliance` TINYINT(1) NOT NULL DEFAULT 0 
+    COMMENT 'Cho phép liên quân: 0=không, 1=có',
+  ADD COLUMN `alliance_max_per_org` INT UNSIGNED DEFAULT NULL 
+    COMMENT 'Số người tối đa từ mỗi đơn vị trong đội liên quân';
+```
+
+#### 16.4.3 Thêm cột vào bảng `sport_teams`
+
+```sql
+-- Đánh dấu đội liên quân
+ALTER TABLE `sport_teams`
+  ADD COLUMN `is_alliance` TINYINT(1) NOT NULL DEFAULT 0 
+    COMMENT 'Đội liên quân: 0=đội đơn vị, 1=đội liên quân';
+```
+
+#### 16.4.4 Bảng mới: `alliance_requests`
+
+```sql
+-- ============================================================
+-- ALLIANCE_REQUESTS — Yêu cầu liên quân giữa các đơn vị
+-- ============================================================
+CREATE TABLE `alliance_requests` (
+  `id`                INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id`          INT UNSIGNED NOT NULL,
+  `sport_id`          INT UNSIGNED NOT NULL,
+  `team_id`           INT UNSIGNED COMMENT 'Đội liên quân được tạo (sau khi approved)',
+  `requester_org_id`  INT UNSIGNED NOT NULL COMMENT 'Đơn vị gửi yêu cầu',
+  `target_org_id`     INT UNSIGNED NOT NULL COMMENT 'Đơn vị được mời',
+  `status`            ENUM('pending','approved','rejected','cancelled') NOT NULL DEFAULT 'pending',
+  `message`           TEXT COMMENT 'Lời nhắn khi gửi yêu cầu',
+  `response_message`  TEXT COMMENT 'Lời nhắn khi phản hồi',
+  `requested_by`      INT UNSIGNED COMMENT 'unit_accounts.id người gửi',
+  `requested_at`      INT UNSIGNED,
+  `responded_by`      INT UNSIGNED COMMENT 'unit_accounts.id người phản hồi',
+  `responded_at`      INT UNSIGNED,
+  `created_at`        INT UNSIGNED,
+  `updated_at`        INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_alliance_request` (`event_id`, `sport_id`, `requester_org_id`, `target_org_id`),
+  KEY `idx_ar_event_sport` (`event_id`, `sport_id`),
+  KEY `idx_ar_requester` (`requester_org_id`),
+  KEY `idx_ar_target` (`target_org_id`),
+  KEY `idx_ar_status` (`status`),
+  CONSTRAINT `fk_ar_event` FOREIGN KEY (`event_id`) REFERENCES `events`(`id`),
+  CONSTRAINT `fk_ar_sport` FOREIGN KEY (`sport_id`) REFERENCES `sports`(`id`),
+  CONSTRAINT `fk_ar_team` FOREIGN KEY (`team_id`) REFERENCES `sport_teams`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_ar_requester_org` FOREIGN KEY (`requester_org_id`) REFERENCES `organizations`(`id`),
+  CONSTRAINT `fk_ar_target_org` FOREIGN KEY (`target_org_id`) REFERENCES `organizations`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Yêu cầu liên quân giữa các đơn vị';
+```
+
+#### 16.4.5 Bảng mới: `alliance_team_orgs`
+
+```sql
+-- ============================================================
+-- ALLIANCE_TEAM_ORGS — Các đơn vị tham gia đội liên quân
+-- ============================================================
+CREATE TABLE `alliance_team_orgs` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `team_id`         INT UNSIGNED NOT NULL COMMENT 'sport_teams.id (is_alliance=1)',
+  `organization_id` INT UNSIGNED NOT NULL,
+  `is_lead`         TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Đơn vị chủ trì',
+  `joined_at`       INT UNSIGNED,
+  `created_at`      INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_alliance_team_org` (`team_id`, `organization_id`),
+  KEY `idx_ato_org` (`organization_id`),
+  CONSTRAINT `fk_ato_team` FOREIGN KEY (`team_id`) REFERENCES `sport_teams`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ato_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Các đơn vị tham gia đội liên quân';
+```
+
+### 16.5 Validation Rules
+
+#### 16.5.1 Khi bật liên quân (Admin)
+
+```php
+// Trong EventSports model
+public function rules() {
+    return array(
+        // ...existing rules...
+        array('alliance_max_per_org', 'validateAllianceConfig'),
+    );
+}
+
+public function validateAllianceConfig($attribute, $params) {
+    if ($this->allow_alliance == 1) {
+        // Kiểm tra môn có min_players >= 3
+        $sport = Sports::model()->findByPk($this->sport_id);
+        if ($sport && $sport->min_players < 3) {
+            $this->addError('allow_alliance', 
+                'Chỉ môn thể thao có tối thiểu 3 người chơi mới được bật liên quân.');
+            return;
+        }
+        
+        // Bắt buộc phải có alliance_max_per_org
+        if (empty($this->alliance_max_per_org) || $this->alliance_max_per_org < 1) {
+            $this->addError('alliance_max_per_org', 
+                'Phải cài đặt số người tối đa từ mỗi đơn vị khi bật liên quân.');
+        }
+    }
+}
+```
+
+#### 16.5.2 Khi đăng ký thành viên vào đội liên quân
+
+```php
+// Trong SportTeamMembers model
+public function validateAllianceMemberLimit($attribute, $params) {
+    $team = SportTeams::model()->findByPk($this->team_id);
+    if (!$team || $team->is_alliance != 1) {
+        return; // Không phải đội liên quân
+    }
+    
+    // Lấy cấu hình từ event_sports
+    $eventSport = EventSports::model()->findByAttributes(array(
+        'event_id' => $team->event_id,
+        'sport_id' => $team->sport_id,
+    ));
+    
+    if (!$eventSport || !$eventSport->alliance_max_per_org) {
+        return;
+    }
+    
+    // Đếm số thành viên hiện tại từ cùng đơn vị
+    $attendee = Attendees::model()->findByPk($this->attendee_id);
+    $currentCount = SportTeamMembers::model()->countByAttributes(array(
+        'team_id' => $this->team_id,
+    ), array(
+        'join' => 'INNER JOIN attendees a ON a.id = t.attendee_id',
+        'condition' => 'a.organization_id = :org_id AND t.id != :current_id',
+        'params' => array(
+            ':org_id' => $attendee->organization_id,
+            ':current_id' => $this->id ?: 0,
+        ),
+    ));
+    
+    if ($currentCount >= $eventSport->alliance_max_per_org) {
+        $this->addError($attribute, 
+            "Đơn vị đã đạt giới hạn {$eventSport->alliance_max_per_org} người trong đội liên quân.");
+    }
+}
+```
+
+### 16.6 Wireframe Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ADMIN: CẤU HÌNH LIÊN QUÂN CHO MÔN THỂ THAO                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Sự kiện: Đại hội 2026                                          │
+│  Môn: Bóng đá nam (min_players: 11)                             │
+│                                                                 │
+│  ☑ Cho phép liên quân                                           │
+│                                                                 │
+│  Số người tối đa từ mỗi đơn vị: [  5  ] người                   │
+│                                                                 │
+│  ⚠️ Mỗi đơn vị chỉ được đóng góp tối đa 5 cầu thủ vào đội       │
+│     liên quân. Đội phải có thành viên từ ít nhất 2 đơn vị.      │
+│                                                                 │
+│  [Lưu cấu hình]                                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  ĐƠN VỊ: GỬI YÊU CẦU LIÊN QUÂN                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Môn: Bóng đá nam                                               │
+│  Giới hạn: Tối đa 5 người/đơn vị                                │
+│                                                                 │
+│  Đơn vị muốn liên quân: [Khách sạn Mường Thanh Đà Nẵng    ▼]    │
+│                                                                 │
+│  Lời nhắn: [Kính mời quý đơn vị cùng liên quân thi đấu_____]    │
+│            [____________________________________________]        │
+│                                                                 │
+│  [Gửi yêu cầu liên quân]                                        │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  ĐƠN VỊ: ĐĂNG KÝ THÀNH VIÊN ĐỘI LIÊN QUÂN                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Đội: Liên quân MT Hà Nội - MT Đà Nẵng (Bóng đá nam)            │
+│  Giới hạn: Tối đa 5 người/đơn vị                                │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ Đơn vị của bạn: MT Hà Nội (đã đăng ký: 4/5)            │    │
+│  │ ☑ Nguyễn Văn A (Thủ môn)                               │    │
+│  │ ☑ Trần Văn B (Hậu vệ)                                  │    │
+│  │ ☑ Lê Văn C (Tiền vệ)                                   │    │
+│  │ ☑ Phạm Văn D (Tiền đạo)                                │    │
+│  │ ☐ Hoàng Văn E       ← Còn đăng ký được 1 người nữa     │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ Đơn vị liên quân: MT Đà Nẵng (đã đăng ký: 5/5)         │    │
+│  │ ☑ Võ Văn F (Hậu vệ)                                    │    │
+│  │ ☑ Đỗ Văn G (Tiền vệ)                                   │    │
+│  │ ☑ Bùi Văn H (Tiền vệ)                                  │    │
+│  │ ☑ Vũ Văn I (Tiền đạo)                                  │    │
+│  │ ☑ Đinh Văn K (Dự bị)                                   │    │
+│  │ ⚠️ Đã đạt giới hạn 5 người                             │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                 │
+│  Tổng thành viên: 9/11 (còn thiếu 2 người)                      │
+│                                                                 │
+│  [Lưu danh sách]                                                │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 16.7 Entity Relationships
+
+```
+events (1) ─────────────── (N) event_sports
+                                │
+                                │ allow_alliance
+                                │ alliance_max_per_org
+                                ▼
+                           sports (1)
+                                │
+                                │ min_players
+                                │ max_players
+                                ▼
+         ┌──────────────────────┼──────────────────────┐
+         │                      │                      │
+         ▼                      ▼                      ▼
+  sport_teams            alliance_requests      alliance_team_orgs
+  (is_alliance)          (pending/approved)     (team_id + org_id)
+         │                      │
+         │                      │
+         └──────────┬───────────┘
+                    │
+                    ▼
+            sport_team_members
+            (validate max_per_org)
+```
+
+### 16.8 Migration Script
+
+```sql
+-- Migration: 2026_05_21_add_alliance_teams
+
+-- 1. Thêm cột số người chơi vào sports
+ALTER TABLE `sports`
+  ADD COLUMN `min_players` INT UNSIGNED DEFAULT NULL 
+    COMMENT 'Số người chơi tối thiểu (NULL=cá nhân)' AFTER `type`,
+  ADD COLUMN `max_players` INT UNSIGNED DEFAULT NULL 
+    COMMENT 'Số người chơi tối đa' AFTER `min_players`;
+
+-- Update dữ liệu mẫu
+UPDATE `sports` SET `min_players` = 11, `max_players` = 18 WHERE `code` = 'football';
+UPDATE `sports` SET `min_players` = 6, `max_players` = 12 WHERE `code` = 'volleyball';
+UPDATE `sports` SET `min_players` = 8, `max_players` = 10 WHERE `code` = 'tug_of_war';
+
+-- 2. Thêm cột liên quân vào event_sports
+ALTER TABLE `event_sports`
+  ADD COLUMN `allow_alliance` TINYINT(1) NOT NULL DEFAULT 0 
+    COMMENT 'Cho phép liên quân: 0=không, 1=có' AFTER `status`,
+  ADD COLUMN `alliance_max_per_org` INT UNSIGNED DEFAULT NULL 
+    COMMENT 'Số người tối đa từ mỗi đơn vị trong đội liên quân' AFTER `allow_alliance`;
+
+-- 3. Thêm cột is_alliance vào sport_teams
+ALTER TABLE `sport_teams`
+  ADD COLUMN `is_alliance` TINYINT(1) NOT NULL DEFAULT 0 
+    COMMENT 'Đội liên quân: 0=đội đơn vị, 1=đội liên quân' AFTER `organization_id`;
+
+CREATE INDEX `idx_sport_teams_alliance` ON `sport_teams`(`is_alliance`);
+
+-- 4. Tạo bảng alliance_requests
+CREATE TABLE `alliance_requests` (
+  `id`                INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id`          INT UNSIGNED NOT NULL,
+  `sport_id`          INT UNSIGNED NOT NULL,
+  `team_id`           INT UNSIGNED COMMENT 'Đội liên quân được tạo (sau khi approved)',
+  `requester_org_id`  INT UNSIGNED NOT NULL COMMENT 'Đơn vị gửi yêu cầu',
+  `target_org_id`     INT UNSIGNED NOT NULL COMMENT 'Đơn vị được mời',
+  `status`            ENUM('pending','approved','rejected','cancelled') NOT NULL DEFAULT 'pending',
+  `message`           TEXT COMMENT 'Lời nhắn khi gửi yêu cầu',
+  `response_message`  TEXT COMMENT 'Lời nhắn khi phản hồi',
+  `requested_by`      INT UNSIGNED COMMENT 'unit_accounts.id người gửi',
+  `requested_at`      INT UNSIGNED,
+  `responded_by`      INT UNSIGNED COMMENT 'unit_accounts.id người phản hồi',
+  `responded_at`      INT UNSIGNED,
+  `created_at`        INT UNSIGNED,
+  `updated_at`        INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_alliance_request` (`event_id`, `sport_id`, `requester_org_id`, `target_org_id`),
+  KEY `idx_ar_event_sport` (`event_id`, `sport_id`),
+  KEY `idx_ar_requester` (`requester_org_id`),
+  KEY `idx_ar_target` (`target_org_id`),
+  KEY `idx_ar_status` (`status`),
+  CONSTRAINT `fk_ar_event` FOREIGN KEY (`event_id`) REFERENCES `events`(`id`),
+  CONSTRAINT `fk_ar_sport` FOREIGN KEY (`sport_id`) REFERENCES `sports`(`id`),
+  CONSTRAINT `fk_ar_team` FOREIGN KEY (`team_id`) REFERENCES `sport_teams`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_ar_requester_org` FOREIGN KEY (`requester_org_id`) REFERENCES `organizations`(`id`),
+  CONSTRAINT `fk_ar_target_org` FOREIGN KEY (`target_org_id`) REFERENCES `organizations`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Yêu cầu liên quân giữa các đơn vị';
+
+-- 5. Tạo bảng alliance_team_orgs
+CREATE TABLE `alliance_team_orgs` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `team_id`         INT UNSIGNED NOT NULL COMMENT 'sport_teams.id (is_alliance=1)',
+  `organization_id` INT UNSIGNED NOT NULL,
+  `is_lead`         TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Đơn vị chủ trì',
+  `joined_at`       INT UNSIGNED,
+  `created_at`      INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_alliance_team_org` (`team_id`, `organization_id`),
+  KEY `idx_ato_org` (`organization_id`),
+  CONSTRAINT `fk_ato_team` FOREIGN KEY (`team_id`) REFERENCES `sport_teams`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ato_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Các đơn vị tham gia đội liên quân';
+```
+
+### 16.9 User Stories
+
+#### US-AL01: Cấu hình liên quân cho môn thể thao
+
+**As a** Admin HO / BTC Thể thao
+**I want to** bật tính năng liên quân cho các môn thể thao đồng đội
+**So that** các đơn vị nhỏ có thể kết hợp thành đội thi đấu
+
+**Acceptance Criteria:**
+- [ ] Chỉ hiển thị checkbox "Cho phép liên quân" khi môn có `min_players >= 3`
+- [ ] Khi bật liên quân, bắt buộc nhập số người tối đa từ mỗi đơn vị
+- [ ] Hiển thị cảnh báo nếu cố gắng bật liên quân cho môn cá nhân
+
+**Out of Scope:**
+- Liên quân cho thi nghiệp vụ
+- Liên quân cho thi Miss/Văn nghệ
+
+**Estimate:** S (4 giờ)
+
+---
+
+#### US-AL02: Gửi yêu cầu liên quân
+
+**As a** Đại diện đơn vị
+**I want to** gửi yêu cầu liên quân đến đơn vị khác
+**So that** hai đơn vị có thể tạo đội chung thi đấu
+
+**Acceptance Criteria:**
+- [ ] Chỉ hiển thị nút "Gửi yêu cầu liên quân" khi môn cho phép liên quân
+- [ ] Dropdown chọn đơn vị không hiển thị các đơn vị đã gửi yêu cầu trước đó
+- [ ] Có thể nhập lời nhắn khi gửi yêu cầu
+- [ ] Sau khi gửi, trạng thái là "Chờ phản hồi"
+
+**Estimate:** S (4 giờ)
+
+---
+
+#### US-AL03: Đăng ký thành viên đội liên quân
+
+**As a** Đại diện đơn vị
+**I want to** đăng ký thành viên của đơn vị vào đội liên quân
+**So that** đội có đủ người thi đấu
+
+**Acceptance Criteria:**
+- [ ] Hiển thị số người đã đăng ký và giới hạn của đơn vị (VD: 4/5)
+- [ ] Không cho chọn thêm khi đã đạt giới hạn
+- [ ] Hiển thị thông tin thành viên từ các đơn vị khác (chỉ xem, không sửa)
+- [ ] Hiển thị tổng số thành viên và yêu cầu tối thiểu của môn
+
+**Estimate:** M (1 ngày)
