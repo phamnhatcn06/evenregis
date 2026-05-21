@@ -1730,7 +1730,25 @@ class RegistrationsController extends AdminController
 	public function actionGetAttendeesForMiss($registration_id)
 	{
 		$result = array();
+		$registered = array();
 		$contestId = isset($_GET['contest_id']) ? $_GET['contest_id'] : null;
+
+		$contest = $contestId ? BeautyContests::fetchFromApi($contestId) : null;
+		$contestGender = $contest && isset($contest->gender) ? $contest->gender : null;
+
+		$existingContestants = $contestId ? BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 1000)->getData() : array();
+		$registeredAttendeeIds = array();
+		foreach ($existingContestants as $c) {
+			$attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
+			if ($attId) $registeredAttendeeIds[] = $attId;
+
+			$registered[] = array(
+				'id' => isset($c->id) ? $c->id : $c['id'],
+				'attendee_id' => $attId,
+				'name' => isset($c->attendee_name) ? $c->attendee_name : (isset($c['attendee_name']) ? $c['attendee_name'] : ''),
+				'candidate_number' => isset($c->candidate_number) ? $c->candidate_number : (isset($c['candidate_number']) ? $c['candidate_number'] : ''),
+			);
+		}
 
 		$attendees = Attendees::getByRegistrationId($registration_id);
 
@@ -1742,8 +1760,9 @@ class RegistrationsController extends AdminController
 
 			if (!$id) continue;
 
-			// Có thể lọc theo giới tính nếu contest có yêu cầu
-			// if ($contest && $contest->gender && $gender !== $contest->gender) continue;
+			if (in_array($id, $registeredAttendeeIds)) continue;
+
+			if ($contestGender && $gender !== $contestGender) continue;
 
 			$result[] = array(
 				'id' => $id,
@@ -1754,7 +1773,7 @@ class RegistrationsController extends AdminController
 		}
 
 		header('Content-Type: application/json');
-		echo CJSON::encode(array('success' => true, 'data' => $result));
+		echo CJSON::encode(array('success' => true, 'data' => $result, 'registered' => $registered));
 		Yii::app()->end();
 	}
 
