@@ -646,18 +646,11 @@ var RegistrationView = (function() {
             });
         }
 
-        // Tạo row HTML
-        var deleteUrl = window.BASE_URL + '/admin/registrations/deleteDetail?id=' + data.detailId + '&registration_id=' + registrationId;
-        var rowHtml = '<tr data-detail-id="' + data.detailId + '">' +
+        // Tạo row HTML (không có nút xóa tạm thời, reload để xóa)
+        var rowHtml = '<tr data-competition-id="' + data.competitionId + '">' +
             '<td>' + escapeHtml(data.competitionName) + '</td>' +
             '<td class="text-center">' + (data.attendees ? data.attendees.length : 0) + '</td>' +
             '<td>' + badgesHtml + '</td>' +
-            '<td class="text-center">' +
-                '<form method="post" action="' + deleteUrl + '" id="delete-detail-form-' + data.detailId + '" style="display:none;"></form>' +
-                '<button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDetail(' + data.detailId + ')">' +
-                    '<i class="fa fa-trash"></i>' +
-                '</button>' +
-            '</td>' +
         '</tr>';
 
         if (!table) {
@@ -667,7 +660,6 @@ var RegistrationView = (function() {
                     '<th>Cuộc thi</th>' +
                     '<th style="width:100px;">Số người</th>' +
                     '<th>Danh sách thí sinh</th>' +
-                    '<th style="width:60px;"></th>' +
                 '</tr></thead>' +
                 '<tbody>' + rowHtml + '</tbody>' +
             '</table>';
