@@ -4198,7 +4198,7 @@ CREATE TABLE `event_sport_alliance_config` (
 -- INSERT INTO event_sport_alliance_config (event_id, sport_id, organization_id, max_members) VALUES
 -- (1, 1, 1, 6), (1, 1, 2, 5);
 
--- 3. Thêm cột is_alliance vào sport_teams
+-- 4. Thêm cột is_alliance vào sport_teams
 ALTER TABLE `sport_teams`
   ADD COLUMN `is_alliance` TINYINT(1) NOT NULL DEFAULT 0 
     COMMENT 'Đội liên quân: 0=đội đơn vị, 1=đội liên quân' AFTER `organization_id`;
