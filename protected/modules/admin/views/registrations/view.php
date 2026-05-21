@@ -468,10 +468,10 @@ foreach ($registrationDetails as $detail) {
         </div>
         <?php endif; ?>
 
-        <?php if (empty($detailsByContent['competition'])): ?>
+        <?php if (empty($competitionRegistrations)): ?>
             <p class="text-muted mb-0">Chưa đăng ký thi nghiệp vụ nào.</p>
         <?php else: ?>
-            <table class="table table-bordered table-striped table-sm mb-0">
+            <table class="table table-bordered table-striped table-sm mb-0" id="competition-list-table">
                 <thead class="table-light">
                     <tr>
                         <th>Cuộc thi</th>
@@ -483,27 +483,28 @@ foreach ($registrationDetails as $detail) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($detailsByContent['competition'] as $detail):
-                        $detailId = isset($detail['id']) ? $detail['id'] : null;
-                        $compAtts = ($detailId && isset($detailAttendees[$detailId])) ? $detailAttendees[$detailId] : array();
-                    ?>
-                        <tr>
-                            <td><?php echo CHtml::encode($detail['competition_name']); ?></td>
-                            <td class="text-center"><?php echo count($compAtts); ?></td>
+                    <?php foreach ($competitionRegistrations as $compId => $compData): ?>
+                        <tr data-competition-id="<?php echo $compId; ?>">
+                            <td><?php echo CHtml::encode($compData['competition_name']); ?></td>
+                            <td class="text-center"><?php echo count($compData['attendees']); ?></td>
                             <td>
-                                <?php foreach ($compAtts as $idx => $att):
-                                    $staffName = isset($att['staff_name']) ? $att['staff_name'] : (isset($att['staff_full_name']) ? $att['staff_full_name'] : '');
-                                    $staffCode = isset($att['staff_code']) ? $att['staff_code'] : '';
+                                <?php foreach ($compData['attendees'] as $idx => $att):
+                                    $name = $att['attendee_name'];
+                                    $position = $att['position_name'];
+                                    $division = $att['division_name'];
+                                    $info = $name;
+                                    if ($position || $division) {
+                                        $info .= ' (' . trim($position . ' - ' . $division, ' -') . ')';
+                                    }
                                 ?>
                                     <span class="badge bg-light text-dark border me-1 mb-1">
-                                        <?php echo ($idx + 1) . '. ' . CHtml::encode($staffCode ? $staffCode . ' - ' . $staffName : $staffName); ?>
+                                        <?php echo ($idx + 1) . '. ' . CHtml::encode($info); ?>
                                     </span>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                                 <td class="text-center">
-                                    <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detailId, 'registration_id' => $model->id)); ?>" id="delete-detail-form-<?php echo $detailId; ?>" style="display:none;"></form>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDetail(<?php echo $detailId; ?>)">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCompetitionRegistration(<?php echo $compId; ?>)">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
