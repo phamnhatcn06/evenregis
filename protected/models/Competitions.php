@@ -58,7 +58,7 @@ class Competitions extends BaseCompetitions
     public function updateViaApi()
     {
         $url = ApiEndpoints::url(ApiEndpoints::COMPETITION_UPDATE, array('id' => $this->id));
-        return ApiClient::put($url, $this->attributes);
+        return ApiClient::post($url, $this->attributes);
     }
 
     public static function deleteViaApi($id)
