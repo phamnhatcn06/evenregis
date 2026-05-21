@@ -1026,6 +1026,7 @@ class RegistrationsController extends AdminController
 				'allowed_departments' => $allowedDepartments,
 				'total_attendees' => count($attendees),
 				'filtered_count' => count($result),
+				'sample_attendee' => !empty($attendees) ? array_keys($attendees[0]) : array(),
 			)
 		));
 		Yii::app()->end();
