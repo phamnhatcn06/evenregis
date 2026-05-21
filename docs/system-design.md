@@ -3857,7 +3857,32 @@ ALTER TABLE `sports`
 ALTER TABLE `event_sports`
   ADD COLUMN `allow_alliance` TINYINT(1) NOT NULL DEFAULT 0 
     COMMENT 'Cho phép liên quân: 0=không, 1=có';
--- Lưu ý: Số người tối đa từ mỗi đơn vị được cài đặt riêng trong bảng alliance_team_orgs.max_members
+```
+
+#### 16.4.3 Bảng mới: `event_sport_alliance_config`
+
+```sql
+-- ============================================================
+-- EVENT_SPORT_ALLIANCE_CONFIG — Cấu hình số người liên quân theo môn + đơn vị
+-- Admin cài đặt: Bóng đá → Đơn vị A: 4 người, Đơn vị B: 3 người...
+-- ============================================================
+CREATE TABLE `event_sport_alliance_config` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id`        INT UNSIGNED NOT NULL,
+  `sport_id`        INT UNSIGNED NOT NULL,
+  `organization_id` INT UNSIGNED NOT NULL,
+  `max_members`     INT UNSIGNED NOT NULL COMMENT 'Số người tối đa từ đơn vị này cho môn này',
+  `created_at`      INT UNSIGNED,
+  `updated_at`      INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_esac_event_sport_org` (`event_id`, `sport_id`, `organization_id`),
+  KEY `idx_esac_event_sport` (`event_id`, `sport_id`),
+  KEY `idx_esac_org` (`organization_id`),
+  CONSTRAINT `fk_esac_event` FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_esac_sport` FOREIGN KEY (`sport_id`) REFERENCES `sports`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_esac_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Cấu hình số người liên quân tối đa theo môn + đơn vị';
 ```
 
 #### 16.4.3 Thêm cột vào bảng `sport_teams`
