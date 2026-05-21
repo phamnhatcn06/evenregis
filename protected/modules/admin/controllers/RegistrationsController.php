@@ -1160,6 +1160,96 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	public function actionGetCompetitionRegisteredAttendees($registration_id, $competition_id)
+	{
+		header('Content-Type: application/json');
+
+		$registrations = CompetitionRegistrations::getApiDataProvider(array(
+			'registration_id' => $registration_id,
+			'competition_id'  => $competition_id,
+		), 100)->getData();
+
+		$result = array();
+		foreach ($registrations as $reg) {
+			$result[] = array(
+				'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
+				'attendee_id' => isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null),
+			);
+		}
+
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionUpdateCompetitionRegistration()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$competitionId = Yii::app()->getRequest()->getPost('competition_id');
+		$propertyId = Yii::app()->getRequest()->getPost('property_id');
+		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
+		$note = Yii::app()->getRequest()->getPost('note', '');
+
+		// Lấy danh sách đã đăng ký hiện tại
+		$existingRegs = CompetitionRegistrations::getApiDataProvider(array(
+			'registration_id' => $registrationId,
+			'competition_id'  => $competitionId,
+		), 100)->getData();
+
+		$existingAttendeeIds = array();
+		$existingRegMap = array();
+		foreach ($existingRegs as $reg) {
+			$attId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
+			$regId = isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null);
+			if ($attId && $regId) {
+				$existingAttendeeIds[] = $attId;
+				$existingRegMap[$attId] = $regId;
+			}
+		}
+
+		$newStaffIds = is_array($staffIds) ? $staffIds : array();
+
+		// Xóa những người không còn trong danh sách mới
+		$toDelete = array_diff($existingAttendeeIds, $newStaffIds);
+		foreach ($toDelete as $attId) {
+			if (isset($existingRegMap[$attId])) {
+				CompetitionRegistrations::deleteViaApi($existingRegMap[$attId]);
+			}
+		}
+
+		// Thêm những người mới
+		$toAdd = array_diff($newStaffIds, $existingAttendeeIds);
+		$successCount = 0;
+		foreach ($toAdd as $attId) {
+			$regData = array(
+				'registration_id' => $registrationId,
+				'competition_id'  => $competitionId,
+				'property_id'     => $propertyId,
+				'attendee_id'     => $attId,
+				'status'          => CompetitionRegistrations::STATUS_PENDING,
+				'note'            => $note,
+			);
+			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $regData);
+			if ($result['success']) {
+				$successCount++;
+			}
+		}
+
+		echo CJSON::encode(array(
+			'success' => true,
+			'message' => 'Đã cập nhật danh sách đăng ký thi nghiệp vụ.',
+			'deleted' => count($toDelete),
+			'added'   => $successCount,
+		));
+		Yii::app()->end();
+	}
+
 	public function actionAddAttendeesFromStaff()
 	{
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
