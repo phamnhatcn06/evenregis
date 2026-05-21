@@ -3894,7 +3894,7 @@ ALTER TABLE `sport_teams`
     COMMENT 'Đội liên quân: 0=đội đơn vị, 1=đội liên quân';
 ```
 
-#### 16.4.4 Bảng mới: `alliance_requests`
+#### 16.4.5 Bảng mới: `alliance_requests`
 
 ```sql
 -- ============================================================
