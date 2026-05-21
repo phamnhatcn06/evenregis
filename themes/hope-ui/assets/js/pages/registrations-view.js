@@ -524,6 +524,11 @@ var RegistrationView = (function() {
     }
 
     function loadStaffByProperty(propertyId) {
+        // Không cần propertyId nữa, load attendees từ registration
+        loadAttendeesForCompetition();
+    }
+
+    function loadAttendeesForCompetition() {
         document.getElementById('staff_placeholder').style.display = 'none';
         document.getElementById('dual_listbox_wrapper').style.display = 'flex';
 
@@ -531,7 +536,7 @@ var RegistrationView = (function() {
         availableList.innerHTML = '<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
 
         var competitionId = document.getElementById('comp_competition_id')?.value || '';
-        var url = window.BASE_URL + '/admin/registrations/getStaffByProperty?property_id=' + propertyId;
+        var url = window.BASE_URL + '/admin/registrations/getAttendeesForCompetition?registration_id=' + registrationId;
         if (competitionId) {
             url += '&competition_id=' + competitionId;
         }
