@@ -1123,14 +1123,13 @@ class RegistrationsController extends AdminController
 
 		$attendeeList = array();
 		foreach ($registrations as $reg) {
-			$staffCode = isset($reg->staff_code) ? $reg->staff_code : (isset($reg['staff_code']) ? $reg['staff_code'] : '');
-			$staffName = isset($reg->staff_name) ? $reg->staff_name : (isset($reg['staff_name']) ? $reg['staff_name'] : '');
-			if (!$staffName) {
-				$staffName = isset($reg->staff_full_name) ? $reg->staff_full_name : (isset($reg['staff_full_name']) ? $reg['staff_full_name'] : '');
-			}
+			$attendeeName = isset($reg->attendee_name) ? $reg->attendee_name : (isset($reg['attendee_name']) ? $reg['attendee_name'] : '');
+			$positionName = isset($reg->position_name) ? $reg->position_name : (isset($reg['position_name']) ? $reg['position_name'] : '');
+			$divisionName = isset($reg->division_name) ? $reg->division_name : (isset($reg['division_name']) ? $reg['division_name'] : '');
 			$attendeeList[] = array(
-				'staff_code' => $staffCode,
-				'staff_name' => $staffName,
+				'attendee_name' => $attendeeName,
+				'position_name' => $positionName,
+				'division_name' => $divisionName,
 			);
 		}
 
