@@ -1250,6 +1250,42 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	public function actionDeleteCompetitionRegistration()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$competitionId = Yii::app()->getRequest()->getPost('competition_id');
+
+		$registrations = CompetitionRegistrations::getApiDataProvider(array(
+			'registration_id' => $registrationId,
+			'competition_id'  => $competitionId,
+		), 100)->getData();
+
+		$deletedCount = 0;
+		foreach ($registrations as $reg) {
+			$regId = isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null);
+			if ($regId) {
+				$result = CompetitionRegistrations::deleteViaApi($regId);
+				if ($result['success']) {
+					$deletedCount++;
+				}
+			}
+		}
+
+		echo CJSON::encode(array(
+			'success' => true,
+			'message' => "Đã xóa {$deletedCount} đăng ký.",
+			'deleted' => $deletedCount,
+		));
+		Yii::app()->end();
+	}
+
 	public function actionAddAttendeesFromStaff()
 	{
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
