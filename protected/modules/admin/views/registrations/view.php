@@ -389,7 +389,7 @@ foreach ($registrationDetails as $detail) {
             </div>
             <div id="sport_preview_list"></div>
             <div class="text-end mt-2">
-                <button type="button" class="btn btn-success" id="btn_save_all_sports">
+                <button type="button" class="btn btn-sm btn-success" id="btn_save_all_sports">
                     <i class="fa fa-save me-1"></i>Lưu tất cả đăng ký
                 </button>
             </div>
