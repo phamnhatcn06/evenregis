@@ -360,7 +360,7 @@ foreach ($registrationDetails as $detail) {
             <div class="col-md-5">
                 <label class="form-label mb-1">Đơn vị liên quân</label>
                 <div>
-                    <button type="button" class="btn btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#alliancePropertyModal" style="height:42px;">
+                    <button type="button" class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#alliancePropertyModal">
                         <i class="fa fa-handshake-o me-1"></i>Thêm đơn vị liên quân
                     </button>
                     <div id="alliance_selected_texts" class="mt-2 small text-primary fw-bold"></div>
