@@ -414,9 +414,10 @@ class RegistrationsController extends AdminController
 			foreach ($properties as $p) {
 				$pId = isset($p['id']) ? $p['id'] : (isset($p->id) ? $p->id : null);
 				if ($pId && $pId != $property_id) {
+					$prefix = isset($p['prefix']) ? $p['prefix'] : (isset($p->prefix) ? $p->prefix : '');
 					$result[] = array(
 						'id' => $pId,
-						'code' => isset($p['code']) ? $p['code'] : '',
+						'code' => $prefix ? $prefix : (isset($p['code']) ? $p['code'] : ''),
 						'name' => isset($p['name']) ? $p['name'] : '',
 					);
 				}
