@@ -56,6 +56,8 @@ class CompetitionsController extends AdminController
                 $result = $model->updateViaApi();
 
                 if ($result['success']) {
+                    $depts = isset($_POST['CompetitionDepartments']) ? $_POST['CompetitionDepartments'] : array();
+                    $this->syncDepartments($id, $depts);
                     Yii::app()->user->setFlash('success', 'Cập nhật cuộc thi thành công.');
                     $this->redirect(array('view', 'id' => $id));
                 } else {
@@ -66,6 +68,8 @@ class CompetitionsController extends AdminController
 
         $this->render('update', array(
             'model' => $model,
+            'allDepartments' => Departments::getActiveList(),
+            'selectedDepartments' => array_values(CompetitionDepartments::getDepartmentCodes($id)),
         ));
     }
 
