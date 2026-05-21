@@ -1893,10 +1893,18 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
+		$attendeeName = $model->attendee_name;
+		if (empty($attendeeName) && $model->attendee_id) {
+			$attendee = Attendees::fetchFromApi($model->attendee_id);
+			if ($attendee) {
+				$attendeeName = $attendee->full_name;
+			}
+		}
+
 		header('Content-Type: application/json');
 		echo CJSON::encode(array('success' => true, 'data' => array(
 			'id' => $model->id,
-			'attendee_name' => $model->attendee_name,
+			'attendee_name' => $attendeeName,
 			'candidate_number' => $model->candidate_number,
 			'height_cm' => $model->height_cm,
 			'weight_kg' => $model->weight_kg,
