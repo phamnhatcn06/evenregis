@@ -49,12 +49,12 @@ class SportTeamMembers extends BaseSportTeamMembers
         $data = $this->attributes;
         $data['sport_team_id'] = $this->sport_team_id;
         $data['attendee_id'] = $this->attendee_id;
+        $data['code'] = $this->code;
+        $data['name'] = $this->name;
 
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
         });
-        print_r($data);
-        die;
         return ApiClient::post(ApiEndpoints::SPORT_TEAM_MEMBER_STORE, $data);
     }
 
