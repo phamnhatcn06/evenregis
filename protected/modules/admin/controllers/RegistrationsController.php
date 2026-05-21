@@ -1768,7 +1768,7 @@ class RegistrationsController extends AdminController
 
 			if (in_array($id, $registeredAttendeeIds)) continue;
 
-			if ($contestGender && $gender !== $contestGender) continue;
+			if ($contestGender !== null && (int)$gender !== $contestGender) continue;
 
 			$result[] = array(
 				'id' => $id,
