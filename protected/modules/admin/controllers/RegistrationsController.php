@@ -459,9 +459,10 @@ class RegistrationsController extends AdminController
 					if ($pId == $registration->property_id) {
 						continue;
 					}
+					$prefix = isset($p['prefix']) ? $p['prefix'] : (isset($p->prefix) ? $p->prefix : '');
 					$result[] = array(
 						'id' => $pId,
-						'code' => isset($p['code']) ? $p['code'] : '',
+						'code' => $prefix ? $prefix : (isset($p['code']) ? $p['code'] : ''),
 						'name' => isset($p['name']) ? $p['name'] : '',
                         'is_selected' => in_array($pId, $existingTargetIds) ? 1 : 0,
 					);
