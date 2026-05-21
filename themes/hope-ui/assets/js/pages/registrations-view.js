@@ -41,6 +41,7 @@ var RegistrationView = (function() {
         }
 
         bindCompetitionEvents();
+        bindEditCompetitionEvents();
         bindSportEvents();
         bindSportCardEvents();
         bindAttendeeEvents();
