@@ -265,6 +265,9 @@ class ApiEndpoints
     const ALLIANCE_REQUEST_RESPOND = '/api/alliance-requests/respond/{id}';
     const ALLIANCE_REQUEST_BY_TARGET = '/api/alliance-requests/by-target/{org_id}';
 
+    // Dashboard Statistics
+    const DASHBOARD_STATS = '/api/dashboard/stats';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
