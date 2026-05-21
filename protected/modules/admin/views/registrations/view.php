@@ -404,11 +404,10 @@ foreach ($registrationDetails as $detail) {
                     <tr>
                         <th>Môn thi đấu</th>
                         <th>Tên đội</th>
-                        <th style="width:150px;">Liên quân</th>
                         <th style="width:100px;">Số VĐV</th>
                         <th>Danh sách VĐV</th>
                         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                            <th style="width:60px;"></th>
+                            <th style="width:80px;"></th>
                         <?php endif; ?>
                     </tr>
                 </thead>
@@ -417,14 +416,11 @@ foreach ($registrationDetails as $detail) {
                         $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
                         $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
                         $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
-                        $isAlliance = isset($team->is_alliance) ? $team->is_alliance : (isset($team['is_alliance']) ? $team['is_alliance'] : 0);
-                        $allianceNames = isset($team->alliance_org_names) ? $team->alliance_org_names : ($isAlliance ? 'Có' : '-');
                         $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
                     ?>
                         <tr>
                             <td><?php echo CHtml::encode($sportName); ?></td>
                             <td><span class="badge bg-primary"><?php echo CHtml::encode($teamName); ?></span></td>
-                            <td><?php echo CHtml::encode($allianceNames); ?></td>
                             <td class="text-center"><?php echo count($members); ?></td>
                             <td>
                                 <?php foreach ($members as $idx => $member):
