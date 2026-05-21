@@ -625,7 +625,7 @@ var RegistrationView = (function() {
 
     function removeHiddenInputs() {
         var form = document.getElementById('add-competition-form');
-        var inputs = form.querySelectorAll('input[name="staff_codes[]"]');
+        var inputs = form.querySelectorAll('input[name="staff_ids[]"]');
         inputs.forEach(function(input) { input.remove(); });
     }
 
