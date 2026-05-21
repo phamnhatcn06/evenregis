@@ -427,20 +427,16 @@ foreach ($registrationDetails as $detail) {
                             <td class="text-center"><?php echo count($members); ?></td>
                             <td>
                                 <?php foreach ($members as $idx => $member):
-                                    $memberName = isset($member->attendee_name) ? $member->attendee_name :
-                                        (isset($member['attendee_name']) ? $member['attendee_name'] :
-                                        (isset($member->name) ? $member->name :
-                                        (isset($member['name']) ? $member['name'] : '')));
-                                    $memberPosition = isset($member->position_name) ? $member->position_name :
-                                        (isset($member['position_name']) ? $member['position_name'] : '');
-                                    $memberDivision = isset($member->division_name) ? $member->division_name :
-                                        (isset($member['division_name']) ? $member['division_name'] : '');
+                                    $memberName = isset($member['attendee_name']) ? $member['attendee_name'] :
+                                        (isset($member['name']) ? $member['name'] : '');
+                                    $memberPosition = isset($member['position_name']) ? $member['position_name'] : '';
+                                    $memberDivision = isset($member['division_name']) ? $member['division_name'] : '';
                                     $memberInfo = $memberName;
                                     if ($memberPosition || $memberDivision) {
-                                        $memberInfo .= ' (' . trim($memberPosition . ' - ' . $memberDivision, ' -') . ')';
+                                        $memberInfo .= ' <small class="text-muted">(' . trim($memberPosition . ' - ' . $memberDivision, ' -') . ')</small>';
                                     }
                                 ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($memberInfo); ?></span>
+                                    <div><?php echo ($idx + 1) . '. ' . $memberInfo; ?></div>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
