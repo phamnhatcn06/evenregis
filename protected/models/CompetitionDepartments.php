@@ -18,12 +18,17 @@ class CompetitionDepartments extends BaseCompetitionDepartments
     }
 
     /**
-     * Lấy danh sách department_code của một competition
+     * Lấy danh sách department_code của một competition (từ API)
      */
     public static function getDepartmentCodes($competitionId)
     {
-        $models = self::model()->findAllByAttributes(array('competition_id' => $competitionId));
-        return CHtml::listData($models, 'id', 'department_code');
+        $codes = array();
+        $dataProvider = self::getApiDataProvider(array('competition_id' => $competitionId), 100);
+        $models = $dataProvider->getData();
+        foreach ($models as $model) {
+            $codes[] = $model->department_code;
+        }
+        return $codes;
     }
 
     /**
