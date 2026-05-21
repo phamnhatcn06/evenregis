@@ -1,6 +1,7 @@
 <div class="form-wrap">
     <?php $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
         'id' => 'competitions-form',
+        'method' => 'post',
         'htmlOptions' => array('data-toggle' => 'validator'),
         'enableClientValidation' => true,
         'clientOptions' => array(
