@@ -1048,14 +1048,29 @@ class RegistrationsController extends AdminController
 			$message .= " Có {$errorCount} người không đăng ký được.";
 		}
 
+		// Load thông tin để render row mới
+		$competition = Competitions::fetchFromApi($competitionId);
+		$competitionName = $competition ? $competition->name : '';
+
+		// Load danh sách attendees vừa đăng ký
+		$attendees = RegistrationDetailAttendees::getByDetailId($detailId);
+		$attendeeList = array();
+		foreach ($attendees as $att) {
+			$attendeeList[] = array(
+				'staff_code' => isset($att['staff_code']) ? $att['staff_code'] : '',
+				'staff_name' => isset($att['staff_name']) ? $att['staff_name'] : (isset($att['staff_full_name']) ? $att['staff_full_name'] : ''),
+			);
+		}
+
 		echo CJSON::encode(array(
-			'success'      => true,
-			'message'      => $message,
-			'successCount' => $successCount,
-			'errorCount'   => $errorCount,
-			'detailId'     => $detailId,
-			'staffCodes'   => $staffCodes,
-			'debugErrors'  => $debugErrors,
+			'success'         => true,
+			'message'         => $message,
+			'successCount'    => $successCount,
+			'errorCount'      => $errorCount,
+			'detailId'        => $detailId,
+			'competitionId'   => $competitionId,
+			'competitionName' => $competitionName,
+			'attendees'       => $attendeeList,
 		));
 		Yii::app()->end();
 	}
