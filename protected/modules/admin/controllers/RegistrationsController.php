@@ -883,8 +883,18 @@ class RegistrationsController extends AdminController
 
 			foreach ($competitions as $item) {
 				$compId = isset($item['competition_id']) ? $item['competition_id'] : $item['id'];
-				$maxPerOrg = isset($item['max_per_org']) ? (int)$item['max_per_org'] : 0;
 				$currentCount = isset($registeredCounts[$compId]) ? $registeredCounts[$compId] : 0;
+
+				// Lấy max_per_org từ Competitions model
+				$maxPerOrg = 0;
+				if (isset($item['max_per_org'])) {
+					$maxPerOrg = (int)$item['max_per_org'];
+				} else {
+					$competition = Competitions::fetchFromApi($compId);
+					if ($competition) {
+						$maxPerOrg = $competition->max_per_org ? (int)$competition->max_per_org : 0;
+					}
+				}
 
 				// Bỏ qua nếu đã đăng ký đủ số lượng (max_per_org > 0 và đã đạt giới hạn)
 				if ($maxPerOrg > 0 && $currentCount >= $maxPerOrg) {
