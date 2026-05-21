@@ -520,10 +520,6 @@ var RegistrationView = (function() {
         fetch(url)
             .then(function(response) { return response.json(); })
             .then(function(data) {
-                console.log('Attendees response:', data);
-                if (data.debug) {
-                    console.log('Debug info:', data.debug);
-                }
                 allStaff = data.success && data.data ? data.data : [];
                 selectedStaff = [];
                 renderAvailableStaff();
