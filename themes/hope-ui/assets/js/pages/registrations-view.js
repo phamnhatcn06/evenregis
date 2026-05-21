@@ -47,6 +47,8 @@ var RegistrationView = (function() {
         bindAttendeeEvents();
         bindEditAttendeeForm();
         bindAddAttendeeModalReset();
+        bindMissEvents();
+        bindTalentEvents();
 
         if (isHotel && propertyId) {
             loadAttendeeStaffList();
