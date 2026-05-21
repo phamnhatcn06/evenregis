@@ -274,4 +274,6 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
 .bg-soft-info { background-color: rgba(13, 202, 240, 0.1); }
 .bg-soft-secondary { background-color: rgba(108, 117, 125, 0.1); }
 .sticky-top { position: sticky; top: 0; z-index: 1; }
+.row { margin-bottom: 1.5rem; }
+.card { margin-bottom: 0; }
 </style>
