@@ -113,6 +113,12 @@
     ));
     ?>
 
+    <?php $this->renderPartial('_departments', array(
+        'model' => $model,
+        'allDepartments' => isset($allDepartments) ? $allDepartments : array(),
+        'selectedDepartments' => isset($selectedDepartments) ? $selectedDepartments : array(),
+    )); ?>
+
     <hr />
     <div class="footer-action">
         <button id="btn-submit" type="submit" class="btn btn-sm btn-primary">
