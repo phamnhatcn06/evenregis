@@ -3816,15 +3816,14 @@ CREATE TABLE `competition_departments` (
 ```
 [Admin HO / BTC Thể thao]
   ├── UC-AL01: Cấu hình cho phép liên quân cho môn thể thao trong sự kiện
-  ├── UC-AL02: Thiết lập số người tối đa từ mỗi đơn vị trong đội liên quân
-  ├── UC-AL03: Xem danh sách đội liên quân và thành phần
-  └── UC-AL04: Phê duyệt / Từ chối yêu cầu liên quân
+  ├── UC-AL02: Xem danh sách đội liên quân và thành phần
+  └── UC-AL03: Phê duyệt / Từ chối yêu cầu liên quân
 
 [Đại diện đơn vị]
-  ├── UC-AL05: Gửi yêu cầu liên quân đến đơn vị khác
-  ├── UC-AL06: Xem / Chấp nhận / Từ chối yêu cầu liên quân
-  ├── UC-AL07: Đăng ký thành viên vào đội liên quân (trong giới hạn cho phép)
-  └── UC-AL08: Hủy tham gia liên quân (nếu chưa được phê duyệt)
+  ├── UC-AL04: Gửi yêu cầu liên quân + cài đặt số người tối đa từng đơn vị
+  ├── UC-AL05: Xem / Chấp nhận / Từ chối yêu cầu liên quân
+  ├── UC-AL06: Đăng ký thành viên vào đội liên quân (trong giới hạn max_members của đơn vị mình)
+  └── UC-AL07: Hủy tham gia liên quân (nếu chưa được phê duyệt)
 ```
 
 ### 16.3 Business Rules
