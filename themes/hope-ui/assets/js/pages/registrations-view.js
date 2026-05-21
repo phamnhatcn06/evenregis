@@ -2730,12 +2730,13 @@ var RegistrationView = (function() {
 
     function addMissSelected() {
         var selected = document.querySelectorAll('#miss_available_list .list-group-item.active');
+        var totalAllowed = missMaxPerOrg > 0 ? (missMaxPerOrg - missRegisteredCount) : Infinity;
         selected.forEach(function(item) {
             var id = item.getAttribute('data-id');
             var att = missAllAttendees.find(function(a) { return String(a.id) === String(id); });
             if (att && !missSelectedAttendees.find(function(s) { return String(s.id) === String(id); })) {
-                if (missMaxPerOrg > 0 && missSelectedAttendees.length >= missMaxPerOrg) {
-                    Toast.warning('Đã đạt số lượng tối đa: ' + missMaxPerOrg);
+                if (missSelectedAttendees.length >= totalAllowed) {
+                    Toast.warning('Đã đạt số lượng tối đa cho phép: ' + totalAllowed);
                     return;
                 }
                 missSelectedAttendees.push(att);
@@ -2744,16 +2745,21 @@ var RegistrationView = (function() {
         });
         renderMissAvailableList();
         renderMissSelectedList();
+        updateMissMaxDisplay();
     }
 
     function addMissAll() {
+        var totalAllowed = missMaxPerOrg > 0 ? (missMaxPerOrg - missRegisteredCount) : Infinity;
         missAllAttendees.forEach(function(att) {
-            if (missMaxPerOrg > 0 && missSelectedAttendees.length >= missMaxPerOrg) return;
+            if (missSelectedAttendees.length >= totalAllowed) return;
             missSelectedAttendees.push(att);
         });
-        missAllAttendees = [];
+        missAllAttendees = missAllAttendees.filter(function(att) {
+            return !missSelectedAttendees.find(function(s) { return String(s.id) === String(att.id); });
+        });
         renderMissAvailableList();
         renderMissSelectedList();
+        updateMissMaxDisplay();
     }
 
     function removeMissSelected() {
