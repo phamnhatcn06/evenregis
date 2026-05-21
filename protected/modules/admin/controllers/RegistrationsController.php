@@ -985,58 +985,38 @@ class RegistrationsController extends AdminController
 		}
 
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
-		$contentId = 2;
 		$competitionId = Yii::app()->getRequest()->getPost('competition_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
 		$staffCodes = Yii::app()->getRequest()->getPost('staff_codes', array());
 		$note = Yii::app()->getRequest()->getPost('note', '');
-
-		Yii::log("AddCompetitionRegistration - POST data: " . json_encode($_POST), 'info', 'application.registration');
 
 		if (empty($staffCodes) || !is_array($staffCodes)) {
 			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một nhân viên.'));
 			Yii::app()->end();
 		}
 
-		$detailData = array(
-			'registration_id' => $registrationId,
-			'content_id'      => $contentId,
-			'competition_id'  => $competitionId,
-			'quantity'        => count($staffCodes),
-			'note'            => $note,
-		);
-
-		Yii::log("AddCompetitionRegistration - detailData: " . json_encode($detailData), 'info', 'application.registration');
-
-		$detailResult = RegistrationDetails::storeViaApi($detailData);
-		Yii::log("AddCompetitionRegistration - detailResult: " . json_encode($detailResult), 'info', 'application.registration');
-
-		if (!$detailResult['success']) {
-			$error = isset($detailResult['error']) ? $detailResult['error'] : 'Không thể tạo chi tiết đăng ký.';
-			echo CJSON::encode(array('success' => false, 'error' => $error));
-			Yii::app()->end();
-		}
-		$detailId = isset($detailResult['data']['data']['id']) ? $detailResult['data']['data']['id'] : null;
-
-		if (!$detailId) {
-			echo CJSON::encode(array('success' => false, 'error' => 'Không lấy được ID chi tiết đăng ký.'));
-			Yii::app()->end();
-		}
-
 		$successCount = 0;
 		$errorCount   = 0;
 		$debugErrors  = array();
+		$createdIds   = array();
 
 		foreach ($staffCodes as $staffCode) {
-			$attendeeData = array(
-				'registration_detail_id' => $detailId,
-				'staff_code'             => $staffCode,
+			$regData = array(
+				'registration_id' => $registrationId,
+				'competition_id'  => $competitionId,
+				'property_id'     => $propertyId,
+				'staff_code'      => $staffCode,
+				'status'          => CompetitionRegistrations::STATUS_PENDING,
+				'note'            => $note,
 			);
-			Yii::log("AddCompetitionRegistration - attendeeData: " . json_encode($attendeeData), 'info', 'application.registration');
-			$result = RegistrationDetailAttendees::storeViaApi($attendeeData);
-			Yii::log("AddCompetitionRegistration - attendeeResult: " . json_encode($result), 'info', 'application.registration');
+			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $regData);
 			if ($result['success']) {
 				$successCount++;
+				if (isset($result['data']['data']['id'])) {
+					$createdIds[] = $result['data']['data']['id'];
+				} elseif (isset($result['data']['id'])) {
+					$createdIds[] = $result['data']['id'];
+				}
 			} else {
 				$errorCount++;
 				$debugErrors[] = array('staff_code' => $staffCode, 'error' => $result);
@@ -1048,35 +1028,41 @@ class RegistrationsController extends AdminController
 			$message .= " Có {$errorCount} người không đăng ký được.";
 		}
 
-		// Load thông tin để render row mới
+		// Load thông tin để render
 		$competition = Competitions::fetchFromApi($competitionId);
 		$competitionName = $competition ? $competition->name : '';
 
-		// Load danh sách attendees vừa đăng ký
-		$attendees = RegistrationDetailAttendees::getByDetailId($detailId);
+		// Load danh sách vừa đăng ký từ competition_registrations
+		$registrations = CompetitionRegistrations::getApiDataProvider(array(
+			'registration_id' => $registrationId,
+			'competition_id'  => $competitionId,
+		), 100)->getData();
+
 		$attendeeList = array();
-		foreach ($attendees as $att) {
+		foreach ($registrations as $reg) {
+			$staffCode = isset($reg->staff_code) ? $reg->staff_code : (isset($reg['staff_code']) ? $reg['staff_code'] : '');
+			$staffName = isset($reg->staff_name) ? $reg->staff_name : (isset($reg['staff_name']) ? $reg['staff_name'] : '');
+			if (!$staffName) {
+				$staffName = isset($reg->staff_full_name) ? $reg->staff_full_name : (isset($reg['staff_full_name']) ? $reg['staff_full_name'] : '');
+			}
 			$attendeeList[] = array(
-				'staff_code' => isset($att['staff_code']) ? $att['staff_code'] : '',
-				'staff_name' => isset($att['staff_name']) ? $att['staff_name'] : (isset($att['staff_full_name']) ? $att['staff_full_name'] : ''),
+				'staff_code' => $staffCode,
+				'staff_name' => $staffName,
 			);
 		}
-		// Debug: raw attendees from API
-		$rawAttendeesDebug = $attendees;
 
 		echo CJSON::encode(array(
 			'success'         => true,
 			'message'         => $message,
 			'successCount'    => $successCount,
 			'errorCount'      => $errorCount,
-			'detailId'        => $detailId,
 			'competitionId'   => $competitionId,
 			'competitionName' => $competitionName,
 			'attendees'       => $attendeeList,
 			'debug'           => array(
 				'staffCodesReceived' => $staffCodes,
 				'debugErrors'        => $debugErrors,
-				'rawAttendees'       => $rawAttendeesDebug,
+				'createdIds'         => $createdIds,
 			),
 		));
 		Yii::app()->end();
