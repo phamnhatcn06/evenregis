@@ -4205,7 +4205,7 @@ ALTER TABLE `sport_teams`
 
 CREATE INDEX `idx_sport_teams_alliance` ON `sport_teams`(`is_alliance`);
 
--- 4. Tạo bảng alliance_requests
+-- 5. Tạo bảng alliance_requests
 CREATE TABLE `alliance_requests` (
   `id`                INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `event_id`          INT UNSIGNED NOT NULL,
