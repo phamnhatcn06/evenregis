@@ -22,8 +22,11 @@ class CompetitionsController extends AdminController
                 $model->created_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
                 $result = $model->storeViaApi();
                 if ($result['success']) {
-                    Yii::app()->user->setFlash('success', 'Tạo cuộc thi thành công.');
                     $newId = isset($result['data']['id']) ? $result['data']['id'] : null;
+                    if ($newId && isset($_POST['CompetitionDepartments'])) {
+                        $this->syncDepartments($newId, $_POST['CompetitionDepartments']);
+                    }
+                    Yii::app()->user->setFlash('success', 'Tạo cuộc thi thành công.');
                     $this->redirect($newId ? array('view', 'id' => $newId) : array('admin'));
                 } else {
                     $errorMsg = $result['error'] ?: 'Không thể tạo cuộc thi.';
@@ -37,6 +40,8 @@ class CompetitionsController extends AdminController
 
         $this->render('create', array(
             'model' => $model,
+            'allDepartments' => Departments::getActiveList(),
+            'selectedDepartments' => array(),
         ));
     }
 
