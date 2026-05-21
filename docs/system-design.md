@@ -3980,14 +3980,21 @@ public function validateAllianceConfig($attribute, $params) {
 }
 ```
 
-#### 16.5.2 Khi tạo đội liên quân (cài đặt max_members từng đơn vị)
+#### 16.5.2 Khi Admin cài đặt cấu hình liên quân theo môn
 
 ```php
-// Trong AllianceTeamOrgs model
+// Trong EventSportAllianceConfig model
 public function rules() {
     return array(
-        array('max_members', 'required', 'message' => 'Phải cài đặt số người tối đa cho đơn vị.'),
+        array('event_id, sport_id, organization_id, max_members', 'required'),
         array('max_members', 'numerical', 'integerOnly' => true, 'min' => 1),
+        array('event_id, sport_id, organization_id', 'unique', 
+            'criteria' => array(
+                'condition' => 'event_id = :e AND sport_id = :s AND organization_id = :o',
+                'params' => array(':e' => $this->event_id, ':s' => $this->sport_id, ':o' => $this->organization_id)
+            ),
+            'message' => 'Đã có cấu hình cho đơn vị này.'
+        ),
     );
 }
 ```
