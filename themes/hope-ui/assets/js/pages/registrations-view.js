@@ -2825,6 +2825,39 @@ var RegistrationView = (function() {
             .catch(function() { Toast.error('Lỗi kết nối.'); });
     }
 
+    function deleteMissContestant(id) {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: 'Bạn có chắc muốn xóa thí sinh này khỏi cuộc thi?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('id', id);
+                fetch(window.BASE_URL + '/admin/registrations/deleteMissContestant', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        Toast.success(data.message || 'Xóa thành công!');
+                        location.reload();
+                    } else {
+                        Toast.error(data.error || 'Có lỗi xảy ra.');
+                    }
+                })
+                .catch(function() { Toast.error('Lỗi kết nối.'); });
+            }
+        });
+    }
+
     function bindEditMissForm() {
         var form = document.getElementById('edit-miss-form');
         if (form) {
