@@ -1820,6 +1820,46 @@ var RegistrationView = (function() {
         });
     }
 
+    function deleteCompetitionRegistration(competitionId) {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: 'Bạn có chắc chắn muốn xóa đăng ký thi nghiệp vụ này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                fetch(window.BASE_URL + '/admin/registrations/deleteCompetitionRegistration', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: 'registration_id=' + registrationId + '&competition_id=' + competitionId
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        Toast.success('Đã xóa đăng ký thi nghiệp vụ.');
+                        var row = document.querySelector('tr[data-competition-id="' + competitionId + '"]');
+                        if (row) row.remove();
+
+                        // Check if table is empty
+                        var tbody = document.querySelector('#competition-list-table tbody');
+                        if (tbody && tbody.children.length === 0) {
+                            location.reload();
+                        }
+                    } else {
+                        Toast.error(data.error || 'Có lỗi xảy ra.');
+                    }
+                });
+            }
+        });
+    }
+
     function bindAttendeeEvents() {
         // Init datepickers for Add Staff modal
         var staffModal = document.getElementById('addAttendeeFromStaffModal');
