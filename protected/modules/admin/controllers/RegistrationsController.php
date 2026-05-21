@@ -49,6 +49,11 @@ class RegistrationsController extends AdminController
             foreach ($teamsData as $team) {
                 $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
                 if ($teamId) {
+                    // Fetch sport name if not available
+                    if (empty($team->sport_name) && $team->sport_id) {
+                        $sport = Sports::fetchFromApi($team->sport_id);
+                        $team->sport_name = $sport ? $sport->name : '';
+                    }
                     $sportTeams[] = $team;
                     $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
                     $sportTeamMembers[$teamId] = $members;
