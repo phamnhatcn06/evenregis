@@ -445,13 +445,6 @@ var RegistrationView = (function() {
 
                 var formData = new FormData(form);
 
-                // Debug: log form data
-                console.log('=== DEBUG COMPETITION FORM ===');
-                console.log('selectedStaff:', selectedStaff);
-                for (var pair of formData.entries()) {
-                    console.log(pair[0] + ': ' + pair[1]);
-                }
-
                 fetch(form.action, {
                     method: 'POST',
                     body: formData,
