@@ -4175,7 +4175,28 @@ UPDATE `sports` SET `min_players` = 8, `max_players` = 10 WHERE `code` = 'tug_of
 ALTER TABLE `event_sports`
   ADD COLUMN `allow_alliance` TINYINT(1) NOT NULL DEFAULT 0 
     COMMENT 'Cho phép liên quân: 0=không, 1=có' AFTER `status`;
--- Lưu ý: max_members được cài đặt riêng cho từng đơn vị trong alliance_team_orgs
+
+-- 3. Tạo bảng cấu hình số người liên quân theo môn + đơn vị
+CREATE TABLE `event_sport_alliance_config` (
+  `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id`        INT UNSIGNED NOT NULL,
+  `sport_id`        INT UNSIGNED NOT NULL,
+  `organization_id` INT UNSIGNED NOT NULL,
+  `max_members`     INT UNSIGNED NOT NULL COMMENT 'Số người tối đa từ đơn vị này cho môn này',
+  `created_at`      INT UNSIGNED,
+  `updated_at`      INT UNSIGNED,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_esac_event_sport_org` (`event_id`, `sport_id`, `organization_id`),
+  KEY `idx_esac_event_sport` (`event_id`, `sport_id`),
+  CONSTRAINT `fk_esac_event` FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_esac_sport` FOREIGN KEY (`sport_id`) REFERENCES `sports`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_esac_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Cấu hình số người liên quân tối đa theo môn + đơn vị';
+
+-- Ví dụ: Bóng đá - MT Hà Nội max 6, MT Đà Nẵng max 5
+-- INSERT INTO event_sport_alliance_config (event_id, sport_id, organization_id, max_members) VALUES
+-- (1, 1, 1, 6), (1, 1, 2, 5);
 
 -- 3. Thêm cột is_alliance vào sport_teams
 ALTER TABLE `sport_teams`
