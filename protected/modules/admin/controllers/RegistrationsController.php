@@ -160,6 +160,11 @@ class RegistrationsController extends AdminController
 								'attendee_id' => $attId,
 								'attendee_name' => isset($attInfo['full_name']) ? $attInfo['full_name'] : '',
 								'candidate_number' => isset($c->candidate_number) ? $c->candidate_number : (isset($c['candidate_number']) ? $c['candidate_number'] : ''),
+								'height_cm' => isset($c->height_cm) ? $c->height_cm : (isset($c['height_cm']) ? $c['height_cm'] : null),
+								'weight_kg' => isset($c->weight_kg) ? $c->weight_kg : (isset($c['weight_kg']) ? $c['weight_kg'] : null),
+								'measurements' => isset($c->measurements) ? $c->measurements : (isset($c['measurements']) ? $c['measurements'] : ''),
+								'talent' => isset($c->talent) ? $c->talent : (isset($c['talent']) ? $c['talent'] : ''),
+								'bio' => isset($c->bio) ? $c->bio : (isset($c['bio']) ? $c['bio'] : ''),
 								'status' => isset($c->status) ? $c->status : (isset($c['status']) ? $c['status'] : 0),
 							);
 						}
