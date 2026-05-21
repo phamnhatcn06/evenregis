@@ -2667,6 +2667,8 @@ var RegistrationView = (function() {
     function hideMissDualListbox() {
         document.getElementById('miss_dual_listbox_wrapper').style.display = 'none';
         document.getElementById('miss_placeholder').style.display = 'block';
+        var wrapper = document.getElementById('miss_registered_wrapper');
+        if (wrapper) wrapper.style.display = 'none';
     }
 
     function renderMissAvailableList() {
