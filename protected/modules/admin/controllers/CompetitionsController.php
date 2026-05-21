@@ -56,8 +56,10 @@ class CompetitionsController extends AdminController
                 $result = $model->updateViaApi();
 
                 if ($result['success']) {
-                    $depts = isset($_POST['CompetitionDepartments']) ? $_POST['CompetitionDepartments'] : array();
-                    $this->syncDepartments($id, $depts);
+                    // Sync departments nếu có chọn
+                    if (isset($_POST['CompetitionDepartments'])) {
+                        $this->syncDepartments($id, $_POST['CompetitionDepartments']);
+                    }
                     Yii::app()->user->setFlash('success', 'Cập nhật cuộc thi thành công.');
                     $this->redirect(array('view', 'id' => $id));
                 } else {
