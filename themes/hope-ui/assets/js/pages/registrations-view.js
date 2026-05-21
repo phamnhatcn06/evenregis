@@ -2631,8 +2631,32 @@ var RegistrationView = (function() {
                     renderMissAvailableList();
                     renderMissSelectedList();
                     showMissDualListbox();
+                    renderMissRegisteredList(data.registered || []);
                 }
             });
+    }
+
+    function renderMissRegisteredList(registered) {
+        var wrapper = document.getElementById('miss_registered_wrapper');
+        var list = document.getElementById('miss_registered_list');
+        var count = document.getElementById('miss_registered_count');
+
+        if (!list) return;
+
+        list.innerHTML = '';
+        count.textContent = registered.length;
+
+        if (registered.length > 0) {
+            wrapper.style.display = 'block';
+            registered.forEach(function(item) {
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td><span class="badge bg-primary">' + (item.candidate_number || '-') + '</span></td>' +
+                    '<td>' + (item.name || '') + '</td>';
+                list.appendChild(tr);
+            });
+        } else {
+            wrapper.style.display = 'none';
+        }
     }
 
     function showMissDualListbox() {
