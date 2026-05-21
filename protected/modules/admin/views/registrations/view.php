@@ -507,7 +507,7 @@ foreach ($registrationDetails as $detail) {
                                     <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editCompetitionRegistration(<?php echo $compId; ?>, '<?php echo addslashes($compData['competition_name']); ?>')" title="Sửa">
                                         <i class="fa fa-pencil"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCompetitionRegistration(<?php echo $compId; ?>)" title="Xóa">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteCompetitionRegistration(<?php echo $compId; ?>)" title="Xóa">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
