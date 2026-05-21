@@ -2540,6 +2540,7 @@ var RegistrationView = (function() {
         removeAthleteFromSport: removeAthleteFromSport,
         editPendingSport: editPendingSport,
         editSportTeam: editSportTeam,
-        editCompetitionRegistration: editCompetitionRegistration
+        editCompetitionRegistration: editCompetitionRegistration,
+        deleteCompetitionRegistration: deleteCompetitionRegistration
     };
 })();
