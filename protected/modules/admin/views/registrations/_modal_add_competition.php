@@ -18,12 +18,7 @@
                                     <option value="">-- Chọn cuộc thi --</option>
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Đơn vị <span class="text-danger">*</span></label>
-                                <select class="form-select" id="comp_property_id" name="property_id" required>
-                                    <option value="">-- Chọn cuộc thi trước --</option>
-                                </select>
-                            </div>
+                            <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
                             <div class="mb-3">
                                 <label class="form-label">Số lượng tối đa</label>
                                 <input type="text" class="form-control" id="comp_max_per_org" readonly value="-">
