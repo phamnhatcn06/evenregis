@@ -932,7 +932,7 @@ class RegistrationsController extends AdminController
 				$divisionName = isset($staff['division_name']) ? $staff['division_name'] : (isset($staff->division_name) ? $staff->division_name : '');
 				$code = isset($staff['code']) ? $staff['code'] : (isset($staff->code) ? $staff->code : '');
 				$startDate = isset($staff['start_date']) ? $staff['start_date'] : (isset($staff->start_date) ? $staff->start_date : '');
-				$departmentCode = isset($staff['department_code']) ? $staff['department_code'] : (isset($staff->department_code) ? $staff->department_code : '');
+				$departmentCode = isset($staff['division_code']) ? $staff['division_code'] : (isset($staff->division_code) ? $staff->division_code : '');
 
 				if (!$id) continue;
 
@@ -977,8 +977,11 @@ class RegistrationsController extends AdminController
 
 	public function actionAddCompetitionRegistration()
 	{
+		header('Content-Type: application/json');
+
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
-			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
 		}
 
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
@@ -991,9 +994,8 @@ class RegistrationsController extends AdminController
 		Yii::log("AddCompetitionRegistration - POST data: " . json_encode($_POST), 'info', 'application.registration');
 
 		if (empty($staffCodes) || !is_array($staffCodes)) {
-			Yii::app()->user->setFlash('error', 'Vui lòng chọn ít nhất một nhân viên.');
-			$this->redirect(array('view', 'id' => $registrationId));
-			return;
+			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một nhân viên.'));
+			Yii::app()->end();
 		}
 
 		$detailData = array(
@@ -1010,16 +1012,15 @@ class RegistrationsController extends AdminController
 		Yii::log("AddCompetitionRegistration - detailResult: " . json_encode($detailResult), 'info', 'application.registration');
 
 		if (!$detailResult['success']) {
-			Yii::app()->user->setFlash('error', isset($detailResult['error']) ? $detailResult['error'] : 'Không thể tạo chi tiết đăng ký.');
-			$this->redirect(array('view', 'id' => $registrationId));
-			return;
+			$error = isset($detailResult['error']) ? $detailResult['error'] : 'Không thể tạo chi tiết đăng ký.';
+			echo CJSON::encode(array('success' => false, 'error' => $error));
+			Yii::app()->end();
 		}
 		$detailId = isset($detailResult['data']['data']['id']) ? $detailResult['data']['data']['id'] : null;
 
 		if (!$detailId) {
-			Yii::app()->user->setFlash('error', 'Không lấy được ID chi tiết đăng ký.');
-			$this->redirect(array('view', 'id' => $registrationId));
-			return;
+			echo CJSON::encode(array('success' => false, 'error' => 'Không lấy được ID chi tiết đăng ký.'));
+			Yii::app()->end();
 		}
 
 		$successCount = 0;
@@ -1038,14 +1039,18 @@ class RegistrationsController extends AdminController
 			}
 		}
 
-		if ($successCount > 0) {
-			Yii::app()->user->setFlash('success', "Đã đăng ký thành công {$successCount} người tham dự thi nghiệp vụ.");
-		}
+		$message = "Đã đăng ký thành công {$successCount} người tham dự thi nghiệp vụ.";
 		if ($errorCount > 0) {
-			Yii::app()->user->setFlash('warning', "Có {$errorCount} người không đăng ký được.");
+			$message .= " Có {$errorCount} người không đăng ký được.";
 		}
 
-		$this->redirect(array('view', 'id' => $registrationId));
+		echo CJSON::encode(array(
+			'success' => true,
+			'message' => $message,
+			'successCount' => $successCount,
+			'errorCount' => $errorCount,
+		));
+		Yii::app()->end();
 	}
 
 	public function actionAddAttendeesFromStaff()
