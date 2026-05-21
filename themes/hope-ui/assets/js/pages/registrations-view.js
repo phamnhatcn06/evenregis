@@ -2774,6 +2774,7 @@ var RegistrationView = (function() {
         });
         renderMissAvailableList();
         renderMissSelectedList();
+        updateMissMaxDisplay();
     }
 
     function removeMissAll() {
@@ -2781,6 +2782,7 @@ var RegistrationView = (function() {
         missSelectedAttendees = [];
         renderMissAvailableList();
         renderMissSelectedList();
+        updateMissMaxDisplay();
     }
 
     function submitMissForm(form) {
