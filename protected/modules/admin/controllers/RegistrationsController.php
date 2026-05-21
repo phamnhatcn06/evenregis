@@ -906,6 +906,15 @@ class RegistrationsController extends AdminController
 					'name' => isset($item['competition_name']) ? $item['competition_name'] : (isset($item['name']) ? $item['name'] : ''),
 				);
 			}
+		} elseif ($content_type === 'miss') {
+			$contests = BeautyContests::getApiDataProvider(array('event_id' => $event_id), 100)->getData();
+			foreach ($contests as $item) {
+				$id = isset($item['id']) ? $item['id'] : (isset($item->id) ? $item->id : null);
+				$name = isset($item['name']) ? $item['name'] : (isset($item->name) ? $item->name : '');
+				if ($id) {
+					$result[] = array('id' => $id, 'name' => $name);
+				}
+			}
 		}
 
 		header('Content-Type: application/json');
