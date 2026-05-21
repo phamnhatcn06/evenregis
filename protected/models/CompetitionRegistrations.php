@@ -102,4 +102,19 @@ class CompetitionRegistrations extends BaseCompetitionRegistrations
             self::STATUS_NO_SHOW => 'Vắng mặt',
         );
     }
+
+    public static function getByRegistrationId($registrationId)
+    {
+        $result = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, array(
+            'registration_id' => $registrationId,
+            'per_page' => 1000,
+        ));
+        if ($result['success'] && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        if ($result['success'] && isset($result['data']) && is_array($result['data'])) {
+            return $result['data'];
+        }
+        return array();
+    }
 }
