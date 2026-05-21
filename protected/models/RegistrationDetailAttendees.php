@@ -29,7 +29,10 @@ class RegistrationDetailAttendees extends CModel
 
     public static function storeViaApi($data)
     {
-        return ApiClient::post(ApiEndpoints::REGISTRATION_DETAIL_ATTENDEE_STORE, $data);
+        Yii::log("RegistrationDetailAttendees::storeViaApi - data: " . json_encode($data), 'info', 'application.registration');
+        $result = ApiClient::post(ApiEndpoints::REGISTRATION_DETAIL_ATTENDEE_STORE, $data);
+        Yii::log("RegistrationDetailAttendees::storeViaApi - result: " . json_encode($result), 'info', 'application.registration');
+        return $result;
     }
 
     public static function deleteViaApi($id)
