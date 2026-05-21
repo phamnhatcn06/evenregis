@@ -3833,8 +3833,8 @@ CREATE TABLE `competition_departments` (
 |---|---------|-------|
 | BR-AL01 | Điều kiện bật liên quân | Chỉ môn thể thao có `min_players >= 3` mới được phép bật liên quân |
 | BR-AL02 | Cấu hình tại event_sports | Mỗi sự kiện cấu hình riêng việc cho phép liên quân cho từng môn |
-| BR-AL03 | Giới hạn người/đơn vị | Khi tạo đội liên quân, **bắt buộc** phải cài đặt `max_members` **riêng cho từng đơn vị** trong bảng `alliance_team_orgs` |
-| BR-AL04 | Validate đăng ký | Số thành viên từ mỗi đơn vị trong đội liên quân **không được vượt quá** `max_members` của đơn vị đó |
+| BR-AL03 | Giới hạn người/đơn vị | Admin cài đặt `max_members` **theo từng đơn vị + từng môn** trong bảng `event_sport_alliance_config` |
+| BR-AL04 | Validate đăng ký | Số thành viên từ mỗi đơn vị **không được vượt quá** `max_members` đã cấu hình cho môn đó |
 | BR-AL05 | Yêu cầu liên quân | Một đơn vị gửi yêu cầu, các đơn vị khác phải chấp nhận mới thành lập được đội |
 | BR-AL06 | Trạng thái yêu cầu | Yêu cầu liên quân có các trạng thái: `pending`, `approved`, `rejected`, `cancelled` |
 | BR-AL07 | Đội liên quân | Đội liên quân được đánh dấu `is_alliance = 1` trong `sport_teams` |
