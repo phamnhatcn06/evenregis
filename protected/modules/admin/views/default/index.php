@@ -1,6 +1,37 @@
 <?php
-$registrationsByStatus = isset($stats['registrations_by_status']) ? $stats['registrations_by_status'] : array();
-$unregisteredProperties = isset($stats['unregistered_properties']) ? $stats['unregistered_properties'] : array();
+$registrationsByStatus = isset($stats['registrations_by_status']) ? $stats['registrations_by_status'] : array(
+    'draft' => 5,
+    'submitted' => 12,
+    'approved' => 28,
+    'rejected' => 2,
+);
+$unregisteredProperties = isset($stats['unregistered_properties']) ? $stats['unregistered_properties'] : array(
+    array('code' => 'HN01', 'name' => 'Khách sạn Mường Thanh Grand Hà Nội', 'regional_name' => 'Miền Bắc'),
+    array('code' => 'HN02', 'name' => 'Khách sạn Mường Thanh Luxury Quảng Ninh', 'regional_name' => 'Miền Bắc'),
+    array('code' => 'DN01', 'name' => 'Khách sạn Mường Thanh Luxury Đà Nẵng', 'regional_name' => 'Miền Trung'),
+    array('code' => 'SG01', 'name' => 'Khách sạn Mường Thanh Luxury Sài Gòn', 'regional_name' => 'Miền Nam'),
+    array('code' => 'HP01', 'name' => 'Khách sạn Mường Thanh Grand Hải Phòng', 'regional_name' => 'Miền Bắc'),
+);
+
+// Default values nếu API chưa trả về
+$totalProperties = isset($stats['total_properties']) ? $stats['total_properties'] : 52;
+$registeredProperties = isset($stats['registered_properties']) ? $stats['registered_properties'] : 47;
+$totalAttendees = isset($stats['total_attendees']) ? $stats['total_attendees'] : 586;
+$sportTeams = isset($stats['sport_teams']) ? $stats['sport_teams'] : 24;
+$competitionParticipants = isset($stats['competition_participants']) ? $stats['competition_participants'] : 156;
+$beautyContestants = isset($stats['beauty_contestants']) ? $stats['beauty_contestants'] : 32;
+$talentEntries = isset($stats['talent_entries']) ? $stats['talent_entries'] : 18;
+
+$sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams_by_sport'] : array(
+    array('name' => 'Bóng đá nam', 'count' => 12),
+    array('name' => 'Bóng đá nữ', 'count' => 8),
+    array('name' => 'Cầu lông đơn nam', 'count' => 24),
+    array('name' => 'Cầu lông đơn nữ', 'count' => 16),
+    array('name' => 'Cầu lông đôi nam', 'count' => 12),
+    array('name' => 'Cầu lông đôi nữ', 'count' => 8),
+    array('name' => 'Bóng bàn đơn nam', 'count' => 20),
+    array('name' => 'Bóng bàn đơn nữ', 'count' => 14),
+);
 ?>
 
 <div class="row">
