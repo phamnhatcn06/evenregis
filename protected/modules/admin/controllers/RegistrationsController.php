@@ -1076,6 +1076,7 @@ class RegistrationsController extends AdminController
 			'debug'           => array(
 				'staffCodesReceived' => $staffCodes,
 				'debugErrors'        => $debugErrors,
+				'rawAttendees'       => $rawAttendeesDebug,
 			),
 		));
 		Yii::app()->end();
