@@ -1718,6 +1718,7 @@ class RegistrationsController extends AdminController
 				'id' => $contest->id,
 				'name' => $contest->name,
 				'max_per_org' => isset($contest->max_per_org) ? (int)$contest->max_per_org : 0,
+				'gender' => isset($contest->gender) ? $contest->gender : null,
 			);
 		}
 
