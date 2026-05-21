@@ -977,10 +977,12 @@ class RegistrationsController extends AdminController
 
 	public function actionGetAttendeesForCompetition($registration_id)
 	{
+		Yii::log("getAttendeesForCompetition: registration_id=$registration_id", 'info');
 		$result = array();
 		$competitionId = isset($_GET['competition_id']) ? $_GET['competition_id'] : null;
 
 		$attendees = Attendees::getByRegistrationId($registration_id);
+		Yii::log("getAttendeesForCompetition: found " . count($attendees) . " attendees", 'info');
 
 		// Lọc theo phòng ban được phép thi nếu có competition_id
 		$allowedDepartments = array();
