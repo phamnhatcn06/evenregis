@@ -13,6 +13,7 @@ class TalentEntries extends BaseTalentEntries
     public $show_name;
     public $member_count;
     public $registration_id;
+    public $alliance_property_ids;
 
     public static function model($className = __CLASS__)
     {
