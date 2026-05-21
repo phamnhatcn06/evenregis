@@ -1010,7 +1010,7 @@ class RegistrationsController extends AdminController
 				'name' => $fullName,
 				'code' => $staffCode,
 				'position' => $positionName,
-				'department_code' => $departmentCode,
+				'division_code' => $divisionCode,
 				'display' => $staffCode ? ($staffCode . ' - ' . $fullName) : $fullName,
 			);
 		}
