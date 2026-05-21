@@ -342,6 +342,9 @@ $detailsByContent = array(
 );
 foreach ($registrationDetails as $detail) {
     $code = isset($detail['content_code']) ? $detail['content_code'] : 'other';
+    // Normalize: API có thể trả về "competitions" hoặc "competition", "sports" hoặc "sport"
+    if ($code === 'competitions') $code = 'competition';
+    if ($code === 'sport') $code = 'sports';
     if (isset($detailsByContent[$code])) {
         $detailsByContent[$code][] = $detail;
     }

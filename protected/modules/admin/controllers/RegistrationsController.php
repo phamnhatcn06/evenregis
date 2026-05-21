@@ -35,7 +35,7 @@ class RegistrationsController extends AdminController
 		foreach ($registrationDetails as $detail) {
 			$detailId = isset($detail['id']) ? $detail['id'] : null;
 			$contentCode = isset($detail['content_code']) ? $detail['content_code'] : '';
-			if ($detailId && $contentCode === 'competition') {
+			if ($detailId && ($contentCode === 'competition' || $contentCode === 'competitions')) {
 				$attendees = RegistrationDetailAttendees::getByDetailId($detailId);
 				$detailAttendees[$detailId] = $attendees;
 			}
@@ -1000,10 +1000,10 @@ class RegistrationsController extends AdminController
 
 		$detailData = array(
 			'registration_id' => $registrationId,
-			'content_id' => $contentId,
-			'competition_id' => $competitionId,
-			'quantity' => count($staffCodes),
-			'note' => $note,
+			'content_id'      => $contentId,
+			'competition_id'  => $competitionId,
+			'quantity'        => count($staffCodes),
+			'note'            => $note,
 		);
 
 		Yii::log("AddCompetitionRegistration - detailData: " . json_encode($detailData), 'info', 'application.registration');
@@ -1024,17 +1024,18 @@ class RegistrationsController extends AdminController
 		}
 
 		$successCount = 0;
-		$errorCount = 0;
+		$errorCount   = 0;
 
 		foreach ($staffCodes as $staffCode) {
 			$attendeeData = array(
 				'registration_detail_id' => $detailId,
-				'staff_code' => $staffCode,
+				'staff_code'             => $staffCode,
 			);
 			$result = RegistrationDetailAttendees::storeViaApi($attendeeData);
 			if ($result['success']) {
 				$successCount++;
 			} else {
+				Yii::log("AddCompetitionRegistration - failed staff $staffCode: " . json_encode($result), 'warning', 'application.registration');
 				$errorCount++;
 			}
 		}

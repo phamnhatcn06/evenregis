@@ -429,11 +429,60 @@ var RegistrationView = (function() {
         var form = document.getElementById('add-competition-form');
         if (form) {
             form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
                 if (selectedStaff.length === 0) {
-                    e.preventDefault();
-                    alert('Vui lòng chọn ít nhất một nhân viên.');
+                    Toast.error('Vui lòng chọn ít nhất một nhân viên.');
                     return false;
                 }
+
+                var submitBtn = document.getElementById('btn_submit_competition');
+                var originalHtml = submitBtn.innerHTML;
+
+                // Hiển thị loading, vô hiệu hoá nút để tránh bấm nhiều lần
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang đăng ký...';
+
+                var formData = new FormData(form);
+
+                // Debug: log form data
+                console.log('=== DEBUG COMPETITION FORM ===');
+                console.log('selectedStaff:', selectedStaff);
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+
+                    if (data.success) {
+                        // Đóng modal
+                        var modalEl = document.getElementById('addCompetitionModal');
+                        if (modalEl) {
+                            var modal = bootstrap.Modal.getInstance(modalEl);
+                            if (modal) { modal.hide(); }
+                        }
+
+                        Toast.success(data.message || 'Đăng ký thi nghiệp vụ thành công!');
+
+                        // Reload trang để hiển thị danh sách đã đăng ký
+                        setTimeout(function() { location.reload(); }, 800);
+                    } else {
+                        Toast.error(data.error || 'Có lỗi xảy ra khi đăng ký.');
+                    }
+                })
+                .catch(function(err) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                    Toast.error('Lỗi kết nối. Vui lòng thử lại.');
+                });
             });
         }
     }
@@ -1296,24 +1345,21 @@ var RegistrationView = (function() {
 
     function resetCompetitionModal() {
         var compSelect = document.getElementById('comp_competition_id');
-        var propSelect = document.getElementById('comp_property_id');
         var contentIdField = document.getElementById('comp_content_id');
 
         document.getElementById('add-competition-form').reset();
         compSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
-        propSelect.innerHTML = '<option value="">-- Chọn cuộc thi trước --</option>';
+        var propSelect = document.getElementById('comp_property_id');
+        if (propSelect) propSelect.innerHTML = '<option value="">-- Chọn cuộc thi trước --</option>';
         document.getElementById('comp_max_per_org').value = '-';
 
         if (competitionContentId && contentIdField) {
             contentIdField.value = competitionContentId;
-            console.log('Set content_id to:', competitionContentId);
         } else {
-            console.log('competitionContentId not found, searching in contentsData...');
             contentsData.forEach(function(c) {
-                if (c.code === 'competition' && contentIdField) {
+                if ((c.code === 'competition' || c.code === 'competitions') && contentIdField) {
                     contentIdField.value = c.id;
                     competitionContentId = c.id;
-                    console.log('Found and set content_id to:', c.id);
                 }
             });
         }
