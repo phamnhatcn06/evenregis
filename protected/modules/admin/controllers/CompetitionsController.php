@@ -54,7 +54,7 @@ class CompetitionsController extends AdminController
 
             if ($model->validate()) {
                 $result = $model->updateViaApi();
-
+print_r($result);die(); 
                 if ($result['success']) {
                     // Sync departments nếu có chọn
                     if (isset($_POST['CompetitionDepartments'])) {
