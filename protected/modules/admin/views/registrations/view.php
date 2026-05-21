@@ -535,33 +535,37 @@ foreach ($registrationDetails as $detail) {
         <?php if (empty($beautyContestants)): ?>
             <p class="text-muted mb-0">Chưa đăng ký thi sắc đẹp nào.</p>
         <?php else: ?>
-            <table class="table table-bordered table-striped table-sm mb-0">
+            <?php foreach ($beautyContestants as $contestData): ?>
+            <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
+            <table class="table table-bordered table-striped table-sm mb-3">
                 <thead class="table-light">
                     <tr>
-                        <th>Cuộc thi</th>
-                        <th style="width:100px;">Số người</th>
-                        <th>Danh sách thí sinh</th>
+                        <th style="width:80px;">SBD</th>
+                        <th>Họ tên</th>
+                        <th style="width:80px;">Cao (cm)</th>
+                        <th style="width:80px;">Nặng (kg)</th>
+                        <th style="width:100px;">Số đo</th>
+                        <th style="width:60px;"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($beautyContestants as $contestData): ?>
+                    <?php foreach ($contestData['contestants'] as $c): ?>
                         <tr>
-                            <td><?php echo CHtml::encode($contestData['contest_name']); ?></td>
-                            <td class="text-center"><?php echo count($contestData['contestants']); ?></td>
-                            <td>
-                                <?php foreach ($contestData['contestants'] as $idx => $c): ?>
-                                    <span class="badge bg-primary me-1 mb-1">
-                                        <?php echo CHtml::encode($c['candidate_number']); ?>
-                                    </span>
-                                    <span class="badge bg-light text-dark border me-2 mb-1">
-                                        <?php echo CHtml::encode($c['attendee_name']); ?>
-                                    </span>
-                                <?php endforeach; ?>
+                            <td><span class="badge bg-primary"><?php echo CHtml::encode($c['candidate_number']); ?></span></td>
+                            <td><?php echo CHtml::encode($c['attendee_name']); ?></td>
+                            <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
+                            <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
+                            <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="editMissContestant(<?php echo $c['id']; ?>)" title="Sửa">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            <?php endforeach; ?>
         <?php endif; ?>
     </div>
 </div>
