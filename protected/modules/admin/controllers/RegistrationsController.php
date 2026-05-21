@@ -1696,4 +1696,189 @@ class RegistrationsController extends AdminController
 		}
 		Yii::app()->end();
 	}
+
+	// ==================== MISS REGISTRATION ====================
+
+	public function actionGetMissContestInfo($contest_id)
+	{
+		$contest = BeautyContests::fetchFromApi($contest_id);
+		$result = array();
+
+		if ($contest) {
+			$result = array(
+				'id' => $contest->id,
+				'name' => $contest->name,
+				'max_per_org' => isset($contest->max_per_org) ? (int)$contest->max_per_org : 0,
+			);
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionGetAttendeesForMiss($registration_id)
+	{
+		$result = array();
+		$contestId = isset($_GET['contest_id']) ? $_GET['contest_id'] : null;
+
+		$attendees = Attendees::getByRegistrationId($registration_id);
+
+		foreach ($attendees as $att) {
+			$id = isset($att['id']) ? $att['id'] : null;
+			$fullName = isset($att['full_name']) ? $att['full_name'] : '';
+			$positionName = isset($att['position']) ? $att['position'] : '';
+			$gender = isset($att['gender']) ? $att['gender'] : null;
+
+			if (!$id) continue;
+
+			// Có thể lọc theo giới tính nếu contest có yêu cầu
+			// if ($contest && $contest->gender && $gender !== $contest->gender) continue;
+
+			$result[] = array(
+				'id' => $id,
+				'name' => $fullName,
+				'position' => $positionName,
+				'display' => $fullName . ($positionName ? ' (' . $positionName . ')' : ''),
+			);
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionAddMissRegistration()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$contestId = Yii::app()->getRequest()->getPost('contest_id');
+		$attendeeIds = Yii::app()->getRequest()->getPost('attendee_ids', array());
+		$note = Yii::app()->getRequest()->getPost('note', '');
+
+		if (empty($attendeeIds)) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một thí sinh.'));
+			Yii::app()->end();
+		}
+
+		$successCount = 0;
+		foreach ($attendeeIds as $attendeeId) {
+			$model = new BeautyContestants;
+			$model->contest_id = $contestId;
+			$model->attendee_id = $attendeeId;
+			$model->registration_id = $registrationId;
+			$model->note = $note;
+
+			$result = $model->storeViaApi();
+			if ($result['success']) {
+				$successCount++;
+			}
+		}
+
+		if ($successCount > 0) {
+			echo CJSON::encode(array('success' => true, 'message' => "Đăng ký thành công {$successCount} thí sinh."));
+		} else {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không thể đăng ký.'));
+		}
+		Yii::app()->end();
+	}
+
+	// ==================== TALENT REGISTRATION ====================
+
+	public function actionGetTalentCategories($event_id)
+	{
+		$result = array();
+
+		$categories = TalentCategories::getApiDataProvider(array(), 100)->getData();
+		foreach ($categories as $cat) {
+			$id = isset($cat['id']) ? $cat['id'] : (isset($cat->id) ? $cat->id : null);
+			$name = isset($cat['name']) ? $cat['name'] : (isset($cat->name) ? $cat->name : '');
+			if ($id) {
+				$result[] = array('id' => $id, 'name' => $name);
+			}
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionGetAttendeesForTalent($registration_id)
+	{
+		$result = array();
+
+		$attendees = Attendees::getByRegistrationId($registration_id);
+
+		foreach ($attendees as $att) {
+			$id = isset($att['id']) ? $att['id'] : null;
+			$fullName = isset($att['full_name']) ? $att['full_name'] : '';
+			$positionName = isset($att['position']) ? $att['position'] : '';
+
+			if (!$id) continue;
+
+			$result[] = array(
+				'id' => $id,
+				'name' => $fullName,
+				'position' => $positionName,
+				'display' => $fullName . ($positionName ? ' (' . $positionName . ')' : ''),
+			);
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
+	public function actionAddTalentRegistration()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$categoryId = Yii::app()->getRequest()->getPost('category_id');
+		$title = Yii::app()->getRequest()->getPost('title');
+		$duration = Yii::app()->getRequest()->getPost('duration');
+		$attendeeIds = Yii::app()->getRequest()->getPost('attendee_ids', array());
+		$note = Yii::app()->getRequest()->getPost('note', '');
+
+		if (empty($attendeeIds)) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một người biểu diễn.'));
+			Yii::app()->end();
+		}
+
+		// Tạo talent entry
+		$entry = new TalentEntries;
+		$entry->registration_id = $registrationId;
+		$entry->category_id = $categoryId;
+		$entry->title = $title;
+		$entry->duration = $duration;
+		$entry->note = $note;
+
+		$result = $entry->storeViaApi();
+		if (!$result['success']) {
+			echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể tạo tiết mục.'));
+			Yii::app()->end();
+		}
+
+		$entryId = isset($result['data']['id']) ? $result['data']['id'] : null;
+
+		// Thêm thành viên
+		if ($entryId) {
+			foreach ($attendeeIds as $attendeeId) {
+				$member = new TalentEntryMembers;
+				$member->entry_id = $entryId;
+				$member->attendee_id = $attendeeId;
+				$member->storeViaApi();
+			}
+		}
+
+		echo CJSON::encode(array('success' => true, 'message' => 'Đăng ký tiết mục thành công.'));
+		Yii::app()->end();
+	}
 }
