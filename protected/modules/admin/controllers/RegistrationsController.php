@@ -851,6 +851,7 @@ class RegistrationsController extends AdminController
 	public function actionGetContentItems($event_id, $content_type)
 	{
 		$result = array();
+		$registrationId = Yii::app()->request->getParam('registration_id');
 
 		if ($content_type === 'sports') {
 			$sports = EventSports::getByEventId($event_id);
@@ -864,9 +865,34 @@ class RegistrationsController extends AdminController
 			}
 		} elseif ($content_type === 'competition') {
 			$competitions = EventCompetitions::getByEventId($event_id);
+
+			// Lấy số lượng đã đăng ký cho từng cuộc thi của registration này
+			$registeredCounts = array();
+			if ($registrationId) {
+				$compRegs = CompetitionRegistrations::getByRegistrationId($registrationId);
+				foreach ($compRegs as $reg) {
+					$compId = isset($reg['competition_id']) ? $reg['competition_id'] : (isset($reg->competition_id) ? $reg->competition_id : null);
+					if ($compId) {
+						if (!isset($registeredCounts[$compId])) {
+							$registeredCounts[$compId] = 0;
+						}
+						$registeredCounts[$compId]++;
+					}
+				}
+			}
+
 			foreach ($competitions as $item) {
+				$compId = isset($item['competition_id']) ? $item['competition_id'] : $item['id'];
+				$maxPerOrg = isset($item['max_per_org']) ? (int)$item['max_per_org'] : 0;
+				$currentCount = isset($registeredCounts[$compId]) ? $registeredCounts[$compId] : 0;
+
+				// Bỏ qua nếu đã đăng ký đủ số lượng (max_per_org > 0 và đã đạt giới hạn)
+				if ($maxPerOrg > 0 && $currentCount >= $maxPerOrg) {
+					continue;
+				}
+
 				$result[] = array(
-					'id' => isset($item['competition_id']) ? $item['competition_id'] : $item['id'],
+					'id' => $compId,
 					'name' => isset($item['competition_name']) ? $item['competition_name'] : (isset($item['name']) ? $item['name'] : ''),
 				);
 			}
