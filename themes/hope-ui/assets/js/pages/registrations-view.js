@@ -617,8 +617,8 @@ var RegistrationView = (function() {
 
             var hidden = document.createElement('input');
             hidden.type = 'hidden';
-            hidden.name = 'staff_codes[]';
-            hidden.value = staff.code;
+            hidden.name = 'staff_ids[]';
+            hidden.value = staff.id;
             document.getElementById('add-competition-form').appendChild(hidden);
         });
     }

@@ -1009,6 +1009,8 @@ class RegistrationsController extends AdminController
 				'status'          => CompetitionRegistrations::STATUS_PENDING,
 				'note'            => $note,
 			);
+			print_r(json_encode($regData));
+			exit;
 			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $regData);
 			if ($result['success']) {
 				$successCount++;
