@@ -3940,7 +3940,7 @@ CREATE TABLE `alliance_team_orgs` (
 public function rules() {
     return array(
         // ...existing rules...
-        array('alliance_max_per_org', 'validateAllianceConfig'),
+        array('allow_alliance', 'validateAllianceConfig'),
     );
 }
 
@@ -3951,15 +3951,20 @@ public function validateAllianceConfig($attribute, $params) {
         if ($sport && $sport->min_players < 3) {
             $this->addError('allow_alliance', 
                 'Chỉ môn thể thao có tối thiểu 3 người chơi mới được bật liên quân.');
-            return;
-        }
-        
-        // Bắt buộc phải có alliance_max_per_org
-        if (empty($this->alliance_max_per_org) || $this->alliance_max_per_org < 1) {
-            $this->addError('alliance_max_per_org', 
-                'Phải cài đặt số người tối đa từ mỗi đơn vị khi bật liên quân.');
         }
     }
+}
+```
+
+#### 16.5.2 Khi tạo đội liên quân (cài đặt max_members từng đơn vị)
+
+```php
+// Trong AllianceTeamOrgs model
+public function rules() {
+    return array(
+        array('max_members', 'required', 'message' => 'Phải cài đặt số người tối đa cho đơn vị.'),
+        array('max_members', 'numerical', 'integerOnly' => true, 'min' => 1),
+    );
 }
 ```
 
