@@ -4019,26 +4019,27 @@ public function validateAllianceMemberLimit($attribute, $params) {
 │                                                                 │
 │  ☑ Cho phép liên quân                                           │
 │                                                                 │
-│  Số người tối đa từ mỗi đơn vị: [  5  ] người                   │
-│                                                                 │
-│  ⚠️ Mỗi đơn vị chỉ được đóng góp tối đa 5 cầu thủ vào đội       │
-│     liên quân. Đội phải có thành viên từ ít nhất 2 đơn vị.      │
+│  ⚠️ Số người tối đa từ mỗi đơn vị sẽ được cài đặt khi           │
+│     tạo đội liên quân. Đội phải có ít nhất 2 đơn vị.            │
 │                                                                 │
 │  [Lưu cấu hình]                                                 │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│  ĐƠN VỊ: GỬI YÊU CẦU LIÊN QUÂN                                  │
+│  ĐƠN VỊ: TẠO ĐỘI LIÊN QUÂN - CÀI ĐẶT SỐ NGƯỜI                   │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  Môn: Bóng đá nam                                               │
-│  Giới hạn: Tối đa 5 người/đơn vị                                │
+│  Môn: Bóng đá nam (cần 11 người)                                │
 │                                                                 │
-│  Đơn vị muốn liên quân: [Khách sạn Mường Thanh Đà Nẵng    ▼]    │
+│  Cài đặt số người tối đa từ mỗi đơn vị:                         │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ MT Hà Nội (đơn vị chủ trì):    [ 6 ] người              │    │
+│  │ MT Đà Nẵng (đơn vị liên quân): [ 5 ] người              │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│  Tổng tối đa: 11 người ✓                                        │
 │                                                                 │
 │  Lời nhắn: [Kính mời quý đơn vị cùng liên quân thi đấu_____]    │
-│            [____________________________________________]        │
 │                                                                 │
 │  [Gửi yêu cầu liên quân]                                        │
 │                                                                 │
@@ -4049,28 +4050,28 @@ public function validateAllianceMemberLimit($attribute, $params) {
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  Đội: Liên quân MT Hà Nội - MT Đà Nẵng (Bóng đá nam)            │
-│  Giới hạn: Tối đa 5 người/đơn vị                                │
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │ Đơn vị của bạn: MT Hà Nội (đã đăng ký: 4/5)            │    │
+│  │ MT Hà Nội (đã đăng ký: 5/6)  ← max riêng: 6            │    │
 │  │ ☑ Nguyễn Văn A (Thủ môn)                               │    │
 │  │ ☑ Trần Văn B (Hậu vệ)                                  │    │
 │  │ ☑ Lê Văn C (Tiền vệ)                                   │    │
 │  │ ☑ Phạm Văn D (Tiền đạo)                                │    │
-│  │ ☐ Hoàng Văn E       ← Còn đăng ký được 1 người nữa     │    │
+│  │ ☑ Hoàng Văn E (Dự bị)                                  │    │
+│  │ ☐ Ngô Văn F       ← Còn đăng ký được 1 người nữa       │    │
 │  └─────────────────────────────────────────────────────────┘    │
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │ Đơn vị liên quân: MT Đà Nẵng (đã đăng ký: 5/5)         │    │
-│  │ ☑ Võ Văn F (Hậu vệ)                                    │    │
-│  │ ☑ Đỗ Văn G (Tiền vệ)                                   │    │
-│  │ ☑ Bùi Văn H (Tiền vệ)                                  │    │
-│  │ ☑ Vũ Văn I (Tiền đạo)                                  │    │
-│  │ ☑ Đinh Văn K (Dự bị)                                   │    │
+│  │ MT Đà Nẵng (đã đăng ký: 5/5)  ← max riêng: 5           │    │
+│  │ ☑ Võ Văn G (Hậu vệ)                                    │    │
+│  │ ☑ Đỗ Văn H (Tiền vệ)                                   │    │
+│  │ ☑ Bùi Văn I (Tiền vệ)                                  │    │
+│  │ ☑ Vũ Văn K (Tiền đạo)                                  │    │
+│  │ ☑ Đinh Văn L (Dự bị)                                   │    │
 │  │ ⚠️ Đã đạt giới hạn 5 người                             │    │
 │  └─────────────────────────────────────────────────────────┘    │
 │                                                                 │
-│  Tổng thành viên: 9/11 (còn thiếu 2 người)                      │
+│  Tổng thành viên: 10/11 (còn thiếu 1 người)                     │
 │                                                                 │
 │  [Lưu danh sách]                                                │
 │                                                                 │
