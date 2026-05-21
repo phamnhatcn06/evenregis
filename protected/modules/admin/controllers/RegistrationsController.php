@@ -563,6 +563,7 @@ class RegistrationsController extends AdminController
 		$teamName = Yii::app()->request->getPost('team_name');
 		$note = Yii::app()->request->getPost('note');
 		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
+		$attendeeNames = Yii::app()->request->getPost('attendee_names', array());
 		$contentId = Yii::app()->request->getPost('content_id');
 
 		if (!$registrationId || !$sportId || empty($attendeeIds)) {
