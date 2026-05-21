@@ -522,17 +522,15 @@ foreach ($registrationDetails as $detail) {
 
 <!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
 <div class="card mb-3" id="miss-registration-card">
-    <div class="card-header bg-white">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi sắc đẹp</h5>
+        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+        <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addMissModal">
+            <i class="fa fa-plus me-1"></i>Đăng ký
+        </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
-        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-        <div class="mb-3">
-            <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addMissModal">
-                <i class="fa fa-plus me-1"></i>Đăng ký thi sắc đẹp
-            </button>
-        </div>
-        <?php endif; ?>
 
         <?php if (empty($detailsByContent['miss'])): ?>
             <p class="text-muted mb-0">Chưa đăng ký thi sắc đẹp nào.</p>
