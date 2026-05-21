@@ -69,7 +69,7 @@ class CompetitionsController extends AdminController
         $this->render('update', array(
             'model' => $model,
             'allDepartments' => Departments::getActiveList(),
-            'selectedDepartments' => array_values(CompetitionDepartments::getDepartmentCodes($id)),
+            'selectedDepartments' => CompetitionDepartments::getDepartmentCodes($id),
         ));
     }
 
