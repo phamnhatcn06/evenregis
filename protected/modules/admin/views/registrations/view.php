@@ -459,7 +459,7 @@ foreach ($registrationDetails as $detail) {
     <div class="card-body">
         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
         <div class="mb-3">
-            <button type="button" class="btn btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
+            <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
                 <i class="fa fa-plus me-1"></i>Đăng ký thi nghiệp vụ
             </button>
         </div>
