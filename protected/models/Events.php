@@ -80,4 +80,9 @@ class Events extends BaseEvents
 		}
 		return $list;
 	}
+
+	public static function getListForDropdown()
+	{
+		return self::getActiveList();
+	}
 }
