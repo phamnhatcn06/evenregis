@@ -375,7 +375,7 @@ foreach ($registrationDetails as $detail) {
                 </select>
             </div>
             <div class="col-md-3">
-                <button type="button" class="btn btn-primary text-white w-100" id="btn_open_sport_modal" disabled>
+                <button type="button" class="btn btn-sm btn-primary text-white" id="btn_open_sport_modal" disabled>
                     <i class="fa fa-users me-1"></i>Chọn VĐV & Đăng ký
                 </button>
             </div>
