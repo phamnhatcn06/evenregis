@@ -97,8 +97,27 @@ class RegistrationsController extends AdminController
                         $team->sport_name = $sport ? $sport->name : '';
                     }
                     $sportTeams[] = $team;
-                    $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
-                    $sportTeamMembers[$teamId] = $members;
+                    $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+
+                    // Enrich member info from attendees map
+                    $enrichedMembers = array();
+                    foreach ($membersData as $member) {
+                        $attId = isset($member->attendee_id) ? $member->attendee_id : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
+                        $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+
+                        $memberArr = is_object($member) ? get_object_vars($member) : $member;
+                        if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
+                            $memberArr['attendee_name'] = $attInfo['full_name'];
+                        }
+                        if (empty($memberArr['position_name']) && !empty($attInfo['position_name'])) {
+                            $memberArr['position_name'] = $attInfo['position_name'];
+                        }
+                        if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
+                            $memberArr['division_name'] = $attInfo['division_name'];
+                        }
+                        $enrichedMembers[] = $memberArr;
+                    }
+                    $sportTeamMembers[$teamId] = $enrichedMembers;
                 }
             }
         }
