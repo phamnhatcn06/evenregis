@@ -1734,7 +1734,13 @@ class RegistrationsController extends AdminController
 		$contestId = isset($_GET['contest_id']) ? $_GET['contest_id'] : null;
 
 		$contest = $contestId ? BeautyContests::fetchFromApi($contestId) : null;
-		$contestGender = $contest && isset($contest->gender) ? $contest->gender : null;
+		$contestGenderRaw = $contest && isset($contest->gender) ? $contest->gender : null;
+		$contestGender = null;
+		if ($contestGenderRaw === 'female') {
+			$contestGender = 0;
+		} elseif ($contestGenderRaw === 'male') {
+			$contestGender = 1;
+		}
 
 		$existingContestants = $contestId ? BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 1000)->getData() : array();
 		$registeredAttendeeIds = array();
