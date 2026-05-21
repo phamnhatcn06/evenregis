@@ -1025,18 +1025,21 @@ class RegistrationsController extends AdminController
 
 		$successCount = 0;
 		$errorCount   = 0;
+		$debugErrors  = array();
 
 		foreach ($staffCodes as $staffCode) {
 			$attendeeData = array(
 				'registration_detail_id' => $detailId,
 				'staff_code'             => $staffCode,
 			);
+			Yii::log("AddCompetitionRegistration - attendeeData: " . json_encode($attendeeData), 'info', 'application.registration');
 			$result = RegistrationDetailAttendees::storeViaApi($attendeeData);
+			Yii::log("AddCompetitionRegistration - attendeeResult: " . json_encode($result), 'info', 'application.registration');
 			if ($result['success']) {
 				$successCount++;
 			} else {
-				Yii::log("AddCompetitionRegistration - failed staff $staffCode: " . json_encode($result), 'warning', 'application.registration');
 				$errorCount++;
+				$debugErrors[] = array('staff_code' => $staffCode, 'error' => $result);
 			}
 		}
 
@@ -1046,10 +1049,13 @@ class RegistrationsController extends AdminController
 		}
 
 		echo CJSON::encode(array(
-			'success' => true,
-			'message' => $message,
+			'success'      => true,
+			'message'      => $message,
 			'successCount' => $successCount,
-			'errorCount' => $errorCount,
+			'errorCount'   => $errorCount,
+			'detailId'     => $detailId,
+			'staffCodes'   => $staffCodes,
+			'debugErrors'  => $debugErrors,
 		));
 		Yii::app()->end();
 	}
