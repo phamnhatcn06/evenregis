@@ -18,7 +18,7 @@ class RegistrationsController extends AdminController
 				if (empty($model->property_name)) {
 					$model->property_name = $property->name;
 				}
-				$model->property_code = $property->code;
+				$model->property_code = $property->prefix ? $property->prefix : $property->code;
 			}
 		}
 		if (empty($model->relation_property_name) && $model->relation_property_id) {
