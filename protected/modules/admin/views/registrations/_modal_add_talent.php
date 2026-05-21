@@ -6,7 +6,7 @@
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                 <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
                 <div class="modal-header">
-                    <h5 class="modal-title">Đăng ký văn nghệ</h5>
+                    <h5 class="modal-title"><i class="fa fa-music me-2"></i>Đăng ký văn nghệ</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -26,6 +26,15 @@
                                 <label class="form-label">Thời lượng (phút)</label>
                                 <input type="number" class="form-control" name="duration" id="talent_duration" min="1" max="30" placeholder="VD: 5">
                             </div>
+                            <div class="mb-3" id="talent_alliance_wrapper">
+                                <label class="form-label">Đơn vị liên quân</label>
+                                <select id="talent_alliance_property" name="alliance_property_ids[]" class="form-select d-none" multiple></select>
+                                <div id="talent_alliance_selected_texts" class="mb-2"></div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#talentAlliancePropertyModal">
+                                    <i class="fa fa-users me-1"></i>Chọn đơn vị liên quân
+                                </button>
+                                <small class="text-muted d-block mt-1">Chọn các đơn vị cùng biểu diễn (nếu có)</small>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Ghi chú</label>
                                 <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
@@ -33,6 +42,7 @@
                         </div>
                         <div class="col-md-8">
                             <label class="form-label">Chọn người biểu diễn <span class="text-danger">*</span></label>
+                            <small class="text-muted d-block mb-2">Danh sách người có vai trò "Văn nghệ" của đơn vị</small>
                             <div class="row" id="talent_dual_listbox_wrapper" style="display:none;">
                                 <div class="col-md-5">
                                     <div class="card h-100">
@@ -81,9 +91,33 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success" id="btn_submit_talent">Đăng ký</button>
+                    <button type="submit" class="btn btn-success" id="btn_submit_talent">
+                        <i class="fa fa-check me-1"></i>Đăng ký
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chọn đơn vị liên quân cho Văn nghệ -->
+<div class="modal fade" id="talentAlliancePropertyModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-users me-2"></i>Chọn đơn vị liên quân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Chọn các đơn vị cùng biểu diễn tiết mục văn nghệ:</p>
+                <div id="talent_alliance_modal_list" style="max-height:300px;overflow-y:auto;">
+                    <div class="text-muted small">Đang tải...</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="btn_confirm_talent_alliance">Xác nhận</button>
+            </div>
         </div>
     </div>
 </div>
