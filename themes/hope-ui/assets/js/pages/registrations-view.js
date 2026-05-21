@@ -642,8 +642,14 @@ var RegistrationView = (function() {
         document.getElementById('btn_remove_sport_attendee')?.addEventListener('click', removeSelectedSportAttendee);
         document.getElementById('btn_remove_all_sport_attendee')?.addEventListener('click', removeAllSportAttendees);
 
-        // Thêm vào danh sách preview
-        document.getElementById('btn_add_to_preview')?.addEventListener('click', addSportToPreview);
+        // Thêm vào danh sách preview hoặc cập nhật đội
+        document.getElementById('btn_add_to_preview')?.addEventListener('click', function() {
+            if (editingTeamId) {
+                updateSportTeam();
+            } else {
+                addSportToPreview();
+            }
+        });
 
         // Lưu tất cả
         document.getElementById('btn_save_all_sports')?.addEventListener('click', saveAllSportRegistrations);
