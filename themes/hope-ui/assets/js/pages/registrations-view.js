@@ -1414,7 +1414,7 @@ var RegistrationView = (function() {
         hideDualListbox();
         removeHiddenInputs();
 
-        fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=competition')
+        fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=competition&registration_id=' + registrationId)
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 compSelect.innerHTML = '<option value="">-- Chọn cuộc thi --</option>';
@@ -1425,6 +1425,8 @@ var RegistrationView = (function() {
                         opt.textContent = item.name;
                         compSelect.appendChild(opt);
                     });
+                } else {
+                    compSelect.innerHTML = '<option value="">-- Đã đăng ký đủ tất cả cuộc thi --</option>';
                 }
             });
     }
