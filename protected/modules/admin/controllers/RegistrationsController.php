@@ -1044,17 +1044,7 @@ class RegistrationsController extends AdminController
 		}
 
 		header('Content-Type: application/json');
-		echo CJSON::encode(array(
-			'success' => true,
-			'data' => $result,
-			'debug' => array(
-				'competition_id' => $competitionId,
-				'allowed_departments' => $allowedDepartments,
-				'total_attendees' => count($attendees),
-				'filtered_count' => count($result),
-				'sample_attendee' => !empty($attendees) ? array_keys($attendees[0]) : array(),
-			)
-		));
+		echo CJSON::encode(array('success' => true, 'data' => $result));
 		Yii::app()->end();
 	}
 
