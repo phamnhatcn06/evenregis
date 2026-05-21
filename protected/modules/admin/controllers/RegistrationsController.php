@@ -1936,6 +1936,24 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	public function actionDeleteMissContestant()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$id = Yii::app()->getRequest()->getPost('id');
+		$result = BeautyContestants::deleteViaApi($id);
+
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Xóa thành công.'));
+		} else {
+			echo CJSON::encode(array('success' => false, 'error' => $result['error'] ?: 'Không thể xóa.'));
+		}
+		Yii::app()->end();
+	}
+
 	// ==================== TALENT REGISTRATION ====================
 
 	public function actionGetTalentCategories($event_id)
