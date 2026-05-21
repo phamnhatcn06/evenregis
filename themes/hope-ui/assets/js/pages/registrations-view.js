@@ -2937,6 +2937,53 @@ var RegistrationView = (function() {
         document.getElementById('talent_btn_remove')?.addEventListener('click', removeTalentSelected);
         document.getElementById('talent_btn_remove_all')?.addEventListener('click', removeTalentAll);
 
+        // Talent alliance confirm button
+        var btnConfirmTalentAlliance = document.getElementById('btn_confirm_talent_alliance');
+        if (btnConfirmTalentAlliance) {
+            btnConfirmTalentAlliance.addEventListener('click', function() {
+                var checkboxes = document.querySelectorAll('.talent-alliance-modal-cb');
+                var selectedTexts = [];
+                var selectedIds = [];
+                var selectedCodes = [];
+                checkboxes.forEach(function(cb) {
+                    if (cb.checked) {
+                        selectedIds.push(cb.value);
+                        selectedTexts.push(cb.getAttribute('data-name'));
+                        selectedCodes.push(cb.getAttribute('data-code'));
+                    }
+                });
+
+                var allianceSelect = document.getElementById('talent_alliance_property');
+                if (allianceSelect) {
+                    Array.from(allianceSelect.options).forEach(function(opt) {
+                        opt.selected = selectedIds.includes(opt.value);
+                    });
+                }
+
+                var displayText = document.getElementById('talent_alliance_selected_texts');
+                if (displayText) {
+                    displayText.innerHTML = '';
+                    if (selectedIds.length > 0) {
+                        for (var i = 0; i < selectedIds.length; i++) {
+                            var selId = selectedIds[i];
+                            var selText = selectedTexts[i];
+                            var badge = document.createElement('span');
+                            badge.className = 'badge bg-primary me-1 mb-1 p-2 border';
+                            badge.style.fontSize = '12px';
+                            badge.innerHTML = selText + ' <i class="fa fa-times ms-1 text-white" style="cursor:pointer;" onclick="RegistrationView.removeTalentAllianceProperty(\'' + selId + '\')" title="Huỷ"></i>';
+                            displayText.appendChild(badge);
+                        }
+                    }
+                }
+
+                var modalEl = document.getElementById('talentAlliancePropertyModal');
+                if (modalEl) {
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+            });
+        }
+
         var form = document.getElementById('add-talent-form');
         if (form) {
             form.addEventListener('submit', function(e) {
