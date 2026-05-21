@@ -557,7 +557,7 @@ foreach ($registrationDetails as $detail) {
                             <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
                             <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="editMissContestant(<?php echo $c['id']; ?>)" title="Sửa">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="RegistrationView.editMissContestant(<?php echo $c['id']; ?>)" title="Sửa">
                                     <i class="fa fa-pencil"></i>
                                 </button>
                             </td>
