@@ -631,6 +631,60 @@ var RegistrationView = (function() {
         inputs.forEach(function(input) { input.remove(); });
     }
 
+    function appendCompetitionRow(data) {
+        var card = document.getElementById('competition-registration-card');
+        if (!card) return;
+
+        var cardBody = card.querySelector('.card-body');
+        var table = cardBody.querySelector('table');
+        var emptyMsg = cardBody.querySelector('p.text-muted');
+
+        // Tạo badges cho danh sách thí sinh
+        var badgesHtml = '';
+        if (data.attendees && data.attendees.length > 0) {
+            data.attendees.forEach(function(att, idx) {
+                var display = att.staff_code ? (att.staff_code + ' - ' + att.staff_name) : att.staff_name;
+                badgesHtml += '<span class="badge bg-light text-dark border me-1 mb-1">' + (idx + 1) + '. ' + escapeHtml(display) + '</span>';
+            });
+        }
+
+        // Tạo row HTML
+        var deleteUrl = window.BASE_URL + '/admin/registrations/deleteDetail?id=' + data.detailId + '&registration_id=' + registrationId;
+        var rowHtml = '<tr data-detail-id="' + data.detailId + '">' +
+            '<td>' + escapeHtml(data.competitionName) + '</td>' +
+            '<td class="text-center">' + (data.attendees ? data.attendees.length : 0) + '</td>' +
+            '<td>' + badgesHtml + '</td>' +
+            '<td class="text-center">' +
+                '<form method="post" action="' + deleteUrl + '" id="delete-detail-form-' + data.detailId + '" style="display:none;"></form>' +
+                '<button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDetail(' + data.detailId + ')">' +
+                    '<i class="fa fa-trash"></i>' +
+                '</button>' +
+            '</td>' +
+        '</tr>';
+
+        if (!table) {
+            // Tạo table mới nếu chưa có
+            var tableHtml = '<table class="table table-bordered table-striped table-sm mb-0">' +
+                '<thead class="table-light"><tr>' +
+                    '<th>Cuộc thi</th>' +
+                    '<th style="width:100px;">Số người</th>' +
+                    '<th>Danh sách thí sinh</th>' +
+                    '<th style="width:60px;"></th>' +
+                '</tr></thead>' +
+                '<tbody>' + rowHtml + '</tbody>' +
+            '</table>';
+
+            if (emptyMsg) emptyMsg.remove();
+            cardBody.insertAdjacentHTML('beforeend', tableHtml);
+        } else {
+            // Append vào tbody
+            var tbody = table.querySelector('tbody');
+            if (tbody) {
+                tbody.insertAdjacentHTML('beforeend', rowHtml);
+            }
+        }
+    }
+
     function addSelectedStaff() {
         var list = document.getElementById('available_staff_list');
         var actives = list.querySelectorAll('.active');
