@@ -2499,6 +2499,7 @@ var RegistrationView = (function() {
         removePendingSport: removePendingSport,
         removeAthleteFromSport: removeAthleteFromSport,
         editPendingSport: editPendingSport,
-        editSportTeam: editSportTeam
+        editSportTeam: editSportTeam,
+        editCompetitionRegistration: editCompetitionRegistration
     };
 })();
