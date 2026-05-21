@@ -64,6 +64,9 @@ class TalentEntries extends BaseTalentEntries
         if ($this->registration_id) {
             $data['registration_id'] = $this->registration_id;
         }
+        if ($this->alliance_property_ids) {
+            $data['alliance_property_ids'] = $this->alliance_property_ids;
+        }
         return ApiClient::post(ApiEndpoints::TALENT_ENTRY_STORE, $data);
     }
 
