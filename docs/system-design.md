@@ -3973,32 +3973,36 @@ public function validateAllianceMemberLimit($attribute, $params) {
         return; // Không phải đội liên quân
     }
     
-    // Lấy cấu hình từ event_sports
-    $eventSport = EventSports::model()->findByAttributes(array(
-        'event_id' => $team->event_id,
-        'sport_id' => $team->sport_id,
+    // Lấy thông tin attendee để biết organization_id
+    $attendee = Attendees::model()->findByPk($this->attendee_id);
+    if (!$attendee) return;
+    
+    // Lấy max_members riêng của từng đơn vị trong đội liên quân
+    $allianceOrg = AllianceTeamOrgs::model()->findByAttributes(array(
+        'team_id' => $this->team_id,
+        'organization_id' => $attendee->organization_id,
     ));
     
-    if (!$eventSport || !$eventSport->alliance_max_per_org) {
+    if (!$allianceOrg) {
+        $this->addError($attribute, 'Đơn vị không thuộc đội liên quân này.');
         return;
     }
     
     // Đếm số thành viên hiện tại từ cùng đơn vị
-    $attendee = Attendees::model()->findByPk($this->attendee_id);
-    $currentCount = SportTeamMembers::model()->countByAttributes(array(
-        'team_id' => $this->team_id,
-    ), array(
-        'join' => 'INNER JOIN attendees a ON a.id = t.attendee_id',
-        'condition' => 'a.organization_id = :org_id AND t.id != :current_id',
-        'params' => array(
+    $currentCount = Yii::app()->db->createCommand()
+        ->select('COUNT(*)')
+        ->from('sport_team_members stm')
+        ->join('attendees a', 'a.id = stm.attendee_id')
+        ->where('stm.team_id = :team_id AND a.organization_id = :org_id AND stm.id != :current_id', array(
+            ':team_id' => $this->team_id,
             ':org_id' => $attendee->organization_id,
             ':current_id' => $this->id ?: 0,
-        ),
-    ));
+        ))
+        ->queryScalar();
     
-    if ($currentCount >= $eventSport->alliance_max_per_org) {
+    if ($currentCount >= $allianceOrg->max_members) {
         $this->addError($attribute, 
-            "Đơn vị đã đạt giới hạn {$eventSport->alliance_max_per_org} người trong đội liên quân.");
+            "Đơn vị đã đạt giới hạn {$allianceOrg->max_members} người trong đội liên quân.");
     }
 }
 ```
