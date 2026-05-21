@@ -623,19 +623,19 @@ var RegistrationView = (function() {
         var table = cardBody.querySelector('table#competition-list-table');
         var emptyMsg = cardBody.querySelector('p.text-muted');
 
-        // Tạo badges cho danh sách thí sinh
-        var badgesHtml = '';
+        // Tạo danh sách thí sinh theo dòng
+        var listHtml = '';
         if (data.attendees && data.attendees.length > 0) {
             data.attendees.forEach(function(att, idx) {
                 var name = att.attendee_name || att.name || '';
                 var position = att.position_name || '';
                 var division = att.division_name || '';
-                var info = name;
+                var info = escapeHtml(name);
                 if (position || division) {
                     var extra = (position && division) ? (position + ' - ' + division) : (position || division);
-                    info += ' (' + extra + ')';
+                    info += ' <small class="text-muted">(' + escapeHtml(extra) + ')</small>';
                 }
-                badgesHtml += '<span class="badge bg-light text-dark border me-1 mb-1">' + (idx + 1) + '. ' + escapeHtml(info) + '</span>';
+                listHtml += '<div>' + (idx + 1) + '. ' + info + '</div>';
             });
         }
 
