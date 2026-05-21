@@ -159,12 +159,24 @@ class MenuHelper
             ),
 
             'sports' => array(
-                'label' => 'Hoạt động thể thao',
+                'label' => 'Thể thao',
                 'icon' => 'activities',
                 'forceGroup' => true,
             ),
             'competitions' => array(
-                'label' => 'Cuộc thi nghiệp vụ',
+                'label' => 'Thi nghiệp vụ',
+                'icon' => 'activities',
+                'forceGroup' => true,
+            ),
+
+            'miss' => array(
+                'label' => 'Thi Miss',
+                'icon' => 'activities',
+                'forceGroup' => true,
+            ),
+
+            'talent' => array(
+                'label' => 'Thi Văn nghệ',
                 'icon' => 'activities',
                 'forceGroup' => true,
             ),
