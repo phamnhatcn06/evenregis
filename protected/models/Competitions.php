@@ -61,7 +61,7 @@ class Competitions extends BaseCompetitions
         $data = array_filter($this->attributes, function ($value) {
             return $value !== null && $value !== '';
         });
-        return ApiClient::patch($url, $data);
+        return ApiClient::post($url, $data);
     }
 
     public static function deleteViaApi($id)
