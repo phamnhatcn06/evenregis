@@ -3098,6 +3098,7 @@ var RegistrationView = (function() {
         editPendingSport: editPendingSport,
         editSportTeam: editSportTeam,
         editCompetitionRegistration: editCompetitionRegistration,
-        deleteCompetitionRegistration: deleteCompetitionRegistration
+        deleteCompetitionRegistration: deleteCompetitionRegistration,
+        editMissContestant: editMissContestant
     };
 })();
