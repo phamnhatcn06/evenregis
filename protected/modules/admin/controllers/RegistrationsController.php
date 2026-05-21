@@ -1019,7 +1019,7 @@ class RegistrationsController extends AdminController
 				}
 			} else {
 				$errorCount++;
-				$debugErrors[] = array('staff_code' => $staffCode, 'error' => $result);
+				$debugErrors[] = array('attendee_id' => $staffId, 'error' => $result);
 			}
 		}
 
