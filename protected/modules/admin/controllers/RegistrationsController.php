@@ -975,6 +975,50 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	public function actionGetAttendeesForCompetition($registration_id)
+	{
+		$result = array();
+		$competitionId = isset($_GET['competition_id']) ? $_GET['competition_id'] : null;
+
+		$attendees = Attendees::getByRegistrationId($registration_id);
+
+		// Lọc theo phòng ban được phép thi nếu có competition_id
+		$allowedDepartments = array();
+		if ($competitionId) {
+			$competition = Competitions::fetchFromApi($competitionId);
+			if ($competition) {
+				$allowedDepartments = $competition->getAllowedDepartments();
+			}
+		}
+
+		foreach ($attendees as $att) {
+			$id = isset($att['id']) ? $att['id'] : null;
+			$fullName = isset($att['full_name']) ? $att['full_name'] : '';
+			$staffCode = isset($att['staff_code']) ? $att['staff_code'] : '';
+			$positionName = isset($att['position_name']) ? $att['position_name'] : '';
+			$departmentCode = isset($att['department_code']) ? $att['department_code'] : '';
+
+			if (!$id) continue;
+
+			// Lọc theo phòng ban nếu có quy định
+			if (!empty($allowedDepartments) && !in_array($departmentCode, $allowedDepartments)) {
+				continue;
+			}
+
+			$result[] = array(
+				'id' => $id,
+				'name' => $fullName,
+				'code' => $staffCode,
+				'position' => $positionName,
+				'display' => $staffCode ? ($staffCode . ' - ' . $fullName) : $fullName,
+			);
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
 	public function actionAddCompetitionRegistration()
 	{
 		header('Content-Type: application/json');
@@ -1009,6 +1053,8 @@ class RegistrationsController extends AdminController
 				'status'          => CompetitionRegistrations::STATUS_PENDING,
 				'note'            => $note,
 			);
+			print_r(json_encode($regData));
+			exit;
 			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $regData);
 			if ($result['success']) {
 				$successCount++;
