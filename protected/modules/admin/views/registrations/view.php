@@ -579,17 +579,15 @@ foreach ($registrationDetails as $detail) {
 
 <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
 <div class="card mb-3" id="talent-registration-card">
-    <div class="card-header bg-white">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
+        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+        <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addTalentModal">
+            <i class="fa fa-plus me-1"></i>Đăng ký
+        </button>
+        <?php endif; ?>
     </div>
     <div class="card-body">
-        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-        <div class="mb-3">
-            <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addTalentModal">
-                <i class="fa fa-plus me-1"></i>Đăng ký văn nghệ
-            </button>
-        </div>
-        <?php endif; ?>
 
         <?php if (empty($detailsByContent['talent'])): ?>
             <p class="text-muted mb-0">Chưa đăng ký tiết mục văn nghệ nào.</p>
