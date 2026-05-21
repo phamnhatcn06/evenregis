@@ -905,7 +905,7 @@ var RegistrationView = (function() {
             });
             reg.attendees.forEach(function(att) {
                 formData.append('attendee_ids[]', att.id);
-                formData.append('attendee_names[]', att.name || '');
+                formData.append('attendee_names[]', att.full_name || '');
             });
 
             return fetch(window.BASE_URL + '/admin/registrations/addSportRegistration', {
