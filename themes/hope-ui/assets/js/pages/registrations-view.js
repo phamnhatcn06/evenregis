@@ -1339,6 +1339,111 @@ var RegistrationView = (function() {
         });
     }
 
+    var editingTeamId = null;
+
+    function editSportTeam(teamId) {
+        editingTeamId = teamId;
+
+        fetch(window.BASE_URL + '/admin/registrations/getSportTeamDetail?id=' + teamId, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (!data.success) {
+                Toast.error(data.error || 'Không thể tải thông tin đội.');
+                return;
+            }
+
+            var team = data.data.team;
+            var members = data.data.members || [];
+
+            // Set sport (readonly)
+            var modalSportSelect = document.getElementById('sport_item_id');
+            var sportNameDiv = document.getElementById('sport_selected_name');
+            if (modalSportSelect && sportNameDiv) {
+                modalSportSelect.value = team.sport_id;
+                modalSportSelect.classList.add('d-none');
+                sportNameDiv.textContent = team.sport_name || '';
+                sportNameDiv.classList.remove('d-none');
+            }
+
+            // Set team name
+            var teamNameInput = document.getElementById('sport_team_name');
+            if (teamNameInput) {
+                teamNameInput.value = team.team_name || team.name || '';
+            }
+
+            // Load attendees then pre-select members
+            loadSportAttendees(function() {
+                sportSelectedAttendees = [];
+                members.forEach(function(m) {
+                    var att = sportAllAttendees.find(function(a) { return a.id == m.attendee_id; });
+                    if (att) {
+                        sportSelectedAttendees.push(att);
+                    } else {
+                        sportSelectedAttendees.push({
+                            id: m.attendee_id,
+                            full_name: m.name || m.attendee_name || ''
+                        });
+                    }
+                });
+                renderSportAvailableAttendees();
+                renderSportSelectedAttendees();
+            });
+
+            // Change button text
+            var btnAdd = document.getElementById('btn_add_to_preview');
+            if (btnAdd) {
+                btnAdd.innerHTML = '<i class="fa fa-save me-1"></i>Cập nhật đội';
+            }
+
+            // Open modal
+            var modal = new bootstrap.Modal(document.getElementById('addDetailModal'));
+            modal.show();
+        })
+        .catch(function(err) {
+            Toast.error('Lỗi kết nối server.');
+        });
+    }
+
+    function updateSportTeam() {
+        if (!editingTeamId) return;
+
+        if (sportSelectedAttendees.length === 0) {
+            Toast.error('Vui lòng chọn ít nhất một người tham dự.');
+            return;
+        }
+
+        var teamName = document.getElementById('sport_team_name')?.value || '';
+        var formData = new FormData();
+        formData.append('team_id', editingTeamId);
+        formData.append('team_name', teamName);
+        sportSelectedAttendees.forEach(function(att) {
+            formData.append('attendee_ids[]', att.id);
+            formData.append('attendee_names[]', att.full_name || '');
+        });
+
+        fetch(window.BASE_URL + '/admin/registrations/updateSportTeam', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.success) {
+                Toast.success('Cập nhật đội thành công.');
+                editingTeamId = null;
+                bootstrap.Modal.getInstance(document.getElementById('addDetailModal'))?.hide();
+                location.reload();
+            } else {
+                Toast.error(data.error || 'Không thể cập nhật đội.');
+            }
+        })
+        .catch(function() {
+            Toast.error('Lỗi kết nối server.');
+        });
+    }
+
     function viewDocument(url, type) {
         var modalBody = document.getElementById('documentModalBody');
         var downloadLink = document.getElementById('documentDownloadLink');
