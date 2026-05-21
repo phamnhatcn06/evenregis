@@ -132,6 +132,42 @@ class RegistrationsController extends AdminController
 			);
 		}
 
+		// Load Beauty Contestants (Miss) cho registration
+		$beautyContestants = array();
+		if ($model->event_id) {
+			$attendeeIds = array_keys($attendeesMap);
+			if (!empty($attendeeIds)) {
+				$contests = BeautyContests::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
+				foreach ($contests as $contest) {
+					$contestId = isset($contest->id) ? $contest->id : (isset($contest['id']) ? $contest['id'] : null);
+					$contestName = isset($contest->name) ? $contest->name : (isset($contest['name']) ? $contest['name'] : '');
+					if (!$contestId) continue;
+
+					$contestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 500)->getData();
+					foreach ($contestants as $c) {
+						$attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
+						if ($attId && in_array($attId, $attendeeIds)) {
+							if (!isset($beautyContestants[$contestId])) {
+								$beautyContestants[$contestId] = array(
+									'contest_id' => $contestId,
+									'contest_name' => $contestName,
+									'contestants' => array(),
+								);
+							}
+							$attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+							$beautyContestants[$contestId]['contestants'][] = array(
+								'id' => isset($c->id) ? $c->id : (isset($c['id']) ? $c['id'] : null),
+								'attendee_id' => $attId,
+								'attendee_name' => isset($attInfo['full_name']) ? $attInfo['full_name'] : '',
+								'candidate_number' => isset($c->candidate_number) ? $c->candidate_number : (isset($c['candidate_number']) ? $c['candidate_number'] : ''),
+								'status' => isset($c->status) ? $c->status : (isset($c['status']) ? $c['status'] : 0),
+							);
+						}
+					}
+				}
+			}
+		}
+
 		$this->render('view', array(
 			'model' => $model,
 			'registrationDetails' => $registrationDetails,
@@ -139,6 +175,7 @@ class RegistrationsController extends AdminController
 			'allianceRequest' => $allianceRequest,
             'sportTeams' => $sportTeams,
             'sportTeamMembers' => $sportTeamMembers,
+			'beautyContestants' => $beautyContestants,
 		));
 	}
 
