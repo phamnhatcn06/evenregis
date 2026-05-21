@@ -2529,11 +2529,475 @@ var RegistrationView = (function() {
         }
     };
 
+    // ==================== MISS REGISTRATION ====================
+    var missAllAttendees = [];
+    var missSelectedAttendees = [];
+    var missMaxPerOrg = 0;
+
+    function bindMissEvents() {
+        var contestSelect = document.getElementById('miss_contest_id');
+        if (contestSelect) {
+            contestSelect.addEventListener('change', function() {
+                if (this.value) {
+                    loadMissContestInfo(this.value);
+                    loadAttendeesForMiss();
+                } else {
+                    document.getElementById('miss_max_per_org').value = '-';
+                    hideMissDualListbox();
+                }
+            });
+        }
+
+        document.getElementById('miss_search')?.addEventListener('input', function() {
+            filterMissList(this.value);
+        });
+
+        document.getElementById('miss_btn_add')?.addEventListener('click', addMissSelected);
+        document.getElementById('miss_btn_add_all')?.addEventListener('click', addMissAll);
+        document.getElementById('miss_btn_remove')?.addEventListener('click', removeMissSelected);
+        document.getElementById('miss_btn_remove_all')?.addEventListener('click', removeMissAll);
+
+        var form = document.getElementById('add-miss-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (missSelectedAttendees.length === 0) {
+                    Toast.error('Vui lòng chọn ít nhất một thí sinh.');
+                    return false;
+                }
+                submitMissForm(form);
+            });
+        }
+
+        // Load contests when modal opens
+        var modal = document.getElementById('addMissModal');
+        if (modal) {
+            modal.addEventListener('show.bs.modal', function() {
+                resetMissModal();
+            });
+        }
+    }
+
+    function resetMissModal() {
+        var contestSelect = document.getElementById('miss_contest_id');
+        document.getElementById('add-miss-form').reset();
+        contestSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+        document.getElementById('miss_max_per_org').value = '-';
+        missAllAttendees = [];
+        missSelectedAttendees = [];
+        missMaxPerOrg = 0;
+        hideMissDualListbox();
+        removeMissHiddenInputs();
+
+        fetch(window.BASE_URL + '/admin/registrations/getContentItems?event_id=' + eventId + '&content_type=miss&registration_id=' + registrationId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                contestSelect.innerHTML = '<option value="">-- Chọn cuộc thi --</option>';
+                if (data.success && data.data && data.data.length > 0) {
+                    data.data.forEach(function(item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.name;
+                        contestSelect.appendChild(opt);
+                    });
+                } else {
+                    contestSelect.innerHTML = '<option value="">-- Không có cuộc thi nào --</option>';
+                }
+            });
+    }
+
+    function loadMissContestInfo(contestId) {
+        fetch(window.BASE_URL + '/admin/registrations/getMissContestInfo?contest_id=' + contestId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data) {
+                    missMaxPerOrg = data.data.max_per_org || 0;
+                    document.getElementById('miss_max_per_org').value = missMaxPerOrg > 0 ? missMaxPerOrg : 'Không giới hạn';
+                    document.getElementById('miss_max_count').textContent = missMaxPerOrg > 0 ? missMaxPerOrg : '∞';
+                }
+            });
+    }
+
+    function loadAttendeesForMiss() {
+        var contestId = document.getElementById('miss_contest_id').value;
+        if (!contestId) return;
+
+        fetch(window.BASE_URL + '/admin/registrations/getAttendeesForMiss?registration_id=' + registrationId + '&contest_id=' + contestId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    missAllAttendees = data.data || [];
+                    missSelectedAttendees = [];
+                    renderMissAvailableList();
+                    renderMissSelectedList();
+                    showMissDualListbox();
+                }
+            });
+    }
+
+    function showMissDualListbox() {
+        document.getElementById('miss_dual_listbox_wrapper').style.display = 'flex';
+        document.getElementById('miss_placeholder').style.display = 'none';
+    }
+
+    function hideMissDualListbox() {
+        document.getElementById('miss_dual_listbox_wrapper').style.display = 'none';
+        document.getElementById('miss_placeholder').style.display = 'block';
+    }
+
+    function renderMissAvailableList() {
+        var list = document.getElementById('miss_available_list');
+        list.innerHTML = '';
+        missAllAttendees.forEach(function(att) {
+            var div = document.createElement('div');
+            div.className = 'list-group-item list-group-item-action';
+            div.setAttribute('data-id', att.id);
+            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            div.addEventListener('click', function() { this.classList.toggle('active'); });
+            list.appendChild(div);
+        });
+    }
+
+    function renderMissSelectedList() {
+        var list = document.getElementById('miss_selected_list');
+        list.innerHTML = '';
+        removeMissHiddenInputs();
+        missSelectedAttendees.forEach(function(att) {
+            var div = document.createElement('div');
+            div.className = 'list-group-item list-group-item-action';
+            div.setAttribute('data-id', att.id);
+            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            div.addEventListener('click', function() { this.classList.toggle('active'); });
+            list.appendChild(div);
+
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'attendee_ids[]';
+            input.value = att.id;
+            input.className = 'miss-hidden-input';
+            document.getElementById('add-miss-form').appendChild(input);
+        });
+        document.getElementById('miss_selected_count').textContent = missSelectedAttendees.length;
+    }
+
+    function removeMissHiddenInputs() {
+        document.querySelectorAll('.miss-hidden-input').forEach(function(el) { el.remove(); });
+    }
+
+    function filterMissList(keyword) {
+        var items = document.querySelectorAll('#miss_available_list .list-group-item');
+        keyword = keyword.toLowerCase();
+        items.forEach(function(item) {
+            var text = item.textContent.toLowerCase();
+            item.style.display = text.indexOf(keyword) > -1 ? '' : 'none';
+        });
+    }
+
+    function addMissSelected() {
+        var selected = document.querySelectorAll('#miss_available_list .list-group-item.active');
+        selected.forEach(function(item) {
+            var id = item.getAttribute('data-id');
+            var att = missAllAttendees.find(function(a) { return String(a.id) === String(id); });
+            if (att && !missSelectedAttendees.find(function(s) { return String(s.id) === String(id); })) {
+                if (missMaxPerOrg > 0 && missSelectedAttendees.length >= missMaxPerOrg) {
+                    Toast.warning('Đã đạt số lượng tối đa: ' + missMaxPerOrg);
+                    return;
+                }
+                missSelectedAttendees.push(att);
+                missAllAttendees = missAllAttendees.filter(function(a) { return String(a.id) !== String(id); });
+            }
+        });
+        renderMissAvailableList();
+        renderMissSelectedList();
+    }
+
+    function addMissAll() {
+        missAllAttendees.forEach(function(att) {
+            if (missMaxPerOrg > 0 && missSelectedAttendees.length >= missMaxPerOrg) return;
+            missSelectedAttendees.push(att);
+        });
+        missAllAttendees = [];
+        renderMissAvailableList();
+        renderMissSelectedList();
+    }
+
+    function removeMissSelected() {
+        var selected = document.querySelectorAll('#miss_selected_list .list-group-item.active');
+        selected.forEach(function(item) {
+            var id = item.getAttribute('data-id');
+            var att = missSelectedAttendees.find(function(a) { return String(a.id) === String(id); });
+            if (att) {
+                missAllAttendees.push(att);
+                missSelectedAttendees = missSelectedAttendees.filter(function(a) { return String(a.id) !== String(id); });
+            }
+        });
+        renderMissAvailableList();
+        renderMissSelectedList();
+    }
+
+    function removeMissAll() {
+        missSelectedAttendees.forEach(function(att) { missAllAttendees.push(att); });
+        missSelectedAttendees = [];
+        renderMissAvailableList();
+        renderMissSelectedList();
+    }
+
+    function submitMissForm(form) {
+        var submitBtn = document.getElementById('btn_submit_miss');
+        var originalHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang đăng ký...';
+
+        var formData = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHtml;
+            if (data.success) {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('addMissModal'));
+                if (modal) modal.hide();
+                Toast.success(data.message || 'Đăng ký thành công!');
+                location.reload();
+            } else {
+                Toast.error(data.error || 'Có lỗi xảy ra.');
+            }
+        })
+        .catch(function() {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHtml;
+            Toast.error('Lỗi kết nối.');
+        });
+    }
+
+    // ==================== TALENT REGISTRATION ====================
+    var talentAllAttendees = [];
+    var talentSelectedAttendees = [];
+
+    function bindTalentEvents() {
+        var categorySelect = document.getElementById('talent_category_id');
+        if (categorySelect) {
+            categorySelect.addEventListener('change', function() {
+                if (this.value) {
+                    loadAttendeesForTalent();
+                } else {
+                    hideTalentDualListbox();
+                }
+            });
+        }
+
+        document.getElementById('talent_search')?.addEventListener('input', function() {
+            filterTalentList(this.value);
+        });
+
+        document.getElementById('talent_btn_add')?.addEventListener('click', addTalentSelected);
+        document.getElementById('talent_btn_add_all')?.addEventListener('click', addTalentAll);
+        document.getElementById('talent_btn_remove')?.addEventListener('click', removeTalentSelected);
+        document.getElementById('talent_btn_remove_all')?.addEventListener('click', removeTalentAll);
+
+        var form = document.getElementById('add-talent-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (talentSelectedAttendees.length === 0) {
+                    Toast.error('Vui lòng chọn ít nhất một người biểu diễn.');
+                    return false;
+                }
+                submitTalentForm(form);
+            });
+        }
+
+        var modal = document.getElementById('addTalentModal');
+        if (modal) {
+            modal.addEventListener('show.bs.modal', function() {
+                resetTalentModal();
+            });
+        }
+    }
+
+    function resetTalentModal() {
+        var categorySelect = document.getElementById('talent_category_id');
+        document.getElementById('add-talent-form').reset();
+        categorySelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+        talentAllAttendees = [];
+        talentSelectedAttendees = [];
+        hideTalentDualListbox();
+        removeTalentHiddenInputs();
+
+        fetch(window.BASE_URL + '/admin/registrations/getTalentCategories?event_id=' + eventId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                categorySelect.innerHTML = '<option value="">-- Chọn thể loại --</option>';
+                if (data.success && data.data && data.data.length > 0) {
+                    data.data.forEach(function(item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.name;
+                        categorySelect.appendChild(opt);
+                    });
+                } else {
+                    categorySelect.innerHTML = '<option value="">-- Không có thể loại nào --</option>';
+                }
+            });
+    }
+
+    function loadAttendeesForTalent() {
+        fetch(window.BASE_URL + '/admin/registrations/getAttendeesForTalent?registration_id=' + registrationId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    talentAllAttendees = data.data || [];
+                    talentSelectedAttendees = [];
+                    renderTalentAvailableList();
+                    renderTalentSelectedList();
+                    showTalentDualListbox();
+                }
+            });
+    }
+
+    function showTalentDualListbox() {
+        document.getElementById('talent_dual_listbox_wrapper').style.display = 'flex';
+        document.getElementById('talent_placeholder').style.display = 'none';
+    }
+
+    function hideTalentDualListbox() {
+        document.getElementById('talent_dual_listbox_wrapper').style.display = 'none';
+        document.getElementById('talent_placeholder').style.display = 'block';
+    }
+
+    function renderTalentAvailableList() {
+        var list = document.getElementById('talent_available_list');
+        list.innerHTML = '';
+        talentAllAttendees.forEach(function(att) {
+            var div = document.createElement('div');
+            div.className = 'list-group-item list-group-item-action';
+            div.setAttribute('data-id', att.id);
+            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            div.addEventListener('click', function() { this.classList.toggle('active'); });
+            list.appendChild(div);
+        });
+    }
+
+    function renderTalentSelectedList() {
+        var list = document.getElementById('talent_selected_list');
+        list.innerHTML = '';
+        removeTalentHiddenInputs();
+        talentSelectedAttendees.forEach(function(att) {
+            var div = document.createElement('div');
+            div.className = 'list-group-item list-group-item-action';
+            div.setAttribute('data-id', att.id);
+            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            div.addEventListener('click', function() { this.classList.toggle('active'); });
+            list.appendChild(div);
+
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'attendee_ids[]';
+            input.value = att.id;
+            input.className = 'talent-hidden-input';
+            document.getElementById('add-talent-form').appendChild(input);
+        });
+        document.getElementById('talent_selected_count').textContent = talentSelectedAttendees.length;
+    }
+
+    function removeTalentHiddenInputs() {
+        document.querySelectorAll('.talent-hidden-input').forEach(function(el) { el.remove(); });
+    }
+
+    function filterTalentList(keyword) {
+        var items = document.querySelectorAll('#talent_available_list .list-group-item');
+        keyword = keyword.toLowerCase();
+        items.forEach(function(item) {
+            var text = item.textContent.toLowerCase();
+            item.style.display = text.indexOf(keyword) > -1 ? '' : 'none';
+        });
+    }
+
+    function addTalentSelected() {
+        var selected = document.querySelectorAll('#talent_available_list .list-group-item.active');
+        selected.forEach(function(item) {
+            var id = item.getAttribute('data-id');
+            var att = talentAllAttendees.find(function(a) { return String(a.id) === String(id); });
+            if (att && !talentSelectedAttendees.find(function(s) { return String(s.id) === String(id); })) {
+                talentSelectedAttendees.push(att);
+                talentAllAttendees = talentAllAttendees.filter(function(a) { return String(a.id) !== String(id); });
+            }
+        });
+        renderTalentAvailableList();
+        renderTalentSelectedList();
+    }
+
+    function addTalentAll() {
+        talentAllAttendees.forEach(function(att) { talentSelectedAttendees.push(att); });
+        talentAllAttendees = [];
+        renderTalentAvailableList();
+        renderTalentSelectedList();
+    }
+
+    function removeTalentSelected() {
+        var selected = document.querySelectorAll('#talent_selected_list .list-group-item.active');
+        selected.forEach(function(item) {
+            var id = item.getAttribute('data-id');
+            var att = talentSelectedAttendees.find(function(a) { return String(a.id) === String(id); });
+            if (att) {
+                talentAllAttendees.push(att);
+                talentSelectedAttendees = talentSelectedAttendees.filter(function(a) { return String(a.id) !== String(id); });
+            }
+        });
+        renderTalentAvailableList();
+        renderTalentSelectedList();
+    }
+
+    function removeTalentAll() {
+        talentSelectedAttendees.forEach(function(att) { talentAllAttendees.push(att); });
+        talentSelectedAttendees = [];
+        renderTalentAvailableList();
+        renderTalentSelectedList();
+    }
+
+    function submitTalentForm(form) {
+        var submitBtn = document.getElementById('btn_submit_talent');
+        var originalHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang đăng ký...';
+
+        var formData = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHtml;
+            if (data.success) {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('addTalentModal'));
+                if (modal) modal.hide();
+                Toast.success(data.message || 'Đăng ký thành công!');
+                location.reload();
+            } else {
+                Toast.error(data.error || 'Có lỗi xảy ra.');
+            }
+        })
+        .catch(function() {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHtml;
+            Toast.error('Lỗi kết nối.');
+        });
+    }
+
     return {
         init: init,
         resetAddModal: resetSportModal,
         resetCompetitionModal: resetCompetitionModal,
         resetSportModal: resetSportModal,
+        resetMissModal: resetMissModal,
+        resetTalentModal: resetTalentModal,
         viewDocument: viewDocument,
         confirmDeleteDetail: confirmDeleteDetail,
         editAttendee: editAttendee,
