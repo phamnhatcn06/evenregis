@@ -654,6 +654,86 @@ class RegistrationsController extends AdminController
         }
     }
 
+    public function actionGetSportTeamDetail($id)
+    {
+        $team = SportTeams::fetchFromApi($id);
+        if (!$team) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy đội.'));
+            Yii::app()->end();
+        }
+
+        $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
+        $membersArr = array();
+        foreach ($members as $m) {
+            $membersArr[] = array(
+                'id' => $m->id,
+                'attendee_id' => $m->attendee_id,
+                'name' => $m->name,
+                'attendee_name' => $m->attendee_name,
+            );
+        }
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'data' => array(
+                'team' => array(
+                    'id' => $team->id,
+                    'sport_id' => $team->sport_id,
+                    'sport_name' => $team->sport_name,
+                    'team_name' => $team->team_name,
+                    'name' => $team->name,
+                    'is_alliance' => $team->is_alliance,
+                ),
+                'members' => $membersArr,
+            ),
+        ));
+        Yii::app()->end();
+    }
+
+    public function actionUpdateSportTeam()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            throw new CHttpException(400, 'Bad Request');
+        }
+
+        $teamId = Yii::app()->request->getPost('team_id');
+        $teamName = Yii::app()->request->getPost('team_name');
+        $attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
+        $attendeeNames = Yii::app()->request->getPost('attendee_names', array());
+
+        if (!$teamId) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu team_id.'));
+            Yii::app()->end();
+        }
+
+        // Update team name
+        $team = SportTeams::fetchFromApi($teamId);
+        if ($team) {
+            $team->team_name = $teamName;
+            $team->name = $teamName;
+            $team->updateViaApi();
+        }
+
+        // Delete old members
+        $oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+        foreach ($oldMembers as $m) {
+            SportTeamMembers::deleteViaApi($m->id);
+        }
+
+        // Create new members
+        foreach ($attendeeIds as $idx => $attId) {
+            $member = new SportTeamMembers();
+            $member->sport_team_id = $teamId;
+            $member->attendee_id = $attId;
+            $member->code = 'T' . $teamId . '-A' . $attId;
+            $member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
+            $member->storeViaApi();
+        }
+
+        echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật đội thành công.'));
+        Yii::app()->end();
+    }
+
 	public function actionAdmin()
 	{
 		$model = new Registrations('search');
