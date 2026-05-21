@@ -4005,7 +4005,7 @@ public function validateAllianceMemberLimit($attribute, $params) {
     $attendee = Attendees::model()->findByPk($this->attendee_id);
     if (!$attendee) return;
     
-    // Lấy max_members riêng của từng đơn vị trong đội liên quân
+    // Kiểm tra đơn vị có trong đội liên quân không
     $allianceOrg = AllianceTeamOrgs::model()->findByAttributes(array(
         'team_id' => $this->team_id,
         'organization_id' => $attendee->organization_id,
@@ -4013,6 +4013,18 @@ public function validateAllianceMemberLimit($attribute, $params) {
     
     if (!$allianceOrg) {
         $this->addError($attribute, 'Đơn vị không thuộc đội liên quân này.');
+        return;
+    }
+    
+    // Lấy max_members từ cấu hình theo môn (event_sport_alliance_config)
+    $config = EventSportAllianceConfig::model()->findByAttributes(array(
+        'event_id' => $team->event_id,
+        'sport_id' => $team->sport_id,
+        'organization_id' => $attendee->organization_id,
+    ));
+    
+    if (!$config) {
+        $this->addError($attribute, 'Chưa cấu hình số người liên quân cho đơn vị này.');
         return;
     }
     
@@ -4028,9 +4040,9 @@ public function validateAllianceMemberLimit($attribute, $params) {
         ))
         ->queryScalar();
     
-    if ($currentCount >= $allianceOrg->max_members) {
+    if ($currentCount >= $config->max_members) {
         $this->addError($attribute, 
-            "Đơn vị đã đạt giới hạn {$allianceOrg->max_members} người trong đội liên quân.");
+            "Đơn vị đã đạt giới hạn {$config->max_members} người cho môn này.");
     }
 }
 ```
