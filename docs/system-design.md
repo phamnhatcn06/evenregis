@@ -3968,7 +3968,7 @@ public function rules() {
 }
 ```
 
-#### 16.5.2 Khi đăng ký thành viên vào đội liên quân
+#### 16.5.3 Khi đăng ký thành viên vào đội liên quân
 
 ```php
 // Trong SportTeamMembers model
