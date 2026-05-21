@@ -4130,9 +4130,8 @@ UPDATE `sports` SET `min_players` = 8, `max_players` = 10 WHERE `code` = 'tug_of
 -- 2. Thêm cột liên quân vào event_sports
 ALTER TABLE `event_sports`
   ADD COLUMN `allow_alliance` TINYINT(1) NOT NULL DEFAULT 0 
-    COMMENT 'Cho phép liên quân: 0=không, 1=có' AFTER `status`,
-  ADD COLUMN `alliance_max_per_org` INT UNSIGNED DEFAULT NULL 
-    COMMENT 'Số người tối đa từ mỗi đơn vị trong đội liên quân' AFTER `allow_alliance`;
+    COMMENT 'Cho phép liên quân: 0=không, 1=có' AFTER `status`;
+-- Lưu ý: max_members được cài đặt riêng cho từng đơn vị trong alliance_team_orgs
 
 -- 3. Thêm cột is_alliance vào sport_teams
 ALTER TABLE `sport_teams`
