@@ -3265,6 +3265,7 @@ var RegistrationView = (function() {
         editCompetitionRegistration: editCompetitionRegistration,
         deleteCompetitionRegistration: deleteCompetitionRegistration,
         editMissContestant: editMissContestant,
-        deleteMissContestant: deleteMissContestant
+        deleteMissContestant: deleteMissContestant,
+        removeTalentAllianceProperty: removeTalentAllianceProperty
     };
 })();
