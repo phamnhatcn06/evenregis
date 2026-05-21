@@ -1775,23 +1775,28 @@ class RegistrationsController extends AdminController
 		}
 
 		$successCount = 0;
+		$errors = array();
 		foreach ($attendeeIds as $attendeeId) {
 			$model = new BeautyContestants;
 			$model->contest_id = $contestId;
 			$model->attendee_id = $attendeeId;
 			$model->registration_id = $registrationId;
 			$model->note = $note;
+			$model->status = BeautyContestants::STATUS_REGISTERED;
 
 			$result = $model->storeViaApi();
 			if ($result['success']) {
 				$successCount++;
+			} else {
+				$errors[] = isset($result['error']) ? $result['error'] : 'Lỗi không xác định';
 			}
 		}
 
 		if ($successCount > 0) {
 			echo CJSON::encode(array('success' => true, 'message' => "Đăng ký thành công {$successCount} thí sinh."));
 		} else {
-			echo CJSON::encode(array('success' => false, 'error' => 'Không thể đăng ký.'));
+			$errorMsg = !empty($errors) ? implode('; ', array_unique($errors)) : 'Không thể đăng ký.';
+			echo CJSON::encode(array('success' => false, 'error' => $errorMsg));
 		}
 		Yii::app()->end();
 	}
