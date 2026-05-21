@@ -2630,12 +2630,20 @@ var RegistrationView = (function() {
                 if (data.success) {
                     missAllAttendees = data.data || [];
                     missSelectedAttendees = [];
+                    missRegisteredCount = (data.registered || []).length;
                     renderMissAvailableList();
                     renderMissSelectedList();
                     showMissDualListbox();
                     renderMissRegisteredList(data.registered || []);
+                    updateMissMaxDisplay();
                 }
             });
+    }
+
+    function updateMissMaxDisplay() {
+        var remaining = missMaxPerOrg > 0 ? (missMaxPerOrg - missRegisteredCount - missSelectedAttendees.length) : '∞';
+        var maxDisplay = missMaxPerOrg > 0 ? missMaxPerOrg : '∞';
+        document.getElementById('miss_max_count').textContent = remaining;
     }
 
     function renderMissRegisteredList(registered) {
