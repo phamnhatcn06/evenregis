@@ -478,7 +478,7 @@ foreach ($registrationDetails as $detail) {
                         <th style="width:100px;">Số người</th>
                         <th>Danh sách thí sinh</th>
                         <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                            <th style="width:60px;"></th>
+                            <th style="width:100px;">Thao tác</th>
                         <?php endif; ?>
                     </tr>
                 </thead>
@@ -504,7 +504,10 @@ foreach ($registrationDetails as $detail) {
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCompetitionRegistration(<?php echo $compId; ?>)">
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editCompetitionRegistration(<?php echo $compId; ?>, '<?php echo addslashes($compData['competition_name']); ?>')" title="Sửa">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCompetitionRegistration(<?php echo $compId; ?>)" title="Xóa">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
