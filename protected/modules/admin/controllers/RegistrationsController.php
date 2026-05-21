@@ -103,7 +103,7 @@ class RegistrationsController extends AdminController
 		$this->render('view', array(
 			'model' => $model,
 			'registrationDetails' => $registrationDetails,
-			'detailAttendees' => $detailAttendees,
+			'competitionRegistrations' => $competitionRegistrations,
 			'allianceRequest' => $allianceRequest,
             'sportTeams' => $sportTeams,
             'sportTeamMembers' => $sportTeamMembers,
