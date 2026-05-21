@@ -3013,6 +3013,14 @@ var RegistrationView = (function() {
         hideTalentDualListbox();
         removeTalentHiddenInputs();
 
+        // Reset alliance
+        var allianceDisplay = document.getElementById('talent_alliance_selected_texts');
+        if (allianceDisplay) allianceDisplay.innerHTML = '';
+        var allianceSelect = document.getElementById('talent_alliance_property');
+        if (allianceSelect) {
+            Array.from(allianceSelect.options).forEach(function(opt) { opt.selected = false; });
+        }
+
         fetch(window.BASE_URL + '/admin/registrations/getTalentCategories?event_id=' + eventId)
             .then(function(response) { return response.json(); })
             .then(function(data) {
@@ -3028,6 +3036,67 @@ var RegistrationView = (function() {
                     categorySelect.innerHTML = '<option value="">-- Không có thể loại nào --</option>';
                 }
             });
+
+        // Load alliance properties for talent
+        loadTalentAllianceProperties();
+    }
+
+    function loadTalentAllianceProperties() {
+        var allianceSelect = document.getElementById('talent_alliance_property');
+        var modalList = document.getElementById('talent_alliance_modal_list');
+        if (!allianceSelect || !modalList) return;
+
+        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                allianceSelect.innerHTML = '';
+                modalList.innerHTML = '';
+
+                if (data.success && data.data && data.data.length > 0) {
+                    data.data.forEach(function(item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.setAttribute('data-code', item.code);
+                        opt.textContent = item.code + ' - ' + item.name;
+                        allianceSelect.appendChild(opt);
+
+                        var div = document.createElement('div');
+                        div.className = 'form-check mb-2';
+                        var escapedName = escapeHtml(item.code + ' - ' + item.name);
+                        div.innerHTML = '<input class="form-check-input talent-alliance-modal-cb" type="checkbox" value="'+item.id+'" data-name="'+escapedName+'" data-code="'+escapeHtml(item.code)+'" id="talent_alliance_'+item.id+'">' +
+                                        '<label class="form-check-label" for="talent_alliance_'+item.id+'">' + escapedName + '</label>';
+                        modalList.appendChild(div);
+                    });
+                } else {
+                    modalList.innerHTML = '<p class="text-muted mb-0">Không có đơn vị nào để liên quân.</p>';
+                }
+            });
+    }
+
+    function removeTalentAllianceProperty(id) {
+        var cb = document.getElementById('talent_alliance_' + id);
+        if (cb) cb.checked = false;
+
+        var allianceSelect = document.getElementById('talent_alliance_property');
+        if (allianceSelect) {
+            Array.from(allianceSelect.options).forEach(function(opt) {
+                if (opt.value == id) opt.selected = false;
+            });
+        }
+
+        var displayText = document.getElementById('talent_alliance_selected_texts');
+        if (displayText) {
+            var badges = displayText.querySelectorAll('span.badge');
+            badges.forEach(function(badge) {
+                var closeIcon = badge.querySelector('i.fa-times');
+                if (closeIcon) {
+                    var onclickAttr = closeIcon.getAttribute('onclick') || '';
+                    if (onclickAttr.indexOf("'" + id + "'") !== -1) {
+                        badge.remove();
+                    }
+                }
+            });
+        }
     }
 
     function loadAttendeesForTalent() {
