@@ -996,14 +996,12 @@ class RegistrationsController extends AdminController
 			$fullName = isset($att['full_name']) ? $att['full_name'] : '';
 			$staffCode = isset($att['staff_code']) ? $att['staff_code'] : '';
 			$positionName = isset($att['position_name']) ? $att['position_name'] : '';
-			// Thử lấy department_code từ nhiều field có thể
-			$departmentCode = isset($att['department_code']) ? $att['department_code'] :
-				(isset($att['property_code']) ? $att['property_code'] : '');
+			$divisionCode = isset($att['division_code']) ? $att['division_code'] : '';
 
 			if (!$id) continue;
 
-			// Lọc theo phòng ban nếu có quy định
-			if (!empty($allowedDepartments) && !in_array($departmentCode, $allowedDepartments)) {
+			// Lọc theo division_code nằm trong danh sách phòng ban được phép thi
+			if (!empty($allowedDepartments) && !in_array($divisionCode, $allowedDepartments)) {
 				continue;
 			}
 
