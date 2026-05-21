@@ -504,7 +504,7 @@ foreach ($registrationDetails as $detail) {
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editCompetitionRegistration(<?php echo $compId; ?>, '<?php echo addslashes($compData['competition_name']); ?>')" title="Sửa">
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editCompetitionRegistration(<?php echo $compId; ?>, '<?php echo addslashes($compData['competition_name']); ?>')" title="Sửa">
                                         <i class="fa fa-pencil"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCompetitionRegistration(<?php echo $compId; ?>)" title="Xóa">
