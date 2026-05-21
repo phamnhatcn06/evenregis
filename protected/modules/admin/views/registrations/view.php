@@ -682,6 +682,13 @@ foreach ($registrationDetails as $d) {
     if (!empty($d['sport_id'])) $sportIds[] = (int)$d['sport_id'];
     if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
 }
+// Include sport IDs from existing sport teams
+foreach ($sportTeams as $team) {
+    $teamSportId = isset($team->sport_id) ? $team->sport_id : (isset($team['sport_id']) ? $team['sport_id'] : null);
+    if ($teamSportId && !in_array((int)$teamSportId, $sportIds)) {
+        $sportIds[] = (int)$teamSportId;
+    }
+}
 
 // Lấy danh sách staff_id đã là attendee
 $existingStaffIds = array();
