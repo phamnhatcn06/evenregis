@@ -455,9 +455,6 @@ var RegistrationView = (function() {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalHtml;
 
-                    console.log('=== RESPONSE FROM SERVER ===');
-                    console.log(data);
-
                     if (data.success) {
                         // Đóng modal
                         var modalEl = document.getElementById('addCompetitionModal');
