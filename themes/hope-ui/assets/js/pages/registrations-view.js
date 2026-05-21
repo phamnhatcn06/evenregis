@@ -659,6 +659,11 @@ var RegistrationView = (function() {
         if (modalEl) {
             modalEl.addEventListener('hidden.bs.modal', function() {
                 resetSportModalUI();
+                editingTeamId = null;
+                var btnAdd = document.getElementById('btn_add_to_preview');
+                if (btnAdd) {
+                    btnAdd.innerHTML = '<i class="fa fa-plus me-1"></i>Thêm vào danh sách';
+                }
             });
         }
     }
