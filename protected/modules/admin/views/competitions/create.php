@@ -18,6 +18,10 @@ $this->Tabletitle = 'Thêm cuộc thi nghiệp vụ';
 
 <div class="card">
     <div class="card-body">
-        <?php echo $this->renderPartial('_form', array('model' => $model)); ?>
+        <?php echo $this->renderPartial('_form', array(
+            'model' => $model,
+            'allDepartments' => $allDepartments,
+            'selectedDepartments' => $selectedDepartments,
+        )); ?>
     </div>
 </div>
