@@ -561,9 +561,7 @@ class RegistrationsController extends AdminController
 		if (!Yii::app()->request->isPostRequest) {
 			throw new CHttpException(400, 'Bad Request');
 		}
-
 		$isAjax = Yii::app()->request->isAjaxRequest;
-
 		$registrationId = Yii::app()->request->getPost('registration_id');
 		$sportId = Yii::app()->request->getPost('sport_id');
 		$alliancePropertyIds = Yii::app()->request->getPost('alliance_property_ids', array());

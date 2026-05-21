@@ -24,4 +24,20 @@ class Departments extends BaseDepartments
 		$dept = self::findByPropertyAndDivision($propertyCode, $divisionCode);
 		return $dept ? $dept->name : '';
 	}
+
+	/**
+	 * Lấy danh sách tất cả phòng ban dạng array(unique_code => name)
+	 */
+	public static function getActiveList()
+	{
+		$list = array();
+		$models = self::model()->findAll(array(
+			'condition' => 'deleted_at IS NULL AND status = 1',
+			'order' => 'name ASC',
+		));
+		foreach ($models as $model) {
+			$list[$model->unique_code] = $model->name;
+		}
+		return $list;
+	}
 }
