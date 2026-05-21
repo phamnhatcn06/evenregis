@@ -4106,9 +4106,10 @@ public function validateAllianceMemberLimit($attribute, $params) {
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  Đội: Liên quân MT Hà Nội - MT Đà Nẵng (Bóng đá nam)            │
+│  ⚠️ Giới hạn đã được Admin cấu hình theo môn                    │
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │ MT Hà Nội (đã đăng ký: 5/6)  ← max riêng: 6            │    │
+│  │ MT Hà Nội (đã đăng ký: 5/6)  ← Admin cấu hình: 6       │    │
 │  │ ☑ Nguyễn Văn A (Thủ môn)                               │    │
 │  │ ☑ Trần Văn B (Hậu vệ)                                  │    │
 │  │ ☑ Lê Văn C (Tiền vệ)                                   │    │
@@ -4118,7 +4119,7 @@ public function validateAllianceMemberLimit($attribute, $params) {
 │  └─────────────────────────────────────────────────────────┘    │
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │ MT Đà Nẵng (đã đăng ký: 5/5)  ← max riêng: 5           │    │
+│  │ MT Đà Nẵng (đã đăng ký: 5/5)  ← Admin cấu hình: 5      │    │
 │  │ ☑ Võ Văn G (Hậu vệ)                                    │    │
 │  │ ☑ Đỗ Văn H (Tiền vệ)                                   │    │
 │  │ ☑ Bùi Văn I (Tiền vệ)                                  │    │
