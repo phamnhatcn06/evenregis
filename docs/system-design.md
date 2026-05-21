@@ -3931,19 +3931,18 @@ CREATE TABLE `alliance_requests` (
   COMMENT='Yêu cầu liên quân giữa các đơn vị';
 ```
 
-#### 16.4.5 Bảng mới: `alliance_team_orgs`
+#### 16.4.6 Bảng mới: `alliance_team_orgs`
 
 ```sql
 -- ============================================================
 -- ALLIANCE_TEAM_ORGS — Các đơn vị tham gia đội liên quân
--- Mỗi đơn vị có max_members riêng (không dùng chung 1 giá trị)
+-- max_members được lấy từ event_sport_alliance_config
 -- ============================================================
 CREATE TABLE `alliance_team_orgs` (
   `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `team_id`         INT UNSIGNED NOT NULL COMMENT 'sport_teams.id (is_alliance=1)',
   `organization_id` INT UNSIGNED NOT NULL,
   `is_lead`         TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Đơn vị chủ trì',
-  `max_members`     INT UNSIGNED NOT NULL COMMENT 'Số người tối đa từ đơn vị này',
   `joined_at`       INT UNSIGNED,
   `created_at`      INT UNSIGNED,
   PRIMARY KEY (`id`),
