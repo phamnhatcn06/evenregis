@@ -502,12 +502,10 @@ foreach ($registrationDetails as $detail) {
                                     $division = $att['division_name'];
                                     $info = $name;
                                     if ($position || $division) {
-                                        $info .= ' (' . trim($position . ' - ' . $division, ' -') . ')';
+                                        $info .= ' <small class="text-muted">(' . trim($position . ' - ' . $division, ' -') . ')</small>';
                                     }
                                 ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1">
-                                        <?php echo ($idx + 1) . '. ' . CHtml::encode($info); ?>
-                                    </span>
+                                    <div><?php echo ($idx + 1) . '. ' . $info; ?></div>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
