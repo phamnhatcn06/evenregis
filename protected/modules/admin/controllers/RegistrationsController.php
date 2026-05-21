@@ -1053,9 +1053,7 @@ class RegistrationsController extends AdminController
 		$competitionName = $competition ? $competition->name : '';
 
 		// Load danh sách attendees vừa đăng ký
-		Yii::log("AddCompetitionRegistration - Loading attendees for detailId: " . $detailId, 'info', 'application.registration');
 		$attendees = RegistrationDetailAttendees::getByDetailId($detailId);
-		Yii::log("AddCompetitionRegistration - Loaded attendees: " . json_encode($attendees), 'info', 'application.registration');
 		$attendeeList = array();
 		foreach ($attendees as $att) {
 			$attendeeList[] = array(
@@ -1063,6 +1061,8 @@ class RegistrationsController extends AdminController
 				'staff_name' => isset($att['staff_name']) ? $att['staff_name'] : (isset($att['staff_full_name']) ? $att['staff_full_name'] : ''),
 			);
 		}
+		// Debug: raw attendees from API
+		$rawAttendeesDebug = $attendees;
 
 		echo CJSON::encode(array(
 			'success'         => true,
