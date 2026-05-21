@@ -475,7 +475,13 @@ var RegistrationView = (function() {
         var availableList = document.getElementById('available_staff_list');
         availableList.innerHTML = '<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
 
-        fetch(window.BASE_URL + '/admin/registrations/getStaffByProperty?property_id=' + propertyId)
+        var competitionId = document.getElementById('comp_competition_id')?.value || '';
+        var url = window.BASE_URL + '/admin/registrations/getStaffByProperty?property_id=' + propertyId;
+        if (competitionId) {
+            url += '&competition_id=' + competitionId;
+        }
+
+        fetch(url)
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 allStaff = data.success && data.data ? data.data : [];
