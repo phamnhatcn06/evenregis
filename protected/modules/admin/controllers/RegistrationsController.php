@@ -33,6 +33,17 @@ class RegistrationsController extends AdminController
 		// Load competition registrations từ bảng competition_registrations
 		$competitionRegistrations = array();
 		$compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $id), 200)->getData();
+
+		// Load tất cả attendees của registration để lấy thông tin chi tiết
+		$attendeesMap = array();
+		$attendeesData = Attendees::getByRegistrationId($id);
+		foreach ($attendeesData as $att) {
+			$attId = isset($att['id']) ? $att['id'] : null;
+			if ($attId) {
+				$attendeesMap[$attId] = $att;
+			}
+		}
+
 		foreach ($compRegsData as $reg) {
 			$compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
 			if (!$compId) continue;
@@ -45,11 +56,13 @@ class RegistrationsController extends AdminController
 				);
 			}
 
-			// Lấy thông tin attendee
+			// Lấy thông tin attendee từ map
 			$attendeeId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
-			$attendeeName = isset($reg->attendee_name) ? $reg->attendee_name : (isset($reg['attendee_name']) ? $reg['attendee_name'] : '');
-			$positionName = isset($reg->position_name) ? $reg->position_name : (isset($reg['position_name']) ? $reg['position_name'] : '');
-			$divisionName = isset($reg->division_name) ? $reg->division_name : (isset($reg['division_name']) ? $reg['division_name'] : '');
+			$attendeeInfo = isset($attendeesMap[$attendeeId]) ? $attendeesMap[$attendeeId] : array();
+
+			$attendeeName = isset($attendeeInfo['full_name']) ? $attendeeInfo['full_name'] : '';
+			$positionName = isset($attendeeInfo['position_name']) ? $attendeeInfo['position_name'] : '';
+			$divisionName = isset($attendeeInfo['division_name']) ? $attendeeInfo['division_name'] : '';
 
 			$competitionRegistrations[$compId]['attendees'][] = array(
 				'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
