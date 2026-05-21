@@ -147,19 +147,7 @@ class CompetitionsController extends AdminController
     protected function syncDepartments($competitionId, $departmentCodes)
     {
         try {
-            // Xóa tất cả department cũ của competition này
-            $existing = CompetitionDepartments::getApiDataProvider(array('competition_id' => $competitionId), 100)->getData();
-            foreach ($existing as $item) {
-                CompetitionDepartments::deleteViaApi($item->id);
-            }
-
-            // Thêm mới các department được chọn
-            foreach ($departmentCodes as $code) {
-                $model = new CompetitionDepartments;
-                $model->competition_id = $competitionId;
-                $model->department_code = $code;
-                $model->storeViaApi();
-            }
+            CompetitionDepartments::syncDepartments($competitionId, $departmentCodes);
         } catch (Exception $e) {
             Yii::log('Sync departments error: ' . $e->getMessage(), CLogger::LEVEL_ERROR);
         }
