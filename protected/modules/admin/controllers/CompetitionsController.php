@@ -141,4 +141,10 @@ class CompetitionsController extends AdminController
         }
         return $model;
     }
+
+    protected function syncDepartments($competitionId, $departmentCodes)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::COMPETITION_DEPARTMENT_SYNC, array('competition_id' => $competitionId));
+        ApiClient::post($url, array('department_codes' => $departmentCodes));
+    }
 }
