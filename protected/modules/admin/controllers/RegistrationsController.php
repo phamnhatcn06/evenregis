@@ -1885,6 +1885,57 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	public function actionGetMissContestant($id)
+	{
+		$model = BeautyContestants::fetchFromApi($id);
+		if (!$model) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy thí sinh.'));
+			Yii::app()->end();
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => array(
+			'id' => $model->id,
+			'attendee_name' => $model->attendee_name,
+			'candidate_number' => $model->candidate_number,
+			'height_cm' => $model->height_cm,
+			'weight_kg' => $model->weight_kg,
+			'measurements' => $model->measurements,
+			'talent' => $model->talent,
+			'bio' => $model->bio,
+		)));
+		Yii::app()->end();
+	}
+
+	public function actionUpdateMissContestant()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$id = Yii::app()->getRequest()->getPost('id');
+		$model = BeautyContestants::fetchFromApi($id);
+		if (!$model) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy thí sinh.'));
+			Yii::app()->end();
+		}
+
+		$model->height_cm = Yii::app()->getRequest()->getPost('height_cm');
+		$model->weight_kg = Yii::app()->getRequest()->getPost('weight_kg');
+		$model->measurements = Yii::app()->getRequest()->getPost('measurements');
+		$model->talent = Yii::app()->getRequest()->getPost('talent');
+		$model->bio = Yii::app()->getRequest()->getPost('bio');
+
+		$result = $model->updateViaApi();
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật thành công.'));
+		} else {
+			echo CJSON::encode(array('success' => false, 'error' => $result['error'] ?: 'Không thể cập nhật.'));
+		}
+		Yii::app()->end();
+	}
+
 	// ==================== TALENT REGISTRATION ====================
 
 	public function actionGetTalentCategories($event_id)
