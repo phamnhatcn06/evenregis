@@ -3885,7 +3885,7 @@ CREATE TABLE `event_sport_alliance_config` (
   COMMENT='Cấu hình số người liên quân tối đa theo môn + đơn vị';
 ```
 
-#### 16.4.3 Thêm cột vào bảng `sport_teams`
+#### 16.4.4 Thêm cột vào bảng `sport_teams`
 
 ```sql
 -- Đánh dấu đội liên quân
