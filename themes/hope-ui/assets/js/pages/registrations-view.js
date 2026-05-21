@@ -386,29 +386,15 @@ var RegistrationView = (function() {
 
     function bindCompetitionEvents() {
         var compSelect = document.getElementById('comp_competition_id');
-        var propSelect = document.getElementById('comp_property_id');
 
         if (compSelect) {
             compSelect.addEventListener('change', function() {
                 var competitionId = this.value;
                 if (competitionId) {
                     loadCompetitionInfo(competitionId);
-                    loadOrganizations();
-                } else {
-                    document.getElementById('comp_max_per_org').value = '-';
-                    if (propSelect) {
-                        propSelect.innerHTML = '<option value="">-- Chọn cuộc thi trước --</option>';
-                    }
-                    hideDualListbox();
-                }
-            });
-        }
-
-        if (propSelect) {
-            propSelect.addEventListener('change', function() {
-                if (this.value) {
                     loadAttendeesForCompetition();
                 } else {
+                    document.getElementById('comp_max_per_org').value = '-';
                     hideDualListbox();
                 }
             });
