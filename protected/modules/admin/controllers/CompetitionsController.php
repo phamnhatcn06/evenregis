@@ -144,7 +144,18 @@ class CompetitionsController extends AdminController
 
     protected function syncDepartments($competitionId, $departmentCodes)
     {
-        $url = ApiEndpoints::url(ApiEndpoints::COMPETITION_DEPARTMENT_SYNC, array('competition_id' => $competitionId));
-        ApiClient::post($url, array('department_codes' => $departmentCodes));
+        // Xóa tất cả department cũ của competition này
+        $existing = CompetitionDepartments::getApiDataProvider(array('competition_id' => $competitionId), 100)->getData();
+        foreach ($existing as $item) {
+            CompetitionDepartments::deleteViaApi($item->id);
+        }
+
+        // Thêm mới các department được chọn
+        foreach ($departmentCodes as $code) {
+            $model = new CompetitionDepartments;
+            $model->competition_id = $competitionId;
+            $model->department_code = $code;
+            $model->storeViaApi();
+        }
     }
 }
