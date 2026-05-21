@@ -394,10 +394,7 @@ var RegistrationView = (function() {
                 if (competitionId) {
                     loadCompetitionInfo(competitionId);
                     loadOrganizations();
-                    var propertyId = propSelect.value;
-                    if (propertyId) {
-                        loadStaffByProperty(propertyId);
-                    }
+                    hideDualListbox();
                 } else {
                     propSelect.innerHTML = '<option value="">-- Chọn cuộc thi trước --</option>';
                     document.getElementById('comp_max_per_org').value = '-';
