@@ -2020,6 +2020,7 @@ class RegistrationsController extends AdminController
 		$title = Yii::app()->getRequest()->getPost('title');
 		$duration = Yii::app()->getRequest()->getPost('duration');
 		$attendeeIds = Yii::app()->getRequest()->getPost('attendee_ids', array());
+		$alliancePropertyIds = Yii::app()->getRequest()->getPost('alliance_property_ids', array());
 		$note = Yii::app()->getRequest()->getPost('note', '');
 
 		if (empty($attendeeIds)) {
@@ -2034,6 +2035,7 @@ class RegistrationsController extends AdminController
 		$entry->title = $title;
 		$entry->duration = $duration;
 		$entry->note = $note;
+		$entry->alliance_property_ids = !empty($alliancePropertyIds) ? implode(',', $alliancePropertyIds) : null;
 
 		$result = $entry->storeViaApi();
 		if (!$result['success']) {
