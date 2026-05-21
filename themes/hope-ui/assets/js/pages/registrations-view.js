@@ -48,6 +48,7 @@ var RegistrationView = (function() {
         bindEditAttendeeForm();
         bindAddAttendeeModalReset();
         bindMissEvents();
+        bindEditMissForm();
         bindTalentEvents();
 
         if (isHotel && propertyId) {
