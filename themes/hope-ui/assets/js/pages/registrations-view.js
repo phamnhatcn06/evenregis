@@ -535,10 +535,15 @@ var RegistrationView = (function() {
         fetch(url)
             .then(function(response) { return response.json(); })
             .then(function(data) {
+                console.log('Attendees response:', data);
                 allStaff = data.success && data.data ? data.data : [];
                 selectedStaff = [];
                 renderAvailableStaff();
                 renderSelectedStaff();
+            })
+            .catch(function(err) {
+                console.error('Load attendees error:', err);
+                availableList.innerHTML = '<div class="text-center text-danger p-3">Lỗi tải dữ liệu</div>';
             });
     }
 
