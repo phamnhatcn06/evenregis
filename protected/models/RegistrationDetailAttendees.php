@@ -41,8 +41,12 @@ class RegistrationDetailAttendees extends CModel
     public static function getByDetailId($detailId)
     {
         $result = ApiClient::get(ApiEndpoints::REGISTRATION_DETAIL_ATTENDEE_LIST, array('registration_detail_id' => $detailId));
+        Yii::log("getByDetailId($detailId) - API result: " . json_encode($result), 'info', 'application.registration');
         if ($result['success'] && isset($result['data']['data'])) {
             return $result['data']['data'];
+        }
+        if ($result['success'] && isset($result['data']) && is_array($result['data'])) {
+            return $result['data'];
         }
         return array();
     }
