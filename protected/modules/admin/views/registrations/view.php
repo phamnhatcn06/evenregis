@@ -532,43 +532,32 @@ foreach ($registrationDetails as $detail) {
     </div>
     <div class="card-body">
 
-        <?php if (empty($detailsByContent['miss'])): ?>
+        <?php if (empty($beautyContestants)): ?>
             <p class="text-muted mb-0">Chưa đăng ký thi sắc đẹp nào.</p>
         <?php else: ?>
             <table class="table table-bordered table-striped table-sm mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Nội dung thi</th>
+                        <th>Cuộc thi</th>
                         <th style="width:100px;">Số người</th>
                         <th>Danh sách thí sinh</th>
-                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                            <th style="width:60px;"></th>
-                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($detailsByContent['miss'] as $detail):
-                        $detailId = isset($detail['id']) ? $detail['id'] : null;
-                        $missAtts = ($detailId && isset($detailAttendees[$detailId])) ? $detailAttendees[$detailId] : array();
-                    ?>
+                    <?php foreach ($beautyContestants as $contestData): ?>
                         <tr>
-                            <td><?php echo CHtml::encode(isset($detail['content_name']) ? $detail['content_name'] : '-'); ?></td>
-                            <td class="text-center"><?php echo count($missAtts); ?></td>
+                            <td><?php echo CHtml::encode($contestData['contest_name']); ?></td>
+                            <td class="text-center"><?php echo count($contestData['contestants']); ?></td>
                             <td>
-                                <?php foreach ($missAtts as $idx => $att):
-                                    $name = isset($att['attendee_name']) ? $att['attendee_name'] : (isset($att['staff_name']) ? $att['staff_name'] : '');
-                                ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
+                                <?php foreach ($contestData['contestants'] as $idx => $c): ?>
+                                    <span class="badge bg-primary me-1 mb-1">
+                                        <?php echo CHtml::encode($c['candidate_number']); ?>
+                                    </span>
+                                    <span class="badge bg-light text-dark border me-2 mb-1">
+                                        <?php echo CHtml::encode($c['attendee_name']); ?>
+                                    </span>
                                 <?php endforeach; ?>
                             </td>
-                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                                <td class="text-center">
-                                    <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detailId, 'registration_id' => $model->id)); ?>" id="delete-detail-form-<?php echo $detailId; ?>" style="display:none;"></form>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDetail(<?php echo $detailId; ?>)">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </td>
-                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
