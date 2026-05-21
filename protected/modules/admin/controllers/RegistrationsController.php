@@ -662,6 +662,13 @@ class RegistrationsController extends AdminController
             Yii::app()->end();
         }
 
+        // Fetch sport name if not available
+        $sportName = $team->sport_name;
+        if (empty($sportName) && $team->sport_id) {
+            $sport = Sports::fetchFromApi($team->sport_id);
+            $sportName = $sport ? $sport->name : '';
+        }
+
         $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
         $membersArr = array();
         foreach ($members as $m) {
@@ -679,7 +686,7 @@ class RegistrationsController extends AdminController
                 'team' => array(
                     'id' => $team->id,
                     'sport_id' => $team->sport_id,
-                    'sport_name' => $team->sport_name,
+                    'sport_name' => $sportName,
                     'team_name' => $team->team_name,
                     'name' => $team->name,
                     'is_alliance' => $team->is_alliance,
