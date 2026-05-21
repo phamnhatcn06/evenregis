@@ -30,16 +30,45 @@ class RegistrationsController extends AdminController
 			$model->period_name = $period ? $period->name : '';
 		}
 
-		// Load attendees cho từng registration detail (nghiệp vụ)
-		$detailAttendees = array();
-		foreach ($registrationDetails as $detail) {
-			$detailId = isset($detail['id']) ? $detail['id'] : null;
-			$contentCode = isset($detail['content_code']) ? $detail['content_code'] : '';
-			if ($detailId && ($contentCode === 'competition' || $contentCode === 'competitions')) {
-				$attendees = RegistrationDetailAttendees::getByDetailId($detailId);
-				$detailAttendees[$detailId] = $attendees;
+		// Load competition registrations từ bảng competition_registrations
+		$competitionRegistrations = array();
+		$compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $id), 200)->getData();
+		foreach ($compRegsData as $reg) {
+			$compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
+			if (!$compId) continue;
+
+			if (!isset($competitionRegistrations[$compId])) {
+				$competitionRegistrations[$compId] = array(
+					'competition_id' => $compId,
+					'competition_name' => isset($reg->competition_name) ? $reg->competition_name : (isset($reg['competition_name']) ? $reg['competition_name'] : ''),
+					'attendees' => array(),
+				);
+			}
+
+			// Lấy thông tin attendee
+			$attendeeId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
+			$attendeeName = isset($reg->attendee_name) ? $reg->attendee_name : (isset($reg['attendee_name']) ? $reg['attendee_name'] : '');
+			$positionName = isset($reg->position_name) ? $reg->position_name : (isset($reg['position_name']) ? $reg['position_name'] : '');
+			$divisionName = isset($reg->division_name) ? $reg->division_name : (isset($reg['division_name']) ? $reg['division_name'] : '');
+
+			$competitionRegistrations[$compId]['attendees'][] = array(
+				'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
+				'attendee_id' => $attendeeId,
+				'attendee_name' => $attendeeName,
+				'position_name' => $positionName,
+				'division_name' => $divisionName,
+				'status' => isset($reg->status) ? $reg->status : (isset($reg['status']) ? $reg['status'] : 0),
+			);
+		}
+
+		// Load tên cuộc thi nếu chưa có
+		foreach ($competitionRegistrations as $compId => &$compData) {
+			if (empty($compData['competition_name'])) {
+				$comp = Competitions::fetchFromApi($compId);
+				$compData['competition_name'] = $comp ? $comp->name : '';
 			}
 		}
+		unset($compData);
 
         // Load Sport Teams cho đơn vị
         $sportTeams = array();
