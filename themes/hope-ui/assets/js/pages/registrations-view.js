@@ -643,7 +643,7 @@ var RegistrationView = (function() {
         var rowHtml = '<tr data-competition-id="' + data.competitionId + '">' +
             '<td>' + escapeHtml(data.competitionName) + '</td>' +
             '<td class="text-center">' + (data.attendees ? data.attendees.length : 0) + '</td>' +
-            '<td>' + badgesHtml + '</td>' +
+            '<td>' + listHtml + '</td>' +
         '</tr>';
 
         if (!table) {
