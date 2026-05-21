@@ -1428,6 +1428,241 @@ var RegistrationView = (function() {
             });
     }
 
+    // Edit Competition Registration
+    var editCompAllStaff = [];
+    var editCompSelectedStaff = [];
+    var editCompMaxPerOrg = 0;
+
+    function editCompetitionRegistration(competitionId, competitionName) {
+        document.getElementById('edit_comp_competition_id').value = competitionId;
+        document.getElementById('edit_comp_name').textContent = competitionName;
+
+        // Load competition info
+        fetch(window.BASE_URL + '/admin/registrations/getCompetitionInfo?competition_id=' + competitionId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data) {
+                    editCompMaxPerOrg = data.data.max_per_org || 0;
+                    document.getElementById('edit_comp_max_per_org').value = editCompMaxPerOrg > 0 ? editCompMaxPerOrg : 'Không giới hạn';
+                    document.getElementById('edit_max_count').textContent = editCompMaxPerOrg > 0 ? editCompMaxPerOrg : '∞';
+                }
+            });
+
+        // Load attendees và đánh dấu đã chọn
+        var url = window.BASE_URL + '/admin/registrations/getAttendeesForCompetition?registration_id=' + registrationId + '&competition_id=' + competitionId;
+        fetch(url)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                editCompAllStaff = data.success && data.data ? data.data : [];
+
+                // Load danh sách đã đăng ký
+                return fetch(window.BASE_URL + '/admin/registrations/getCompetitionRegisteredAttendees?registration_id=' + registrationId + '&competition_id=' + competitionId);
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                var registeredIds = [];
+                if (data.success && data.data) {
+                    data.data.forEach(function(item) {
+                        registeredIds.push(parseInt(item.attendee_id));
+                    });
+                }
+
+                // Phân loại available và selected
+                editCompSelectedStaff = [];
+                var availableStaff = [];
+                editCompAllStaff.forEach(function(s) {
+                    if (registeredIds.indexOf(parseInt(s.id)) !== -1) {
+                        editCompSelectedStaff.push(s);
+                    } else {
+                        availableStaff.push(s);
+                    }
+                });
+                editCompAllStaff = availableStaff;
+
+                renderEditCompAvailableStaff();
+                renderEditCompSelectedStaff();
+
+                var modal = new bootstrap.Modal(document.getElementById('editCompetitionModal'));
+                modal.show();
+            });
+    }
+
+    function renderEditCompAvailableStaff() {
+        var list = document.getElementById('edit_available_staff_list');
+        var searchTerm = (document.getElementById('edit_staff_search')?.value || '').toLowerCase();
+
+        var available = editCompAllStaff.filter(function(s) {
+            return editCompSelectedStaff.findIndex(function(sel) { return sel.id == s.id; }) === -1;
+        });
+
+        if (searchTerm) {
+            available = available.filter(function(s) {
+                return s.display.toLowerCase().indexOf(searchTerm) !== -1;
+            });
+        }
+
+        if (available.length === 0) {
+            list.innerHTML = '<div class="text-center text-muted p-3">Không có nhân viên</div>';
+            return;
+        }
+
+        list.innerHTML = '';
+        available.forEach(function(staff) {
+            var item = document.createElement('a');
+            item.href = '#';
+            item.className = 'list-group-item list-group-item-action py-2';
+            item.setAttribute('data-id', staff.id);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>';
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.classList.toggle('active');
+            });
+            list.appendChild(item);
+        });
+    }
+
+    function renderEditCompSelectedStaff() {
+        var list = document.getElementById('edit_selected_staff_list');
+        document.getElementById('edit_selected_count').textContent = editCompSelectedStaff.length;
+
+        // Update hidden inputs
+        var form = document.getElementById('edit-competition-form');
+        form.querySelectorAll('input[name="staff_ids[]"]').forEach(function(el) { el.remove(); });
+        editCompSelectedStaff.forEach(function(staff) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'staff_ids[]';
+            input.value = staff.id;
+            form.appendChild(input);
+        });
+
+        if (editCompSelectedStaff.length === 0) {
+            list.innerHTML = '<div class="text-center text-muted p-3">Chưa chọn nhân viên</div>';
+            return;
+        }
+
+        list.innerHTML = '';
+        editCompSelectedStaff.forEach(function(staff) {
+            var item = document.createElement('a');
+            item.href = '#';
+            item.className = 'list-group-item list-group-item-action py-2';
+            item.setAttribute('data-id', staff.id);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>';
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.classList.toggle('active');
+            });
+            list.appendChild(item);
+        });
+    }
+
+    function bindEditCompetitionEvents() {
+        document.getElementById('edit_staff_search')?.addEventListener('input', function() {
+            renderEditCompAvailableStaff();
+        });
+
+        document.getElementById('edit_btn_add_staff')?.addEventListener('click', function() {
+            var selected = document.querySelectorAll('#edit_available_staff_list .active');
+            selected.forEach(function(el) {
+                var id = el.getAttribute('data-id');
+                var staff = editCompAllStaff.find(function(s) { return s.id == id; });
+                if (staff && editCompSelectedStaff.findIndex(function(s) { return s.id == id; }) === -1) {
+                    if (editCompMaxPerOrg > 0 && editCompSelectedStaff.length >= editCompMaxPerOrg) {
+                        Toast.error('Đã đạt số lượng tối đa: ' + editCompMaxPerOrg);
+                        return;
+                    }
+                    editCompSelectedStaff.push(staff);
+                }
+            });
+            renderEditCompAvailableStaff();
+            renderEditCompSelectedStaff();
+        });
+
+        document.getElementById('edit_btn_add_all_staff')?.addEventListener('click', function() {
+            editCompAllStaff.forEach(function(staff) {
+                if (editCompSelectedStaff.findIndex(function(s) { return s.id == staff.id; }) === -1) {
+                    if (editCompMaxPerOrg > 0 && editCompSelectedStaff.length >= editCompMaxPerOrg) {
+                        return;
+                    }
+                    editCompSelectedStaff.push(staff);
+                }
+            });
+            renderEditCompAvailableStaff();
+            renderEditCompSelectedStaff();
+        });
+
+        document.getElementById('edit_btn_remove_staff')?.addEventListener('click', function() {
+            var selected = document.querySelectorAll('#edit_selected_staff_list .active');
+            selected.forEach(function(el) {
+                var id = el.getAttribute('data-id');
+                editCompSelectedStaff = editCompSelectedStaff.filter(function(s) { return s.id != id; });
+                var staff = editCompAllStaff.find(function(s) { return s.id == id; });
+                if (!staff) {
+                    // Add back to available
+                    var originalStaff = editCompSelectedStaff.concat(editCompAllStaff).find(function(s) { return s.id == id; });
+                    if (originalStaff) editCompAllStaff.push(originalStaff);
+                }
+            });
+            renderEditCompAvailableStaff();
+            renderEditCompSelectedStaff();
+        });
+
+        document.getElementById('edit_btn_remove_all_staff')?.addEventListener('click', function() {
+            editCompAllStaff = editCompAllStaff.concat(editCompSelectedStaff);
+            editCompSelectedStaff = [];
+            renderEditCompAvailableStaff();
+            renderEditCompSelectedStaff();
+        });
+
+        // Form submit
+        var form = document.getElementById('edit-competition-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                if (editCompSelectedStaff.length === 0) {
+                    Toast.error('Vui lòng chọn ít nhất một nhân viên.');
+                    return false;
+                }
+
+                var submitBtn = document.getElementById('btn_submit_edit_competition');
+                var originalHtml = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang cập nhật...';
+
+                var formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+
+                    if (data.success) {
+                        var modalEl = document.getElementById('editCompetitionModal');
+                        if (modalEl) {
+                            var modal = bootstrap.Modal.getInstance(modalEl);
+                            if (modal) modal.hide();
+                        }
+                        Toast.success(data.message || 'Cập nhật thành công!');
+                        location.reload();
+                    } else {
+                        Toast.error(data.error || 'Có lỗi xảy ra.');
+                    }
+                })
+                .catch(function(err) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                    Toast.error('Lỗi kết nối. Vui lòng thử lại.');
+                });
+            });
+        }
+    }
+
     function confirmDeleteTeam(id) {
         Swal.fire({
             title: 'Xóa đội thể thao?',
