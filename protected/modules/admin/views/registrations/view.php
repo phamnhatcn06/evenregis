@@ -428,15 +428,21 @@ foreach ($registrationDetails as $detail) {
                             <td class="text-center"><?php echo count($members); ?></td>
                             <td>
                                 <?php foreach ($members as $idx => $member):
-                                    $name = isset($member->attendee_name) ? $member->attendee_name : (isset($member['attendee_name']) ? $member['attendee_name'] : '');
+                                    $memberName = isset($member->attendee_name) ? $member->attendee_name :
+                                        (isset($member['attendee_name']) ? $member['attendee_name'] :
+                                        (isset($member->name) ? $member->name :
+                                        (isset($member['name']) ? $member['name'] : '')));
                                 ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
+                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($memberName); ?></span>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-                                <td class="text-center">
+                                <td class="text-center text-nowrap">
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editSportTeam(<?php echo $teamId; ?>)" title="Sửa">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
                                     <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamId, 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamId; ?>" style="display:none;"></form>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamId; ?>)">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamId; ?>)" title="Xóa">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
