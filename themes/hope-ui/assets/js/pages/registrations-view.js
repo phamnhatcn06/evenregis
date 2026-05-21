@@ -2642,7 +2642,6 @@ var RegistrationView = (function() {
 
     function updateMissMaxDisplay() {
         var remaining = missMaxPerOrg > 0 ? (missMaxPerOrg - missRegisteredCount - missSelectedAttendees.length) : '∞';
-        var maxDisplay = missMaxPerOrg > 0 ? missMaxPerOrg : '∞';
         document.getElementById('miss_max_count').textContent = remaining;
     }
 
