@@ -438,7 +438,7 @@ foreach ($registrationDetails as $detail) {
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                                 <td class="text-center text-nowrap">
-                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editSportTeam(<?php echo $teamId; ?>)" title="Sửa">
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editSportTeam(<?php echo $teamId; ?>)" title="Sửa">
                                         <i class="fa fa-pencil"></i>
                                     </button>
                                     <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamId, 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamId; ?>" style="display:none;"></form>
