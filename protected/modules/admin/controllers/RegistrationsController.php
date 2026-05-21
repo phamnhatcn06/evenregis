@@ -1141,11 +1141,6 @@ class RegistrationsController extends AdminController
 			'competitionId'   => $competitionId,
 			'competitionName' => $competitionName,
 			'attendees'       => $attendeeList,
-			'debug'           => array(
-				'staffIdsReceived' => $staffIds,
-				'debugErrors'      => $debugErrors,
-				'createdIds'       => $createdIds,
-			),
 		));
 		Yii::app()->end();
 	}
