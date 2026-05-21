@@ -977,12 +977,10 @@ class RegistrationsController extends AdminController
 
 	public function actionGetAttendeesForCompetition($registration_id)
 	{
-		Yii::log("getAttendeesForCompetition: registration_id=$registration_id", 'info');
 		$result = array();
 		$competitionId = isset($_GET['competition_id']) ? $_GET['competition_id'] : null;
 
 		$attendees = Attendees::getByRegistrationId($registration_id);
-		Yii::log("getAttendeesForCompetition: found " . count($attendees) . " attendees", 'info');
 
 		// Lọc theo phòng ban được phép thi nếu có competition_id
 		$allowedDepartments = array();
@@ -998,7 +996,9 @@ class RegistrationsController extends AdminController
 			$fullName = isset($att['full_name']) ? $att['full_name'] : '';
 			$staffCode = isset($att['staff_code']) ? $att['staff_code'] : '';
 			$positionName = isset($att['position_name']) ? $att['position_name'] : '';
-			$departmentCode = isset($att['department_code']) ? $att['department_code'] : '';
+			// Thử lấy department_code từ nhiều field có thể
+			$departmentCode = isset($att['department_code']) ? $att['department_code'] :
+				(isset($att['property_code']) ? $att['property_code'] : '');
 
 			if (!$id) continue;
 
@@ -1012,12 +1012,22 @@ class RegistrationsController extends AdminController
 				'name' => $fullName,
 				'code' => $staffCode,
 				'position' => $positionName,
+				'department_code' => $departmentCode,
 				'display' => $staffCode ? ($staffCode . ' - ' . $fullName) : $fullName,
 			);
 		}
 
 		header('Content-Type: application/json');
-		echo CJSON::encode(array('success' => true, 'data' => $result));
+		echo CJSON::encode(array(
+			'success' => true,
+			'data' => $result,
+			'debug' => array(
+				'competition_id' => $competitionId,
+				'allowed_departments' => $allowedDepartments,
+				'total_attendees' => count($attendees),
+				'filtered_count' => count($result),
+			)
+		));
 		Yii::app()->end();
 	}
 
