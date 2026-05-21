@@ -54,8 +54,6 @@ class SportTeamMembers extends BaseSportTeamMembers
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
         });
-        print_r($data);
-        die;
         return ApiClient::post(ApiEndpoints::SPORT_TEAM_MEMBER_STORE, $data);
     }
 
