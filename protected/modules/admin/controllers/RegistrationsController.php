@@ -912,6 +912,15 @@ class RegistrationsController extends AdminController
 	public function actionGetStaffByProperty($property_id)
 	{
 		$result = array();
+		$competitionId = isset($_GET['competition_id']) ? $_GET['competition_id'] : null;
+
+		$allowedDepartments = array();
+		if ($competitionId) {
+			$competition = Competitions::fetchFromApi($competitionId);
+			if ($competition) {
+				$allowedDepartments = $competition->getAllowedDepartments();
+			}
+		}
 
 		$property = Properties::fetchFromApi($property_id);
 		if ($property && $property->code) {
@@ -923,8 +932,13 @@ class RegistrationsController extends AdminController
 				$divisionName = isset($staff['division_name']) ? $staff['division_name'] : (isset($staff->division_name) ? $staff->division_name : '');
 				$code = isset($staff['code']) ? $staff['code'] : (isset($staff->code) ? $staff->code : '');
 				$startDate = isset($staff['start_date']) ? $staff['start_date'] : (isset($staff->start_date) ? $staff->start_date : '');
+				$departmentCode = isset($staff['department_code']) ? $staff['department_code'] : (isset($staff->department_code) ? $staff->department_code : '');
 
 				if (!$id) continue;
+
+				if (!empty($allowedDepartments) && !in_array($departmentCode, $allowedDepartments)) {
+					continue;
+				}
 
 				$result[] = array(
 					'id' => $id,
