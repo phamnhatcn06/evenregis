@@ -614,6 +614,7 @@ var RegistrationView = (function() {
             hidden.type = 'hidden';
             hidden.name = 'staff_codes[]';
             hidden.value = staff.code;
+            console.log('Adding hidden input - staff:', staff, 'code:', staff.code);
             document.getElementById('add-competition-form').appendChild(hidden);
         });
     }
