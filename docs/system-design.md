@@ -4171,12 +4171,13 @@ CREATE TABLE `alliance_requests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Yêu cầu liên quân giữa các đơn vị';
 
--- 5. Tạo bảng alliance_team_orgs
+-- 5. Tạo bảng alliance_team_orgs (mỗi đơn vị có max_members riêng)
 CREATE TABLE `alliance_team_orgs` (
   `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `team_id`         INT UNSIGNED NOT NULL COMMENT 'sport_teams.id (is_alliance=1)',
   `organization_id` INT UNSIGNED NOT NULL,
   `is_lead`         TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Đơn vị chủ trì',
+  `max_members`     INT UNSIGNED NOT NULL COMMENT 'Số người tối đa từ đơn vị này',
   `joined_at`       INT UNSIGNED,
   `created_at`      INT UNSIGNED,
   PRIMARY KEY (`id`),
@@ -4185,7 +4186,7 @@ CREATE TABLE `alliance_team_orgs` (
   CONSTRAINT `fk_ato_team` FOREIGN KEY (`team_id`) REFERENCES `sport_teams`(`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_ato_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Các đơn vị tham gia đội liên quân';
+  COMMENT='Các đơn vị tham gia đội liên quân - mỗi đơn vị có max_members riêng';
 ```
 
 ### 16.9 User Stories
