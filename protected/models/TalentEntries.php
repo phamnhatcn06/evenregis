@@ -4,9 +4,11 @@ Yii::import('application.models._base.BaseTalentEntries');
 
 class TalentEntries extends BaseTalentEntries
 {
-    const STATUS_PENDING = 0;
-    const STATUS_CONFIRMED = 1;
-    const STATUS_CANCELLED = 2;
+    const STATUS_DRAFT = 1;
+    const STATUS_SUBMITTED = 2;
+    const STATUS_APPROVED = 3;
+    const STATUS_REJECTED = 4;
+    const STATUS_PENDING = 5;
 
     public $property_name;
     public $category_name;

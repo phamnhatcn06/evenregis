@@ -2068,7 +2068,7 @@ class RegistrationsController extends AdminController
 		$entry->music_path = $musicPath;
 		$entry->video_path = $videoPath;
 		$entry->alliance_property_ids = !empty($alliancePropertyIds) ? implode(',', $alliancePropertyIds) : null;
-
+		
 		$result = $entry->storeViaApi();
 		if (!$result['success']) {
 			echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể tạo tiết mục.'));

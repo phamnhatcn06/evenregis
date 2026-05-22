@@ -55,29 +55,30 @@ abstract class BaseTalentEntries extends GxActiveRecord {
 		return 'title';
 	}
 
-	  public function rules() {
-        return array(
-            array('show_id, category_id, property_id, title', 'required'),
-            array('duration_seconds, performance_order, status, final_rank, is_alliance_team', 'numerical', 'integerOnly'=>true),
-            array('final_score', 'numerical'),
-            array('show_id, category_id, property_id, director_phone, approved_by', 'length', 'max'=>20),
-            array('title, award, director, origin', 'length', 'max'=>255),
-            array('music_path, video_path', 'length', 'max'=>500),
-            array('description, note, document, content, submitted_at, approved_at, created_at, updated_at, deleted_at', 'safe'),
-            array('description, duration_seconds, music_path, video_path, performance_order, status, final_score, final_rank, award, note, document, content, director, director_phone, origin, is_alliance_team, submitted_at, approved_by, approved_at, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-            array('id, show_id, category_id, property_id, title, description, duration_seconds, music_path, video_path, performance_order, status, final_score, final_rank, award, note, document, content, director, director_phone, origin, is_alliance_team, submitted_at, approved_by, approved_at, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
-        );
-    }
+	public function rules() {
+		return array(
+			array('show_id, category_id, property_id, title', 'required'),
+			array('duration_seconds, performance_order, final_rank', 'numerical', 'integerOnly'=>true),
+			array('final_score', 'numerical'),
+			array('show_id, category_id, property_id, approved_by', 'length', 'max'=>20),
+			array('title, award', 'length', 'max'=>255),
+			array('music_path, video_path', 'length', 'max'=>500),
+			array('status', 'length', 'max'=>9),
+			array('description, note, submitted_at, approved_at, created_at, updated_at, deleted_at', 'safe'),
+			array('description, duration_seconds, music_path, video_path, performance_order, status, final_score, final_rank, award, note, submitted_at, approved_by, approved_at, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, show_id, category_id, property_id, title, description, duration_seconds, music_path, video_path, performance_order, status, final_score, final_rank, award, note, submitted_at, approved_by, approved_at, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
+		);
+	}
 
-	   public function relations() {
-        return array(
-            'category' => array(self::BELONGS_TO, 'TalentCategories', 'category_id'),
-            'property' => array(self::BELONGS_TO, 'Properties', 'property_id'),
-            'show' => array(self::BELONGS_TO, 'TalentShows', 'show_id'),
-            'talentEntryMembers' => array(self::HAS_MANY, 'TalentEntryMembers', 'entry_id'),
-            'talentScores' => array(self::HAS_MANY, 'TalentScores', 'entry_id'),
-        );
-    }
+	public function relations() {
+		return array(
+			'category' => array(self::BELONGS_TO, 'TalentCategories', 'category_id'),
+			'property' => array(self::BELONGS_TO, 'Properties', 'property_id'),
+			'show' => array(self::BELONGS_TO, 'TalentShows', 'show_id'),
+			'talentEntryMembers' => array(self::HAS_MANY, 'TalentEntryMembers', 'entry_id'),
+			'talentScores' => array(self::HAS_MANY, 'TalentScores', 'entry_id'),
+		);
+	}
 
 	public function pivotModels() {
 		return array(
