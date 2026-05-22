@@ -634,16 +634,24 @@ class RegistrationsController extends AdminController
 		}
 
 		// Add new ones
+		$errors = array();
 		if (!empty($targetOrgIds)) {
 			foreach ($targetOrgIds as $targetId) {
 				if (!in_array($targetId, $existingTargetIds)) {
-					$this->createAllianceRequest($eventId, $requesterOrgId, $targetId, $eventContentId);
+					$result = $this->createAllianceRequest($eventId, $requesterOrgId, $targetId, $eventContentId);
+					if ($result && !$result['success']) {
+						$errors[] = $result;
+					}
 				}
 			}
 		}
 
 		header('Content-Type: application/json');
-		echo CJSON::encode(array('success' => true));
+		if (!empty($errors)) {
+			echo CJSON::encode(array('success' => false, 'errors' => $errors));
+		} else {
+			echo CJSON::encode(array('success' => true));
+		}
 		Yii::app()->end();
 	}
 
