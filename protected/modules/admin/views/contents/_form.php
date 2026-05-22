@@ -1,3 +1,9 @@
+<?php
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/contents-form.js',
+    CClientScript::POS_END
+);
+?>
 <div class="form-wrap">
     <?php $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
         'id' => 'contents-form',
