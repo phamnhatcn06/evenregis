@@ -3111,21 +3111,45 @@ var RegistrationView = (function() {
                 allianceSelect.innerHTML = '';
                 modalList.innerHTML = '';
 
+                var selectedIds = [];
+                var selectedTexts = [];
+
                 if (data.success && data.data && data.data.length > 0) {
                     data.data.forEach(function(item) {
+                        var isSelected = item.is_selected == 1;
+                        var escapedName = escapeHtml(item.code + ' - ' + item.name);
+
                         var opt = document.createElement('option');
                         opt.value = item.id;
                         opt.setAttribute('data-code', item.code);
                         opt.textContent = item.code + ' - ' + item.name;
+                        if (isSelected) {
+                            opt.selected = true;
+                            selectedIds.push(item.id);
+                            selectedTexts.push(escapedName);
+                        }
                         allianceSelect.appendChild(opt);
 
                         var div = document.createElement('div');
                         div.className = 'form-check mb-2';
-                        var escapedName = escapeHtml(item.code + ' - ' + item.name);
-                        div.innerHTML = '<input class="form-check-input talent-alliance-modal-cb" type="checkbox" value="'+item.id+'" data-name="'+escapedName+'" data-code="'+escapeHtml(item.code)+'" id="talent_alliance_'+item.id+'">' +
+                        var checked = isSelected ? 'checked' : '';
+                        div.innerHTML = '<input class="form-check-input talent-alliance-modal-cb" type="checkbox" value="'+item.id+'" data-name="'+escapedName+'" data-code="'+escapeHtml(item.code)+'" id="talent_alliance_'+item.id+'" '+checked+'>' +
                                         '<label class="form-check-label" for="talent_alliance_'+item.id+'">' + escapedName + '</label>';
                         modalList.appendChild(div);
                     });
+
+                    // Hiển thị badges cho các đơn vị đã chọn
+                    var displayText = document.getElementById('talent_alliance_selected_texts');
+                    if (displayText && selectedIds.length > 0) {
+                        displayText.innerHTML = '';
+                        for (var i = 0; i < selectedIds.length; i++) {
+                            var badge = document.createElement('span');
+                            badge.className = 'badge bg-primary me-1 mb-1 p-2 border';
+                            badge.style.fontSize = '12px';
+                            badge.innerHTML = selectedTexts[i] + ' <i class="fa fa-times ms-1 text-white" style="cursor:pointer;" onclick="RegistrationView.removeTalentAllianceProperty(\'' + selectedIds[i] + '\')" title="Huỷ"></i>';
+                            displayText.appendChild(badge);
+                        }
+                    }
                 } else {
                     modalList.innerHTML = '<p class="text-muted mb-0">Không có đơn vị nào để liên quân.</p>';
                 }
