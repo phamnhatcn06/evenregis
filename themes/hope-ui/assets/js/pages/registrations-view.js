@@ -3016,9 +3016,13 @@ var RegistrationView = (function() {
                 var talentCard = document.getElementById('talent-registration-card');
                 var talentEventContentId = talentCard ? talentCard.getAttribute('data-event-content-id') : '';
 
+                console.log('Talent Alliance Save - event_content_id:', talentEventContentId);
+
                 var formData = new FormData();
                 formData.append('registration_id', registrationId);
-                formData.append('event_content_id', talentEventContentId);
+                if (talentEventContentId) {
+                    formData.append('event_content_id', talentEventContentId);
+                }
                 selectedIds.forEach(function(id) {
                     formData.append('target_org_ids[]', id);
                 });
