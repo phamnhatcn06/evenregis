@@ -1331,6 +1331,7 @@ var RegistrationView = (function() {
 
         var formData = new FormData();
         formData.append('registration_id', registrationId);
+        formData.append('content_type', 'sports');
         remainingIds.forEach(function(rid) {
             formData.append('target_org_ids[]', rid);
         });
