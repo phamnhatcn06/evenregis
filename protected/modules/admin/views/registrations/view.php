@@ -196,12 +196,15 @@ $contentIdMap = array('sports' => null, 'talent' => null, 'competition' => null,
 foreach ($eventContents as $ec) {
     $code = isset($ec['content_code']) ? $ec['content_code'] : (isset($ec['code']) ? $ec['code'] : '');
     $ecId = isset($ec['id']) ? $ec['id'] : null;
+    // Normalize content codes
     if ($code === 'sport') $code = 'sports';
     if ($code === 'competitions') $code = 'competition';
-    if (isset($contentIdMap[$code])) {
+    if (isset($contentIdMap[$code]) && $ecId) {
         $contentIdMap[$code] = $ecId;
     }
 }
+// Debug: log to see what we got
+Yii::log("EventContents for event {$model->event_id}: " . json_encode($eventContents) . " => contentIdMap: " . json_encode($contentIdMap), 'info', 'application.registration');
 ?>
 
 <div class="card mb-3" id="attendees-card">
