@@ -3146,7 +3146,10 @@ var RegistrationView = (function() {
         var modalList = document.getElementById('talent_alliance_modal_list');
         if (!allianceSelect || !modalList) return;
 
-        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId + '&content_type=talent')
+        var talentCard = document.getElementById('talent-registration-card');
+        var talentEventContentId = talentCard ? talentCard.getAttribute('data-event-content-id') : '';
+
+        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId + '&event_content_id=' + talentEventContentId)
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 allianceSelect.innerHTML = '';
