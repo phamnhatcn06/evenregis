@@ -207,19 +207,14 @@ foreach ($eventContents as $ec) {
     // Normalize content codes
     if ($code === 'sport') $code = 'sports';
     if ($code === 'competitions') $code = 'competition';
-    if ($code === 'talent_show' || $code === 'talent-show' || $code === 'talents') $code = 'talent';
-    if ($code === 'beauty' || $code === 'beauty_contest' || $code === 'beauty_contests') $code = 'miss';
-    if (isset($contentIdMap[$code]) && $ecId) {
+    if ($code === 'talents') $code = 'talent';
+    if ($code === 'beauty_contests') $code = 'miss';
+    // Gán vào map
+    if (array_key_exists($code, $contentIdMap) && $ecId) {
         $contentIdMap[$code] = $ecId;
     }
 }
 ?>
-<!-- DEBUG -->
-<div class="alert alert-info small mb-3">
-<strong>DEBUG:</strong>
-<pre style="font-size:11px;"><?php print_r($eventContents); ?></pre>
-<strong>ContentIdMap:</strong> <?php echo json_encode($contentIdMap); ?>
-</div>
 
 <div class="card mb-3" id="attendees-card">
     <div class="card-header d-flex justify-content-between align-items-center">
