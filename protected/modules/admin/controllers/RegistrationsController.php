@@ -2058,7 +2058,7 @@ class RegistrationsController extends AdminController
 		$entry->category_id = $categoryId;
 		$entry->title = $title;
 		$entry->duration_seconds = $duration ? ($duration * 60) : null;
-		$entry->status = TalentEntries::STATUS_PENDING;
+		$entry->status = TalentEntries::STATUS_DRAFT;
 		$entry->note = $note;
 		$entry->description = $description;
 		$entry->content = $content;
