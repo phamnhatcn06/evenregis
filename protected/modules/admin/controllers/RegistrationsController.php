@@ -2056,6 +2056,7 @@ class RegistrationsController extends AdminController
 		// Tạo talent entry
 		$entry = new TalentEntries;
 		$entry->registration_id = $registrationId;
+		$entry->property_id = $propertyId;
 		$entry->category_id = $categoryId;
 		$entry->title = $title;
 		$entry->duration_seconds = $duration ? ($duration * 60) : null;
