@@ -632,7 +632,7 @@ foreach ($registrationDetails as $detail) {
         </div>
         <?php endif; ?>
 
-        <?php if (empty($detailsByContent['talent'])): ?>
+        <?php if (empty($talentEntries)): ?>
             <p class="text-muted mb-0">Chưa đăng ký tiết mục văn nghệ nào.</p>
         <?php else: ?>
             <table class="table table-bordered table-striped table-sm mb-0">
@@ -648,25 +648,27 @@ foreach ($registrationDetails as $detail) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($detailsByContent['talent'] as $detail):
-                        $detailId = isset($detail['id']) ? $detail['id'] : null;
-                        $talentAtts = ($detailId && isset($detailAttendees[$detailId])) ? $detailAttendees[$detailId] : array();
+                    <?php foreach ($talentEntries as $entry):
+                        $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+                        $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
+                        $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
+                        $members = ($entryId && isset($talentEntryMembers[$entryId])) ? $talentEntryMembers[$entryId] : array();
                     ?>
                         <tr>
-                            <td><?php echo CHtml::encode(isset($detail['content_name']) ? $detail['content_name'] : '-'); ?></td>
-                            <td><?php echo CHtml::encode(isset($detail['category_name']) ? $detail['category_name'] : '-'); ?></td>
-                            <td class="text-center"><?php echo count($talentAtts); ?></td>
+                            <td><?php echo CHtml::encode($entryTitle); ?></td>
+                            <td><?php echo CHtml::encode($categoryName); ?></td>
+                            <td class="text-center"><?php echo count($members); ?></td>
                             <td>
-                                <?php foreach ($talentAtts as $idx => $att):
-                                    $name = isset($att['attendee_name']) ? $att['attendee_name'] : (isset($att['staff_name']) ? $att['staff_name'] : '');
+                                <?php foreach ($members as $idx => $member):
+                                    $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
                                 ?>
                                     <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
                                 <td class="text-center">
-                                    <form method="post" action="<?php echo $this->createUrl('deleteDetail', array('id' => $detailId, 'registration_id' => $model->id)); ?>" id="delete-detail-form-<?php echo $detailId; ?>" style="display:none;"></form>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteDetail(<?php echo $detailId; ?>)">
+                                    <form method="post" action="<?php echo $this->createUrl('deleteTalentEntry', array('id' => $entryId, 'registration_id' => $model->id)); ?>" id="delete-talent-form-<?php echo $entryId; ?>" style="display:none;"></form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTalent(<?php echo $entryId; ?>)">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
