@@ -104,19 +104,23 @@ class TalentEntries extends BaseTalentEntries
     public static function getStatusLabel($status)
     {
         $labels = array(
-            self::STATUS_PENDING => '<span class="badge bg-warning text-dark">Chờ duyệt</span>',
-            self::STATUS_CONFIRMED => '<span class="badge bg-success">Đã xác nhận</span>',
-            self::STATUS_CANCELLED => '<span class="badge bg-danger">Đã hủy</span>',
+            self::STATUS_DRAFT => '<span class="badge bg-secondary">Nháp</span>',
+            self::STATUS_SUBMITTED => '<span class="badge bg-info">Đã nộp</span>',
+            self::STATUS_APPROVED => '<span class="badge bg-success">Đã duyệt</span>',
+            self::STATUS_REJECTED => '<span class="badge bg-danger">Từ chối</span>',
+            self::STATUS_PENDING => '<span class="badge bg-warning text-dark">Chờ xử lý</span>',
         );
-        return isset($labels[$status]) ? $labels[$status] : $status;
+        return isset($labels[$status]) ? $labels[$status] : '<span class="badge bg-secondary">Không xác định</span>';
     }
 
     public static function getStatusOptions()
     {
         return array(
-            self::STATUS_PENDING => 'Chờ duyệt',
-            self::STATUS_CONFIRMED => 'Đã xác nhận',
-            self::STATUS_CANCELLED => 'Đã hủy',
+            self::STATUS_DRAFT => 'Nháp',
+            self::STATUS_SUBMITTED => 'Đã nộp',
+            self::STATUS_APPROVED => 'Đã duyệt',
+            self::STATUS_REJECTED => 'Từ chối',
+            self::STATUS_PENDING => 'Chờ xử lý',
         );
     }
 }
