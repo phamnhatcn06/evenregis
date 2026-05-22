@@ -3076,15 +3076,18 @@ var RegistrationView = (function() {
     }
 
     function resetTalentModal() {
-        var categorySelect = document.getElementById('talent_category_id');
         document.getElementById('add-talent-form').reset();
-        categorySelect.innerHTML = '<option value="">-- Đang tải... --</option>';
         talentAllAttendees = [];
         talentSelectedAttendees = [];
-        hideTalentDualListbox();
         removeTalentHiddenInputs();
 
-        // Reset alliance
+        // Reset category select outside
+        var categorySelectMain = document.getElementById('talent_category_select_main');
+        if (categorySelectMain) categorySelectMain.value = '';
+        var btnOpenModal = document.getElementById('btn_open_talent_modal');
+        if (btnOpenModal) btnOpenModal.disabled = true;
+
+        // Reset alliance display
         var allianceDisplay = document.getElementById('talent_alliance_selected_texts');
         if (allianceDisplay) allianceDisplay.innerHTML = '';
         var allianceSelect = document.getElementById('talent_alliance_property');
@@ -3092,23 +3095,8 @@ var RegistrationView = (function() {
             Array.from(allianceSelect.options).forEach(function(opt) { opt.selected = false; });
         }
 
-        fetch(window.BASE_URL + '/admin/registrations/getTalentCategories?event_id=' + eventId)
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                categorySelect.innerHTML = '<option value="">-- Chọn thể loại --</option>';
-                if (data.success && data.data && data.data.length > 0) {
-                    data.data.forEach(function(item) {
-                        var opt = document.createElement('option');
-                        opt.value = item.id;
-                        opt.textContent = item.name;
-                        categorySelect.appendChild(opt);
-                    });
-                } else {
-                    categorySelect.innerHTML = '<option value="">-- Không có thể loại nào --</option>';
-                }
-            });
-
-        // Load alliance properties for talent
+        // Reload categories và alliance
+        loadTalentCategoriesMain();
         loadTalentAllianceProperties();
     }
 
