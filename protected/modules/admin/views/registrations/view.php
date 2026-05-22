@@ -189,6 +189,19 @@ foreach ($transportsData as $t) {
     $tName = isset($t['name']) ? $t['name'] : (isset($t->name) ? $t->name : '');
     if ($tId) $transports[$tId] = $tName;
 }
+
+// Load event contents để lấy event_content_id cho từng loại nội dung
+$eventContents = EventContents::getByEventId($model->event_id);
+$contentIdMap = array('sports' => null, 'talent' => null, 'competition' => null, 'miss' => null);
+foreach ($eventContents as $ec) {
+    $code = isset($ec['content_code']) ? $ec['content_code'] : (isset($ec['code']) ? $ec['code'] : '');
+    $ecId = isset($ec['id']) ? $ec['id'] : null;
+    if ($code === 'sport') $code = 'sports';
+    if ($code === 'competitions') $code = 'competition';
+    if (isset($contentIdMap[$code])) {
+        $contentIdMap[$code] = $ecId;
+    }
+}
 ?>
 
 <div class="card mb-3" id="attendees-card">
