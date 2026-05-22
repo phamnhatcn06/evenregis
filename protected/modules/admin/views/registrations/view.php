@@ -575,15 +575,37 @@ foreach ($registrationDetails as $detail) {
 
 <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
 <div class="card mb-3" id="talent-registration-card">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <div class="card-header bg-white">
         <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
-        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
-        <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addTalentModal">
-            <i class="fa fa-plus me-1"></i>Đăng ký
-        </button>
-        <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+        <!-- Form chọn liên quân và thể loại -->
+        <div class="row mb-3 g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label mb-1">Đơn vị liên quân</label>
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#talentAlliancePropertyModal">
+                        <i class="fa fa-handshake-o me-1"></i>Thêm đơn vị liên quân
+                    </button>
+                    <div id="talent_alliance_selected_texts" class="mt-2 small text-primary fw-bold"></div>
+                </div>
+                <select class="d-none" id="talent_alliance_property" name="alliance_property_ids[]" multiple></select>
+                <small class="text-muted mt-1 d-block">Chọn đơn vị cùng biểu diễn (nếu có)</small>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label mb-1">Thể loại <span class="text-danger">*</span></label>
+                <select class="form-select" id="talent_category_select_main">
+                    <option value="">-- Chọn thể loại --</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-sm btn-primary text-white" id="btn_open_talent_modal" disabled>
+                    <i class="fa fa-users me-1"></i>Chọn người & Đăng ký
+                </button>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php if (empty($detailsByContent['talent'])): ?>
             <p class="text-muted mb-0">Chưa đăng ký tiết mục văn nghệ nào.</p>
