@@ -89,7 +89,10 @@ var RegistrationView = (function() {
         var allianceSelect = document.getElementById('sport_alliance_property');
         if (!allianceSelect) return;
 
-        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId + '&content_type=sports')
+        var sportsCard = document.getElementById('sports-registration-card');
+        var sportsEventContentId = sportsCard ? sportsCard.getAttribute('data-event-content-id') : '';
+
+        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId + '&event_content_id=' + sportsEventContentId)
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 allianceSelect.innerHTML = '';
