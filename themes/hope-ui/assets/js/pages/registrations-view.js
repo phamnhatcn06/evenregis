@@ -3183,6 +3183,23 @@ var RegistrationView = (function() {
     }
 
     function removeTalentAllianceProperty(id) {
+        Swal.fire({
+            title: 'Xác nhận',
+            text: 'Bạn có chắc muốn xóa đơn vị liên quân này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                doRemoveTalentAllianceProperty(id);
+            }
+        });
+    }
+
+    function doRemoveTalentAllianceProperty(id) {
         var cb = document.getElementById('talent_alliance_' + id);
         if (cb) cb.checked = false;
 
@@ -3193,6 +3210,7 @@ var RegistrationView = (function() {
             });
         }
 
+        // Xóa badge
         var displayText = document.getElementById('talent_alliance_selected_texts');
         if (displayText) {
             var badges = displayText.querySelectorAll('span.badge');
@@ -3206,6 +3224,35 @@ var RegistrationView = (function() {
                 }
             });
         }
+
+        // Lưu danh sách còn lại vào server
+        var checkboxes = document.querySelectorAll('.talent-alliance-modal-cb');
+        var remainingIds = [];
+        checkboxes.forEach(function(cbEl) {
+            if (cbEl.checked) remainingIds.push(cbEl.value);
+        });
+
+        var formData = new FormData();
+        formData.append('registration_id', registrationId);
+        remainingIds.forEach(function(rid) {
+            formData.append('target_org_ids[]', rid);
+        });
+
+        fetch(window.BASE_URL + '/admin/registrations/saveAllianceProperties', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.success) {
+                Toast.success('Đã xóa đơn vị liên quân.');
+            } else {
+                Toast.error(data.error || 'Có lỗi xảy ra.');
+            }
+        })
+        .catch(function() {
+            Toast.error('Lỗi kết nối.');
+        });
     }
 
     function loadAttendeesForTalent() {
