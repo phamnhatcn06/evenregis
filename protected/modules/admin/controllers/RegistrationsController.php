@@ -1066,6 +1066,23 @@ class RegistrationsController extends AdminController
 		}
 	}
 
+	public function actionDeleteTalentEntry($id, $registration_id)
+	{
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$result = TalentEntries::deleteViaApi($id);
+
+			if ($result['success']) {
+				Yii::app()->user->setFlash('success', 'Xóa tiết mục văn nghệ thành công.');
+			} else {
+				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể xóa.');
+			}
+
+			$this->redirect(array('view', 'id' => $registration_id));
+		} else {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+	}
+
 	public function actionGetOrganizations()
 	{
 		$user = AuthHandler::getUser();
