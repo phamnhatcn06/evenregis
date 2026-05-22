@@ -215,8 +215,6 @@ foreach ($eventContents as $ec) {
     }
 }
 ?>
-<!-- DEBUG: Xóa sau khi test xong -->
-<div class="alert alert-warning small mb-2">ContentIdMap: <?php echo json_encode($contentIdMap); ?></div>
 
 <div class="card mb-3" id="attendees-card">
     <div class="card-header d-flex justify-content-between align-items-center">
