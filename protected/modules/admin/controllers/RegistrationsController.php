@@ -2039,6 +2039,11 @@ class RegistrationsController extends AdminController
 		$attendeeIds = Yii::app()->getRequest()->getPost('attendee_ids', array());
 		$alliancePropertyIds = Yii::app()->getRequest()->getPost('alliance_property_ids', array());
 		$note = Yii::app()->getRequest()->getPost('note', '');
+		$description = Yii::app()->getRequest()->getPost('description', '');
+		$content = Yii::app()->getRequest()->getPost('content', '');
+		$director = Yii::app()->getRequest()->getPost('director', '');
+		$directorPhone = Yii::app()->getRequest()->getPost('director_phone', '');
+		$origin = Yii::app()->getRequest()->getPost('origin', '');
 
 		if (empty($attendeeIds)) {
 			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một người biểu diễn.'));
@@ -2050,8 +2055,13 @@ class RegistrationsController extends AdminController
 		$entry->registration_id = $registrationId;
 		$entry->category_id = $categoryId;
 		$entry->title = $title;
-		$entry->duration = $duration;
+		$entry->duration_seconds = $duration ? ($duration * 60) : null;
 		$entry->note = $note;
+		$entry->description = $description;
+		$entry->content = $content;
+		$entry->director = $director;
+		$entry->director_phone = $directorPhone;
+		$entry->origin = $origin;
 		$entry->alliance_property_ids = !empty($alliancePropertyIds) ? implode(',', $alliancePropertyIds) : null;
 
 		$result = $entry->storeViaApi();
