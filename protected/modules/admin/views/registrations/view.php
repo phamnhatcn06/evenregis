@@ -587,7 +587,7 @@ foreach ($registrationDetails as $detail) {
 </div>
 
 <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
-<div class="card mb-3" id="talent-registration-card">
+<div class="card mb-3" id="talent-registration-card" data-event-content-id="<?php echo $contentIdMap['talent']; ?>">
     <div class="card-header bg-white">
         <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
     </div>
