@@ -70,7 +70,15 @@ class AllianceRequests extends BaseAllianceRequests
 			'requested_at' => date('Y-m-d H:i:s'),
 			'note' => $this->note,
 		);
-		return ApiClient::post(ApiEndpoints::ALLIANCE_REQUEST_STORE, $data);
+		$result = ApiClient::post(ApiEndpoints::ALLIANCE_REQUEST_STORE, $data);
+
+		// Check nested error response
+		if ($result['success'] && isset($result['data']['code']) && $result['data']['code'] >= 400) {
+			$result['success'] = false;
+			$result['error'] = isset($result['data']['message']) ? $result['data']['message'] : 'API error';
+		}
+
+		return $result;
 	}
 
 	public function updateViaApi()
