@@ -1066,7 +1066,10 @@ var RegistrationView = (function() {
 
         container.innerHTML = '<div class="text-muted small">Đang tải...</div>';
 
-        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId)
+        var sportsCard = document.getElementById('sports-registration-card');
+        var sportsEventContentId = sportsCard ? sportsCard.getAttribute('data-event-content-id') : '';
+
+        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId + '&event_content_id=' + sportsEventContentId)
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success && data.data && data.data.length > 0) {
