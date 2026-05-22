@@ -365,7 +365,7 @@ foreach ($registrationDetails as $detail) {
 ?>
 
 <!-- 1. ĐĂNG KÝ THI ĐẤU THỂ THAO -->
-<div class="card mb-3" id="sports-registration-card">
+<div class="card mb-3" id="sports-registration-card" data-event-content-id="<?php echo $contentIdMap['sports']; ?>">
     <div class="card-header bg-white">
         <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao</h5>
     </div>
