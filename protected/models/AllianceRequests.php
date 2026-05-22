@@ -70,6 +70,8 @@ class AllianceRequests extends BaseAllianceRequests
 			'requested_at' => date('Y-m-d H:i:s'),
 			'note' => $this->note,
 		);
+		print_r(json_encode($data));
+		die;
 		$result = ApiClient::post(ApiEndpoints::ALLIANCE_REQUEST_STORE, $data);
 
 		// Check nested error response

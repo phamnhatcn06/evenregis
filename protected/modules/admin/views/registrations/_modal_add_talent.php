@@ -26,6 +26,26 @@
                                 <input type="number" class="form-control" name="duration" id="talent_duration" min="1" max="30" placeholder="VD: 5">
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">Nguồn gốc/Xuất xứ</label>
+                                <input type="text" class="form-control" name="origin" id="talent_origin" placeholder="VD: Dân ca Bắc Bộ...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Đạo diễn/Biên đạo</label>
+                                <input type="text" class="form-control" name="director" id="talent_director" placeholder="Họ tên người phụ trách...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">SĐT đạo diễn</label>
+                                <input type="text" class="form-control" name="director_phone" id="talent_director_phone" placeholder="Số điện thoại...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mô tả tiết mục</label>
+                                <textarea class="form-control" name="description" id="talent_description" rows="2" placeholder="Mô tả ngắn về tiết mục..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nội dung chi tiết</label>
+                                <textarea class="form-control" name="content" id="talent_content" rows="2" placeholder="Nội dung chi tiết, kịch bản..."></textarea>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Ghi chú</label>
                                 <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
                             </div>
