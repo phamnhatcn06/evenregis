@@ -3017,6 +3017,8 @@ var RegistrationView = (function() {
                 var talentEventContentId = talentCard ? talentCard.getAttribute('data-event-content-id') : '';
 
                 console.log('Talent Alliance Save - event_content_id:', talentEventContentId);
+                console.log('Talent card element:', talentCard);
+                console.log('Talent card outerHTML:', talentCard ? talentCard.outerHTML.substring(0, 200) : 'not found');
 
                 var formData = new FormData();
                 formData.append('registration_id', registrationId);
