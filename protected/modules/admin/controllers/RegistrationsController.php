@@ -496,12 +496,9 @@ class RegistrationsController extends AdminController
 
 		$result = $alliance->storeViaApi();
 		// Debug: log kết quả
-		Yii::log("Alliance storeViaApi - data sent: " . json_encode(array(
-			'event_id' => $eventId,
-			'requester_org_id' => $requesterOrgId,
-			'target_org_id' => $targetOrgId,
-			'event_content_id' => $eventContentId,
-		)) . " - result: " . json_encode($result), 'info', 'application.alliance');
+		Yii::log("Alliance storeViaApi - event_content_id=$eventContentId, result: " . json_encode($result), 'info', 'application.alliance');
+
+		return $result;
 	}
 
 	public function actionGetRelationProperties($property_id)
