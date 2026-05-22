@@ -537,19 +537,24 @@ class RegistrationsController extends AdminController
 
 	public function actionGetAllianceProperties($registration_id)
 	{
+		$contentType = isset($_GET['content_type']) ? $_GET['content_type'] : 'sports';
 		$registration = Registrations::fetchFromApi($registration_id);
 		$result = array();
 
 		if ($registration && $registration->property_id) {
 			$property = Properties::fetchFromApi($registration->property_id);
 			if ($property && $property->region_id) {
-                // Get existing alliance requests
+                // Get existing alliance requests filtered by content_type (stored in note)
                 $existingRequests = AllianceRequests::getApiDataProvider(array(
                     'event_id' => $registration->event_id,
                     'requester_org_id' => $registration->property_id,
                 ), 100)->getData();
                 $existingTargetIds = array();
                 foreach ($existingRequests as $req) {
+                    $note = isset($req['note']) ? $req['note'] : (isset($req->note) ? $req->note : '');
+                    // Chỉ lấy những request có note trùng với content_type
+                    if ($note !== $contentType) continue;
+
                     $targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
                     if ($targetId) {
                         $existingTargetIds[] = $targetId;

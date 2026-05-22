@@ -77,7 +77,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Property Name\",\n    \"smile_code\": \"S01\",\n    \"active_date\": \"2026-01-01\",\n    \"status\": 1,\n    \"prefix\": \"PR\",\n    \"region_id\": 1,\n    \"code\": \"PROP01\"\n}",
+                            "raw": "{\n    \"name\": \"Property Name\",\n    \"smile_code\": \"S01\",\n    \"active_date\": \"2026-01-01\",\n    \"status\": 1,\n    \"prefix\": \"PR\",\n    \"region_id\": 1,\n    \"code\": \"PROP01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -142,7 +142,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Property Name\",\n    \"smile_code\": \"S01\",\n    \"active_date\": \"2026-01-01\",\n    \"status\": 1,\n    \"prefix\": \"PR\",\n    \"region_id\": 1,\n    \"code\": \"PROP01\"\n}",
+                            "raw": "{\n    \"name\": \"Property Name\",\n    \"smile_code\": \"S01\",\n    \"active_date\": \"2026-01-01\",\n    \"status\": 1,\n    \"prefix\": \"PR\",\n    \"region_id\": 1,\n    \"code\": \"PROP01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -186,6 +186,15 @@
                                 "destroy",
                                 "1"
                             ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
                         }
                     },
                     "response": []
@@ -278,7 +287,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Miền Bắc\",\n    \"description\": \"Khu vực phía Bắc\",\n    \"status\": 1,\n    \"code\": \"PROP01\",\n    \"content_id\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Miền Bắc\",\n    \"description\": \"Khu vực phía Bắc\",\n    \"status\": 1,\n    \"code\": \"PROP01\",\n    \"content_id\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -333,7 +342,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Miền Bắc Cập Nhật\",\n    \"description\": \"Mô tả mới\",\n    \"status\": 1,\n    \"code\": \"PROP01\",\n    \"content_id\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Miền Bắc Cập Nhật\",\n    \"description\": \"Mô tả mới\",\n    \"status\": 1,\n    \"code\": \"PROP01\",\n    \"content_id\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -373,6 +382,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -456,7 +474,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"property_code\": \"PROP01\",\n    \"division_code\": \"DIV01\",\n    \"name\": \"Department Name\",\n    \"unique_code\": \"PROP01-DIV01-DEPT01\",\n    \"status\": 1,\n    \"total_member\": 10,\n    \"notes\": \"Some notes\",\n    \"code\": \"DEPT01\"\n}",
+                            "raw": "{\n    \"property_code\": \"PROP01\",\n    \"division_code\": \"DIV01\",\n    \"name\": \"Department Name\",\n    \"unique_code\": \"PROP01-DIV01-DEPT01\",\n    \"status\": 1,\n    \"total_member\": 10,\n    \"notes\": \"Some notes\",\n    \"code\": \"DEPT01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -521,7 +539,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"property_code\": \"PROP01\",\n    \"division_code\": \"DIV01\",\n    \"name\": \"Department Name\",\n    \"unique_code\": \"PROP01-DIV01-DEPT01\",\n    \"status\": 1,\n    \"total_member\": 10,\n    \"notes\": \"Some notes\",\n    \"code\": \"DEPT01\"\n}",
+                            "raw": "{\n    \"property_code\": \"PROP01\",\n    \"division_code\": \"DIV01\",\n    \"name\": \"Department Name\",\n    \"unique_code\": \"PROP01-DIV01-DEPT01\",\n    \"status\": 1,\n    \"total_member\": 10,\n    \"notes\": \"Some notes\",\n    \"code\": \"DEPT01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -565,6 +583,15 @@
                                 "destroy",
                                 "1"
                             ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
                         }
                     },
                     "response": []
@@ -641,7 +668,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"property_code\": \"PROP01\",\n    \"unique_code\": \"PROP01-DIV01\",\n    \"name\": \"Division Name\",\n    \"total_staff\": 50,\n    \"status\": 1,\n    \"notes\": \"Some notes\",\n    \"code\": \"DIV01\"\n}",
+                            "raw": "{\n    \"property_code\": \"PROP01\",\n    \"unique_code\": \"PROP01-DIV01\",\n    \"name\": \"Division Name\",\n    \"total_staff\": 50,\n    \"status\": 1,\n    \"notes\": \"Some notes\",\n    \"code\": \"DIV01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -706,7 +733,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"property_code\": \"PROP01\",\n    \"unique_code\": \"PROP01-DIV01\",\n    \"name\": \"Division Name\",\n    \"total_staff\": 50,\n    \"status\": 1,\n    \"notes\": \"Some notes\",\n    \"code\": \"DIV01\"\n}",
+                            "raw": "{\n    \"property_code\": \"PROP01\",\n    \"unique_code\": \"PROP01-DIV01\",\n    \"name\": \"Division Name\",\n    \"total_staff\": 50,\n    \"status\": 1,\n    \"notes\": \"Some notes\",\n    \"code\": \"DIV01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -750,6 +777,15 @@
                                 "destroy",
                                 "1"
                             ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
                         }
                     },
                     "response": []
@@ -836,7 +872,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"notes\": \"Some notes\",\n    \"name\": \"Position Name\",\n    \"department_code\": \"DEPT01\",\n    \"division_code\": \"DIV01\",\n    \"level\": 1,\n    \"unique_code\": \"PROP01-DIV01-DEPT01-POS01\",\n    \"property_code\": \"PROP01\",\n    \"status\": 1,\n    \"amount\": 5,\n    \"code\": \"POS01\"\n}",
+                            "raw": "{\n    \"notes\": \"Some notes\",\n    \"name\": \"Position Name\",\n    \"department_code\": \"DEPT01\",\n    \"division_code\": \"DIV01\",\n    \"level\": 1,\n    \"unique_code\": \"PROP01-DIV01-DEPT01-POS01\",\n    \"property_code\": \"PROP01\",\n    \"status\": 1,\n    \"amount\": 5,\n    \"code\": \"POS01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -901,7 +937,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"notes\": \"Some notes\",\n    \"name\": \"Position Name\",\n    \"department_code\": \"DEPT01\",\n    \"division_code\": \"DIV01\",\n    \"level\": 1,\n    \"unique_code\": \"PROP01-DIV01-DEPT01-POS01\",\n    \"property_code\": \"PROP01\",\n    \"status\": 1,\n    \"amount\": 5,\n    \"code\": \"POS01\"\n}",
+                            "raw": "{\n    \"notes\": \"Some notes\",\n    \"name\": \"Position Name\",\n    \"department_code\": \"DEPT01\",\n    \"division_code\": \"DIV01\",\n    \"level\": 1,\n    \"unique_code\": \"PROP01-DIV01-DEPT01-POS01\",\n    \"property_code\": \"PROP01\",\n    \"status\": 1,\n    \"amount\": 5,\n    \"code\": \"POS01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -945,6 +981,15 @@
                                 "destroy",
                                 "1"
                             ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
                         }
                     },
                     "response": []
@@ -966,7 +1011,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/staffs?per_page=20&page=1",
+                            "raw": "{{base_url}}/api/staffs?per_page=20&page=1&property_code=&division_code=&department_code=&position_code=&code=&full_name=",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -985,33 +1030,27 @@
                                 },
                                 {
                                     "key": "property_code",
-                                    "value": "",
-                                    "disabled": true
+                                    "value": ""
                                 },
                                 {
                                     "key": "division_code",
-                                    "value": "",
-                                    "disabled": true
+                                    "value": ""
                                 },
                                 {
                                     "key": "department_code",
-                                    "value": "",
-                                    "disabled": true
+                                    "value": ""
                                 },
                                 {
                                     "key": "position_code",
-                                    "value": "",
-                                    "disabled": true
+                                    "value": ""
                                 },
                                 {
                                     "key": "code",
-                                    "value": "",
-                                    "disabled": true
+                                    "value": ""
                                 },
                                 {
                                     "key": "full_name",
-                                    "value": "",
-                                    "disabled": true
+                                    "value": ""
                                 }
                             ]
                         }
@@ -1036,7 +1075,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"john@example.com\",\n    \"property_code\": \"PROP01\",\n    \"first_name\": \"John\",\n    \"birthday\": \"1990-01-01\",\n    \"lecturer_type\": 1,\n    \"position_code\": \"POS01\",\n    \"unique_code\": \"STAFF001\",\n    \"phone\": \"0123456789\",\n    \"curren_job_id\": 1,\n    \"department_code\": \"DEPT01\",\n    \"division_code\": \"DIV01\",\n    \"rank_id\": \"R01\",\n    \"gender\": 0,\n    \"full_name\": \"John Doe\",\n    \"address\": \"123 Street\",\n    \"status\": 1,\n    \"married\": false,\n    \"id_card\": \"123456789\",\n    \"last_name\": \"Doe\",\n    \"is_lecturer\": 0,\n    \"code\": \"STAFF001\"\n}",
+                            "raw": "{\n    \"email\": \"john@example.com\",\n    \"property_code\": \"PROP01\",\n    \"first_name\": \"John\",\n    \"birthday\": \"1990-01-01\",\n  \"position_code\": \"POS01\",\n    \"unique_code\": \"STAFF001\",\n    \"phone\": \"0123456789\",\n    \"curren_job_id\": 1,\n    \"department_code\": \"DEPT01\",\n    \"division_code\": \"DIV01\",\n    \"rank_id\": \"R01\",\n    \"gender\": 0,\n    \"full_name\": \"John Doe\",\n    \"address\": \"123 Street\",\n    \"status\": 1,\n    \"married\": false,\n    \"id_card\": \"123456789\",\n    \"last_name\": \"Doe\",\n    \"is_lecturer\": 0,\n    \"code\": \"STAFF001\",\n    \"auth_email\": \"admin@example.com\",\n    \"contract_type\": \"Full-time\",\n    \"start_date\": \"2025-01-01 08:00:00\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1101,7 +1140,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"john@example.com\",\n    \"property_code\": \"PROP01\",\n    \"first_name\": \"John\",\n    \"birthday\": \"1990-01-01\",\n    \"lecturer_type\": 1,\n    \"position_code\": \"POS01\",\n    \"unique_code\": \"STAFF001\",\n    \"phone\": \"0123456789\",\n    \"curren_job_id\": 1,\n    \"department_code\": \"DEPT01\",\n    \"division_code\": \"DIV01\",\n    \"rank_id\": \"R01\",\n    \"gender\": 0,\n    \"full_name\": \"John Doe\",\n    \"address\": \"123 Street\",\n    \"status\": 1,\n    \"married\": false,\n    \"id_card\": \"123456789\",\n    \"last_name\": \"Doe\",\n    \"is_lecturer\": 0,\n    \"code\": \"STAFF001\"\n}",
+                            "raw": "{\n    \"email\": \"john@example.com\",\n    \"property_code\": \"PROP01\",\n    \"first_name\": \"John\",\n    \"birthday\": \"1990-01-01\",\n  \"position_code\": \"POS01\",\n    \"unique_code\": \"STAFF001\",\n    \"phone\": \"0123456789\",\n    \"curren_job_id\": 1,\n    \"department_code\": \"DEPT01\",\n    \"division_code\": \"DIV01\",\n    \"rank_id\": \"R01\",\n    \"gender\": 0,\n    \"full_name\": \"John Doe\",\n    \"address\": \"123 Street\",\n    \"status\": 1,\n    \"married\": false,\n    \"id_card\": \"123456789\",\n    \"last_name\": \"Doe\",\n    \"is_lecturer\": 0,\n    \"code\": \"STAFF001\",\n    \"auth_email\": \"admin@example.com\",\n    \"contract_type\": \"Full-time\",\n    \"start_date\": \"2025-01-01 08:00:00\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1144,6 +1183,82 @@
                                 "staffs",
                                 "destroy",
                                 "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"auth_email\": \"admin@example.com\",\n    \"contract_type\": \"Full-time\",\n    \"start_date\": \"2025-01-01 08:00:00\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get List Before June 2026",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/staffs/list-before-june-2026?per_page=20&page=1&property_code=PROP01&division_code=DIV01&department_code=DEP01&position_code=POS01&name=Nguyen+Van+A&code=NV001&id_card=0123456789&email=nva%40example.com&status=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "staffs",
+                                "list-before-june-2026"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "20",
+                                    "description": "Số bản ghi trên 1 trang"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Trang hiện tại"
+                                },
+                                {
+                                    "key": "property_code",
+                                    "value": "PROP01"
+                                },
+                                {
+                                    "key": "division_code",
+                                    "value": "DIV01"
+                                },
+                                {
+                                    "key": "department_code",
+                                    "value": "DEP01"
+                                },
+                                {
+                                    "key": "position_code",
+                                    "value": "POS01"
+                                },
+                                {
+                                    "key": "name",
+                                    "value": "Nguyen Van A"
+                                },
+                                {
+                                    "key": "code",
+                                    "value": "NV001"
+                                },
+                                {
+                                    "key": "id_card",
+                                    "value": "0123456789"
+                                },
+                                {
+                                    "key": "email",
+                                    "value": "nva@example.com"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "1"
+                                }
                             ]
                         }
                     },
@@ -1274,6 +1389,12 @@
                                             "key": "is_active",
                                             "value": "1",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -1390,6 +1511,12 @@
                                             "key": "is_active",
                                             "value": "1",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -1430,6 +1557,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -1501,7 +1637,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"table_id\": 1,\n    \"attendee_id\": 1,\n    \"seat_number\": 1,\n    \"assigned_by\": 1,\n    \"assigned_at\": \"2026-06-01 10:00:00\"\n}",
+                                    "raw": "{\n    \"table_id\": 1,\n    \"attendee_id\": 1,\n    \"seat_number\": 1,\n    \"assigned_by\": 1,\n    \"assigned_at\": \"2026-06-01 10:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -1566,7 +1702,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"table_id\": 1,\n    \"attendee_id\": 1,\n    \"seat_number\": 1,\n    \"assigned_by\": 1,\n    \"assigned_at\": \"2026-06-01 10:00:00\"\n}",
+                                    "raw": "{\n    \"table_id\": 1,\n    \"attendee_id\": 1,\n    \"seat_number\": 1,\n    \"assigned_by\": 1,\n    \"assigned_at\": \"2026-06-01 10:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -1610,6 +1746,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -1686,7 +1831,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"table_number\": 1,\n    \"label\": \"Bàn A1\",\n    \"capacity\": 10,\n    \"pos_x\": 100.5,\n    \"pos_y\": 200.0,\n    \"shape\": \"round\",\n    \"note\": \"Bàn dành cho VIP\"\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"table_number\": 1,\n    \"label\": \"Bàn A1\",\n    \"capacity\": 10,\n    \"pos_x\": 100.5,\n    \"pos_y\": 200,\n    \"shape\": \"round\",\n    \"note\": \"Bàn dành cho VIP\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -1751,7 +1896,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"table_number\": 1,\n    \"label\": \"Bàn A1\",\n    \"capacity\": 10,\n    \"pos_x\": 100.5,\n    \"pos_y\": 200.0,\n    \"shape\": \"round\",\n    \"note\": \"Bàn dành cho VIP\"\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"table_number\": 1,\n    \"label\": \"Bàn A1\",\n    \"capacity\": 10,\n    \"pos_x\": 100.5,\n    \"pos_y\": 200,\n    \"shape\": \"round\",\n    \"note\": \"Bàn dành cho VIP\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -1795,6 +1940,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -1936,6 +2090,12 @@
                                             "key": "status",
                                             "value": "0",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -2067,6 +2227,12 @@
                                             "key": "status",
                                             "value": "0",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -2107,6 +2273,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -2178,7 +2353,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Miss Mường Thanh 2026\",\n    \"description\": \"Cuộc thi sắc đẹp thường niên\",\n    \"location\": \"Sân khấu chính\",\n    \"contest_date\": \"2026-06-03\",\n    \"age_min\": 18,\n    \"age_max\": 30,\n    \"gender\": \"female\",\n    \"registration_open_at\": \"2026-05-01 00:00:00\",\n    \"registration_close_at\": \"2026-05-25 23:59:59\",\n    \"max_per_org\": 5,\n    \"candidate_prefix\": \"MT\",\n    \"candidate_start\": 1,\n    \"is_active\": 1\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Miss Mường Thanh 2026\",\n    \"description\": \"Cuộc thi sắc đẹp thường niên\",\n    \"location\": \"Sân khấu chính\",\n    \"contest_date\": \"2026-06-03\",\n    \"age_min\": 18,\n    \"age_max\": 30,\n    \"gender\": \"female\",\n    \"registration_open_at\": \"2026-05-01 00:00:00\",\n    \"registration_close_at\": \"2026-05-25 23:59:59\",\n    \"max_per_org\": 5,\n    \"candidate_prefix\": \"MT\",\n    \"candidate_start\": 1,\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2243,7 +2418,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Miss Mường Thanh 2026\",\n    \"description\": \"Cuộc thi sắc đẹp thường niên\",\n    \"location\": \"Sân khấu chính\",\n    \"contest_date\": \"2026-06-03\",\n    \"age_min\": 18,\n    \"age_max\": 30,\n    \"gender\": \"female\",\n    \"registration_open_at\": \"2026-05-01 00:00:00\",\n    \"registration_close_at\": \"2026-05-25 23:59:59\",\n    \"max_per_org\": 5,\n    \"candidate_prefix\": \"MT\",\n    \"candidate_start\": 1,\n    \"is_active\": 1\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Miss Mường Thanh 2026\",\n    \"description\": \"Cuộc thi sắc đẹp thường niên\",\n    \"location\": \"Sân khấu chính\",\n    \"contest_date\": \"2026-06-03\",\n    \"age_min\": 18,\n    \"age_max\": 30,\n    \"gender\": \"female\",\n    \"registration_open_at\": \"2026-05-01 00:00:00\",\n    \"registration_close_at\": \"2026-05-25 23:59:59\",\n    \"max_per_org\": 5,\n    \"candidate_prefix\": \"MT\",\n    \"candidate_start\": 1,\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2287,6 +2462,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -2358,7 +2542,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"competition_id\": 1,\r\n    \"attendee_id\": 1,\r\n    \"candidate_number\": \"12\"\r\n}",
+                                    "raw": "{\n    \"competition_id\": 1,\n    \"attendee_id\": 1,\n    \"candidate_number\": \"12\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2423,7 +2607,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"competition_id\": 1,\r\n    \"attendee_id\": 1,\r\n    \"candidate_number\": \"12\"\r\n}",
+                                    "raw": "{\n    \"competition_id\": 1,\n    \"attendee_id\": 1,\n    \"candidate_number\": \"12\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2467,6 +2651,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -2533,7 +2726,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"contest_id\": 1,\r\n    \"name\": \"Vòng Chung kết - Trình diễn trang phục dạ hội\",\r\n    \"round_type\": \"bikini\",\r\n    \"round_order\": 3,\r\n    \"max_score\": 100,\r\n    \"weight\": 0.4,\r\n    \"start_time\": \"2026-06-15 19:00:00\",\r\n    \"end_time\": \"2026-06-15 22:00:00\",\r\n    \"note\": \"Thí sinh có 2 phút để trình diễn và trả lời câu hỏi ứng xử\"\r\n}\r\n",
+                                    "raw": "{\n    \"contest_id\": 1,\n    \"name\": \"Vòng Chung kết - Trình diễn trang phục dạ hội\",\n    \"round_type\": \"bikini\",\n    \"round_order\": 3,\n    \"max_score\": 100,\n    \"weight\": 0.4,\n    \"start_time\": \"2026-06-15 19:00:00\",\n    \"end_time\": \"2026-06-15 22:00:00\",\n    \"note\": \"Thí sinh có 2 phút để trình diễn và trả lời câu hỏi ứng xử\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2598,7 +2791,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"contest_id\": 1,\r\n    \"name\": \"Vòng Chung kết - Trình diễn trang phục dạ hội\",\r\n    \"round_type\": \"bikini\",\r\n    \"round_order\": 3,\r\n    \"max_score\": 100,\r\n    \"weight\": 0.4,\r\n    \"start_time\": \"2026-06-15 19:00:00\",\r\n    \"end_time\": \"2026-06-15 22:00:00\",\r\n    \"note\": \"Thí sinh có 2 phút để trình diễn và trả lời câu hỏi ứng xử\"\r\n}\r\n",
+                                    "raw": "{\n    \"contest_id\": 1,\n    \"name\": \"Vòng Chung kết - Trình diễn trang phục dạ hội\",\n    \"round_type\": \"bikini\",\n    \"round_order\": 3,\n    \"max_score\": 100,\n    \"weight\": 0.4,\n    \"start_time\": \"2026-06-15 19:00:00\",\n    \"end_time\": \"2026-06-15 22:00:00\",\n    \"note\": \"Thí sinh có 2 phút để trình diễn và trả lời câu hỏi ứng xử\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2642,6 +2835,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -2713,7 +2915,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"round_id\": 1,\r\n    \"registration_id\": 1,\r\n    \"score\": 10,\r\n    \"note\": \"abc\"\r\n}",
+                                    "raw": "{\n    \"round_id\": 1,\n    \"registration_id\": 1,\n    \"score\": 10,\n    \"note\": \"abc\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2778,7 +2980,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"round_id\": 1,\r\n    \"registration_id\": 1,\r\n    \"score\": 10,\r\n    \"note\": \"abc\"\r\n}",
+                                    "raw": "{\n    \"round_id\": 1,\n    \"registration_id\": 1,\n    \"score\": 10,\n    \"note\": \"abc\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2822,6 +3024,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -2893,7 +3104,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"round_id\": 1,\r\n    \"contestant_id\": 1,\r\n    \"judge_id\": 1,\r\n    \"note\": \"Perfect\",\r\n    \"score\": 10\r\n}",
+                                    "raw": "{\n    \"round_id\": 1,\n    \"contestant_id\": 1,\n    \"judge_id\": 1,\n    \"note\": \"Perfect\",\n    \"score\": 10,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -2958,7 +3169,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"round_id\": 1,\r\n    \"contestant_id\": 1,\r\n    \"judge_id\": 1,\r\n    \"note\": \"Perfect\",\r\n    \"score\": 10\r\n}",
+                                    "raw": "{\n    \"round_id\": 1,\n    \"contestant_id\": 1,\n    \"judge_id\": 1,\n    \"note\": \"Perfect\",\n    \"score\": 10,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3002,6 +3213,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -3068,7 +3288,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Nghiệp vụ buồng phòng 2026\",\n    \"description\": \"Cuộc thi tay nghề nhân viên buồng phòng\",\n    \"registration_open_at\": \"2026-06-01 08:00:00\",\n    \"registration_close_at\": \"2026-06-15 17:00:00\",\n    \"candidate_number_prefix\": \"BP\",\n    \"candidate_number_start\": 1,\n    \"candidate_number_pad\": 3,\n    \"max_per_org\": 5,\n    \"has_qualification\": 1,\n    \"allow_direct_final\": 0,\n    \"is_active\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Nghiệp vụ buồng phòng 2026\",\n    \"description\": \"Cuộc thi tay nghề nhân viên buồng phòng\",\n    \"registration_open_at\": \"2026-06-01 08:00:00\",\n    \"registration_close_at\": \"2026-06-15 17:00:00\",\n    \"candidate_number_prefix\": \"BP\",\n    \"candidate_number_start\": 1,\n    \"candidate_number_pad\": 3,\n    \"max_per_org\": 5,\n    \"has_qualification\": 1,\n    \"allow_direct_final\": 0,\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3133,7 +3353,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Nghiệp vụ buồng phòng 2026\",\n    \"description\": \"Cuộc thi tay nghề nhân viên buồng phòng\",\n    \"registration_open_at\": \"2026-06-01 08:00:00\",\n    \"registration_close_at\": \"2026-06-15 17:00:00\",\n    \"candidate_number_prefix\": \"BP\",\n    \"candidate_number_start\": 1,\n    \"candidate_number_pad\": 3,\n    \"max_per_org\": 5,\n    \"has_qualification\": 1,\n    \"allow_direct_final\": 0,\n    \"is_active\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Nghiệp vụ buồng phòng 2026\",\n    \"description\": \"Cuộc thi tay nghề nhân viên buồng phòng\",\n    \"registration_open_at\": \"2026-06-01 08:00:00\",\n    \"registration_close_at\": \"2026-06-15 17:00:00\",\n    \"candidate_number_prefix\": \"BP\",\n    \"candidate_number_start\": 1,\n    \"candidate_number_pad\": 3,\n    \"max_per_org\": 5,\n    \"has_qualification\": 1,\n    \"allow_direct_final\": 0,\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3177,6 +3397,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -3238,7 +3467,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"competition_id\": 1,\n    \"name\": \"Vòng Sơ loại\",\n    \"round_order\": 1,\n    \"location\": \"Hội trường A\",\n    \"start_time\": \"2026-06-16 08:00:00\",\n    \"end_time\": \"2026-06-16 11:30:00\",\n    \"instructions\": \"Thi trắc nghiệm lý thuyết nghiệp vụ\"\n}",
+                                    "raw": "{\n    \"competition_id\": 1,\n    \"name\": \"Vòng Sơ loại\",\n    \"round_order\": 1,\n    \"location\": \"Hội trường A\",\n    \"start_time\": \"2026-06-16 08:00:00\",\n    \"end_time\": \"2026-06-16 11:30:00\",\n    \"instructions\": \"Thi trắc nghiệm lý thuyết nghiệp vụ\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3303,7 +3532,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"competition_id\": 1,\n    \"name\": \"Vòng Sơ loại\",\n    \"round_order\": 1,\n    \"location\": \"Hội trường A\",\n    \"start_time\": \"2026-06-16 08:00:00\",\n    \"end_time\": \"2026-06-16 11:30:00\",\n    \"instructions\": \"Thi trắc nghiệm lý thuyết nghiệp vụ\"\n}",
+                                    "raw": "{\n    \"competition_id\": 1,\n    \"name\": \"Vòng Sơ loại\",\n    \"round_order\": 1,\n    \"location\": \"Hội trường A\",\n    \"start_time\": \"2026-06-16 08:00:00\",\n    \"end_time\": \"2026-06-16 11:30:00\",\n    \"instructions\": \"Thi trắc nghiệm lý thuyết nghiệp vụ\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3347,6 +3576,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -3408,7 +3646,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"competition_id\": 1,\n    \"attendee_id\": 1,\n    \"candidate_number\": \"BP001\",\n    \"status\": \"pending\",\n    \"registered_at\": \"2026-06-05 10:00:00\",\n    \"note\": \"Nhân viên mới\"\n}",
+                                    "raw": "{\n    \"competition_id\": 1,\n    \"attendee_id\": 1,\n    \"registration_id\": 1,\n    \"candidate_number\": \"BP001\",\n    \"status\": 1,\n    \"registered_at\": \"2026-06-05 10:00:00\",\n    \"note\": \"Ghi chú\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3473,7 +3711,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"competition_id\": 1,\n    \"attendee_id\": 1,\n    \"candidate_number\": \"BP001\",\n    \"status\": \"pending\",\n    \"registered_at\": \"2026-06-05 10:00:00\",\n    \"note\": \"Nhân viên mới\"\n}",
+                                    "raw": "{\n    \"competition_id\": 1,\n    \"attendee_id\": 1,\n    \"registration_id\": 1,\n    \"candidate_number\": \"BP001\",\n    \"status\": 1,\n    \"registered_at\": \"2026-06-05 10:00:00\",\n    \"note\": \"Ghi chú\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3517,6 +3755,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -3578,7 +3825,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"round_id\": 1,\n    \"registration_id\": 1,\n    \"score\": 85.5,\n    \"rank\": 1,\n    \"passed\": 1,\n    \"entry_type\": \"manual\",\n    \"note\": \"Hoàn thành tốt phần thi\"\n}",
+                                    "raw": "{\n    \"round_id\": 1,\n    \"registration_id\": 1,\n    \"score\": 85.5,\n    \"rank\": 1,\n    \"passed\": 1,\n    \"entry_type\": \"manual\",\n    \"note\": \"Hoàn thành tốt phần thi\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3643,7 +3890,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"round_id\": 1,\n    \"registration_id\": 1,\n    \"score\": 85.5,\n    \"rank\": 1,\n    \"passed\": 1,\n    \"entry_type\": \"manual\",\n    \"note\": \"Hoàn thành tốt phần thi\"\n}",
+                                    "raw": "{\n    \"round_id\": 1,\n    \"registration_id\": 1,\n    \"score\": 85.5,\n    \"rank\": 1,\n    \"passed\": 1,\n    \"entry_type\": \"manual\",\n    \"note\": \"Hoàn thành tốt phần thi\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3685,6 +3932,230 @@
                                         "api",
                                         "competition-round-results",
                                         "destroy",
+                                        "1"
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Competition Department",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/competition-departments?per_page=20&page=1&competition_id=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "competition-departments"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "competition_id",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "department_code",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"competition_id\": 1,\n    \"department_code\": \"KT\",\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/competition-departments/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "competition-departments",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/competition-departments/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "competition-departments",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"competition_id\": 1,\n    \"department_code\": \"NS\",\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/competition-departments/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "competition-departments",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/competition-departments/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "competition-departments",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Check Eligibility",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/competition-departments/check-eligibility/1/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "competition-departments",
+                                        "check-eligibility",
+                                        "1",
                                         "1"
                                     ]
                                 }
@@ -3763,7 +4234,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Hội nghị thường niên Mường Thanh 2026\",\n    \"from_date\": \"2026-06-01\",\n    \"to_date\": \"2026-06-05\",\n    \"description\": \"Sự kiện lớn nhất trong năm của tập đoàn\",\n    \"status\": \"active\"\n}",
+                                    "raw": "{\n    \"name\": \"Hội nghị thường niên Mường Thanh 2026\",\n    \"from_date\": \"2026-06-01\",\n    \"to_date\": \"2026-06-05\",\n    \"description\": \"Sự kiện lớn nhất trong năm của tập đoàn\",\n    \"status\": \"1\",\n    \"max_sports_per_attendee\": 3,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3828,7 +4299,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Hội nghị thường niên Mường Thanh 2026\",\n    \"from_date\": \"2026-06-01\",\n    \"to_date\": \"2026-06-05\",\n    \"description\": \"Sự kiện lớn nhất trong năm của tập đoàn\",\n    \"status\": \"active\"\n}",
+                                    "raw": "{\n    \"name\": \"Hội nghị thường niên Mường Thanh 2026\",\n    \"from_date\": \"2026-06-01\",\n    \"to_date\": \"2026-06-05\",\n    \"description\": \"Sự kiện lớn nhất trong năm của tập đoàn\",\n    \"status\": \"active\",\n    \"max_sports_per_attendee\": 3,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -3872,6 +4343,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -3943,7 +4423,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"title\": \"Lễ khai mạc\",\n    \"description\": \"Giới thiệu đại biểu và phát biểu khai mạc\",\n    \"location\": \"Sảnh chính\",\n    \"start_time\": \"2026-06-01 08:00:00\",\n    \"end_time\": \"2026-06-01 10:00:00\",\n    \"type\": \"ceremony\",\n    \"is_public\": 1,\n    \"sort_order\": 1\n}",
+                                    "raw": "{\n    \"title\": \"Lễ khai mạc\",\n    \"description\": \"Giới thiệu đại biểu và phát biểu khai mạc\",\n    \"location\": \"Sảnh chính\",\n    \"start_time\": \"2026-06-01 08:00:00\",\n    \"end_time\": \"2026-06-01 10:00:00\",\n    \"type\": \"ceremony\",\n    \"is_public\": 1,\n    \"sort_order\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -4008,7 +4488,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"title\": \"Lễ khai mạc\",\n    \"description\": \"Giới thiệu đại biểu và phát biểu khai mạc\",\n    \"location\": \"Sảnh chính\",\n    \"start_time\": \"2026-06-01 08:00:00\",\n    \"end_time\": \"2026-06-01 10:00:00\",\n    \"type\": \"ceremony\",\n    \"is_public\": 1,\n    \"sort_order\": 1\n}",
+                                    "raw": "{\n    \"title\": \"Lễ khai mạc\",\n    \"description\": \"Giới thiệu đại biểu và phát biểu khai mạc\",\n    \"location\": \"Sảnh chính\",\n    \"start_time\": \"2026-06-01 08:00:00\",\n    \"end_time\": \"2026-06-01 10:00:00\",\n    \"type\": \"ceremony\",\n    \"is_public\": 1,\n    \"sort_order\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -4052,6 +4532,15 @@
                                         "destroy",
                                         "2"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -4123,7 +4612,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"status\": \"confirmed\",\n    \"note\": \"Tham gia với 50 cán bộ nhân viên\"\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"status\": \"confirmed\",\n    \"note\": \"Tham gia với 50 cán bộ nhân viên\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -4188,7 +4677,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"status\": \"confirmed\",\n    \"note\": \"Tham gia với 50 cán bộ nhân viên\"\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"status\": \"confirmed\",\n    \"note\": \"Tham gia với 50 cán bộ nhân viên\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -4232,6 +4721,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -4300,7 +4798,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"code\": \"CONTENT_01\",\n    \"name\": \"Nội dung thi đấu chính\",\n    \"description\": \"Các hạng mục thi đấu trong khuôn khổ hội nghị\",\n    \"status\": 1,\n    \"sort_order\": 1,\n    \"allow_alliance\": 1,\n    \"max_alliance_teams\": 3\n}",
+                                    "raw": "{\n    \"code\": \"CONTENT_01\",\n    \"name\": \"Nội dung thi đấu chính\",\n    \"description\": \"Các hạng mục thi đấu trong khuôn khổ hội nghị\",\n    \"status\": 1,\n    \"sort_order\": 1,\n    \"allow_alliance\": 1,\n    \"max_alliance_teams\": 3,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -4362,7 +4860,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"code\": \"CONTENT_01\",\n    \"name\": \"Nội dung thi đấu chính\",\n    \"description\": \"Các hạng mục thi đấu trong khuôn khổ hội nghị\",\n    \"status\": 1,\n    \"sort_order\": 1,\n    \"allow_alliance\": 1,\n    \"max_alliance_teams\": 3\n}",
+                                    "raw": "{\n    \"code\": \"CONTENT_01\",\n    \"name\": \"Nội dung thi đấu chính\",\n    \"description\": \"Các hạng mục thi đấu trong khuôn khổ hội nghị\",\n    \"status\": 1,\n    \"sort_order\": 1,\n    \"allow_alliance\": 1,\n    \"max_alliance_teams\": 3,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -4405,6 +4903,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -4468,7 +4975,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"content_code\": \"CR001\",\n    \"content_id\": 1,\n    \"name\": \"Vòng loại trực tiếp\",\n    \"description\": \"Phân loại thí sinh khu vực miền Bắc\",\n    \"sort_order\": 1,\n    \"status\": 1\n}",
+                                    "raw": "{\n    \"content_code\": \"CR001\",\n    \"content_id\": 1,\n    \"name\": \"Vòng loại trực tiếp\",\n    \"description\": \"Phân loại thí sinh khu vực miền Bắc\",\n    \"sort_order\": 1,\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -4530,7 +5037,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"content_id\": 1,\n    \"name\": \"Vòng loại trực tiếp\",\n    \"description\": \"Phân loại thí sinh khu vực miền Bắc\",\n    \"sort_order\": 1,\n    \"status\": 1\n}",
+                                    "raw": "{\n    \"content_id\": 1,\n    \"name\": \"Vòng loại trực tiếp\",\n    \"description\": \"Phân loại thí sinh khu vực miền Bắc\",\n    \"sort_order\": 1,\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -4573,6 +5080,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -4616,7 +5132,7 @@
                                 "header": [],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"content_id\": 1,\n    \"status\": 1,\n    \"allow_alliance\": 1,\n    \"max_alliance_teams\": 3\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"content_id\": 1,\n    \"status\": 1,\n    \"allow_alliance\": 1,\n    \"max_alliance_teams\": 3,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/event-contents/store",
@@ -4657,7 +5173,7 @@
                                 "header": [],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"content_id\": 1,\n    \"status\": 1,\n    \"allow_alliance\": 1,\n    \"max_alliance_teams\": 3\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"content_id\": 1,\n    \"status\": 1,\n    \"allow_alliance\": 1,\n    \"max_alliance_teams\": 3,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/event-contents/update/1",
@@ -4689,6 +5205,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -4731,7 +5256,7 @@
                                 "header": [],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"competition_id\": 1,\n    \"status\": 1\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"competition_id\": 1,\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/event-competitions/store",
@@ -4772,7 +5297,7 @@
                                 "header": [],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"competition_id\": 1,\n    \"status\": 1\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"competition_id\": 1,\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/event-competitions/update/1",
@@ -4804,6 +5329,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -4846,7 +5380,7 @@
                                 "header": [],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"status\": 1\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/event-sports/store",
@@ -4887,7 +5421,7 @@
                                 "header": [],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"status\": 1\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/event-sports/update/1",
@@ -4919,6 +5453,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -4994,7 +5537,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Bữa trưa ngày 1\",\n    \"meal_date\": \"2026-06-01\",\n    \"meal_type\": \"lunch\",\n    \"serving_time\": \"2026-06-01 11:30:00\",\n    \"cutoff_deadline\": \"2026-06-01 09:00:00\",\n    \"location\": \"Nhà hàng trung tâm\",\n    \"total_count\": 500,\n    \"description\": \"Thực đơn tự chọn\",\n    \"is_active\": 1\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Bữa trưa ngày 1\",\n    \"meal_date\": \"2026-06-01\",\n    \"meal_type\": \"lunch\",\n    \"serving_time\": \"2026-06-01 11:30:00\",\n    \"cutoff_deadline\": \"2026-06-01 09:00:00\",\n    \"location\": \"Nhà hàng trung tâm\",\n    \"total_count\": 500,\n    \"description\": \"Thực đơn tự chọn\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5059,7 +5602,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Bữa trưa ngày 1\",\n    \"meal_date\": \"2026-06-01\",\n    \"meal_type\": \"lunch\",\n    \"serving_time\": \"2026-06-01 11:30:00\",\n    \"cutoff_deadline\": \"2026-06-01 09:00:00\",\n    \"location\": \"Nhà hàng trung tâm\",\n    \"total_count\": 500,\n    \"description\": \"Thực đơn tự chọn\",\n    \"is_active\": 1\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Bữa trưa ngày 1\",\n    \"meal_date\": \"2026-06-01\",\n    \"meal_type\": \"lunch\",\n    \"serving_time\": \"2026-06-01 11:30:00\",\n    \"cutoff_deadline\": \"2026-06-01 09:00:00\",\n    \"location\": \"Nhà hàng trung tâm\",\n    \"total_count\": 500,\n    \"description\": \"Thực đơn tự chọn\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5103,6 +5646,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -5174,7 +5726,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"meal_id\": 1,\n    \"name\": \"Bàn VIP 01\",\n    \"capacity\": 10,\n    \"status\": 0\n}",
+                                    "raw": "{\n    \"meal_id\": 1,\n    \"name\": \"Bàn VIP 01\",\n    \"capacity\": 10,\n    \"status\": 0,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5239,7 +5791,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"meal_id\": 1,\n    \"name\": \"Bàn VIP 01\",\n    \"capacity\": 10,\n    \"status\": 0\n}",
+                                    "raw": "{\n    \"meal_id\": 1,\n    \"name\": \"Bàn VIP 01\",\n    \"capacity\": 10,\n    \"status\": 0,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5283,6 +5835,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -5359,7 +5920,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"meal_id\": 1,\n    \"attendee_id\": 1,\n    \"table_id\": 1,\n    \"status\": \"confirmed\"\n}",
+                                    "raw": "{\n    \"meal_id\": 1,\n    \"attendee_id\": 1,\n    \"table_id\": 1,\n    \"status\": \"confirmed\",\n    \"auth_email\": \"admin@example.com\",\n    \"approval_status\": 0,\n    \"join_hotel_date\": \"2025-01-01\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5424,7 +5985,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"meal_id\": 1,\n    \"attendee_id\": 1,\n    \"table_id\": 1,\n    \"status\": \"confirmed\"\n}",
+                                    "raw": "{\n    \"meal_id\": 1,\n    \"attendee_id\": 1,\n    \"table_id\": 1,\n    \"status\": \"confirmed\",\n    \"auth_email\": \"admin@example.com\",\n    \"approval_status\": 0,\n    \"join_hotel_date\": \"2025-01-01\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5468,6 +6029,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\",\n    \"approval_status\": 0,\n    \"join_hotel_date\": \"2025-01-01\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -5539,7 +6109,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"meal_id\": 1,\n    \"attendee_id\": 1,\n    \"check_in_time\": \"2026-06-05 12:30:00\",\n    \"status\": 1\n}",
+                                    "raw": "{\n    \"meal_id\": 1,\n    \"attendee_id\": 1,\n    \"check_in_time\": \"2026-06-05 12:30:00\",\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5604,7 +6174,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"meal_code\": \"MEA00000001\",\n    \"staff_code\": \"STF00000001\"\n}",
+                                    "raw": "{\n    \"meal_code\": \"MEA00000001\",\n    \"staff_code\": \"STF00000001\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5648,6 +6218,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -5714,7 +6293,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"meal_id\": 1,\n    \"attendee_id\": 1,\n    \"is_cutoff\": 1,\n    \"reason\": \"Vắng mặt\",\n    \"reported_by\": 1,\n    \"reported_at\": \"2026-06-05 08:00:00\"\n}",
+                                    "raw": "{\n    \"meal_id\": 1,\n    \"attendee_id\": 1,\n    \"is_cutoff\": 1,\n    \"reason\": \"Vắng mặt\",\n    \"reported_by\": 1,\n    \"reported_at\": \"2026-06-05 08:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5779,7 +6358,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"meal_code\": \"MEA00000001\",\n    \"cutoff_at\": \"2026-06-01 09:00:00\"\n}",
+                                    "raw": "{\n    \"meal_code\": \"MEA00000001\",\n    \"cutoff_at\": \"2026-06-01 09:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -5823,6 +6402,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -5954,6 +6542,12 @@
                                             "key": "rejection_reason",
                                             "value": "",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -6060,6 +6654,12 @@
                                             "key": "rejection_reason",
                                             "value": "",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -6100,6 +6700,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -6166,7 +6775,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"registration_id\": 1,\n    \"registration_type\": \"quantity\",\n    \"role_id\": 1,\n    \"content_id\": 1,\n    \"sport_id\": 1,\n    \"competition_id\": 1,\n    \"quantity\": 5,\n    \"note\": \"Sample note\",\n    \"status\": 1\n}",
+                                    "raw": "{\n    \"registration_id\": 1,\n    \"registration_type\": \"quantity\",\n    \"role_id\": 1,\n    \"content_id\": 1,\n    \"sport_id\": 1,\n    \"competition_id\": 1,\n    \"quantity\": 5,\n    \"note\": \"Sample note\",\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -6231,7 +6840,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"registration_id\": 1,\n    \"registration_type\": \"quantity\",\n    \"role_id\": 1,\n    \"content_id\": 1,\n    \"sport_id\": 1,\n    \"competition_id\": 1,\n    \"quantity\": 10,\n    \"note\": \"Updated note\",\n    \"status\": 1\n}",
+                                    "raw": "{\n    \"registration_id\": 1,\n    \"registration_type\": \"quantity\",\n    \"role_id\": 1,\n    \"content_id\": 1,\n    \"sport_id\": 1,\n    \"competition_id\": 1,\n    \"quantity\": 10,\n    \"note\": \"Updated note\",\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -6275,6 +6884,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -6325,7 +6943,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"registration_detail_id\": 1,\n    \"attendee_id\": 1,\n    \"status\": 1,\n    \"note\": \"Sample note\"\n}"
+                                    "raw": "{\n    \"registration_detail_id\": 1,\n    \"staff_code\": \"STAFF001\",\n    \"status\": 1,\n    \"note\": \"Sample note\",\n    \"auth_email\": \"admin@example.com\",\n    \"approval_status\": 0,\n    \"join_hotel_date\": \"2025-01-01\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/registration-detail-attendees/store",
@@ -6354,7 +6972,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"registration_detail_id\": 1,\n    \"attendee_id\": 1,\n    \"status\": 2,\n    \"note\": \"Updated note\"\n}"
+                                    "raw": "{\n    \"registration_detail_id\": 1,\n    \"staff_code\": \"STAFF001\",\n    \"status\": 2,\n    \"note\": \"Updated note\",\n    \"auth_email\": \"admin@example.com\",\n    \"approval_status\": 0,\n    \"join_hotel_date\": \"2025-01-01\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/registration-detail-attendees/update/1",
@@ -6387,6 +7005,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\",\n    \"approval_status\": 0,\n    \"join_hotel_date\": \"2025-01-01\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -6437,7 +7064,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"org_a_id\": 1,\n    \"org_b_id\": 2,\n    \"event_content_id\": 1,\n    \"status\": 1,\n    \"note\": \"Sample alliance note\"\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"org_a_id\": 1,\n    \"org_b_id\": 2,\n    \"event_content_id\": 1,\n    \"status\": 1,\n    \"note\": \"Sample alliance note\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/alliances/store",
@@ -6486,7 +7113,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"org_a_id\": 1,\n    \"org_b_id\": 2,\n    \"status\": 2,\n    \"dissolved_by\": 1,\n    \"dissolved_reason\": \"No longer needed\",\n    \"note\": \"Updated note\"\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"org_a_id\": 1,\n    \"org_b_id\": 2,\n    \"status\": 2,\n    \"dissolved_by\": 1,\n    \"dissolved_reason\": \"No longer needed\",\n    \"note\": \"Updated note\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/alliances/update/1",
@@ -6519,6 +7146,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -6528,7 +7164,6 @@
                 {
                     "name": "Alliance Request",
                     "item": [
-
                         {
                             "name": "Get List",
                             "request": {
@@ -6570,7 +7205,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"requester_org_id\": 1,\n    \"target_org_id\": 2,\n    \"event_content_id\": 1,\n    \"requested_by\": 1,\n    \"note\": \"Alliance request note\"\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"requester_org_id\": 1,\n    \"target_org_id\": 2,\n    \"event_content_id\": 1,\n    \"requested_by\": 1,\n    \"note\": \"Alliance request note\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/alliance-requests/store",
@@ -6619,7 +7254,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"status\": 2,\n    \"reviewed_by\": 1,\n    \"rejection_reason\": \"\",\n    \"note\": \"Approved alliance\"\n}"
+                                    "raw": "{\n    \"status\": 2,\n    \"reviewed_by\": 1,\n    \"rejection_reason\": \"\",\n    \"note\": \"Approved alliance\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/alliance-requests/update/1",
@@ -6652,6 +7287,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -6802,7 +7446,7 @@
                                         {
                                             "key": "photo_path",
                                             "value": "",
-                                            "type": "file"
+                                            "type": "text"
                                         },
                                         {
                                             "key": "note",
@@ -6818,6 +7462,50 @@
                                             "key": "sort_order",
                                             "value": "1",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "cccd_front_path",
+                                            "value": "",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "cccd_back_path",
+                                            "value": "",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "portrait_path",
+                                            "value": "",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "contract_path",
+                                            "value": "",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
+                                        },
+                                        {
+                                            "key": "approval_status",
+                                            "value": "0",
+                                            "type": "text",
+                                            "description": "0: Pending, 1: Approved, 2: Rejected"
+                                        },
+                                        {
+                                            "key": "join_hotel_date",
+                                            "value": "2025-01-01",
+                                            "type": "text",
+                                            "description": "Ngày vào làm"
+                                        },
+                                        {
+                                            "key": "end_date",
+                                            "value": "2026-01-01 17:00:00",
+                                            "type": "text",
+                                            "description": "Ngày hết hạn hợp đồng"
                                         }
                                     ]
                                 },
@@ -6943,7 +7631,7 @@
                                         {
                                             "key": "photo_path",
                                             "value": "",
-                                            "type": "file"
+                                            "type": "text"
                                         },
                                         {
                                             "key": "note",
@@ -6959,6 +7647,50 @@
                                             "key": "sort_order",
                                             "value": "1",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "cccd_front_path",
+                                            "value": "",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "cccd_back_path",
+                                            "value": "",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "portrait_path",
+                                            "value": "",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "contract_path",
+                                            "value": "",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
+                                        },
+                                        {
+                                            "key": "approval_status",
+                                            "value": "0",
+                                            "type": "text",
+                                            "description": "0: Pending, 1: Approved, 2: Rejected"
+                                        },
+                                        {
+                                            "key": "join_hotel_date",
+                                            "value": "2025-01-01",
+                                            "type": "text",
+                                            "description": "Ngày vào làm"
+                                        },
+                                        {
+                                            "key": "end_date",
+                                            "value": "2026-01-01 17:00:00",
+                                            "type": "text",
+                                            "description": "Ngày hết hạn hợp đồng"
                                         }
                                     ]
                                 },
@@ -6999,6 +7731,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\",\n    \"approval_status\": 0,\n    \"join_hotel_date\": \"2025-01-01\",\n    \"end_date\": \"2026-01-01 17:00:00\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -7070,7 +7811,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"attendee_id\": 1,\n    \"role_id\": 1,\n    \"assigned_by\": 1,\n    \"assigned_at\": \"2026-06-05 10:00:00\"\n}"
+                                    "raw": "{\n    \"attendee_id\": 1,\n    \"role_id\": 1,\n    \"assigned_by\": 1,\n    \"assigned_at\": \"2026-06-05 10:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/attendee-roles/store",
@@ -7130,7 +7871,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"attendee_id\": 1,\n    \"role_id\": 1,\n    \"assigned_by\": 1,\n    \"assigned_at\": \"2026-06-05 10:00:00\"\n}"
+                                    "raw": "{\n    \"attendee_id\": 1,\n    \"role_id\": 1,\n    \"assigned_by\": 1,\n    \"assigned_at\": \"2026-06-05 10:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/attendee-roles/update/1",
@@ -7169,6 +7910,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -7240,7 +7990,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"attendee_id\": 1,\n    \"template_id\": 1,\n    \"generated_path\": \"badges/badge_1.pdf\",\n    \"width_mm\": 85.6,\n    \"height_mm\": 53.98,\n    \"dpi\": 300,\n    \"generated_at\": \"2026-06-05 15:00:00\",\n    \"print_count\": 0\n}"
+                                    "raw": "{\n    \"attendee_id\": 1,\n    \"template_id\": 1,\n    \"generated_path\": \"badges/badge_1.pdf\",\n    \"width_mm\": 85.6,\n    \"height_mm\": 53.98,\n    \"dpi\": 300,\n    \"generated_at\": \"2026-06-05 15:00:00\",\n    \"print_count\": 0,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/badges/store",
@@ -7300,7 +8050,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"attendee_id\": 1,\n    \"template_id\": 1,\n    \"generated_path\": \"badges/badge_1.pdf\",\n    \"width_mm\": 85.6,\n    \"height_mm\": 53.98,\n    \"dpi\": 300,\n    \"generated_at\": \"2026-06-05 15:00:00\",\n    \"print_count\": 0\n}"
+                                    "raw": "{\n    \"attendee_id\": 1,\n    \"template_id\": 1,\n    \"generated_path\": \"badges/badge_1.pdf\",\n    \"width_mm\": 85.6,\n    \"height_mm\": 53.98,\n    \"dpi\": 300,\n    \"generated_at\": \"2026-06-05 15:00:00\",\n    \"print_count\": 0,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/badges/update/1",
@@ -7339,6 +8089,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -7446,7 +8205,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"name\": \"Early Bird\",\r\n    \"end_time\": \"2026-02-01 23:59:59\",\r\n    \"is_active\": true,\r\n    \"max_per_org\": 5,\r\n    \"event_id\": 1,\r\n    \"note\": null,\r\n    \"start_time\": \"2026-01-01 00:00:00\"\r\n}",
+                                    "raw": "{\n    \"name\": \"Early Bird\",\n    \"end_time\": \"2026-02-01 23:59:59\",\n    \"is_active\": true,\n    \"max_per_org\": 5,\n    \"event_id\": 1,\n    \"note\": null,\n    \"start_time\": \"2026-01-01 00:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -7511,7 +8270,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"name\": \"Early Bird\",\r\n    \"end_time\": \"2026-02-01 23:59:59\",\r\n    \"is_active\": true,\r\n    \"max_per_org\": 5,\r\n    \"event_id\": 1,\r\n    \"note\": \"svcas\",\r\n    \"start_time\": \"2026-01-01 00:00:00\"\r\n}",
+                                    "raw": "{\n    \"name\": \"Early Bird\",\n    \"end_time\": \"2026-02-01 23:59:59\",\n    \"is_active\": true,\n    \"max_per_org\": 5,\n    \"event_id\": 1,\n    \"note\": \"svcas\",\n    \"start_time\": \"2026-01-01 00:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -7555,6 +8314,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -7626,7 +8394,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Admin\",\n    \"color\": \"#FF0000\",\n    \"icon\": \"fa-user\",\n    \"sort_order\": 1,\n    \"description\": \"Qu\\u1ea3n tr\\u1ecb vi\\u00ean\"\n}"
+                                    "raw": "{\n    \"name\": \"Admin\",\n    \"color\": \"#FF0000\",\n    \"icon\": \"fa-user\",\n    \"sort_order\": 1,\n    \"description\": \"Quản trị viên\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/roles/store",
@@ -7686,7 +8454,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Admin\",\n    \"color\": \"#FF0000\",\n    \"icon\": \"fa-user\",\n    \"sort_order\": 1,\n    \"description\": \"Qu\\u1ea3n tr\\u1ecb vi\\u00ean\"\n}"
+                                    "raw": "{\n    \"name\": \"Admin\",\n    \"color\": \"#FF0000\",\n    \"icon\": \"fa-user\",\n    \"sort_order\": 1,\n    \"description\": \"Quản trị viên\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/roles/update/1",
@@ -7725,6 +8493,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -7796,7 +8573,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Xe buýt đưa đón\",\n    \"description\": \"Dịch vụ vận chuyển nội bộ\",\n    \"status\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Xe buýt đưa đón\",\n    \"description\": \"Dịch vụ vận chuyển nội bộ\",\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -7861,7 +8638,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Xe buýt đưa đón\",\n    \"description\": \"Dịch vụ vận chuyển nội bộ\",\n    \"status\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Xe buýt đưa đón\",\n    \"description\": \"Dịch vụ vận chuyển nội bộ\",\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -7905,6 +8682,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -7998,6 +8784,18 @@
                                             "type": "text"
                                         },
                                         {
+                                            "key": "min_per_team_member",
+                                            "value": "5",
+                                            "type": "text",
+                                            "description": "Số lượng thành viên tối thiểu mỗi đội"
+                                        },
+                                        {
+                                            "key": "max_per_team_member",
+                                            "value": "15",
+                                            "type": "text",
+                                            "description": "Số lượng thành viên tối đa mỗi đội"
+                                        },
+                                        {
                                             "key": "parent_id",
                                             "value": "0",
                                             "type": "text"
@@ -8021,6 +8819,12 @@
                                             "key": "document",
                                             "type": "file",
                                             "src": []
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -8094,6 +8898,18 @@
                                             "type": "text"
                                         },
                                         {
+                                            "key": "min_per_team_member",
+                                            "value": "5",
+                                            "type": "text",
+                                            "description": "Số lượng thành viên tối thiểu mỗi đội"
+                                        },
+                                        {
+                                            "key": "max_per_team_member",
+                                            "value": "15",
+                                            "type": "text",
+                                            "description": "Số lượng thành viên tối đa mỗi đội"
+                                        },
+                                        {
                                             "key": "parent_id",
                                             "value": "0",
                                             "type": "text"
@@ -8117,6 +8933,12 @@
                                             "key": "document",
                                             "type": "file",
                                             "src": []
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -8155,6 +8977,41 @@
                                         "api",
                                         "sports",
                                         "destroy",
+                                        "1"
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Count Root Sports",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/sports/count-root-sports/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "sports",
+                                        "count-root-sports",
                                         "1"
                                     ]
                                 }
@@ -8228,7 +9085,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -8293,7 +9150,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -8337,6 +9194,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -8453,6 +9319,12 @@
                                             "key": "status",
                                             "value": "0",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -8559,6 +9431,12 @@
                                             "key": "status",
                                             "value": "0",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -8599,6 +9477,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -8665,7 +9552,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"stage_id\": 1,\n    \"team_a_id\": 1,\n    \"team_b_id\": 2,\n    \"match_time\": \"2026-06-05 15:00:00\",\n    \"location\": \"Sân vận động\",\n    \"match_type\": \"final\",\n    \"match_order\": 1,\n    \"round\": \"Final\",\n    \"final_score\": \"2-1\",\n    \"description\": \"Trận chung kết kịch tính\",\n    \"note\": \"Live stream trên fanpage\",\n    \"status\": 0\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"stage_id\": 1,\n    \"team_a_id\": 1,\n    \"team_b_id\": 2,\n    \"match_time\": \"2026-06-05 15:00:00\",\n    \"location\": \"Sân vận động\",\n    \"match_type\": \"final\",\n    \"match_order\": 1,\n    \"round\": \"Final\",\n    \"final_score\": \"2-1\",\n    \"description\": \"Trận chung kết kịch tính\",\n    \"note\": \"Live stream trên fanpage\",\n    \"status\": 0,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -8730,7 +9617,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"stage_id\": 1,\n    \"team_a_id\": 1,\n    \"team_b_id\": 2,\n    \"match_time\": \"2026-06-05 15:00:00\",\n    \"location\": \"Sân vận động\",\n    \"match_type\": \"final\",\n    \"match_order\": 1,\n    \"round\": \"Final\",\n    \"final_score\": \"2-1\",\n    \"description\": \"Trận chung kết kịch tính\",\n    \"note\": \"Live stream trên fanpage\",\n    \"status\": 0\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"stage_id\": 1,\n    \"team_a_id\": 1,\n    \"team_b_id\": 2,\n    \"match_time\": \"2026-06-05 15:00:00\",\n    \"location\": \"Sân vận động\",\n    \"match_type\": \"final\",\n    \"match_order\": 1,\n    \"round\": \"Final\",\n    \"final_score\": \"2-1\",\n    \"description\": \"Trận chung kết kịch tính\",\n    \"note\": \"Live stream trên fanpage\",\n    \"status\": 0,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -8774,6 +9661,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -8840,7 +9736,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"match_id\": 1,\n    \"score_a\": 2,\n    \"score_b\": 1,\n    \"winner_team_id\": 1,\n    \"is_draw\": 0,\n    \"detail\": \"Đội A thắng sít sao\",\n    \"note\": \"Trận đấu kịch tính\",\n    \"status\": 1,\n    \"recorded_by\": 1,\n    \"recorded_at\": \"2026-06-05 17:00:00\"\n}"
+                                    "raw": "{\n    \"match_id\": 1,\n    \"score_a\": 2,\n    \"score_b\": 1,\n    \"winner_team_id\": 1,\n    \"is_draw\": 0,\n    \"detail\": \"Đội A thắng sít sao\",\n    \"note\": \"Trận đấu kịch tính\",\n    \"status\": 1,\n    \"recorded_by\": 1,\n    \"recorded_at\": \"2026-06-05 17:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/sport-match-results/store",
@@ -8900,7 +9796,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"match_id\": 1,\n    \"score_a\": 2,\n    \"score_b\": 1,\n    \"winner_team_id\": 1,\n    \"is_draw\": 0,\n    \"detail\": \"Đội A thắng sít sao\",\n    \"note\": \"Trận đấu kịch tính\",\n    \"status\": 1,\n    \"recorded_by\": 1,\n    \"recorded_at\": \"2026-06-05 17:00:00\"\n}"
+                                    "raw": "{\n    \"match_id\": 1,\n    \"score_a\": 2,\n    \"score_b\": 1,\n    \"winner_team_id\": 1,\n    \"is_draw\": 0,\n    \"detail\": \"Đội A thắng sít sao\",\n    \"note\": \"Trận đấu kịch tính\",\n    \"status\": 1,\n    \"recorded_by\": 1,\n    \"recorded_at\": \"2026-06-05 17:00:00\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/sport-match-results/update/2",
@@ -8939,6 +9835,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -9005,7 +9910,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Bóng đá nam 11 người\",\n    \"type\": \"team\",\n    \"description\": \"Giải bóng đá Cup Mường Thanh\",\n    \"is_active\": 1,\n    \"sort_order\": 1\n}",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"name\": \"Vòng bảng\",\n    \"stage_type\": \"qualification\",\n    \"stage_order\": 1,\n    \"start_date\": \"2025-09-01\",\n    \"end_date\": \"2025-09-07\",\n    \"location\": \"Sân vận động Mường Thanh\",\n    \"rules\": \"Thi đấu vòng tròn\",\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -9070,7 +9975,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Bóng đá nam 11 người\",\n    \"type\": \"team\",\n    \"description\": \"Giải bóng đá Cup Mường Thanh\",\n    \"is_active\": 1,\n    \"sort_order\": 1\n}",
+                                    "raw": "{\n    \"name\": \"Vòng bảng\",\n    \"stage_type\": \"qualification\",\n    \"stage_order\": 1,\n    \"start_date\": \"2025-09-01\",\n    \"end_date\": \"2025-09-07\",\n    \"location\": \"Sân vận động Mường Thanh\",\n    \"rules\": \"Thi đấu vòng tròn\",\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -9114,6 +10019,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -9185,7 +10099,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Bóng đá nam 11 người\",\n    \"type\": \"team\",\n    \"description\": \"Giải bóng đá Cup Mường Thanh\",\n    \"is_active\": 1,\n    \"sort_order\": 1\n}",
+                                    "raw": "{\n    \"stage_id\": 1,\n    \"team_id\": 1,\n    \"entry_type\": \"registered\",\n    \"qualified_from\": null,\n    \"seed\": 1,\n    \"final_rank\": null,\n    \"status\": 1,\n    \"note\": \"\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -9250,7 +10164,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Bóng đá nam 11 người\",\n    \"type\": \"team\",\n    \"description\": \"Giải bóng đá Cup Mường Thanh\",\n    \"is_active\": 1,\n    \"sort_order\": 1\n}",
+                                    "raw": "{\n    \"entry_type\": \"registered\",\n    \"qualified_from\": null,\n    \"seed\": 1,\n    \"final_rank\": null,\n    \"status\": 1,\n    \"note\": \"\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -9291,6 +10205,359 @@
                                     "path": [
                                         "api",
                                         "sport-stage-teams",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Alliance Team Orgs",
+                    "item": [
+                        {
+                            "name": "List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/alliance-team-orgs?per_page=20&page=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "alliance-team-orgs"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "team_id",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "organization_id",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "is_lead",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"team_id\": 1,\n    \"organization_id\": 1,\n    \"is_lead\": 1,\n    \"joined_at\": null,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/alliance-team-orgs/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "alliance-team-orgs",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/alliance-team-orgs/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "alliance-team-orgs",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"team_id\": 1,\n    \"organization_id\": 1,\n    \"is_lead\": 0,\n    \"joined_at\": null,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/alliance-team-orgs/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "alliance-team-orgs",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/alliance-team-orgs/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "alliance-team-orgs",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Event Sport Alliance Configs",
+                    "item": [
+                        {
+                            "name": "List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/event-sport-alliance-configs?per_page=20&page=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "event-sport-alliance-configs"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "event_id",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "sport_id",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "organization_id",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"organization_id\": 1,\n    \"max_members\": 5,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/event-sport-alliance-configs/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "event-sport-alliance-configs",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/event-sport-alliance-configs/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "event-sport-alliance-configs",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"sport_id\": 1,\n    \"organization_id\": 1,\n    \"max_members\": 10,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/event-sport-alliance-configs/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "event-sport-alliance-configs",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/event-sport-alliance-configs/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "event-sport-alliance-configs",
                                         "destroy",
                                         "1"
                                     ]
@@ -9370,7 +10637,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Liên hoan nghệ thuật Mường Thanh 2026\",\n    \"description\": \"Cuộc thi tài năng dành cho CBCNV\",\n    \"registration_open_at\": \"2026-06-01 08:00:00\",\n    \"registration_close_at\": \"2026-06-30 23:59:59\",\n    \"show_date\": \"2026-07-15\",\n    \"location\": \"Hội trường lớn\",\n    \"max_entries_per_org\": 2,\n    \"is_active\": 1\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Liên hoan nghệ thuật Mường Thanh 2026\",\n    \"description\": \"Cuộc thi tài năng dành cho CBCNV\",\n    \"registration_open_at\": \"2026-06-01 08:00:00\",\n    \"registration_close_at\": \"2026-06-30 23:59:59\",\n    \"show_date\": \"2026-07-15\",\n    \"location\": \"Hội trường lớn\",\n    \"max_entries_per_org\": 2,\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/talent-shows/store",
@@ -9430,7 +10697,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Liên hoan nghệ thuật Mường Thanh 2026\",\n    \"description\": \"Cuộc thi tài năng dành cho CBCNV\",\n    \"registration_open_at\": \"2026-06-01 08:00:00\",\n    \"registration_close_at\": \"2026-06-30 23:59:59\",\n    \"show_date\": \"2026-07-15\",\n    \"location\": \"Hội trường lớn\",\n    \"max_entries_per_org\": 2,\n    \"is_active\": 1\n}"
+                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Liên hoan nghệ thuật Mường Thanh 2026\",\n    \"description\": \"Cuộc thi tài năng dành cho CBCNV\",\n    \"registration_open_at\": \"2026-06-01 08:00:00\",\n    \"registration_close_at\": \"2026-06-30 23:59:59\",\n    \"show_date\": \"2026-07-15\",\n    \"location\": \"Hội trường lớn\",\n    \"max_entries_per_org\": 2,\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/talent-shows/update/1",
@@ -9469,6 +10736,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -9535,7 +10811,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"code\": \"TAL_001\",\n    \"name\": \"Hát đơn ca\",\n    \"type\": \"individual\",\n    \"min_members\": 1,\n    \"max_members\": 1,\n    \"max_duration_seconds\": 300,\n    \"description\": \"Hát đơn ca nam/nữ\",\n    \"sort_order\": 1\n}"
+                                    "raw": "{\n    \"code\": \"TAL_001\",\n    \"name\": \"Hát đơn ca\",\n    \"type\": \"individual\",\n    \"min_members\": 1,\n    \"max_members\": 1,\n    \"max_duration_seconds\": 300,\n    \"description\": \"Hát đơn ca nam/nữ\",\n    \"sort_order\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/talent-categories/store",
@@ -9595,7 +10871,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"code\": \"TAL_001\",\n    \"name\": \"Hát đơn ca\",\n    \"type\": \"individual\",\n    \"min_members\": 1,\n    \"max_members\": 1,\n    \"max_duration_seconds\": 300,\n    \"description\": \"Hát đơn ca nam/nữ\",\n    \"sort_order\": 1\n}"
+                                    "raw": "{\n    \"code\": \"TAL_001\",\n    \"name\": \"Hát đơn ca\",\n    \"type\": \"individual\",\n    \"min_members\": 1,\n    \"max_members\": 1,\n    \"max_duration_seconds\": 300,\n    \"description\": \"Hát đơn ca nam/nữ\",\n    \"sort_order\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/talent-categories/update/1",
@@ -9634,6 +10910,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -9760,6 +11045,48 @@
                                             "key": "note",
                                             "value": "Cần âm thanh tốt",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "document",
+                                            "value": "[]",
+                                            "type": "text",
+                                            "description": "JSON danh sách tệp đính kèm"
+                                        },
+                                        {
+                                            "key": "content",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Nội dung tiết mục"
+                                        },
+                                        {
+                                            "key": "director",
+                                            "value": "Nguyễn Văn A",
+                                            "type": "text",
+                                            "description": "Người chịu trách nhiệm"
+                                        },
+                                        {
+                                            "key": "director_phone",
+                                            "value": "0901234567",
+                                            "type": "text",
+                                            "description": "Số điện thoại người chịu trách nhiệm"
+                                        },
+                                        {
+                                            "key": "origin",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Xuất xứ tiết mục"
+                                        },
+                                        {
+                                            "key": "is_alliance_team",
+                                            "value": "0",
+                                            "type": "text",
+                                            "description": "Cờ đội liên quân: 0=không, 1=có"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -9871,6 +11198,48 @@
                                             "key": "note",
                                             "value": "Cần âm thanh tốt",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "document",
+                                            "value": "[]",
+                                            "type": "text",
+                                            "description": "JSON danh sách tệp đính kèm"
+                                        },
+                                        {
+                                            "key": "content",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Nội dung tiết mục"
+                                        },
+                                        {
+                                            "key": "director",
+                                            "value": "Nguyễn Văn A",
+                                            "type": "text",
+                                            "description": "Người chịu trách nhiệm"
+                                        },
+                                        {
+                                            "key": "director_phone",
+                                            "value": "0901234567",
+                                            "type": "text",
+                                            "description": "Số điện thoại người chịu trách nhiệm"
+                                        },
+                                        {
+                                            "key": "origin",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Xuất xứ tiết mục"
+                                        },
+                                        {
+                                            "key": "is_alliance_team",
+                                            "value": "0",
+                                            "type": "text",
+                                            "description": "Cờ đội liên quân: 0=không, 1=có"
+                                        },
+                                        {
+                                            "key": "auth_email",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện thao tác"
                                         }
                                     ]
                                 },
@@ -9911,6 +11280,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -9982,7 +11360,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"entry_id\": 1,\n    \"attendee_id\": 1,\n    \"role\": \"Ca sĩ chính\",\n    \"is_lead\": 1,\n    \"sort_order\": 1\n}"
+                                    "raw": "{\n    \"entry_id\": 1,\n    \"attendee_id\": 1,\n    \"role\": \"Ca sĩ chính\",\n    \"is_lead\": 1,\n    \"sort_order\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/talent-entry-members/store",
@@ -10042,7 +11420,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"entry_id\": 1,\n    \"attendee_id\": 1,\n    \"role\": \"Ca sĩ chính\",\n    \"is_lead\": 1,\n    \"sort_order\": 1\n}"
+                                    "raw": "{\n    \"entry_id\": 1,\n    \"attendee_id\": 1,\n    \"role\": \"Ca sĩ chính\",\n    \"is_lead\": 1,\n    \"sort_order\": 1,\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/talent-entry-members/update/1",
@@ -10081,6 +11459,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
@@ -10152,7 +11539,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"judge_id\": 1,\r\n    \"score\": 9.5,\r\n    \"entry_id\": 1,\r\n    \"criteria\": \"Vocals\",\r\n    \"note\": \"Excellent technique\"\r\n}",
+                                    "raw": "{\n    \"judge_id\": 1,\n    \"score\": 9.5,\n    \"entry_id\": 1,\n    \"criteria\": \"Vocals\",\n    \"note\": \"Excellent technique\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -10217,7 +11604,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\r\n    \"judge_id\": 1,\r\n    \"score\": 9.5,\r\n    \"entry_id\": 1,\r\n    \"criteria\": \"Vocals\",\r\n    \"note\": \"Excellent technique\"\r\n}",
+                                    "raw": "{\n    \"judge_id\": 1,\n    \"score\": 9.5,\n    \"entry_id\": 1,\n    \"criteria\": \"Vocals\",\n    \"note\": \"Excellent technique\",\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -10261,6 +11648,15 @@
                                         "destroy",
                                         "1"
                                     ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
                                 }
                             },
                             "response": []
