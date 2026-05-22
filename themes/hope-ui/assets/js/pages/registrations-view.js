@@ -3033,6 +3033,8 @@ var RegistrationView = (function() {
                     btnConfirmTalentAlliance.innerHTML = 'Xác nhận';
                     btnConfirmTalentAlliance.disabled = false;
 
+                    console.log('Save alliance response:', data);
+
                     if (data.success) {
                         // Cập nhật UI
                         var allianceSelect = document.getElementById('talent_alliance_property');
