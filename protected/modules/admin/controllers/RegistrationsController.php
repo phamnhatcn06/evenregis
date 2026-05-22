@@ -2064,6 +2064,8 @@ class RegistrationsController extends AdminController
 		$entry->director = $director;
 		$entry->director_phone = $directorPhone;
 		$entry->origin = $origin;
+		$entry->music_path = $musicPath;
+		$entry->video_path = $videoPath;
 		$entry->alliance_property_ids = !empty($alliancePropertyIds) ? implode(',', $alliancePropertyIds) : null;
 
 		$result = $entry->storeViaApi();
