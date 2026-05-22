@@ -244,9 +244,13 @@ var RegistrationView = (function() {
                 var sportsCard = document.getElementById('sports-registration-card');
                 var sportsEventContentId = sportsCard ? sportsCard.getAttribute('data-event-content-id') : '';
 
+                console.log('Sports Alliance Save - event_content_id:', sportsEventContentId);
+
                 var formData = new FormData();
                 formData.append('registration_id', registrationId);
-                formData.append('event_content_id', sportsEventContentId);
+                if (sportsEventContentId) {
+                    formData.append('event_content_id', sportsEventContentId);
+                }
                 selectedIds.forEach(function(id) {
                     formData.append('target_org_ids[]', id);
                 });
