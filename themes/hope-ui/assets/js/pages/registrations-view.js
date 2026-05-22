@@ -244,8 +244,6 @@ var RegistrationView = (function() {
                 var sportsCard = document.getElementById('sports-registration-card');
                 var sportsEventContentId = sportsCard ? sportsCard.getAttribute('data-event-content-id') : '';
 
-                console.log('Sports Alliance Save - event_content_id:', sportsEventContentId);
-
                 var formData = new FormData();
                 formData.append('registration_id', registrationId);
                 if (sportsEventContentId) {
