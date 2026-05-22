@@ -240,6 +240,7 @@ var RegistrationView = (function() {
 
                 var formData = new FormData();
                 formData.append('registration_id', registrationId);
+                formData.append('content_type', 'sports');
                 selectedIds.forEach(function(id) {
                     formData.append('target_org_ids[]', id);
                 });
@@ -252,7 +253,7 @@ var RegistrationView = (function() {
                 .then(function(data) {
                     btnConfirmAlliance.innerHTML = 'Xác nhận';
                     btnConfirmAlliance.disabled = false;
-                    
+
                     if (data.success) {
                         Toast.success('Lưu đơn vị liên quân thành công');
                         
