@@ -89,7 +89,7 @@ var RegistrationView = (function() {
         var allianceSelect = document.getElementById('sport_alliance_property');
         if (!allianceSelect) return;
 
-        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId)
+        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId + '&content_type=sports')
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 allianceSelect.innerHTML = '';
