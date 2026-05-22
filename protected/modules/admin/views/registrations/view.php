@@ -207,10 +207,11 @@ foreach ($eventContents as $ec) {
 }
 ?>
 <!-- DEBUG: Xem content codes từ API -->
-<script>
-console.log('EventContents:', <?php echo json_encode($eventContents); ?>);
-console.log('ContentIdMap:', <?php echo json_encode($contentIdMap); ?>);
-</script>
+<div class="alert alert-info small mb-3">
+<strong>DEBUG EventContents:</strong><br>
+<pre style="font-size:11px;max-height:150px;overflow:auto;"><?php print_r($eventContents); ?></pre>
+<strong>ContentIdMap:</strong> <?php echo json_encode($contentIdMap); ?>
+</div>
 
 <div class="card mb-3" id="attendees-card">
     <div class="card-header d-flex justify-content-between align-items-center">
