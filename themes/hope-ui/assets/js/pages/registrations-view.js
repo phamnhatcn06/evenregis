@@ -3250,9 +3250,12 @@ var RegistrationView = (function() {
             if (cbEl.checked) remainingIds.push(cbEl.value);
         });
 
+        var talentCard = document.getElementById('talent-registration-card');
+        var talentEventContentId = talentCard ? talentCard.getAttribute('data-event-content-id') : '';
+
         var formData = new FormData();
         formData.append('registration_id', registrationId);
-        formData.append('content_type', 'talent');
+        formData.append('event_content_id', talentEventContentId);
         remainingIds.forEach(function(rid) {
             formData.append('target_org_ids[]', rid);
         });
