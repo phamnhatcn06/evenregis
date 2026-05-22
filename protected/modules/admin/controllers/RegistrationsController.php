@@ -590,7 +590,7 @@ class RegistrationsController extends AdminController
 
 		$registrationId = Yii::app()->request->getPost('registration_id');
 		$targetOrgIds = Yii::app()->request->getPost('target_org_ids', array());
-		$contentType = Yii::app()->request->getPost('content_type', 'sports');
+		$eventContentId = Yii::app()->request->getPost('event_content_id');
 
 		$model = Registrations::fetchFromApi($registrationId);
 		if (!$model || !$model->event_id || !$model->property_id) {
@@ -602,38 +602,38 @@ class RegistrationsController extends AdminController
 		$eventId = $model->event_id;
 		$requesterOrgId = $model->property_id;
 
-        // Get existing alliance requests
-        $existingRequests = AllianceRequests::getApiDataProvider(array(
-            'event_id' => $eventId,
-            'requester_org_id' => $requesterOrgId,
-        ), 100)->getData();
+		// Get existing alliance requests filtered by event_content_id
+		$params = array(
+			'event_id' => $eventId,
+			'requester_org_id' => $requesterOrgId,
+		);
+		if ($eventContentId) {
+			$params['event_content_id'] = $eventContentId;
+		}
+		$existingRequests = AllianceRequests::getApiDataProvider($params, 100)->getData();
 
-        $existingTargetIds = array();
-        foreach ($existingRequests as $req) {
-            $reqId = isset($req['id']) ? $req['id'] : (isset($req->id) ? $req->id : null);
-            $targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
-            $note = isset($req['note']) ? $req['note'] : (isset($req->note) ? $req->note : '');
+		$existingTargetIds = array();
+		foreach ($existingRequests as $req) {
+			$reqId = isset($req['id']) ? $req['id'] : (isset($req->id) ? $req->id : null);
+			$targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
 
-            // Chỉ xử lý những request có cùng content_type
-            if ($note !== $contentType) continue;
+			if ($targetId) {
+				$existingTargetIds[] = $targetId;
+				// If it's unchecked, we delete the alliance request
+				if (!in_array($targetId, $targetOrgIds)) {
+					AllianceRequests::deleteViaApi($reqId);
+				}
+			}
+		}
 
-            if ($targetId) {
-                $existingTargetIds[] = $targetId;
-                // If it's unchecked, we delete the alliance request
-                if (!in_array($targetId, $targetOrgIds)) {
-                    AllianceRequests::deleteViaApi($reqId);
-                }
-            }
-        }
-
-        // Add new ones
-        if (!empty($targetOrgIds)) {
-            foreach ($targetOrgIds as $targetId) {
-                if (!in_array($targetId, $existingTargetIds)) {
-                    $this->createAllianceRequest($eventId, $requesterOrgId, $targetId, $contentType);
-                }
-            }
-        }
+		// Add new ones
+		if (!empty($targetOrgIds)) {
+			foreach ($targetOrgIds as $targetId) {
+				if (!in_array($targetId, $existingTargetIds)) {
+					$this->createAllianceRequest($eventId, $requesterOrgId, $targetId, $eventContentId);
+				}
+			}
+		}
 
 		header('Content-Type: application/json');
 		echo CJSON::encode(array('success' => true));
