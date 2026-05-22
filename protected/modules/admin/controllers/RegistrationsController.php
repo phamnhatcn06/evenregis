@@ -601,8 +601,6 @@ class RegistrationsController extends AdminController
 			$eventContentId = null;
 		}
 
-		Yii::log("actionSaveAllianceProperties - eventContentId=" . var_export($eventContentId, true) . ", targetOrgIds=" . json_encode($targetOrgIds), 'info', 'application.alliance');
-
 		$model = Registrations::fetchFromApi($registrationId);
 		if (!$model || !$model->event_id || !$model->property_id) {
 			header('Content-Type: application/json');
