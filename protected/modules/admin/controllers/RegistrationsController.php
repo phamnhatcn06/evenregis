@@ -2044,6 +2044,8 @@ class RegistrationsController extends AdminController
 		$director = Yii::app()->getRequest()->getPost('director', '');
 		$directorPhone = Yii::app()->getRequest()->getPost('director_phone', '');
 		$origin = Yii::app()->getRequest()->getPost('origin', '');
+		$musicPath = Yii::app()->getRequest()->getPost('music_path', '');
+		$videoPath = Yii::app()->getRequest()->getPost('video_path', '');
 
 		if (empty($attendeeIds)) {
 			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một người biểu diễn.'));
