@@ -16,8 +16,6 @@ class ContentsController extends AdminController
 
 		if (isset($_POST['Contents'])) {
 			$model->setAttributes($_POST['Contents']);
-			print_r($model->attributes);
-			die;
 			$model->allow_alliance = isset($_POST['Contents']['allow_alliance']) ? intval($_POST['Contents']['allow_alliance']) : 0;
 			$model->max_alliance_teams = isset($_POST['Contents']['max_alliance_teams']) ? intval($_POST['Contents']['max_alliance_teams']) : 0;
 
