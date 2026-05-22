@@ -595,6 +595,7 @@ class RegistrationsController extends AdminController
 
 		$registrationId = Yii::app()->request->getPost('registration_id');
 		$targetOrgIds = Yii::app()->request->getPost('target_org_ids', array());
+		$contentType = Yii::app()->request->getPost('content_type', 'sports');
 
 		$model = Registrations::fetchFromApi($registrationId);
 		if (!$model || !$model->event_id || !$model->property_id) {
@@ -616,7 +617,11 @@ class RegistrationsController extends AdminController
         foreach ($existingRequests as $req) {
             $reqId = isset($req['id']) ? $req['id'] : (isset($req->id) ? $req->id : null);
             $targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
-            
+            $note = isset($req['note']) ? $req['note'] : (isset($req->note) ? $req->note : '');
+
+            // Chỉ xử lý những request có cùng content_type
+            if ($note !== $contentType) continue;
+
             if ($targetId) {
                 $existingTargetIds[] = $targetId;
                 // If it's unchecked, we delete the alliance request
@@ -630,7 +635,7 @@ class RegistrationsController extends AdminController
         if (!empty($targetOrgIds)) {
             foreach ($targetOrgIds as $targetId) {
                 if (!in_array($targetId, $existingTargetIds)) {
-                    $this->createAllianceRequest($eventId, $requesterOrgId, $targetId);
+                    $this->createAllianceRequest($eventId, $requesterOrgId, $targetId, $contentType);
                 }
             }
         }
