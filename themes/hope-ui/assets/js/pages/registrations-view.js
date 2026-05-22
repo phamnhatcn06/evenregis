@@ -2917,14 +2917,54 @@ var RegistrationView = (function() {
     var talentSelectedAttendees = [];
 
     function bindTalentEvents() {
-        var categorySelect = document.getElementById('talent_category_id');
-        if (categorySelect) {
-            categorySelect.addEventListener('change', function() {
-                if (this.value) {
-                    loadAttendeesForTalent();
-                } else {
-                    hideTalentDualListbox();
+        // Category select outside card
+        var categorySelectMain = document.getElementById('talent_category_select_main');
+        var btnOpenModal = document.getElementById('btn_open_talent_modal');
+
+        if (categorySelectMain) {
+            categorySelectMain.addEventListener('change', function() {
+                if (btnOpenModal) {
+                    btnOpenModal.disabled = !this.value;
                 }
+            });
+        }
+
+        // Button open modal
+        if (btnOpenModal) {
+            btnOpenModal.addEventListener('click', function() {
+                var categoryId = categorySelectMain ? categorySelectMain.value : '';
+                if (!categoryId) {
+                    Toast.error('Vui lòng chọn thể loại.');
+                    return;
+                }
+
+                var categoryName = categorySelectMain.options[categorySelectMain.selectedIndex].text;
+
+                // Set category vào modal
+                document.getElementById('talent_category_id_hidden').value = categoryId;
+                document.getElementById('talent_category_display').textContent = categoryName;
+
+                // Copy alliance từ ngoài vào form
+                var allianceSelect = document.getElementById('talent_alliance_property');
+                var form = document.getElementById('add-talent-form');
+                // Remove old hidden inputs
+                form.querySelectorAll('input[name="alliance_property_ids[]"]').forEach(function(el) { el.remove(); });
+                if (allianceSelect) {
+                    Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
+                        var hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'alliance_property_ids[]';
+                        hidden.value = opt.value;
+                        form.appendChild(hidden);
+                    });
+                }
+
+                // Load attendees
+                loadAttendeesForTalent();
+
+                // Open modal
+                var modal = new bootstrap.Modal(document.getElementById('addTalentModal'));
+                modal.show();
             });
         }
 
@@ -2996,12 +3036,43 @@ var RegistrationView = (function() {
             });
         }
 
-        var modal = document.getElementById('addTalentModal');
-        if (modal) {
-            modal.addEventListener('show.bs.modal', function() {
-                resetTalentModal();
+        // Load categories và alliance khi page load
+        loadTalentCategoriesMain();
+        loadTalentAllianceProperties();
+
+        // Reset modal khi đóng
+        var modalEl = document.getElementById('addTalentModal');
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function() {
+                document.getElementById('add-talent-form').reset();
+                talentAllAttendees = [];
+                talentSelectedAttendees = [];
+                removeTalentHiddenInputs();
             });
         }
+    }
+
+    function loadTalentCategoriesMain() {
+        var categorySelect = document.getElementById('talent_category_select_main');
+        if (!categorySelect) return;
+
+        categorySelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+
+        fetch(window.BASE_URL + '/admin/registrations/getTalentCategories?event_id=' + eventId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                categorySelect.innerHTML = '<option value="">-- Chọn thể loại --</option>';
+                if (data.success && data.data && data.data.length > 0) {
+                    data.data.forEach(function(item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.name;
+                        categorySelect.appendChild(opt);
+                    });
+                } else {
+                    categorySelect.innerHTML = '<option value="">-- Không có thể loại nào --</option>';
+                }
+            });
     }
 
     function resetTalentModal() {
