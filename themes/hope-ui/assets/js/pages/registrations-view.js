@@ -1335,9 +1335,12 @@ var RegistrationView = (function() {
             }
         });
 
+        var sportsCard = document.getElementById('sports-registration-card');
+        var sportsEventContentId = sportsCard ? sportsCard.getAttribute('data-event-content-id') : '';
+
         var formData = new FormData();
         formData.append('registration_id', registrationId);
-        formData.append('content_type', 'sports');
+        formData.append('event_content_id', sportsEventContentId);
         remainingIds.forEach(function(rid) {
             formData.append('target_org_ids[]', rid);
         });
