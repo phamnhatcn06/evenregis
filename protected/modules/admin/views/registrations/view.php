@@ -191,16 +191,23 @@ foreach ($transportsData as $t) {
 }
 
 // Load event contents để lấy event_content_id cho từng loại nội dung
-$eventContents = EventContents::getByEventId($model->event_id);
+$eventContents = EventContents::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
 $contentIdMap = array('sports' => null, 'talent' => null, 'competition' => null, 'miss' => null);
 foreach ($eventContents as $ec) {
-    $code = isset($ec['content_code']) ? $ec['content_code'] : (isset($ec['code']) ? $ec['code'] : '');
-    $ecId = isset($ec['id']) ? $ec['id'] : null;
+    // Lấy code từ các field có thể có
+    $code = '';
+    if (is_object($ec)) {
+        $code = isset($ec->content_code) ? $ec->content_code : (isset($ec->code) ? $ec->code : '');
+        $ecId = isset($ec->id) ? $ec->id : null;
+    } else {
+        $code = isset($ec['content_code']) ? $ec['content_code'] : (isset($ec['code']) ? $ec['code'] : '');
+        $ecId = isset($ec['id']) ? $ec['id'] : null;
+    }
     // Normalize content codes
     if ($code === 'sport') $code = 'sports';
     if ($code === 'competitions') $code = 'competition';
     if ($code === 'talent_show' || $code === 'talent-show' || $code === 'talents') $code = 'talent';
-    if ($code === 'beauty' || $code === 'beauty_contest') $code = 'miss';
+    if ($code === 'beauty' || $code === 'beauty_contest' || $code === 'beauty_contests') $code = 'miss';
     if (isset($contentIdMap[$code]) && $ecId) {
         $contentIdMap[$code] = $ecId;
     }
@@ -208,8 +215,13 @@ foreach ($eventContents as $ec) {
 ?>
 <!-- DEBUG: Xem content codes từ API -->
 <div class="alert alert-info small mb-3">
-<strong>DEBUG EventContents:</strong><br>
-<pre style="font-size:11px;max-height:150px;overflow:auto;"><?php print_r($eventContents); ?></pre>
+<strong>DEBUG EventContents (<?php echo count($eventContents); ?> items):</strong><br>
+<pre style="font-size:11px;max-height:150px;overflow:auto;"><?php
+foreach ($eventContents as $ec) {
+    if (is_object($ec)) print_r(get_object_vars($ec));
+    else print_r($ec);
+}
+?></pre>
 <strong>ContentIdMap:</strong> <?php echo json_encode($contentIdMap); ?>
 </div>
 
