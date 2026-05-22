@@ -46,6 +46,16 @@
                                 <textarea class="form-control" name="content" id="talent_content" rows="2" placeholder="Nội dung chi tiết, kịch bản..."></textarea>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">Link nhạc nền</label>
+                                <input type="url" class="form-control" name="music_path" id="talent_music_path" placeholder="https://drive.google.com/...">
+                                <small class="text-muted">Link Google Drive, Dropbox hoặc URL trực tiếp</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Link video mẫu</label>
+                                <input type="url" class="form-control" name="video_path" id="talent_video_path" placeholder="https://youtube.com/...">
+                                <small class="text-muted">Link YouTube, Google Drive hoặc URL trực tiếp</small>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Ghi chú</label>
                                 <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
                             </div>
