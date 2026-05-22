@@ -80,6 +80,7 @@ abstract class BaseContents extends GxActiveRecord
 			'description' => Yii::t('app', 'Description'),
 			'status' => Yii::t('app', 'Status'),
 			'sort_order' => Yii::t('app', 'Sort Order'),
+			'max_alliance_teams' => Yii::t('app', 'Số đội liên quân tối đa'),
 			'created_at' => Yii::t('app', 'Created At'),
 			'updated_at' => Yii::t('app', 'Updated At'),
 			'deleted_at' => Yii::t('app', 'Deleted At'),
