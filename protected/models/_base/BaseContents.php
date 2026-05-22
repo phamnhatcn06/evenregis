@@ -15,6 +15,7 @@
  * @property string $description
  * @property integer $status
  * @property integer $sort_order
+ * @property integer $allow_alliance
  * @property integer $max_alliance_teams
  * @property string $created_at
  * @property string $updated_at
