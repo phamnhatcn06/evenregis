@@ -2999,6 +2999,7 @@ var RegistrationView = (function() {
 
                 var formData = new FormData();
                 formData.append('registration_id', registrationId);
+                formData.append('content_type', 'talent');
                 selectedIds.forEach(function(id) {
                     formData.append('target_org_ids[]', id);
                 });
