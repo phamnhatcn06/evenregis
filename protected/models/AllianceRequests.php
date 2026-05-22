@@ -64,6 +64,7 @@ class AllianceRequests extends BaseAllianceRequests
 			'event_id' => $this->event_id,
 			'requester_org_id' => $this->requester_org_id,
 			'target_org_id' => $this->target_org_id,
+			'event_content_id' => $this->event_content_id,
 			'status' => self::STATUS_PENDING,
 			'requested_by' => $this->requested_by,
 			'requested_at' => date('Y-m-d H:i:s'),
