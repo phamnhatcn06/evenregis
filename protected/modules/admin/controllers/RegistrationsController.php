@@ -173,6 +173,35 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		// Load Talent Entries cho registration
+		$talentEntries = array();
+		$talentEntryMembers = array();
+		if ($model->property_id) {
+			$entriesData = TalentEntries::getApiDataProvider(array('property_id' => $model->property_id), 100)->getData();
+			foreach ($entriesData as $entry) {
+				$entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+				if ($entryId) {
+					$talentEntries[] = $entry;
+					$membersResult = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array('entry_id' => $entryId));
+					$membersData = array();
+					if ($membersResult['success'] && isset($membersResult['data'])) {
+						$membersData = isset($membersResult['data']['data']) ? $membersResult['data']['data'] : $membersResult['data'];
+					}
+					$enrichedMembers = array();
+					foreach ($membersData as $member) {
+						$attId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
+						$attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+						$memberArr = is_array($member) ? $member : get_object_vars($member);
+						if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
+							$memberArr['attendee_name'] = $attInfo['full_name'];
+						}
+						$enrichedMembers[] = $memberArr;
+					}
+					$talentEntryMembers[$entryId] = $enrichedMembers;
+				}
+			}
+		}
+
 		$this->render('view', array(
 			'model' => $model,
 			'registrationDetails' => $registrationDetails,
@@ -181,6 +210,8 @@ class RegistrationsController extends AdminController
             'sportTeams' => $sportTeams,
             'sportTeamMembers' => $sportTeamMembers,
 			'beautyContestants' => $beautyContestants,
+			'talentEntries' => $talentEntries,
+			'talentEntryMembers' => $talentEntryMembers,
 		));
 	}
 
