@@ -495,11 +495,13 @@ class RegistrationsController extends AdminController
 		$alliance->event_content_id = $eventContentId ? $eventContentId : null;
 
 		$result = $alliance->storeViaApi();
-		if (!$result['success']) {
-			Yii::log("Failed to create alliance request: " . json_encode($result), 'error', 'application.alliance');
-		} else {
-			Yii::log("Created alliance request for event=$eventId, requester=$requesterOrgId, target=$targetOrgId, event_content_id=$eventContentId", 'info', 'application.alliance');
-		}
+		// Debug: log kết quả
+		Yii::log("Alliance storeViaApi - data sent: " . json_encode(array(
+			'event_id' => $eventId,
+			'requester_org_id' => $requesterOrgId,
+			'target_org_id' => $targetOrgId,
+			'event_content_id' => $eventContentId,
+		)) . " - result: " . json_encode($result), 'info', 'application.alliance');
 	}
 
 	public function actionGetRelationProperties($property_id)
