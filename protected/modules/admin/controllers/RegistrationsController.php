@@ -484,26 +484,21 @@ class RegistrationsController extends AdminController
 		}
 	}
 
-	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId)
+	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId, $contentType = 'sports')
 	{
-		$existing = AllianceRequests::findByRegistration($eventId, $requesterOrgId, $targetOrgId);
-		if ($existing) {
-			Yii::log("Alliance request already exists for event=$eventId, requester=$requesterOrgId, target=$targetOrgId", 'info', 'application.alliance');
-			return;
-		}
-
 		$ssoUser = AuthHandler::getUser();
 		$alliance = new AllianceRequests;
 		$alliance->event_id = $eventId;
 		$alliance->requester_org_id = $requesterOrgId;
 		$alliance->target_org_id = $targetOrgId;
 		$alliance->requested_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+		$alliance->note = $contentType;
 
 		$result = $alliance->storeViaApi();
 		if (!$result['success']) {
 			Yii::log("Failed to create alliance request: " . json_encode($result), 'error', 'application.alliance');
 		} else {
-			Yii::log("Created alliance request for event=$eventId, requester=$requesterOrgId, target=$targetOrgId", 'info', 'application.alliance');
+			Yii::log("Created alliance request for event=$eventId, requester=$requesterOrgId, target=$targetOrgId, type=$contentType", 'info', 'application.alliance');
 		}
 	}
 
