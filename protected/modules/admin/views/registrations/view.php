@@ -199,7 +199,7 @@ foreach ($eventContents as $ec) {
     // Normalize content codes
     if ($code === 'sport') $code = 'sports';
     if ($code === 'competitions') $code = 'competition';
-    if ($code === 'talent_show' || $code === 'talent-show') $code = 'talent';
+    if ($code === 'talent_show' || $code === 'talent-show' || $code === 'talents') $code = 'talent';
     if ($code === 'beauty' || $code === 'beauty_contest') $code = 'miss';
     if (isset($contentIdMap[$code]) && $ecId) {
         $contentIdMap[$code] = $ecId;
