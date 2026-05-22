@@ -3459,6 +3459,7 @@ var RegistrationView = (function() {
         resetTalentModal: resetTalentModal,
         viewDocument: viewDocument,
         confirmDeleteDetail: confirmDeleteDetail,
+        confirmDeleteTalent: confirmDeleteTalent,
         editAttendee: editAttendee,
         confirmDeleteAttendee: confirmDeleteAttendee,
         removeAllianceProperty: removeAllianceProperty,
