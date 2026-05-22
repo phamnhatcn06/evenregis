@@ -3134,7 +3134,7 @@ var RegistrationView = (function() {
         var modalList = document.getElementById('talent_alliance_modal_list');
         if (!allianceSelect || !modalList) return;
 
-        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId)
+        fetch(window.BASE_URL + '/admin/registrations/getAllianceProperties?registration_id=' + registrationId + '&content_type=talent')
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 allianceSelect.innerHTML = '';
