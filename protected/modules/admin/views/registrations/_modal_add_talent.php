@@ -5,6 +5,7 @@
             <form method="post" action="<?php echo $this->createUrl('addTalentRegistration'); ?>" id="add-talent-form">
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                 <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
+                <input type="hidden" name="category_id" id="talent_category_id_hidden" value="">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa fa-music me-2"></i>Đăng ký văn nghệ</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -13,10 +14,8 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label class="form-label">Thể loại <span class="text-danger">*</span></label>
-                                <select class="form-select" id="talent_category_id" name="category_id" required>
-                                    <option value="">-- Chọn thể loại --</option>
-                                </select>
+                                <label class="form-label">Thể loại</label>
+                                <div class="form-control bg-light" id="talent_category_display" style="pointer-events:none;"></div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Tên tiết mục <span class="text-danger">*</span></label>
@@ -26,15 +25,6 @@
                                 <label class="form-label">Thời lượng (phút)</label>
                                 <input type="number" class="form-control" name="duration" id="talent_duration" min="1" max="30" placeholder="VD: 5">
                             </div>
-                            <div class="mb-3" id="talent_alliance_wrapper">
-                                <label class="form-label">Đơn vị liên quân</label>
-                                <select id="talent_alliance_property" name="alliance_property_ids[]" class="form-select d-none" multiple></select>
-                                <div id="talent_alliance_selected_texts" class="mb-2"></div>
-                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#talentAlliancePropertyModal">
-                                    <i class="fa fa-users me-1"></i>Chọn đơn vị liên quân
-                                </button>
-                                <small class="text-muted d-block mt-1">Chọn các đơn vị cùng biểu diễn (nếu có)</small>
-                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Ghi chú</label>
                                 <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
@@ -43,7 +33,7 @@
                         <div class="col-md-8">
                             <label class="form-label">Chọn người biểu diễn <span class="text-danger">*</span></label>
                             <small class="text-muted d-block mb-2">Danh sách người có vai trò "Văn nghệ" của đơn vị</small>
-                            <div class="row" id="talent_dual_listbox_wrapper" style="display:none;">
+                            <div class="row" id="talent_dual_listbox_wrapper">
                                 <div class="col-md-5">
                                     <div class="card h-100">
                                         <div class="card-header py-2">
@@ -52,6 +42,7 @@
                                         </div>
                                         <div class="card-body p-0" style="height:300px;overflow-y:auto;">
                                             <div class="list-group list-group-flush" id="talent_available_list">
+                                                <div class="text-center text-muted p-3">Đang tải...</div>
                                             </div>
                                         </div>
                                     </div>
@@ -81,10 +72,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div id="talent_placeholder" class="text-center text-muted py-5">
-                                <i class="fa fa-music fa-3x mb-3"></i>
-                                <p>Vui lòng chọn thể loại để hiển thị danh sách người biểu diễn</p>
                             </div>
                         </div>
                     </div>
