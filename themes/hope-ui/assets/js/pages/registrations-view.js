@@ -1841,6 +1841,23 @@ var RegistrationView = (function() {
         });
     }
 
+    function confirmDeleteTalent(entryId) {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: 'Bạn có chắc chắn muốn xóa tiết mục văn nghệ này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById('delete-talent-form-' + entryId).submit();
+            }
+        });
+    }
+
     function deleteCompetitionRegistration(competitionId) {
         Swal.fire({
             title: 'Xác nhận xóa',
