@@ -492,9 +492,13 @@ class RegistrationsController extends AdminController
 		$alliance->requester_org_id = $requesterOrgId;
 		$alliance->target_org_id = $targetOrgId;
 		$alliance->requested_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
-		$alliance->event_content_id = $eventContentId;
+		$alliance->event_content_id = $eventContentId ? $eventContentId : null;
+
+		Yii::log("createAllianceRequest called with eventContentId=" . var_export($eventContentId, true), 'info', 'application.alliance');
 
 		$result = $alliance->storeViaApi();
+		Yii::log("storeViaApi result: " . json_encode($result), 'info', 'application.alliance');
+
 		if (!$result['success']) {
 			Yii::log("Failed to create alliance request: " . json_encode($result), 'error', 'application.alliance');
 		} else {
