@@ -3006,9 +3006,12 @@ var RegistrationView = (function() {
                 btnConfirmTalentAlliance.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang lưu...';
                 btnConfirmTalentAlliance.disabled = true;
 
+                var talentCard = document.getElementById('talent-registration-card');
+                var talentEventContentId = talentCard ? talentCard.getAttribute('data-event-content-id') : '';
+
                 var formData = new FormData();
                 formData.append('registration_id', registrationId);
-                formData.append('content_type', 'talent');
+                formData.append('event_content_id', talentEventContentId);
                 selectedIds.forEach(function(id) {
                     formData.append('target_org_ids[]', id);
                 });
