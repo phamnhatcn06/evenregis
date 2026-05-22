@@ -53,7 +53,7 @@ abstract class BaseContents extends GxActiveRecord
 			array('name', 'required'),
 			array('status, sort_order, allow_alliance, max_alliance_teams', 'numerical', 'integerOnly' => true),
 			array('name', 'length', 'max' => 255),
-			array('description, created_at, updated_at, deleted_at', 'safe'),
+			array('code, description, created_at, updated_at, deleted_at', 'safe'),
 			array('description, status, sort_order, allow_alliance, max_alliance_teams, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
 			array('id, code, name, description, status, sort_order, allow_alliance, max_alliance_teams, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);

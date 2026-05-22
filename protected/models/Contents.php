@@ -27,6 +27,8 @@ class Contents extends BaseContents
 		$data = array_filter($this->attributes, function ($value) {
 			return $value !== null && $value !== '';
 		});
+		print_r(json_encode($data));
+		die;
 		return ApiClient::post(ApiEndpoints::CONTENT_STORE, $data);
 	}
 
