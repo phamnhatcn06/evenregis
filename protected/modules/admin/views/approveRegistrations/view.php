@@ -121,7 +121,7 @@ $attributes = array(
                 <tbody>
                     <?php if (empty($attendees)): ?>
                         <tr>
-                            <td colspan="<?php echo $model->status == Registrations::STATUS_SUBMITTED ? 9 : 8; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td>
+                            <td colspan="<?php echo $model->status == Registrations::STATUS_SUBMITTED ? 10 : 9; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($attendees as $idx => $att):
