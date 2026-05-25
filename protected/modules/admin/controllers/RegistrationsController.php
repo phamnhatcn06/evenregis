@@ -418,7 +418,11 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_APPROVED;
-			$model->reviewed_at = time();
+			$model->reviewed_at = date('Y-m-d H:i:s');
+			$ssoUser = AuthHandler::getUser();
+			if (isset($ssoUser['id'])) {
+				$model->reviewed_by = $ssoUser['id'];
+			}
 			$result = $model->updateViaApi();
 
 			if ($result['success']) {
@@ -435,7 +439,11 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_REJECTED;
-			$model->reviewed_at = time();
+			$model->reviewed_at = date('Y-m-d H:i:s');
+			$ssoUser = AuthHandler::getUser();
+			if (isset($ssoUser['id'])) {
+				$model->reviewed_by = $ssoUser['id'];
+			}
 			$model->rejection_reason = Yii::app()->getRequest()->getPost('rejection_reason', '');
 			$result = $model->updateViaApi();
 
