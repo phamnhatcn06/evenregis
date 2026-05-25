@@ -36,11 +36,11 @@ $attributes = array(
                 <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin đăng ký</h5>
                 <?php if ($model->status == Registrations::STATUS_SUBMITTED): ?>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-success btn-sm px-3" onclick="approveAllRegistration()">
-                        <i class="fa fa-check-circle me-1"></i>Duyệt tất cả
+                    <button type="button" class="btn btn-success btn-sm px-3" onclick="approveRegistration()">
+                        <i class="fa fa-check-circle me-1"></i>Duyệt đăng ký
                     </button>
-                    <button type="button" class="btn btn-outline-danger btn-sm px-3" onclick="rejectAllRegistration()">
-                        <i class="fa fa-times-circle me-1"></i>Từ chối tất cả
+                    <button type="button" class="btn btn-outline-warning btn-sm px-3" onclick="returnRegistration()">
+                        <i class="fa fa-undo me-1"></i>Trả lại
                     </button>
                 </div>
                 <?php endif; ?>
