@@ -638,8 +638,11 @@ foreach ($registrationDetails as $detail) {
                     <tr>
                         <th>Tiết mục</th>
                         <th style="width:120px;">Thể loại</th>
-                        <th style="width:100px;">Số người</th>
+                        <th style="width:80px;">Thời lượng</th>
+                        <th>Mô tả</th>
+                        <th style="width:80px;">Số người</th>
                         <th>Danh sách</th>
+                        <th style="width:80px;">Video</th>
                         <?php if ($canEdit): ?>
                             <th style="width:60px;"></th>
                         <?php endif; ?>
@@ -650,11 +653,33 @@ foreach ($registrationDetails as $detail) {
                         $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
                         $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
                         $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
+                        $description = isset($entry->description) ? $entry->description : (isset($entry['description']) ? $entry['description'] : '');
+                        $durationSeconds = isset($entry->duration_seconds) ? $entry->duration_seconds : (isset($entry['duration_seconds']) ? $entry['duration_seconds'] : 0);
+                        $videoPath = isset($entry->video_path) ? $entry->video_path : (isset($entry['video_path']) ? $entry['video_path'] : '');
+                        $musicPath = isset($entry->music_path) ? $entry->music_path : (isset($entry['music_path']) ? $entry['music_path'] : '');
                         $members = ($entryId && isset($talentEntryMembers[$entryId])) ? $talentEntryMembers[$entryId] : array();
+
+                        // Format duration
+                        $durationText = '-';
+                        if ($durationSeconds > 0) {
+                            $mins = floor($durationSeconds / 60);
+                            $secs = $durationSeconds % 60;
+                            $durationText = $mins . ':' . str_pad($secs, 2, '0', STR_PAD_LEFT);
+                        }
                     ?>
                         <tr>
                             <td><?php echo CHtml::encode($entryTitle); ?></td>
-                            <td><?php echo CHtml::encode($categoryName); ?></td>
+                            <td><span class="badge bg-info"><?php echo CHtml::encode($categoryName); ?></span></td>
+                            <td class="text-center"><?php echo $durationText; ?></td>
+                            <td>
+                                <?php if ($description): ?>
+                                    <span class="text-muted" title="<?php echo CHtml::encode($description); ?>">
+                                        <?php echo CHtml::encode(mb_substr($description, 0, 50) . (mb_strlen($description) > 50 ? '...' : '')); ?>
+                                    </span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
                             <td class="text-center"><?php echo count($members); ?></td>
                             <td>
                                 <?php foreach ($members as $idx => $member):
@@ -662,6 +687,19 @@ foreach ($registrationDetails as $detail) {
                                 ?>
                                     <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
                                 <?php endforeach; ?>
+                            </td>
+                            <td class="text-center">
+                                <?php if ($videoPath): ?>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="viewTalentVideo('<?php echo CHtml::encode(addslashes($videoPath)); ?>', '<?php echo CHtml::encode(addslashes($entryTitle)); ?>')" title="Xem video">
+                                        <i class="fa fa-play-circle"></i>
+                                    </button>
+                                <?php elseif ($musicPath): ?>
+                                    <a href="<?php echo CHtml::encode($musicPath); ?>" target="_blank" class="btn btn-sm btn-outline-secondary" title="Nghe nhạc">
+                                        <i class="fa fa-music"></i>
+                                    </a>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
                             </td>
                             <?php if ($canEdit): ?>
                                 <td class="text-center">
