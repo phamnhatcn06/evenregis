@@ -399,6 +399,8 @@ class RegistrationsController extends AdminController
 			$result = $model->updateViaApi();
 
 			if ($result['success']) {
+				// Reset rejected attendees to pending (approved attendees keep their status)
+				Attendees::resetRejectedToPending($id);
 				Yii::app()->user->setFlash('success', 'Đã nộp phiếu đăng ký.');
 			} else {
 				Yii::app()->user->setFlash('error', 'Không thể nộp phiếu đăng ký.');
