@@ -213,7 +213,7 @@ foreach ($eventContents as $ec) {
 <div class="card mb-3" id="attendees-card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự (<?php echo count($attendees); ?>)</h5>
-        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+        <?php if ($canEdit): ?>
             <div>
                 <?php if ($isHotel): ?>
                     <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addAttendeeFromStaffModal">
@@ -277,7 +277,7 @@ foreach ($eventContents as $ec) {
                         <th>Ngày đi</th>
                         <th>Phương tiện</th>
                         <th style="width:90px;">Trạng thái</th>
-                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                        <?php if ($canEdit): ?>
                             <th style="width:70px;"></th>
                         <?php endif; ?>
                     </tr>
@@ -285,7 +285,7 @@ foreach ($eventContents as $ec) {
                 <tbody>
                     <?php if (empty($attendees)): ?>
                         <tr>
-                            <td colspan="<?php echo $model->status == Registrations::STATUS_DRAFT ? 11 : 10; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td>
+                            <td colspan="<?php echo $canEdit ? 11 : 10; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($attendees as $idx => $att):
@@ -319,7 +319,7 @@ foreach ($eventContents as $ec) {
                                 <td><?php echo $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-'; ?></td>
                                 <td><?php echo CHtml::encode($transportName ?: '-'); ?></td>
                                 <td><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
-                                <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                                <?php if ($canEdit): ?>
                                     <td class="text-center">
                                         <?php if (!empty($att['contract_path']) || !empty($att['portrait_path']) || !empty($att['cccd_front_path']) || !empty($att['cccd_back_path'])):
                                             $docs = array(
@@ -376,7 +376,7 @@ foreach ($registrationDetails as $detail) {
         <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao</h5>
     </div>
     <div class="card-body">
-        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+        <?php if ($canEdit): ?>
         <!-- Form chọn liên quân và môn thể thao -->
         <div class="row mb-3 g-3 align-items-end">
             <div class="col-md-5">
@@ -428,7 +428,7 @@ foreach ($registrationDetails as $detail) {
                         <th>Tên đội</th>
                         <th style="width:100px;">Số VĐV</th>
                         <th>Danh sách VĐV</th>
-                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                        <?php if ($canEdit): ?>
                             <th style="width:80px;"></th>
                         <?php endif; ?>
                     </tr>
@@ -458,7 +458,7 @@ foreach ($registrationDetails as $detail) {
                                     <div><?php echo ($idx + 1) . '. ' . $memberInfo; ?></div>
                                 <?php endforeach; ?>
                             </td>
-                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <?php if ($canEdit): ?>
                                 <td class="text-center text-nowrap">
                                     <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editSportTeam(<?php echo $teamId; ?>)" title="Sửa">
                                         <i class="fa fa-pencil"></i>
@@ -481,7 +481,7 @@ foreach ($registrationDetails as $detail) {
 <div class="card mb-3" id="competition-registration-card">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-trophy me-2 text-primary"></i>Đăng ký thi nghiệp vụ</h5>
-        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+        <?php if ($canEdit): ?>
         <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
             <i class="fa fa-plus me-1"></i>Đăng ký
         </button>
@@ -498,7 +498,7 @@ foreach ($registrationDetails as $detail) {
                         <th>Cuộc thi</th>
                         <th style="width:100px;">Số người</th>
                         <th>Danh sách thí sinh</th>
-                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                        <?php if ($canEdit): ?>
                             <th style="width:100px;">Thao tác</th>
                         <?php endif; ?>
                     </tr>
@@ -521,7 +521,7 @@ foreach ($registrationDetails as $detail) {
                                     <div><?php echo ($idx + 1) . '. ' . $info; ?></div>
                                 <?php endforeach; ?>
                             </td>
-                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <?php if ($canEdit): ?>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editCompetitionRegistration(<?php echo $compId; ?>, '<?php echo addslashes($compData['competition_name']); ?>')" title="Sửa">
                                         <i class="fa fa-pencil"></i>
@@ -543,7 +543,7 @@ foreach ($registrationDetails as $detail) {
 <div class="card mb-3" id="miss-registration-card">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi sắc đẹp</h5>
-        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+        <?php if ($canEdit): ?>
         <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addMissModal">
             <i class="fa fa-plus me-1"></i>Đăng ký
         </button>
@@ -564,7 +564,7 @@ foreach ($registrationDetails as $detail) {
                         <th style="width:80px;">Cao (cm)</th>
                         <th style="width:80px;">Nặng (kg)</th>
                         <th style="width:100px;">Số đo</th>
-                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                        <?php if ($canEdit): ?>
                             <th style="width:60px;"></th>
                         <?php endif; ?>
                     </tr>
@@ -577,7 +577,7 @@ foreach ($registrationDetails as $detail) {
                             <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
-                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <?php if ($canEdit): ?>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editMissContestant(<?php echo $c['id']; ?>)" title="Sửa">
                                         <i class="fa fa-pencil"></i>
@@ -602,7 +602,7 @@ foreach ($registrationDetails as $detail) {
         <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
     </div>
     <div class="card-body">
-        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+        <?php if ($canEdit): ?>
         <!-- Form chọn liên quân và thể loại -->
         <div class="row mb-3 g-3 align-items-end">
             <div class="col-md-5">
@@ -640,7 +640,7 @@ foreach ($registrationDetails as $detail) {
                         <th style="width:120px;">Thể loại</th>
                         <th style="width:100px;">Số người</th>
                         <th>Danh sách</th>
-                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                        <?php if ($canEdit): ?>
                             <th style="width:60px;"></th>
                         <?php endif; ?>
                     </tr>
@@ -663,7 +663,7 @@ foreach ($registrationDetails as $detail) {
                                     <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
                                 <?php endforeach; ?>
                             </td>
-                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <?php if ($canEdit): ?>
                                 <td class="text-center">
                                     <form method="post" action="<?php echo $this->createUrl('deleteTalentEntry', array('id' => $entryId, 'registration_id' => $model->id)); ?>" id="delete-talent-form-<?php echo $entryId; ?>" style="display:none;"></form>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTalent(<?php echo $entryId; ?>)">
