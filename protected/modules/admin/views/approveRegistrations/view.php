@@ -539,15 +539,15 @@ function rejectAttendee(attendeeId) {
     });
 }
 
-function approveAllRegistration() {
+function approveRegistration() {
     Swal.fire({
-        title: 'Duyệt tất cả',
-        text: 'Bạn có chắc chắn muốn phê duyệt toàn bộ phiếu đăng ký này?',
+        title: 'Duyệt đăng ký',
+        text: 'Bạn có chắc chắn muốn duyệt phiếu đăng ký này?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#28a745',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Duyệt tất cả',
+        confirmButtonText: 'Duyệt',
         cancelButtonText: 'Hủy'
     }).then(function(result) {
         if (result.isConfirmed) {
@@ -571,9 +571,76 @@ function approveAllRegistration() {
     });
 }
 
-function rejectAllRegistration() {
+function returnRegistration() {
     Swal.fire({
-        title: 'Từ chối toàn bộ đăng ký',
+        title: 'Trả lại đăng ký',
+        input: 'textarea',
+        inputLabel: 'Lý do trả lại',
+        inputPlaceholder: 'Nhập lý do trả lại để đơn vị chỉnh sửa...',
+        inputAttributes: {
+            'aria-label': 'Lý do trả lại'
+        },
+        showCancelButton: true,
+        confirmButtonColor: '#ffc107',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Trả lại',
+        cancelButtonText: 'Hủy',
+        inputValidator: function(value) {
+            if (!value || !value.trim()) {
+                return 'Vui lòng nhập lý do trả lại!';
+            }
+        }
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            $.post('{$rejectAllUrl}', { registration_id: registrationId, reason: result.value }, function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Đã trả lại!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(function() {
+                        window.location.href = '{$adminUrl}';
+                    });
+                } else {
+                    Toast.error(response.error || 'Có lỗi xảy ra.');
+                }
+            }, 'json').fail(function() {
+                Toast.error('Có lỗi xảy ra khi gọi API.');
+            });
+        }
+    });
+}
+
+function approveAllAttendees() {
+    Swal.fire({
+        title: 'Duyệt tất cả người tham dự',
+        text: 'Bạn có chắc chắn muốn duyệt tất cả người đang chờ duyệt?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Duyệt tất cả',
+        cancelButtonText: 'Hủy'
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            $.post('{$approveAttendeeUrl}', { registration_id: registrationId, all: 1 }, function(response) {
+                if (response.success) {
+                    Toast.success(response.message);
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    Toast.error(response.error || 'Có lỗi xảy ra.');
+                }
+            }, 'json').fail(function() {
+                Toast.error('Có lỗi xảy ra khi gọi API.');
+            });
+        }
+    });
+}
+
+function rejectAllAttendees() {
+    Swal.fire({
+        title: 'Từ chối tất cả người tham dự',
         input: 'textarea',
         inputLabel: 'Lý do từ chối',
         inputPlaceholder: 'Nhập lý do từ chối...',
@@ -592,16 +659,10 @@ function rejectAllRegistration() {
         }
     }).then(function(result) {
         if (result.isConfirmed) {
-            $.post('{$rejectAllUrl}', { registration_id: registrationId, reason: result.value }, function(response) {
+            $.post('{$rejectAttendeeUrl}', { registration_id: registrationId, all: 1, reason: result.value }, function(response) {
                 if (response.success) {
-                    Swal.fire({
-                        title: 'Đã từ chối!',
-                        text: response.message,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(function() {
-                        window.location.href = '{$adminUrl}';
-                    });
+                    Toast.success(response.message);
+                    setTimeout(function() { location.reload(); }, 1000);
                 } else {
                     Toast.error(response.error || 'Có lỗi xảy ra.');
                 }
