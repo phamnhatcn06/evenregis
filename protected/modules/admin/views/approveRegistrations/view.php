@@ -593,7 +593,7 @@ function returnRegistration() {
         }
     }).then(function(result) {
         if (result.isConfirmed) {
-            $.post('{$rejectAllUrl}', { registration_id: registrationId, reason: result.value }, function(response) {
+            $.post('{$returnUrl}', { registration_id: registrationId, reason: result.value }, function(response) {
                 if (response.success) {
                     Swal.fire({
                         title: 'Đã trả lại!',
