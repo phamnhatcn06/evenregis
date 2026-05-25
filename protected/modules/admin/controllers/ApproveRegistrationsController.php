@@ -319,7 +319,7 @@ class ApproveRegistrationsController extends AdminController
                     $attendee = new Attendees();
                     $attendee->id = $att['id'];
                     $attendee->approval_status = Attendees::APPROVAL_REJECTED;
-                    $attendee->rejection_reason = $reason;
+                    $attendee->note = $reason;
                     $attendee->approved_at = date('Y-m-d H:i:s');
                     $attendee->approved_by = $approvedBy;
                     $attendee->updateViaApi();
@@ -340,7 +340,7 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $attendee->approval_status = Attendees::APPROVAL_REJECTED;
-        $attendee->rejection_reason = $reason;
+        $attendee->note = $reason;
         $attendee->approved_at = date('Y-m-d H:i:s');
         $attendee->approved_by = $approvedBy;
 
@@ -446,7 +446,7 @@ class ApproveRegistrationsController extends AdminController
                 $attendee = Attendees::fetchFromApi($attId);
                 if ($attendee && $attendee->approval_status != Attendees::APPROVAL_REJECTED) {
                     $attendee->approval_status = Attendees::APPROVAL_REJECTED;
-                    $attendee->rejection_reason = $reason;
+                    $attendee->note = $reason;
                     $attendee->approved_at = time();
                     $attendee->approved_by = $approvedBy;
                     $result = $attendee->updateViaApi();
