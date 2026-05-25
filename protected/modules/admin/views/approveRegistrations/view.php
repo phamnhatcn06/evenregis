@@ -195,6 +195,175 @@ $attributes = array(
     </div>
 </div>
 
+<!-- 1. ĐĂNG KÝ THI ĐẤU THỂ THAO -->
+<div class="card mb-3">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao</h5>
+    </div>
+    <div class="card-body">
+        <?php if (empty($sportTeams)): ?>
+            <p class="text-muted mb-0">Chưa đăng ký môn thể thao nào.</p>
+        <?php else: ?>
+            <table class="table table-bordered table-striped table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Môn thi đấu</th>
+                        <th>Tên đội</th>
+                        <th style="width:100px;">Số VĐV</th>
+                        <th>Danh sách VĐV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($sportTeams as $team):
+                        $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+                        $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
+                        $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
+                        $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
+                    ?>
+                        <tr>
+                            <td><?php echo CHtml::encode($sportName); ?></td>
+                            <td><span class="badge bg-primary"><?php echo CHtml::encode($teamName); ?></span></td>
+                            <td class="text-center"><?php echo count($members); ?></td>
+                            <td>
+                                <?php foreach ($members as $idx => $member):
+                                    $memberName = isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : '');
+                                ?>
+                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($memberName); ?></span>
+                                <?php endforeach; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- 2. ĐĂNG KÝ THI NGHIỆP VỤ -->
+<div class="card mb-3">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fa fa-trophy me-2 text-primary"></i>Đăng ký thi nghiệp vụ</h5>
+    </div>
+    <div class="card-body">
+        <?php if (empty($competitionRegistrations)): ?>
+            <p class="text-muted mb-0">Chưa đăng ký thi nghiệp vụ nào.</p>
+        <?php else: ?>
+            <table class="table table-bordered table-striped table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Cuộc thi</th>
+                        <th style="width:100px;">Số người</th>
+                        <th>Danh sách thí sinh</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($competitionRegistrations as $compId => $compData): ?>
+                        <tr>
+                            <td><?php echo CHtml::encode($compData['competition_name']); ?></td>
+                            <td class="text-center"><?php echo count($compData['attendees']); ?></td>
+                            <td>
+                                <?php foreach ($compData['attendees'] as $idx => $att):
+                                    $name = $att['attendee_name'];
+                                    $position = $att['position_name'];
+                                    $division = $att['division_name'];
+                                    $info = $name;
+                                    if ($position || $division) {
+                                        $info .= ' <small class="text-muted">(' . trim($position . ' - ' . $division, ' -') . ')</small>';
+                                    }
+                                ?>
+                                    <div><?php echo ($idx + 1) . '. ' . $info; ?></div>
+                                <?php endforeach; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
+<div class="card mb-3">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi sắc đẹp</h5>
+    </div>
+    <div class="card-body">
+        <?php if (empty($beautyContestants)): ?>
+            <p class="text-muted mb-0">Chưa đăng ký thi sắc đẹp nào.</p>
+        <?php else: ?>
+            <?php foreach ($beautyContestants as $contestData): ?>
+            <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
+            <table class="table table-bordered table-striped table-sm mb-3">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:80px;">SBD</th>
+                        <th>Họ tên</th>
+                        <th style="width:80px;">Cao (cm)</th>
+                        <th style="width:80px;">Nặng (kg)</th>
+                        <th style="width:100px;">Số đo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($contestData['contestants'] as $c): ?>
+                        <tr>
+                            <td><span class="badge bg-primary"><?php echo CHtml::encode($c['candidate_number']); ?></span></td>
+                            <td><?php echo CHtml::encode($c['attendee_name']); ?></td>
+                            <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
+                            <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
+                            <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
+<div class="card mb-3">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
+    </div>
+    <div class="card-body">
+        <?php if (empty($talentEntries)): ?>
+            <p class="text-muted mb-0">Chưa đăng ký tiết mục văn nghệ nào.</p>
+        <?php else: ?>
+            <table class="table table-bordered table-striped table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tiết mục</th>
+                        <th style="width:120px;">Thể loại</th>
+                        <th style="width:100px;">Số người</th>
+                        <th>Danh sách</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($talentEntries as $entry):
+                        $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+                        $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
+                        $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
+                        $members = ($entryId && isset($talentEntryMembers[$entryId])) ? $talentEntryMembers[$entryId] : array();
+                    ?>
+                        <tr>
+                            <td><?php echo CHtml::encode($entryTitle); ?></td>
+                            <td><?php echo CHtml::encode($categoryName); ?></td>
+                            <td class="text-center"><?php echo count($members); ?></td>
+                            <td>
+                                <?php foreach ($members as $idx => $member):
+                                    $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
+                                ?>
+                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
+                                <?php endforeach; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    </div>
+</div>
+
 <!-- Modal View All Documents -->
 <div class="modal fade" id="allDocumentsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
