@@ -192,6 +192,36 @@ $attributes = array(
     </div>
 </div>
 
+<!-- Modal View All Documents -->
+<div class="modal fade" id="allDocumentsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tài liệu đính kèm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="all_documents_viewer">
+                <!-- Content will be injected dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal View Single Document -->
+<div class="modal fade" id="documentModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xem tài liệu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center" id="document_viewer">
+                <!-- Content will be injected dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
 $baseUrl = Yii::app()->theme->baseUrl;
 Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/DataTables/datatables.min.css');
