@@ -232,7 +232,7 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
-     * Phê duyệt một người tham dự
+     * Phê duyệt một hoặc tất cả người tham dự
      */
     public function actionApproveAttendee()
     {
@@ -243,6 +243,32 @@ class ApproveRegistrationsController extends AdminController
             Yii::app()->end();
         }
 
+        $ssoUser = AuthHandler::getUser();
+        $approvedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+        $all = Yii::app()->request->getPost('all');
+        $registrationId = Yii::app()->request->getPost('registration_id');
+
+        // Bulk approve all pending attendees
+        if ($all && $registrationId) {
+            $attendees = Attendees::getByRegistrationId($registrationId);
+            $count = 0;
+            foreach ($attendees as $att) {
+                $status = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
+                if ($status == Attendees::APPROVAL_PENDING) {
+                    $attendee = new Attendees();
+                    $attendee->id = $att['id'];
+                    $attendee->approval_status = Attendees::APPROVAL_APPROVED;
+                    $attendee->approved_at = date('Y-m-d H:i:s');
+                    $attendee->approved_by = $approvedBy;
+                    $attendee->updateViaApi();
+                    $count++;
+                }
+            }
+            echo CJSON::encode(array('success' => true, 'message' => "Đã duyệt {$count} người tham dự."));
+            Yii::app()->end();
+        }
+
+        // Single approve
         $attendeeId = Yii::app()->request->getPost('attendee_id');
         $attendee = Attendees::fetchFromApi($attendeeId);
 
@@ -252,9 +278,8 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $attendee->approval_status = Attendees::APPROVAL_APPROVED;
-        $attendee->approved_at = time();
-        $ssoUser = AuthHandler::getUser();
-        $attendee->approved_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+        $attendee->approved_at = date('Y-m-d H:i:s');
+        $attendee->approved_by = $approvedBy;
 
         $result = $attendee->updateViaApi();
 
@@ -267,7 +292,7 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
-     * Từ chối một người tham dự
+     * Từ chối một hoặc tất cả người tham dự
      */
     public function actionRejectAttendee()
     {
@@ -278,8 +303,35 @@ class ApproveRegistrationsController extends AdminController
             Yii::app()->end();
         }
 
-        $attendeeId = Yii::app()->request->getPost('attendee_id');
+        $ssoUser = AuthHandler::getUser();
+        $approvedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
         $reason = Yii::app()->request->getPost('reason', '');
+        $all = Yii::app()->request->getPost('all');
+        $registrationId = Yii::app()->request->getPost('registration_id');
+
+        // Bulk reject all pending attendees
+        if ($all && $registrationId) {
+            $attendees = Attendees::getByRegistrationId($registrationId);
+            $count = 0;
+            foreach ($attendees as $att) {
+                $status = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
+                if ($status == Attendees::APPROVAL_PENDING) {
+                    $attendee = new Attendees();
+                    $attendee->id = $att['id'];
+                    $attendee->approval_status = Attendees::APPROVAL_REJECTED;
+                    $attendee->rejection_reason = $reason;
+                    $attendee->approved_at = date('Y-m-d H:i:s');
+                    $attendee->approved_by = $approvedBy;
+                    $attendee->updateViaApi();
+                    $count++;
+                }
+            }
+            echo CJSON::encode(array('success' => true, 'message' => "Đã từ chối {$count} người tham dự."));
+            Yii::app()->end();
+        }
+
+        // Single reject
+        $attendeeId = Yii::app()->request->getPost('attendee_id');
         $attendee = Attendees::fetchFromApi($attendeeId);
 
         if (!$attendee) {
@@ -289,9 +341,8 @@ class ApproveRegistrationsController extends AdminController
 
         $attendee->approval_status = Attendees::APPROVAL_REJECTED;
         $attendee->rejection_reason = $reason;
-        $attendee->approved_at = time();
-        $ssoUser = AuthHandler::getUser();
-        $attendee->approved_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+        $attendee->approved_at = date('Y-m-d H:i:s');
+        $attendee->approved_by = $approvedBy;
 
         $result = $attendee->updateViaApi();
 
