@@ -570,7 +570,9 @@ foreach ($registrationDetails as $detail) {
                         <th style="width:80px;">Cao (cm)</th>
                         <th style="width:80px;">Nặng (kg)</th>
                         <th style="width:100px;">Số đo</th>
-                        <th style="width:60px;"></th>
+                        <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                            <th style="width:60px;"></th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -581,14 +583,16 @@ foreach ($registrationDetails as $detail) {
                             <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editMissContestant(<?php echo $c['id']; ?>)" title="Sửa">
-                                    <i class="fa fa-pencil"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </td>
+                            <?php if ($model->status == Registrations::STATUS_DRAFT): ?>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editMissContestant(<?php echo $c['id']; ?>)" title="Sửa">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
