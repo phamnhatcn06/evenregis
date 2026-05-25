@@ -896,6 +896,63 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         var container = document.getElementById("videoContainer");
         container.innerHTML = "";
     }
+    function editTalentEntry(id) {
+        fetch(window.BASE_URL + "admin/registrations/getTalentEntry?id=" + id)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success && data.data) {
+                    var entry = data.data;
+                    document.getElementById("edit_talent_id").value = entry.id;
+                    document.getElementById("edit_talent_title").value = entry.title || "";
+                    document.getElementById("edit_talent_category").value = entry.category_name || "";
+                    document.getElementById("edit_talent_duration").value = entry.duration_seconds || "";
+                    document.getElementById("edit_talent_director").value = entry.director || "";
+                    document.getElementById("edit_talent_director_phone").value = entry.director_phone || "";
+                    document.getElementById("edit_talent_description").value = entry.description || "";
+                    document.getElementById("edit_talent_content").value = entry.content || "";
+                    document.getElementById("edit_talent_origin").value = entry.origin || "";
+                    document.getElementById("edit_talent_participant_count").value = entry.participant_count || "";
+                    document.getElementById("edit_talent_music_path").value = entry.music_path || "";
+                    document.getElementById("edit_talent_video_path").value = entry.video_path || "";
+                    document.getElementById("edit_talent_note").value = entry.note || "";
+                    var modal = new bootstrap.Modal(document.getElementById("editTalentModal"));
+                    modal.show();
+                } else {
+                    Toast.error(data.message || "Không thể tải thông tin tiết mục");
+                }
+            })
+            .catch(function() {
+                Toast.error("Lỗi kết nối server");
+            });
+    }
+    function previewEditVideo() {
+        var url = document.getElementById("edit_talent_video_path").value;
+        if (url) {
+            viewTalentVideo(url, "Xem trước video");
+        }
+    }
+    document.getElementById("editTalentForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        var form = this;
+        var formData = new FormData(form);
+        fetch(window.BASE_URL + "admin/registrations/updateTalentEntry", {
+            method: "POST",
+            body: formData
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                Toast.success("Cập nhật tiết mục thành công");
+                bootstrap.Modal.getInstance(document.getElementById("editTalentModal")).hide();
+                setTimeout(function() { location.reload(); }, 1000);
+            } else {
+                Toast.error(data.message || "Cập nhật thất bại");
+            }
+        })
+        .catch(function() {
+            Toast.error("Lỗi kết nối server");
+        });
+    });
     function confirmSubmitRegistration() {
         Swal.fire({
             title: "Xác nhận nộp phiếu",
