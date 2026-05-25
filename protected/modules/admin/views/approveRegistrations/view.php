@@ -151,6 +151,24 @@ $attributes = array(
                                 <td><?php echo $checkInDate ? date('d/m/Y', strtotime($checkInDate)) : '-'; ?></td>
                                 <td><?php echo $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-'; ?></td>
                                 <td class="status-cell"><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
+                                <td class="text-center">
+                                    <?php
+                                    $hasDoc = !empty($att['portrait_path']) || !empty($att['cccd_front_path']) || !empty($att['cccd_back_path']) || !empty($att['contract_path']);
+                                    if ($hasDoc):
+                                        $docs = array(
+                                            'portrait' => isset($att['portrait_path']) ? $att['portrait_path'] : '',
+                                            'cccd_front' => isset($att['cccd_front_path']) ? $att['cccd_front_path'] : '',
+                                            'cccd_back' => isset($att['cccd_back_path']) ? $att['cccd_back_path'] : '',
+                                            'contract' => isset($att['contract_path']) ? $att['contract_path'] : '',
+                                        );
+                                    ?>
+                                        <button type="button" class="btn btn-sm btn-outline-info" onclick="viewAllDocuments(this)" data-docs="<?php echo CHtml::encode(CJSON::encode($docs)); ?>" title="Xem tài liệu">
+                                            <i class="fa fa-folder-open-o"></i>
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
                                 <?php if ($model->status == Registrations::STATUS_SUBMITTED): ?>
                                     <td class="text-center action-cell">
                                         <?php if ($approvalStatus == Attendees::APPROVAL_PENDING): ?>
