@@ -114,8 +114,10 @@ class Attendees extends BaseAttendees
         $attendees = self::getByRegistrationId($registrationId);
         $count = 0;
         $errors = array();
+        $debug = array();
         foreach ($attendees as $att) {
             $status = isset($att['approval_status']) ? (int)$att['approval_status'] : self::APPROVAL_PENDING;
+            $debug[] = array('id' => $att['id'], 'status' => $status);
             // Chỉ reset những attendee bị từ chối (status=2), giữ nguyên đã duyệt (status=1)
             if ($status == self::APPROVAL_REJECTED) {
                 $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $att['id']));
@@ -130,7 +132,8 @@ class Attendees extends BaseAttendees
                 }
             }
         }
-        return array('success' => empty($errors), 'count' => $count, 'errors' => $errors);
+        Yii::log('resetRejectedToPending debug: ' . CJSON::encode($debug), 'info', 'attendees');
+        return array('success' => empty($errors), 'count' => $count, 'errors' => $errors, 'debug' => $debug);
     }
 
     /**
