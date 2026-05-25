@@ -395,7 +395,11 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_SUBMITTED;
-			$model->submitted_at = time();
+			$model->submitted_at = date('Y-m-d H:i:s');
+			$ssoUser = AuthHandler::getUser();
+			if (isset($ssoUser['id'])) {
+				$model->submitted_by = $ssoUser['id'];
+			}
 			$result = $model->updateViaApi();
 
 			if ($result['success']) {
