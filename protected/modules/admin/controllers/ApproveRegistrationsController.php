@@ -510,7 +510,7 @@ class ApproveRegistrationsController extends AdminController
                 'message' => 'Đã từ chối phiếu đăng ký.',
             ));
         } else {
-            echo CJSON::encode(array('success' => false, 'error' => 'Không thể trả lại phiếu đăng ký.'));
+            echo CJSON::encode(array('success' => false, 'error' => 'Không thể từ chối phiếu đăng ký.'));
         }
         Yii::app()->end();
     }
