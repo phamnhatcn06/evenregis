@@ -1,0 +1,86 @@
+<?php
+$form = $this->beginWidget('booster.widgets.TbActiveForm', array(
+    'id' => 'talent-shows-form',
+    'type' => 'horizontal',
+    'htmlOptions' => array('class' => 'needs-validation'),
+));
+?>
+
+<div class="row">
+    <div class="col-md-6">
+        <?php echo $form->dropDownListGroup($model, 'event_id', array(
+            'widgetOptions' => array(
+                'data' => $events,
+                'htmlOptions' => array('prompt' => '-- Chọn sự kiện --', 'class' => 'form-select'),
+            ),
+        )); ?>
+    </div>
+    <div class="col-md-6">
+        <?php echo $form->textFieldGroup($model, 'name', array(
+            'widgetOptions' => array('htmlOptions' => array('maxlength' => 255)),
+        )); ?>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <?php echo $form->dateFieldGroup($model, 'registration_open_at', array(
+            'widgetOptions' => array('htmlOptions' => array('class' => 'form-control')),
+        )); ?>
+    </div>
+    <div class="col-md-6">
+        <?php echo $form->dateFieldGroup($model, 'registration_close_at', array(
+            'widgetOptions' => array('htmlOptions' => array('class' => 'form-control')),
+        )); ?>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <?php echo $form->dateFieldGroup($model, 'show_date', array(
+            'widgetOptions' => array('htmlOptions' => array('class' => 'form-control')),
+        )); ?>
+    </div>
+    <div class="col-md-6">
+        <?php echo $form->textFieldGroup($model, 'location', array(
+            'widgetOptions' => array('htmlOptions' => array('maxlength' => 255)),
+        )); ?>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <?php echo $form->numberFieldGroup($model, 'max_entries_per_org', array(
+            'widgetOptions' => array('htmlOptions' => array('min' => 1, 'placeholder' => 'Tối đa tiết mục mỗi đơn vị')),
+        )); ?>
+    </div>
+    <div class="col-md-6">
+        <?php echo $form->checkBoxGroup($model, 'is_active', array(
+            'widgetOptions' => array('htmlOptions' => array('value' => 1)),
+        )); ?>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <?php echo $form->textAreaGroup($model, 'description', array(
+            'widgetOptions' => array('htmlOptions' => array('rows' => 3)),
+        )); ?>
+    </div>
+</div>
+
+<div class="form-actions">
+    <?php $this->widget('booster.widgets.TbButton', array(
+        'buttonType' => 'submit',
+        'context' => 'primary',
+        'label' => $model->isNewRecord ? 'Tạo mới' : 'Cập nhật',
+    )); ?>
+    <?php $this->widget('booster.widgets.TbButton', array(
+        'buttonType' => 'link',
+        'context' => 'secondary',
+        'label' => 'Hủy',
+        'url' => $this->createUrl('admin'),
+    )); ?>
+</div>
+
+<?php $this->endWidget(); ?>
