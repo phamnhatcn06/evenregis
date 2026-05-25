@@ -810,6 +810,22 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
     function removeAllianceProperty(id) { RegistrationView.removeAllianceProperty(id); }
     function confirmDeleteTeam(id) { RegistrationView.confirmDeleteTeam(id); }
+    function confirmSubmitRegistration() {
+        Swal.fire({
+            title: "Xác nhận nộp phiếu",
+            text: "Bạn có chắc muốn nộp phiếu đăng ký này? Những người tham dự bị từ chối trước đó sẽ được chuyển về trạng thái chờ duyệt.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#17a2b8",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Nộp",
+            cancelButtonText: "Hủy"
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById("form-submit-registration").submit();
+            }
+        });
+    }
 
     function initAttendeesDataTable() {
         if (typeof $.fn.DataTable === "undefined") return;
