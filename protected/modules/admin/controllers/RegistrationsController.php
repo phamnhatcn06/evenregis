@@ -409,13 +409,9 @@ class RegistrationsController extends AdminController
 				if ($resetResult['count'] > 0) {
 					$msg .= ' Đã chuyển ' . $resetResult['count'] . ' người bị từ chối về trạng thái chờ duyệt.';
 				}
-				// Debug: hiển thị trạng thái các attendee
-				if (!empty($resetResult['debug'])) {
-					$statuses = array();
-					foreach ($resetResult['debug'] as $d) {
-						$statuses[] = 'ID:' . $d['id'] . '=status:' . $d['status'];
-					}
-					$msg .= ' [Debug: ' . implode(', ', $statuses) . ']';
+				// Debug: hiển thị lỗi nếu có
+				if (!empty($resetResult['errors'])) {
+					$msg .= ' [Errors: ' . CJSON::encode($resetResult['errors']) . ']';
 				}
 				Yii::app()->user->setFlash('success', $msg);
 			} else {
