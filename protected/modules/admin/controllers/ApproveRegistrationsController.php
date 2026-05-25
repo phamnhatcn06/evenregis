@@ -475,6 +475,46 @@ class ApproveRegistrationsController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionReturn()
+    {
+        header('Content-Type: application/json');
+
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+
+        $registrationId = Yii::app()->request->getPost('registration_id');
+        $reason = Yii::app()->request->getPost('reason', '');
+        $model = Registrations::fetchFromApi($registrationId);
+
+        if (!$model) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy phiếu đăng ký.'));
+            Yii::app()->end();
+        }
+
+        $ssoUser = AuthHandler::getUser();
+        $reviewedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+
+        // Return registration to draft - do NOT change attendee approval status
+        $model->status = Registrations::STATUS_DRAFT;
+        $model->reviewed_at = time();
+        $model->reviewed_by = $reviewedBy;
+        $model->return_reason = $reason;
+        $model->submitted_at = null;
+        $result = $model->updateViaApi();
+
+        if ($result['success']) {
+            echo CJSON::encode(array(
+                'success' => true,
+                'message' => 'Đã trả lại phiếu đăng ký để đơn vị chỉnh sửa.',
+            ));
+        } else {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không thể trả lại phiếu đăng ký.'));
+        }
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = Registrations::fetchFromApi($id);
