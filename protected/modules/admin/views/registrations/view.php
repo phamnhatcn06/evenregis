@@ -724,6 +724,7 @@ foreach ($registrationDetails as $detail) {
 <?php $this->renderPartial('_modal_edit_miss', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_add_talent', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_document'); ?>
+<?php $this->renderPartial('_modal_video'); ?>
 <?php $this->renderPartial('_modal_reject', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_add_attendee_staff', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
 <?php $this->renderPartial('_modal_edit_attendee', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
