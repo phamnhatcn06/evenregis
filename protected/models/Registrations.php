@@ -23,6 +23,47 @@ class Registrations extends BaseRegistrations
 		return parent::model($className);
 	}
 
+	public function rules()
+	{
+		return array_merge(parent::rules(), array(
+			array('property_id', 'validateUniqueRegistration', 'on' => 'insert'),
+		));
+	}
+
+	/**
+	 * Validate mỗi đơn vị chỉ được đăng ký 1 lần cho mỗi đợt đăng ký của sự kiện
+	 */
+	public function validateUniqueRegistration($attribute, $params)
+	{
+		if ($this->hasErrors()) {
+			return;
+		}
+
+		if (!$this->event_id || !$this->property_id || !$this->period_id) {
+			return;
+		}
+
+		$existing = self::findExisting($this->event_id, $this->property_id, $this->period_id);
+		if ($existing) {
+			$this->addError($attribute, 'Đơn vị này đã có phiếu đăng ký cho đợt đăng ký này. Mỗi đợt đăng ký chỉ được đăng ký 1 lần.');
+		}
+	}
+
+	/**
+	 * Kiểm tra xem đã tồn tại đăng ký với event_id, property_id, period_id chưa
+	 */
+	public static function findExisting($eventId, $propertyId, $periodId)
+	{
+		$params = array(
+			'event_id' => $eventId,
+			'property_id' => $propertyId,
+			'period_id' => $periodId,
+		);
+		$dataProvider = self::getApiDataProvider($params, 1);
+		$data = $dataProvider->getData();
+		return !empty($data) ? $data[0] : null;
+	}
+
 	public static function fetchFromApi($id)
 	{
 		$url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_DETAIL, array('id' => $id));
