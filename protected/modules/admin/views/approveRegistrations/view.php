@@ -237,6 +237,57 @@ $adminUrl = $this->createUrl('admin');
 Yii::app()->clientScript->registerScript('approve-registrations-view', "
 var registrationId = {$registrationId};
 
+function viewAllDocuments(btn) {
+    var docs = JSON.parse(btn.getAttribute('data-docs'));
+    var labels = {
+        'portrait': 'Ảnh chân dung',
+        'cccd_front': 'CCCD mặt trước',
+        'cccd_back': 'CCCD mặt sau',
+        'contract': 'Hợp đồng'
+    };
+    var html = '<div class=\"row g-3\">';
+    for (var key in docs) {
+        if (docs[key]) {
+            var ext = docs[key].split('.').pop().toLowerCase();
+            var isPdf = (ext === 'pdf');
+            html += '<div class=\"col-md-6 col-lg-3\">';
+            html += '<div class=\"card h-100\">';
+            html += '<div class=\"card-header py-2 bg-light\"><small class=\"fw-bold\">' + labels[key] + '</small></div>';
+            if (isPdf) {
+                html += '<div class=\"card-body text-center d-flex align-items-center justify-content-center\" style=\"min-height:150px;\">';
+                html += '<i class=\"fa fa-file-pdf-o fa-3x text-danger\"></i>';
+                html += '</div>';
+            } else {
+                html += '<img src=\"' + docs[key] + '\" class=\"card-img-top\" style=\"height:150px;object-fit:cover;cursor:pointer;\" onclick=\"viewDocument(\\'' + docs[key] + '\\', \\'image\\')\">';
+            }
+            html += '<div class=\"card-footer text-center py-2\">';
+            if (!isPdf) {
+                html += '<button type=\"button\" class=\"btn btn-xs btn-outline-primary me-1\" onclick=\"viewDocument(\\'' + docs[key] + '\\', \\'image\\')\"><i class=\"fa fa-eye\"></i></button>';
+            }
+            html += '<a href=\"' + docs[key] + '\" class=\"btn btn-xs btn-outline-secondary\" download><i class=\"fa fa-download\"></i></a>';
+            if (isPdf) {
+                html += ' <a href=\"' + docs[key] + '\" target=\"_blank\" class=\"btn btn-xs btn-outline-info\"><i class=\"fa fa-external-link\"></i></a>';
+            }
+            html += '</div></div></div>';
+        }
+    }
+    html += '</div>';
+    document.getElementById('all_documents_viewer').innerHTML = html;
+    var modal = new bootstrap.Modal(document.getElementById('allDocumentsModal'));
+    modal.show();
+}
+
+function viewDocument(url, type) {
+    var viewer = document.getElementById('document_viewer');
+    if (type === 'image') {
+        viewer.innerHTML = '<img src=\"' + url + '\" style=\"max-width:100%;max-height:80vh;\">';
+    } else if (type === 'pdf') {
+        viewer.innerHTML = '<iframe src=\"' + url + '\" style=\"width:100%;height:80vh;border:none;\"></iframe>';
+    }
+    var modal = new bootstrap.Modal(document.getElementById('documentModal'));
+    modal.show();
+}
+
 function approveAttendee(attendeeId) {
     Swal.fire({
         title: 'Xác nhận duyệt',
