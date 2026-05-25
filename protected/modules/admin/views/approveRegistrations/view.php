@@ -124,7 +124,7 @@ $attributes = array(
                         <th>Ngày đi</th>
                         <th style="width:100px;">Trạng thái</th>
                         <th style="width:60px;">Tài liệu</th>
-                        <?php if ($model->status == Registrations::STATUS_SUBMITTED): ?>
+                        <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED): ?>
                             <th style="width:150px;">Thao tác</th>
                         <?php endif; ?>
                     </tr>
@@ -132,7 +132,7 @@ $attributes = array(
                 <tbody>
                     <?php if (empty($attendees)): ?>
                         <tr>
-                            <td colspan="<?php echo $model->status == Registrations::STATUS_SUBMITTED ? 11 : 10; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td>
+                            <td colspan="<?php echo (int)$model->status === Registrations::STATUS_SUBMITTED ? 11 : 10; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($attendees as $idx => $att):
@@ -187,7 +187,7 @@ $attributes = array(
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>
                                 </td>
-                                <?php if ($model->status == Registrations::STATUS_SUBMITTED): ?>
+                                <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED): ?>
                                     <td class="text-center action-cell">
                                         <?php if ($approvalStatus == Attendees::APPROVAL_PENDING): ?>
                                             <button type="button" class="btn btn-sm btn-success me-1" onclick="approveAttendee(<?php echo $attId; ?>)" title="Duyệt">
