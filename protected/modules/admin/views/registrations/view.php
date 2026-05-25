@@ -80,8 +80,8 @@ if (!empty($model->document)) {
                 <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin chung</h5>
                 <div class="btn-group">
                     <?php if ($canEdit): ?>
-                        <form method="post" action="<?php echo $this->createUrl('submit', array('id' => $model->id)); ?>" style="display:inline;">
-                            <button type="submit" class="btn btn-sm btn-info" onclick="return confirm('Bạn có chắc muốn nộp phiếu đăng ký này?')">
+                        <form id="form-submit-registration" method="post" action="<?php echo $this->createUrl('submit', array('id' => $model->id)); ?>" style="display:inline;">
+                            <button type="button" class="btn btn-sm btn-info" onclick="confirmSubmitRegistration()">
                                 <i class="fa fa-paper-plane me-1"></i>Nộp
                             </button>
                         </form>
