@@ -496,8 +496,8 @@ class ApproveRegistrationsController extends AdminController
         $ssoUser = AuthHandler::getUser();
         $reviewedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
 
-        // Return registration to draft - do NOT change attendee approval status
-        $model->status = Registrations::STATUS_DRAFT;
+        // Return registration to rejected status
+        $model->status = Registrations::STATUS_REJECTED;
         $model->reviewed_at = time();
         $model->reviewed_by = $reviewedBy;
         $model->note = $reason;
