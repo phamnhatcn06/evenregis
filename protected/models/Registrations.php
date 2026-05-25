@@ -26,7 +26,7 @@ class Registrations extends BaseRegistrations
 	public function rules()
 	{
 		return array_merge(parent::rules(), array(
-			array('property_id', 'validateUniqueRegistration', 'on' => 'insert'),
+			array('property_id', 'validateUniqueRegistration'),
 		));
 	}
 
@@ -36,6 +36,11 @@ class Registrations extends BaseRegistrations
 	public function validateUniqueRegistration($attribute, $params)
 	{
 		if ($this->hasErrors()) {
+			return;
+		}
+
+		// Chỉ validate khi tạo mới (không có id)
+		if ($this->id) {
 			return;
 		}
 
