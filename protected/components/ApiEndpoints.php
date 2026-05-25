@@ -204,7 +204,6 @@ class ApiEndpoints
     const ATTENDEE_APPROVE = '/api/attendees/approve/{id}';
     const ATTENDEE_REJECT = '/api/attendees/reject/{id}';
     const ATTENDEE_BULK_STORE = '/api/attendees/bulk-store';
-    const ATTENDEE_RESET_REJECTED = '/api/attendees/reset-rejected/{registration_id}';
 
     // Competition Department
     const COMPETITION_DEPARTMENT_LIST = '/api/competition-departments';
