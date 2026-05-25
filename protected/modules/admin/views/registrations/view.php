@@ -849,6 +849,49 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
     function removeAllianceProperty(id) { RegistrationView.removeAllianceProperty(id); }
     function confirmDeleteTeam(id) { RegistrationView.confirmDeleteTeam(id); }
+    function confirmDeleteTalent(id) {
+        Swal.fire({
+            title: "Xác nhận xóa",
+            text: "Bạn có chắc muốn xóa tiết mục này?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Xóa",
+            cancelButtonText: "Hủy"
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById("delete-talent-form-" + id).submit();
+            }
+        });
+    }
+    function viewTalentVideo(url, title) {
+        var container = document.getElementById("videoContainer");
+        var downloadLink = document.getElementById("videoDownloadLink");
+        document.getElementById("videoModalTitle").textContent = title || "Video tiết mục";
+
+        // Check if YouTube link
+        var youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if (youtubeMatch) {
+            container.innerHTML = "<iframe src=\"https://www.youtube.com/embed/" + youtubeMatch[1] + "?autoplay=1\" allowfullscreen allow=\"autoplay\" class=\"w-100 h-100\" style=\"border:none;\"></iframe>";
+            downloadLink.href = "https://www.youtube.com/watch?v=" + youtubeMatch[1];
+            downloadLink.style.display = "inline-block";
+        } else if (url.match(/\.(mp4|webm|ogg|mov)$/i)) {
+            container.innerHTML = "<video controls autoplay class=\"w-100 h-100\"><source src=\"" + url + "\" type=\"video/mp4\">Trình duyệt không hỗ trợ video.</video>";
+            downloadLink.href = url;
+            downloadLink.style.display = "inline-block";
+        } else {
+            container.innerHTML = "<div class=\"d-flex align-items-center justify-content-center h-100 bg-light\"><div class=\"text-center\"><i class=\"fa fa-external-link fa-3x text-muted mb-3\"></i><p>Link video bên ngoài</p><a href=\"" + url + "\" target=\"_blank\" class=\"btn btn-primary\"><i class=\"fa fa-play-circle me-1\"></i>Mở video</a></div></div>";
+            downloadLink.href = url;
+            downloadLink.style.display = "inline-block";
+        }
+        var modal = new bootstrap.Modal(document.getElementById("videoModal"));
+        modal.show();
+    }
+    function stopVideo() {
+        var container = document.getElementById("videoContainer");
+        container.innerHTML = "";
+    }
     function confirmSubmitRegistration() {
         Swal.fire({
             title: "Xác nhận nộp phiếu",
