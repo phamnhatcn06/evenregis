@@ -112,6 +112,7 @@ $attributes = array(
                         <th>Ngày đến</th>
                         <th>Ngày đi</th>
                         <th style="width:100px;">Trạng thái</th>
+                        <th style="width:60px;">Tài liệu</th>
                         <?php if ($model->status == Registrations::STATUS_SUBMITTED): ?>
                             <th style="width:150px;">Thao tác</th>
                         <?php endif; ?>
