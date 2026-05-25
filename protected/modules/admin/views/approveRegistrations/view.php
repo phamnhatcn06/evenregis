@@ -109,6 +109,7 @@ $attributes = array(
                         <th>Họ tên</th>
                         <th>Phòng ban - Chức danh</th>
                         <th>Vai trò</th>
+                        <th>Ngày vào làm</th>
                         <th>Ngày đến</th>
                         <th>Ngày đi</th>
                         <th style="width:100px;">Trạng thái</th>
