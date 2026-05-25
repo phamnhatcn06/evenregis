@@ -595,29 +595,37 @@ function returnRegistration() {
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Trả lại',
         cancelButtonText: 'Hủy',
-        inputValidator: function(value) {
-            if (!value || !value.trim()) {
-                return 'Vui lòng nhập lý do trả lại!';
+        allowOutsideClick: false,
+        showLoaderOnConfirm: true,
+        preConfirm: function(reason) {
+            if (!reason || !reason.trim()) {
+                Swal.showValidationMessage('Vui lòng nhập lý do trả lại!');
+                return false;
             }
+            return new Promise(function(resolve, reject) {
+                $.post('{$returnUrl}', { registration_id: registrationId, reason: reason }, function(response) {
+                    resolve(response);
+                }, 'json').fail(function() {
+                    reject('Có lỗi xảy ra khi gọi API.');
+                });
+            }).catch(function(error) {
+                Swal.showValidationMessage(error);
+            });
         }
     }).then(function(result) {
-        if (result.isConfirmed) {
-            $.post('{$returnUrl}', { registration_id: registrationId, reason: result.value }, function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        title: 'Đã trả lại!',
-                        text: response.message,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(function() {
-                        window.location.href = '{$adminUrl}';
-                    });
-                } else {
-                    Toast.error(response.error || 'Có lỗi xảy ra.');
-                }
-            }, 'json').fail(function() {
-                Toast.error('Có lỗi xảy ra khi gọi API.');
-            });
+        if (result.isConfirmed && result.value) {
+            if (result.value.success) {
+                Swal.fire({
+                    title: 'Đã trả lại!',
+                    text: result.value.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(function() {
+                    window.location.href = '{$adminUrl}';
+                });
+            } else {
+                Toast.error(result.value.error || 'Có lỗi xảy ra.');
+            }
         }
     });
 }
