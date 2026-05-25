@@ -57,6 +57,13 @@ class ApproveRegistrationsController extends AdminController
 
         // Load attendees
         $attendees = Attendees::getByRegistrationId($id);
+        $attendeesMap = array();
+        foreach ($attendees as $att) {
+            $attId = isset($att['id']) ? $att['id'] : null;
+            if ($attId) {
+                $attendeesMap[$attId] = $att;
+            }
+        }
 
         // Load roles
         $rolesData = Roles::getApiDataProvider(array(), 100)->getData();
@@ -76,11 +83,151 @@ class ApproveRegistrationsController extends AdminController
             if ($tId) $transports[$tId] = $tName;
         }
 
+        // Load competition registrations
+        $competitionRegistrations = array();
+        $compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $id), 200)->getData();
+        foreach ($compRegsData as $reg) {
+            $compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
+            if (!$compId) continue;
+
+            if (!isset($competitionRegistrations[$compId])) {
+                $competitionRegistrations[$compId] = array(
+                    'competition_id' => $compId,
+                    'competition_name' => isset($reg->competition_name) ? $reg->competition_name : (isset($reg['competition_name']) ? $reg['competition_name'] : ''),
+                    'attendees' => array(),
+                );
+            }
+
+            $attendeeId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
+            $attendeeInfo = isset($attendeesMap[$attendeeId]) ? $attendeesMap[$attendeeId] : array();
+
+            $competitionRegistrations[$compId]['attendees'][] = array(
+                'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
+                'attendee_id' => $attendeeId,
+                'attendee_name' => isset($attendeeInfo['full_name']) ? $attendeeInfo['full_name'] : '',
+                'position_name' => isset($attendeeInfo['position_name']) ? $attendeeInfo['position_name'] : '',
+                'division_name' => isset($attendeeInfo['division_name']) ? $attendeeInfo['division_name'] : '',
+            );
+        }
+
+        // Load competition names if missing
+        foreach ($competitionRegistrations as $compId => &$compData) {
+            if (empty($compData['competition_name'])) {
+                $comp = Competitions::fetchFromApi($compId);
+                $compData['competition_name'] = $comp ? $comp->name : '';
+            }
+        }
+        unset($compData);
+
+        // Load Sport Teams
+        $sportTeams = array();
+        $sportTeamMembers = array();
+        if ($model->event_id && $model->property_id) {
+            $teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id), 100)->getData();
+            foreach ($teamsData as $team) {
+                $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+                if ($teamId) {
+                    if (empty($team->sport_name) && $team->sport_id) {
+                        $sport = Sports::fetchFromApi($team->sport_id);
+                        $team->sport_name = $sport ? $sport->name : '';
+                    }
+                    $sportTeams[] = $team;
+                    $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+
+                    $enrichedMembers = array();
+                    foreach ($membersData as $member) {
+                        $attId = isset($member->attendee_id) ? $member->attendee_id : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
+                        $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+
+                        $memberArr = is_object($member) ? get_object_vars($member) : $member;
+                        if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
+                            $memberArr['attendee_name'] = $attInfo['full_name'];
+                        }
+                        $enrichedMembers[] = $memberArr;
+                    }
+                    $sportTeamMembers[$teamId] = $enrichedMembers;
+                }
+            }
+        }
+
+        // Load Beauty Contestants
+        $beautyContestants = array();
+        if ($model->event_id) {
+            $attendeeIds = array_keys($attendeesMap);
+            if (!empty($attendeeIds)) {
+                $contests = BeautyContests::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
+                foreach ($contests as $contest) {
+                    $contestId = isset($contest->id) ? $contest->id : (isset($contest['id']) ? $contest['id'] : null);
+                    $contestName = isset($contest->name) ? $contest->name : (isset($contest['name']) ? $contest['name'] : '');
+                    if (!$contestId) continue;
+
+                    $contestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 500)->getData();
+                    foreach ($contestants as $c) {
+                        $attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
+                        if ($attId && in_array($attId, $attendeeIds)) {
+                            if (!isset($beautyContestants[$contestId])) {
+                                $beautyContestants[$contestId] = array(
+                                    'contest_id' => $contestId,
+                                    'contest_name' => $contestName,
+                                    'contestants' => array(),
+                                );
+                            }
+                            $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+                            $beautyContestants[$contestId]['contestants'][] = array(
+                                'id' => isset($c->id) ? $c->id : (isset($c['id']) ? $c['id'] : null),
+                                'attendee_id' => $attId,
+                                'attendee_name' => isset($attInfo['full_name']) ? $attInfo['full_name'] : '',
+                                'candidate_number' => isset($c->candidate_number) ? $c->candidate_number : (isset($c['candidate_number']) ? $c['candidate_number'] : ''),
+                                'height_cm' => isset($c->height_cm) ? $c->height_cm : (isset($c['height_cm']) ? $c['height_cm'] : null),
+                                'weight_kg' => isset($c->weight_kg) ? $c->weight_kg : (isset($c['weight_kg']) ? $c['weight_kg'] : null),
+                                'measurements' => isset($c->measurements) ? $c->measurements : (isset($c['measurements']) ? $c['measurements'] : ''),
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // Load Talent Entries
+        $talentEntries = array();
+        $talentEntryMembers = array();
+        if ($model->property_id) {
+            $entriesData = TalentEntries::getApiDataProvider(array('property_id' => $model->property_id), 100)->getData();
+            foreach ($entriesData as $entry) {
+                $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+                if ($entryId) {
+                    $talentEntries[] = $entry;
+                    $membersResult = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array('entry_id' => $entryId));
+                    $membersData = array();
+                    if ($membersResult['success'] && isset($membersResult['data'])) {
+                        $membersData = isset($membersResult['data']['data']) ? $membersResult['data']['data'] : $membersResult['data'];
+                    }
+                    $enrichedMembers = array();
+                    foreach ($membersData as $member) {
+                        $attId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
+                        $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+                        $memberArr = is_array($member) ? $member : get_object_vars($member);
+                        if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
+                            $memberArr['attendee_name'] = $attInfo['full_name'];
+                        }
+                        $enrichedMembers[] = $memberArr;
+                    }
+                    $talentEntryMembers[$entryId] = $enrichedMembers;
+                }
+            }
+        }
+
         $this->render('view', array(
             'model' => $model,
             'attendees' => $attendees,
             'roles' => $roles,
             'transports' => $transports,
+            'competitionRegistrations' => $competitionRegistrations,
+            'sportTeams' => $sportTeams,
+            'sportTeamMembers' => $sportTeamMembers,
+            'beautyContestants' => $beautyContestants,
+            'talentEntries' => $talentEntries,
+            'talentEntryMembers' => $talentEntryMembers,
         ));
     }
 
