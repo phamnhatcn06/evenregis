@@ -153,7 +153,12 @@ $attributes = array(
                                 <td><?php echo $startDate ? date('d/m/Y', strtotime($startDate)) : '-'; ?></td>
                                 <td><?php echo $checkInDate ? date('d/m/Y', strtotime($checkInDate)) : '-'; ?></td>
                                 <td><?php echo $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-'; ?></td>
-                                <td class="status-cell"><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
+                                <td class="status-cell">
+                                    <?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?>
+                                    <?php if ($approvalStatus == Attendees::APPROVAL_REJECTED && !empty($att['rejection_reason'])): ?>
+                                        <br><small class="text-danger"><i class="fa fa-info-circle"></i> <?php echo CHtml::encode($att['rejection_reason']); ?></small>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="text-center">
                                     <?php
                                     $hasDoc = !empty($att['portrait_path']) || !empty($att['cccd_front_path']) || !empty($att['cccd_back_path']) || !empty($att['contract_path']);
