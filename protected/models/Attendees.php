@@ -111,8 +111,20 @@ class Attendees extends BaseAttendees
      */
     public static function resetRejectedToPending($registrationId)
     {
-        $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_RESET_REJECTED, array('registration_id' => $registrationId));
-        return ApiClient::post($url, array());
+        $attendees = self::getByRegistrationId($registrationId);
+        $count = 0;
+        foreach ($attendees as $att) {
+            $status = isset($att['approval_status']) ? (int)$att['approval_status'] : self::APPROVAL_PENDING;
+            if ($status == self::APPROVAL_REJECTED) {
+                $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $att['id']));
+                ApiClient::post($url, array(
+                    'approval_status' => self::APPROVAL_PENDING,
+                    'rejection_reason' => null,
+                ));
+                $count++;
+            }
+        }
+        return array('success' => true, 'count' => $count);
     }
 
     /**
