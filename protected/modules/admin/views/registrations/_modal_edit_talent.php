@@ -1,0 +1,87 @@
+<!-- Modal Sửa Tiết Mục Văn Nghệ -->
+<div class="modal fade" id="editTalentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-edit me-2"></i>Sửa tiết mục văn nghệ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editTalentForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="talent_entry_id" id="edit_talent_id">
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Tên tiết mục <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="title" id="edit_talent_title" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Thể loại</label>
+                            <input type="text" class="form-control" id="edit_talent_category" readonly disabled>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Thời lượng (giây)</label>
+                            <input type="number" class="form-control" name="duration_seconds" id="edit_talent_duration" min="0" placeholder="VD: 180">
+                            <small class="text-muted">VD: 180 giây = 3 phút</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Đạo diễn/Biên đạo</label>
+                            <input type="text" class="form-control" name="director" id="edit_talent_director" placeholder="Tên người biên đạo">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">SĐT đạo diễn</label>
+                            <input type="text" class="form-control" name="director_phone" id="edit_talent_director_phone" placeholder="Số điện thoại">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Mô tả ngắn</label>
+                            <textarea class="form-control" name="description" id="edit_talent_description" rows="2" placeholder="Mô tả nội dung tiết mục..."></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Nội dung chi tiết</label>
+                            <textarea class="form-control" name="content" id="edit_talent_content" rows="3" placeholder="Nội dung chi tiết, kịch bản, lời bài hát..."></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Nguồn gốc/Xuất xứ</label>
+                            <input type="text" class="form-control" name="origin" id="edit_talent_origin" placeholder="VD: Dân ca Bắc Bộ, Nhạc trẻ...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Số người tham gia</label>
+                            <input type="number" class="form-control" name="participant_count" id="edit_talent_participant_count" min="1">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Link nhạc nền</label>
+                            <input type="url" class="form-control" name="music_path" id="edit_talent_music_path" placeholder="https://...">
+                            <small class="text-muted">Link đến file nhạc (Google Drive, Dropbox...)</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Link video</label>
+                            <div class="input-group">
+                                <input type="url" class="form-control" name="video_path" id="edit_talent_video_path" placeholder="https://youtube.com/...">
+                                <button type="button" class="btn btn-outline-secondary" onclick="previewEditVideo()" title="Xem trước">
+                                    <i class="fa fa-play"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Link YouTube hoặc video trực tiếp</small>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea class="form-control" name="note" id="edit_talent_note" rows="2" placeholder="Ghi chú thêm..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save me-1"></i>Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
