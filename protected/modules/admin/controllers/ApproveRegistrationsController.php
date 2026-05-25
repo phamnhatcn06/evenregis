@@ -507,7 +507,7 @@ class ApproveRegistrationsController extends AdminController
         if ($result['success']) {
             echo CJSON::encode(array(
                 'success' => true,
-                'message' => 'Đã trả lại phiếu đăng ký để đơn vị chỉnh sửa.',
+                'message' => 'Đã từ chối phiếu đăng ký.',
             ));
         } else {
             echo CJSON::encode(array('success' => false, 'error' => 'Không thể trả lại phiếu đăng ký.'));
