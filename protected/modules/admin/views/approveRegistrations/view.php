@@ -98,7 +98,7 @@ $attributes = array(
 <div class="card mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự</h5>
-        <?php if ($model->status == Registrations::STATUS_SUBMITTED && $pending > 0): ?>
+        <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED && $pending > 0): ?>
         <div class="d-flex gap-2">
             <button type="button" class="btn btn-success btn-sm px-3" onclick="approveAllAttendees()">
                 <i class="fa fa-check me-1"></i>Duyệt tất cả
