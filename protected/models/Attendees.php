@@ -121,11 +121,11 @@ class Attendees extends BaseAttendees
             // Chỉ reset những attendee bị từ chối (status=2), giữ nguyên đã duyệt (status=1)
             if ($status == self::APPROVAL_REJECTED) {
                 $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $att['id']));
-                $apiResult = ApiClient::post($url, array(
-                    'approval_status' => self::APPROVAL_PENDING,
-                    'rejection_reason' => null,
-                ));
-                Yii::log('API Update attendee ' . $att['id'] . ': ' . CJSON::encode($apiResult), 'info', 'attendees');
+                // Gửi đầy đủ data hiện tại + cập nhật approval_status
+                $updateData = $att;
+                $updateData['approval_status'] = self::APPROVAL_PENDING;
+                $updateData['rejection_reason'] = null;
+                $apiResult = ApiClient::post($url, $updateData);
                 if (isset($apiResult['success']) && $apiResult['success']) {
                     $count++;
                 } else {
