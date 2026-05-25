@@ -702,9 +702,12 @@ foreach ($registrationDetails as $detail) {
                                 <?php endif; ?>
                             </td>
                             <?php if ($canEdit): ?>
-                                <td class="text-center">
+                                <td class="text-center text-nowrap">
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editTalentEntry(<?php echo $entryId; ?>)" title="Sửa">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
                                     <form method="post" action="<?php echo $this->createUrl('deleteTalentEntry', array('id' => $entryId, 'registration_id' => $model->id)); ?>" id="delete-talent-form-<?php echo $entryId; ?>" style="display:none;"></form>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTalent(<?php echo $entryId; ?>)">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTalent(<?php echo $entryId; ?>)" title="Xóa">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
