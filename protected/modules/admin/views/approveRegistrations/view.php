@@ -419,6 +419,7 @@ $approveAttendeeUrl = $this->createUrl('approveAttendee');
 $rejectAttendeeUrl = $this->createUrl('rejectAttendee');
 $approveAllUrl = $this->createUrl('approveAll');
 $rejectAllUrl = $this->createUrl('rejectAll');
+$returnUrl = $this->createUrl('return');
 $adminUrl = $this->createUrl('admin');
 
 Yii::app()->clientScript->registerScript('approve-registrations-view', "
