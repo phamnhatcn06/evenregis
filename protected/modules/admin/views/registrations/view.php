@@ -1,4 +1,6 @@
 <?php
+$canEdit = in_array($model->status, array(Registrations::STATUS_DRAFT, Registrations::STATUS_REJECTED));
+
 $this->menu = array(
     array(
         'label' => Yii::t('app', 'Manage'),
@@ -16,23 +18,25 @@ $this->menu = array(
         'icon' => 'fa-plus',
         'id' => 'btn_create',
     ),
-    array(
+);
+if ($canEdit) {
+    $this->menu[] = array(
         'label' => Yii::t('app', 'Update'),
         'labelIcon' => Yii::t('app', 'Update'),
         'url' => $this->createUrl('update', array('id' => $model->id)),
         'color' => 'warning',
         'icon' => 'fa-pencil',
         'id' => 'btn_update',
-    ),
-    array(
+    );
+    $this->menu[] = array(
         'label' => Yii::t('app', 'Delete'),
         'labelIcon' => Yii::t('app', 'Delete'),
         'url' => $this->createUrl('delete', array('id' => $model->id)),
         'color' => 'danger',
         'icon' => 'fa-trash',
         'id' => 'btn_delete'
-    ),
-);
+    );
+}
 
 $this->breadcrumbs = array(
     Registrations::label(2) => array('admin'),
