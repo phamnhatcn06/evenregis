@@ -106,6 +106,16 @@ class Attendees extends BaseAttendees
     }
 
     /**
+     * Reset rejected attendees to pending when registration is resubmitted
+     * Approved attendees keep their status
+     */
+    public static function resetRejectedToPending($registrationId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_RESET_REJECTED, array('registration_id' => $registrationId));
+        return ApiClient::post($url, array());
+    }
+
+    /**
      * BR-REG-02: Validate tất cả documents đã upload
      */
     public function validateDocuments()
