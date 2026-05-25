@@ -96,8 +96,18 @@ $attributes = array(
 </div>
 
 <div class="card mb-3">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự</h5>
+        <?php if ($model->status == Registrations::STATUS_SUBMITTED && $pending > 0): ?>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-success btn-sm px-3" onclick="approveAllAttendees()">
+                <i class="fa fa-check me-1"></i>Duyệt tất cả
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm px-3" onclick="rejectAllAttendees()">
+                <i class="fa fa-times me-1"></i>Từ chối tất cả
+            </button>
+        </div>
+        <?php endif; ?>
     </div>
     <div class="card-body">
         <div class="table-responsive">
