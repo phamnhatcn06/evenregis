@@ -34,7 +34,7 @@ $attributes = array(
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin đăng ký</h5>
-                <?php if ($model->status == Registrations::STATUS_SUBMITTED): ?>
+                <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED): ?>
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-success btn-sm px-3" onclick="approveRegistration()">
                         <i class="fa fa-check-circle me-1"></i>Duyệt đăng ký
