@@ -549,25 +549,34 @@ function approveRegistration() {
         confirmButtonColor: '#28a745',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Duyệt',
-        cancelButtonText: 'Hủy'
-    }).then(function(result) {
-        if (result.isConfirmed) {
-            $.post('{$approveAllUrl}', { registration_id: registrationId }, function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        title: 'Thành công!',
-                        text: response.message,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(function() {
-                        window.location.href = '{$adminUrl}';
-                    });
-                } else {
-                    Toast.error(response.error || 'Có lỗi xảy ra.');
-                }
-            }, 'json').fail(function() {
-                Toast.error('Có lỗi xảy ra khi gọi API.');
+        cancelButtonText: 'Hủy',
+        allowOutsideClick: false,
+        showLoaderOnConfirm: true,
+        preConfirm: function() {
+            return new Promise(function(resolve, reject) {
+                $.post('{$approveAllUrl}', { registration_id: registrationId }, function(response) {
+                    resolve(response);
+                }, 'json').fail(function() {
+                    reject('Có lỗi xảy ra khi gọi API.');
+                });
+            }).catch(function(error) {
+                Swal.showValidationMessage(error);
             });
+        }
+    }).then(function(result) {
+        if (result.isConfirmed && result.value) {
+            if (result.value.success) {
+                Swal.fire({
+                    title: 'Thành công!',
+                    text: result.value.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(function() {
+                    window.location.href = '{$adminUrl}';
+                });
+            } else {
+                Toast.error(result.value.error || 'Có lỗi xảy ra.');
+            }
         }
     });
 }
