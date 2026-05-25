@@ -150,6 +150,7 @@ $attributes = array(
                                 <td><?php echo CHtml::encode($fullName); ?></td>
                                 <td><?php echo CHtml::encode($position); ?></td>
                                 <td><?php echo CHtml::encode($roleName); ?></td>
+                                <td><?php echo $startDate ? date('d/m/Y', strtotime($startDate)) : '-'; ?></td>
                                 <td><?php echo $checkInDate ? date('d/m/Y', strtotime($checkInDate)) : '-'; ?></td>
                                 <td><?php echo $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-'; ?></td>
                                 <td class="status-cell"><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
