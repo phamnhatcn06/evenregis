@@ -177,13 +177,40 @@ class RegistrationsController extends AdminController
 		$talentEntries = array();
 		$talentEntryMembers = array();
 		if ($model->property_id && $model->event_id) {
-			$entriesData = TalentEntries::getApiDataProvider(array(
-				'property_id' => $model->property_id,
-				'event_id' => $model->event_id
-			), 100)->getData();
+			// Lấy talent shows của event
+			$showsData = TalentShows::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
+			$showIds = array();
+			foreach ($showsData as $show) {
+				$showId = isset($show->id) ? $show->id : (isset($show['id']) ? $show['id'] : null);
+				if ($showId) $showIds[] = $showId;
+			}
+
+			// Lấy talent entries của property cho các shows này
+			$filterParams = array('property_id' => $model->property_id);
+			if (!empty($showIds)) {
+				// Nếu API hỗ trợ filter theo event_id thì dùng luôn
+				$filterParams['event_id'] = $model->event_id;
+			}
+			$entriesData = TalentEntries::getApiDataProvider($filterParams, 100)->getData();
+
 			foreach ($entriesData as $entry) {
 				$entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
-				if ($entryId) {
+				$entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
+
+				// Chỉ lấy entries thuộc shows của event này
+				if ($entryId && (empty($showIds) || in_array($entryShowId, $showIds))) {
+					// Fetch category name if not available
+					if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
+						$catId = isset($entry->category_id) ? $entry->category_id : $entry['category_id'];
+						$cat = TalentCategories::fetchFromApi($catId);
+						if ($cat) {
+							if (is_object($entry)) {
+								$entry->category_name = $cat->name;
+							} else {
+								$entry['category_name'] = $cat->name;
+							}
+						}
+					}
 					$talentEntries[] = $entry;
 					$membersResult = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array('entry_id' => $entryId));
 					$membersData = array();
