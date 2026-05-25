@@ -29,7 +29,6 @@ $attributes = array(
 );
 ?>
 
-<!-- DEBUG: status=<?php echo var_export($model->status, true); ?>, SUBMITTED=<?php echo Registrations::STATUS_SUBMITTED; ?>, pending=<?php echo isset($pending) ? $pending : 'not set'; ?> -->
 <div class="row mb-3">
     <div class="col-md-8">
         <div class="card h-100">
