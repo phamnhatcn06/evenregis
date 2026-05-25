@@ -1135,6 +1135,80 @@ class RegistrationsController extends AdminController
 		}
 	}
 
+	public function actionGetTalentEntry($id)
+	{
+		header('Content-Type: application/json');
+
+		$entry = TalentEntries::fetchFromApi($id);
+		if ($entry) {
+			echo CJSON::encode(array(
+				'success' => true,
+				'data' => array(
+					'id' => $entry->id,
+					'title' => $entry->title,
+					'category_name' => $entry->category_name,
+					'description' => $entry->description,
+					'content' => $entry->content,
+					'duration_seconds' => $entry->duration_seconds,
+					'music_path' => $entry->music_path,
+					'video_path' => $entry->video_path,
+					'director' => $entry->director,
+					'director_phone' => $entry->director_phone,
+					'origin' => $entry->origin,
+					'participant_count' => $entry->participant_count,
+					'note' => $entry->note,
+				)
+			));
+		} else {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục.'));
+		}
+		Yii::app()->end();
+	}
+
+	public function actionUpdateTalentEntry()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$id = Yii::app()->request->getPost('talent_entry_id');
+		if (!$id) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Thiếu ID tiết mục.'));
+			Yii::app()->end();
+		}
+
+		$entry = TalentEntries::fetchFromApi($id);
+		if (!$entry) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục.'));
+			Yii::app()->end();
+		}
+
+		$entry->title = Yii::app()->request->getPost('title', $entry->title);
+		$entry->description = Yii::app()->request->getPost('description', $entry->description);
+		$entry->content = Yii::app()->request->getPost('content', $entry->content);
+		$entry->duration_seconds = Yii::app()->request->getPost('duration_seconds', $entry->duration_seconds);
+		$entry->music_path = Yii::app()->request->getPost('music_path', $entry->music_path);
+		$entry->video_path = Yii::app()->request->getPost('video_path', $entry->video_path);
+		$entry->director = Yii::app()->request->getPost('director', $entry->director);
+		$entry->director_phone = Yii::app()->request->getPost('director_phone', $entry->director_phone);
+		$entry->origin = Yii::app()->request->getPost('origin', $entry->origin);
+		$entry->participant_count = Yii::app()->request->getPost('participant_count', $entry->participant_count);
+		$entry->note = Yii::app()->request->getPost('note', $entry->note);
+
+		$result = $entry->updateViaApi();
+
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật thành công.'));
+		} else {
+			$error = isset($result['error']) ? $result['error'] : 'Cập nhật thất bại.';
+			echo CJSON::encode(array('success' => false, 'message' => $error));
+		}
+		Yii::app()->end();
+	}
+
 	public function actionGetOrganizations()
 	{
 		$user = AuthHandler::getUser();
