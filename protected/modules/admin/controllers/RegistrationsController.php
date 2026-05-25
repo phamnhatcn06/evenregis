@@ -176,8 +176,11 @@ class RegistrationsController extends AdminController
 		// Load Talent Entries cho registration
 		$talentEntries = array();
 		$talentEntryMembers = array();
-		if ($model->property_id) {
-			$entriesData = TalentEntries::getApiDataProvider(array('property_id' => $model->property_id), 100)->getData();
+		if ($model->property_id && $model->event_id) {
+			$entriesData = TalentEntries::getApiDataProvider(array(
+				'property_id' => $model->property_id,
+				'event_id' => $model->event_id
+			), 100)->getData();
 			foreach ($entriesData as $entry) {
 				$entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
 				if ($entryId) {
