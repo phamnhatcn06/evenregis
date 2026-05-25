@@ -516,7 +516,8 @@ function rejectAttendee(attendeeId) {
             $.post('{$rejectAttendeeUrl}', { attendee_id: attendeeId, reason: result.value }, function(response) {
                 if (response.success) {
                     Toast.success(response.message);
-                    $('#attendee-row-' + attendeeId + ' .status-cell').html('<span class=\"badge bg-danger\">Từ chối</span>');
+                    var statusHtml = '<span class=\"badge bg-danger\">Từ chối</span><br><small class=\"text-danger\"><i class=\"fa fa-info-circle\"></i> ' + $('<div>').text(result.value).html() + '</small>';
+                    $('#attendee-row-' + attendeeId + ' .status-cell').html(statusHtml);
                     $('#attendee-row-' + attendeeId + ' .action-cell').html('<span class=\"text-muted\">-</span>');
                 } else {
                     Toast.error(response.error || 'Có lỗi xảy ra.');
