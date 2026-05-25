@@ -8,59 +8,68 @@ $this->Tabletitle = 'Danh sách đăng ký chờ phê duyệt';
 ?>
 
 <div class="card">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="fa fa-check-square-o me-2"></i>Danh sách đăng ký chờ phê duyệt</h5>
-    </div>
     <div class="card-body">
-        <?php $this->widget('booster.widgets.TbGridView', array(
+        <?php
+        $this->widget('ext.edatatables.EDataTables', array(
             'id' => 'approve-registrations-grid',
             'dataProvider' => $dataProvider,
-            'type' => 'striped bordered',
-            'template' => "{items}\n{pager}",
+            'language' => 'vi',
+            'filter' => true,
             'columns' => array(
+                array('name' => 'id', 'header' => 'ID', 'width' => '60px', 'filter' => false),
                 array(
-                    'header' => 'STT',
-                    'value' => '$this->grid->dataProvider->pagination->currentPage * $this->grid->dataProvider->pagination->pageSize + ($row + 1)',
-                    'htmlOptions' => array('style' => 'width:50px;text-align:center;'),
-                ),
-                array(
-                    'name' => 'property_name',
-                    'header' => 'Đơn vị',
-                    'value' => 'isset($data["property_name"]) ? $data["property_name"] : ""',
-                ),
-                array(
-                    'name' => 'event_name',
+                    'name' => 'event_id',
                     'header' => 'Sự kiện',
-                    'value' => 'isset($data["event_name"]) ? $data["event_name"] : ""',
+                    'value' => function ($data) {
+                        return isset($data->event_name) ? $data->event_name : '';
+                    }
                 ),
                 array(
-                    'name' => 'period_name',
+                    'name' => 'property_id',
+                    'header' => 'Đơn vị',
+                    'value' => function ($data) {
+                        return isset($data->property_name) ? $data->property_name : '';
+                    }
+                ),
+                array(
+                    'name' => 'period_id',
                     'header' => 'Đợt đăng ký',
-                    'value' => 'isset($data["period_name"]) ? $data["period_name"] : ""',
+                    'value' => function ($data) {
+                        return isset($data->period_name) ? $data->period_name : '';
+                    }
                 ),
                 array(
                     'name' => 'submitted_at',
                     'header' => 'Ngày nộp',
-                    'value' => 'isset($data["submitted_at"]) && $data["submitted_at"] ? date("d/m/Y H:i", $data["submitted_at"]) : "-"',
-                    'htmlOptions' => array('style' => 'width:130px;'),
+                    'value' => function ($data) {
+                        return $data->submitted_at ? MyHelper::formatDateTime($data->submitted_at) : '-';
+                    }
                 ),
                 array(
                     'name' => 'status',
                     'header' => 'Trạng thái',
                     'type' => 'raw',
-                    'value' => 'Registrations::getStatusLabel(isset($data["status"]) ? $data["status"] : 0)',
-                    'htmlOptions' => array('style' => 'width:100px;text-align:center;'),
+                    'filter' => false,
+                    'value' => function ($data) {
+                        return Registrations::getStatusLabel($data->status);
+                    }
                 ),
                 array(
                     'header' => 'Thao tác',
+                    'width' => '120px',
                     'type' => 'raw',
-                    'value' => function($data, $row, $grid) {
-                        $id = isset($data['id']) ? $data['id'] : '';
-                        return '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $id)) . '" class="btn btn-sm btn-primary"><i class="fa fa-eye me-1"></i>Xem & Duyệt</a>';
-                    },
-                    'htmlOptions' => array('style' => 'width:120px;text-align:center;'),
+                    'filter' => false,
+                    'sortable' => false,
+                    'value' => function ($data) {
+                        return '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm btn-primary"><i class="fa fa-eye me-1"></i>Xem & Duyệt</a>';
+                    }
                 ),
             ),
-        )); ?>
+            'options' => array(
+                'pageLength' => 25,
+                'order' => array(array(4, 'desc')), // Order by submitted_at desc
+            ),
+        ));
+        ?>
     </div>
 </div>
