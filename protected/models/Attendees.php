@@ -113,18 +113,24 @@ class Attendees extends BaseAttendees
     {
         $attendees = self::getByRegistrationId($registrationId);
         $count = 0;
+        $errors = array();
         foreach ($attendees as $att) {
             $status = isset($att['approval_status']) ? (int)$att['approval_status'] : self::APPROVAL_PENDING;
+            // Chỉ reset những attendee bị từ chối (status=2), giữ nguyên đã duyệt (status=1)
             if ($status == self::APPROVAL_REJECTED) {
                 $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $att['id']));
-                ApiClient::post($url, array(
+                $result = ApiClient::post($url, array(
                     'approval_status' => self::APPROVAL_PENDING,
                     'rejection_reason' => null,
                 ));
-                $count++;
+                if (isset($result['success']) && $result['success']) {
+                    $count++;
+                } else {
+                    $errors[] = $att['id'];
+                }
             }
         }
-        return array('success' => true, 'count' => $count);
+        return array('success' => empty($errors), 'count' => $count, 'errors' => $errors);
     }
 
     /**
