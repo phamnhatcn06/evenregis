@@ -83,44 +83,44 @@ class RegistrationsController extends AdminController
 		}
 		unset($compData);
 
-        // Load Sport Teams cho đơn vị
-        $sportTeams = array();
-        $sportTeamMembers = array();
-        if ($model->event_id && $model->property_id) {
-            $teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id), 100)->getData();
-            foreach ($teamsData as $team) {
-                $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
-                if ($teamId) {
-                    // Fetch sport name if not available
-                    if (empty($team->sport_name) && $team->sport_id) {
-                        $sport = Sports::fetchFromApi($team->sport_id);
-                        $team->sport_name = $sport ? $sport->name : '';
-                    }
-                    $sportTeams[] = $team;
-                    $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+		// Load Sport Teams cho đơn vị
+		$sportTeams = array();
+		$sportTeamMembers = array();
+		if ($model->event_id && $model->property_id) {
+			$teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id), 100)->getData();
+			foreach ($teamsData as $team) {
+				$teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+				if ($teamId) {
+					// Fetch sport name if not available
+					if (empty($team->sport_name) && $team->sport_id) {
+						$sport = Sports::fetchFromApi($team->sport_id);
+						$team->sport_name = $sport ? $sport->name : '';
+					}
+					$sportTeams[] = $team;
+					$membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
 
-                    // Enrich member info from attendees map
-                    $enrichedMembers = array();
-                    foreach ($membersData as $member) {
-                        $attId = isset($member->attendee_id) ? $member->attendee_id : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
-                        $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+					// Enrich member info from attendees map
+					$enrichedMembers = array();
+					foreach ($membersData as $member) {
+						$attId = isset($member->attendee_id) ? $member->attendee_id : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
+						$attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
 
-                        $memberArr = is_object($member) ? get_object_vars($member) : $member;
-                        if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
-                            $memberArr['attendee_name'] = $attInfo['full_name'];
-                        }
-                        if (empty($memberArr['position_name']) && !empty($attInfo['position_name'])) {
-                            $memberArr['position_name'] = $attInfo['position_name'];
-                        }
-                        if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
-                            $memberArr['division_name'] = $attInfo['division_name'];
-                        }
-                        $enrichedMembers[] = $memberArr;
-                    }
-                    $sportTeamMembers[$teamId] = $enrichedMembers;
-                }
-            }
-        }
+						$memberArr = is_object($member) ? get_object_vars($member) : $member;
+						if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
+							$memberArr['attendee_name'] = $attInfo['full_name'];
+						}
+						if (empty($memberArr['position_name']) && !empty($attInfo['position_name'])) {
+							$memberArr['position_name'] = $attInfo['position_name'];
+						}
+						if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
+							$memberArr['division_name'] = $attInfo['division_name'];
+						}
+						$enrichedMembers[] = $memberArr;
+					}
+					$sportTeamMembers[$teamId] = $enrichedMembers;
+				}
+			}
+		}
 
 		// Load alliance request nếu có liên quân
 		$allianceRequest = null;
@@ -252,8 +252,8 @@ class RegistrationsController extends AdminController
 			'registrationDetails' => $registrationDetails,
 			'competitionRegistrations' => $competitionRegistrations,
 			'allianceRequest' => $allianceRequest,
-            'sportTeams' => $sportTeams,
-            'sportTeamMembers' => $sportTeamMembers,
+			'sportTeams' => $sportTeams,
+			'sportTeamMembers' => $sportTeamMembers,
 			'beautyContestants' => $beautyContestants,
 			'talentEntries' => $talentEntries,
 			'talentEntryMembers' => $talentEntryMembers,
@@ -636,22 +636,22 @@ class RegistrationsController extends AdminController
 		if ($registration && $registration->property_id) {
 			$property = Properties::fetchFromApi($registration->property_id);
 			if ($property && $property->region_id) {
-                // Get existing alliance requests filtered by event_content_id
-                $params = array(
-                    'event_id' => $registration->event_id,
-                    'requester_org_id' => $registration->property_id,
-                );
-                if ($eventContentId) {
-                    $params['event_content_id'] = $eventContentId;
-                }
-                $existingRequests = AllianceRequests::getApiDataProvider($params, 100)->getData();
-                $existingTargetIds = array();
-                foreach ($existingRequests as $req) {
-                    $targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
-                    if ($targetId) {
-                        $existingTargetIds[] = $targetId;
-                    }
-                }
+				// Get existing alliance requests filtered by event_content_id
+				$params = array(
+					'event_id' => $registration->event_id,
+					'requester_org_id' => $registration->property_id,
+				);
+				if ($eventContentId) {
+					$params['event_content_id'] = $eventContentId;
+				}
+				$existingRequests = AllianceRequests::getApiDataProvider($params, 100)->getData();
+				$existingTargetIds = array();
+				foreach ($existingRequests as $req) {
+					$targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
+					if ($targetId) {
+						$existingTargetIds[] = $targetId;
+					}
+				}
 
 				$properties = Properties::getApiDataProvider(array('region_id' => $property->region_id), 500)->getData();
 				foreach ($properties as $p) {
@@ -665,7 +665,7 @@ class RegistrationsController extends AdminController
 						'id' => $pId,
 						'code' => $prefix ? $prefix : (isset($p['code']) ? $p['code'] : ''),
 						'name' => isset($p['name']) ? $p['name'] : '',
-                        'is_selected' => in_array($pId, $existingTargetIds) ? 1 : 0,
+						'is_selected' => in_array($pId, $existingTargetIds) ? 1 : 0,
 					);
 				}
 				usort($result, function ($a, $b) {
@@ -788,7 +788,7 @@ class RegistrationsController extends AdminController
 		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
 		$attendeeNames = Yii::app()->request->getPost('attendee_names', array());
 		$contentId = Yii::app()->request->getPost('content_id');
-	
+
 		if (!$registrationId || !$sportId || empty($attendeeIds)) {
 			if ($isAjax) {
 				echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin bắt buộc.'));
@@ -802,76 +802,76 @@ class RegistrationsController extends AdminController
 		$ssoUser = AuthHandler::getUser();
 		$createdBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
 
-        $registration = Registrations::fetchFromApi($registrationId);
-        if (!$registration) {
+		$registration = Registrations::fetchFromApi($registrationId);
+		if (!$registration) {
 			if ($isAjax) {
 				echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy phiếu đăng ký.'));
 				Yii::app()->end();
 			}
-            Yii::app()->user->setFlash('error', 'Không tìm thấy phiếu đăng ký.');
+			Yii::app()->user->setFlash('error', 'Không tìm thấy phiếu đăng ký.');
 			$this->redirect(array('admin'));
 			return;
-        }
+		}
 
-        // Tạo SportTeam
-        $teamModel = new SportTeams();
-        $teamModel->event_id = $registration->event_id;
-        $teamModel->sport_id = $sportId;
-        $teamModel->property_id = $registration->property_id;
-        $teamModel->name = $teamName ? $teamName : 'Team';
-        $teamModel->code = $teamName ? $teamName : 'TEAM';
-        // Set public custom property if needed
-        $teamModel->team_name = $teamName;
-        $teamModel->is_alliance = empty($alliancePropertyIds) ? 0 : 1;
-        $teamModel->alliance_property_ids = $alliancePropertyIds;
-        $teamModel->status = SportTeams::STATUS_CONFIRMED;
+		// Tạo SportTeam
+		$teamModel = new SportTeams();
+		$teamModel->event_id = $registration->event_id;
+		$teamModel->sport_id = $sportId;
+		$teamModel->property_id = $registration->property_id;
+		$teamModel->name = $teamName ? $teamName : 'Team';
+		$teamModel->code = $teamName ? $teamName : 'TEAM';
+		// Set public custom property if needed
+		$teamModel->team_name = $teamName;
+		$teamModel->is_alliance = empty($alliancePropertyIds) ? 0 : 1;
+		$teamModel->alliance_property_ids = $alliancePropertyIds;
+		$teamModel->status = SportTeams::STATUS_CONFIRMED;
 
-        // Kiểm tra giới hạn số môn thể thao trước khi tạo đội
-        $overLimitAttendees = array();
-        foreach ($attendeeIds as $idx => $attId) {
-            if (!SportTeamMembers::canRegisterMore($attId)) {
-                $name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
-                $overLimitAttendees[] = $name;
-            }
-        }
-        if (!empty($overLimitAttendees)) {
-            $msg = 'Các người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn: ' . implode(', ', $overLimitAttendees);
-            if ($isAjax) {
-                echo CJSON::encode(array('success' => false, 'error' => $msg));
-                Yii::app()->end();
-            }
-            Yii::app()->user->setFlash('error', $msg);
-            $this->redirect(array('view', 'id' => $registrationId));
-            return;
-        }
+		// Kiểm tra giới hạn số môn thể thao trước khi tạo đội
+		$overLimitAttendees = array();
+		foreach ($attendeeIds as $idx => $attId) {
+			if (!SportTeamMembers::canRegisterMore($attId)) {
+				$name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
+				$overLimitAttendees[] = $name;
+			}
+		}
+		if (!empty($overLimitAttendees)) {
+			$msg = 'Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn: ' . implode(', ', $overLimitAttendees);
+			if ($isAjax) {
+				echo CJSON::encode(array('success' => false, 'error' => $msg));
+				Yii::app()->end();
+			}
+			Yii::app()->user->setFlash('error', $msg);
+			$this->redirect(array('view', 'id' => $registrationId));
+			return;
+		}
 
-        $teamResult = $teamModel->storeViaApi();
-        if ($teamResult['success']) {
-            $teamId = isset($teamResult['data']['data']['id']) ? $teamResult['data']['data']['id'] : (isset($teamResult['data']['id']) ? $teamResult['data']['id'] : null);
-            if ($teamId) {
-                // Tạo SportTeamMembers
-                foreach ($attendeeIds as $idx => $attId) {
-                    $member = new SportTeamMembers();
-                    $member->sport_team_id = $teamId;
-                    $member->attendee_id = $attId;
-                    $member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
-                    $member->storeViaApi();
-                }
-            }
+		$teamResult = $teamModel->storeViaApi();
+		if ($teamResult['success']) {
+			$teamId = isset($teamResult['data']['data']['id']) ? $teamResult['data']['data']['id'] : (isset($teamResult['data']['id']) ? $teamResult['data']['id'] : null);
+			if ($teamId) {
+				// Tạo SportTeamMembers
+				foreach ($attendeeIds as $idx => $attId) {
+					$member = new SportTeamMembers();
+					$member->sport_team_id = $teamId;
+					$member->attendee_id = $attId;
+					$member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
+					$member->storeViaApi();
+				}
+			}
 			if ($isAjax) {
 				echo CJSON::encode(array('success' => true, 'message' => 'Đăng ký thể thao thành công.', 'team_id' => $teamId));
 				Yii::app()->end();
 			}
-            Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
-        } else {
+			Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
+		} else {
 			if ($isAjax) {
 				echo CJSON::encode(array('success' => false, 'error' => isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.'));
 				Yii::app()->end();
 			}
-            Yii::app()->user->setFlash('error', isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.');
-            $this->redirect(array('view', 'id' => $registrationId));
-            return;
-        }
+			Yii::app()->user->setFlash('error', isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.');
+			$this->redirect(array('view', 'id' => $registrationId));
+			return;
+		}
 
 		// Không tạo RegistrationDetails nữa, vì môn thể thao sẽ được quản lý bởi SportTeams
 		if (!$isAjax) {
@@ -879,109 +879,109 @@ class RegistrationsController extends AdminController
 		}
 	}
 
-    public function actionDeleteSportTeam($id, $registration_id)
-    {
-        if (Yii::app()->getRequest()->getIsPostRequest()) {
-            $result = SportTeams::deleteViaApi($id);
+	public function actionDeleteSportTeam($id, $registration_id)
+	{
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$result = SportTeams::deleteViaApi($id);
 
-            if ($result['success']) {
-                Yii::app()->user->setFlash('success', 'Xóa đội thể thao thành công.');
-            } else {
-                Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể xóa đội.');
-            }
+			if ($result['success']) {
+				Yii::app()->user->setFlash('success', 'Xóa đội thể thao thành công.');
+			} else {
+				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể xóa đội.');
+			}
 
-            $this->redirect(array('view', 'id' => $registration_id));
-        } else {
-            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
-        }
-    }
+			$this->redirect(array('view', 'id' => $registration_id));
+		} else {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+	}
 
-    public function actionGetSportTeamDetail($id)
-    {
-        $team = SportTeams::fetchFromApi($id);
-        if (!$team) {
-            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy đội.'));
-            Yii::app()->end();
-        }
+	public function actionGetSportTeamDetail($id)
+	{
+		$team = SportTeams::fetchFromApi($id);
+		if (!$team) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy đội.'));
+			Yii::app()->end();
+		}
 
-        // Fetch sport name if not available
-        $sportName = $team->sport_name;
-        if (empty($sportName) && $team->sport_id) {
-            $sport = Sports::fetchFromApi($team->sport_id);
-            $sportName = $sport ? $sport->name : '';
-        }
+		// Fetch sport name if not available
+		$sportName = $team->sport_name;
+		if (empty($sportName) && $team->sport_id) {
+			$sport = Sports::fetchFromApi($team->sport_id);
+			$sportName = $sport ? $sport->name : '';
+		}
 
-        $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
-        $membersArr = array();
-        foreach ($members as $m) {
-            $membersArr[] = array(
-                'id' => $m->id,
-                'attendee_id' => $m->attendee_id,
-                'name' => $m->name,
-                'attendee_name' => $m->attendee_name,
-            );
-        }
+		$members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
+		$membersArr = array();
+		foreach ($members as $m) {
+			$membersArr[] = array(
+				'id' => $m->id,
+				'attendee_id' => $m->attendee_id,
+				'name' => $m->name,
+				'attendee_name' => $m->attendee_name,
+			);
+		}
 
-        echo CJSON::encode(array(
-            'success' => true,
-            'data' => array(
-                'team' => array(
-                    'id' => $team->id,
-                    'sport_id' => $team->sport_id,
-                    'sport_name' => $sportName,
-                    'team_name' => $team->team_name,
-                    'name' => $team->name,
-                    'is_alliance' => $team->is_alliance,
-                ),
-                'members' => $membersArr,
-            ),
-        ));
-        Yii::app()->end();
-    }
+		echo CJSON::encode(array(
+			'success' => true,
+			'data' => array(
+				'team' => array(
+					'id' => $team->id,
+					'sport_id' => $team->sport_id,
+					'sport_name' => $sportName,
+					'team_name' => $team->team_name,
+					'name' => $team->name,
+					'is_alliance' => $team->is_alliance,
+				),
+				'members' => $membersArr,
+			),
+		));
+		Yii::app()->end();
+	}
 
-    public function actionUpdateSportTeam()
-    {
-        if (!Yii::app()->request->isPostRequest) {
-            throw new CHttpException(400, 'Bad Request');
-        }
+	public function actionUpdateSportTeam()
+	{
+		if (!Yii::app()->request->isPostRequest) {
+			throw new CHttpException(400, 'Bad Request');
+		}
 
-        $teamId = Yii::app()->request->getPost('team_id');
-        $teamName = Yii::app()->request->getPost('team_name');
-        $attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
-        $attendeeNames = Yii::app()->request->getPost('attendee_names', array());
+		$teamId = Yii::app()->request->getPost('team_id');
+		$teamName = Yii::app()->request->getPost('team_name');
+		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
+		$attendeeNames = Yii::app()->request->getPost('attendee_names', array());
 
-        if (!$teamId) {
-            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu team_id.'));
-            Yii::app()->end();
-        }
+		if (!$teamId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu team_id.'));
+			Yii::app()->end();
+		}
 
-        // Update team name
-        $team = SportTeams::fetchFromApi($teamId);
-        if ($team) {
-            $team->team_name = $teamName;
-            $team->name = $teamName;
-            $team->updateViaApi();
-        }
+		// Update team name
+		$team = SportTeams::fetchFromApi($teamId);
+		if ($team) {
+			$team->team_name = $teamName;
+			$team->name = $teamName;
+			$team->updateViaApi();
+		}
 
-        // Delete old members
-        $oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
-        foreach ($oldMembers as $m) {
-            SportTeamMembers::deleteViaApi($m->id);
-        }
+		// Delete old members
+		$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+		foreach ($oldMembers as $m) {
+			SportTeamMembers::deleteViaApi($m->id);
+		}
 
-        // Create new members
-        foreach ($attendeeIds as $idx => $attId) {
-            $member = new SportTeamMembers();
-            $member->sport_team_id = $teamId;
-            $member->attendee_id = $attId;
-            $member->code = 'T' . $teamId . '-A' . $attId;
-            $member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
-            $member->storeViaApi();
-        }
+		// Create new members
+		foreach ($attendeeIds as $idx => $attId) {
+			$member = new SportTeamMembers();
+			$member->sport_team_id = $teamId;
+			$member->attendee_id = $attId;
+			$member->code = 'T' . $teamId . '-A' . $attId;
+			$member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
+			$member->storeViaApi();
+		}
 
-        echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật đội thành công.'));
-        Yii::app()->end();
-    }
+		echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật đội thành công.'));
+		Yii::app()->end();
+	}
 
 	public function actionAdmin()
 	{
@@ -1266,25 +1266,25 @@ class RegistrationsController extends AdminController
 		}
 
 		$entry->title = Yii::app()->request->getPost('title', $entry->title);
-		
+
 		$categoryId = Yii::app()->request->getPost('category_id');
 		$entry->category_id = ($categoryId !== null && $categoryId !== '') ? (int)$categoryId : $entry->category_id;
-		
+
 		$entry->description = Yii::app()->request->getPost('description', $entry->description);
 		$entry->content = Yii::app()->request->getPost('content', $entry->content);
-		
+
 		$durationSeconds = Yii::app()->request->getPost('duration_seconds');
 		$entry->duration_seconds = ($durationSeconds !== null && $durationSeconds !== '') ? (int)$durationSeconds : null;
-		
+
 		$entry->music_path = Yii::app()->request->getPost('music_path', $entry->music_path);
 		$entry->video_path = Yii::app()->request->getPost('video_path', $entry->video_path);
 		$entry->director = Yii::app()->request->getPost('director', $entry->director);
 		$entry->director_phone = Yii::app()->request->getPost('director_phone', $entry->director_phone);
 		$entry->origin = Yii::app()->request->getPost('origin', $entry->origin);
-		
+
 		$participantCount = Yii::app()->request->getPost('participant_count');
 		$entry->participant_count = ($participantCount !== null && $participantCount !== '') ? (int)$participantCount : null;
-		
+
 		$entry->note = Yii::app()->request->getPost('note', $entry->note);
 
 		// Log request details to find the exact reason for the failure
@@ -1742,7 +1742,7 @@ class RegistrationsController extends AdminController
 			$attendee->transport_id = $transportId;
 
 			$uploadedFiles = $this->handleAttendeeDocumentUpload();
-			
+
 			if (isset($uploadedFiles['errors']) && !empty($uploadedFiles['errors'])) {
 				Yii::app()->user->setFlash('error', implode("\n", $uploadedFiles['errors']));
 				$this->redirect(array('view', 'id' => $registrationId));
@@ -2006,7 +2006,7 @@ class RegistrationsController extends AdminController
 		$attendee->position = Yii::app()->getRequest()->getPost('position');
 		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
-		
+
 		$joinHotelDate = Yii::app()->getRequest()->getPost('join_hotel_date');
 		if ($joinHotelDate === null) {
 			$joinHotelDate = Yii::app()->getRequest()->getPost('start_date');
@@ -2014,13 +2014,13 @@ class RegistrationsController extends AdminController
 		if ($joinHotelDate !== null) {
 			$attendee->join_hotel_date = $joinHotelDate;
 		}
-		
+
 		$attendee->check_in_date = Yii::app()->getRequest()->getPost('check_in_date');
 		$attendee->check_out_date = Yii::app()->getRequest()->getPost('check_out_date');
 		$attendee->transport_id = Yii::app()->getRequest()->getPost('transport_id');
 
 		$uploadedFiles = $this->handleAttendeeDocumentUpload();
-		
+
 		if (isset($uploadedFiles['errors']) && !empty($uploadedFiles['errors'])) {
 			echo CJSON::encode(array('success' => false, 'error' => implode("\n", $uploadedFiles['errors'])));
 			Yii::app()->end();
@@ -2354,7 +2354,7 @@ class RegistrationsController extends AdminController
 		$entry->music_path = $musicPath;
 		$entry->video_path = $videoPath;
 		$entry->alliance_property_ids = !empty($alliancePropertyIds) ? implode(',', $alliancePropertyIds) : null;
-		
+
 		$result = $entry->storeViaApi();
 		if (!$result['success']) {
 			echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể tạo tiết mục.'));
