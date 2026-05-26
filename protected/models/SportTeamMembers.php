@@ -80,10 +80,16 @@ class SportTeamMembers extends BaseSportTeamMembers
 
     public static function countSportsByAttendee($attendeeId)
     {
-        $url = ApiEndpoints::url(ApiEndpoints::SPORT_TEAM_MEMBER_COUNT_BY_ATTENDEE, array('attendee_id' => $attendeeId));
-        $result = ApiClient::get($url);
-        if ($result['success'] && isset($result['data']['count'])) {
-            return (int) $result['data']['count'];
+        // Đếm qua API list với filter attendee_id
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 100,
+        ));
+        if ($result['success'] && isset($result['data']['data'])) {
+            return count($result['data']['data']);
+        }
+        if ($result['success'] && isset($result['data']) && is_array($result['data'])) {
+            return count($result['data']);
         }
         return 0;
     }
