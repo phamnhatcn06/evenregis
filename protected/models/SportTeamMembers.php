@@ -85,13 +85,29 @@ class SportTeamMembers extends BaseSportTeamMembers
             'attendee_id' => $attendeeId,
             'per_page' => 100,
         ));
+
+        $items = array();
         if ($result['success'] && isset($result['data']['data'])) {
-            return count($result['data']['data']);
+            $items = $result['data']['data'];
+        } elseif ($result['success'] && isset($result['data']) && is_array($result['data'])) {
+            $items = $result['data'];
         }
-        if ($result['success'] && isset($result['data']) && is_array($result['data'])) {
-            return count($result['data']);
+
+        // Nếu API không filter theo attendee_id, filter thủ công
+        $count = 0;
+        foreach ($items as $item) {
+            $itemAttendeeId = isset($item['attendee_id']) ? $item['attendee_id'] : null;
+            if ($itemAttendeeId == $attendeeId) {
+                $count++;
+            }
         }
-        return 0;
+
+        // Nếu count = 0 nhưng có items, nghĩa là API đã filter đúng
+        if ($count == 0 && !empty($items)) {
+            return count($items);
+        }
+
+        return $count;
     }
 
     public static function canRegisterMore($attendeeId)
