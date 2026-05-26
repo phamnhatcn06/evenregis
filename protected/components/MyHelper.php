@@ -92,6 +92,9 @@ class MyHelper
     public static function formatDate($date)
     {
         if (empty($date)) return '';
+        if (is_numeric($date)) {
+            return date('d-m-Y', $date);
+        }
         return date('d-m-Y', strtotime($date));
     }
 
@@ -101,6 +104,9 @@ class MyHelper
     public static function formatDateTime($date)
     {
         if (empty($date)) return '';
+        if (is_numeric($date)) {
+            return date('d-m-Y H:i', $date);
+        }
         return date('d-m-Y H:i', strtotime($date));
     }
 

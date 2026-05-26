@@ -450,12 +450,15 @@ foreach ($registrationDetails as $detail) {
                                         (isset($member['name']) ? $member['name'] : '');
                                     $memberPosition = isset($member['position_name']) ? $member['position_name'] : '';
                                     $memberDivision = isset($member['division_name']) ? $member['division_name'] : '';
-                                    $memberInfo = $memberName;
-                                    if ($memberPosition || $memberDivision) {
-                                        $memberInfo .= ' <small class="text-muted">(' . trim($memberPosition . ' - ' . $memberDivision, ' -') . ')</small>';
+                                    $nameInfo = CHtml::encode($memberName);
+                                    $details = array();
+                                    if ($memberPosition) $details[] = CHtml::encode($memberPosition);
+                                    if ($memberDivision) $details[] = 'Bộ phận: ' . CHtml::encode($memberDivision);
+                                    if (!empty($details)) {
+                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
                                     }
                                 ?>
-                                    <div><?php echo ($idx + 1) . '. ' . $memberInfo; ?></div>
+                                    <div><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($canEdit): ?>
@@ -513,12 +516,15 @@ foreach ($registrationDetails as $detail) {
                                     $name = $att['attendee_name'];
                                     $position = $att['position_name'];
                                     $division = $att['division_name'];
-                                    $info = $name;
-                                    if ($position || $division) {
-                                        $info .= ' <small class="text-muted">(' . trim($position . ' - ' . $division, ' -') . ')</small>';
+                                    $nameInfo = CHtml::encode($name);
+                                    $details = array();
+                                    if ($position) $details[] = CHtml::encode($position);
+                                    if ($division) $details[] = 'Bộ phận: ' . CHtml::encode($division);
+                                    if (!empty($details)) {
+                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
                                     }
                                 ?>
-                                    <div><?php echo ($idx + 1) . '. ' . $info; ?></div>
+                                    <div><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
                                 <?php endforeach; ?>
                             </td>
                             <?php if ($canEdit): ?>
@@ -573,7 +579,18 @@ foreach ($registrationDetails as $detail) {
                     <?php foreach ($contestData['contestants'] as $c): ?>
                         <tr>
                             <td><span class="badge bg-primary"><?php echo CHtml::encode($c['candidate_number']); ?></span></td>
-                            <td><?php echo CHtml::encode($c['attendee_name']); ?></td>
+                            <td>
+                                <?php
+                                $nameInfo = CHtml::encode($c['attendee_name']);
+                                $details = array();
+                                if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
+                                if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
+                                if (!empty($details)) {
+                                    $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                }
+                                echo $nameInfo;
+                                ?>
+                            </td>
                             <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
@@ -602,7 +619,7 @@ foreach ($registrationDetails as $detail) {
         <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
     </div>
     <div class="card-body">
-        <?php if ($canEdit): ?>
+        <?php if ($canEdit && empty($talentEntries)): ?>
         <!-- Form chọn liên quân và thể loại -->
         <div class="row mb-3 g-3 align-items-end">
             <div class="col-md-5">
@@ -684,8 +701,17 @@ foreach ($registrationDetails as $detail) {
                             <td>
                                 <?php foreach ($members as $idx => $member):
                                     $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
+                                    $pos = isset($member['position_name']) ? $member['position_name'] : '';
+                                    $div = isset($member['division_name']) ? $member['division_name'] : '';
+                                    $nameInfo = CHtml::encode($name);
+                                    $details = array();
+                                    if ($pos) $details[] = CHtml::encode($pos);
+                                    if ($div) $details[] = 'Bộ phận: ' . CHtml::encode($div);
+                                    if (!empty($details)) {
+                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                    }
                                 ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
+                                    <div class="mb-1"><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
                                 <?php endforeach; ?>
                             </td>
                             <td class="text-center">
@@ -897,14 +923,14 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         container.innerHTML = "";
     }
     function editTalentEntry(id) {
-        fetch(window.BASE_URL + "admin/registrations/getTalentEntry?id=" + id)
+        fetch("/admin/registrations/getTalentEntry?id=" + id)
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 if (data.success && data.data) {
                     var entry = data.data;
                     document.getElementById("edit_talent_id").value = entry.id;
                     document.getElementById("edit_talent_title").value = entry.title || "";
-                    document.getElementById("edit_talent_category").value = entry.category_name || "";
+                    document.getElementById("edit_talent_category").value = entry.category_id || "";
                     document.getElementById("edit_talent_duration").value = entry.duration_seconds || "";
                     document.getElementById("edit_talent_director").value = entry.director || "";
                     document.getElementById("edit_talent_director_phone").value = entry.director_phone || "";
@@ -915,6 +941,13 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
                     document.getElementById("edit_talent_music_path").value = entry.music_path || "";
                     document.getElementById("edit_talent_video_path").value = entry.video_path || "";
                     document.getElementById("edit_talent_note").value = entry.note || "";
+
+                    var selectedMemberIds = [];
+                    if (data.members && Array.isArray(data.members)) {
+                        selectedMemberIds = data.members.map(function(m) { return m.attendee_id; });
+                    }
+                    RegistrationView.loadAttendeesForEditTalent(selectedMemberIds);
+
                     var modal = new bootstrap.Modal(document.getElementById("editTalentModal"));
                     modal.show();
                 } else {
@@ -935,7 +968,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         e.preventDefault();
         var form = this;
         var formData = new FormData(form);
-        fetch(window.BASE_URL + "admin/registrations/updateTalentEntry", {
+        fetch("/admin/registrations/updateTalentEntry", {
             method: "POST",
             body: formData
         })

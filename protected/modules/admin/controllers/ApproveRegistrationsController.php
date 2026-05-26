@@ -143,6 +143,12 @@ class ApproveRegistrationsController extends AdminController
                         if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
                             $memberArr['attendee_name'] = $attInfo['full_name'];
                         }
+                        if (empty($memberArr['position_name']) && !empty($attInfo['position_name'])) {
+                            $memberArr['position_name'] = $attInfo['position_name'];
+                        }
+                        if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
+                            $memberArr['division_name'] = $attInfo['division_name'];
+                        }
                         $enrichedMembers[] = $memberArr;
                     }
                     $sportTeamMembers[$teamId] = $enrichedMembers;
@@ -177,6 +183,8 @@ class ApproveRegistrationsController extends AdminController
                                 'id' => isset($c->id) ? $c->id : (isset($c['id']) ? $c['id'] : null),
                                 'attendee_id' => $attId,
                                 'attendee_name' => isset($attInfo['full_name']) ? $attInfo['full_name'] : '',
+                                'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
+                                'division_name' => isset($attInfo['division_name']) ? $attInfo['division_name'] : '',
                                 'candidate_number' => isset($c->candidate_number) ? $c->candidate_number : (isset($c['candidate_number']) ? $c['candidate_number'] : ''),
                                 'height_cm' => isset($c->height_cm) ? $c->height_cm : (isset($c['height_cm']) ? $c['height_cm'] : null),
                                 'weight_kg' => isset($c->weight_kg) ? $c->weight_kg : (isset($c['weight_kg']) ? $c['weight_kg'] : null),
@@ -196,6 +204,27 @@ class ApproveRegistrationsController extends AdminController
             foreach ($entriesData as $entry) {
                 $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
                 if ($entryId) {
+                    // Fetch category name if not available
+                    if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
+                        $catId = isset($entry->category_id) ? $entry->category_id : $entry['category_id'];
+                        $cat = TalentCategories::fetchFromApi($catId);
+                        if ($cat) {
+                            if (is_object($entry)) {
+                                $entry->category_name = $cat->name;
+                            } else {
+                                $entry['category_name'] = $cat->name;
+                            }
+                        }
+                    }
+                    
+                    if (is_object($entry)) {
+                        $entry->video_path = $this->cleanStorageUrl($entry->video_path);
+                        $entry->music_path = $this->cleanStorageUrl($entry->music_path);
+                    } else {
+                        $entry['video_path'] = $this->cleanStorageUrl($entry['video_path']);
+                        $entry['music_path'] = $this->cleanStorageUrl($entry['music_path']);
+                    }
+                    
                     $talentEntries[] = $entry;
                     $membersResult = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array('entry_id' => $entryId));
                     $membersData = array();
@@ -209,6 +238,12 @@ class ApproveRegistrationsController extends AdminController
                         $memberArr = is_array($member) ? $member : get_object_vars($member);
                         if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
                             $memberArr['attendee_name'] = $attInfo['full_name'];
+                        }
+                        if (empty($memberArr['position_name']) && !empty($attInfo['position_name'])) {
+                            $memberArr['position_name'] = $attInfo['position_name'];
+                        }
+                        if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
+                            $memberArr['division_name'] = $attInfo['division_name'];
                         }
                         $enrichedMembers[] = $memberArr;
                     }
@@ -521,5 +556,27 @@ class ApproveRegistrationsController extends AdminController
             throw new CHttpException(404, 'Không tìm thấy phiếu đăng ký.');
         }
         return $model;
+    }
+
+    private function cleanStorageUrl($url)
+    {
+        if (empty($url)) {
+            return $url;
+        }
+        $prefix = 'https://portal-registration.muongthanh.vn/storage/';
+        if (strpos($url, $prefix) === 0) {
+            $remaining = substr($url, strlen($prefix));
+            if (preg_match('/^https?:\/\//i', $remaining)) {
+                return $remaining;
+            }
+        }
+        $prefixHttp = 'http://portal-registration.muongthanh.vn/storage/';
+        if (strpos($url, $prefixHttp) === 0) {
+            $remaining = substr($url, strlen($prefixHttp));
+            if (preg_match('/^https?:\/\//i', $remaining)) {
+                return $remaining;
+            }
+        }
+        return $url;
     }
 }

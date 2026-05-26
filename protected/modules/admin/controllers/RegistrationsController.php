@@ -159,6 +159,8 @@ class RegistrationsController extends AdminController
 								'id' => isset($c->id) ? $c->id : (isset($c['id']) ? $c['id'] : null),
 								'attendee_id' => $attId,
 								'attendee_name' => isset($attInfo['full_name']) ? $attInfo['full_name'] : '',
+								'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
+								'division_name' => isset($attInfo['division_name']) ? $attInfo['division_name'] : '',
 								'candidate_number' => isset($c->candidate_number) ? $c->candidate_number : (isset($c['candidate_number']) ? $c['candidate_number'] : ''),
 								'height_cm' => isset($c->height_cm) ? $c->height_cm : (isset($c['height_cm']) ? $c['height_cm'] : null),
 								'weight_kg' => isset($c->weight_kg) ? $c->weight_kg : (isset($c['weight_kg']) ? $c['weight_kg'] : null),
@@ -211,6 +213,13 @@ class RegistrationsController extends AdminController
 							}
 						}
 					}
+					if (is_object($entry)) {
+						$entry->video_path = $this->cleanStorageUrl($entry->video_path);
+						$entry->music_path = $this->cleanStorageUrl($entry->music_path);
+					} else {
+						$entry['video_path'] = $this->cleanStorageUrl($entry['video_path']);
+						$entry['music_path'] = $this->cleanStorageUrl($entry['music_path']);
+					}
 					$talentEntries[] = $entry;
 					$membersResult = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array('entry_id' => $entryId));
 					$membersData = array();
@@ -224,6 +233,12 @@ class RegistrationsController extends AdminController
 						$memberArr = is_array($member) ? $member : get_object_vars($member);
 						if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
 							$memberArr['attendee_name'] = $attInfo['full_name'];
+						}
+						if (empty($memberArr['position_name']) && !empty($attInfo['position_name'])) {
+							$memberArr['position_name'] = $attInfo['position_name'];
+						}
+						if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
+							$memberArr['division_name'] = $attInfo['division_name'];
 						}
 						$enrichedMembers[] = $memberArr;
 					}
@@ -425,7 +440,7 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_SUBMITTED;
-			$model->submitted_at = date('Y-m-d H:i:s');
+			$model->submitted_at = time();
 			$ssoUser = AuthHandler::getUser();
 			if (isset($ssoUser['id'])) {
 				$model->submitted_by = $ssoUser['id'];
@@ -456,7 +471,7 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_APPROVED;
-			$model->reviewed_at = date('Y-m-d H:i:s');
+			$model->reviewed_at = time();
 			$ssoUser = AuthHandler::getUser();
 			if (isset($ssoUser['id'])) {
 				$model->reviewed_by = $ssoUser['id'];
@@ -477,7 +492,7 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_REJECTED;
-			$model->reviewed_at = date('Y-m-d H:i:s');
+			$model->reviewed_at = time();
 			$ssoUser = AuthHandler::getUser();
 			if (isset($ssoUser['id'])) {
 				$model->reviewed_by = $ssoUser['id'];
@@ -811,6 +826,25 @@ class RegistrationsController extends AdminController
         $teamModel->alliance_property_ids = $alliancePropertyIds;
         $teamModel->status = SportTeams::STATUS_CONFIRMED;
 
+        // Kiểm tra giới hạn số môn thể thao trước khi tạo đội
+        $overLimitAttendees = array();
+        foreach ($attendeeIds as $idx => $attId) {
+            if (!SportTeamMembers::canRegisterMore($attId)) {
+                $name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
+                $overLimitAttendees[] = $name;
+            }
+        }
+        if (!empty($overLimitAttendees)) {
+            $msg = 'Các người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn: ' . implode(', ', $overLimitAttendees);
+            if ($isAjax) {
+                echo CJSON::encode(array('success' => false, 'error' => $msg));
+                Yii::app()->end();
+            }
+            Yii::app()->user->setFlash('error', $msg);
+            $this->redirect(array('view', 'id' => $registrationId));
+            return;
+        }
+
         $teamResult = $teamModel->storeViaApi();
         if ($teamResult['success']) {
             $teamId = isset($teamResult['data']['data']['id']) ? $teamResult['data']['data']['id'] : (isset($teamResult['data']['id']) ? $teamResult['data']['id'] : null);
@@ -1135,29 +1169,68 @@ class RegistrationsController extends AdminController
 		}
 	}
 
+	private function cleanStorageUrl($url)
+	{
+		if (empty($url)) {
+			return $url;
+		}
+		$prefix = 'https://portal-registration.muongthanh.vn/storage/';
+		if (strpos($url, $prefix) === 0) {
+			$remaining = substr($url, strlen($prefix));
+			if (preg_match('/^https?:\/\//i', $remaining)) {
+				return $remaining;
+			}
+		}
+		$prefixHttp = 'http://portal-registration.muongthanh.vn/storage/';
+		if (strpos($url, $prefixHttp) === 0) {
+			$remaining = substr($url, strlen($prefixHttp));
+			if (preg_match('/^https?:\/\//i', $remaining)) {
+				return $remaining;
+			}
+		}
+		return $url;
+	}
+
 	public function actionGetTalentEntry($id)
 	{
 		header('Content-Type: application/json');
 
 		$entry = TalentEntries::fetchFromApi($id);
 		if ($entry) {
+			if (empty($entry->category_name) && $entry->category_id) {
+				$cat = TalentCategories::fetchFromApi($entry->category_id);
+				if ($cat) {
+					$entry->category_name = $cat->name;
+				}
+			}
+			$members = TalentEntryMembers::getApiDataProvider(array('entry_id' => $id), 100)->getData();
+			$membersArr = array();
+			foreach ($members as $m) {
+				$membersArr[] = array(
+					'id' => $m->id,
+					'attendee_id' => $m->attendee_id,
+					'name' => isset($m->attendee_name) ? $m->attendee_name : '',
+				);
+			}
 			echo CJSON::encode(array(
 				'success' => true,
 				'data' => array(
 					'id' => $entry->id,
 					'title' => $entry->title,
+					'category_id' => $entry->category_id,
 					'category_name' => $entry->category_name,
 					'description' => $entry->description,
 					'content' => $entry->content,
 					'duration_seconds' => $entry->duration_seconds,
-					'music_path' => $entry->music_path,
-					'video_path' => $entry->video_path,
+					'music_path' => $this->cleanStorageUrl($entry->music_path),
+					'video_path' => $this->cleanStorageUrl($entry->video_path),
 					'director' => $entry->director,
 					'director_phone' => $entry->director_phone,
 					'origin' => $entry->origin,
 					'participant_count' => $entry->participant_count,
 					'note' => $entry->note,
-				)
+				),
+				'members' => $membersArr
 			));
 		} else {
 			echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục.'));
@@ -1186,21 +1259,58 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
+		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
+		if (empty($attendeeIds)) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng chọn ít nhất một người biểu diễn.'));
+			Yii::app()->end();
+		}
+
 		$entry->title = Yii::app()->request->getPost('title', $entry->title);
+		
+		$categoryId = Yii::app()->request->getPost('category_id');
+		$entry->category_id = ($categoryId !== null && $categoryId !== '') ? (int)$categoryId : $entry->category_id;
+		
 		$entry->description = Yii::app()->request->getPost('description', $entry->description);
 		$entry->content = Yii::app()->request->getPost('content', $entry->content);
-		$entry->duration_seconds = Yii::app()->request->getPost('duration_seconds', $entry->duration_seconds);
+		
+		$durationSeconds = Yii::app()->request->getPost('duration_seconds');
+		$entry->duration_seconds = ($durationSeconds !== null && $durationSeconds !== '') ? (int)$durationSeconds : null;
+		
 		$entry->music_path = Yii::app()->request->getPost('music_path', $entry->music_path);
 		$entry->video_path = Yii::app()->request->getPost('video_path', $entry->video_path);
 		$entry->director = Yii::app()->request->getPost('director', $entry->director);
 		$entry->director_phone = Yii::app()->request->getPost('director_phone', $entry->director_phone);
 		$entry->origin = Yii::app()->request->getPost('origin', $entry->origin);
-		$entry->participant_count = Yii::app()->request->getPost('participant_count', $entry->participant_count);
+		
+		$participantCount = Yii::app()->request->getPost('participant_count');
+		$entry->participant_count = ($participantCount !== null && $participantCount !== '') ? (int)$participantCount : null;
+		
 		$entry->note = Yii::app()->request->getPost('note', $entry->note);
 
+		// Log request details to find the exact reason for the failure
+		Yii::log("updateTalentEntry POST data: " . CJSON::encode($_POST), 'info', 'application.registration');
+		Yii::log("updateTalentEntry entry model attributes: " . CJSON::encode($entry->attributes), 'info', 'application.registration');
+
 		$result = $entry->updateViaApi();
+		Yii::log("updateTalentEntry updateViaApi result: " . CJSON::encode($result), 'info', 'application.registration');
 
 		if ($result['success']) {
+			// Xóa các thành viên cũ
+			$oldMembers = TalentEntryMembers::getApiDataProvider(array('entry_id' => $id), 100)->getData();
+			if (!empty($oldMembers)) {
+				foreach ($oldMembers as $m) {
+					TalentEntryMembers::deleteViaApi($m->id);
+				}
+			}
+
+			// Thêm các thành viên mới
+			foreach ($attendeeIds as $attendeeId) {
+				$member = new TalentEntryMembers;
+				$member->entry_id = $id;
+				$member->attendee_id = $attendeeId;
+				$member->storeViaApi();
+			}
+
 			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật thành công.'));
 		} else {
 			$error = isset($result['error']) ? $result['error'] : 'Cập nhật thất bại.';

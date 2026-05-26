@@ -16,10 +16,24 @@ class TalentEntries extends BaseTalentEntries
     public $member_count;
     public $registration_id;
     public $alliance_property_ids;
+    public $director;
+    public $director_phone;
+    public $origin;
+    public $participant_count;
+    public $content;
+    public $document;
+    public $is_alliance_team;
 
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
+    }
+
+    public function rules()
+    {
+        $rules = parent::rules();
+        $rules[] = array('property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team', 'safe');
+        return $rules;
     }
 
     public function attributeLabels()
@@ -60,6 +74,13 @@ class TalentEntries extends BaseTalentEntries
             $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
             $model->category_name = isset($data['category_name']) ? $data['category_name'] : '';
             $model->show_name = isset($data['show_name']) ? $data['show_name'] : '';
+            $model->director = isset($data['director']) ? $data['director'] : '';
+            $model->director_phone = isset($data['director_phone']) ? $data['director_phone'] : '';
+            $model->origin = isset($data['origin']) ? $data['origin'] : '';
+            $model->participant_count = isset($data['participant_count']) ? $data['participant_count'] : null;
+            $model->content = isset($data['content']) ? $data['content'] : '';
+            $model->document = isset($data['document']) ? $data['document'] : '';
+            $model->is_alliance_team = isset($data['is_alliance_team']) ? $data['is_alliance_team'] : null;
             $model->id = $id;
             return $model;
         }
@@ -68,23 +89,46 @@ class TalentEntries extends BaseTalentEntries
 
     public function storeViaApi()
     {
-        $data = array_filter($this->attributes, function ($value) {
-            return $value !== null && $value !== '';
-        });
+        $data = $this->attributes;
+        $data['director'] = $this->director;
+        $data['director_phone'] = $this->director_phone;
+        $data['origin'] = $this->origin;
+        $data['participant_count'] = $this->participant_count;
+        $data['content'] = $this->content;
+        $data['document'] = $this->document;
+        $data['is_alliance_team'] = $this->is_alliance_team;
+
         if ($this->registration_id) {
             $data['registration_id'] = $this->registration_id;
         }
         if ($this->alliance_property_ids) {
             $data['alliance_property_ids'] = $this->alliance_property_ids;
         }
+
+        $data = array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
         // print_r(json_encode($data));die;
         return ApiClient::post(ApiEndpoints::TALENT_ENTRY_STORE, $data);
     }
 
     public function updateViaApi()
     {
+        $data = $this->attributes;
+        $data['director'] = $this->director;
+        $data['director_phone'] = $this->director_phone;
+        $data['origin'] = $this->origin;
+        $data['participant_count'] = $this->participant_count;
+        $data['content'] = $this->content;
+        $data['document'] = $this->document;
+        $data['is_alliance_team'] = $this->is_alliance_team;
+
+        $data = array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+
         $url = ApiEndpoints::url(ApiEndpoints::TALENT_ENTRY_UPDATE, array('id' => $this->id));
-        return ApiClient::post($url, $this->attributes);
+        return ApiClient::post($url, $data);
     }
 
     public static function deleteViaApi($id)

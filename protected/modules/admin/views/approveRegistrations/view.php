@@ -242,8 +242,17 @@ $attributes = array(
                             <td>
                                 <?php foreach ($members as $idx => $member):
                                     $memberName = isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : '');
+                                    $memberPosition = isset($member['position_name']) ? $member['position_name'] : '';
+                                    $memberDivision = isset($member['division_name']) ? $member['division_name'] : '';
+                                    $nameInfo = CHtml::encode($memberName);
+                                    $details = array();
+                                    if ($memberPosition) $details[] = CHtml::encode($memberPosition);
+                                    if ($memberDivision) $details[] = 'Bộ phận: ' . CHtml::encode($memberDivision);
+                                    if (!empty($details)) {
+                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                    }
                                 ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($memberName); ?></span>
+                                    <div class="mb-1"><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
                                 <?php endforeach; ?>
                             </td>
                         </tr>
@@ -281,12 +290,15 @@ $attributes = array(
                                     $name = $att['attendee_name'];
                                     $position = $att['position_name'];
                                     $division = $att['division_name'];
-                                    $info = $name;
-                                    if ($position || $division) {
-                                        $info .= ' <small class="text-muted">(' . trim($position . ' - ' . $division, ' -') . ')</small>';
+                                    $nameInfo = CHtml::encode($name);
+                                    $details = array();
+                                    if ($position) $details[] = CHtml::encode($position);
+                                    if ($division) $details[] = 'Bộ phận: ' . CHtml::encode($division);
+                                    if (!empty($details)) {
+                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
                                     }
                                 ?>
-                                    <div><?php echo ($idx + 1) . '. ' . $info; ?></div>
+                                    <div><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
                                 <?php endforeach; ?>
                             </td>
                         </tr>
@@ -322,7 +334,18 @@ $attributes = array(
                     <?php foreach ($contestData['contestants'] as $c): ?>
                         <tr>
                             <td><span class="badge bg-primary"><?php echo CHtml::encode($c['candidate_number']); ?></span></td>
-                            <td><?php echo CHtml::encode($c['attendee_name']); ?></td>
+                            <td>
+                                <?php
+                                $nameInfo = CHtml::encode($c['attendee_name']);
+                                $details = array();
+                                if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
+                                if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
+                                if (!empty($details)) {
+                                    $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                }
+                                echo $nameInfo;
+                                ?>
+                            </td>
                             <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
                             <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
@@ -351,6 +374,7 @@ $attributes = array(
                         <th style="width:120px;">Thể loại</th>
                         <th style="width:100px;">Số người</th>
                         <th>Danh sách</th>
+                        <th style="width:120px;" class="text-center">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -359,6 +383,35 @@ $attributes = array(
                         $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
                         $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
                         $members = ($entryId && isset($talentEntryMembers[$entryId])) ? $talentEntryMembers[$entryId] : array();
+
+                        $entryDetails = array(
+                            'title' => $entryTitle,
+                            'category_name' => $categoryName,
+                            'duration_seconds' => isset($entry->duration_seconds) ? (int)$entry->duration_seconds : (isset($entry['duration_seconds']) ? (int)$entry['duration_seconds'] : 0),
+                            'director' => isset($entry->director) ? $entry->director : (isset($entry['director']) ? $entry['director'] : ''),
+                            'director_phone' => isset($entry->director_phone) ? $entry->director_phone : (isset($entry['director_phone']) ? $entry['director_phone'] : ''),
+                            'origin' => isset($entry->origin) ? $entry->origin : (isset($entry['origin']) ? $entry['origin'] : ''),
+                            'participant_count' => isset($entry->participant_count) ? (int)$entry->participant_count : (isset($entry['participant_count']) ? (int)$entry['participant_count'] : 0),
+                            'description' => isset($entry->description) ? $entry->description : (isset($entry['description']) ? $entry['description'] : ''),
+                            'content' => isset($entry->content) ? $entry->content : (isset($entry['content']) ? $entry['content'] : ''),
+                            'note' => isset($entry->note) ? $entry->note : (isset($entry['note']) ? $entry['note'] : ''),
+                            'music_path' => isset($entry->music_path) ? $entry->music_path : (isset($entry['music_path']) ? $entry['music_path'] : ''),
+                            'video_path' => isset($entry->video_path) ? $entry->video_path : (isset($entry['video_path']) ? $entry['video_path'] : ''),
+                        );
+                        $memberNames = array();
+                        foreach ($members as $member) {
+                            $mName = isset($member['attendee_name']) ? $member['attendee_name'] : '';
+                            $mPos = isset($member['position_name']) ? $member['position_name'] : '';
+                            $mDiv = isset($member['division_name']) ? $member['division_name'] : '';
+                            $nameInfo = CHtml::encode($mName);
+                            $details = array();
+                            if ($mPos) $details[] = CHtml::encode($mPos);
+                            if ($mDiv) $details[] = 'Bộ phận: ' . CHtml::encode($mDiv);
+                            if (!empty($details)) {
+                                $nameInfo .= " <small class='text-muted'>(" . implode(' - ', $details) . ")</small>";
+                            }
+                            $memberNames[] = $nameInfo;
+                        }
                     ?>
                         <tr>
                             <td><?php echo CHtml::encode($entryTitle); ?></td>
@@ -367,9 +420,26 @@ $attributes = array(
                             <td>
                                 <?php foreach ($members as $idx => $member):
                                     $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
+                                    $pos = isset($member['position_name']) ? $member['position_name'] : '';
+                                    $div = isset($member['division_name']) ? $member['division_name'] : '';
+                                    $nameInfo = CHtml::encode($name);
+                                    $details = array();
+                                    if ($pos) $details[] = CHtml::encode($pos);
+                                    if ($div) $details[] = 'Bộ phận: ' . CHtml::encode($div);
+                                    if (!empty($details)) {
+                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                    }
                                 ?>
-                                    <span class="badge bg-light text-dark border me-1 mb-1"><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></span>
+                                    <div class="mb-1"><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
                                 <?php endforeach; ?>
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-outline-primary btn-view-talent-detail" 
+                                        data-entry="<?php echo CHtml::encode(CJSON::encode($entryDetails)); ?>"
+                                        data-members="<?php echo CHtml::encode(CJSON::encode($memberNames)); ?>"
+                                        title="Xem chi tiết">
+                                    <i class="fa fa-eye me-1"></i>Xem chi tiết
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -404,6 +474,76 @@ $attributes = array(
             </div>
             <div class="modal-body text-center" id="document_viewer">
                 <!-- Content will be injected dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Chi Tiết Tiết Mục Văn Nghệ -->
+<div class="modal fade" id="detailTalentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-music me-2 text-primary"></i>Chi tiết tiết mục văn nghệ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mb-3">
+                        <tbody>
+                            <tr>
+                                <th style="width:30%;background:#f8f9fa;">Tên tiết mục</th>
+                                <td id="dt_title" class="fw-bold text-primary"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Thể loại</th>
+                                <td id="dt_category"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Thời lượng</th>
+                                <td id="dt_duration"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Đạo diễn/Biên đạo</th>
+                                <td id="dt_director"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">SĐT đạo diễn</th>
+                                <td id="dt_director_phone"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Nguồn gốc/Xuất xứ</th>
+                                <td id="dt_origin"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Số người tham gia</th>
+                                <td id="dt_participant_count"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Mô tả ngắn</th>
+                                <td id="dt_description"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Nội dung chi tiết</th>
+                                <td id="dt_content" style="white-space: pre-line;"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Ghi chú</th>
+                                <td id="dt_note"></td>
+                            </tr>
+                            <tr>
+                                <th style="background:#f8f9fa;">Tài liệu/Nhạc/Video</th>
+                                <td id="dt_media"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h6 class="fw-bold mb-2"><i class="fa fa-users me-1 text-info"></i>Danh sách người biểu diễn (<span id="dt_member_count">0</span>)</h6>
+                <div id="dt_members_list" class="d-flex flex-wrap gap-2"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
@@ -690,6 +830,59 @@ function rejectAllAttendees() {
         }
     });
 }
+
+$(document).on('click', '.btn-view-talent-detail', function() {
+    var entry = JSON.parse($(this).attr('data-entry'));
+    var members = JSON.parse($(this).attr('data-members'));
+    
+    $('#dt_title').text(entry.title || '-');
+    $('#dt_category').text(entry.category_name || '-');
+    
+    // Format duration
+    var durationText = '-';
+    if (entry.duration_seconds > 0) {
+        var mins = Math.floor(entry.duration_seconds / 60);
+        var secs = entry.duration_seconds % 60;
+        durationText = mins + ':' + (secs < 10 ? '0' : '') + secs + ' (' + entry.duration_seconds + ' giây)';
+    }
+    $('#dt_duration').text(durationText);
+    
+    $('#dt_director').text(entry.director || '-');
+    $('#dt_director_phone').text(entry.director_phone || '-');
+    $('#dt_origin').text(entry.origin || '-');
+    $('#dt_participant_count').text(entry.participant_count || '-');
+    $('#dt_description').text(entry.description || '-');
+    $('#dt_content').text(entry.content || '-');
+    $('#dt_note').text(entry.note || '-');
+    
+    // Media links
+    var mediaHtml = '';
+    if (entry.music_path) {
+        mediaHtml += '<a href=\"' + entry.music_path + '\" target=\"_blank\" class=\"btn btn-xs btn-outline-secondary me-2\"><i class=\"fa fa-music me-1\"></i>Nghe nhạc nền</a>';
+    }
+    if (entry.video_path) {
+        mediaHtml += '<a href=\"' + entry.video_path + '\" target=\"_blank\" class=\"btn btn-xs btn-outline-danger\"><i class=\"fa fa-play-circle me-1\"></i>Xem video</a>';
+    }
+    if (!mediaHtml) {
+        mediaHtml = '-';
+    }
+    $('#dt_media').html(mediaHtml);
+    
+    // Members list
+    $('#dt_member_count').text(members.length);
+    var membersHtml = '';
+    if (members.length > 0) {
+        for (var i = 0; i < members.length; i++) {
+            membersHtml += '<div class=\"mb-1\">' + (i + 1) + '. ' + members[i] + '</div>';
+        }
+    } else {
+        membersHtml = '<span class=\"text-muted\">Chưa chọn người biểu diễn</span>';
+    }
+    $('#dt_members_list').html(membersHtml);
+    
+    var modal = new bootstrap.Modal(document.getElementById('detailTalentModal'));
+    modal.show();
+});
 
 $(document).ready(function() {
     if ($.fn.DataTable) {
