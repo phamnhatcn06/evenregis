@@ -1046,13 +1046,17 @@ var RegistrationView = (function() {
                 btn.innerHTML = '<i class="fa fa-save me-1"></i>Lưu tất cả đăng ký';
 
                 var successCount = results.filter(function(r) { return r.success; }).length;
+                var errors = results.filter(function(r) { return !r.success && r.error; }).map(function(r) { return r.error; });
+
                 if (successCount === pendingSportRegistrations.length) {
                     Toast.success('Đã lưu thành công ' + successCount + ' môn thể thao.');
                     pendingSportRegistrations = [];
                     setTimeout(function() { location.reload(); }, 1000);
+                } else if (errors.length > 0) {
+                    Toast.error(errors.join('; '));
                 } else {
                     Toast.warning('Lưu được ' + successCount + '/' + pendingSportRegistrations.length + ' môn.');
-                    location.reload();
+                    setTimeout(function() { location.reload(); }, 2000);
                 }
             })
             .catch(function() {
