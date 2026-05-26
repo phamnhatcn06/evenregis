@@ -83,30 +83,33 @@ class SportTeamMembers extends BaseSportTeamMembers
         // Đếm qua API list với filter attendee_id
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'attendee_id' => $attendeeId,
-            'per_page' => 100,
+            'per_page' => 500,
         ));
 
-        $items = array();
-        if ($result['success'] && isset($result['data']['data'])) {
-            $items = $result['data']['data'];
-        } elseif ($result['success'] && isset($result['data']) && is_array($result['data'])) {
-            $items = $result['data'];
+        if (!$result['success']) {
+            Yii::log('countSportsByAttendee API failed: ' . print_r($result, true), 'error');
+            return 0;
         }
 
-        // Nếu API không filter theo attendee_id, filter thủ công
+        $items = isset($result['data']['data']) ? $result['data']['data'] : (isset($result['data']) ? $result['data'] : array());
+        if (!is_array($items)) {
+            return 0;
+        }
+
+        // Filter thủ công để đảm bảo chỉ đếm đúng attendee
         $count = 0;
         foreach ($items as $item) {
-            $itemAttendeeId = isset($item['attendee_id']) ? $item['attendee_id'] : null;
-            if ($itemAttendeeId == $attendeeId) {
+            if (isset($item['attendee_id']) && $item['attendee_id'] == $attendeeId) {
                 $count++;
             }
         }
 
-        // Nếu count = 0 nhưng có items, nghĩa là API đã filter đúng
-        if ($count == 0 && !empty($items)) {
-            return count($items);
+        // Nếu API đã filter sẵn (không có item nào khác attendee_id)
+        if ($count == 0 && count($items) > 0) {
+            $count = count($items);
         }
 
+        Yii::log("countSportsByAttendee($attendeeId) = $count", 'info');
         return $count;
     }
 
