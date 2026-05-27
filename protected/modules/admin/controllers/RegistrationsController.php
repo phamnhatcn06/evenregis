@@ -999,6 +999,13 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		// Filter theo property_id của user (nếu không phải admin toàn hệ thống)
+		$ssoUser = AuthHandler::getUser();
+		$userPropertyId = isset($ssoUser['property_id']) ? $ssoUser['property_id'] : null;
+		if ($userPropertyId) {
+			$params['property_id'] = $userPropertyId;
+		}
+
 		$dataProvider = Registrations::getApiDataProvider($params);
 
 		$this->render('admin', array(
