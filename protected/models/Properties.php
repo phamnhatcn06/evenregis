@@ -28,6 +28,24 @@ class Properties extends BaseProperties
 		return null;
 	}
 
+	public static function fetchByCode($code)
+	{
+		$result = ApiClient::get(ApiEndpoints::PROPERTY_LIST, array('code' => $code, 'per_page' => 1));
+		if ($result['success'] && isset($result['data']['data']) && !empty($result['data']['data'])) {
+			$data = $result['data']['data'][0];
+			$model = new self;
+			$model->setAttributes($data, false);
+			if (isset($data['id'])) {
+				$model->id = $data['id'];
+			}
+			if (isset($data['region_id'])) {
+				$model->region_id = $data['region_id'];
+			}
+			return $model;
+		}
+		return null;
+	}
+
 	public function storeViaApi()
 	{
 		$data = array_filter($this->attributes, function ($value) {

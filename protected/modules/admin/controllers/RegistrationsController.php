@@ -1032,12 +1032,12 @@ class RegistrationsController extends AdminController
 		$ssoUser = AuthHandler::getUser();
 		$userPropertyCode = isset($ssoUser['property_code']) ? $ssoUser['property_code'] : null;
 		$userPropertyId = isset($ssoUser['property_id']) ? $ssoUser['property_id'] : null;
-		if ($userPropertyCode !== '9999' && $userPropertyId) {
-			$params['property_id'] = $userPropertyId;
+
+		if ($userPropertyCode !== '9999') {
+			$params['property_id'] = $userPropertyCode;
 		}
 
 		$dataProvider = Registrations::getApiDataProvider($params);
-
 		$this->render('admin', array(
 			'model' => $model,
 			'dataProvider' => $dataProvider,
