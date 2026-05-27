@@ -57,6 +57,18 @@ if (isset($relationProperties)) {
                 )); ?>
                 <?php echo $form->error($model, 'event_id'); ?>
             </div>
+            <div class="form-group mb-3">
+                <?php echo $form->labelEx($model, 'property_id'); ?>
+                <?php echo $form->dropDownList($model, 'property_id', $propertyList, array(
+                    'class' => 'form-select',
+                    'prompt' => '-- Chọn đơn vị --',
+                    'disabled' => !$isHO && count($propertyList) == 1,
+                )); ?>
+                <?php if (!$isHO && count($propertyList) == 1): ?>
+                    <input type="hidden" name="Registrations[property_id]" value="<?php echo $model->property_id; ?>">
+                <?php endif; ?>
+                <?php echo $form->error($model, 'property_id'); ?>
+            </div>
         </div>
         <div class="col-md-6">
             <div class="form-group mb-3">
@@ -83,24 +95,6 @@ if (isset($relationProperties)) {
                 <?php echo $form->error($model, 'note'); ?>
             </div>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group mb-3">
-                <?php echo $form->labelEx($model, 'property_id'); ?>
-                <?php echo $form->dropDownList($model, 'property_id', $propertyList, array(
-                    'class' => 'form-select',
-                    'prompt' => '-- Chọn đơn vị --',
-                    'disabled' => !$isHO && count($propertyList) == 1,
-                )); ?>
-                <?php if (!$isHO && count($propertyList) == 1): ?>
-                    <input type="hidden" name="Registrations[property_id]" value="<?php echo $model->property_id; ?>">
-                <?php endif; ?>
-                <?php echo $form->error($model, 'property_id'); ?>
-            </div>
-        </div>
-
     </div>
 
     <div class="form-group mb-3">
