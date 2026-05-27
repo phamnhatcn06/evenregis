@@ -329,6 +329,7 @@ class RegistrationsController extends AdminController
 
 	public function actionUpdate($id)
 	{
+		$this->checkRegistrationAccess($id);
 		$model = $this->loadModelById($id);
 
 		// Lưu lại relation_property_id cũ để so sánh
