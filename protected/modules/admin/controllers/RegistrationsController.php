@@ -1044,13 +1044,18 @@ class RegistrationsController extends AdminController
 		$ssoUser = AuthHandler::getUser();
 		$userPropertyCode = isset($ssoUser['property_code']) ? $ssoUser['property_code'] : null;
 
+		// Debug log
+		Yii::log("actionAdmin - userPropertyCode: " . $userPropertyCode, 'info');
+
 		if ($userPropertyCode !== '9999' && $userPropertyCode) {
 			$userProperty = Properties::fetchByCode($userPropertyCode);
+			Yii::log("actionAdmin - fetchByCode result: " . ($userProperty ? $userProperty->id : 'null'), 'info');
 			if ($userProperty && $userProperty->id) {
 				$params['property_id'] = $userProperty->id;
 			}
 		}
 
+		Yii::log("actionAdmin - params: " . json_encode($params), 'info');
 		$dataProvider = Registrations::getApiDataProvider($params);
 		$this->render('admin', array(
 			'model' => $model,
