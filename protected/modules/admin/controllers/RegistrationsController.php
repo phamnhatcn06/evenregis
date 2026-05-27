@@ -1033,10 +1033,12 @@ class RegistrationsController extends AdminController
 		// Filter theo property_id của user (nếu không phải admin HO code 9999)
 		$ssoUser = AuthHandler::getUser();
 		$userPropertyCode = isset($ssoUser['property_code']) ? $ssoUser['property_code'] : null;
-		$userPropertyId = isset($ssoUser['property_id']) ? $ssoUser['property_id'] : null;
 
-		if ($userPropertyCode !== '9999') {
-			$params['property_id'] = $userPropertyCode;
+		if ($userPropertyCode !== '9999' && $userPropertyCode) {
+			$userProperty = Properties::fetchByCode($userPropertyCode);
+			if ($userProperty && $userProperty->id) {
+				$params['property_id'] = $userProperty->id;
+			}
 		}
 
 		$dataProvider = Registrations::getApiDataProvider($params);
