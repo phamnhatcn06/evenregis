@@ -1186,6 +1186,7 @@ class RegistrationsController extends AdminController
 
 	public function actionDeleteTalentEntry($id, $registration_id)
 	{
+		$this->checkRegistrationAccess($registration_id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$result = TalentEntries::deleteViaApi($id);
 
