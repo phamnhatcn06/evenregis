@@ -266,20 +266,30 @@ class RegistrationsController extends AdminController
 		$model = new Registrations;
 
 		$user = AuthHandler::getUser();
-		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
 		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
-		$userRegionalId = isset($user['regional_id']) ? $user['regional_id'] : null;
 		$isAdmin = ($userPropertyCode === '9999');
+
+		// Lấy property của user từ API dựa vào property_code
+		$userProperty = null;
+		$userPropertyId = null;
+		$userRegionalId = null;
+		if ($userPropertyCode && !$isAdmin) {
+			$userProperty = Properties::fetchByCode($userPropertyCode);
+			if ($userProperty) {
+				$userPropertyId = $userProperty->id;
+				$userRegionalId = $userProperty->region_id;
+			}
+		}
 
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
 		$periods = RegistrationPeriods::getActiveList();
 
 		if ($isAdmin) {
-			$properties = Properties::getApiDataProvider(array(), 100)->getData();
+			$properties = Properties::getApiDataProvider(array(), 500)->getData();
 			$relationProperties = $properties;
 		} else {
-			$properties = $userPropertyId ? Properties::getApiDataProvider(array('id' => $userPropertyId), 100)->getData() : array();
-			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('region_id' => $userRegionalId), 100)->getData() : array();
+			$properties = $userProperty ? array($userProperty) : array();
+			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('region_id' => $userRegionalId), 500)->getData() : array();
 		}
 
 		if ($userPropertyId && !$model->property_id) {
