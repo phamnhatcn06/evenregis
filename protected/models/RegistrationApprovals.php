@@ -105,11 +105,20 @@ class RegistrationApprovals extends BaseRegistrationApprovals
     }
 
     /**
-     * Yêu cầu chỉnh sửa
+     * Yêu cầu chỉnh sửa - trả về cấp cụ thể
+     * @param int $portalUserId
+     * @param string $approverName
+     * @param int $returnToIndex Trả về bước nào (0 = người tạo, 1 = bước 1...)
+     * @param string $comment
      */
-    public function requestRevision($portalUserId, $approverName, $comment = null)
+    public function requestRevision($portalUserId, $approverName, $returnToIndex = 0, $comment = null)
     {
         if ($this->status !== self::STATUS_PENDING) {
+            return false;
+        }
+
+        // Validate: chỉ được trả về bước trước đó
+        if ($returnToIndex >= $this->current_index) {
             return false;
         }
 
@@ -122,12 +131,37 @@ class RegistrationApprovals extends BaseRegistrationApprovals
             $portalUserId,
             $comment,
             $stepName,
-            $approverName
+            $approverName,
+            $returnToIndex
         );
 
-        $this->status = self::STATUS_REVISION;
+        // Nếu trả về bước 0 (người tạo) → status = revision
+        // Nếu trả về bước > 0 → current_index = returnToIndex, status vẫn pending
+        if ($returnToIndex == 0) {
+            $this->status = self::STATUS_REVISION;
+        } else {
+            $this->current_index = $returnToIndex;
+            // status vẫn là pending, chờ bước đó duyệt lại
+        }
 
         return $this->save();
+    }
+
+    /**
+     * Lấy danh sách các bước có thể trả về
+     */
+    public function getReturnableSteps()
+    {
+        $steps = array(
+            0 => 'Người tạo đăng ký'
+        );
+
+        for ($i = 1; $i < $this->current_index; $i++) {
+            $stepName = $this->workflow->getStepName($i);
+            $steps[$i] = "Bước {$i}: {$stepName}";
+        }
+
+        return $steps;
     }
 
     /**
