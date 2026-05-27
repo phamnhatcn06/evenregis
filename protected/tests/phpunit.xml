@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    bootstrap="bootstrap.php"
+    colors="true"
+    stopOnFailure="false"
+    verbose="true">
+
+    <testsuites>
+        <testsuite name="Unit Tests">
+            <directory>./unit</directory>
+        </testsuite>
+        <testsuite name="Functional Tests">
+            <directory>./functional</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../components</directory>
+            <directory suffix=".php">../models</directory>
+            <directory suffix=".php">../modules/admin/controllers</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" target="./coverage" />
+        <log type="testdox-text" target="./testdox.txt" />
+    </logging>
+
+</phpunit>
