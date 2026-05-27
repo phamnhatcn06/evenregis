@@ -2322,6 +2322,7 @@ class RegistrationsController extends AdminController
 
 	public function actionGetAttendeesForTalent($registration_id)
 	{
+		$this->checkRegistrationAccess($registration_id);
 		$result = array();
 
 		$attendees = Attendees::getByRegistrationId($registration_id);
