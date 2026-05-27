@@ -420,6 +420,7 @@ class RegistrationsController extends AdminController
 
 	public function actionDelete($id)
 	{
+		$this->checkRegistrationAccess($id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$result = Registrations::deleteViaApi($id);
 
