@@ -652,6 +652,7 @@ class RegistrationsController extends AdminController
 
 	public function actionGetAllianceProperties($registration_id)
 	{
+		$this->checkRegistrationAccess($registration_id);
 		$eventContentId = isset($_GET['event_content_id']) ? $_GET['event_content_id'] : null;
 		$registration = Registrations::fetchFromApi($registration_id);
 		$result = array();
