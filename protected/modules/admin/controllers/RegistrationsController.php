@@ -1739,6 +1739,7 @@ class RegistrationsController extends AdminController
 		}
 
 		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$this->checkRegistrationAccess($registrationId);
 		$eventId = Yii::app()->getRequest()->getPost('event_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
 		$roleId = Yii::app()->getRequest()->getPost('role_id');
