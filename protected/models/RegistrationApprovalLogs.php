@@ -12,13 +12,14 @@ class RegistrationApprovalLogs extends BaseRegistrationApprovalLogs
     /**
      * Ghi log
      */
-    public static function log($registrationId, $stepIndex, $action, $portalUserId = null, $comment = null, $stepName = null, $approverName = null)
+    public static function log($registrationId, $stepIndex, $action, $portalUserId = null, $comment = null, $stepName = null, $approverName = null, $returnToIndex = null)
     {
         $log = new self;
         $log->registration_id = $registrationId;
         $log->step_index = $stepIndex;
         $log->step_name = $stepName;
         $log->action = $action;
+        $log->return_to_index = $returnToIndex;
         $log->approver_portal_id = $portalUserId;
         $log->approver_name = $approverName;
         $log->comment = $comment;
