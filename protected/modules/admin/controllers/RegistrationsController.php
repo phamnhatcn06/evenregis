@@ -5,6 +5,14 @@ class RegistrationsController extends AdminController
 	public function actionView($id)
 	{
 		$model = $this->loadModelById($id);
+
+		// Kiểm tra quyền xem: user chỉ được xem registration của đơn vị mình
+		$ssoUser = AuthHandler::getUser();
+		$userPropertyId = isset($ssoUser['property_id']) ? $ssoUser['property_id'] : null;
+		if ($userPropertyId && $model->property_id != $userPropertyId) {
+			throw new CHttpException(403, 'Bạn không có quyền xem đăng ký này.');
+		}
+
 		$registrationDetails = RegistrationDetails::getByRegistrationId($id);
 
 		// Load related names nếu API không trả về
