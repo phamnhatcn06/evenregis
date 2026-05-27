@@ -1459,6 +1459,7 @@ class RegistrationsController extends AdminController
 
 	public function actionGetAttendeesForCompetition($registration_id)
 	{
+		$this->checkRegistrationAccess($registration_id);
 		$result = array();
 		$competitionId = isset($_GET['competition_id']) ? $_GET['competition_id'] : null;
 
