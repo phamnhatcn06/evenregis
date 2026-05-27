@@ -1944,6 +1944,7 @@ class RegistrationsController extends AdminController
 
 	public function actionGetAttendeesList($registration_id)
 	{
+		$this->checkRegistrationAccess($registration_id);
 		$attendees = Attendees::getByRegistrationId($registration_id);
 		$result = array();
 
