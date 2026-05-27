@@ -64,9 +64,19 @@ class Registrations extends BaseRegistrations
 			'property_id' => $propertyId,
 			'period_id' => $periodId,
 		);
-		$dataProvider = self::getApiDataProvider($params, 1);
+		$dataProvider = self::getApiDataProvider($params, 100);
 		$data = $dataProvider->getData();
-		return !empty($data) ? $data[0] : null;
+
+		// Double-check vì API có thể không filter chính xác
+		foreach ($data as $item) {
+			$itemPropertyId = is_object($item) ? $item->property_id : (isset($item['property_id']) ? $item['property_id'] : null);
+			$itemPeriodId = is_object($item) ? $item->period_id : (isset($item['period_id']) ? $item['period_id'] : null);
+
+			if ($itemPropertyId == $propertyId && $itemPeriodId == $periodId) {
+				return $item;
+			}
+		}
+		return null;
 	}
 
 	public static function fetchFromApi($id)
