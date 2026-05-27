@@ -2108,6 +2108,7 @@ class RegistrationsController extends AdminController
 
 	public function actionGetAttendeesForMiss($registration_id)
 	{
+		$this->checkRegistrationAccess($registration_id);
 		$result = array();
 		$registered = array();
 		$contestId = isset($_GET['contest_id']) ? $_GET['contest_id'] : null;
