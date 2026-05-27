@@ -806,6 +806,7 @@ class RegistrationsController extends AdminController
 		}
 		$isAjax = Yii::app()->request->isAjaxRequest;
 		$registrationId = Yii::app()->request->getPost('registration_id');
+		$this->checkRegistrationAccess($registrationId);
 		$sportId = Yii::app()->request->getPost('sport_id');
 		$alliancePropertyIds = Yii::app()->request->getPost('alliance_property_ids', array());
 		$teamName = Yii::app()->request->getPost('team_name');
