@@ -531,11 +531,13 @@ class RegistrationsController extends AdminController
 	{
 		$ssoUser = AuthHandler::getUser();
 		$userPropertyCode = isset($ssoUser['property_code']) ? $ssoUser['property_code'] : null;
-		$userPropertyId = isset($ssoUser['property_id']) ? $ssoUser['property_id'] : null;
 
 		if ($userPropertyCode === '9999') {
 			return; // Admin HO (code 9999) - có quyền truy cập tất cả
 		}
+
+		$userProperty = $userPropertyCode ? Properties::fetchByCode($userPropertyCode) : null;
+		$userPropertyId = $userProperty ? $userProperty->id : null;
 
 		$model = Registrations::fetchFromApi($registrationId);
 		if ($model && $model->property_id != $userPropertyId) {
