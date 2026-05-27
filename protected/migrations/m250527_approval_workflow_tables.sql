@@ -70,9 +70,10 @@ CREATE TABLE IF NOT EXISTS `registration_approvals` (
 CREATE TABLE IF NOT EXISTS `registration_approval_logs` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `registration_id` INT UNSIGNED NOT NULL,
-    `step_index` TINYINT UNSIGNED NOT NULL COMMENT 'Bước được duyệt',
+    `step_index` TINYINT UNSIGNED NOT NULL COMMENT 'Bước thực hiện action',
     `step_name` VARCHAR(255) NULL COMMENT 'Tên bước (snapshot)',
     `action` ENUM('approved', 'rejected', 'revision', 'submitted', 'resubmitted') NOT NULL,
+    `return_to_index` TINYINT UNSIGNED NULL COMMENT 'Trả về bước nào (0 = người tạo)',
     `approver_portal_id` INT UNSIGNED NULL COMMENT 'Portal user ID người duyệt',
     `approver_name` VARCHAR(255) NULL COMMENT 'Tên người duyệt (cache)',
     `comment` TEXT NULL COMMENT 'Ghi chú/Lý do',
