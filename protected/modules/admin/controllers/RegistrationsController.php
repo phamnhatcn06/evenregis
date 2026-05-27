@@ -776,6 +776,7 @@ class RegistrationsController extends AdminController
 
 	public function actionGetSportAttendees($registration_id)
 	{
+		$this->checkRegistrationAccess($registration_id);
 		$result = array();
 
 		// Lấy attendees từ registration hiện tại có role "Thi đấu thể thao"
