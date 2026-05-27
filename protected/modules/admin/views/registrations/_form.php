@@ -73,6 +73,15 @@ if (isset($relationProperties)) {
                 )); ?>
                 <?php echo $form->error($model, 'period_id'); ?>
             </div>
+            <div class="form-group mb-3">
+                <?php echo $form->labelEx($model, 'note'); ?>
+                <?php echo $form->textArea($model, 'note', array(
+                    'class' => 'form-control',
+                    'rows' => 3,
+                    'placeholder' => 'Ghi chú thêm',
+                )); ?>
+                <?php echo $form->error($model, 'note'); ?>
+            </div>
         </div>
     </div>
 
@@ -91,15 +100,7 @@ if (isset($relationProperties)) {
                 <?php echo $form->error($model, 'property_id'); ?>
             </div>
         </div>
-        <div class="form-group mb-3">
-            <?php echo $form->labelEx($model, 'note'); ?>
-            <?php echo $form->textArea($model, 'note', array(
-                'class' => 'form-control',
-                'rows' => 3,
-                'placeholder' => 'Ghi chú thêm',
-            )); ?>
-            <?php echo $form->error($model, 'note'); ?>
-        </div>
+
     </div>
 
     <div class="form-group mb-3">
