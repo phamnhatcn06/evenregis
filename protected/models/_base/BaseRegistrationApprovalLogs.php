@@ -8,6 +8,7 @@
  * @property integer $step_index
  * @property string $step_name
  * @property string $action
+ * @property integer $return_to_index
  * @property integer $approver_portal_id
  * @property string $approver_name
  * @property string $comment
