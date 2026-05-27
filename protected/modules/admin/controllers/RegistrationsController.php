@@ -440,6 +440,7 @@ class RegistrationsController extends AdminController
 
 	public function actionSubmit($id)
 	{
+		$this->checkRegistrationAccess($id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_SUBMITTED;
