@@ -530,9 +530,11 @@ class RegistrationsController extends AdminController
 	protected function checkRegistrationAccess($registrationId)
 	{
 		$ssoUser = AuthHandler::getUser();
+		$userPropertyCode = isset($ssoUser['property_code']) ? $ssoUser['property_code'] : null;
 		$userPropertyId = isset($ssoUser['property_id']) ? $ssoUser['property_id'] : null;
-		if (!$userPropertyId) {
-			return; // Admin HO - có quyền truy cập tất cả
+
+		if ($userPropertyCode === '9999') {
+			return; // Admin HO (code 9999) - có quyền truy cập tất cả
 		}
 
 		$model = Registrations::fetchFromApi($registrationId);
