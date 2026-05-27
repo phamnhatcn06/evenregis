@@ -526,6 +526,25 @@ class RegistrationsController extends AdminController
 		return $model;
 	}
 
+	/**
+	 * Kiểm tra user có quyền truy cập registration không
+	 * @param int $registrationId
+	 * @throws CHttpException nếu không có quyền
+	 */
+	protected function checkRegistrationAccess($registrationId)
+	{
+		$ssoUser = AuthHandler::getUser();
+		$userPropertyId = isset($ssoUser['property_id']) ? $ssoUser['property_id'] : null;
+		if (!$userPropertyId) {
+			return; // Admin HO - có quyền truy cập tất cả
+		}
+
+		$model = Registrations::fetchFromApi($registrationId);
+		if ($model && $model->property_id != $userPropertyId) {
+			throw new CHttpException(403, 'Bạn không có quyền thực hiện thao tác này.');
+		}
+	}
+
 	protected function handleDocumentUpload($existingDocument = null)
 	{
 		$uploadedFiles = array();
