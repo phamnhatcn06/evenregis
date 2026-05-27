@@ -39,7 +39,7 @@ abstract class BaseRegistrationPeriods extends GxActiveRecord
 
 	public static function label($n = 1)
 	{
-		return Yii::t('app', 'RegistrationPeriods|RegistrationPeriods', $n);
+		return Yii::t('app', 'Đợt đăng ký', $n);
 	}
 
 	public static function representingColumn()
