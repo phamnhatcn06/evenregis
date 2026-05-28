@@ -76,7 +76,7 @@ if (!empty($model->document)) {
                 <i class="fa fa-handshake-o fa-2x text-warning me-3"></i>
                 <div>
                     <h6 class="alert-heading mb-1 text-dark fw-bold">Yêu cầu liên quân từ đơn vị trong cụm</h6>
-                    <span>Đơn vị <strong><?php echo CHtml::encode($requesterName); ?></strong> muốn gửi yêu cầu liên quân <?php if ($contentName): ?><strong class="text-primary"><?php echo CHtml::encode($contentName); ?></strong><?php else: ?>cho sự kiện này<?php endif; ?> với đơn vị của bạn.</span>
+                    <span>Đơn vị <strong><?php echo CHtml::encode($requesterName); ?></strong> gửi yêu cầu liên quân <?php if ($contentName): ?><strong class="text-primary"><?php echo CHtml::encode($contentName); ?></strong><?php else: ?>cho sự kiện này<?php endif; ?> với đơn vị của bạn.</span>
                 </div>
             </div>
             <div class="d-flex align-items-center ms-3">
