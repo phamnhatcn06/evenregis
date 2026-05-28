@@ -2110,8 +2110,7 @@ var RegistrationView = (function() {
         var tbody = document.querySelector('#attendees-table tbody');
         if (!tbody) return;
 
-        var hasActionCol = document.querySelector('#attendees-table thead th:last-child:empty') !== null;
-        var colCount = hasActionCol ? 11 : 10;
+        var colCount = canEdit ? 11 : 10;
 
         if (attendees.length === 0) {
             tbody.innerHTML = '<tr><td colspan="' + colCount + '" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>';
