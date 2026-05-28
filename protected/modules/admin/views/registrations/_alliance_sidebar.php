@@ -292,20 +292,4 @@ if (!$hasPending && !$hasHistory) return;
 .alliance-history-reason i {
     margin-right: 4px;
 }
-
-/* Fix table overflow in sibling column */
-.col-md-9 .table-responsive,
-.col-md-9 table {
-    width: 100%;
-    max-width: 100%;
-}
-.col-md-9 .table {
-    table-layout: fixed;
-    word-wrap: break-word;
-}
-.col-md-9 .table td,
-.col-md-9 .table th {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
 </style>
