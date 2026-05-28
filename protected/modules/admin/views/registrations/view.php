@@ -788,6 +788,39 @@ foreach ($registrationDetails as $detail) {
 <?php $this->renderPartial('_modal_add_attendee_manual', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
 <?php $this->renderPartial('_modal_all_documents'); ?>
 
+<!-- Modal Upload Document -->
+<div class="modal fade" id="uploadDocumentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="uploadDocumentForm" method="post" action="<?php echo $this->createUrl('uploadDocument', array('id' => $model->id)); ?>" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa fa-upload me-2"></i>Tải lên tệp đính kèm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Chọn tệp <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" name="documents[]" id="upload_documents" multiple required>
+                        <small class="text-muted">Hỗ trợ: JPG, PNG, PDF, DOC, DOCX, XLS, XLSX (tối đa 10MB/tệp)</small>
+                    </div>
+                    <div id="upload_preview" class="row g-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="btn_upload_document">
+                        <i class="fa fa-upload me-1"></i>Tải lên
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Form xóa document -->
+<form id="deleteDocumentForm" method="post" action="<?php echo $this->createUrl('deleteDocument', array('id' => $model->id)); ?>" style="display:none;">
+    <input type="hidden" name="document_index" id="delete_document_index">
+</form>
+
 <!-- Modal Chọn Đơn vị liên quân -->
 <div class="modal fade" id="alliancePropertyModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
