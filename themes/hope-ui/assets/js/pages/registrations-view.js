@@ -2101,7 +2101,21 @@ var RegistrationView = (function() {
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success && data.data) {
+                    // Destroy existing DataTable if any
+                    var table = $('#attendees-table');
+                    if ($.fn.DataTable && $.fn.DataTable.isDataTable(table)) {
+                        table.DataTable().destroy();
+                    }
                     renderAttendeesTable(data.data);
+                    // Reinitialize DataTable
+                    if (typeof initAttendeesDataTable === 'function') {
+                        initAttendeesDataTable();
+                    }
+                    // Scroll to table
+                    var tableEl = document.getElementById('attendees-table');
+                    if (tableEl) {
+                        tableEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }
             });
     }
