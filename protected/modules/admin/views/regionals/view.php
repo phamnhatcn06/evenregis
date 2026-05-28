@@ -116,7 +116,7 @@ Yii::app()->clientScript->registerScriptFile(
 
 <!-- Modal -->
 <div class="modal fade" id="assignOrganizationsModal" tabindex="-1" aria-labelledby="assignOrganizationsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <form method="post" action="<?php echo $this->createUrl('assignOrganizations', array('id' => $model->id)); ?>">
                 <div class="modal-header">
@@ -127,6 +127,7 @@ Yii::app()->clientScript->registerScriptFile(
                     <div class="row">
                         <div class="col-md-5">
                             <label class="form-label fw-bold">Đơn vị chưa gán</label>
+                            <input type="text" id="filterAvailable" class="form-control form-control-sm mb-2" placeholder="Tìm kiếm...">
                             <select id="availableOrgs" class="form-select" size="15" multiple>
                             </select>
                         </div>
@@ -146,6 +147,7 @@ Yii::app()->clientScript->registerScriptFile(
                         </div>
                         <div class="col-md-5">
                             <label class="form-label fw-bold">Đơn vị đã gán</label>
+                            <input type="text" id="filterAssigned" class="form-control form-control-sm mb-2" placeholder="Tìm kiếm...">
                             <select id="assignedOrgs" class="form-select" size="15" multiple>
                                 <?php foreach ($organizations as $org): ?>
                                     <option value="<?php echo $org['id']; ?>"><?php echo CHtml::encode($org['code'] . ' - ' . $org['name']); ?></option>
