@@ -115,6 +115,86 @@ if (!empty($model->document)) {
     <?php endforeach; ?>
 <?php endif; ?>
 
+<?php if (!empty($allianceHistory)): ?>
+<div class="card mb-3">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-history me-2 text-primary"></i>Lịch sử yêu cầu liên quân</h5>
+        <button class="btn btn-sm btn-link text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#allianceHistoryCollapse" aria-expanded="false">
+            <i class="fa fa-chevron-down"></i>
+        </button>
+    </div>
+    <div class="collapse" id="allianceHistoryCollapse">
+        <div class="card-body pt-2">
+            <div class="timeline-alliance">
+                <?php foreach ($allianceHistory as $item):
+                    $req = $item['request'];
+                    $isSent = $item['type'] === 'sent';
+                    $partnerName = $item['partner_name'];
+                    $contentName = $item['content_name'];
+                    $status = isset($req->status) ? $req->status : 0;
+                    $requestedAt = isset($req->requested_at) ? $req->requested_at : '';
+                    $reviewedAt = isset($req->reviewed_at) ? $req->reviewed_at : '';
+                    $rejectionReason = isset($req->rejection_reason) ? $req->rejection_reason : '';
+
+                    // Status styling
+                    if ($status == AllianceRequests::STATUS_APPROVED) {
+                        $statusClass = 'bg-success';
+                        $statusText = 'Đã chấp nhận';
+                        $statusIcon = 'fa-check-circle';
+                    } elseif ($status == AllianceRequests::STATUS_REJECTED) {
+                        $statusClass = 'bg-danger';
+                        $statusText = 'Đã từ chối';
+                        $statusIcon = 'fa-times-circle';
+                    } elseif ($status == AllianceRequests::STATUS_CANCELLED) {
+                        $statusClass = 'bg-secondary';
+                        $statusText = 'Đã hủy';
+                        $statusIcon = 'fa-ban';
+                    } else {
+                        $statusClass = 'bg-warning';
+                        $statusText = 'Chờ xác nhận';
+                        $statusIcon = 'fa-clock-o';
+                    }
+                ?>
+                <div class="d-flex mb-3 pb-3 border-bottom">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center <?php echo $statusClass; ?>" style="width:40px;height:40px;">
+                            <i class="fa <?php echo $statusIcon; ?> text-white"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <?php if ($isSent): ?>
+                                    <span class="badge bg-info me-1">Gửi đi</span>
+                                    <span>Đã gửi yêu cầu liên quân đến <strong><?php echo CHtml::encode($partnerName); ?></strong></span>
+                                <?php else: ?>
+                                    <span class="badge bg-primary me-1">Nhận</span>
+                                    <span>Nhận yêu cầu liên quân từ <strong><?php echo CHtml::encode($partnerName); ?></strong></span>
+                                <?php endif; ?>
+                                <?php if ($contentName): ?>
+                                    <span class="text-muted">- <?php echo CHtml::encode($contentName); ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            <i class="fa fa-clock-o me-1"></i>Gửi: <?php echo $requestedAt ? MyHelper::formatDateTime($requestedAt) : '-'; ?>
+                            <?php if ($reviewedAt && $status != AllianceRequests::STATUS_PENDING): ?>
+                                <span class="ms-3"><i class="fa fa-check me-1"></i>Xử lý: <?php echo MyHelper::formatDateTime($reviewedAt); ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($rejectionReason && $status == AllianceRequests::STATUS_REJECTED): ?>
+                            <div class="small text-danger mt-1"><i class="fa fa-exclamation-triangle me-1"></i>Lý do: <?php echo CHtml::encode($rejectionReason); ?></div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="row mb-3">
     <!-- Thông tin chung -->
     <div class="col-md-6">
