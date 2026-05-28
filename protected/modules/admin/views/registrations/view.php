@@ -859,6 +859,7 @@ $talentHasAlliance = ($talentPendingCount > 0 || $talentHistoryCount > 0);
         <?php if (empty($talentEntries)): ?>
             <p class="text-muted mb-0">Chưa đăng ký tiết mục văn nghệ nào.</p>
         <?php else: ?>
+            <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-0">
                 <thead class="table-light">
                     <tr>
