@@ -86,8 +86,26 @@ class AllianceRequests extends BaseAllianceRequests
 		$data = array_filter($this->attributes, function ($value) {
 			return $value !== null && $value !== '';
 		});
+
+		// Loại bỏ các trường metadata/read-only không cần thiết khi update
+		unset($data['created_at']);
+		unset($data['updated_at']);
+		unset($data['deleted_at']);
+
+		// Loại bỏ requested_by nếu bị ép kiểu sai thành số 0 (API trả về email string nhưng local DB/ActiveRecord ép về 0)
+		if (isset($data['requested_by']) && ($data['requested_by'] === 0 || $data['requested_by'] === '0')) {
+			unset($data['requested_by']);
+		}
+
 		$url = ApiEndpoints::url(ApiEndpoints::ALLIANCE_REQUEST_UPDATE, array('id' => $this->id));
-		return ApiClient::post($url, $data);
+		$result = ApiClient::post($url, $data);
+
+		if ($result['success'] && isset($result['data']['code']) && $result['data']['code'] >= 400) {
+			$result['success'] = false;
+			$result['error'] = isset($result['data']['message']) ? $result['data']['message'] : 'API error';
+		}
+
+		return $result;
 	}
 
 	public static function deleteViaApi($id)

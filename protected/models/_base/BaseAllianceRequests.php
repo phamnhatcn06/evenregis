@@ -28,36 +28,43 @@
  * @property Properties $requesterOrg
  * @property Properties $targetOrg
  */
-abstract class BaseAllianceRequests extends GxActiveRecord {
+abstract class BaseAllianceRequests extends GxActiveRecord
+{
 
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+	{
 		return 'alliance_requests';
 	}
 
-	public static function label($n = 1) {
+	public static function label($n = 1)
+	{
 		return Yii::t('app', 'AllianceRequests|AllianceRequests', $n);
 	}
 
-	public static function representingColumn() {
+	public static function representingColumn()
+	{
 		return 'requested_at';
 	}
 
-	public function rules() {
+	public function rules()
+	{
 		return array(
 			array('event_id, requester_org_id, target_org_id', 'required'),
-			array('status', 'numerical', 'integerOnly'=>true),
-			array('event_id, requester_org_id, target_org_id, requested_by, reviewed_by', 'length', 'max'=>20),
+			array('status', 'numerical', 'integerOnly' => true),
+			array('event_id, requester_org_id, target_org_id, reviewed_by', 'length', 'max' => 20),
 			array('requested_at, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe'),
 			array('status, requested_by, requested_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, event_id, requester_org_id, target_org_id, status, requested_by, requested_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
+			array('id, event_id, requester_org_id, target_org_id, status, requested_by, requested_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+	{
 		return array(
 			'event' => array(self::BELONGS_TO, 'Events', 'event_id'),
 			'requesterOrg' => array(self::BELONGS_TO, 'Properties', 'requester_org_id'),
@@ -65,12 +72,13 @@ abstract class BaseAllianceRequests extends GxActiveRecord {
 		);
 	}
 
-	public function pivotModels() {
-		return array(
-		);
+	public function pivotModels()
+	{
+		return array();
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+	{
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'event_id' => null,
@@ -92,7 +100,8 @@ abstract class BaseAllianceRequests extends GxActiveRecord {
 		);
 	}
 
-	public function search() {
+	public function search()
+	{
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);

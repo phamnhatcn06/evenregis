@@ -21,14 +21,6 @@ $this->menu = array(
 );
 if ($canEdit) {
     $this->menu[] = array(
-        'label' => Yii::t('app', 'Update'),
-        'labelIcon' => Yii::t('app', 'Update'),
-        'url' => $this->createUrl('update', array('id' => $model->id)),
-        'color' => 'warning',
-        'icon' => 'fa-pencil',
-        'id' => 'btn_update',
-    );
-    $this->menu[] = array(
         'label' => Yii::t('app', 'Delete'),
         'labelIcon' => Yii::t('app', 'Delete'),
         'url' => $this->createUrl('delete', array('id' => $model->id)),
@@ -73,29 +65,24 @@ if (!empty($model->document)) {
 ?>
 
 <?php if (!empty($incomingRequestsData)): ?>
-    <?php foreach ($incomingRequestsData as $item): 
+    <?php foreach ($incomingRequestsData as $item):
         $req = $item['request'];
         $reqId = $req->id;
         $requesterName = $item['requester_name'];
-        $requesterRegId = $item['requester_registration_id'];
     ?>
         <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3 p-3 rounded shadow-sm border-start border-4 border-warning">
             <div class="d-flex align-items-center">
                 <i class="fa fa-handshake-o fa-2x text-warning me-3"></i>
                 <div>
-                    <h6 class="alert-heading mb-1 text-dark fw-bold">Yêu cầu liên quân từ đối tác</h6>
-                    <span>Đơn vị <strong><?php echo CHtml::encode($requesterName); ?></strong> muốn gửi yêu cầu liên quân với bạn cho sự kiện này.</span>
-                    <?php if ($requesterRegId): ?>
-                        <span class="ms-1">(Xem phiếu đăng ký liên quan: <a href="<?php echo $this->createUrl('view', array('id' => $requesterRegId)); ?>" class="alert-link text-decoration-underline text-primary">view?id=<?php echo $requesterRegId; ?></a>)</span>
-                    <?php endif; ?>
+                    <h6 class="alert-heading mb-1 text-dark fw-bold">Yêu cầu liên quân từ đơn vị trong cụm</h6>
+                    <span>Đơn vị <strong><?php echo CHtml::encode($requesterName); ?></strong> muốn gửi yêu cầu liên quân với đơn vị của bạn cho sự kiện này.</span>
                 </div>
             </div>
             <div class="d-flex align-items-center ms-3">
-                <form method="post" action="<?php echo $this->createUrl('approveAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:inline;" class="me-2" onsubmit="return confirm('Bạn có chắc chắn muốn chấp nhận yêu cầu liên quân này?');">
-                    <button type="submit" class="btn btn-sm btn-success text-white px-3 fw-bold">
-                        <i class="fa fa-check me-1"></i>Chấp nhận
-                    </button>
-                </form>
+                <button type="button" class="btn btn-sm btn-success text-white px-3 fw-bold me-2" onclick="confirmApproveAlliance(<?php echo $reqId; ?>)">
+                    <i class="fa fa-check me-1"></i>Chấp nhận
+                </button>
+                <form id="approve-alliance-form-<?php echo $reqId; ?>" method="post" action="<?php echo $this->createUrl('approveAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:none;"></form>
                 <button type="button" class="btn btn-sm btn-outline-danger px-3 fw-bold bg-white" onclick="confirmRejectAlliance(<?php echo $reqId; ?>)">
                     <i class="fa fa-times me-1"></i>Từ chối
                 </button>
@@ -141,8 +128,13 @@ if (!empty($model->document)) {
     <!-- Tệp đính kèm -->
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fa fa-file-text me-2"></i>Tệp đính kèm</h5>
+                <?php if ($canEdit): ?>
+                    <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
+                        <i class="fa fa-upload me-1"></i>Tải lên
+                    </button>
+                <?php endif; ?>
             </div>
             <div class="card-body">
                 <?php if (!empty($documents)): ?>
@@ -408,31 +400,31 @@ foreach ($registrationDetails as $detail) {
     </div>
     <div class="card-body">
         <?php if ($canEdit): ?>
-        <!-- Form chọn liên quân và môn thể thao -->
-        <div class="row mb-3 g-3 align-items-end">
-            <div class="col-md-5">
-                <label class="form-label mb-1">Đơn vị liên quân</label>
-                <div>
-                    <button type="button" class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#alliancePropertyModal">
-                        <i class="fa fa-handshake-o me-1"></i>Thêm đơn vị liên quân
-                    </button>
-                    <div id="alliance_selected_texts" class="mt-2 small text-primary fw-bold"></div>
+            <!-- Form chọn liên quân và môn thể thao -->
+            <div class="row mb-3 g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label mb-1">Đơn vị liên quân</label>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#alliancePropertyModal">
+                            <i class="fa fa-handshake-o me-1"></i>Thêm đơn vị liên quân
+                        </button>
+                        <div id="alliance_selected_texts" class="mt-2 small text-primary fw-bold"></div>
+                    </div>
+                    <select class="d-none" id="sport_alliance_property" multiple></select>
+                    <small class="text-muted mt-1 d-block">Áp dụng cho môn đội > 3 người. Để trống nếu không liên quân.</small>
                 </div>
-                <select class="d-none" id="sport_alliance_property" multiple></select>
-                <small class="text-muted mt-1 d-block">Áp dụng cho môn đội > 3 người. Để trống nếu không liên quân.</small>
+                <div class="col-md-4">
+                    <label class="form-label mb-1">Môn thể thao <span class="text-danger">*</span></label>
+                    <select class="form-select" id="sport_select_main">
+                        <option value="">-- Chọn môn thể thao --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-sm btn-primary text-white" id="btn_open_sport_modal" disabled>
+                        <i class="fa fa-users me-1"></i>Chọn VĐV & Đăng ký
+                    </button>
+                </div>
             </div>
-            <div class="col-md-4">
-                <label class="form-label mb-1">Môn thể thao <span class="text-danger">*</span></label>
-                <select class="form-select" id="sport_select_main">
-                    <option value="">-- Chọn môn thể thao --</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-sm btn-primary text-white" id="btn_open_sport_modal" disabled>
-                    <i class="fa fa-users me-1"></i>Chọn VĐV & Đăng ký
-                </button>
-            </div>
-        </div>
         <?php endif; ?>
 
         <!-- Preview: Danh sách đang chọn (chưa lưu) -->
@@ -477,8 +469,7 @@ foreach ($registrationDetails as $detail) {
                             <td class="text-center"><?php echo count($members); ?></td>
                             <td>
                                 <?php foreach ($members as $idx => $member):
-                                    $memberName = isset($member['attendee_name']) ? $member['attendee_name'] :
-                                        (isset($member['name']) ? $member['name'] : '');
+                                    $memberName = isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : '');
                                     $memberPosition = isset($member['position_name']) ? $member['position_name'] : '';
                                     $memberDivision = isset($member['division_name']) ? $member['division_name'] : '';
                                     $nameInfo = CHtml::encode($memberName);
@@ -516,9 +507,9 @@ foreach ($registrationDetails as $detail) {
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-trophy me-2 text-primary"></i>Đăng ký thi nghiệp vụ</h5>
         <?php if ($canEdit): ?>
-        <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
-            <i class="fa fa-plus me-1"></i>Đăng ký
-        </button>
+            <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
+                <i class="fa fa-plus me-1"></i>Đăng ký
+            </button>
         <?php endif; ?>
     </div>
     <div class="card-body">
@@ -581,9 +572,9 @@ foreach ($registrationDetails as $detail) {
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi sắc đẹp</h5>
         <?php if ($canEdit): ?>
-        <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addMissModal">
-            <i class="fa fa-plus me-1"></i>Đăng ký
-        </button>
+            <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addMissModal">
+                <i class="fa fa-plus me-1"></i>Đăng ký
+            </button>
         <?php endif; ?>
     </div>
     <div class="card-body">
@@ -592,53 +583,53 @@ foreach ($registrationDetails as $detail) {
             <p class="text-muted mb-0">Chưa đăng ký thi sắc đẹp nào.</p>
         <?php else: ?>
             <?php foreach ($beautyContestants as $contestData): ?>
-            <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
-            <table class="table table-bordered table-striped table-sm mb-3">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width:80px;">SBD</th>
-                        <th>Họ tên</th>
-                        <th style="width:80px;">Cao (cm)</th>
-                        <th style="width:80px;">Nặng (kg)</th>
-                        <th style="width:100px;">Số đo</th>
-                        <?php if ($canEdit): ?>
-                            <th style="width:60px;"></th>
-                        <?php endif; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($contestData['contestants'] as $c): ?>
+                <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
+                <table class="table table-bordered table-striped table-sm mb-3">
+                    <thead class="table-light">
                         <tr>
-                            <td><span class="badge bg-primary"><?php echo CHtml::encode($c['candidate_number']); ?></span></td>
-                            <td>
-                                <?php
-                                $nameInfo = CHtml::encode($c['attendee_name']);
-                                $details = array();
-                                if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
-                                if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
-                                if (!empty($details)) {
-                                    $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
-                                }
-                                echo $nameInfo;
-                                ?>
-                            </td>
-                            <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
-                            <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
-                            <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
+                            <th style="width:80px;">SBD</th>
+                            <th>Họ tên</th>
+                            <th style="width:80px;">Cao (cm)</th>
+                            <th style="width:80px;">Nặng (kg)</th>
+                            <th style="width:100px;">Số đo</th>
                             <?php if ($canEdit): ?>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editMissContestant(<?php echo $c['id']; ?>)" title="Sửa">
-                                        <i class="fa fa-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </td>
+                                <th style="width:60px;"></th>
                             <?php endif; ?>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($contestData['contestants'] as $c): ?>
+                            <tr>
+                                <td><span class="badge bg-primary"><?php echo CHtml::encode($c['candidate_number']); ?></span></td>
+                                <td>
+                                    <?php
+                                    $nameInfo = CHtml::encode($c['attendee_name']);
+                                    $details = array();
+                                    if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
+                                    if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
+                                    if (!empty($details)) {
+                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                    }
+                                    echo $nameInfo;
+                                    ?>
+                                </td>
+                                <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
+                                <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
+                                <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
+                                <?php if ($canEdit): ?>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editMissContestant(<?php echo $c['id']; ?>)" title="Sửa">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </td>
+                                <?php endif; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
@@ -651,31 +642,31 @@ foreach ($registrationDetails as $detail) {
     </div>
     <div class="card-body">
         <?php if ($canEdit && empty($talentEntries)): ?>
-        <!-- Form chọn liên quân và thể loại -->
-        <div class="row mb-3 g-3 align-items-end">
-            <div class="col-md-5">
-                <label class="form-label mb-1">Đơn vị liên quân</label>
-                <div>
-                    <button type="button" class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#talentAlliancePropertyModal">
-                        <i class="fa fa-handshake-o me-1"></i>Thêm đơn vị liên quân
-                    </button>
-                    <div id="talent_alliance_selected_texts" class="mt-2 small text-primary fw-bold"></div>
+            <!-- Form chọn liên quân và thể loại -->
+            <div class="row mb-3 g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label mb-1">Đơn vị liên quân</label>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#talentAlliancePropertyModal">
+                            <i class="fa fa-handshake-o me-1"></i>Thêm đơn vị liên quân
+                        </button>
+                        <div id="talent_alliance_selected_texts" class="mt-2 small text-primary fw-bold"></div>
+                    </div>
+                    <select class="d-none" id="talent_alliance_property" name="alliance_property_ids[]" multiple></select>
+                    <small class="text-muted mt-1 d-block">Chọn đơn vị cùng biểu diễn (nếu có)</small>
                 </div>
-                <select class="d-none" id="talent_alliance_property" name="alliance_property_ids[]" multiple></select>
-                <small class="text-muted mt-1 d-block">Chọn đơn vị cùng biểu diễn (nếu có)</small>
+                <div class="col-md-4">
+                    <label class="form-label mb-1">Thể loại <span class="text-danger">*</span></label>
+                    <select class="form-select" id="talent_category_select_main">
+                        <option value="">-- Chọn thể loại --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-sm btn-primary text-white" id="btn_open_talent_modal" disabled>
+                        <i class="fa fa-users me-1"></i>Chọn người & Đăng ký
+                    </button>
+                </div>
             </div>
-            <div class="col-md-4">
-                <label class="form-label mb-1">Thể loại <span class="text-danger">*</span></label>
-                <select class="form-select" id="talent_category_select_main">
-                    <option value="">-- Chọn thể loại --</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-sm btn-primary text-white" id="btn_open_talent_modal" disabled>
-                    <i class="fa fa-users me-1"></i>Chọn người & Đăng ký
-                </button>
-            </div>
-        </div>
         <?php endif; ?>
 
         <?php if (empty($talentEntries)): ?>
@@ -910,6 +901,22 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
     function removeAllianceProperty(id) { RegistrationView.removeAllianceProperty(id); }
     function confirmDeleteTeam(id) { RegistrationView.confirmDeleteTeam(id); }
+    function confirmApproveAlliance(id) {
+        Swal.fire({
+            title: "Xác nhận liên quân",
+            text: "Bạn có chắc chắn muốn chấp nhận yêu cầu liên quân này?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#198754",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Chấp nhận",
+            cancelButtonText: "Hủy"
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById("approve-alliance-form-" + id).submit();
+            }
+        });
+    }
     function confirmRejectAlliance(id) {
         Swal.fire({
             title: "Từ chối liên quân",

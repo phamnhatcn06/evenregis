@@ -569,6 +569,7 @@ class RegistrationsController extends AdminController
 	{
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$this->checkRegistrationAccess($registration_id);
+			Yii::log("actionApproveAlliance - request_id={$request_id}, registration_id={$registration_id}", 'info', 'application.alliance');
 			$model = AllianceRequests::fetchFromApi($request_id);
 			if ($model) {
 				$ssoUser = AuthHandler::getUser();
@@ -576,13 +577,17 @@ class RegistrationsController extends AdminController
 				$model->reviewed_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
 				$model->reviewed_at = date('Y-m-d H:i:s');
 
+				Yii::log("actionApproveAlliance - Updating AllianceRequest model attributes: " . CJSON::encode($model->attributes), 'info', 'application.alliance');
 				$result = $model->updateViaApi();
+				Yii::log("actionApproveAlliance - AllianceRequest update result: " . CJSON::encode($result), 'info', 'application.alliance');
 
 				if ($result['success']) {
 					$regModel = $this->loadModelById($registration_id);
-					if ($regModel && !$regModel->relation_property_id) {
+					if ($regModel) {
 						$regModel->relation_property_id = $model->requester_org_id;
-						$regModel->updateViaApi();
+						Yii::log("actionApproveAlliance - Updating Registration relation_property_id to {$model->requester_org_id}", 'info', 'application.alliance');
+						$regResult = $regModel->updateViaApi();
+						Yii::log("actionApproveAlliance - Registration update result: " . CJSON::encode($regResult), 'info', 'application.alliance');
 					}
 					Yii::app()->user->setFlash('success', 'Đã chấp nhận yêu cầu liên quân.');
 				} else {
@@ -599,6 +604,7 @@ class RegistrationsController extends AdminController
 	{
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$this->checkRegistrationAccess($registration_id);
+			Yii::log("actionRejectAlliance - request_id={$request_id}, registration_id={$registration_id}", 'info', 'application.alliance');
 			$model = AllianceRequests::fetchFromApi($request_id);
 			if ($model) {
 				$ssoUser = AuthHandler::getUser();
@@ -607,7 +613,9 @@ class RegistrationsController extends AdminController
 				$model->reviewed_at = date('Y-m-d H:i:s');
 				$model->rejection_reason = Yii::app()->getRequest()->getPost('rejection_reason', '');
 
+				Yii::log("actionRejectAlliance - Updating AllianceRequest model attributes: " . CJSON::encode($model->attributes), 'info', 'application.alliance');
 				$result = $model->updateViaApi();
+				Yii::log("actionRejectAlliance - AllianceRequest update result: " . CJSON::encode($result), 'info', 'application.alliance');
 
 				if ($result['success']) {
 					Yii::app()->user->setFlash('success', 'Đã từ chối yêu cầu liên quân.');
@@ -951,19 +959,6 @@ class RegistrationsController extends AdminController
 			return;
 		}
 
-		// Tạo SportTeam
-		$teamModel = new SportTeams();
-		$teamModel->event_id = $registration->event_id;
-		$teamModel->sport_id = $sportId;
-		$teamModel->property_id = $registration->property_id;
-		$teamModel->name = $teamName ? $teamName : 'Team';
-		$teamModel->code = $teamName ? $teamName : 'TEAM';
-		// Set public custom property if needed
-		$teamModel->team_name = $teamName;
-		$teamModel->is_alliance = empty($alliancePropertyIds) ? 0 : 1;
-		$teamModel->alliance_property_ids = $alliancePropertyIds;
-		$teamModel->status = SportTeams::STATUS_CONFIRMED;
-
 		// Kiểm tra giới hạn số môn thể thao trước khi tạo đội
 		$overLimitAttendees = array();
 		foreach ($attendeeIds as $idx => $attId) {
@@ -983,32 +978,74 @@ class RegistrationsController extends AdminController
 			return;
 		}
 
-		$teamResult = $teamModel->storeViaApi();
-		if ($teamResult['success']) {
-			$teamId = isset($teamResult['data']['data']['id']) ? $teamResult['data']['data']['id'] : (isset($teamResult['data']['id']) ? $teamResult['data']['id'] : null);
-			if ($teamId) {
-				// Tạo SportTeamMembers
-				foreach ($attendeeIds as $idx => $attId) {
-					$member = new SportTeamMembers();
-					$member->sport_team_id = $teamId;
-					$member->attendee_id = $attId;
-					$member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
-					$member->storeViaApi();
-				}
+		// Lấy SportTeam của đối tác liên quân nếu bộ môn có 3 người trở lên
+		$teamId = null;
+		if ($registration->relation_property_id && count($attendeeIds) >= 3) {
+			$partnerTeams = SportTeams::getApiDataProvider(array(
+				'event_id' => $registration->event_id,
+				'property_id' => $registration->relation_property_id,
+				'sport_id' => $sportId,
+			), 10)->getData();
+			if (!empty($partnerTeams)) {
+				$partnerTeam = $partnerTeams[0];
+				$teamId = isset($partnerTeam->id) ? $partnerTeam->id : (isset($partnerTeam['id']) ? $partnerTeam['id'] : null);
+			}
+		}
+
+		if ($teamId) {
+			// Thêm thành viên vào đội liên quân có sẵn của đối tác
+			foreach ($attendeeIds as $idx => $attId) {
+				$member = new SportTeamMembers();
+				$member->sport_team_id = $teamId;
+				$member->attendee_id = $attId;
+				$member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
+				$member->storeViaApi();
 			}
 			if ($isAjax) {
-				echo CJSON::encode(array('success' => true, 'message' => 'Đăng ký thể thao thành công.', 'team_id' => $teamId));
+				echo CJSON::encode(array('success' => true, 'message' => 'Ghép đội liên quân thành công.', 'team_id' => $teamId));
 				Yii::app()->end();
 			}
-			Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
+			Yii::app()->user->setFlash('success', 'Ghép đội liên quân thành công.');
 		} else {
-			if ($isAjax) {
-				echo CJSON::encode(array('success' => false, 'error' => isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.'));
-				Yii::app()->end();
+			// Tạo SportTeam mới
+			$teamModel = new SportTeams();
+			$teamModel->event_id = $registration->event_id;
+			$teamModel->sport_id = $sportId;
+			$teamModel->property_id = $registration->property_id;
+			$teamModel->name = $teamName ? $teamName : 'Team';
+			$teamModel->code = $teamName ? $teamName : 'TEAM';
+			$teamModel->team_name = $teamName;
+			$teamModel->is_alliance = empty($alliancePropertyIds) ? 0 : 1;
+			$teamModel->alliance_property_ids = $alliancePropertyIds;
+			$teamModel->status = SportTeams::STATUS_CONFIRMED;
+
+			$teamResult = $teamModel->storeViaApi();
+			if ($teamResult['success']) {
+				$teamId = isset($teamResult['data']['data']['id']) ? $teamResult['data']['data']['id'] : (isset($teamResult['data']['id']) ? $teamResult['data']['id'] : null);
+				if ($teamId) {
+					// Tạo SportTeamMembers
+					foreach ($attendeeIds as $idx => $attId) {
+						$member = new SportTeamMembers();
+						$member->sport_team_id = $teamId;
+						$member->attendee_id = $attId;
+						$member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
+						$member->storeViaApi();
+					}
+				}
+				if ($isAjax) {
+					echo CJSON::encode(array('success' => true, 'message' => 'Đăng ký thể thao thành công.', 'team_id' => $teamId));
+					Yii::app()->end();
+				}
+				Yii::app()->user->setFlash('success', 'Đăng ký thể thao thành công.');
+			} else {
+				if ($isAjax) {
+					echo CJSON::encode(array('success' => false, 'error' => isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.'));
+					Yii::app()->end();
+				}
+				Yii::app()->user->setFlash('error', isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.');
+				$this->redirect(array('view', 'id' => $registrationId));
+				return;
 			}
-			Yii::app()->user->setFlash('error', isset($teamResult['error']) ? $teamResult['error'] : 'Không thể tạo đội thi đấu.');
-			$this->redirect(array('view', 'id' => $registrationId));
-			return;
 		}
 
 		// Không tạo RegistrationDetails nữa, vì môn thể thao sẽ được quản lý bởi SportTeams
