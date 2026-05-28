@@ -122,6 +122,7 @@ class ApiEndpoints
     const SPORT_DETAIL = '/api/sports/detail/{id}';
     const SPORT_UPDATE = '/api/sports/update/{id}';
     const SPORT_DESTROY = '/api/sports/destroy/{id}';
+    const SPORT_COUNT_ROOT = '/api/sports/count-root-sports/{id}';
 
     // Event Sport
     const EVENT_SPORT_LIST = '/api/event-sports';
