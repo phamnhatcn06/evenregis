@@ -27158,3 +27158,18 @@ panel-title {
 .form-control::placeholder {
   color: #6c757d !important;
 }
+
+/* Fix text color when staff item is selected/active */
+#attendee_available_staff_list .list-group-item.active .text-muted,
+#attendee_selected_staff_list .list-group-item.active .text-muted,
+#available_staff_list .list-group-item.active .text-muted,
+#selected_staff_list .list-group-item.active .text-muted {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+#attendee_available_staff_list .list-group-item.active,
+#attendee_selected_staff_list .list-group-item.active,
+#available_staff_list .list-group-item.active,
+#selected_staff_list .list-group-item.active {
+  color: #fff !important;
+}
