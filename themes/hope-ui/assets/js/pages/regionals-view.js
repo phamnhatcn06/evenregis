@@ -2,6 +2,30 @@ document.addEventListener('DOMContentLoaded', function() {
     var availableOrgs = document.getElementById('availableOrgs');
     var assignedOrgs = document.getElementById('assignedOrgs');
     var hiddenInputs = document.getElementById('hiddenInputs');
+    var filterAvailable = document.getElementById('filterAvailable');
+    var filterAssigned = document.getElementById('filterAssigned');
+
+    // Filter function
+    function filterSelect(input, select) {
+        var filter = input.value.toLowerCase();
+        var options = select.options;
+        for (var i = 0; i < options.length; i++) {
+            var text = options[i].textContent.toLowerCase();
+            options[i].style.display = text.indexOf(filter) > -1 ? '' : 'none';
+        }
+    }
+
+    if (filterAvailable) {
+        filterAvailable.addEventListener('input', function() {
+            filterSelect(this, availableOrgs);
+        });
+    }
+
+    if (filterAssigned) {
+        filterAssigned.addEventListener('input', function() {
+            filterSelect(this, assignedOrgs);
+        });
+    }
 
     // Load all properties when modal opens
     var modal = document.getElementById('assignOrganizationsModal');
