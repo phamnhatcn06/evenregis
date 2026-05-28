@@ -946,6 +946,8 @@ $talentHasAlliance = ($talentPendingCount > 0 || $talentHistoryCount > 0);
                 </tbody>
             </table>
         <?php endif; ?>
+            </div><!-- end main col -->
+        </div><!-- end row -->
     </div>
 </div>
 
