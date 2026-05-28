@@ -1,10 +1,3 @@
-<style>
-.btn-outline-danger-hover:hover {
-    background-color: #dc3545 !important;
-    color: #fff !important;
-    border-color: #dc3545 !important;
-}
-</style>
 <?php
 $canEdit = in_array($model->status, array(Registrations::STATUS_DRAFT, Registrations::STATUS_REJECTED));
 
