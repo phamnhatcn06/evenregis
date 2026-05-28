@@ -137,40 +137,25 @@ class RegistrationApprovals extends BaseRegistrationApprovals
     {
         $url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_APPROVAL_RESUBMIT, array('id' => $id));
         return ApiClient::post($url, array());
-
-        return $this->save();
     }
 
     /**
-     * Lấy danh sách đơn chờ duyệt của user
+     * Lấy danh sách đơn chờ duyệt của user - gọi API
      */
     public static function getPendingForApprover($portalUserId)
     {
-        // Lấy các step mà user được phép duyệt
-        $approverSteps = ApprovalWorkflowApprovers::getApproverSteps($portalUserId);
+        $url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_APPROVAL_PENDING, array('portal_user_id' => $portalUserId));
+        $result = ApiClient::get($url);
 
-        if (empty($approverSteps)) {
-            return array();
+        $models = array();
+        if ($result['success'] && !empty($result['data']['data'])) {
+            foreach ($result['data']['data'] as $item) {
+                $model = new self;
+                $model->setAttributes($item, false);
+                $models[] = $model;
+            }
         }
-
-        // Build điều kiện
-        $conditions = array();
-        $params = array();
-        $i = 0;
-        foreach ($approverSteps as $step) {
-            $conditions[] = "(workflow_id = :wid{$i} AND current_index = :step{$i})";
-            $params[":wid{$i}"] = $step->workflow_id;
-            $params[":step{$i}"] = $step->step_index;
-            $i++;
-        }
-
-        $criteria = new CDbCriteria();
-        $criteria->condition = 'status = :status AND (' . implode(' OR ', $conditions) . ')';
-        $criteria->params = array_merge(array(':status' => self::STATUS_PENDING), $params);
-        $criteria->with = array('registration', 'workflow');
-        $criteria->order = 'started_at ASC';
-
-        return self::model()->findAll($criteria);
+        return $models;
     }
 
     /**
@@ -178,7 +163,13 @@ class RegistrationApprovals extends BaseRegistrationApprovals
      */
     public static function countPendingForApprover($portalUserId)
     {
-        return count(self::getPendingForApprover($portalUserId));
+        $url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_APPROVAL_PENDING, array('portal_user_id' => $portalUserId));
+        $result = ApiClient::get($url, array('count_only' => 1));
+
+        if ($result['success'] && isset($result['data']['total'])) {
+            return $result['data']['total'];
+        }
+        return 0;
     }
 
     /**
@@ -186,7 +177,10 @@ class RegistrationApprovals extends BaseRegistrationApprovals
      */
     public function getCurrentStepName()
     {
-        return $this->workflow ? $this->workflow->getStepName($this->current_index) : 'Bước ' . $this->current_index;
+        if (isset($this->workflow) && $this->workflow) {
+            return $this->workflow->getStepName($this->current_index);
+        }
+        return 'Bước ' . $this->current_index;
     }
 
     /**
