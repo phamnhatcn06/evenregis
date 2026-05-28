@@ -40,6 +40,34 @@ $this->Tabletitle = 'Chi tiết phiếu đăng ký của ' . $model->property_na
 ?>
 
 <?php
+// Helper function to resolve content code from request
+function resolveContentCode($req) {
+    // Try direct content_code first
+    $code = isset($req->content_code) ? $req->content_code : '';
+
+    // Try to derive from content_name if not set
+    if (empty($code) && isset($req->content_name)) {
+        $name = mb_strtolower($req->content_name, 'UTF-8');
+        if (strpos($name, 'thể thao') !== false || strpos($name, 'sport') !== false) {
+            $code = 'sports';
+        } elseif (strpos($name, 'văn nghệ') !== false || strpos($name, 'talent') !== false) {
+            $code = 'talent';
+        } elseif (strpos($name, 'nghiệp vụ') !== false || strpos($name, 'competition') !== false) {
+            $code = 'competition';
+        } elseif (strpos($name, 'miss') !== false || strpos($name, 'sắc đẹp') !== false) {
+            $code = 'miss';
+        }
+    }
+
+    // Normalize
+    if ($code === 'sport') $code = 'sports';
+    if ($code === 'competitions') $code = 'competition';
+    if ($code === 'talents') $code = 'talent';
+    if ($code === 'beauty_contests') $code = 'miss';
+
+    return $code ?: 'sports'; // Default to sports
+}
+
 // Group alliance requests and history by content code
 $allianceByContent = array(
     'sports' => array('pending' => array(), 'history' => array()),
@@ -52,9 +80,7 @@ $allianceByContent = array(
 // Group incoming pending requests
 if (!empty($incomingRequestsData)) {
     foreach ($incomingRequestsData as $item) {
-        $contentCode = isset($item['request']->content_code) ? $item['request']->content_code : '';
-        if (empty($contentCode)) $contentCode = 'sports'; // Default to sports if not specified
-        if ($contentCode === 'sport') $contentCode = 'sports';
+        $contentCode = resolveContentCode($item['request']);
         if (!isset($allianceByContent[$contentCode])) $contentCode = 'other';
         $allianceByContent[$contentCode]['pending'][] = $item;
     }
@@ -63,9 +89,7 @@ if (!empty($incomingRequestsData)) {
 // Group alliance history
 if (!empty($allianceHistory)) {
     foreach ($allianceHistory as $item) {
-        $contentCode = isset($item['request']->content_code) ? $item['request']->content_code : '';
-        if (empty($contentCode)) $contentCode = 'sports';
-        if ($contentCode === 'sport') $contentCode = 'sports';
+        $contentCode = resolveContentCode($item['request']);
         if (!isset($allianceByContent[$contentCode])) $contentCode = 'other';
         $allianceByContent[$contentCode]['history'][] = $item;
     }
