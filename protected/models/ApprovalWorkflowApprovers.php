@@ -9,44 +9,93 @@ class ApprovalWorkflowApprovers extends BaseApprovalWorkflowApprovers
         return parent::model($className);
     }
 
-    /**
-     * Kiểm tra user có quyền duyệt ở workflow/step không
-     */
-    public static function canApprove($portalUserId, $workflowId, $stepIndex, $organizationId = null)
+    // ==================== API Methods ====================
+
+    public static function fetchFromApi($id)
     {
-        $criteria = new CDbCriteria();
-        $criteria->condition = 'portal_user_id = :uid AND workflow_id = :wid AND step_index = :step AND is_active = 1';
-        $criteria->params = array(
-            ':uid' => $portalUserId,
-            ':wid' => $workflowId,
-            ':step' => $stepIndex,
-        );
-
-        if ($organizationId) {
-            $criteria->addCondition('(organization_id IS NULL OR organization_id = :org)');
-            $criteria->params[':org'] = $organizationId;
+        $url = ApiEndpoints::url(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_DETAIL, array('id' => $id));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            $model = new self;
+            $model->setAttributes($data, false);
+            $model->id = $id;
+            return $model;
         }
-
-        return self::model()->exists($criteria);
+        return null;
     }
 
+    public function storeViaApi()
+    {
+        $data = array_filter($this->attributes, function ($value) {
+            return $value !== null && $value !== '';
+        });
+        return ApiClient::post(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_STORE, $data);
+    }
+
+    public function updateViaApi()
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_UPDATE, array('id' => $this->id));
+        return ApiClient::post($url, $this->attributes);
+    }
+
+    public static function deleteViaApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_DESTROY, array('id' => $id));
+        return ApiClient::delete($url);
+    }
+
+    public static function getApiDataProvider($params = array(), $pageSize = 25)
+    {
+        return new ApiDataProvider(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_LIST, array(
+            'modelClass' => 'ApprovalWorkflowApprovers',
+            'params' => $params,
+            'pagination' => array('pageSize' => $pageSize),
+        ));
+    }
+
+    // ==================== Business Methods ====================
+
     /**
-     * Lấy danh sách step_index mà user được phép duyệt
+     * Lấy danh sách step mà user được phép duyệt
      */
     public static function getApproverSteps($portalUserId, $workflowId = null)
     {
-        $criteria = new CDbCriteria();
-        $criteria->select = 'DISTINCT step_index, step_name, workflow_id';
-        $criteria->condition = 'portal_user_id = :uid AND is_active = 1';
-        $criteria->params = array(':uid' => $portalUserId);
-        $criteria->order = 'workflow_id, step_index';
-
+        $url = ApiEndpoints::url(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_BY_USER, array('portal_user_id' => $portalUserId));
+        $params = array('is_active' => 1);
         if ($workflowId) {
-            $criteria->addCondition('workflow_id = :wid');
-            $criteria->params[':wid'] = $workflowId;
+            $params['workflow_id'] = $workflowId;
+        }
+        $result = ApiClient::get($url, $params);
+
+        $steps = array();
+        if ($result['success'] && !empty($result['data']['data'])) {
+            foreach ($result['data']['data'] as $item) {
+                $model = new self;
+                $model->setAttributes($item, false);
+                $steps[] = $model;
+            }
+        }
+        return $steps;
+    }
+
+    /**
+     * Kiểm tra user có quyền duyệt không
+     */
+    public static function canApprove($portalUserId, $workflowId, $stepIndex, $organizationId = null)
+    {
+        $params = array(
+            'portal_user_id' => $portalUserId,
+            'workflow_id' => $workflowId,
+            'step_index' => $stepIndex,
+            'is_active' => 1,
+        );
+        if ($organizationId) {
+            $params['organization_id'] = $organizationId;
         }
 
-        return self::model()->findAll($criteria);
+        $result = ApiClient::get(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_LIST, $params);
+        return $result['success'] && !empty($result['data']['data']);
     }
 
     /**
@@ -54,19 +103,23 @@ class ApprovalWorkflowApprovers extends BaseApprovalWorkflowApprovers
      */
     public static function getApproverIds($workflowId, $stepIndex, $organizationId = null)
     {
-        $criteria = new CDbCriteria();
-        $criteria->select = 'portal_user_id';
-        $criteria->condition = 'workflow_id = :wid AND step_index = :step AND is_active = 1';
-        $criteria->params = array(':wid' => $workflowId, ':step' => $stepIndex);
-
+        $params = array(
+            'workflow_id' => $workflowId,
+            'step_index' => $stepIndex,
+            'is_active' => 1,
+            'per_page' => 100,
+        );
         if ($organizationId) {
-            $criteria->addCondition('(organization_id IS NULL OR organization_id = :org)');
-            $criteria->params[':org'] = $organizationId;
+            $params['organization_id'] = $organizationId;
         }
 
-        $models = self::model()->findAll($criteria);
-        return array_map(function ($m) {
-            return $m->portal_user_id;
-        }, $models);
+        $result = ApiClient::get(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_LIST, $params);
+        $ids = array();
+        if ($result['success'] && !empty($result['data']['data'])) {
+            foreach ($result['data']['data'] as $item) {
+                $ids[] = $item['portal_user_id'];
+            }
+        }
+        return $ids;
     }
 }
