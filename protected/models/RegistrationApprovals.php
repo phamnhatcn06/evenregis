@@ -9,6 +9,33 @@ class RegistrationApprovals extends BaseRegistrationApprovals
         return parent::model($className);
     }
 
+    // ==================== API Methods ====================
+
+    public static function fetchFromApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_APPROVAL_DETAIL, array('id' => $id));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            $model = new self;
+            $model->setAttributes($data, false);
+            $model->id = $id;
+            return $model;
+        }
+        return null;
+    }
+
+    public static function getApiDataProvider($params = array(), $pageSize = 25)
+    {
+        return new ApiDataProvider(ApiEndpoints::REGISTRATION_APPROVAL_LIST, array(
+            'modelClass' => 'RegistrationApprovals',
+            'params' => $params,
+            'pagination' => array('pageSize' => $pageSize),
+        ));
+    }
+
+    // ==================== Business Methods ====================
+
     /**
      * Tạo approval tracking khi submit đăng ký
      */
@@ -18,30 +45,27 @@ class RegistrationApprovals extends BaseRegistrationApprovals
         if (!$workflowId) {
             $workflow = ApprovalWorkflows::getDefault();
             if (!$workflow) {
-                return null;
+                return array('success' => false, 'message' => 'Không tìm thấy workflow mặc định');
             }
             $workflowId = $workflow->id;
+            $totalSteps = $workflow->total_steps;
         } else {
-            $workflow = ApprovalWorkflows::model()->findByPk($workflowId);
+            $workflow = ApprovalWorkflows::fetchFromApi($workflowId);
+            if (!$workflow) {
+                return array('success' => false, 'message' => 'Không tìm thấy workflow');
+            }
+            $totalSteps = $workflow->total_steps;
         }
 
-        if (!$workflow) {
-            return null;
-        }
+        $data = array(
+            'registration_id' => $registrationId,
+            'workflow_id' => $workflowId,
+            'current_index' => 1,
+            'total_steps' => $totalSteps,
+            'status' => self::STATUS_PENDING,
+        );
 
-        $model = new self;
-        $model->registration_id = $registrationId;
-        $model->workflow_id = $workflowId;
-        $model->current_index = 1;
-        $model->total_steps = $workflow->total_steps;
-        $model->status = self::STATUS_PENDING;
-
-        if ($model->save()) {
-            // Log submitted
-            RegistrationApprovalLogs::log($registrationId, 0, 'submitted', null, 'Nộp đăng ký');
-            return $model;
-        }
-        return null;
+        return ApiClient::post(ApiEndpoints::REGISTRATION_APPROVAL_STORE, $data);
     }
 
     /**
