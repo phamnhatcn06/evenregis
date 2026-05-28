@@ -2135,8 +2135,8 @@ var RegistrationView = (function() {
         var html = '';
         attendees.forEach(function(att, idx) {
             var photoHtml = att.portrait_path
-                ? '<img src="' + escapeHtml(att.portrait_path) + '" class="rounded" style="width:160px;height:160px;object-fit:cover;cursor:pointer;" onclick="viewDocument(\'' + escapeHtml(att.portrait_path) + '\', \'image\')" title="Click để xem">'
-                : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:160px;height:160px;"><i class="fa fa-user text-muted fa-3x"></i></div>';
+                ? '<img src="' + escapeHtml(att.portrait_path) + '" class="rounded mx-auto d-block" style="width:160px;height:160px;object-fit:cover;cursor:pointer;" onclick="viewDocument(\'' + escapeHtml(att.portrait_path) + '\', \'image\')" title="Click để xem">'
+                : '<div class="bg-light rounded d-flex align-items-center justify-content-center mx-auto" style="width:160px;height:160px;"><i class="fa fa-user text-muted fa-3x"></i></div>';
 
             var statusLabel = getApprovalStatusLabel(att.approval_status);
             var positionDept = [];
@@ -2660,7 +2660,7 @@ var RegistrationView = (function() {
                 html += '<div class="col-md-1 text-center"></div>';
                 html += '<div class="col-md-6 text-center">';
                 html += '<h6>Ảnh chân dung</h6>';
-                html += '<small class="text-muted d-block mb-2">Kích thước 400x400px</small>';
+                html += '<small class="text-muted d-block mb-2"></small>';
                 if (docs.portrait) {
                     html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 530px; height: 530px; object-fit: cover; max-width: 100%;">';
                 } else {
