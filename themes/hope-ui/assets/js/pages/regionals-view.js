@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load all properties when modal opens
     var modal = document.getElementById('assignOrganizationsModal');
     modal.addEventListener('show.bs.modal', function () {
+        clearFilters();
         loadAvailableProperties();
     });
 
