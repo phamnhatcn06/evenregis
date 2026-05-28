@@ -608,6 +608,8 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
                 </tbody>
             </table>
         <?php endif; ?>
+            </div><!-- end main col -->
+        </div><!-- end row -->
     </div>
 </div>
 
