@@ -2473,20 +2473,54 @@ var RegistrationView = (function() {
         var form = document.getElementById('add-attendee-manual-form');
         if (form) {
             form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
                 var checkInEl = document.getElementById('add_check_in_date');
                 var checkOutEl = document.getElementById('add_check_out_date');
                 var startDateEl = document.getElementById('add_start_date');
 
                 // Set values from flatpickr to hidden inputs
-                if (checkInEl._flatpickr && checkInEl._flatpickr.selectedDates[0]) {
+                if (checkInEl && checkInEl._flatpickr && checkInEl._flatpickr.selectedDates[0]) {
                     checkInEl.value = checkInEl._flatpickr.formatDate(checkInEl._flatpickr.selectedDates[0], 'Y-m-d');
                 }
-                if (checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates[0]) {
+                if (checkOutEl && checkOutEl._flatpickr && checkOutEl._flatpickr.selectedDates[0]) {
                     checkOutEl.value = checkOutEl._flatpickr.formatDate(checkOutEl._flatpickr.selectedDates[0], 'Y-m-d');
                 }
                 if (startDateEl && startDateEl._flatpickr && startDateEl._flatpickr.selectedDates[0]) {
                     startDateEl.value = startDateEl._flatpickr.formatDate(startDateEl._flatpickr.selectedDates[0], 'Y-m-d');
                 }
+
+                var btn = document.getElementById('btn_submit_attendee_manual');
+                var originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang thêm...';
+
+                var formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+
+                    if (data.success) {
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('addAttendeeManualModal'));
+                        if (modal) modal.hide();
+                        Toast.success(data.message || 'Thêm thành công.');
+                        location.reload();
+                    } else {
+                        Toast.error(data.error || 'Không thể thêm.');
+                    }
+                })
+                .catch(function() {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    Toast.error('Lỗi kết nối.');
+                });
             });
         }
     }
