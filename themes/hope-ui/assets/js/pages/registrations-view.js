@@ -2141,7 +2141,7 @@ var RegistrationView = (function() {
                 '<td>' + escapeHtml(att.transport_name || '-') + '</td>' +
                 '<td>' + statusLabel + '</td>';
 
-            if (hasActionCol) {
+            if (canEdit) {
                 var docsBtn = '';
                 var docs = {
                     portrait: att.portrait_path || att.photo_path || '',
