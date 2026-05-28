@@ -24,6 +24,7 @@ var RegistrationView = (function() {
     // Pending sport registrations (preview before save)
     var pendingSportRegistrations = [];
     var editingSportIndex = -1; // -1 = adding new, >= 0 = editing existing
+    var existingSportTeams = [];
 
     function init(config) {
         eventId = config.eventId;
@@ -35,6 +36,7 @@ var RegistrationView = (function() {
         registeredCompetitions = config.registeredCompetitions || [];
         existingStaffIds = config.existingStaffIds || [];
         canEdit = config.canEdit || false;
+        existingSportTeams = config.existingSportTeams || [];
 
         if (eventId) {
             loadContentsData();
@@ -169,6 +171,25 @@ var RegistrationView = (function() {
     function updateSportTeamName() {
         var teamNameInput = document.getElementById('sport_team_name');
         if (!teamNameInput) return;
+
+        // Get selected sport ID from modal or main select
+        var sportSelect = document.getElementById('sport_select_main');
+        var modalSportSelect = document.getElementById('sport_item_id');
+        var sportId = modalSportSelect && modalSportSelect.value 
+            ? modalSportSelect.value 
+            : (sportSelect ? sportSelect.value : '');
+
+        var existingTeam = existingSportTeams.find(function(t) { return t.sportId == sportId; });
+        if (existingTeam) {
+            teamNameInput.value = existingTeam.teamName;
+            teamNameInput.readOnly = true;
+            teamNameInput.classList.add('bg-light');
+            return;
+        }
+
+        // Reset readOnly if no existing team is found
+        teamNameInput.readOnly = false;
+        teamNameInput.classList.remove('bg-light');
 
         var allianceSelect = document.getElementById('sport_alliance_property');
         var allianceCodes = [];
@@ -354,6 +375,7 @@ var RegistrationView = (function() {
         var modalSportSelect = document.getElementById('sport_item_id');
         var sportNameDiv = document.getElementById('sport_selected_name');
         var allianceWrapper = document.getElementById('alliance_checkboxes_wrapper');
+        var teamNameInput = document.getElementById('sport_team_name');
 
         if (modalSportSelect) {
             modalSportSelect.classList.remove('d-none');
@@ -365,6 +387,11 @@ var RegistrationView = (function() {
         }
         if (allianceWrapper) {
             allianceWrapper.style.display = '';
+        }
+        if (teamNameInput) {
+            teamNameInput.value = '';
+            teamNameInput.readOnly = false;
+            teamNameInput.classList.remove('bg-light');
         }
 
         // Reset button text and editing state
@@ -608,7 +635,11 @@ var RegistrationView = (function() {
             item.href = '#';
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', staff.id);
-            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>';
+            var subInfo = [];
+            if (staff.department_name) subInfo.push(staff.department_name);
+            if (staff.position) subInfo.push(staff.position);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 this.classList.toggle('active');
@@ -813,62 +844,97 @@ var RegistrationView = (function() {
             }
         }
 
-        // Get alliance info
-        var allianceSelect = document.getElementById('sport_alliance_property');
-        var allianceIds = [];
-        var allianceCodes = [];
-        if (allianceSelect) {
-            Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
-                allianceIds.push(opt.value);
-                allianceCodes.push(opt.getAttribute('data-code'));
-            });
-        }
+        // AJAX check sport limits on the backend first!
+        var btnAdd = document.getElementById('btn_add_to_preview');
+        var originalHtml = btnAdd.innerHTML;
+        btnAdd.disabled = true;
+        btnAdd.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang kiểm tra...';
 
-        // Tự động sinh tên đội theo quy tắc
-        var teamName = document.getElementById('sport_team_name')?.value || '';
-        if (!teamName || teamName === propertyCode) {
-            if (allianceCodes.length > 0) {
-                var allCodes = [propertyCode].concat(allianceCodes);
-                teamName = 'Liên quân ' + allCodes.join(' - ');
-            } else {
-                teamName = propertyCode || 'Team';
+        var formData = new FormData();
+        sportSelectedAttendees.forEach(function(att) {
+            formData.append('attendee_ids[]', att.id);
+        });
+
+        fetch(window.BASE_URL + '/admin/registrations/checkSportAttendeesLimit', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
             }
-        }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            btnAdd.disabled = false;
+            btnAdd.innerHTML = originalHtml;
 
-        var regData = {
-            sportId: sportId,
-            sportName: sportName,
-            teamName: teamName,
-            allianceIds: allianceIds,
-            allianceCodes: allianceCodes,
-            attendees: sportSelectedAttendees.slice() // clone array
-        };
+            if (!data.success) {
+                Toast.error(data.error);
+                return;
+            }
 
-        if (editingSportIndex >= 0) {
-            // Update existing
-            pendingSportRegistrations[editingSportIndex] = regData;
-            Toast.success('Đã cập nhật "' + sportName + '".');
-        } else {
-            // Add new
-            pendingSportRegistrations.push(regData);
-            Toast.success('Đã thêm "' + sportName + '" vào danh sách.');
-        }
+            // Proceed with adding to preview
+            // Get alliance info
+            var allianceSelect = document.getElementById('sport_alliance_property');
+            var allianceIds = [];
+            var allianceCodes = [];
+            if (allianceSelect) {
+                Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
+                    allianceIds.push(opt.value);
+                    allianceCodes.push(opt.getAttribute('data-code'));
+                });
+            }
 
-        // Reset editing state
-        editingSportIndex = -1;
+            // Tự động sinh tên đội theo quy tắc
+            var teamName = document.getElementById('sport_team_name')?.value || '';
+            if (!teamName || teamName === propertyCode) {
+                if (allianceCodes.length > 0) {
+                    var allCodes = [propertyCode].concat(allianceCodes);
+                    teamName = 'Liên quân ' + allCodes.join(' - ');
+                } else {
+                    teamName = propertyCode || 'Team';
+                }
+            }
 
-        // Close modal and render preview
-        var modalEl = document.getElementById('addDetailModal');
-        if (modalEl) {
-            var modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-        }
+            var regData = {
+                sportId: sportId,
+                sportName: sportName,
+                teamName: teamName,
+                allianceIds: allianceIds,
+                allianceCodes: allianceCodes,
+                attendees: sportSelectedAttendees.slice() // clone array
+            };
 
-        renderSportPreview();
+            if (editingSportIndex >= 0) {
+                // Update existing
+                pendingSportRegistrations[editingSportIndex] = regData;
+                Toast.success('Đã cập nhật "' + sportName + '".');
+            } else {
+                // Add new
+                pendingSportRegistrations.push(regData);
+                Toast.success('Đã thêm "' + sportName + '" vào danh sách.');
+            }
 
-        // Reset dropdown
-        if (sportSelect) sportSelect.value = '';
-        document.getElementById('btn_open_sport_modal').disabled = true;
+            // Reset editing state
+            editingSportIndex = -1;
+
+            // Close modal and render preview
+            var modalEl = document.getElementById('addDetailModal');
+            if (modalEl) {
+                var modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+
+            renderSportPreview();
+
+            // Reset dropdown
+            if (sportSelect) sportSelect.value = '';
+            document.getElementById('btn_open_sport_modal').disabled = true;
+        })
+        .catch(function(err) {
+            btnAdd.disabled = false;
+            btnAdd.innerHTML = originalHtml;
+            Toast.error('Có lỗi xảy ra khi kiểm tra giới hạn.');
+        });
     }
 
     function editPendingSport(idx) {
@@ -1159,6 +1225,7 @@ var RegistrationView = (function() {
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', att.id);
             var subInfo = [];
+            if (att.department_name) subInfo.push(att.department_name);
             if (att.property_name) subInfo.push(att.property_name);
             if (att.position) subInfo.push(att.position);
             item.innerHTML = '<small>' + escapeHtml(att.full_name) + '</small>' +
@@ -1192,7 +1259,12 @@ var RegistrationView = (function() {
             item.href = '#';
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', att.id);
-            item.innerHTML = '<small>' + escapeHtml(att.full_name) + '</small>';
+            var subInfo = [];
+            if (att.department_name) subInfo.push(att.department_name);
+            if (att.property_name) subInfo.push(att.property_name);
+            if (att.position) subInfo.push(att.position);
+            item.innerHTML = '<small>' + escapeHtml(att.full_name) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 this.classList.toggle('active');
@@ -1540,7 +1612,11 @@ var RegistrationView = (function() {
             item.href = '#';
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', staff.id);
-            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>';
+            var subInfo = [];
+            if (staff.department_name) subInfo.push(staff.department_name);
+            if (staff.position) subInfo.push(staff.position);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 this.classList.toggle('active');
@@ -1575,7 +1651,11 @@ var RegistrationView = (function() {
             item.href = '#';
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', staff.id);
-            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>';
+            var subInfo = [];
+            if (staff.department_name) subInfo.push(staff.department_name);
+            if (staff.position) subInfo.push(staff.position);
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 this.classList.toggle('active');
@@ -1741,6 +1821,8 @@ var RegistrationView = (function() {
             var teamNameInput = document.getElementById('sport_team_name');
             if (teamNameInput) {
                 teamNameInput.value = team.team_name || team.name || '';
+                teamNameInput.readOnly = true;
+                teamNameInput.classList.add('bg-light');
             }
 
             // Load attendees then pre-select members
@@ -2067,15 +2149,10 @@ var RegistrationView = (function() {
 
                     if (data.success) {
                         Toast.success(data.message || 'Thêm thành công.');
-                        // Thêm các staff đã chọn vào existingStaffIds để không hiện lại
-                        attendeeSelectedStaff.forEach(function(staff) {
-                            if (existingStaffIds.indexOf(parseInt(staff.id)) === -1) {
-                                existingStaffIds.push(parseInt(staff.id));
-                            }
-                        });
                         bootstrap.Modal.getInstance(document.getElementById('addAttendeeFromStaffModal')).hide();
-                        reloadAttendeesTable();
-                        resetAttendeeStaffSelection();
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
                     } else {
                         Toast.error(data.error || 'Không thể thêm.');
                     }
@@ -2091,7 +2168,12 @@ var RegistrationView = (function() {
 
     function resetAttendeeStaffSelection() {
         attendeeSelectedStaff = [];
-        document.getElementById('staff_role_id').value = '';
+        var roleSelect = document.getElementById('staff_role_id');
+        if (roleSelect) {
+            for (var i = 0; i < roleSelect.options.length; i++) {
+                roleSelect.options[i].selected = false;
+            }
+        }
         renderAttendeeAvailableStaff();
         renderAttendeeSelectedStaff();
     }
@@ -2120,6 +2202,38 @@ var RegistrationView = (function() {
             });
     }
 
+    function getRoleBadgeClassJs(roleName) {
+        var rLower = roleName.toLowerCase().trim();
+        if (rLower.indexOf('trưởng đoàn') !== -1) {
+            return 'bg-danger text-white';
+        } else if (rLower.indexOf('phó đoàn') !== -1) {
+            return 'bg-warning text-dark';
+        } else if (rLower.indexOf('huấn luyện viên') !== -1 || rLower.indexOf('hlv') !== -1) {
+            return 'bg-info text-dark';
+        } else if (rLower.indexOf('vận động viên') !== -1 || rLower.indexOf('vđv') !== -1 || rLower.indexOf('thi đấu') !== -1) {
+            return 'bg-primary text-white';
+        } else if (rLower.indexOf('cổ động viên') !== -1 || rLower.indexOf('cdv') !== -1) {
+            return 'bg-success text-white';
+        } else if (rLower.indexOf('khách') !== -1) {
+            return 'bg-dark text-white';
+        } else {
+            var hash = 0;
+            for (var i = 0; i < rLower.length; i++) {
+                hash = rLower.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            var classes = [
+                'bg-primary text-white',
+                'bg-secondary text-white',
+                'bg-success text-white',
+                'bg-danger text-white',
+                'bg-warning text-dark',
+                'bg-info text-dark',
+                'bg-dark text-white'
+            ];
+            return classes[Math.abs(hash) % classes.length];
+        }
+    }
+
     function renderAttendeesTable(attendees) {
         var tbody = document.querySelector('#attendees-table tbody');
         if (!tbody) return;
@@ -2143,12 +2257,24 @@ var RegistrationView = (function() {
             if (att.department_name) positionDept.push(att.department_name);
             if (att.position) positionDept.push(att.position);
 
+            var roleBadges = '';
+            if (att.role_name) {
+                var roles = att.role_name.split(',').map(function(r) { return r.trim(); });
+                roles.forEach(function(r) {
+                    if (!r) return;
+                    var cls = getRoleBadgeClassJs(r);
+                    roleBadges += '<span class="badge ' + cls + ' me-1 mb-1">' + escapeHtml(r) + '</span>';
+                });
+            } else {
+                roleBadges = '-';
+            }
+
             html += '<tr>' +
                 '<td class="text-center">' + (idx + 1) + '</td>' +
                 '<td class="text-center">' + photoHtml + '</td>' +
                 '<td>' + escapeHtml(att.full_name) + '</td>' +
                 '<td>' + escapeHtml(positionDept.join(' - ')) + '</td>' +
-                '<td>' + escapeHtml(att.role_name || '') + '</td>' +
+                '<td>' + roleBadges + '</td>' +
                 '<td>' + formatDate(att.start_date) + '</td>' +
                 '<td>' + formatDate(att.check_in_date) + '</td>' +
                 '<td>' + formatDate(att.check_out_date) + '</td>' +
@@ -2432,7 +2558,20 @@ var RegistrationView = (function() {
                     document.getElementById('edit_full_name').value = att.full_name || '';
                     document.getElementById('edit_position').value = att.position || '';
                     document.getElementById('edit_department').value = att.department_name || '';
-                    document.getElementById('edit_role_id').value = att.role_id || '';
+                    var editRoleSelect = document.getElementById('edit_role_id');
+                    if (editRoleSelect) {
+                        for (var i = 0; i < editRoleSelect.options.length; i++) {
+                            editRoleSelect.options[i].selected = false;
+                        }
+                        if (att.role_id) {
+                            var selectedRoles = String(att.role_id).split(',').map(function(s) { return s.trim(); });
+                            for (var i = 0; i < editRoleSelect.options.length; i++) {
+                                if (selectedRoles.indexOf(editRoleSelect.options[i].value) !== -1) {
+                                    editRoleSelect.options[i].selected = true;
+                                }
+                            }
+                        }
+                    }
                     document.getElementById('edit_note').value = att.note || '';
                     document.getElementById('edit_start_date').value = formatDate(att.start_date);
                     document.getElementById('edit_transport_id').value = att.transport_id || '';
@@ -2660,12 +2799,13 @@ var RegistrationView = (function() {
                 html += '<div class="col-md-1 text-center"></div>';
                 html += '<div class="col-md-6 text-center">';
                 html += '<h6>Ảnh chân dung</h6>';
-                html += '<small class="text-muted d-block mb-2"></small>';
+                html += '<div class="text-center mb-3"><small class="text-muted d-block mb-2"></small>';
                 if (docs.portrait) {
                     html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 530px; height: 530px; object-fit: cover; max-width: 100%;">';
                 } else {
                     html += '<div class="border rounded d-flex align-items-center justify-content-center text-muted" style="width: 530px; height: 530px; max-width: 100%;"><i class="fa fa-user fa-3x"></i></div>';
                 }
+                html += '</div>';
                 html += '</div>';
                 // Cột 2: CCCD xếp dọc
                 html += '<div class="col-md-4">';
@@ -2861,12 +3001,18 @@ var RegistrationView = (function() {
 
     function renderMissAvailableList() {
         var list = document.getElementById('miss_available_list');
+        if (!list) return;
         list.innerHTML = '';
         missAllAttendees.forEach(function(att) {
             var div = document.createElement('div');
-            div.className = 'list-group-item list-group-item-action';
+            div.className = 'list-group-item list-group-item-action py-2';
             div.setAttribute('data-id', att.id);
-            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            var displayName = att.name || att.full_name || '';
+            var subInfo = [];
+            if (att.department_name) subInfo.push(att.department_name);
+            if (att.position) subInfo.push(att.position);
+            div.innerHTML = '<small>' + escapeHtml(displayName) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             div.addEventListener('click', function() { this.classList.toggle('active'); });
             list.appendChild(div);
         });
@@ -2874,13 +3020,19 @@ var RegistrationView = (function() {
 
     function renderMissSelectedList() {
         var list = document.getElementById('miss_selected_list');
+        if (!list) return;
         list.innerHTML = '';
         removeMissHiddenInputs();
         missSelectedAttendees.forEach(function(att) {
             var div = document.createElement('div');
-            div.className = 'list-group-item list-group-item-action';
+            div.className = 'list-group-item list-group-item-action py-2';
             div.setAttribute('data-id', att.id);
-            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            var displayName = att.name || att.full_name || '';
+            var subInfo = [];
+            if (att.department_name) subInfo.push(att.department_name);
+            if (att.position) subInfo.push(att.position);
+            div.innerHTML = '<small>' + escapeHtml(displayName) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             div.addEventListener('click', function() { this.classList.toggle('active'); });
             list.appendChild(div);
 
@@ -3521,12 +3673,18 @@ var RegistrationView = (function() {
 
     function renderTalentAvailableList() {
         var list = document.getElementById('talent_available_list');
+        if (!list) return;
         list.innerHTML = '';
         talentAllAttendees.forEach(function(att) {
             var div = document.createElement('div');
-            div.className = 'list-group-item list-group-item-action';
+            div.className = 'list-group-item list-group-item-action py-2';
             div.setAttribute('data-id', att.id);
-            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            var displayName = att.name || att.full_name || '';
+            var subInfo = [];
+            if (att.department_name) subInfo.push(att.department_name);
+            if (att.position) subInfo.push(att.position);
+            div.innerHTML = '<small>' + escapeHtml(displayName) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             div.addEventListener('click', function() { this.classList.toggle('active'); });
             list.appendChild(div);
         });
@@ -3534,13 +3692,19 @@ var RegistrationView = (function() {
 
     function renderTalentSelectedList() {
         var list = document.getElementById('talent_selected_list');
+        if (!list) return;
         list.innerHTML = '';
         removeTalentHiddenInputs();
         talentSelectedAttendees.forEach(function(att) {
             var div = document.createElement('div');
-            div.className = 'list-group-item list-group-item-action';
+            div.className = 'list-group-item list-group-item-action py-2';
             div.setAttribute('data-id', att.id);
-            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            var displayName = att.name || att.full_name || '';
+            var subInfo = [];
+            if (att.department_name) subInfo.push(att.department_name);
+            if (att.position) subInfo.push(att.position);
+            div.innerHTML = '<small>' + escapeHtml(displayName) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             div.addEventListener('click', function() { this.classList.toggle('active'); });
             list.appendChild(div);
 
@@ -3641,9 +3805,14 @@ var RegistrationView = (function() {
         list.innerHTML = '';
         editTalentAllAttendees.forEach(function(att) {
             var div = document.createElement('div');
-            div.className = 'list-group-item list-group-item-action';
+            div.className = 'list-group-item list-group-item-action py-2';
             div.setAttribute('data-id', att.id);
-            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            var displayName = att.name || att.full_name || '';
+            var subInfo = [];
+            if (att.department_name) subInfo.push(att.department_name);
+            if (att.position) subInfo.push(att.position);
+            div.innerHTML = '<small>' + escapeHtml(displayName) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             div.addEventListener('click', function() { this.classList.toggle('active'); });
             list.appendChild(div);
         });
@@ -3656,9 +3825,14 @@ var RegistrationView = (function() {
         removeEditTalentHiddenInputs();
         editTalentSelectedAttendees.forEach(function(att) {
             var div = document.createElement('div');
-            div.className = 'list-group-item list-group-item-action';
+            div.className = 'list-group-item list-group-item-action py-2';
             div.setAttribute('data-id', att.id);
-            div.innerHTML = '<small>' + escapeHtml(att.display || att.name) + '</small>';
+            var displayName = att.name || att.full_name || '';
+            var subInfo = [];
+            if (att.department_name) subInfo.push(att.department_name);
+            if (att.position) subInfo.push(att.position);
+            div.innerHTML = '<small>' + escapeHtml(displayName) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             div.addEventListener('click', function() { this.classList.toggle('active'); });
             list.appendChild(div);
 

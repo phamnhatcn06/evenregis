@@ -269,6 +269,35 @@ class Attendees extends BaseAttendees
 
 
 
+    public static function resolveRoleNames($roleIdField)
+    {
+        if (empty($roleIdField)) {
+            return '';
+        }
+        if (is_array($roleIdField)) {
+            $roleIds = array_map('trim', $roleIdField);
+        } else {
+            $roleIds = array_map('trim', explode(',', $roleIdField));
+        }
+        $roleNames = array();
+        static $cachedRoles = null;
+        if ($cachedRoles === null) {
+            $rolesData = Roles::getApiDataProvider(array(), 100)->getData();
+            $cachedRoles = array();
+            foreach ($rolesData as $r) {
+                $rId = isset($r['id']) ? $r['id'] : (isset($r->id) ? $r->id : null);
+                $rName = isset($r['name']) ? $r['name'] : (isset($r->name) ? $r->name : '');
+                if ($rId) $cachedRoles[$rId] = $rName;
+            }
+        }
+        foreach ($roleIds as $rId) {
+            if (isset($cachedRoles[$rId])) {
+                $roleNames[] = $cachedRoles[$rId];
+            }
+        }
+        return !empty($roleNames) ? implode(', ', $roleNames) : '';
+    }
+
     public static function deleteViaApi($id)
     {
         $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_DESTROY, array('id' => $id));
@@ -283,4 +312,35 @@ class Attendees extends BaseAttendees
             'pagination' => array('pageSize' => $pageSize),
         ));
     }
+
+    public static function getRoleBadgeClass($roleName)
+    {
+        $roleNameLower = mb_strtolower(trim($roleName), 'UTF-8');
+        if (strpos($roleNameLower, 'trưởng đoàn') !== false) {
+            return 'bg-danger text-white';
+        } elseif (strpos($roleNameLower, 'phó đoàn') !== false) {
+            return 'bg-warning text-dark';
+        } elseif (strpos($roleNameLower, 'huấn luyện viên') !== false || strpos($roleNameLower, 'hlv') !== false) {
+            return 'bg-info text-dark';
+        } elseif (strpos($roleNameLower, 'vận động viên') !== false || strpos($roleNameLower, 'vđv') !== false || strpos($roleNameLower, 'thi đấu') !== false) {
+            return 'bg-primary text-white';
+        } elseif (strpos($roleNameLower, 'cổ động viên') !== false || strpos($roleNameLower, 'cdv') !== false) {
+            return 'bg-success text-white';
+        } elseif (strpos($roleNameLower, 'khách') !== false) {
+            return 'bg-dark text-white';
+        } else {
+            $hash = crc32($roleNameLower);
+            $classes = array(
+                'bg-primary text-white',
+                'bg-secondary text-white',
+                'bg-success text-white',
+                'bg-danger text-white',
+                'bg-warning text-dark',
+                'bg-info text-dark',
+                'bg-dark text-white'
+            );
+            return $classes[abs($hash) % count($classes)];
+        }
+    }
 }
+

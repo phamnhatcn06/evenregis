@@ -49,8 +49,7 @@ class ApprovalController extends AdminController
         }
 
         if (!empty($model->role_id)) {
-            $role = Roles::fetchFromApi($model->role_id);
-            $model->role_name = $role ? $role->name : '';
+            $model->role_name = Attendees::resolveRoleNames($model->role_id);
         }
 
         if (!empty($model->staff_id)) {

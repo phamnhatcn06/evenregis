@@ -102,7 +102,7 @@ foreach ($properties as $p) {
                             $fullName = isset($att['full_name']) ? $att['full_name'] : (isset($att->full_name) ? $att->full_name : '');
                             $propertyName = isset($att['property_name']) ? $att['property_name'] : '';
                             $position = isset($att['position']) ? $att['position'] : (isset($att->position) ? $att->position : '');
-                            $roleName = isset($att['role_name']) ? $att['role_name'] : '';
+                            $roleName = Attendees::resolveRoleNames(isset($att['role_id']) ? $att['role_id'] : (isset($att->role_id) ? $att->role_id : ''));
                             $photoPath = isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
                             $approvalStatus = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
                         ?>
@@ -124,7 +124,15 @@ foreach ($properties as $p) {
                                 <td><?php echo CHtml::encode($fullName); ?></td>
                                 <td><?php echo CHtml::encode($propertyName); ?></td>
                                 <td><?php echo CHtml::encode($position); ?></td>
-                                <td><?php echo CHtml::encode($roleName); ?></td>
+                                <td>
+                                    <?php if (!empty($roleName)): ?>
+                                        <?php foreach (array_map('trim', explode(',', $roleName)) as $role): ?>
+                                            <span class="badge <?php echo Attendees::getRoleBadgeClass($role); ?> me-1 mb-1"><?php echo CHtml::encode($role); ?></span>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
                                 <td class="text-center">
                                     <a href="<?php echo $this->createUrl('view', array('id' => $attId)); ?>" class="btn btn-sm btn-outline-info me-1" title="Xem chi tiết">

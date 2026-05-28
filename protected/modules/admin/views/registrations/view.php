@@ -30,9 +30,10 @@ if ($canEdit) {
     );
 }
 
+$pendingRequestCount = isset($incomingRequestsData) ? count($incomingRequestsData) : 0;
 $this->breadcrumbs = array(
     Registrations::label(2) => array('admin'),
-    Yii::t('app', 'View'),
+    Yii::t('app', 'View') . ($pendingRequestCount > 0 ? ' <span class="badge bg-danger rounded-pill">' . $pendingRequestCount . '</span>' : ''),
 );
 
 $this->Tabletitle = 'Chi tiết phiếu đăng ký của ' . $model->property_name;
@@ -50,6 +51,11 @@ $attributes = array(
     array('label' => 'Ghi chú', 'value' => $model->note ?: '-'),
     array('label' => 'Ngày tạo', 'value' => MyHelper::formatDateTime($model->created_at)),
 );
+
+if (isset($allianceRequest) && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED && !empty($model->relation_property_name)) {
+    $attributes[] = array('label' => 'Đơn vị liên quân', 'value' => $model->relation_property_name);
+}
+
 
 // Parse documents
 $documents = array();
@@ -321,7 +327,7 @@ foreach ($eventContents as $ec) {
                             $attId = isset($att['id']) ? $att['id'] : '';
                             $fullName = isset($att['full_name']) ? $att['full_name'] : '';
                             $position = isset($att['position']) ? $att['position'] : '';
-                            $roleName = isset($att['role_name']) ? $att['role_name'] : '';
+                            $roleName = Attendees::resolveRoleNames(isset($att['role_id']) ? $att['role_id'] : '');
                             $photoPath = isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
                             $approvalStatus = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
                             $startDate = isset($att['join_hotel_date']) ? $att['join_hotel_date'] : (isset($att['start_date']) ? $att['start_date'] : '');
@@ -342,7 +348,15 @@ foreach ($eventContents as $ec) {
                                 </td>
                                 <td><?php echo CHtml::encode($fullName); ?></td>
                                 <td><?php echo CHtml::encode($position); ?></td>
-                                <td><?php echo CHtml::encode($roleName); ?></td>
+                                <td>
+                                    <?php if (!empty($roleName)): ?>
+                                        <?php foreach (array_map('trim', explode(',', $roleName)) as $role): ?>
+                                            <span class="badge <?php echo Attendees::getRoleBadgeClass($role); ?> me-1 mb-1"><?php echo CHtml::encode($role); ?></span>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo $startDate ? date('d/m/Y', strtotime($startDate)) : '-'; ?></td>
                                 <td><?php echo $checkInDate ? date('d/m/Y', strtotime($checkInDate)) : '-'; ?></td>
                                 <td><?php echo $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-'; ?></td>
@@ -405,6 +419,15 @@ foreach ($registrationDetails as $detail) {
         <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao</h5>
     </div>
     <div class="card-body">
+        <?php if (isset($allianceRequest) && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED && !empty($model->relation_property_name)): ?>
+            <div class="alert alert-success d-flex align-items-center py-2 px-3 mb-3 border-start border-4 border-success">
+                <i class="fa fa-handshake-o me-2 fa-lg text-success"></i>
+                <div>
+                    Đơn vị đang liên quân với: <strong><?php echo CHtml::encode($model->relation_property_name); ?></strong>. 
+                    Hệ thống đang hiển thị và chia sẻ danh sách các đội thi đấu thể thao của cả hai đơn vị.
+                </div>
+            </div>
+        <?php endif; ?>
         <?php if ($canEdit): ?>
             <!-- Form chọn liên quân và môn thể thao -->
             <div class="row mb-3 g-3 align-items-end">
@@ -468,6 +491,7 @@ foreach ($registrationDetails as $detail) {
                         $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
                         $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
                         $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
+                        $teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
                     ?>
                         <tr>
                             <td><?php echo CHtml::encode($sportName); ?></td>
@@ -478,10 +502,12 @@ foreach ($registrationDetails as $detail) {
                                     $memberName = isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : '');
                                     $memberPosition = isset($member['position_name']) ? $member['position_name'] : '';
                                     $memberDivision = isset($member['division_name']) ? $member['division_name'] : '';
+                                    $memberProperty = isset($member['property_name']) ? $member['property_name'] : '';
                                     $nameInfo = CHtml::encode($memberName);
                                     $details = array();
                                     if ($memberPosition) $details[] = CHtml::encode($memberPosition);
                                     if ($memberDivision) $details[] = 'Bộ phận: ' . CHtml::encode($memberDivision);
+                                    if ($memberProperty) $details[] = 'Đơn vị: ' . CHtml::encode($memberProperty);
                                     if (!empty($details)) {
                                         $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
                                     }
@@ -491,13 +517,17 @@ foreach ($registrationDetails as $detail) {
                             </td>
                             <?php if ($canEdit): ?>
                                 <td class="text-center text-nowrap">
-                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editSportTeam(<?php echo $teamId; ?>)" title="Sửa">
-                                        <i class="fa fa-pencil"></i>
-                                    </button>
-                                    <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamId, 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamId; ?>" style="display:none;"></form>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamId; ?>)" title="Xóa">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
+                                    <?php if ($teamPropertyId == $model->property_id): ?>
+                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editSportTeam(<?php echo $teamId; ?>)" title="Sửa">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamId, 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamId; ?>" style="display:none;"></form>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamId; ?>)" title="Xóa">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Liên quân</span>
+                                    <?php endif; ?>
                                 </td>
                             <?php endif; ?>
                         </tr>
@@ -862,11 +892,21 @@ foreach ($registrationDetails as $d) {
     if (!empty($d['sport_id'])) $sportIds[] = (int)$d['sport_id'];
     if (!empty($d['competition_id'])) $competitionIds[] = (int)$d['competition_id'];
 }
+$existingSportTeams = array();
 // Include sport IDs from existing sport teams
 foreach ($sportTeams as $team) {
     $teamSportId = isset($team->sport_id) ? $team->sport_id : (isset($team['sport_id']) ? $team['sport_id'] : null);
     if ($teamSportId && !in_array((int)$teamSportId, $sportIds)) {
         $sportIds[] = (int)$teamSportId;
+    }
+    $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+    $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
+    if ($teamSportId) {
+        $existingSportTeams[] = array(
+            'id' => $teamId,
+            'sportId' => (int)$teamSportId,
+            'teamName' => $teamName,
+        );
     }
 }
 
@@ -888,6 +928,7 @@ $jsConfig = array(
     'registeredCompetitions' => $competitionIds,
     'existingStaffIds' => $existingStaffIds,
     'canEdit' => $canEdit,
+    'existingSportTeams' => $existingSportTeams,
 );
 
 // Flatpickr Vietnamese locale

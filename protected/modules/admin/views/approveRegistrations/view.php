@@ -135,7 +135,7 @@ $attributes = array(
                             $attId = isset($att['id']) ? $att['id'] : '';
                             $fullName = isset($att['full_name']) ? $att['full_name'] : '';
                             $position = isset($att['position']) ? $att['position'] : '';
-                            $roleName = isset($att['role_name']) ? $att['role_name'] : '';
+                            $roleName = Attendees::resolveRoleNames(isset($att['role_id']) ? $att['role_id'] : '');
                             $photoPath = isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
                             $approvalStatus = isset($att['approval_status']) ? (int)$att['approval_status'] : Attendees::APPROVAL_PENDING;
                             $startDate = isset($att['join_hotel_date']) ? $att['join_hotel_date'] : (isset($att['start_date']) ? $att['start_date'] : '');
@@ -155,7 +155,15 @@ $attributes = array(
                                 </td>
                                 <td><?php echo CHtml::encode($fullName); ?></td>
                                 <td><?php echo CHtml::encode($position); ?></td>
-                                <td><?php echo CHtml::encode($roleName); ?></td>
+                                <td>
+                                    <?php if (!empty($roleName)): ?>
+                                        <?php foreach (array_map('trim', explode(',', $roleName)) as $role): ?>
+                                            <span class="badge <?php echo Attendees::getRoleBadgeClass($role); ?> me-1 mb-1"><?php echo CHtml::encode($role); ?></span>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo $startDate ? date('d/m/Y', strtotime($startDate)) : '-'; ?></td>
                                 <td><?php echo $checkInDate ? date('d/m/Y', strtotime($checkInDate)) : '-'; ?></td>
                                 <td><?php echo $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-'; ?></td>

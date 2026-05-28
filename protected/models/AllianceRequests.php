@@ -85,18 +85,13 @@ class AllianceRequests extends BaseAllianceRequests
 
 	public function updateViaApi()
 	{
-		$data = array_filter($this->attributes, function ($value) {
-			return $value !== null && $value !== '';
-		});
-
-		// Loại bỏ các trường metadata/read-only không cần thiết khi update
-		unset($data['created_at']);
-		unset($data['updated_at']);
-		unset($data['deleted_at']);
-
-		// Loại bỏ requested_by nếu bị ép kiểu sai thành số 0 (API trả về email string nhưng local DB/ActiveRecord ép về 0)
-		if (isset($data['requested_by']) && ($data['requested_by'] === 0 || $data['requested_by'] === '0')) {
-			unset($data['requested_by']);
+		// Only send specific fields that are allowed to be updated for an Alliance Request
+		$allowedFields = array('status', 'reviewed_by', 'reviewed_at', 'rejection_reason', 'note');
+		$data = array();
+		foreach ($allowedFields as $field) {
+			if ($this->$field !== null && $this->$field !== '') {
+				$data[$field] = $this->$field;
+			}
 		}
 
 		$url = ApiEndpoints::url(ApiEndpoints::ALLIANCE_REQUEST_UPDATE, array('id' => $this->id));

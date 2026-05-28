@@ -27173,3 +27173,7 @@ panel-title {
 #selected_staff_list .list-group-item.active {
   color: #fff !important;
 }
+
+.list-group-item.active .text-muted {
+  color: #fff !important;
+}

@@ -6,6 +6,12 @@
                 <input type="hidden" name="attendee_id" id="edit_attendee_id">
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                 <input type="hidden" id="edit_staff_id">
+                <style>
+                    #edit_role_id option:checked {
+                        background-color: #0d6efd !important;
+                        color: #fff !important;
+                    }
+                </style>
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa fa-pencil me-2"></i>Sửa thông tin người tham dự</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -31,12 +37,12 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Vai trò <span class="text-danger">*</span></label>
-                                <select class="form-select" name="role_id" id="edit_role_id" required>
-                                    <option value="">-- Chọn vai trò --</option>
+                                <select class="form-select" name="role_id[]" id="edit_role_id" multiple="multiple" style="height: 120px;" required>
                                     <?php foreach ($roles as $rId => $rName): ?>
                                         <option value="<?php echo $rId; ?>"><?php echo CHtml::encode($rName); ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                                <small class="text-muted d-block mt-1">Giữ Ctrl để chọn nhiều vai trò</small>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">

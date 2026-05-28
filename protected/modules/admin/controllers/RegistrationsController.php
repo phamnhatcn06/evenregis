@@ -31,6 +31,24 @@ class RegistrationsController extends AdminController
 			$model->period_name = $period ? $period->name : '';
 		}
 
+		// Load alliance request nếu có liên quân (hỗ trợ tìm kiếm 2 chiều)
+		$allianceRequest = null;
+		if ($model->relation_property_id && $model->event_id && $model->property_id) {
+			$allianceRequest = AllianceRequests::findByRegistration(
+				$model->event_id,
+				$model->property_id,
+				$model->relation_property_id
+			);
+			if (!$allianceRequest) {
+				$allianceRequest = AllianceRequests::findByRegistration(
+					$model->event_id,
+					$model->relation_property_id,
+					$model->property_id
+				);
+			}
+		}
+		$isAllianceApproved = $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED;
+
 		// Load competition registrations từ bảng competition_registrations
 		$competitionRegistrations = array();
 		$compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $id), 200)->getData();
@@ -41,7 +59,30 @@ class RegistrationsController extends AdminController
 		foreach ($attendeesData as $att) {
 			$attId = isset($att['id']) ? $att['id'] : null;
 			if ($attId) {
+				$att['property_name'] = $model->property_name;
 				$attendeesMap[$attId] = $att;
+			}
+		}
+
+		// Nếu liên quân đã được duyệt, tải thêm attendees của đối tác liên quân để phục vụ hiển thị VĐV trong đội liên quân
+		if ($isAllianceApproved && $model->relation_property_id) {
+			$partnerRegs = Registrations::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'property_id' => $model->relation_property_id,
+			), 1)->getData();
+			if (!empty($partnerRegs)) {
+				$partnerReg = $partnerRegs[0];
+				$partnerRegId = isset($partnerReg['id']) ? $partnerReg['id'] : (isset($partnerReg->id) ? $partnerReg->id : null);
+				if ($partnerRegId) {
+					$partnerAttendees = Attendees::getByRegistrationId($partnerRegId);
+					foreach ($partnerAttendees as $att) {
+						$attId = isset($att['id']) ? $att['id'] : null;
+						if ($attId) {
+							$att['property_name'] = $model->relation_property_name;
+							$attendeesMap[$attId] = $att;
+						}
+					}
+				}
 			}
 		}
 
@@ -89,6 +130,15 @@ class RegistrationsController extends AdminController
 		$sportTeamMembers = array();
 		if ($model->event_id && $model->property_id) {
 			$teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id), 100)->getData();
+
+			// Nếu liên quân đã được duyệt, tải thêm các đội thi đấu thể thao của đối tác liên quân
+			if ($isAllianceApproved && $model->relation_property_id) {
+				$partnerTeamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->relation_property_id), 100)->getData();
+				if (!empty($partnerTeamsData)) {
+					$teamsData = array_merge($teamsData, $partnerTeamsData);
+				}
+			}
+
 			foreach ($teamsData as $team) {
 				$teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
 				if ($teamId) {
@@ -116,21 +166,14 @@ class RegistrationsController extends AdminController
 						if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
 							$memberArr['division_name'] = $attInfo['division_name'];
 						}
+						if (empty($memberArr['property_name']) && !empty($attInfo['property_name'])) {
+							$memberArr['property_name'] = $attInfo['property_name'];
+						}
 						$enrichedMembers[] = $memberArr;
 					}
 					$sportTeamMembers[$teamId] = $enrichedMembers;
 				}
 			}
-		}
-
-		// Load alliance request nếu có liên quân
-		$allianceRequest = null;
-		if ($model->relation_property_id && $model->event_id && $model->property_id) {
-			$allianceRequest = AllianceRequests::findByRegistration(
-				$model->event_id,
-				$model->property_id,
-				$model->relation_property_id
-			);
 		}
 
 		// Load incoming pending alliance requests if any
@@ -906,7 +949,7 @@ class RegistrationsController extends AdminController
 		// Lấy attendees từ registration hiện tại có role "Thi đấu thể thao"
 		$attendees = Attendees::getByRegistrationId($registration_id);
 		foreach ($attendees as $att) {
-			$roleName = isset($att['role_name']) ? $att['role_name'] : '';
+			$roleName = Attendees::resolveRoleNames(isset($att['role_id']) ? $att['role_id'] : '');
 			// Kiểm tra role có chứa "thể thao" hoặc "thi đấu"
 			if (stripos($roleName, 'thể thao') !== false || stripos($roleName, 'thi đấu') !== false) {
 				$result[] = array(
@@ -921,6 +964,34 @@ class RegistrationsController extends AdminController
 		header('Content-Type: application/json');
 		echo CJSON::encode(array('success' => true, 'data' => $result));
 		Yii::app()->end();
+	}
+
+	public static function getSportMaxPlayers($sportName)
+	{
+		if (empty($sportName)) return 9999;
+		$sportNameLower = mb_strtolower($sportName, 'UTF-8');
+
+		if (strpos($sportNameLower, 'bóng đá') !== false || strpos($sportNameLower, 'football') !== false || strpos($sportNameLower, 'soccer') !== false) {
+			return 11;
+		}
+		if (strpos($sportNameLower, 'kéo co') !== false) {
+			return 10;
+		}
+		if (strpos($sportNameLower, 'bơi tiếp sức') !== false || strpos($sportNameLower, 'bơi đồng đội') !== false) {
+			return 4;
+		}
+		if (strpos($sportNameLower, 'đôi') !== false || strpos($sportNameLower, 'doubles') !== false) {
+			return 2;
+		}
+		if (strpos($sportNameLower, 'đơn') !== false || strpos($sportNameLower, 'singles') !== false || strpos($sportNameLower, 'cờ vua') !== false || strpos($sportNameLower, 'cờ tướng') !== false || strpos($sportNameLower, 'bản đồ') !== false) {
+			return 1;
+		}
+
+		if (strpos($sportNameLower, 'bóng bàn') !== false || strpos($sportNameLower, 'cầu lông') !== false || strpos($sportNameLower, 'tennis') !== false || strpos($sportNameLower, 'quần vợt') !== false || strpos($sportNameLower, 'pickleball') !== false || strpos($sportNameLower, 'pickerball') !== false) {
+			return 2;
+		}
+
+		return 9999;
 	}
 
 	public function actionAddSportRegistration()
@@ -963,16 +1034,32 @@ class RegistrationsController extends AdminController
 			return;
 		}
 
+		// Kiểm tra số lượng vận động viên tối đa của môn
+		$sport = Sports::fetchFromApi($sportId);
+		$sportName = $sport ? $sport->name : '';
+		$maxPlayers = self::getSportMaxPlayers($sportName);
+		if (count($attendeeIds) > $maxPlayers) {
+			$msg = "Môn {$sportName} tối đa chỉ cho phép chọn {$maxPlayers} người.";
+			if ($isAjax) {
+				echo CJSON::encode(array('success' => false, 'error' => $msg));
+				Yii::app()->end();
+			}
+			Yii::app()->user->setFlash('error', $msg);
+			$this->redirect(array('view', 'id' => $registrationId));
+			return;
+		}
+
 		// Kiểm tra giới hạn số môn thể thao trước khi tạo đội
 		$overLimitAttendees = array();
 		foreach ($attendeeIds as $idx => $attId) {
-			if (!SportTeamMembers::canRegisterMore($attId)) {
+			$count = SportTeamMembers::countSportsByAttendee($attId);
+			if ($count > SportTeamMembers::MAX_SPORTS_PER_ATTENDEE) {
 				$name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
-				$overLimitAttendees[] = $name;
+				$overLimitAttendees[] = "{$name} (đã đăng ký {$count} môn)";
 			}
 		}
 		if (!empty($overLimitAttendees)) {
-			$msg = 'Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn: ' . implode(', ', $overLimitAttendees);
+			$msg = 'Không thể lưu. Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn: ' . implode(', ', $overLimitAttendees);
 			if ($isAjax) {
 				echo CJSON::encode(array('success' => false, 'error' => $msg));
 				Yii::app()->end();
@@ -1062,6 +1149,13 @@ class RegistrationsController extends AdminController
 	{
 		$this->checkRegistrationAccess($registration_id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$team = SportTeams::fetchFromApi($id);
+			$registration = Registrations::fetchFromApi($registration_id);
+			if ($team && $registration && $team->property_id != $registration->property_id) {
+				Yii::app()->user->setFlash('error', 'Bạn không có quyền xóa đội liên quân này.');
+				$this->redirect(array('view', 'id' => $registration_id));
+				return;
+			}
 			$result = SportTeams::deleteViaApi($id);
 
 			if ($result['success']) {
@@ -1138,6 +1232,25 @@ class RegistrationsController extends AdminController
 		// Update team name
 		$team = SportTeams::fetchFromApi($teamId);
 		if ($team) {
+			$ssoUser = AuthHandler::getUser();
+			$userPropertyCode = isset($ssoUser['property_code']) ? $ssoUser['property_code'] : null;
+			if ($userPropertyCode !== '9999') {
+				$userProperty = Properties::fetchByCode($userPropertyCode);
+				if ($userProperty && $team->property_id != $userProperty->id) {
+					echo CJSON::encode(array('success' => false, 'error' => 'Bạn không có quyền sửa đội liên quân này.'));
+					Yii::app()->end();
+				}
+			}
+
+			// Kiểm tra số lượng vận động viên tối đa của môn
+			$sport = Sports::fetchFromApi($team->sport_id);
+			$sportName = $sport ? $sport->name : '';
+			$maxPlayers = self::getSportMaxPlayers($sportName);
+			if (count($attendeeIds) > $maxPlayers) {
+				echo CJSON::encode(array('success' => false, 'error' => "Môn {$sportName} tối đa chỉ cho phép chọn {$maxPlayers} người."));
+				Yii::app()->end();
+			}
+
 			$team->team_name = $teamName;
 			$team->name = $teamName;
 			$team->updateViaApi();
@@ -1655,8 +1768,9 @@ class RegistrationsController extends AdminController
 				'id' => $id,
 				'name' => $fullName,
 				'code' => $staffCode,
-				'position' => $positionName,
+				'position' => isset($att['position']) ? $att['position'] : (isset($att['position_name']) ? $att['position_name'] : ''),
 				'division_code' => $divisionCode,
+				'department_name' => isset($att['department_name']) ? $att['department_name'] : (isset($att['division_name']) ? $att['division_name'] : ''),
 				'display' => $staffCode ? ($staffCode . ' - ' . $fullName) : $fullName,
 			);
 		}
@@ -1906,6 +2020,9 @@ class RegistrationsController extends AdminController
 		$eventId = Yii::app()->getRequest()->getPost('event_id');
 		$propertyId = Yii::app()->getRequest()->getPost('property_id');
 		$roleId = Yii::app()->getRequest()->getPost('role_id');
+		if (is_array($roleId)) {
+			$roleId = implode(', ', $roleId);
+		}
 		$staffIds = Yii::app()->getRequest()->getPost('staff_ids', array());
 		$checkInDate = Yii::app()->getRequest()->getPost('check_in_date');
 		$checkOutDate = Yii::app()->getRequest()->getPost('check_out_date');
@@ -2012,7 +2129,11 @@ class RegistrationsController extends AdminController
 		$attendee->property_id = $propertyId;
 		$attendee->full_name = Yii::app()->getRequest()->getPost('full_name');
 		$attendee->position = Yii::app()->getRequest()->getPost('position');
-		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
+		$roleId = Yii::app()->getRequest()->getPost('role_id');
+		if (is_array($roleId)) {
+			$roleId = implode(', ', $roleId);
+		}
+		$attendee->role_id = $roleId;
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
 		$attendee->approval_status = Attendees::APPROVAL_PENDING;
 		$attendee->join_hotel_date = $join_hotel_date;
@@ -2143,12 +2264,14 @@ class RegistrationsController extends AdminController
 				}
 			}
 
+			$roleName = Attendees::resolveRoleNames(isset($att['role_id']) ? $att['role_id'] : '');
+
 			$result[] = array(
 				'id' => $attId,
 				'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
 				'position' => $positionName,
 				'department_name' => $departmentName,
-				'role_name' => isset($att['role_name']) ? $att['role_name'] : '',
+				'role_name' => $roleName,
 				'portrait_path' => isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : ''),
 				'approval_status' => isset($att['approval_status']) ? (int)$att['approval_status'] : 0,
 				'start_date' => isset($att['join_hotel_date']) ? $att['join_hotel_date'] : (isset($att['start_date']) ? $att['start_date'] : ''),
@@ -2222,7 +2345,11 @@ class RegistrationsController extends AdminController
 
 		$attendee->full_name = Yii::app()->getRequest()->getPost('full_name');
 		$attendee->position = Yii::app()->getRequest()->getPost('position');
-		$attendee->role_id = Yii::app()->getRequest()->getPost('role_id');
+		$roleId = Yii::app()->getRequest()->getPost('role_id');
+		if (is_array($roleId)) {
+			$roleId = implode(', ', $roleId);
+		}
+		$attendee->role_id = $roleId;
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
 
 		$joinHotelDate = Yii::app()->getRequest()->getPost('join_hotel_date');
@@ -2336,6 +2463,7 @@ class RegistrationsController extends AdminController
 				'id' => $id,
 				'name' => $fullName,
 				'position' => $positionName,
+				'department_name' => isset($att['department_name']) ? $att['department_name'] : (isset($att['division_name']) ? $att['division_name'] : ''),
 				'display' => $fullName . ($positionName ? ' (' . $positionName . ')' : ''),
 			);
 		}
@@ -2521,6 +2649,7 @@ class RegistrationsController extends AdminController
 				'id' => $id,
 				'name' => $fullName,
 				'position' => $positionName,
+				'department_name' => isset($att['department_name']) ? $att['department_name'] : (isset($att['division_name']) ? $att['division_name'] : ''),
 				'display' => $fullName . ($positionName ? ' (' . $positionName . ')' : ''),
 			);
 		}
@@ -2726,5 +2855,35 @@ class RegistrationsController extends AdminController
 		}
 
 		$this->redirect(array('view', 'id' => $id));
+	}
+
+	public function actionCheckSportAttendeesLimit()
+	{
+		if (!Yii::app()->request->isAjaxRequest) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		$attendeeIds = Yii::app()->request->getParam('attendee_ids', array());
+		$overLimit = array();
+
+		foreach ($attendeeIds as $attId) {
+			$count = SportTeamMembers::countSportsByAttendee($attId);
+			if ($count > SportTeamMembers::MAX_SPORTS_PER_ATTENDEE) {
+				$attendee = Attendees::fetchFromApi($attId);
+				$name = $attendee ? $attendee->full_name : "ID: $attId";
+				$overLimit[] = "{$name} (đã đăng ký {$count} môn)";
+			}
+		}
+
+		header('Content-Type: application/json');
+		if (!empty($overLimit)) {
+			echo CJSON::encode(array(
+				'success' => false,
+				'error' => 'Không thể thêm. Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn thể thao: ' . implode(', ', $overLimit)
+			));
+		} else {
+			echo CJSON::encode(array('success' => true));
+		}
+		Yii::app()->end();
 	}
 }

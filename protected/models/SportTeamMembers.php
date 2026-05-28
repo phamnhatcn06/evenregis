@@ -104,11 +104,6 @@ class SportTeamMembers extends BaseSportTeamMembers
             }
         }
 
-        // Nếu API đã filter sẵn (không có item nào khác attendee_id)
-        if ($count == 0 && count($items) > 0) {
-            $count = count($items);
-        }
-
         Yii::log("countSportsByAttendee($attendeeId) = $count", 'info');
         return $count;
     }

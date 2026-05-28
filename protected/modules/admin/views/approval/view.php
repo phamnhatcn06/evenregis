@@ -73,7 +73,15 @@ $approvalStatus = isset($model->approval_status) ? (int)$model->approval_status 
                         </tr>
                         <tr>
                             <th style="background:#f8f9fa;">Vai trò tham dự</th>
-                            <td><?php echo CHtml::encode($model->role_name ?: '-'); ?></td>
+                            <td>
+                                <?php if (!empty($model->role_name)): ?>
+                                    <?php foreach (array_map('trim', explode(',', $model->role_name)) as $role): ?>
+                                        <span class="badge <?php echo Attendees::getRoleBadgeClass($role); ?> me-1 mb-1"><?php echo CHtml::encode($role); ?></span>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <tr>
                             <th style="background:#f8f9fa;">Trưởng đoàn</th>

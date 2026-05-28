@@ -20,13 +20,6 @@
                                 </select>
                                 <div id="sport_selected_name" class="form-control bg-light d-none" style="pointer-events:none;"></div>
                             </div>
-                            <div class="mb-3" id="alliance_checkboxes_wrapper">
-                                <label class="form-label">Đơn vị liên quân</label>
-                                <div id="alliance_checkboxes" class="border rounded p-2" style="max-height:200px;overflow-y:auto;">
-                                    <div class="text-muted small">Đang tải...</div>
-                                </div>
-                                <small class="text-muted">Chọn các đơn vị cùng thi đấu (nếu có)</small>
-                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Tên đội</label>
                                 <input type="text" class="form-control" name="team_name" id="sport_team_name" placeholder="Nhập tên đội (nếu có)">

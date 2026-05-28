@@ -6,6 +6,12 @@
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                 <input type="hidden" name="event_id" value="<?php echo $model->event_id; ?>">
                 <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
+                <style>
+                    #addAttendeeManualModal select[multiple] option:checked {
+                        background-color: #0d6efd !important;
+                        color: #fff !important;
+                    }
+                </style>
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa fa-user-plus me-2"></i>Thêm người tham dự</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -23,12 +29,12 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Vai trò <span class="text-danger">*</span></label>
-                                <select class="form-select" name="role_id" required>
-                                    <option value="">-- Chọn vai trò --</option>
+                                <select class="form-select" name="role_id[]" multiple="multiple" style="height: 120px;" required>
                                     <?php foreach ($roles as $rId => $rName): ?>
                                         <option value="<?php echo $rId; ?>"><?php echo CHtml::encode($rName); ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                                <small class="text-muted d-block mt-1">Giữ Ctrl để chọn nhiều vai trò</small>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
