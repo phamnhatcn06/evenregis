@@ -88,15 +88,26 @@ class PropertiesController extends AdminController
 	public function actionListJson()
 	{
 		$dataProvider = Properties::getApiDataProvider(array('status' => 1), 500);
-		$data = $dataProvider->getData();
+		$models = $dataProvider->getData();
 
 		$excludeRegionalId = isset($_GET['exclude_regional_id']) ? (int)$_GET['exclude_regional_id'] : null;
-		if ($excludeRegionalId !== null) {
-			$data = array_filter($data, function($item) use ($excludeRegionalId) {
-				$regionId = isset($item->region_id) ? (int)$item->region_id : null;
-				return $regionId === null || $regionId === 0 || $regionId === $excludeRegionalId;
-			});
-			$data = array_values($data);
+
+		$data = array();
+		foreach ($models as $model) {
+			$regionId = isset($model->region_id) ? (int)$model->region_id : null;
+
+			if ($excludeRegionalId !== null) {
+				if ($regionId !== null && $regionId !== 0 && $regionId !== $excludeRegionalId) {
+					continue;
+				}
+			}
+
+			$data[] = array(
+				'id' => $model->id,
+				'code' => $model->code,
+				'name' => $model->name,
+				'region_id' => $regionId,
+			);
 		}
 
 		header('Content-Type: application/json');
