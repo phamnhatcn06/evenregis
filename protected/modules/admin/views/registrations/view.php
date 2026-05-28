@@ -1069,6 +1069,11 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     document.getElementById("editTalentForm").addEventListener("submit", function(e) {
         e.preventDefault();
         var form = this;
+        var btn = document.getElementById("btn_submit_edit_talent");
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+
         var formData = new FormData(form);
         fetch("/admin/registrations/updateTalentEntry", {
             method: "POST",
@@ -1081,10 +1086,14 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
                 bootstrap.Modal.getInstance(document.getElementById("editTalentModal")).hide();
                 setTimeout(function() { location.reload(); }, 1000);
             } else {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
                 Toast.error(data.message || "Cập nhật thất bại");
             }
         })
         .catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
             Toast.error("Lỗi kết nối server");
         });
     });
