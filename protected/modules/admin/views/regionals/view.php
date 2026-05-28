@@ -169,5 +169,5 @@ Yii::app()->clientScript->registerScriptFile(
 <script>
     var regionalId = <?php echo $model->id; ?>;
     var assignedOrgIds = <?php echo json_encode(array_column($organizations, 'id')); ?>;
-    var allPropertiesUrl = '<?php echo $this->createUrl('/admin/properties/listJson'); ?>';
+    var allPropertiesUrl = '<?php echo $this->createUrl('/admin/properties/listJson', array('exclude_regional_id' => $model->id)); ?>';
 </script>
