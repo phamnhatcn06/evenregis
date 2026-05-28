@@ -652,6 +652,7 @@ $competitionHasAlliance = ($competitionPendingCount > 0 || $competitionHistoryCo
         <?php if (empty($competitionRegistrations)): ?>
             <p class="text-muted mb-0">Chưa đăng ký thi nghiệp vụ nào.</p>
         <?php else: ?>
+            <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-0" id="competition-list-table">
                 <thead class="table-light">
                     <tr>
