@@ -333,9 +333,9 @@ foreach ($eventContents as $ec) {
                                 <td class="text-center" style="width: 50px;"><?php echo $idx + 1; ?></td>
                                 <td class="text-center">
                                     <?php if ($photoPath): ?>
-                                        <img src="<?php echo CHtml::encode($photoPath); ?>" class="rounded" style="width:160px;height:160px;object-fit:cover;cursor:pointer;" onclick="viewDocument('<?php echo CHtml::encode($photoPath); ?>', 'image')" title="Click để xem">
+                                        <img src="<?php echo CHtml::encode($photoPath); ?>" class="rounded mx-auto d-block" style="width:160px;height:160px;object-fit:cover;cursor:pointer;" onclick="viewDocument('<?php echo CHtml::encode($photoPath); ?>', 'image')" title="Click để xem">
                                     <?php else: ?>
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:160px;height:160px;">
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center mx-auto" style="width:160px;height:160px;">
                                             <i class="fa fa-user text-muted fa-3x"></i>
                                         </div>
                                     <?php endif; ?>

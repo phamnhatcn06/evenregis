@@ -2657,16 +2657,18 @@ var RegistrationView = (function() {
             if (docs.portrait || docs.cccd_front || docs.cccd_back) {
                 html += '<div class="row mb-4">';
                 // Cột 1: Ảnh chân dung
-                html += '<div class="col-md-5 text-center">';
+                html += '<div class="col-md-1 text-center"></div>';
+                html += '<div class="col-md-6 text-center">';
                 html += '<h6>Ảnh chân dung</h6>';
+                html += '<small class="text-muted d-block mb-2">Kích thước 400x400px</small>';
                 if (docs.portrait) {
-                    html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 400px; height: 400px; object-fit: cover; max-width: 100%;">';
+                    html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 530px; height: 530px; object-fit: cover; max-width: 100%;">';
                 } else {
-                    html += '<div class="border rounded d-flex align-items-center justify-content-center text-muted" style="width: 400px; height: 400px; max-width: 100%;"><i class="fa fa-user fa-3x"></i></div>';
+                    html += '<div class="border rounded d-flex align-items-center justify-content-center text-muted" style="width: 530px; height: 530px; max-width: 100%;"><i class="fa fa-user fa-3x"></i></div>';
                 }
                 html += '</div>';
                 // Cột 2: CCCD xếp dọc
-                html += '<div class="col-md-7">';
+                html += '<div class="col-md-4">';
                 html += '<h6 class="text-center">Ảnh CCCD</h6>';
                 if (docs.cccd_front) {
                     html += '<div class="text-center mb-3"><small class="text-muted d-block mb-2">Mặt trước</small>';
@@ -2680,6 +2682,7 @@ var RegistrationView = (function() {
                     html += '<div class="text-center text-muted"><i class="fa fa-id-card-o fa-3x"></i><p class="mt-2">Chưa có ảnh CCCD</p></div>';
                 }
                 html += '</div>';
+                html += '<div class="col-md-1 text-center"></div>';
                 html += '</div>';
             }
             // Hàng 2: Hợp đồng
