@@ -159,10 +159,21 @@ class RegistrationsController extends AdminController
 					$requesterName = $prop ? $prop->name : 'Đơn vị khác';
 				}
 
+				// Lấy tên nội dung liên quân từ event_content_id
+				$contentName = '';
+				$eventContentId = isset($req->event_content_id) ? $req->event_content_id : null;
+				if ($eventContentId) {
+					$ec = EventContents::fetchFromApi($eventContentId);
+					if ($ec) {
+						$contentName = isset($ec->content_name) ? $ec->content_name : (isset($ec->name) ? $ec->name : '');
+					}
+				}
+
 				$incomingRequestsData[] = array(
 					'request' => $req,
 					'requester_registration_id' => $requesterRegId,
 					'requester_name' => $requesterName,
+					'content_name' => $contentName,
 				);
 			}
 		}
