@@ -5,11 +5,16 @@
             <form method="post" id="edit-attendee-form" enctype="multipart/form-data">
                 <input type="hidden" name="attendee_id" id="edit_attendee_id">
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
+                <input type="hidden" id="edit_staff_id">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa fa-pencil me-2"></i>Sửa thông tin người tham dự</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Thông báo cho người dùng biết không thể sửa nếu là nhân viên -->
+                    <div class="alert alert-info py-2 mb-3 d-none" id="edit_staff_notice">
+                        <i class="fa fa-info-circle me-1"></i>Họ tên, chức danh, phòng ban được đồng bộ từ hệ thống nhân sự và không thể chỉnh sửa.
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -18,11 +23,11 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Chức danh</label>
-                                <input type="text" class="form-control bg-light" id="edit_position" readonly>
+                                <input type="text" class="form-control" name="position" id="edit_position">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Phòng ban</label>
-                                <input type="text" class="form-control bg-light" id="edit_department" readonly>
+                                <input type="text" class="form-control" name="department" id="edit_department">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Vai trò <span class="text-danger">*</span></label>

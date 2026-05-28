@@ -45,6 +45,7 @@
                                 <div class="card-header py-2">
                                     <small class="fw-bold">Danh sách nhân viên</small>
                                     <p style="color: red;font-size: 12px;font-weight: bold;">Lưu ý: Danh sách chỉ hiển thị những nhân viên có ngày gia nhập trước ngày 01/06/2026</p>
+                                    <p style="color: red;font-size: 12px;font-weight: bold;">*Lựa chọn nhưng nhân viên có cùng vài trò, ngày đến, ngày đi, phương tiện</p>
                                     <input type="text" class="form-control form-control-sm mt-2" id="attendee_staff_search" placeholder="Tìm kiếm theo tên, mã NV...">
                                 </div>
                                 <div class="card-body p-0" style="height:300px;overflow-y:auto;">
