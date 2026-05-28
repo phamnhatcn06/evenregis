@@ -103,8 +103,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         select.innerHTML = '';
         options.forEach(function(option) {
+            option.style.display = '';
             select.appendChild(option);
         });
+    }
+
+    function clearFilters() {
+        if (filterAvailable) filterAvailable.value = '';
+        if (filterAssigned) filterAssigned.value = '';
     }
 
     // Before form submit, create hidden inputs for assigned orgs
