@@ -2183,6 +2183,7 @@ class RegistrationsController extends AdminController
 
 		$data = array(
 			'id' => $attendee->id,
+			'staff_id' => $attendee->staff_id,
 			'full_name' => $attendee->full_name,
 			'position' => $positionName,
 			'department_name' => $departmentName,
