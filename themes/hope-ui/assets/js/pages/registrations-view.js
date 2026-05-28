@@ -2280,8 +2280,12 @@ var RegistrationView = (function() {
             item.href = '#';
             item.className = 'list-group-item list-group-item-action py-2';
             item.setAttribute('data-id', staff.id);
-            var joinDateInfo = staff.join_hotel_date ? '<br><span class="text-muted" style="font-size:11px;">Ngày vào: ' + formatDate(staff.join_hotel_date) + '</span>' : '';
-            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' + joinDateInfo;
+            var subInfo = [];
+            if (staff.department_name) subInfo.push(staff.department_name);
+            if (staff.position) subInfo.push(staff.position);
+            if (staff.join_hotel_date) subInfo.push('Vào: ' + formatDate(staff.join_hotel_date));
+            item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
                 e.preventDefault();
                 this.classList.toggle('active');

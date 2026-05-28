@@ -6,7 +6,7 @@
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                 <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
                 <div class="modal-header">
-                    <h5 class="modal-title">Đăng ký thi sắc đẹp</h5>
+                    <h5 class="modal-title">Đăng ký thi Miss Mường Thanh</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -95,8 +95,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success" id="btn_submit_miss">Đăng ký</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-sm btn-success" id="btn_submit_miss">Đăng ký</button>
                 </div>
             </form>
         </div>

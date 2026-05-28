@@ -14,8 +14,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-danger">Từ chối</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-sm btn-danger">Từ chối</button>
                 </div>
             </form>
         </div>

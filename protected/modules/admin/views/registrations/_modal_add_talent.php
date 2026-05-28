@@ -107,8 +107,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success" id="btn_submit_talent">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-sm btn-success" id="btn_submit_talent">
                         <i class="fa fa-check me-1"></i>Đăng ký
                     </button>
                 </div>
@@ -132,8 +132,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" id="btn_confirm_talent_alliance">Xác nhận</button>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-sm btn-primary" id="btn_confirm_talent_alliance">Xác nhận</button>
             </div>
         </div>
     </div>

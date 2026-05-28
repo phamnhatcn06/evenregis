@@ -121,8 +121,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-sm btn-primary">
                         <i class="fa fa-save me-1"></i>Lưu thay đổi
                     </button>
                 </div>

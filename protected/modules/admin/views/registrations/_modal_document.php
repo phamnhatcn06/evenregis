@@ -9,10 +9,10 @@
             <div class="modal-body p-0" id="documentModalBody" style="min-height:500px;">
             </div>
             <div class="modal-footer">
-                <a href="#" id="documentDownloadLink" class="btn btn-primary" download>
+                <a href="#" id="documentDownloadLink" class="btn btn-sm btn-primary" download>
                     <i class="fa fa-download me-1"></i>Tải xuống
                 </a>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>

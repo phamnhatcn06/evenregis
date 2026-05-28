@@ -83,8 +83,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" id="btn_add_to_preview">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-sm btn-primary" id="btn_add_to_preview">
                         <i class="fa fa-plus me-1"></i>Thêm vào danh sách
                     </button>
                 </div>

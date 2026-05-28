@@ -35,14 +35,14 @@ $attributes = array(
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin đăng ký</h5>
                 <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED): ?>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-success btn-sm px-3" onclick="approveRegistration()">
-                        <i class="fa fa-check-circle me-1"></i>Duyệt đăng ký
-                    </button>
-                    <button type="button" class="btn btn-outline-warning btn-sm px-3" onclick="returnRegistration()">
-                        <i class="fa fa-undo me-1"></i>Trả lại
-                    </button>
-                </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success btn-sm px-3" onclick="approveRegistration()">
+                            <i class="fa fa-check-circle me-1"></i>Duyệt đăng ký
+                        </button>
+                        <button type="button" class="btn btn-outline-warning btn-sm px-3" onclick="returnRegistration()">
+                            <i class="fa fa-undo me-1"></i>Trả lại
+                        </button>
+                    </div>
                 <?php endif; ?>
             </div>
             <div class="card-body">
@@ -99,14 +99,14 @@ $attributes = array(
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự</h5>
         <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED && $pending > 0): ?>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-success btn-sm px-3" onclick="approveAllAttendees()">
-                <i class="fa fa-check me-1"></i>Duyệt tất cả
-            </button>
-            <button type="button" class="btn btn-outline-danger btn-sm px-3" onclick="rejectAllAttendees()">
-                <i class="fa fa-times me-1"></i>Từ chối tất cả
-            </button>
-        </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-success btn-sm px-3" onclick="approveAllAttendees()">
+                    <i class="fa fa-check me-1"></i>Duyệt tất cả
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm px-3" onclick="rejectAllAttendees()">
+                    <i class="fa fa-times me-1"></i>Từ chối tất cả
+                </button>
+            </div>
         <?php endif; ?>
     </div>
     <div class="card-body">
@@ -308,47 +308,47 @@ $attributes = array(
 <!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
 <div class="card mb-3">
     <div class="card-header bg-white">
-        <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi sắc đẹp</h5>
+        <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi Miss Mường Thanh</h5>
     </div>
     <div class="card-body">
         <?php if (empty($beautyContestants)): ?>
-            <p class="text-muted mb-0">Chưa đăng ký thi sắc đẹp nào.</p>
+            <p class="text-muted mb-0">Chưa có đăng ký thi.</p>
         <?php else: ?>
             <?php foreach ($beautyContestants as $contestData): ?>
-            <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
-            <table class="table table-bordered table-striped table-sm mb-3">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width:80px;">SBD</th>
-                        <th>Họ tên</th>
-                        <th style="width:80px;">Cao (cm)</th>
-                        <th style="width:80px;">Nặng (kg)</th>
-                        <th style="width:100px;">Số đo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($contestData['contestants'] as $c): ?>
+                <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
+                <table class="table table-bordered table-striped table-sm mb-3">
+                    <thead class="table-light">
                         <tr>
-                            <td><span class="badge bg-primary"><?php echo CHtml::encode($c['candidate_number']); ?></span></td>
-                            <td>
-                                <?php
-                                $nameInfo = CHtml::encode($c['attendee_name']);
-                                $details = array();
-                                if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
-                                if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
-                                if (!empty($details)) {
-                                    $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
-                                }
-                                echo $nameInfo;
-                                ?>
-                            </td>
-                            <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
-                            <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
-                            <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
+                            <th style="width:80px;">SBD</th>
+                            <th>Họ tên</th>
+                            <th style="width:80px;">Cao (cm)</th>
+                            <th style="width:80px;">Nặng (kg)</th>
+                            <th style="width:100px;">Số đo</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($contestData['contestants'] as $c): ?>
+                            <tr>
+                                <td><span class="badge bg-primary"><?php echo CHtml::encode($c['candidate_number']); ?></span></td>
+                                <td>
+                                    <?php
+                                    $nameInfo = CHtml::encode($c['attendee_name']);
+                                    $details = array();
+                                    if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
+                                    if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
+                                    if (!empty($details)) {
+                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                    }
+                                    echo $nameInfo;
+                                    ?>
+                                </td>
+                                <td class="text-center"><?php echo isset($c['height_cm']) && $c['height_cm'] ? $c['height_cm'] : '-'; ?></td>
+                                <td class="text-center"><?php echo isset($c['weight_kg']) && $c['weight_kg'] ? $c['weight_kg'] : '-'; ?></td>
+                                <td class="text-center"><?php echo isset($c['measurements']) && $c['measurements'] ? CHtml::encode($c['measurements']) : '-'; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
@@ -430,10 +430,10 @@ $attributes = array(
                                 <?php endforeach; ?>
                             </td>
                             <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-outline-primary btn-view-talent-detail" 
-                                        data-entry="<?php echo CHtml::encode(CJSON::encode($entryDetails)); ?>"
-                                        data-members="<?php echo CHtml::encode(CJSON::encode($memberNames)); ?>"
-                                        title="Xem chi tiết">
+                                <button type="button" class="btn btn-sm btn-outline-primary btn-view-talent-detail"
+                                    data-entry="<?php echo CHtml::encode(CJSON::encode($entryDetails)); ?>"
+                                    data-members="<?php echo CHtml::encode(CJSON::encode($memberNames)); ?>"
+                                    title="Xem chi tiết">
                                     <i class="fa fa-eye me-1"></i>Xem chi tiết
                                 </button>
                             </td>
@@ -534,7 +534,7 @@ $attributes = array(
                         </tbody>
                     </table>
                 </div>
-                
+
                 <h6 class="fw-bold mb-2"><i class="fa fa-users me-1 text-info"></i>Danh sách người biểu diễn (<span id="dt_member_count">0</span>)</h6>
                 <div id="dt_members_list" class="d-flex flex-wrap gap-2"></div>
             </div>
