@@ -2592,55 +2592,84 @@ class RegistrationsController extends AdminController
 			$this->redirect(array('view', 'id' => $id));
 		}
 
-		if (isset($_FILES['documents']) && !empty($_FILES['documents']['name'][0])) {
-			$documents = array();
-			if (!empty($model->document)) {
-				$parsed = json_decode($model->document, true);
-				if (is_array($parsed)) {
-					$documents = $parsed;
-				}
+		if (!isset($_FILES['documents']) || empty($_FILES['documents']['name'][0])) {
+			Yii::app()->user->setFlash('error', 'Vui lòng chọn tệp để tải lên.');
+			$this->redirect(array('view', 'id' => $id));
+		}
+
+		$documents = array();
+		if (!empty($model->document)) {
+			$parsed = json_decode($model->document, true);
+			if (is_array($parsed)) {
+				$documents = $parsed;
+			}
+		}
+
+		$uploadPath = Yii::getPathOfAlias('webroot') . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'registrations' . DIRECTORY_SEPARATOR . $id;
+		if (!is_dir($uploadPath)) {
+			if (!@mkdir($uploadPath, 0755, true)) {
+				Yii::app()->user->setFlash('error', 'Không thể tạo thư mục upload.');
+				$this->redirect(array('view', 'id' => $id));
+			}
+		}
+
+		$allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx');
+		$maxSize = 10 * 1024 * 1024;
+
+		$files = $_FILES['documents'];
+		$uploadedCount = 0;
+		$errors = array();
+
+		for ($i = 0; $i < count($files['name']); $i++) {
+			$filename = $files['name'][$i];
+			if (empty($filename)) continue;
+
+			if ($files['error'][$i] !== UPLOAD_ERR_OK) {
+				$errors[] = $filename . ': Lỗi upload (code ' . $files['error'][$i] . ')';
+				continue;
 			}
 
-			$uploadPath = Yii::getPathOfAlias('webroot') . '/uploads/registrations/' . $id;
-			if (!is_dir($uploadPath)) {
-				mkdir($uploadPath, 0755, true);
+			$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+			if (!in_array($ext, $allowedTypes)) {
+				$errors[] = $filename . ': Định dạng không hỗ trợ';
+				continue;
 			}
 
-			$allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx');
-			$maxSize = 10 * 1024 * 1024;
-
-			$files = $_FILES['documents'];
-			$uploadedCount = 0;
-
-			for ($i = 0; $i < count($files['name']); $i++) {
-				if ($files['error'][$i] !== UPLOAD_ERR_OK) continue;
-
-				$filename = $files['name'][$i];
-				$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-				if (!in_array($ext, $allowedTypes)) continue;
-				if ($files['size'][$i] > $maxSize) continue;
-
-				$newFilename = time() . '_' . $i . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $filename);
-				$targetPath = $uploadPath . '/' . $newFilename;
-
-				if (move_uploaded_file($files['tmp_name'][$i], $targetPath)) {
-					$documents[] = Yii::app()->baseUrl . '/uploads/registrations/' . $id . '/' . $newFilename;
-					$uploadedCount++;
-				}
+			if ($files['size'][$i] > $maxSize) {
+				$errors[] = $filename . ': Vượt quá 10MB';
+				continue;
 			}
 
-			if ($uploadedCount > 0) {
-				$model->document = CJSON::encode($documents);
-				$result = $model->updateViaApi();
-				if ($result['success']) {
-					Yii::app()->user->setFlash('success', 'Tải lên ' . $uploadedCount . ' tệp thành công.');
-				} else {
-					Yii::app()->user->setFlash('error', 'Lỗi lưu thông tin tệp.');
-				}
+			$safeFilename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+			$newFilename = time() . '_' . $i . '_' . $safeFilename;
+			$targetPath = $uploadPath . DIRECTORY_SEPARATOR . $newFilename;
+
+			if (move_uploaded_file($files['tmp_name'][$i], $targetPath)) {
+				$documents[] = '/uploads/registrations/' . $id . '/' . $newFilename;
+				$uploadedCount++;
 			} else {
-				Yii::app()->user->setFlash('error', 'Không có tệp nào được tải lên.');
+				$errors[] = $filename . ': Không thể lưu tệp';
 			}
+		}
+
+		if ($uploadedCount > 0) {
+			$model->document = CJSON::encode($documents);
+			$result = $model->updateViaApi();
+			if ($result['success']) {
+				$msg = 'Tải lên ' . $uploadedCount . ' tệp thành công.';
+				if (!empty($errors)) {
+					$msg .= ' Lỗi: ' . implode(', ', $errors);
+				}
+				Yii::app()->user->setFlash('success', $msg);
+			} else {
+				Yii::app()->user->setFlash('error', 'Lỗi lưu thông tin: ' . (isset($result['message']) ? $result['message'] : ''));
+			}
+		} else {
+			$errorMsg = 'Không có tệp nào được tải lên.';
+			if (!empty($errors)) {
+				$errorMsg .= ' Chi tiết: ' . implode(', ', $errors);
+			}
+			Yii::app()->user->setFlash('error', $errorMsg);
 		}
 
 		$this->redirect(array('view', 'id' => $id));
