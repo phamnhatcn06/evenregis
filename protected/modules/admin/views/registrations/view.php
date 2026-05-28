@@ -655,9 +655,15 @@ foreach ($registrationDetails as $detail) {
 </div>
 
 <!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
+<?php $missPendingCount = count($allianceByContent['miss']['pending']); ?>
 <div class="card mb-3" id="miss-registration-card">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi Miss Mường Thanh</h5>
+        <h5 class="mb-0">
+            <i class="fa fa-star me-2 text-primary"></i>Đăng ký thi Miss Mường Thanh
+            <?php if ($missPendingCount > 0): ?>
+                <span class="badge bg-danger rounded-pill ms-2"><?php echo $missPendingCount; ?> yêu cầu</span>
+            <?php endif; ?>
+        </h5>
         <?php if ($canEdit): ?>
             <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addMissModal">
                 <i class="fa fa-plus me-1"></i>Đăng ký
@@ -665,6 +671,12 @@ foreach ($registrationDetails as $detail) {
         <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php $this->renderPartial('_alliance_section', array(
+            'pendingRequests' => $allianceByContent['miss']['pending'],
+            'historyItems' => $allianceByContent['miss']['history'],
+            'contentCode' => 'miss',
+            'model' => $model,
+        )); ?>
 
         <?php if (empty($beautyContestants)): ?>
             <p class="text-muted mb-0">Chưa có đăng ký</p>
