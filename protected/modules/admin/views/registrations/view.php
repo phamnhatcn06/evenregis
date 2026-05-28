@@ -745,6 +745,7 @@ $missHasAlliance = ($missPendingCount > 0 || $missHistoryCount > 0);
         <?php else: ?>
             <?php foreach ($beautyContestants as $contestData): ?>
                 <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
+                <div class="table-responsive">
                 <table class="table table-bordered table-striped table-sm mb-3">
                     <thead class="table-light">
                         <tr>
