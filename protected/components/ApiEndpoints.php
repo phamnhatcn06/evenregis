@@ -434,6 +434,35 @@ class ApiEndpoints
     const TALENT_SCORE_UPDATE = '/api/talent-scores/update/{id}';
     const TALENT_SCORE_DESTROY = '/api/talent-scores/destroy/{id}';
 
+    // Approval Workflow
+    const APPROVAL_WORKFLOW_LIST = '/api/approval-workflows';
+    const APPROVAL_WORKFLOW_STORE = '/api/approval-workflows/store';
+    const APPROVAL_WORKFLOW_DETAIL = '/api/approval-workflows/detail/{id}';
+    const APPROVAL_WORKFLOW_UPDATE = '/api/approval-workflows/update/{id}';
+    const APPROVAL_WORKFLOW_DESTROY = '/api/approval-workflows/destroy/{id}';
+
+    // Approval Workflow Approver
+    const APPROVAL_WORKFLOW_APPROVER_LIST = '/api/approval-workflow-approvers';
+    const APPROVAL_WORKFLOW_APPROVER_STORE = '/api/approval-workflow-approvers/store';
+    const APPROVAL_WORKFLOW_APPROVER_DETAIL = '/api/approval-workflow-approvers/detail/{id}';
+    const APPROVAL_WORKFLOW_APPROVER_UPDATE = '/api/approval-workflow-approvers/update/{id}';
+    const APPROVAL_WORKFLOW_APPROVER_DESTROY = '/api/approval-workflow-approvers/destroy/{id}';
+    const APPROVAL_WORKFLOW_APPROVER_BY_USER = '/api/approval-workflow-approvers/by-user/{portal_user_id}';
+
+    // Registration Approval
+    const REGISTRATION_APPROVAL_LIST = '/api/registration-approvals';
+    const REGISTRATION_APPROVAL_STORE = '/api/registration-approvals/store';
+    const REGISTRATION_APPROVAL_DETAIL = '/api/registration-approvals/detail/{id}';
+    const REGISTRATION_APPROVAL_PENDING = '/api/registration-approvals/pending/{portal_user_id}';
+    const REGISTRATION_APPROVAL_APPROVE = '/api/registration-approvals/approve/{id}';
+    const REGISTRATION_APPROVAL_REJECT = '/api/registration-approvals/reject/{id}';
+    const REGISTRATION_APPROVAL_REVISION = '/api/registration-approvals/revision/{id}';
+    const REGISTRATION_APPROVAL_RESUBMIT = '/api/registration-approvals/resubmit/{id}';
+
+    // Registration Approval Log
+    const REGISTRATION_APPROVAL_LOG_LIST = '/api/registration-approval-logs';
+    const REGISTRATION_APPROVAL_LOG_BY_REGISTRATION = '/api/registration-approval-logs/by-registration/{registration_id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;

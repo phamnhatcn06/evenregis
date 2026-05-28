@@ -2492,7 +2492,7 @@
                                     }
                                 ],
                                 "url": {
-                                    "raw": "{{base_url}}/api/beauty-registrations?per_page=20&page=1",
+                                    "raw": "{{base_url}}/api/beauty-registrations?per_page=20&page=1&registration_id=1&event_id=1&property_id=1&period_id=1&status=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -2510,14 +2510,24 @@
                                             "value": "1"
                                         },
                                         {
-                                            "key": "competition_id",
-                                            "value": "",
-                                            "disabled": true
+                                            "key": "registration_id",
+                                            "value": "1"
                                         },
                                         {
-                                            "key": "attendee_id",
-                                            "value": "",
-                                            "disabled": true
+                                            "key": "event_id",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "property_id",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "period_id",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "status",
+                                            "value": "1"
                                         }
                                     ]
                                 }
@@ -3606,7 +3616,7 @@
                                     }
                                 ],
                                 "url": {
-                                    "raw": "{{base_url}}/api/competition-registrations?per_page=20&page=1",
+                                    "raw": "{{base_url}}/api/competition-registrations?per_page=20&page=1&registration_id=1&event_id=1&property_id=1&period_id=1&status=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -3621,6 +3631,18 @@
                                         },
                                         {
                                             "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "event_id",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "status",
                                             "value": "1"
                                         }
                                     ]
@@ -6437,7 +6459,7 @@
                                     }
                                 ],
                                 "url": {
-                                    "raw": "{{base_url}}/api/registrations?per_page=20&page=1",
+                                    "raw": "{{base_url}}/api/registrations?per_page=20&page=1&registration_id=1&event_id=1&property_id=1&period_id=1&status=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -6455,24 +6477,24 @@
                                             "value": "1"
                                         },
                                         {
+                                            "key": "registration_id",
+                                            "value": "1"
+                                        },
+                                        {
                                             "key": "event_id",
-                                            "value": "",
-                                            "disabled": true
+                                            "value": "1"
                                         },
                                         {
                                             "key": "property_id",
-                                            "value": "",
-                                            "disabled": true
+                                            "value": "1"
                                         },
                                         {
                                             "key": "period_id",
-                                            "value": "",
-                                            "disabled": true
+                                            "value": "1"
                                         },
                                         {
                                             "key": "status",
-                                            "value": "",
-                                            "disabled": true
+                                            "value": "1"
                                         }
                                     ]
                                 }
@@ -8696,6 +8718,1004 @@
                             "response": []
                         }
                     ]
+                },
+                {
+                    "name": "Approve Attendee Log",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-attendee-logs?per_page=20&page=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-attendee-logs"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "attendee_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Người tham gia ID"
+                                        },
+                                        {
+                                            "key": "status_approve",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Trạng thái duyệt (0: Pending, 1: Approved, 2: Rejected)"
+                                        },
+                                        {
+                                            "key": "reject_reason",
+                                            "value": "Lý do từ chối nếu có",
+                                            "type": "text",
+                                            "description": "Lý do từ chối (bắt buộc nếu trạng thái là 2)"
+                                        },
+                                        {
+                                            "key": "auth_mail",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người duyệt"
+                                        },
+                                        {
+                                            "key": "old_data",
+                                            "value": "{\n  \"status\": 0,\n  \"note\": \"Initial data\"\n}",
+                                            "type": "text",
+                                            "description": "Dữ liệu cũ (JSON chuỗi hoặc JSON array)"
+                                        },
+                                        {
+                                            "key": "new_data",
+                                            "value": "{\n  \"status\": 1,\n  \"note\": \"Approved by manager\"\n}",
+                                            "type": "text",
+                                            "description": "Dữ liệu mới (JSON chuỗi hoặc JSON array)"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-attendee-logs/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-attendee-logs",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-attendee-logs/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-attendee-logs",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "attendee_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Người tham gia ID"
+                                        },
+                                        {
+                                            "key": "status_approve",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Trạng thái duyệt (0: Pending, 1: Approved, 2: Rejected)"
+                                        },
+                                        {
+                                            "key": "reject_reason",
+                                            "value": "Lý do cập nhật",
+                                            "type": "text",
+                                            "description": "Lý do từ chối"
+                                        },
+                                        {
+                                            "key": "auth_mail",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người duyệt"
+                                        },
+                                        {
+                                            "key": "old_data",
+                                            "value": "{\n  \"status\": 0,\n  \"note\": \"Initial data\"\n}",
+                                            "type": "text",
+                                            "description": "Dữ liệu cũ (JSON chuỗi hoặc JSON array)"
+                                        },
+                                        {
+                                            "key": "new_data",
+                                            "value": "{\n  \"status\": 1,\n  \"note\": \"Approved by manager\"\n}",
+                                            "type": "text",
+                                            "description": "Dữ liệu mới (JSON chuỗi hoặc JSON array)"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-attendee-logs/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-attendee-logs",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-attendee-logs/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-attendee-logs",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Approve Registration Log",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-registration-logs",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-registration-logs"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Đăng ký ID"
+                                        },
+                                        {
+                                            "key": "status_approve",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Trạng thái duyệt (0: Pending, 1: Approved, 2: Rejected)"
+                                        },
+                                        {
+                                            "key": "reject_reason",
+                                            "value": "Lý do từ chối nếu có",
+                                            "type": "text",
+                                            "description": "Lý do từ chối"
+                                        },
+                                        {
+                                            "key": "auth_mail",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người duyệt"
+                                        },
+                                        {
+                                            "key": "old_data",
+                                            "value": "{\n  \"status\": 0,\n  \"note\": \"Initial data\"\n}",
+                                            "type": "text",
+                                            "description": "Dữ liệu cũ (JSON chuỗi hoặc JSON array)"
+                                        },
+                                        {
+                                            "key": "new_data",
+                                            "value": "{\n  \"status\": 1,\n  \"note\": \"Approved by manager\"\n}",
+                                            "type": "text",
+                                            "description": "Dữ liệu mới (JSON chuỗi hoặc JSON array)"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-registration-logs/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-registration-logs",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-registration-logs/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-registration-logs",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Đăng ký ID"
+                                        },
+                                        {
+                                            "key": "status_approve",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Trạng thái duyệt (0: Pending, 1: Approved, 2: Rejected)"
+                                        },
+                                        {
+                                            "key": "reject_reason",
+                                            "value": "Lý do thay đổi",
+                                            "type": "text",
+                                            "description": "Lý do từ chối"
+                                        },
+                                        {
+                                            "key": "auth_mail",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người duyệt"
+                                        },
+                                        {
+                                            "key": "old_data",
+                                            "value": "{\n  \"status\": 0,\n  \"note\": \"Initial data\"\n}",
+                                            "type": "text",
+                                            "description": "Dữ liệu cũ (JSON chuỗi hoặc JSON array)"
+                                        },
+                                        {
+                                            "key": "new_data",
+                                            "value": "{\n  \"status\": 1,\n  \"note\": \"Approved by manager\"\n}",
+                                            "type": "text",
+                                            "description": "Dữ liệu mới (JSON chuỗi hoặc JSON array)"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-registration-logs/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-registration-logs",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Destroy",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approve-registration-logs/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approve-registration-logs",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Approval Workflow",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflows?per_page=20&page=1&is_active=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflows"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "is_active",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "is_default",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"code\": \"WF001\",\n    \"name\": \"Quy trình duyệt 2 bước\",\n    \"description\": \"GĐ đơn vị → NS Tổ chức\",\n    \"total_steps\": 2,\n    \"is_default\": 0,\n    \"is_active\": 1,\n    \"created_by\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflows/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflows",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflows/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflows",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Quy trình duyệt 2 bước (cập nhật)\",\n    \"total_steps\": 2,\n    \"is_default\": 1,\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflows/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflows",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflows/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflows",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Approval Workflow Approver",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflow-approvers?per_page=20&page=1&workflow_id=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflow-approvers"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "workflow_id",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "step_index",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "organization_id",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "portal_user_id",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "is_active",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"workflow_id\": 1,\n    \"step_index\": 1,\n    \"step_name\": \"Giám đốc đơn vị\",\n    \"portal_user_id\": 101,\n    \"portal_user_name\": \"Nguyễn Văn A\",\n    \"portal_user_email\": \"nguyenvana@muongthanh.vn\",\n    \"organization_id\": 29,\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflow-approvers/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflow-approvers",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflow-approvers/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflow-approvers",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"step_name\": \"Giám đốc đơn vị (cập nhật)\",\n    \"portal_user_name\": \"Trần Thị B\",\n    \"portal_user_email\": \"tranthib@muongthanh.vn\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflow-approvers/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflow-approvers",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/approval-workflow-approvers/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "approval-workflow-approvers",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Registration Approval",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-approvals?per_page=20&page=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-approvals"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "registration_id",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "workflow_id",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "status",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"registration_id\": 1,\n    \"workflow_id\": 1,\n    \"total_steps\": 2,\n    \"current_index\": 1,\n    \"status\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-approvals/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-approvals",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-approvals/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-approvals",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"current_index\": 2,\n    \"status\": 2,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-approvals/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-approvals",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-approvals/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-approvals",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Registration Approval Log",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-approval-logs?per_page=20&page=1&registration_id=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-approval-logs"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "step_index",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "action",
+                                            "value": "",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "approver_portal_id",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"registration_id\": 1,\n    \"step_index\": 1,\n    \"step_name\": \"Giám đốc đơn vị\",\n    \"action\": 1,\n    \"approver_portal_id\": 101,\n    \"approver_name\": \"Nguyễn Văn A\",\n    \"comment\": \"Đồng ý, hồ sơ đầy đủ\",\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-approval-logs/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-approval-logs",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-approval-logs/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-approval-logs",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
                 }
             ]
         },
@@ -9061,6 +10081,11 @@
                                             "key": "property_id",
                                             "value": "",
                                             "disabled": true
+                                        },
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1",
+                                            "description": "ID phiếu đăng ký"
                                         }
                                     ]
                                 }
@@ -9085,7 +10110,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"registration_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -9150,7 +10175,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"registration_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -10958,7 +11983,7 @@
                                             "value": "1"
                                         },
                                         {
-                                            "key": "show_id",
+                                            "key": "registration_id",
                                             "value": "",
                                             "disabled": true
                                         },
@@ -10997,7 +12022,7 @@
                                     "mode": "formdata",
                                     "formdata": [
                                         {
-                                            "key": "show_id",
+                                            "key": "registration_id",
                                             "value": "1",
                                             "type": "text"
                                         },
@@ -11150,7 +12175,7 @@
                                     "mode": "formdata",
                                     "formdata": [
                                         {
-                                            "key": "show_id",
+                                            "key": "registration_id",
                                             "value": "1",
                                             "type": "text"
                                         },
