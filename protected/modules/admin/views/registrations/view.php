@@ -174,6 +174,11 @@ if (!empty($model->document)) {
                                         <a href="<?php echo CHtml::encode($docUrl); ?>" class="btn btn-xs btn-outline-secondary" download>
                                             <i class="fa fa-download"></i>
                                         </a>
+                                        <?php if ($canEdit): ?>
+                                            <button type="button" class="btn btn-xs btn-outline-danger" onclick="confirmDeleteDocument(<?php echo $index; ?>)" title="Xóa">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
