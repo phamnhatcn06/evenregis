@@ -9,12 +9,85 @@ class ApprovalWorkflows extends BaseApprovalWorkflows
         return parent::model($className);
     }
 
+    // ==================== API Methods ====================
+
+    /**
+     * Lấy chi tiết từ API
+     */
+    public static function fetchFromApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::APPROVAL_WORKFLOW_DETAIL, array('id' => $id));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            $model = new self;
+            $model->setAttributes($data, false);
+            $model->id = $id;
+            return $model;
+        }
+        return null;
+    }
+
+    /**
+     * Tạo mới qua API
+     */
+    public function storeViaApi()
+    {
+        $data = array_filter($this->attributes, function ($value) {
+            return $value !== null && $value !== '';
+        });
+        return ApiClient::post(ApiEndpoints::APPROVAL_WORKFLOW_STORE, $data);
+    }
+
+    /**
+     * Cập nhật qua API
+     */
+    public function updateViaApi()
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::APPROVAL_WORKFLOW_UPDATE, array('id' => $this->id));
+        return ApiClient::post($url, $this->attributes);
+    }
+
+    /**
+     * Xóa qua API
+     */
+    public static function deleteViaApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::APPROVAL_WORKFLOW_DESTROY, array('id' => $id));
+        return ApiClient::delete($url);
+    }
+
+    /**
+     * DataProvider cho danh sách
+     */
+    public static function getApiDataProvider($params = array(), $pageSize = 25)
+    {
+        return new ApiDataProvider(ApiEndpoints::APPROVAL_WORKFLOW_LIST, array(
+            'modelClass' => 'ApprovalWorkflows',
+            'params' => $params,
+            'pagination' => array('pageSize' => $pageSize),
+        ));
+    }
+
+    // ==================== Business Methods ====================
+
     /**
      * Lấy workflow mặc định
      */
     public static function getDefault()
     {
-        return self::model()->find('is_default = 1 AND is_active = 1');
+        $result = ApiClient::get(ApiEndpoints::APPROVAL_WORKFLOW_LIST, array(
+            'is_default' => 1,
+            'is_active' => 1,
+            'per_page' => 1,
+        ));
+        if ($result['success'] && !empty($result['data']['data'])) {
+            $data = $result['data']['data'][0];
+            $model = new self;
+            $model->setAttributes($data, false);
+            return $model;
+        }
+        return null;
     }
 
     /**
@@ -22,42 +95,32 @@ class ApprovalWorkflows extends BaseApprovalWorkflows
      */
     public static function getList()
     {
-        $models = self::model()->findAll(array(
-            'condition' => 'is_active = 1',
-            'order' => 'name ASC',
+        $result = ApiClient::get(ApiEndpoints::APPROVAL_WORKFLOW_LIST, array(
+            'is_active' => 1,
+            'per_page' => 100,
         ));
-        return CHtml::listData($models, 'id', 'name');
-    }
-
-    /**
-     * Lấy approvers theo step_index
-     */
-    public function getApproversByStep($stepIndex, $organizationId = null)
-    {
-        $criteria = new CDbCriteria();
-        $criteria->condition = 'workflow_id = :wid AND step_index = :step AND is_active = 1';
-        $criteria->params = array(':wid' => $this->id, ':step' => $stepIndex);
-
-        if ($organizationId) {
-            $criteria->addCondition('(organization_id IS NULL OR organization_id = :org)');
-            $criteria->params[':org'] = $organizationId;
-        } else {
-            $criteria->addCondition('organization_id IS NULL');
+        $list = array();
+        if ($result['success'] && !empty($result['data']['data'])) {
+            foreach ($result['data']['data'] as $item) {
+                $list[$item['id']] = $item['name'];
+            }
         }
-
-        return ApprovalWorkflowApprovers::model()->findAll($criteria);
+        return $list;
     }
 
     /**
-     * Lấy tên bước theo index
+     * Lấy tên bước theo index (từ cache hoặc relation)
      */
     public function getStepName($stepIndex)
     {
-        $approver = ApprovalWorkflowApprovers::model()->find(array(
-            'condition' => 'workflow_id = :wid AND step_index = :step',
-            'params' => array(':wid' => $this->id, ':step' => $stepIndex),
-        ));
-        return $approver ? $approver->step_name : 'Bước ' . $stepIndex;
+        if (!empty($this->approvers)) {
+            foreach ($this->approvers as $approver) {
+                if ($approver->step_index == $stepIndex) {
+                    return $approver->step_name;
+                }
+            }
+        }
+        return 'Bước ' . $stepIndex;
     }
 
     /**
@@ -65,11 +128,19 @@ class ApprovalWorkflows extends BaseApprovalWorkflows
      */
     public function getSteps()
     {
-        return Yii::app()->db->createCommand()
-            ->selectDistinct('step_index, step_name')
-            ->from('approval_workflow_approvers')
-            ->where('workflow_id = :wid', array(':wid' => $this->id))
-            ->order('step_index ASC')
-            ->queryAll();
+        $steps = array();
+        if (!empty($this->approvers)) {
+            $seen = array();
+            foreach ($this->approvers as $approver) {
+                if (!isset($seen[$approver->step_index])) {
+                    $steps[] = array(
+                        'step_index' => $approver->step_index,
+                        'step_name' => $approver->step_name,
+                    );
+                    $seen[$approver->step_index] = true;
+                }
+            }
+        }
+        return $steps;
     }
 }
