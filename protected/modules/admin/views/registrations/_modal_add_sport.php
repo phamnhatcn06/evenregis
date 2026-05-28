@@ -63,7 +63,7 @@
                                 <div class="col-md-5">
                                     <div class="card h-100">
                                         <div class="card-header py-2">
-                                            <small class="fw-bold">Đã chọn (<span id="sport_selected_count">0</span>)</small>
+                                            <small class="fw-bold">Đã chọn (<span id="sport_selected_count">0</span>/<span id="sport_max_count">∞</span>)</small>
                                         </div>
                                         <div class="card-body p-0" style="height:340px;overflow-y:auto;">
                                             <div class="list-group list-group-flush" id="sport_selected_attendee_list">
