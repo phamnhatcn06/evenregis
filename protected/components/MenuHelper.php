@@ -236,6 +236,12 @@ class MenuHelper
                 'forceGroup' => true,
                 'sort' => 90,
             ),
+            'approval' => array(
+                'label' => 'Quy trình duyệt',
+                'icon' => 'approval',
+                'forceGroup' => true,
+                'sort' => 25,
+            ),
         );
 
         return isset($configs[$root]) ? $configs[$root] : array(
