@@ -711,11 +711,23 @@ foreach ($registrationDetails as $detail) {
 </div>
 
 <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
+<?php $talentPendingCount = count($allianceByContent['talent']['pending']); ?>
 <div class="card mb-3" id="talent-registration-card" data-event-content-id="<?php echo $contentIdMap['talent']; ?>">
-    <div class="card-header bg-white">
-        <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ
+            <?php if ($talentPendingCount > 0): ?>
+                <span class="badge bg-danger rounded-pill ms-2"><?php echo $talentPendingCount; ?> yêu cầu</span>
+            <?php endif; ?>
+        </h5>
     </div>
     <div class="card-body">
+        <?php $this->renderPartial('_alliance_section', array(
+            'pendingRequests' => $allianceByContent['talent']['pending'],
+            'historyItems' => $allianceByContent['talent']['history'],
+            'contentCode' => 'talent',
+            'model' => $model,
+        )); ?>
         <?php if ($canEdit && empty($talentEntries)): ?>
             <!-- Form chọn liên quân và thể loại -->
             <div class="row mb-3 g-3 align-items-end">
