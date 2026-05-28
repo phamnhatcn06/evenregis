@@ -90,7 +90,7 @@ if (!empty($model->document)) {
                     <i class="fa fa-check me-1"></i>Chấp nhận
                 </button>
                 <form id="approve-alliance-form-<?php echo $reqId; ?>" method="post" action="<?php echo $this->createUrl('approveAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:none;"></form>
-                <button type="button" class="btn btn-sm btn-outline-danger px-3 fw-bold bg-white" onclick="confirmRejectAlliance(<?php echo $reqId; ?>)">
+                <button type="button" class="btn btn-sm btn-outline-danger btn-outline-danger-hover px-3 fw-bold bg-white" onclick="confirmRejectAlliance(<?php echo $reqId; ?>)">
                     <i class="fa fa-times me-1"></i>Từ chối
                 </button>
                 <form id="reject-alliance-form-<?php echo $reqId; ?>" method="post" action="<?php echo $this->createUrl('rejectAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:none;">
