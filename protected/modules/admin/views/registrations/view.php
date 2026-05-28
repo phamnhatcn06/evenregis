@@ -40,6 +40,39 @@ $this->Tabletitle = 'Chi tiết phiếu đăng ký của ' . $model->property_na
 ?>
 
 <?php
+// Group alliance requests and history by content code
+$allianceByContent = array(
+    'sports' => array('pending' => array(), 'history' => array()),
+    'talent' => array('pending' => array(), 'history' => array()),
+    'competition' => array('pending' => array(), 'history' => array()),
+    'miss' => array('pending' => array(), 'history' => array()),
+    'other' => array('pending' => array(), 'history' => array()),
+);
+
+// Group incoming pending requests
+if (!empty($incomingRequestsData)) {
+    foreach ($incomingRequestsData as $item) {
+        $contentCode = isset($item['request']->content_code) ? $item['request']->content_code : '';
+        if (empty($contentCode)) $contentCode = 'sports'; // Default to sports if not specified
+        if ($contentCode === 'sport') $contentCode = 'sports';
+        if (!isset($allianceByContent[$contentCode])) $contentCode = 'other';
+        $allianceByContent[$contentCode]['pending'][] = $item;
+    }
+}
+
+// Group alliance history
+if (!empty($allianceHistory)) {
+    foreach ($allianceHistory as $item) {
+        $contentCode = isset($item['request']->content_code) ? $item['request']->content_code : '';
+        if (empty($contentCode)) $contentCode = 'sports';
+        if ($contentCode === 'sport') $contentCode = 'sports';
+        if (!isset($allianceByContent[$contentCode])) $contentCode = 'other';
+        $allianceByContent[$contentCode]['history'][] = $item;
+    }
+}
+?>
+
+<?php
 $attributes = array(
     array('label' => 'Sự kiện', 'value' => isset($model->event_name) ? $model->event_name : ''),
     array('label' => 'Đơn vị', 'value' => isset($model->property_name) ? $model->property_name : ''),

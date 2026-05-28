@@ -225,6 +225,14 @@ var RegistrationView = (function() {
             });
         }
 
+        var modalSportSelect = document.getElementById('sport_item_id');
+        if (modalSportSelect) {
+            modalSportSelect.addEventListener('change', function() {
+                renderSportSelectedAttendees();
+                updateSportTeamName();
+            });
+        }
+
         var btnConfirmAlliance = document.getElementById('btn_confirm_alliance');
         if (btnConfirmAlliance) {
             btnConfirmAlliance.addEventListener('click', function() {
@@ -835,6 +843,12 @@ var RegistrationView = (function() {
             return;
         }
 
+        var maxPlayers = getSportMaxPlayers(sportName);
+        if (sportSelectedAttendees.length > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+            return;
+        }
+
         // Check if sport already in pending list (only when adding new)
         if (editingSportIndex === -1) {
             var existingIdx = pendingSportRegistrations.findIndex(function(r) { return r.sportId == sportId; });
@@ -1178,6 +1192,46 @@ var RegistrationView = (function() {
             });
     }
 
+    function getSportMaxPlayers(sportName) {
+        if (!sportName) return Infinity;
+        sportName = sportName.toLowerCase();
+        
+        if (sportName.includes('bóng đá') || sportName.includes('football') || sportName.includes('soccer')) {
+            return 11;
+        }
+        if (sportName.includes('kéo co')) {
+            return 10;
+        }
+        if (sportName.includes('bơi tiếp sức') || sportName.includes('bơi đồng đội')) {
+            return 4;
+        }
+        if (sportName.includes('đôi') || sportName.includes('doubles')) {
+            return 2;
+        }
+        if (sportName.includes('đơn') || sportName.includes('singles') || sportName.includes('cờ vua') || sportName.includes('cờ tướng') || sportName.includes('bản đồ')) {
+            return 1;
+        }
+        
+        if (sportName.includes('bóng bàn') || sportName.includes('cầu lông') || sportName.includes('tennis') || sportName.includes('quần vợt') || sportName.includes('pickleball') || sportName.includes('pickerball')) {
+            return 2;
+        }
+        
+        return Infinity;
+    }
+
+    function getSelectedSportName() {
+        var sportSelect = document.getElementById('sport_select_main');
+        var modalSportSelect = document.getElementById('sport_item_id');
+        var sportName = '';
+        if (modalSportSelect && modalSportSelect.value) {
+            var opt = modalSportSelect.querySelector('option[value="' + modalSportSelect.value + '"]');
+            sportName = opt ? opt.textContent.trim() : '';
+        } else if (sportSelect && sportSelect.selectedIndex > 0) {
+            sportName = sportSelect.options[sportSelect.selectedIndex].text.trim();
+        }
+        return sportName;
+    }
+
     function loadSportAttendees(callback) {
         var availableList = document.getElementById('sport_available_attendee_list');
         if (!availableList) return;
@@ -1245,6 +1299,13 @@ var RegistrationView = (function() {
         var countSpan = document.getElementById('sport_selected_count');
         if (countSpan) countSpan.textContent = sportSelectedAttendees.length;
 
+        var maxSpan = document.getElementById('sport_max_count');
+        if (maxSpan) {
+            var sportName = getSelectedSportName();
+            var maxPlayers = getSportMaxPlayers(sportName);
+            maxSpan.textContent = isFinite(maxPlayers) ? maxPlayers : '∞';
+        }
+
         removeSportHiddenInputs();
 
         if (sportSelectedAttendees.length === 0) {
@@ -1289,6 +1350,17 @@ var RegistrationView = (function() {
     function addSelectedSportAttendee() {
         var list = document.getElementById('sport_available_attendee_list');
         var actives = list.querySelectorAll('.active');
+        if (actives.length === 0) return;
+
+        var sportName = getSelectedSportName();
+        var maxPlayers = getSportMaxPlayers(sportName);
+        var currentlySelected = sportSelectedAttendees.length;
+        var toAddCount = actives.length;
+
+        if (currentlySelected + toAddCount > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+            return;
+        }
 
         actives.forEach(function(el) {
             var id = el.getAttribute('data-id');
@@ -1307,6 +1379,17 @@ var RegistrationView = (function() {
         var available = sportAllAttendees.filter(function(a) {
             return sportSelectedAttendees.findIndex(function(sel) { return sel.id == a.id; }) === -1;
         });
+        if (available.length === 0) return;
+
+        var sportName = getSelectedSportName();
+        var maxPlayers = getSportMaxPlayers(sportName);
+        var currentlySelected = sportSelectedAttendees.length;
+        var toAddCount = available.length;
+
+        if (currentlySelected + toAddCount > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+            return;
+        }
 
         available.forEach(function(att) {
             sportSelectedAttendees.push(att);
@@ -1863,6 +1946,13 @@ var RegistrationView = (function() {
 
         if (sportSelectedAttendees.length === 0) {
             Toast.error('Vui lòng chọn ít nhất một người tham dự.');
+            return;
+        }
+
+        var sportName = getSelectedSportName();
+        var maxPlayers = getSportMaxPlayers(sportName);
+        if (sportSelectedAttendees.length > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
             return;
         }
 
