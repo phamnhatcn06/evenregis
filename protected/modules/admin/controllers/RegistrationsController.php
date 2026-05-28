@@ -189,7 +189,10 @@ class RegistrationsController extends AdminController
 			}
 
 			// Lấy talent entries của property cho các shows này
-			$filterParams = array('property_id' => $model->property_id);
+			$filterParams = array(
+				'property_id' => $model->property_id,
+				'registration_id' => $model->id,
+			);
 			if (!empty($showIds)) {
 				// Nếu API hỗ trợ filter theo event_id thì dùng luôn
 				$filterParams['event_id'] = $model->event_id;
@@ -199,9 +202,13 @@ class RegistrationsController extends AdminController
 			foreach ($entriesData as $entry) {
 				$entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
 				$entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
+				$entryRegId = isset($entry->registration_id) ? $entry->registration_id : (isset($entry['registration_id']) ? $entry['registration_id'] : null);
 
-				// Chỉ lấy entries thuộc shows của event này
+				// Chỉ lấy entries thuộc shows của event này và thuộc registration hiện tại
 				if ($entryId && (empty($showIds) || in_array($entryShowId, $showIds))) {
+					if ($entryRegId && $entryRegId != $model->id) {
+						continue;
+					}
 					// Fetch category name if not available
 					if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
 						$catId = isset($entry->category_id) ? $entry->category_id : $entry['category_id'];

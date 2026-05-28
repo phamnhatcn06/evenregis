@@ -130,11 +130,7 @@ $attributes = array(
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (empty($attendees)): ?>
-                        <tr>
-                            <td colspan="<?php echo (int)$model->status === Registrations::STATUS_SUBMITTED ? 11 : 10; ?>" class="text-center text-muted">Chưa có người tham dự nào.</td>
-                        </tr>
-                    <?php else: ?>
+                    <?php if (!empty($attendees)): ?>
                         <?php foreach ($attendees as $idx => $att):
                             $attId = isset($att['id']) ? $att['id'] : '';
                             $fullName = isset($att['full_name']) ? $att['full_name'] : '';

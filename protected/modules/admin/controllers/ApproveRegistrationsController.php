@@ -200,10 +200,36 @@ class ApproveRegistrationsController extends AdminController
         $talentEntries = array();
         $talentEntryMembers = array();
         if ($model->property_id) {
-            $entriesData = TalentEntries::getApiDataProvider(array('property_id' => $model->property_id), 100)->getData();
+            // Lấy talent shows của event
+            $showIds = array();
+            if ($model->event_id) {
+                $showsData = TalentShows::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
+                foreach ($showsData as $show) {
+                    $showId = isset($show->id) ? $show->id : (isset($show['id']) ? $show['id'] : null);
+                    if ($showId) $showIds[] = $showId;
+                }
+            }
+
+            // Lấy talent entries của property cho các shows này
+            $filterParams = array(
+                'property_id' => $model->property_id,
+                'registration_id' => $model->id,
+            );
+            if ($model->event_id) {
+                $filterParams['event_id'] = $model->event_id;
+            }
+            $entriesData = TalentEntries::getApiDataProvider($filterParams, 100)->getData();
+
             foreach ($entriesData as $entry) {
                 $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
-                if ($entryId) {
+                $entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
+                $entryRegId = isset($entry->registration_id) ? $entry->registration_id : (isset($entry['registration_id']) ? $entry['registration_id'] : null);
+
+                // Chỉ lấy entries thuộc shows của event này và thuộc registration hiện tại
+                if ($entryId && (empty($showIds) || in_array($entryShowId, $showIds))) {
+                    if ($entryRegId && $entryRegId != $model->id) {
+                        continue;
+                    }
                     // Fetch category name if not available
                     if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
                         $catId = isset($entry->category_id) ? $entry->category_id : $entry['category_id'];

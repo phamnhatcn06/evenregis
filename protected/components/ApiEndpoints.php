@@ -8,6 +8,7 @@ class ApiEndpoints
     const PROPERTY_DETAIL = '/api/properties/detail/{id}';
     const PROPERTY_UPDATE = '/api/properties/update/{id}';
     const PROPERTY_DESTROY = '/api/properties/destroy/{id}';
+    const PROPERTY_LIST_AVAILABLE_UNITS = '/api/properties/list-available-units';
 
     // Department
     const DEPARTMENT_LIST = '/api/departments';
