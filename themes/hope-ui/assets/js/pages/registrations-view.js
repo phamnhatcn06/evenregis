@@ -1907,13 +1907,57 @@ var RegistrationView = (function() {
         var staffModal = document.getElementById('addAttendeeFromStaffModal');
         if (staffModal) {
             staffModal.addEventListener('shown.bs.modal', function() {
-                console.log('Modal shown, calling initDatePickers');
-                if (window.initDatePickers) {
-                    window.initDatePickers();
-                    console.log('initDatePickers called');
-                    var checkInEl = document.getElementById('staff_check_in_date');
-                    console.log('After init - checkInEl._flatpickr:', checkInEl ? checkInEl._flatpickr : null);
+                var checkInEl = document.getElementById('staff_check_in_date');
+                var checkOutEl = document.getElementById('staff_check_out_date');
+
+                // Destroy existing flatpickr instances
+                if (checkInEl._flatpickr) checkInEl._flatpickr.destroy();
+                if (checkOutEl._flatpickr) checkOutEl._flatpickr.destroy();
+
+                // Init check_out_date (disabled initially)
+                var checkOutPicker = flatpickr(checkOutEl, {
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'd/m/Y',
+                    allowInput: true,
+                    clickOpens: false
+                });
+                checkOutEl.disabled = true;
+                if (checkOutEl.nextElementSibling && checkOutEl.nextElementSibling.classList.contains('flatpickr-input')) {
+                    checkOutEl.nextElementSibling.disabled = true;
+                    checkOutEl.nextElementSibling.placeholder = '-- Chọn ngày đến trước --';
                 }
+
+                // Init check_in_date with onChange handler
+                flatpickr(checkInEl, {
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'd/m/Y',
+                    allowInput: true,
+                    onChange: function(selectedDates) {
+                        if (selectedDates.length > 0) {
+                            checkOutEl.disabled = false;
+                            if (checkOutEl.nextElementSibling && checkOutEl.nextElementSibling.classList.contains('flatpickr-input')) {
+                                checkOutEl.nextElementSibling.disabled = false;
+                                checkOutEl.nextElementSibling.placeholder = 'dd/mm/yyyy';
+                            }
+                            checkOutPicker.set('minDate', selectedDates[0]);
+                            checkOutPicker.set('clickOpens', true);
+                            // Clear check_out if it's before new check_in
+                            if (checkOutPicker.selectedDates.length > 0 && checkOutPicker.selectedDates[0] < selectedDates[0]) {
+                                checkOutPicker.clear();
+                            }
+                        } else {
+                            checkOutEl.disabled = true;
+                            if (checkOutEl.nextElementSibling && checkOutEl.nextElementSibling.classList.contains('flatpickr-input')) {
+                                checkOutEl.nextElementSibling.disabled = true;
+                                checkOutEl.nextElementSibling.placeholder = '-- Chọn ngày đến trước --';
+                            }
+                            checkOutPicker.clear();
+                            checkOutPicker.set('clickOpens', false);
+                        }
+                    }
+                });
             });
         }
 
