@@ -270,6 +270,170 @@ class ApiEndpoints
     // Dashboard Statistics
     const DASHBOARD_STATS = '/api/dashboard/stats';
 
+    // Event Agenda
+    const EVENT_AGENDA_LIST = '/api/event-agendas';
+    const EVENT_AGENDA_STORE = '/api/event-agendas/store';
+    const EVENT_AGENDA_DETAIL = '/api/event-agendas/detail/{id}';
+    const EVENT_AGENDA_UPDATE = '/api/event-agendas/update/{id}';
+    const EVENT_AGENDA_DESTROY = '/api/event-agendas/destroy/{id}';
+
+    // Content Round
+    const CONTENT_ROUND_LIST = '/api/content-rounds';
+    const CONTENT_ROUND_STORE = '/api/content-rounds/store';
+    const CONTENT_ROUND_DETAIL = '/api/content-rounds/detail/{id}';
+    const CONTENT_ROUND_UPDATE = '/api/content-rounds/update/{id}';
+    const CONTENT_ROUND_DESTROY = '/api/content-rounds/destroy/{id}';
+
+    // Competition Round
+    const COMPETITION_ROUND_LIST = '/api/competition-rounds';
+    const COMPETITION_ROUND_STORE = '/api/competition-rounds/store';
+    const COMPETITION_ROUND_DETAIL = '/api/competition-rounds/detail/{id}';
+    const COMPETITION_ROUND_UPDATE = '/api/competition-rounds/update/{id}';
+    const COMPETITION_ROUND_DESTROY = '/api/competition-rounds/destroy/{id}';
+
+    // Competition Round Result
+    const COMPETITION_ROUND_RESULT_LIST = '/api/competition-round-results';
+    const COMPETITION_ROUND_RESULT_STORE = '/api/competition-round-results/store';
+    const COMPETITION_ROUND_RESULT_DETAIL = '/api/competition-round-results/detail/{id}';
+    const COMPETITION_ROUND_RESULT_UPDATE = '/api/competition-round-results/update/{id}';
+    const COMPETITION_ROUND_RESULT_DESTROY = '/api/competition-round-results/destroy/{id}';
+
+    // Competition Department - Additional
+    const COMPETITION_DEPARTMENT_CHECK_ELIGIBILITY = '/api/competition-departments/check-eligibility';
+
+    // Beauty Registration
+    const BEAUTY_REGISTRATION_LIST = '/api/beauty-registrations';
+    const BEAUTY_REGISTRATION_STORE = '/api/beauty-registrations/store';
+    const BEAUTY_REGISTRATION_DETAIL = '/api/beauty-registrations/detail/{id}';
+    const BEAUTY_REGISTRATION_UPDATE = '/api/beauty-registrations/update/{id}';
+    const BEAUTY_REGISTRATION_DESTROY = '/api/beauty-registrations/destroy/{id}';
+
+    // Beauty Round
+    const BEAUTY_ROUND_LIST = '/api/beauty-rounds';
+    const BEAUTY_ROUND_STORE = '/api/beauty-rounds/store';
+    const BEAUTY_ROUND_DETAIL = '/api/beauty-rounds/detail/{id}';
+    const BEAUTY_ROUND_UPDATE = '/api/beauty-rounds/update/{id}';
+    const BEAUTY_ROUND_DESTROY = '/api/beauty-rounds/destroy/{id}';
+
+    // Beauty Round Result
+    const BEAUTY_ROUND_RESULT_LIST = '/api/beauty-round-results';
+    const BEAUTY_ROUND_RESULT_STORE = '/api/beauty-round-results/store';
+    const BEAUTY_ROUND_RESULT_DETAIL = '/api/beauty-round-results/detail/{id}';
+    const BEAUTY_ROUND_RESULT_UPDATE = '/api/beauty-round-results/update/{id}';
+    const BEAUTY_ROUND_RESULT_DESTROY = '/api/beauty-round-results/destroy/{id}';
+
+    // Beauty Score
+    const BEAUTY_SCORE_LIST = '/api/beauty-scores';
+    const BEAUTY_SCORE_STORE = '/api/beauty-scores/store';
+    const BEAUTY_SCORE_DETAIL = '/api/beauty-scores/detail/{id}';
+    const BEAUTY_SCORE_UPDATE = '/api/beauty-scores/update/{id}';
+    const BEAUTY_SCORE_DESTROY = '/api/beauty-scores/destroy/{id}';
+
+    // Meal
+    const MEAL_LIST = '/api/meals';
+    const MEAL_STORE = '/api/meals/store';
+    const MEAL_DETAIL = '/api/meals/detail/{id}';
+    const MEAL_UPDATE = '/api/meals/update/{id}';
+    const MEAL_DESTROY = '/api/meals/destroy/{id}';
+
+    // Meal Table
+    const MEAL_TABLE_LIST = '/api/meal-tables';
+    const MEAL_TABLE_STORE = '/api/meal-tables/store';
+    const MEAL_TABLE_DETAIL = '/api/meal-tables/detail/{id}';
+    const MEAL_TABLE_UPDATE = '/api/meal-tables/update/{id}';
+    const MEAL_TABLE_DESTROY = '/api/meal-tables/destroy/{id}';
+
+    // Meal Attendee
+    const MEAL_ATTENDEE_LIST = '/api/meal-attendees';
+    const MEAL_ATTENDEE_STORE = '/api/meal-attendees/store';
+    const MEAL_ATTENDEE_DETAIL = '/api/meal-attendees/detail/{id}';
+    const MEAL_ATTENDEE_UPDATE = '/api/meal-attendees/update/{id}';
+    const MEAL_ATTENDEE_DESTROY = '/api/meal-attendees/destroy/{id}';
+
+    // Meal Checkin
+    const MEAL_CHECKIN_LIST = '/api/meal-checkins';
+    const MEAL_CHECKIN_STORE = '/api/meal-checkins/store';
+    const MEAL_CHECKIN_DETAIL = '/api/meal-checkins/detail/{id}';
+    const MEAL_CHECKIN_UPDATE = '/api/meal-checkins/update/{id}';
+    const MEAL_CHECKIN_DESTROY = '/api/meal-checkins/destroy/{id}';
+
+    // Meal Cutoff
+    const MEAL_CUTOFF_LIST = '/api/meal-cutoffs';
+    const MEAL_CUTOFF_STORE = '/api/meal-cutoffs/store';
+    const MEAL_CUTOFF_DETAIL = '/api/meal-cutoffs/detail/{id}';
+    const MEAL_CUTOFF_UPDATE = '/api/meal-cutoffs/update/{id}';
+    const MEAL_CUTOFF_DESTROY = '/api/meal-cutoffs/destroy/{id}';
+
+    // Alliance
+    const ALLIANCE_LIST = '/api/alliances';
+    const ALLIANCE_STORE = '/api/alliances/store';
+    const ALLIANCE_DETAIL = '/api/alliances/detail/{id}';
+    const ALLIANCE_UPDATE = '/api/alliances/update/{id}';
+    const ALLIANCE_DESTROY = '/api/alliances/destroy/{id}';
+
+    // Attendee Role
+    const ATTENDEE_ROLE_LIST = '/api/attendee-roles';
+    const ATTENDEE_ROLE_STORE = '/api/attendee-roles/store';
+    const ATTENDEE_ROLE_DETAIL = '/api/attendee-roles/detail/{id}';
+    const ATTENDEE_ROLE_UPDATE = '/api/attendee-roles/update/{id}';
+    const ATTENDEE_ROLE_DESTROY = '/api/attendee-roles/destroy/{id}';
+
+    // Badge
+    const BADGE_LIST = '/api/badges';
+    const BADGE_STORE = '/api/badges/store';
+    const BADGE_DETAIL = '/api/badges/detail/{id}';
+    const BADGE_UPDATE = '/api/badges/update/{id}';
+    const BADGE_DESTROY = '/api/badges/destroy/{id}';
+
+    // Sport Match
+    const SPORT_MATCH_LIST = '/api/sport-matches';
+    const SPORT_MATCH_STORE = '/api/sport-matches/store';
+    const SPORT_MATCH_DETAIL = '/api/sport-matches/detail/{id}';
+    const SPORT_MATCH_UPDATE = '/api/sport-matches/update/{id}';
+    const SPORT_MATCH_DESTROY = '/api/sport-matches/destroy/{id}';
+
+    // Sport Match Result
+    const SPORT_MATCH_RESULT_LIST = '/api/sport-match-results';
+    const SPORT_MATCH_RESULT_STORE = '/api/sport-match-results/store';
+    const SPORT_MATCH_RESULT_DETAIL = '/api/sport-match-results/detail/{id}';
+    const SPORT_MATCH_RESULT_UPDATE = '/api/sport-match-results/update/{id}';
+    const SPORT_MATCH_RESULT_DESTROY = '/api/sport-match-results/destroy/{id}';
+
+    // Sport Stage
+    const SPORT_STAGE_LIST = '/api/sport-stages';
+    const SPORT_STAGE_STORE = '/api/sport-stages/store';
+    const SPORT_STAGE_DETAIL = '/api/sport-stages/detail/{id}';
+    const SPORT_STAGE_UPDATE = '/api/sport-stages/update/{id}';
+    const SPORT_STAGE_DESTROY = '/api/sport-stages/destroy/{id}';
+
+    // Sport Stage Team
+    const SPORT_STAGE_TEAM_LIST = '/api/sport-stage-teams';
+    const SPORT_STAGE_TEAM_STORE = '/api/sport-stage-teams/store';
+    const SPORT_STAGE_TEAM_DETAIL = '/api/sport-stage-teams/detail/{id}';
+    const SPORT_STAGE_TEAM_UPDATE = '/api/sport-stage-teams/update/{id}';
+    const SPORT_STAGE_TEAM_DESTROY = '/api/sport-stage-teams/destroy/{id}';
+
+    // Alliance Team Orgs
+    const ALLIANCE_TEAM_ORG_LIST = '/api/alliance-team-orgs';
+    const ALLIANCE_TEAM_ORG_STORE = '/api/alliance-team-orgs/store';
+    const ALLIANCE_TEAM_ORG_DETAIL = '/api/alliance-team-orgs/detail/{id}';
+    const ALLIANCE_TEAM_ORG_UPDATE = '/api/alliance-team-orgs/update/{id}';
+    const ALLIANCE_TEAM_ORG_DESTROY = '/api/alliance-team-orgs/destroy/{id}';
+
+    // Event Sport Alliance Configs
+    const EVENT_SPORT_ALLIANCE_CONFIG_LIST = '/api/event-sport-alliance-configs';
+    const EVENT_SPORT_ALLIANCE_CONFIG_STORE = '/api/event-sport-alliance-configs/store';
+    const EVENT_SPORT_ALLIANCE_CONFIG_DETAIL = '/api/event-sport-alliance-configs/detail/{id}';
+    const EVENT_SPORT_ALLIANCE_CONFIG_UPDATE = '/api/event-sport-alliance-configs/update/{id}';
+    const EVENT_SPORT_ALLIANCE_CONFIG_DESTROY = '/api/event-sport-alliance-configs/destroy/{id}';
+
+    // Talent Score
+    const TALENT_SCORE_LIST = '/api/talent-scores';
+    const TALENT_SCORE_STORE = '/api/talent-scores/store';
+    const TALENT_SCORE_DETAIL = '/api/talent-scores/detail/{id}';
+    const TALENT_SCORE_UPDATE = '/api/talent-scores/update/{id}';
+    const TALENT_SCORE_DESTROY = '/api/talent-scores/destroy/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
