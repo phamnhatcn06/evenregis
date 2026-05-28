@@ -792,6 +792,7 @@ $missHasAlliance = ($missPendingCount > 0 || $missHistoryCount > 0);
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div><!-- end table-responsive -->
             <?php endforeach; ?>
         <?php endif; ?>
             </div><!-- end main col -->
