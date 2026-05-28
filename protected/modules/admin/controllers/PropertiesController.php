@@ -93,7 +93,7 @@ class PropertiesController extends AdminController
 		$excludeRegionalId = isset($_GET['exclude_regional_id']) ? (int)$_GET['exclude_regional_id'] : null;
 		if ($excludeRegionalId !== null) {
 			$data = array_filter($data, function($item) use ($excludeRegionalId) {
-				$regionId = isset($item['region_id']) ? (int)$item['region_id'] : null;
+				$regionId = isset($item->region_id) ? (int)$item->region_id : null;
 				return $regionId === null || $regionId === 0 || $regionId === $excludeRegionalId;
 			});
 			$data = array_values($data);
