@@ -1103,6 +1103,48 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         });
     }
 
+    function confirmDeleteDocument(index) {
+        Swal.fire({
+            title: "Xác nhận xóa",
+            text: "Bạn có chắc muốn xóa tệp đính kèm này?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Xóa",
+            cancelButtonText: "Hủy"
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById("delete_document_index").value = index;
+                document.getElementById("deleteDocumentForm").submit();
+            }
+        });
+    }
+
+    document.getElementById("upload_documents").addEventListener("change", function(e) {
+        var preview = document.getElementById("upload_preview");
+        preview.innerHTML = "";
+        var files = e.target.files;
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var col = document.createElement("div");
+            col.className = "col-4";
+            var isImage = file.type.startsWith("image/");
+            if (isImage) {
+                var reader = new FileReader();
+                reader.onload = (function(col) {
+                    return function(e) {
+                        col.innerHTML = "<div class=\"border rounded p-1 text-center\"><img src=\"" + e.target.result + "\" class=\"img-fluid\" style=\"max-height:60px;\"></div>";
+                    };
+                })(col);
+                reader.readAsDataURL(file);
+            } else {
+                col.innerHTML = "<div class=\"border rounded p-2 text-center\"><i class=\"fa fa-file-o\"></i><br><small class=\"text-truncate d-block\">" + file.name + "</small></div>";
+            }
+            preview.appendChild(col);
+        }
+    });
+
     function initAttendeesDataTable() {
         if (typeof $.fn.DataTable === "undefined") return;
         var table = $("#attendees-table").DataTable({
