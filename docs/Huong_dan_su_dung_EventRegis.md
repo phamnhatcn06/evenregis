@@ -38,7 +38,7 @@ Cơ chế **Liên quân theo nội dung** cho phép các đơn vị ghép nhân 
 Trước khi tiến hành đăng ký môn thi hay ghép đội, đơn vị bắt buộc phải điền đầy đủ danh sách đại biểu tham gia để phục vụ việc in thẻ và thẩm định hồ sơ:
 1. Vào phân hệ **Danh sách Đại biểu** -> Click nút **Thêm người tham dự**.
 2. **Chọn nguồn dữ liệu**:
-   - *Chọn từ danh sách nhân viên*: Nhập tên tìm kiếm nhân viên được đồng bộ từ hệ thống dữ liệu SMILE. Hệ thống sẽ tự động điền các thông tin: Họ tên, Chức vụ hiện tại, Phòng ban.
+   - *Chọn từ danh sách nhân viên*: Nhập tên tìm kiếm nhân viên được đồng bộ từ hệ thống dữ liệu SMILE. Hệ thống sẽ tự động điền các thông tin: Họ tên, Chức vụ hiện tại, Phòng ban. **Lưu ý quy định nghiệp vụ đặc biệt: Hệ thống chỉ hiển thị và cho phép đăng ký những nhân viên có ngày gia nhập đơn vị trước ngày 01/06/2026. Những nhân viên có ngày gia nhập từ ngày 01/06/2026 trở đi sẽ bị hệ thống tự động ẩn để đảm bảo tính công bằng chuyên môn.** Nếu nhân viên thỏa mãn điều kiện thời gian nhưng chưa có trên SMILE, tích chọn 'Tự điền thông tin'.
    - *Tự điền thông tin*: Tích chọn ô này nếu nhân sự chưa có trên hệ thống SMILE để nhập thủ công các trường Họ tên, Chức danh hiển thị trên thẻ.
 3. **Tải lên tài liệu đính kèm bắt buộc (4 file)**:
    - **Ảnh CCCD Mặt trước**: Định dạng JPG/PNG, dung lượng < 5MB.

@@ -247,7 +247,7 @@ def generate_docx():
     add_heading_styled(doc, "Bước 2.2: Nhập danh sách Đại biểu & Upload giấy tờ bắt buộc", level=2)
     add_paragraph_styled(doc, "Trước khi đăng ký thể thao và thi nghiệp vụ, đơn vị phải tạo danh sách Đại biểu tham gia sự kiện. Để thực hiện, chọn menu 'Danh sách Đại biểu' -> Click 'Thêm người tham dự' và tiến hành các thao tác:")
     
-    add_bullet_item(doc, "Chọn từ Danh sách Nhân viên: ", "Hệ thống hỗ trợ đồng bộ danh sách nhân viên từ hệ thống SMILE. Người dùng chỉ cần gõ tìm kiếm, hệ thống sẽ tự động điền các thông tin cơ bản: Họ tên, Chức danh, Phòng ban. Trường hợp nhân viên mới chưa có trên SMILE, người dùng tick chọn 'Tự nhập thủ công' để tự điền.")
+    add_bullet_item(doc, "Chọn từ Danh sách Nhân viên: ", "Hệ thống hỗ trợ đồng bộ danh sách nhân viên từ hệ thống SMILE. Người dùng chỉ cần gõ tìm kiếm, hệ thống sẽ tự động điền các thông tin cơ bản: Họ tên, Chức danh, Phòng ban. Lưu ý quy định nghiệp vụ đặc biệt: Hệ thống chỉ hiển thị và cho phép đăng ký những nhân viên có ngày gia nhập đơn vị trước ngày 01/06/2026. Những nhân viên có ngày gia nhập từ ngày 01/06/2026 trở đi sẽ bị hệ thống tự động ẩn để đảm bảo tính công bằng. Trường hợp nhân viên chưa có trên SMILE nhưng thỏa mãn điều kiện thời gian gia nhập, người dùng tích chọn 'Tự điền thông tin' để tự nhập.")
     add_bullet_item(doc, "Tải lên 4 Giấy tờ bắt buộc: ", "Đối với mỗi đại biểu, bắt buộc phải cung cấp đủ hồ sơ pháp lý:")
     doc.add_paragraph("- Ảnh mặt trước CCCD (định dạng JPG/PNG, dung lượng tối đa 5MB).", style='List Bullet')
     doc.add_paragraph("- Ảnh mặt sau CCCD (định dạng JPG/PNG, dung lượng tối đa 5MB).", style='List Bullet')
