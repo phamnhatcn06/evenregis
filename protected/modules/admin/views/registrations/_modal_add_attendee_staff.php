@@ -27,7 +27,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Ngày đi</label>
-                            <input type="text" class="form-control datepicker" name="check_out_date" id="staff_check_out_date" placeholder="dd/mm/yyyy" autocomplete="off">
+                            <input type="text" class="form-control datepicker" name="check_out_date" id="staff_check_out_date" placeholder="-- Chọn ngày đến trước --" autocomplete="off" disabled>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Phương tiện</label>
