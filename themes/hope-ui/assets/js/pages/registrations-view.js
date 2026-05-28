@@ -2653,29 +2653,43 @@ var RegistrationView = (function() {
             var docs = JSON.parse(docsStr);
             var html = '';
             
-            if (docs.portrait) {
-                html += '<div class="mb-4 text-center"><h6>Ảnh chân dung</h6>';
-                html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 180px; height: 180px; object-fit: cover;"></div>';
-            }
-            if (docs.cccd_front || docs.cccd_back) {
-                html += '<div class="mb-4"><h6 class="text-center">Ảnh CCCD</h6><div class="row justify-content-center">';
+            // Hàng 1: Ảnh chân dung + CCCD
+            if (docs.portrait || docs.cccd_front || docs.cccd_back) {
+                html += '<div class="row mb-4">';
+                // Cột 1: Ảnh chân dung
+                html += '<div class="col-md-5 text-center">';
+                html += '<h6>Ảnh chân dung</h6>';
+                if (docs.portrait) {
+                    html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 400px; height: 400px; object-fit: cover; max-width: 100%;">';
+                } else {
+                    html += '<div class="border rounded d-flex align-items-center justify-content-center text-muted" style="width: 400px; height: 400px; max-width: 100%;"><i class="fa fa-user fa-3x"></i></div>';
+                }
+                html += '</div>';
+                // Cột 2: CCCD xếp dọc
+                html += '<div class="col-md-7">';
+                html += '<h6 class="text-center">Ảnh CCCD</h6>';
                 if (docs.cccd_front) {
-                    html += '<div class="col-md-6 text-center mb-3"><small class="text-muted d-block mb-2">Mặt trước</small>';
+                    html += '<div class="text-center mb-3"><small class="text-muted d-block mb-2">Mặt trước</small>';
                     html += '<img src="' + escapeHtml(docs.cccd_front) + '" class="img-fluid rounded" style="max-width: 100%; aspect-ratio: 856/540; object-fit: cover;"></div>';
                 }
                 if (docs.cccd_back) {
-                    html += '<div class="col-md-6 text-center mb-3"><small class="text-muted d-block mb-2">Mặt sau</small>';
+                    html += '<div class="text-center"><small class="text-muted d-block mb-2">Mặt sau</small>';
                     html += '<img src="' + escapeHtml(docs.cccd_back) + '" class="img-fluid rounded" style="max-width: 100%; aspect-ratio: 856/540; object-fit: cover;"></div>';
                 }
-                html += '</div></div>';
+                if (!docs.cccd_front && !docs.cccd_back) {
+                    html += '<div class="text-center text-muted"><i class="fa fa-id-card-o fa-3x"></i><p class="mt-2">Chưa có ảnh CCCD</p></div>';
+                }
+                html += '</div>';
+                html += '</div>';
             }
+            // Hàng 2: Hợp đồng
             if (docs.contract) {
-                html += '<div class="mb-4 text-center"><h6>Hợp đồng lao động</h6>';
+                html += '<div class="mb-4"><h6 class="text-center">Hợp đồng lao động</h6>';
                 var isPdf = docs.contract.toLowerCase().indexOf('.pdf') > -1;
                 if (isPdf) {
-                    html += '<iframe src="' + escapeHtml(docs.contract) + '" style="width:100%; height:700px;" frameborder="0"></iframe>';
+                    html += '<iframe src="' + escapeHtml(docs.contract) + '" style="width:100%; height:600px;" frameborder="0"></iframe>';
                 } else {
-                    html += '<img src="' + escapeHtml(docs.contract) + '" class="img-fluid rounded" style="max-height: 700px;">';
+                    html += '<div class="text-center"><img src="' + escapeHtml(docs.contract) + '" class="img-fluid rounded" style="max-height: 600px;"></div>';
                 }
                 html += '</div>';
             }
