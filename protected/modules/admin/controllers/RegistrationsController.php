@@ -336,6 +336,54 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		// Load alliance history (all requests related to this property)
+		$allianceHistory = array();
+		if ($model->event_id && $model->property_id) {
+			// Requests sent by this property
+			$sentRequests = AllianceRequests::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'requester_org_id' => $model->property_id,
+			), 50)->getData();
+			foreach ($sentRequests as $req) {
+				$targetName = isset($req->target_org_name) ? $req->target_org_name : '';
+				if (empty($targetName) && $req->target_org_id) {
+					$prop = Properties::fetchFromApi($req->target_org_id);
+					$targetName = $prop ? $prop->name : '';
+				}
+				$allianceHistory[] = array(
+					'request' => $req,
+					'type' => 'sent',
+					'partner_name' => $targetName,
+					'content_name' => isset($req->content_name) ? $req->content_name : '',
+				);
+			}
+			// Requests received by this property (exclude pending - already shown in incomingRequestsData)
+			$receivedRequests = AllianceRequests::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'target_org_id' => $model->property_id,
+			), 50)->getData();
+			foreach ($receivedRequests as $req) {
+				if ($req->status == AllianceRequests::STATUS_PENDING) continue;
+				$requesterName = isset($req->requester_org_name) ? $req->requester_org_name : '';
+				if (empty($requesterName) && $req->requester_org_id) {
+					$prop = Properties::fetchFromApi($req->requester_org_id);
+					$requesterName = $prop ? $prop->name : '';
+				}
+				$allianceHistory[] = array(
+					'request' => $req,
+					'type' => 'received',
+					'partner_name' => $requesterName,
+					'content_name' => isset($req->content_name) ? $req->content_name : '',
+				);
+			}
+			// Sort by requested_at desc
+			usort($allianceHistory, function($a, $b) {
+				$aTime = isset($a['request']->requested_at) ? strtotime($a['request']->requested_at) : 0;
+				$bTime = isset($b['request']->requested_at) ? strtotime($b['request']->requested_at) : 0;
+				return $bTime - $aTime;
+			});
+		}
+
 		$this->render('view', array(
 			'model' => $model,
 			'registrationDetails' => $registrationDetails,
@@ -347,6 +395,7 @@ class RegistrationsController extends AdminController
 			'talentEntries' => $talentEntries,
 			'talentEntryMembers' => $talentEntryMembers,
 			'incomingRequestsData' => $incomingRequestsData,
+			'allianceHistory' => $allianceHistory,
 		));
 	}
 
