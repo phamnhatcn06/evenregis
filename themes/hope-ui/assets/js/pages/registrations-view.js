@@ -34,6 +34,7 @@ var RegistrationView = (function() {
         registeredSports = config.registeredSports || [];
         registeredCompetitions = config.registeredCompetitions || [];
         existingStaffIds = config.existingStaffIds || [];
+        canEdit = config.canEdit || false;
 
         if (eventId) {
             loadContentsData();
