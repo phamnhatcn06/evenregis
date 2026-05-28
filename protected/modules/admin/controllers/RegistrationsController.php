@@ -133,6 +133,40 @@ class RegistrationsController extends AdminController
 			);
 		}
 
+		// Load incoming pending alliance requests if any
+		$incomingRequestsData = array();
+		if ($model->event_id && $model->property_id) {
+			$incomingAllianceRequests = AllianceRequests::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'target_org_id' => $model->property_id,
+				'status' => AllianceRequests::STATUS_PENDING,
+			), 100)->getData();
+
+			foreach ($incomingAllianceRequests as $req) {
+				$requesterRegId = null;
+				$requesterRegs = Registrations::getApiDataProvider(array(
+					'event_id' => $model->event_id,
+					'property_id' => $req->requester_org_id,
+				), 1)->getData();
+				if (!empty($requesterRegs)) {
+					$requesterRegsList = $requesterRegs;
+					$requesterRegId = isset($requesterRegsList[0]['id']) ? $requesterRegsList[0]['id'] : (isset($requesterRegsList[0]->id) ? $requesterRegsList[0]->id : null);
+				}
+
+				$requesterName = $req->requester_org_name;
+				if (empty($requesterName)) {
+					$prop = Properties::fetchFromApi($req->requester_org_id);
+					$requesterName = $prop ? $prop->name : 'Đơn vị khác';
+				}
+
+				$incomingRequestsData[] = array(
+					'request' => $req,
+					'requester_registration_id' => $requesterRegId,
+					'requester_name' => $requesterName,
+				);
+			}
+		}
+
 		// Load Beauty Contestants (Miss) cho registration
 		$beautyContestants = array();
 		if ($model->event_id) {
@@ -265,6 +299,7 @@ class RegistrationsController extends AdminController
 			'beautyContestants' => $beautyContestants,
 			'talentEntries' => $talentEntries,
 			'talentEntryMembers' => $talentEntryMembers,
+			'incomingRequestsData' => $incomingRequestsData,
 		));
 	}
 
@@ -527,6 +562,62 @@ class RegistrationsController extends AdminController
 				Yii::app()->user->setFlash('error', 'Không thể từ chối.');
 			}
 			$this->redirect(array('view', 'id' => $id));
+		}
+	}
+
+	public function actionApproveAlliance($request_id, $registration_id)
+	{
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$this->checkRegistrationAccess($registration_id);
+			$model = AllianceRequests::fetchFromApi($request_id);
+			if ($model) {
+				$ssoUser = AuthHandler::getUser();
+				$model->status = AllianceRequests::STATUS_APPROVED;
+				$model->reviewed_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+				$model->reviewed_at = date('Y-m-d H:i:s');
+
+				$result = $model->updateViaApi();
+
+				if ($result['success']) {
+					$regModel = $this->loadModelById($registration_id);
+					if ($regModel && !$regModel->relation_property_id) {
+						$regModel->relation_property_id = $model->requester_org_id;
+						$regModel->updateViaApi();
+					}
+					Yii::app()->user->setFlash('success', 'Đã chấp nhận yêu cầu liên quân.');
+				} else {
+					Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể chấp nhận yêu cầu.');
+				}
+			} else {
+				Yii::app()->user->setFlash('error', 'Không tìm thấy yêu cầu liên quân.');
+			}
+			$this->redirect(array('view', 'id' => $registration_id));
+		}
+	}
+
+	public function actionRejectAlliance($request_id, $registration_id)
+	{
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$this->checkRegistrationAccess($registration_id);
+			$model = AllianceRequests::fetchFromApi($request_id);
+			if ($model) {
+				$ssoUser = AuthHandler::getUser();
+				$model->status = AllianceRequests::STATUS_REJECTED;
+				$model->reviewed_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+				$model->reviewed_at = date('Y-m-d H:i:s');
+				$model->rejection_reason = Yii::app()->getRequest()->getPost('rejection_reason', '');
+
+				$result = $model->updateViaApi();
+
+				if ($result['success']) {
+					Yii::app()->user->setFlash('success', 'Đã từ chối yêu cầu liên quân.');
+				} else {
+					Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể từ chối yêu cầu.');
+				}
+			} else {
+				Yii::app()->user->setFlash('error', 'Không tìm thấy yêu cầu liên quân.');
+			}
+			$this->redirect(array('view', 'id' => $registration_id));
 		}
 	}
 

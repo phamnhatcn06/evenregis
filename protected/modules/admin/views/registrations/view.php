@@ -72,6 +72,41 @@ if (!empty($model->document)) {
 
 ?>
 
+<?php if (!empty($incomingRequestsData)): ?>
+    <?php foreach ($incomingRequestsData as $item): 
+        $req = $item['request'];
+        $reqId = $req->id;
+        $requesterName = $item['requester_name'];
+        $requesterRegId = $item['requester_registration_id'];
+    ?>
+        <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3 p-3 rounded shadow-sm border-start border-4 border-warning">
+            <div class="d-flex align-items-center">
+                <i class="fa fa-handshake-o fa-2x text-warning me-3"></i>
+                <div>
+                    <h6 class="alert-heading mb-1 text-dark fw-bold">Yêu cầu liên quân từ đối tác</h6>
+                    <span>Đơn vị <strong><?php echo CHtml::encode($requesterName); ?></strong> muốn gửi yêu cầu liên quân với bạn cho sự kiện này.</span>
+                    <?php if ($requesterRegId): ?>
+                        <span class="ms-1">(Xem phiếu đăng ký liên quan: <a href="<?php echo $this->createUrl('view', array('id' => $requesterRegId)); ?>" class="alert-link text-decoration-underline text-primary">view?id=<?php echo $requesterRegId; ?></a>)</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="d-flex align-items-center ms-3">
+                <form method="post" action="<?php echo $this->createUrl('approveAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:inline;" class="me-2" onsubmit="return confirm('Bạn có chắc chắn muốn chấp nhận yêu cầu liên quân này?');">
+                    <button type="submit" class="btn btn-sm btn-success text-white px-3 fw-bold">
+                        <i class="fa fa-check me-1"></i>Chấp nhận
+                    </button>
+                </form>
+                <button type="button" class="btn btn-sm btn-outline-danger px-3 fw-bold bg-white" onclick="confirmRejectAlliance(<?php echo $reqId; ?>)">
+                    <i class="fa fa-times me-1"></i>Từ chối
+                </button>
+                <form id="reject-alliance-form-<?php echo $reqId; ?>" method="post" action="<?php echo $this->createUrl('rejectAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:none;">
+                    <input type="hidden" name="rejection_reason" id="rejection_reason_<?php echo $reqId; ?>">
+                </form>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+
 <div class="row mb-3">
     <!-- Thông tin chung -->
     <div class="col-md-6">
@@ -875,6 +910,30 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
     function removeAllianceProperty(id) { RegistrationView.removeAllianceProperty(id); }
     function confirmDeleteTeam(id) { RegistrationView.confirmDeleteTeam(id); }
+    function confirmRejectAlliance(id) {
+        Swal.fire({
+            title: "Từ chối liên quân",
+            text: "Vui lòng nhập lý do từ chối yêu cầu liên quân:",
+            input: "text",
+            inputPlaceholder: "Nhập lý do từ chối...",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Từ chối",
+            cancelButtonText: "Hủy",
+            inputValidator: (value) => {
+                if (!value) {
+                    return "Bạn cần nhập lý do từ chối!";
+                }
+            }
+        }).then(function(result) {
+            if (result.isConfirmed && result.value) {
+                document.getElementById("rejection_reason_" + id).value = result.value;
+                document.getElementById("reject-alliance-form-" + id).submit();
+            }
+        });
+    }
     function confirmDeleteTalent(id) {
         Swal.fire({
             title: "Xác nhận xóa",
