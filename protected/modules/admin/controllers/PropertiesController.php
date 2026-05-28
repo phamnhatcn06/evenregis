@@ -90,6 +90,15 @@ class PropertiesController extends AdminController
 		$dataProvider = Properties::getApiDataProvider(array('status' => 1), 500);
 		$data = $dataProvider->getData();
 
+		$excludeRegionalId = isset($_GET['exclude_regional_id']) ? (int)$_GET['exclude_regional_id'] : null;
+		if ($excludeRegionalId !== null) {
+			$data = array_filter($data, function($item) use ($excludeRegionalId) {
+				$regionId = isset($item['region_id']) ? (int)$item['region_id'] : null;
+				return $regionId === null || $regionId === 0 || $regionId === $excludeRegionalId;
+			});
+			$data = array_values($data);
+		}
+
 		header('Content-Type: application/json');
 		echo CJSON::encode(array(
 			'success' => true,
