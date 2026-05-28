@@ -1072,7 +1072,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         var btn = document.getElementById("btn_submit_edit_talent");
         var originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+        btn.innerHTML = "<i class=\"fa fa-spinner fa-spin me-1\"></i>Đang lưu...";
 
         var formData = new FormData(form);
         fetch("/admin/registrations/updateTalentEntry", {
