@@ -2036,6 +2036,18 @@ class RegistrationsController extends AdminController
 
 		$result = $attendee->storeViaApi();
 
+		// AJAX request - trả về JSON
+		if (Yii::app()->request->isAjaxRequest) {
+			header('Content-Type: application/json');
+			if ($result['success']) {
+				echo CJSON::encode(array('success' => true, 'message' => 'Đã thêm người tham dự thành công.'));
+			} else {
+				echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể thêm người tham dự.'));
+			}
+			Yii::app()->end();
+		}
+
+		// Normal request - redirect
 		if ($result['success']) {
 			Yii::app()->user->setFlash('success', 'Đã thêm người tham dự thành công.');
 		} else {
