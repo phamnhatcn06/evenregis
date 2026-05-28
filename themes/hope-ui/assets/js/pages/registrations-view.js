@@ -1994,11 +1994,6 @@ var RegistrationView = (function() {
                 console.log('Final checkInValue:', checkInValue);
                 console.log('Final checkOutValue:', checkOutValue);
 
-                if (!checkInValue || !checkOutValue) {
-                    Toast.error('Vui lòng chọn ngày đến và ngày đi.');
-                    return false;
-                }
-
                 var btn = document.getElementById('btn_submit_attendees_staff');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang thêm...';
