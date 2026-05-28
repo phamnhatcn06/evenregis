@@ -546,6 +546,7 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
         <?php if (empty($sportTeams)): ?>
             <p class="text-muted mb-0" id="no_sport_msg">Chưa đăng ký môn thể thao nào.</p>
         <?php else: ?>
+            <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-0">
                 <thead class="table-light">
                     <tr>
