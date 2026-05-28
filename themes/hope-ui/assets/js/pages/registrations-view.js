@@ -2400,6 +2400,35 @@ var RegistrationView = (function() {
             .then(function(data) {
                 if (data.success && data.data) {
                     var att = data.data;
+                    var hasStaffId = att.staff_id && att.staff_id !== '' && att.staff_id !== '0' && att.staff_id !== 0;
+
+                    // Lưu staff_id
+                    document.getElementById('edit_staff_id').value = att.staff_id || '';
+
+                    // Toggle readonly dựa vào staff_id
+                    var fullNameEl = document.getElementById('edit_full_name');
+                    var positionEl = document.getElementById('edit_position');
+                    var departmentEl = document.getElementById('edit_department');
+                    var noticeEl = document.getElementById('edit_staff_notice');
+
+                    if (hasStaffId) {
+                        fullNameEl.readOnly = true;
+                        fullNameEl.classList.add('bg-light');
+                        positionEl.readOnly = true;
+                        positionEl.classList.add('bg-light');
+                        departmentEl.readOnly = true;
+                        departmentEl.classList.add('bg-light');
+                        noticeEl.classList.remove('d-none');
+                    } else {
+                        fullNameEl.readOnly = false;
+                        fullNameEl.classList.remove('bg-light');
+                        positionEl.readOnly = false;
+                        positionEl.classList.remove('bg-light');
+                        departmentEl.readOnly = false;
+                        departmentEl.classList.remove('bg-light');
+                        noticeEl.classList.add('d-none');
+                    }
+
                     document.getElementById('edit_full_name').value = att.full_name || '';
                     document.getElementById('edit_position').value = att.position || '';
                     document.getElementById('edit_department').value = att.department_name || '';
