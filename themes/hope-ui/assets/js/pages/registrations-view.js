@@ -1922,10 +1922,10 @@ var RegistrationView = (function() {
                     allowInput: true,
                     clickOpens: false
                 });
-                checkOutEl.disabled = true;
-                if (checkOutEl.nextElementSibling && checkOutEl.nextElementSibling.classList.contains('flatpickr-input')) {
-                    checkOutEl.nextElementSibling.disabled = true;
-                    checkOutEl.nextElementSibling.placeholder = '-- Chọn ngày đến trước --';
+                // Disable altInput
+                if (checkOutPicker.altInput) {
+                    checkOutPicker.altInput.disabled = true;
+                    checkOutPicker.altInput.placeholder = '-- Chọn ngày đến trước --';
                 }
 
                 // Init check_in_date with onChange handler
@@ -1936,10 +1936,10 @@ var RegistrationView = (function() {
                     allowInput: true,
                     onChange: function(selectedDates) {
                         if (selectedDates.length > 0) {
-                            checkOutEl.disabled = false;
-                            if (checkOutEl.nextElementSibling && checkOutEl.nextElementSibling.classList.contains('flatpickr-input')) {
-                                checkOutEl.nextElementSibling.disabled = false;
-                                checkOutEl.nextElementSibling.placeholder = 'dd/mm/yyyy';
+                            // Enable check_out
+                            if (checkOutPicker.altInput) {
+                                checkOutPicker.altInput.disabled = false;
+                                checkOutPicker.altInput.placeholder = 'dd/mm/yyyy';
                             }
                             checkOutPicker.set('minDate', selectedDates[0]);
                             checkOutPicker.set('clickOpens', true);
@@ -1948,10 +1948,10 @@ var RegistrationView = (function() {
                                 checkOutPicker.clear();
                             }
                         } else {
-                            checkOutEl.disabled = true;
-                            if (checkOutEl.nextElementSibling && checkOutEl.nextElementSibling.classList.contains('flatpickr-input')) {
-                                checkOutEl.nextElementSibling.disabled = true;
-                                checkOutEl.nextElementSibling.placeholder = '-- Chọn ngày đến trước --';
+                            // Disable check_out
+                            if (checkOutPicker.altInput) {
+                                checkOutPicker.altInput.disabled = true;
+                                checkOutPicker.altInput.placeholder = '-- Chọn ngày đến trước --';
                             }
                             checkOutPicker.clear();
                             checkOutPicker.set('clickOpens', false);
