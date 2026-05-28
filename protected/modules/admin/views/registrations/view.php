@@ -886,6 +886,7 @@ $jsConfig = array(
     'registeredSports' => $sportIds,
     'registeredCompetitions' => $competitionIds,
     'existingStaffIds' => $existingStaffIds,
+    'canEdit' => $canEdit,
 );
 
 // Flatpickr Vietnamese locale
