@@ -2038,16 +2038,6 @@ var RegistrationView = (function() {
                 console.log('Final checkInValue:', checkInValue);
                 console.log('Final checkOutValue:', checkOutValue);
 
-                // Validate: ngày đến <= ngày đi
-                if (checkInValue && checkOutValue) {
-                    var checkInDate = new Date(checkInValue);
-                    var checkOutDate = new Date(checkOutValue);
-                    if (checkInDate > checkOutDate) {
-                        Toast.error('Ngày đến phải nhỏ hơn hoặc bằng ngày đi.');
-                        return false;
-                    }
-                }
-
                 var btn = document.getElementById('btn_submit_attendees_staff');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang thêm...';
