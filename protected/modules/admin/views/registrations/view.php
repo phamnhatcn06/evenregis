@@ -697,11 +697,17 @@ $competitionHasAlliance = ($competitionPendingCount > 0 || $competitionHistoryCo
                 </tbody>
             </table>
         <?php endif; ?>
+            </div><!-- end main col -->
+        </div><!-- end row -->
     </div>
 </div>
 
 <!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
-<?php $missPendingCount = count($allianceByContent['miss']['pending']); ?>
+<?php
+$missPendingCount = count($allianceByContent['miss']['pending']);
+$missHistoryCount = count($allianceByContent['miss']['history']);
+$missHasAlliance = ($missPendingCount > 0 || $missHistoryCount > 0);
+?>
 <div class="card mb-3" id="miss-registration-card">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
@@ -717,12 +723,18 @@ $competitionHasAlliance = ($competitionPendingCount > 0 || $competitionHistoryCo
         <?php endif; ?>
     </div>
     <div class="card-body">
-        <?php $this->renderPartial('_alliance_section', array(
-            'pendingRequests' => $allianceByContent['miss']['pending'],
-            'historyItems' => $allianceByContent['miss']['history'],
-            'contentCode' => 'miss',
-            'model' => $model,
-        )); ?>
+        <div class="row">
+            <?php if ($missHasAlliance): ?>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <?php $this->renderPartial('_alliance_sidebar', array(
+                    'pendingRequests' => $allianceByContent['miss']['pending'],
+                    'historyItems' => $allianceByContent['miss']['history'],
+                    'contentCode' => 'miss',
+                    'model' => $model,
+                )); ?>
+            </div>
+            <?php endif; ?>
+            <div class="<?php echo $missHasAlliance ? 'col-md-9' : 'col-12'; ?>">
 
         <?php if (empty($beautyContestants)): ?>
             <p class="text-muted mb-0">Chưa có đăng ký</p>
