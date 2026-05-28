@@ -617,3 +617,10 @@ select:focus {
 .table-bordered td {
   border: 1px solid #dee2e6 !important;
 }
+
+/* Button outline danger with white background - hover effect */
+.btn-outline-danger-hover:hover {
+  background-color: #dc3545 !important;
+  color: #fff !important;
+  border-color: #dc3545 !important;
+}
