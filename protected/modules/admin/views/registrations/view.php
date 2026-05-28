@@ -952,6 +952,7 @@ $talentHasAlliance = ($talentPendingCount > 0 || $talentHistoryCount > 0);
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div><!-- end table-responsive -->
         <?php endif; ?>
             </div><!-- end main col -->
         </div><!-- end row -->
