@@ -614,7 +614,11 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
 </div>
 
 <!-- 2. ĐĂNG KÝ THI NGHIỆP VỤ -->
-<?php $competitionPendingCount = count($allianceByContent['competition']['pending']); ?>
+<?php
+$competitionPendingCount = count($allianceByContent['competition']['pending']);
+$competitionHistoryCount = count($allianceByContent['competition']['history']);
+$competitionHasAlliance = ($competitionPendingCount > 0 || $competitionHistoryCount > 0);
+?>
 <div class="card mb-3" id="competition-registration-card">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
@@ -630,12 +634,18 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
         <?php endif; ?>
     </div>
     <div class="card-body">
-        <?php $this->renderPartial('_alliance_section', array(
-            'pendingRequests' => $allianceByContent['competition']['pending'],
-            'historyItems' => $allianceByContent['competition']['history'],
-            'contentCode' => 'competition',
-            'model' => $model,
-        )); ?>
+        <div class="row">
+            <?php if ($competitionHasAlliance): ?>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <?php $this->renderPartial('_alliance_sidebar', array(
+                    'pendingRequests' => $allianceByContent['competition']['pending'],
+                    'historyItems' => $allianceByContent['competition']['history'],
+                    'contentCode' => 'competition',
+                    'model' => $model,
+                )); ?>
+            </div>
+            <?php endif; ?>
+            <div class="<?php echo $competitionHasAlliance ? 'col-md-9' : 'col-12'; ?>">
 
         <?php if (empty($competitionRegistrations)): ?>
             <p class="text-muted mb-0">Chưa đăng ký thi nghiệp vụ nào.</p>
