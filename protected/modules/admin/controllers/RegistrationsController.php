@@ -2581,4 +2581,104 @@ class RegistrationsController extends AdminController
 		echo CJSON::encode(array('success' => true, 'message' => 'Đăng ký tiết mục thành công.'));
 		Yii::app()->end();
 	}
+
+	public function actionUploadDocument($id)
+	{
+		$this->checkRegistrationAccess($id);
+		$model = $this->loadModelById($id);
+
+		if (!in_array($model->status, array(Registrations::STATUS_DRAFT, Registrations::STATUS_REJECTED))) {
+			Yii::app()->user->setFlash('error', 'Không thể tải lên tệp khi phiếu đã nộp hoặc đã duyệt.');
+			$this->redirect(array('view', 'id' => $id));
+		}
+
+		if (isset($_FILES['documents']) && !empty($_FILES['documents']['name'][0])) {
+			$documents = array();
+			if (!empty($model->document)) {
+				$parsed = json_decode($model->document, true);
+				if (is_array($parsed)) {
+					$documents = $parsed;
+				}
+			}
+
+			$uploadPath = Yii::getPathOfAlias('webroot') . '/uploads/registrations/' . $id;
+			if (!is_dir($uploadPath)) {
+				mkdir($uploadPath, 0755, true);
+			}
+
+			$allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx');
+			$maxSize = 10 * 1024 * 1024;
+
+			$files = $_FILES['documents'];
+			$uploadedCount = 0;
+
+			for ($i = 0; $i < count($files['name']); $i++) {
+				if ($files['error'][$i] !== UPLOAD_ERR_OK) continue;
+
+				$filename = $files['name'][$i];
+				$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+				if (!in_array($ext, $allowedTypes)) continue;
+				if ($files['size'][$i] > $maxSize) continue;
+
+				$newFilename = time() . '_' . $i . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $filename);
+				$targetPath = $uploadPath . '/' . $newFilename;
+
+				if (move_uploaded_file($files['tmp_name'][$i], $targetPath)) {
+					$documents[] = Yii::app()->baseUrl . '/uploads/registrations/' . $id . '/' . $newFilename;
+					$uploadedCount++;
+				}
+			}
+
+			if ($uploadedCount > 0) {
+				$model->document = CJSON::encode($documents);
+				$result = $model->updateViaApi();
+				if ($result['success']) {
+					Yii::app()->user->setFlash('success', 'Tải lên ' . $uploadedCount . ' tệp thành công.');
+				} else {
+					Yii::app()->user->setFlash('error', 'Lỗi lưu thông tin tệp.');
+				}
+			} else {
+				Yii::app()->user->setFlash('error', 'Không có tệp nào được tải lên.');
+			}
+		}
+
+		$this->redirect(array('view', 'id' => $id));
+	}
+
+	public function actionDeleteDocument($id)
+	{
+		$this->checkRegistrationAccess($id);
+		$model = $this->loadModelById($id);
+
+		if (!in_array($model->status, array(Registrations::STATUS_DRAFT, Registrations::STATUS_REJECTED))) {
+			Yii::app()->user->setFlash('error', 'Không thể xóa tệp khi phiếu đã nộp hoặc đã duyệt.');
+			$this->redirect(array('view', 'id' => $id));
+		}
+
+		$index = isset($_POST['document_index']) ? (int)$_POST['document_index'] : -1;
+
+		if ($index >= 0 && !empty($model->document)) {
+			$documents = json_decode($model->document, true);
+			if (is_array($documents) && isset($documents[$index])) {
+				$docUrl = $documents[$index];
+				$filePath = Yii::getPathOfAlias('webroot') . parse_url($docUrl, PHP_URL_PATH);
+				if (file_exists($filePath)) {
+					@unlink($filePath);
+				}
+
+				array_splice($documents, $index, 1);
+				$model->document = !empty($documents) ? CJSON::encode($documents) : null;
+				$result = $model->updateViaApi();
+
+				if ($result['success']) {
+					Yii::app()->user->setFlash('success', 'Đã xóa tệp đính kèm.');
+				} else {
+					Yii::app()->user->setFlash('error', 'Lỗi khi xóa tệp.');
+				}
+			}
+		}
+
+		$this->redirect(array('view', 'id' => $id));
+	}
 }
