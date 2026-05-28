@@ -2655,15 +2655,19 @@ var RegistrationView = (function() {
             
             if (docs.portrait) {
                 html += '<div class="mb-4 text-center"><h6>Ảnh chân dung</h6>';
-                html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 530px; height: 530px; object-fit: cover; max-width: 100%;"></div>';
+                html += '<img src="' + escapeHtml(docs.portrait) + '" class="rounded" style="width: 180px; height: 180px; object-fit: cover;"></div>';
             }
-            if (docs.cccd_front) {
-                html += '<div class="mb-4 text-center"><h6>Ảnh CCCD mặt trước</h6>';
-                html += '<img src="' + escapeHtml(docs.cccd_front) + '" class="img-fluid rounded" style="max-height: 500px;"></div>';
-            }
-            if (docs.cccd_back) {
-                html += '<div class="mb-4 text-center"><h6>Ảnh CCCD mặt sau</h6>';
-                html += '<img src="' + escapeHtml(docs.cccd_back) + '" class="img-fluid rounded" style="max-height: 500px;"></div>';
+            if (docs.cccd_front || docs.cccd_back) {
+                html += '<div class="mb-4"><h6 class="text-center">Ảnh CCCD</h6><div class="row justify-content-center">';
+                if (docs.cccd_front) {
+                    html += '<div class="col-md-6 text-center mb-3"><small class="text-muted d-block mb-2">Mặt trước</small>';
+                    html += '<img src="' + escapeHtml(docs.cccd_front) + '" class="img-fluid rounded" style="max-width: 100%; aspect-ratio: 856/540; object-fit: cover;"></div>';
+                }
+                if (docs.cccd_back) {
+                    html += '<div class="col-md-6 text-center mb-3"><small class="text-muted d-block mb-2">Mặt sau</small>';
+                    html += '<img src="' + escapeHtml(docs.cccd_back) + '" class="img-fluid rounded" style="max-width: 100%; aspect-ratio: 856/540; object-fit: cover;"></div>';
+                }
+                html += '</div></div>';
             }
             if (docs.contract) {
                 html += '<div class="mb-4 text-center"><h6>Hợp đồng lao động</h6>';
