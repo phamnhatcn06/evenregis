@@ -699,6 +699,7 @@ $competitionHasAlliance = ($competitionPendingCount > 0 || $competitionHistoryCo
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div><!-- end table-responsive -->
         <?php endif; ?>
             </div><!-- end main col -->
         </div><!-- end row -->
