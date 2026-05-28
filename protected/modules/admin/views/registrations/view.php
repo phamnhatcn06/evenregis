@@ -789,11 +789,17 @@ $missHasAlliance = ($missPendingCount > 0 || $missHistoryCount > 0);
                 </table>
             <?php endforeach; ?>
         <?php endif; ?>
+            </div><!-- end main col -->
+        </div><!-- end row -->
     </div>
 </div>
 
 <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
-<?php $talentPendingCount = count($allianceByContent['talent']['pending']); ?>
+<?php
+$talentPendingCount = count($allianceByContent['talent']['pending']);
+$talentHistoryCount = count($allianceByContent['talent']['history']);
+$talentHasAlliance = ($talentPendingCount > 0 || $talentHistoryCount > 0);
+?>
 <div class="card mb-3" id="talent-registration-card" data-event-content-id="<?php echo $contentIdMap['talent']; ?>">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
@@ -804,12 +810,18 @@ $missHasAlliance = ($missPendingCount > 0 || $missHistoryCount > 0);
         </h5>
     </div>
     <div class="card-body">
-        <?php $this->renderPartial('_alliance_section', array(
-            'pendingRequests' => $allianceByContent['talent']['pending'],
-            'historyItems' => $allianceByContent['talent']['history'],
-            'contentCode' => 'talent',
-            'model' => $model,
-        )); ?>
+        <div class="row">
+            <?php if ($talentHasAlliance): ?>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <?php $this->renderPartial('_alliance_sidebar', array(
+                    'pendingRequests' => $allianceByContent['talent']['pending'],
+                    'historyItems' => $allianceByContent['talent']['history'],
+                    'contentCode' => 'talent',
+                    'model' => $model,
+                )); ?>
+            </div>
+            <?php endif; ?>
+            <div class="<?php echo $talentHasAlliance ? 'col-md-9' : 'col-12'; ?>">
         <?php if ($canEdit && empty($talentEntries)): ?>
             <!-- Form chọn liên quân và thể loại -->
             <div class="row mb-3 g-3 align-items-end">
