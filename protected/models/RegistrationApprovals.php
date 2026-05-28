@@ -69,106 +69,48 @@ class RegistrationApprovals extends BaseRegistrationApprovals
     }
 
     /**
-     * Duyệt bước hiện tại
+     * Duyệt bước hiện tại - gọi API
      */
-    public function approve($portalUserId, $approverName, $comment = null)
+    public static function approveViaApi($id, $portalUserId, $approverName, $comment = null)
     {
-        if ($this->status !== self::STATUS_PENDING) {
-            return false;
-        }
-
-        $stepName = $this->workflow->getStepName($this->current_index);
-
-        // Log approval
-        RegistrationApprovalLogs::log(
-            $this->registration_id,
-            $this->current_index,
-            'approved',
-            $portalUserId,
-            $comment,
-            $stepName,
-            $approverName
-        );
-
-        // Chuyển bước tiếp theo hoặc hoàn tất
-        if ($this->current_index >= $this->total_steps) {
-            $this->status = self::STATUS_APPROVED;
-            $this->completed_at = time();
-        } else {
-            $this->current_index++;
-        }
-
-        return $this->save();
+        $url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_APPROVAL_APPROVE, array('id' => $id));
+        return ApiClient::post($url, array(
+            'approver_portal_id' => $portalUserId,
+            'approver_name' => $approverName,
+            'comment' => $comment,
+        ));
     }
 
     /**
-     * Từ chối
+     * Từ chối - gọi API
      */
-    public function reject($portalUserId, $approverName, $comment = null)
+    public static function rejectViaApi($id, $portalUserId, $approverName, $comment = null)
     {
-        if ($this->status !== self::STATUS_PENDING) {
-            return false;
-        }
-
-        $stepName = $this->workflow->getStepName($this->current_index);
-
-        RegistrationApprovalLogs::log(
-            $this->registration_id,
-            $this->current_index,
-            'rejected',
-            $portalUserId,
-            $comment,
-            $stepName,
-            $approverName
-        );
-
-        $this->status = self::STATUS_REJECTED;
-        $this->completed_at = time();
-
-        return $this->save();
+        $url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_APPROVAL_REJECT, array('id' => $id));
+        return ApiClient::post($url, array(
+            'approver_portal_id' => $portalUserId,
+            'approver_name' => $approverName,
+            'comment' => $comment,
+        ));
     }
 
     /**
-     * Yêu cầu chỉnh sửa - trả về cấp cụ thể
+     * Yêu cầu chỉnh sửa - trả về cấp cụ thể - gọi API
+     * @param int $id Registration approval ID
      * @param int $portalUserId
      * @param string $approverName
      * @param int $returnToIndex Trả về bước nào (0 = người tạo, 1 = bước 1...)
      * @param string $comment
      */
-    public function requestRevision($portalUserId, $approverName, $returnToIndex = 0, $comment = null)
+    public static function revisionViaApi($id, $portalUserId, $approverName, $returnToIndex = 0, $comment = null)
     {
-        if ($this->status !== self::STATUS_PENDING) {
-            return false;
-        }
-
-        // Validate: chỉ được trả về bước trước đó
-        if ($returnToIndex >= $this->current_index) {
-            return false;
-        }
-
-        $stepName = $this->workflow->getStepName($this->current_index);
-
-        RegistrationApprovalLogs::log(
-            $this->registration_id,
-            $this->current_index,
-            'revision',
-            $portalUserId,
-            $comment,
-            $stepName,
-            $approverName,
-            $returnToIndex
-        );
-
-        // Nếu trả về bước 0 (người tạo) → status = revision
-        // Nếu trả về bước > 0 → current_index = returnToIndex, status vẫn pending
-        if ($returnToIndex == 0) {
-            $this->status = self::STATUS_REVISION;
-        } else {
-            $this->current_index = $returnToIndex;
-            // status vẫn là pending, chờ bước đó duyệt lại
-        }
-
-        return $this->save();
+        $url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_APPROVAL_REVISION, array('id' => $id));
+        return ApiClient::post($url, array(
+            'approver_portal_id' => $portalUserId,
+            'approver_name' => $approverName,
+            'return_to_index' => $returnToIndex,
+            'comment' => $comment,
+        ));
     }
 
     /**
@@ -181,7 +123,7 @@ class RegistrationApprovals extends BaseRegistrationApprovals
         );
 
         for ($i = 1; $i < $this->current_index; $i++) {
-            $stepName = $this->workflow->getStepName($i);
+            $stepName = isset($this->workflow) ? $this->workflow->getStepName($i) : 'Bước ' . $i;
             $steps[$i] = "Bước {$i}: {$stepName}";
         }
 
@@ -189,23 +131,12 @@ class RegistrationApprovals extends BaseRegistrationApprovals
     }
 
     /**
-     * Nộp lại sau khi chỉnh sửa
+     * Nộp lại sau khi chỉnh sửa - gọi API
      */
-    public function resubmit()
+    public static function resubmitViaApi($id)
     {
-        if ($this->status !== self::STATUS_REVISION) {
-            return false;
-        }
-
-        RegistrationApprovalLogs::log(
-            $this->registration_id,
-            $this->current_index,
-            'resubmitted',
-            null,
-            'Nộp lại sau chỉnh sửa'
-        );
-
-        $this->status = self::STATUS_PENDING;
+        $url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_APPROVAL_RESUBMIT, array('id' => $id));
+        return ApiClient::post($url, array());
 
         return $this->save();
     }
