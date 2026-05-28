@@ -22,16 +22,16 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Ngày đến <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control datepicker" name="check_in_date" id="staff_check_in_date" required placeholder="dd/mm/yyyy" autocomplete="off">
+                            <label class="form-label">Ngày đến</label>
+                            <input type="text" class="form-control datepicker" name="check_in_date" id="staff_check_in_date" placeholder="dd/mm/yyyy" autocomplete="off">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control datepicker" name="check_out_date" id="staff_check_out_date" required placeholder="dd/mm/yyyy" autocomplete="off">
+                            <label class="form-label">Ngày đi</label>
+                            <input type="text" class="form-control datepicker" name="check_out_date" id="staff_check_out_date" placeholder="dd/mm/yyyy" autocomplete="off">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Phương tiện <span class="text-danger">*</span></label>
-                            <select class="form-select" name="transport_id" id="staff_transport_id" required>
+                            <label class="form-label">Phương tiện</label>
+                            <select class="form-select" name="transport_id" id="staff_transport_id">
                                 <option value="">-- Chọn --</option>
                                 <?php foreach ($transports as $tId => $tName): ?>
                                     <option value="<?php echo $tId; ?>"><?php echo CHtml::encode($tName); ?></option>
