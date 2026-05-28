@@ -441,11 +441,23 @@ foreach ($registrationDetails as $detail) {
 ?>
 
 <!-- 1. ĐĂNG KÝ THI ĐẤU THỂ THAO -->
+<?php $sportsPendingCount = count($allianceByContent['sports']['pending']); ?>
 <div class="card mb-3" id="sports-registration-card" data-event-content-id="<?php echo $contentIdMap['sports']; ?>">
-    <div class="card-header bg-white">
-        <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao</h5>
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao
+            <?php if ($sportsPendingCount > 0): ?>
+                <span class="badge bg-danger rounded-pill ms-2"><?php echo $sportsPendingCount; ?> yêu cầu</span>
+            <?php endif; ?>
+        </h5>
     </div>
     <div class="card-body">
+        <?php $this->renderPartial('_alliance_section', array(
+            'pendingRequests' => $allianceByContent['sports']['pending'],
+            'historyItems' => $allianceByContent['sports']['history'],
+            'contentCode' => 'sports',
+            'model' => $model,
+        )); ?>
         <?php if (isset($allianceRequest) && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED && !empty($model->relation_property_name)): ?>
             <div class="alert alert-success d-flex align-items-center py-2 px-3 mb-3 border-start border-4 border-success">
                 <i class="fa fa-handshake-o me-2 fa-lg text-success"></i>
