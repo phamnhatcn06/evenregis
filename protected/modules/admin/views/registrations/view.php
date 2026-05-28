@@ -103,144 +103,30 @@ if (!empty($model->document)) {
 
 ?>
 
-<?php if (!empty($incomingRequestsData)): ?>
-    <style>
-    @keyframes pulse-border {
-        0% { border-left-color: #ffc107; }
-        50% { border-left-color: #ff9800; }
-        100% { border-left-color: #ffc107; }
-    }
+<style>
+@keyframes pulse-border {
+    0% { border-left-color: #ffc107; }
+    50% { border-left-color: #ff9800; }
+    100% { border-left-color: #ffc107; }
+}
+.alliance-request-alert {
+    animation: pulse-border 2s ease-in-out infinite;
+}
+@media (max-width: 768px) {
     .alliance-request-alert {
-        animation: pulse-border 2s ease-in-out infinite;
+        flex-direction: column !important;
+        align-items: flex-start !important;
     }
-    @media (max-width: 768px) {
-        .alliance-request-alert {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-        }
-        .alliance-request-alert .d-flex.align-items-center.ms-3 {
-            margin-left: 0 !important;
-            margin-top: 1rem;
-            width: 100%;
-        }
-        .alliance-request-alert .d-flex.align-items-center.ms-3 button {
-            flex: 1;
-        }
+    .alliance-request-alert .d-flex.align-items-center.ms-3 {
+        margin-left: 0 !important;
+        margin-top: 1rem;
+        width: 100%;
     }
-    </style>
-    <?php foreach ($incomingRequestsData as $item):
-        $req = $item['request'];
-        $reqId = $req->id;
-        $requesterName = $item['requester_name'];
-        $contentName = isset($item['content_name']) ? $item['content_name'] : '';
-        $requestedAt = isset($req->requested_at) ? $req->requested_at : '';
-    ?>
-        <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3 p-3 rounded shadow-sm border-start border-4 border-warning alliance-request-alert">
-            <div class="d-flex align-items-center">
-                <i class="fa fa-handshake-o fa-2x text-warning me-3"></i>
-                <div>
-                    <h6 class="alert-heading mb-1 text-dark fw-bold">Yêu cầu liên quân từ đơn vị trong cụm</h6>
-                    <span>Đơn vị <strong><?php echo CHtml::encode($requesterName); ?></strong> gửi yêu cầu liên quân <?php if ($contentName): ?><strong class="text-primary"><?php echo CHtml::encode($contentName); ?></strong><?php else: ?>cho sự kiện này<?php endif; ?> với đơn vị của bạn.</span>
-                    <?php if ($requestedAt): ?>
-                        <div class="text-muted small mt-1"><i class="fa fa-clock-o me-1"></i>Gửi lúc: <?php echo MyHelper::formatDateTime($requestedAt); ?></div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <div class="d-flex align-items-center ms-3">
-                <button type="button" class="btn btn-sm btn-success text-white px-3 fw-bold me-2" onclick="confirmApproveAlliance(<?php echo $reqId; ?>)">
-                    <i class="fa fa-check me-1"></i>Chấp nhận
-                </button>
-                <form id="approve-alliance-form-<?php echo $reqId; ?>" method="post" action="<?php echo $this->createUrl('approveAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:none;"></form>
-                <button type="button" class="btn btn-sm btn-outline-danger btn-outline-danger-hover px-3 fw-bold bg-white" onclick="confirmRejectAlliance(<?php echo $reqId; ?>)">
-                    <i class="fa fa-times me-1"></i>Từ chối
-                </button>
-                <form id="reject-alliance-form-<?php echo $reqId; ?>" method="post" action="<?php echo $this->createUrl('rejectAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:none;">
-                    <input type="hidden" name="rejection_reason" id="rejection_reason_<?php echo $reqId; ?>">
-                </form>
-            </div>
-        </div>
-    <?php endforeach; ?>
-<?php endif; ?>
-
-<?php if (!empty($allianceHistory)): ?>
-<div class="card mb-3">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fa fa-history me-2 text-primary"></i>Lịch sử yêu cầu liên quân</h5>
-        <button class="btn btn-sm btn-link text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#allianceHistoryCollapse" aria-expanded="false">
-            <i class="fa fa-chevron-down"></i>
-        </button>
-    </div>
-    <div class="collapse" id="allianceHistoryCollapse">
-        <div class="card-body pt-2">
-            <div class="timeline-alliance">
-                <?php foreach ($allianceHistory as $item):
-                    $req = $item['request'];
-                    $isSent = $item['type'] === 'sent';
-                    $partnerName = $item['partner_name'];
-                    $contentName = $item['content_name'];
-                    $status = isset($req->status) ? $req->status : 0;
-                    $requestedAt = isset($req->requested_at) ? $req->requested_at : '';
-                    $reviewedAt = isset($req->reviewed_at) ? $req->reviewed_at : '';
-                    $rejectionReason = isset($req->rejection_reason) ? $req->rejection_reason : '';
-
-                    // Status styling
-                    if ($status == AllianceRequests::STATUS_APPROVED) {
-                        $statusClass = 'bg-success';
-                        $statusText = 'Đã chấp nhận';
-                        $statusIcon = 'fa-check-circle';
-                    } elseif ($status == AllianceRequests::STATUS_REJECTED) {
-                        $statusClass = 'bg-danger';
-                        $statusText = 'Đã từ chối';
-                        $statusIcon = 'fa-times-circle';
-                    } elseif ($status == AllianceRequests::STATUS_CANCELLED) {
-                        $statusClass = 'bg-secondary';
-                        $statusText = 'Đã hủy';
-                        $statusIcon = 'fa-ban';
-                    } else {
-                        $statusClass = 'bg-warning';
-                        $statusText = 'Chờ xác nhận';
-                        $statusIcon = 'fa-clock-o';
-                    }
-                ?>
-                <div class="d-flex mb-3 pb-3 border-bottom">
-                    <div class="flex-shrink-0 me-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center <?php echo $statusClass; ?>" style="width:40px;height:40px;">
-                            <i class="fa <?php echo $statusIcon; ?> text-white"></i>
-                        </div>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <?php if ($isSent): ?>
-                                    <span class="badge bg-info me-1">Gửi đi</span>
-                                    <span>Đã gửi yêu cầu liên quân đến <strong><?php echo CHtml::encode($partnerName); ?></strong></span>
-                                <?php else: ?>
-                                    <span class="badge bg-primary me-1">Nhận</span>
-                                    <span>Nhận yêu cầu liên quân từ <strong><?php echo CHtml::encode($partnerName); ?></strong></span>
-                                <?php endif; ?>
-                                <?php if ($contentName): ?>
-                                    <span class="text-muted">- <?php echo CHtml::encode($contentName); ?></span>
-                                <?php endif; ?>
-                            </div>
-                            <span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
-                        </div>
-                        <div class="small text-muted mt-1">
-                            <i class="fa fa-clock-o me-1"></i>Gửi: <?php echo $requestedAt ? MyHelper::formatDateTime($requestedAt) : '-'; ?>
-                            <?php if ($reviewedAt && $status != AllianceRequests::STATUS_PENDING): ?>
-                                <span class="ms-3"><i class="fa fa-check me-1"></i>Xử lý: <?php echo MyHelper::formatDateTime($reviewedAt); ?></span>
-                            <?php endif; ?>
-                        </div>
-                        <?php if ($rejectionReason && $status == AllianceRequests::STATUS_REJECTED): ?>
-                            <div class="small text-danger mt-1"><i class="fa fa-exclamation-triangle me-1"></i>Lý do: <?php echo CHtml::encode($rejectionReason); ?></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+    .alliance-request-alert .d-flex.align-items-center.ms-3 button {
+        flex: 1;
+    }
+}
+</style>
 
 <div class="row mb-3">
     <!-- Thông tin chung -->
