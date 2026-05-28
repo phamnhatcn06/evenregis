@@ -96,7 +96,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-sm btn-success">Thêm người tham dự</button>
+                    <button type="submit" class="btn btn-sm btn-success" id="btn_submit_attendee_manual">
+                        <i class="fa fa-plus me-1"></i>Thêm người tham dự
+                    </button>
                 </div>
             </form>
         </div>
