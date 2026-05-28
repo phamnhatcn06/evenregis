@@ -36,7 +36,7 @@ $this->breadcrumbs = array(
     Yii::t('app', 'View') . ($pendingRequestCount > 0 ? ' <span class="badge bg-danger rounded-pill">' . $pendingRequestCount . '</span>' : ''),
 );
 
-$this->Tabletitle = 'Chi tiết phiếu đăng ký của ' . $model->property_name;
+$this->Tabletitle = 'Chi tiết phiếu đăng ký của ' . $model->property_name . ($pendingRequestCount > 0 ? ' <span class="badge bg-danger rounded-pill ms-2">' . $pendingRequestCount . ' yêu cầu chờ xử lý</span>' : '');
 ?>
 
 <?php
