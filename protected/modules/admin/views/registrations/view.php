@@ -69,13 +69,14 @@ if (!empty($model->document)) {
         $req = $item['request'];
         $reqId = $req->id;
         $requesterName = $item['requester_name'];
+        $contentName = isset($item['content_name']) ? $item['content_name'] : '';
     ?>
         <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3 p-3 rounded shadow-sm border-start border-4 border-warning">
             <div class="d-flex align-items-center">
                 <i class="fa fa-handshake-o fa-2x text-warning me-3"></i>
                 <div>
                     <h6 class="alert-heading mb-1 text-dark fw-bold">Yêu cầu liên quân từ đơn vị trong cụm</h6>
-                    <span>Đơn vị <strong><?php echo CHtml::encode($requesterName); ?></strong> muốn gửi yêu cầu liên quân với đơn vị của bạn cho sự kiện này.</span>
+                    <span>Đơn vị <strong><?php echo CHtml::encode($requesterName); ?></strong> muốn gửi yêu cầu liên quân <?php if ($contentName): ?><strong class="text-primary"><?php echo CHtml::encode($contentName); ?></strong><?php else: ?>cho sự kiện này<?php endif; ?> với đơn vị của bạn.</span>
                 </div>
             </div>
             <div class="d-flex align-items-center ms-3">
