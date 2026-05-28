@@ -80,6 +80,20 @@ if (!empty($model->document)) {
     .alliance-request-alert {
         animation: pulse-border 2s ease-in-out infinite;
     }
+    @media (max-width: 768px) {
+        .alliance-request-alert {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+        .alliance-request-alert .d-flex.align-items-center.ms-3 {
+            margin-left: 0 !important;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        .alliance-request-alert .d-flex.align-items-center.ms-3 button {
+            flex: 1;
+        }
+    }
     </style>
     <?php foreach ($incomingRequestsData as $item):
         $req = $item['request'];
