@@ -2449,11 +2449,11 @@ class RegistrationsController extends AdminController
 	{
 		$this->checkRegistrationAccess($registration_id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
-			
+
 			// 1. Xóa đăng ký thi đấu thể thao (SportTeamMembers)
 			// Theo dõi xem những SportTeam nào bị ảnh hưởng để kiểm tra dọn dẹp sau đó
 			$affectedTeamIds = array();
-			
+
 			$resSport = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
 				'attendee_id' => $id,
 				'per_page' => 500,
@@ -2589,9 +2589,9 @@ class RegistrationsController extends AdminController
 					// Nếu đội không còn thành viên nào, xóa đội
 					$teamObj = SportTeams::fetchFromApi($teamId);
 					$sportId = ($teamObj && isset($teamObj->sport_id)) ? $teamObj->sport_id : null;
-					
+
 					SportTeams::deleteViaApi($teamId);
-					
+
 					// Đồng thời dọn dẹp dòng RegistrationDetails môn thể thao rỗng
 					if ($sportId) {
 						$resDetails = ApiClient::get(ApiEndpoints::REGISTRATION_DETAIL_LIST, array(
@@ -2870,6 +2870,39 @@ class RegistrationsController extends AdminController
 
 		$attendee->personal_email = $email;
 		$result = $attendee->updateViaApi();
+
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật email thành công.'));
+		} else {
+			echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể cập nhật email.'));
+		}
+		Yii::app()->end();
+	}
+
+	public function actionUpdateContestantEmail()
+	{
+		header('Content-Type: application/json');
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$contestantId = Yii::app()->getRequest()->getPost('contestant_id');
+		$email = Yii::app()->getRequest()->getPost('personal_email');
+
+		if (!$contestantId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu ID thí sinh.'));
+			Yii::app()->end();
+		}
+
+		$contestant = BeautyContestants::fetchFromApi($contestantId);
+		if (!$contestant) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy thí sinh.'));
+			Yii::app()->end();
+		}
+
+		$contestant->personal_email = $email;
+		$result = $contestant->updateViaApi();
 
 		if ($result['success']) {
 			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật email thành công.'));
@@ -3391,7 +3424,7 @@ class RegistrationsController extends AdminController
 	public function actionCheckSubmitValid($id)
 	{
 		$this->checkRegistrationAccess($id);
-		
+
 		$model = $this->loadModelById($id);
 		$errors = array();
 
