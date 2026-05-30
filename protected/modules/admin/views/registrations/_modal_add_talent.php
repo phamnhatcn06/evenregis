@@ -21,39 +21,15 @@
                                 <label class="form-label">Tên tiết mục <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="title" id="talent_title" required placeholder="Nhập tên tiết mục...">
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Thời lượng (phút)</label>
-                                <input type="number" class="form-control" name="duration" id="talent_duration" min="1" max="30" placeholder="VD: 5">
-                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Nguồn gốc/Xuất xứ</label>
                                 <input type="text" class="form-control" name="origin" id="talent_origin" placeholder="VD: Dân ca Bắc Bộ...">
                             </div>
+
                             <div class="mb-3">
-                                <label class="form-label">Đạo diễn/Biên đạo</label>
-                                <input type="text" class="form-control" name="director" id="talent_director" placeholder="Họ tên người phụ trách...">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">SĐT đạo diễn</label>
-                                <input type="text" class="form-control" name="director_phone" id="talent_director_phone" placeholder="Số điện thoại...">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Mô tả tiết mục</label>
+                                <label class="form-label">Mô tả ngắn tiết mục</label>
                                 <textarea class="form-control" name="description" id="talent_description" rows="2" placeholder="Mô tả ngắn về tiết mục..."></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Nội dung chi tiết</label>
-                                <textarea class="form-control" name="content" id="talent_content" rows="2" placeholder="Nội dung chi tiết, kịch bản..."></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Link nhạc nền</label>
-                                <input type="url" class="form-control" name="music_path" id="talent_music_path" placeholder="https://drive.google.com/...">
-                                <small class="text-muted">Link Google Drive, Dropbox hoặc URL trực tiếp</small>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Link video mẫu</label>
-                                <input type="url" class="form-control" name="video_path" id="talent_video_path" placeholder="https://youtube.com/...">
-                                <small class="text-muted">Link YouTube, Google Drive hoặc URL trực tiếp</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Ghi chú</label>

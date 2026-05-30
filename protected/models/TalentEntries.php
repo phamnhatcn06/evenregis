@@ -108,7 +108,8 @@ class TalentEntries extends BaseTalentEntries
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
         });
-        // print_r(json_encode($data));die;
+        print_r(json_encode($data));
+        die;
         return ApiClient::post(ApiEndpoints::TALENT_ENTRY_STORE, $data);
     }
 
