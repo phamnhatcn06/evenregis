@@ -173,14 +173,41 @@ class ApprovalWorkflowsController extends AdminController
 
         // Lấy danh sách users từ Portal SSO
         $userList = array();
-        $result = ApiClient::get(ApiEndpoints::SSO_USERS, array('per_page' => 500));
-        if ($result['success'] && isset($result['data']['data'])) {
-            foreach ($result['data']['data'] as $user) {
-                $label = isset($user['full_name']) ? $user['full_name'] : $user['email'];
-                if (isset($user['property_name']) && $user['property_name']) {
-                    $label .= ' - ' . $user['property_name'];
+        $params = Yii::app()->params;
+        $portalApiUrl = $params['portal']['api_url'] . '/api/sso/users';
+
+        // Lấy property_code của user hiện tại (nếu có)
+        $ssoUser = AuthHandler::getUser();
+        $queryParams = array('per_page' => 500);
+        if ($ssoUser && isset($ssoUser['property_code']) && $ssoUser['property_code']) {
+            $queryParams['property_code'] = $ssoUser['property_code'];
+        }
+
+        $url = $portalApiUrl . '?' . http_build_query($queryParams);
+        $context = stream_context_create(array(
+            'http' => array(
+                'method' => 'GET',
+                'header' => "Accept: application/json\r\n",
+                'timeout' => 30,
+            ),
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+            ),
+        ));
+
+        $response = @file_get_contents($url, false, $context);
+        if ($response) {
+            $data = json_decode($response, true);
+            if (isset($data['data'])) {
+                $users = isset($data['data']['data']) ? $data['data']['data'] : $data['data'];
+                foreach ($users as $user) {
+                    $label = isset($user['full_name']) ? $user['full_name'] : (isset($user['email']) ? $user['email'] : 'N/A');
+                    if (isset($user['property_name']) && $user['property_name']) {
+                        $label .= ' - ' . $user['property_name'];
+                    }
+                    $userList[$user['id']] = $label;
                 }
-                $userList[$user['id']] = $label;
             }
         }
 
