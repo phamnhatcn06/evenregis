@@ -183,7 +183,7 @@ class ApprovalWorkflowsController extends AdminController
         $this->render('add_approver', array(
             'workflow' => $workflow,
             'model' => $model,
-            'staffList' => $staffList,
+            'staffList' => $userList,
         ));
     }
 
