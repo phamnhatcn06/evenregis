@@ -167,16 +167,17 @@ class ApprovalWorkflowsController extends AdminController
             }
         }
 
-        // Lấy danh sách staff cho dual listbox
-        $staffList = array();
-        $staffDataProvider = Staffs::getApiDataProvider(array('is_active' => 1), 500);
-        $staffData = $staffDataProvider->getData();
-        foreach ($staffData as $staff) {
-            $label = $staff->full_name;
-            if ($staff->property_name) {
-                $label .= ' - ' . $staff->property_name;
+        // Lấy danh sách users từ Portal SSO
+        $userList = array();
+        $result = ApiClient::get(ApiEndpoints::SSO_USERS, array('per_page' => 500));
+        if ($result['success'] && isset($result['data']['data'])) {
+            foreach ($result['data']['data'] as $user) {
+                $label = isset($user['full_name']) ? $user['full_name'] : $user['email'];
+                if (isset($user['property_name']) && $user['property_name']) {
+                    $label .= ' - ' . $user['property_name'];
+                }
+                $userList[$user['id']] = $label;
             }
-            $staffList[$staff->id] = $label;
         }
 
         $this->render('add_approver', array(
