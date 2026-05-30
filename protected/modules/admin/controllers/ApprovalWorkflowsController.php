@@ -197,7 +197,7 @@ class ApprovalWorkflowsController extends AdminController
         // Lấy property_code của user hiện tại (nếu có)
         $ssoUser = AuthHandler::getUser();
         $queryParams = array('per_page' => 500);
-        if ($ssoUser && isset($ssoUser['property_code']) && $ssoUser['property_code']) {
+        if ($ssoUser && isset($ssoUser['property_code']) && $ssoUser['property_code'] && $ssoUser['property_code'] != '9999') {
             $queryParams['hotelID'] = $ssoUser['property_code'];
         }
 
@@ -224,8 +224,6 @@ class ApprovalWorkflowsController extends AdminController
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-        var_dump($response);
-        die;
         if ($response) {
             $data = json_decode($response, true);
             if (isset($data['data'])) {

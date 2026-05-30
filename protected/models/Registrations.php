@@ -101,11 +101,12 @@ class Registrations extends BaseRegistrations
 		return ApiClient::post(ApiEndpoints::REGISTRATION_STORE, $data);
 	}
 
-	public function updateViaApi()
+	public function updateViaApi($additionalData = array())
 	{
 		$data = array_filter($this->attributes, function ($value) {
 			return $value !== null && $value !== '';
 		});
+		$data = array_merge($data, $additionalData);
 		$url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_UPDATE, array('id' => $this->id));
 		return ApiClient::post($url, $data);
 	}
