@@ -1806,10 +1806,6 @@ class RegistrationsController extends AdminController
 		}
 
 		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
-		if (empty($attendeeIds)) {
-			echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng chọn ít nhất một người biểu diễn.'));
-			Yii::app()->end();
-		}
 
 		$entry->title = Yii::app()->request->getPost('title', $entry->title);
 
