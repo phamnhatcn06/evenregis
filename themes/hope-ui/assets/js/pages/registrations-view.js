@@ -3714,10 +3714,6 @@ var RegistrationView = (function() {
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                if (talentSelectedAttendees.length === 0) {
-                    Toast.error('Vui lòng chọn ít nhất một người biểu diễn.');
-                    return false;
-                }
                 submitTalentForm(form);
             });
         }

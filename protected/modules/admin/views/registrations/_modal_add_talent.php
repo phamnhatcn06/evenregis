@@ -12,7 +12,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-12">
                             <div class="mb-3">
                                 <label class="form-label">Thể loại</label>
                                 <div class="form-control bg-light" id="talent_category_display" style="pointer-events:none;"></div>
@@ -25,59 +25,6 @@
                             <div class="mb-3">
                                 <label class="form-label">Nguồn gốc/Xuất xứ</label>
                                 <input type="text" class="form-control" name="origin" id="talent_origin" placeholder="VD: Dân ca Bắc Bộ...">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Mô tả ngắn tiết mục</label>
-                                <textarea class="form-control" name="description" id="talent_description" rows="2" placeholder="Mô tả ngắn về tiết mục..."></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Ghi chú</label>
-                                <textarea class="form-control" name="note" rows="2" placeholder="Ghi chú thêm..."></textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <label class="form-label">Chọn người biểu diễn <span class="text-danger">*</span></label>
-                            <small class="text-muted d-block mb-2">Danh sách người có vai trò "Văn nghệ" của đơn vị</small>
-                            <div class="row" id="talent_dual_listbox_wrapper">
-                                <div class="col-md-5">
-                                    <div class="card h-100">
-                                        <div class="card-header py-2">
-                                            <small class="fw-bold">Danh sách người tham dự</small>
-                                            <input type="text" class="form-control form-control-sm mt-2" id="talent_search" placeholder="Tìm kiếm...">
-                                        </div>
-                                        <div class="card-body p-0" style="height:300px;overflow-y:auto;">
-                                            <div class="list-group list-group-flush" id="talent_available_list">
-                                                <div class="text-center text-muted p-3">Đang tải...</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
-                                    <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="talent_btn_add" title="Thêm">
-                                        <i class="fa fa-chevron-right"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="talent_btn_add_all" title="Thêm tất cả">
-                                        <i class="fa fa-angle-double-right"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger mb-2" id="talent_btn_remove" title="Xóa">
-                                        <i class="fa fa-chevron-left"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" id="talent_btn_remove_all" title="Xóa tất cả">
-                                        <i class="fa fa-angle-double-left"></i>
-                                    </button>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="card h-100">
-                                        <div class="card-header py-2">
-                                            <small class="fw-bold">Đã chọn (<span id="talent_selected_count">0</span>)</small>
-                                        </div>
-                                        <div class="card-body p-0" style="height:340px;overflow-y:auto;">
-                                            <div class="list-group list-group-flush" id="talent_selected_list">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
