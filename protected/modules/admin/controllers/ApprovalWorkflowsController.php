@@ -122,24 +122,67 @@ class ApprovalWorkflowsController extends AdminController
         $model = new ApprovalWorkflowApprovers;
         $model->workflow_id = $id;
 
-        if (isset($_POST['ApprovalWorkflowApprovers'])) {
-            $model->setAttributes($_POST['ApprovalWorkflowApprovers']);
-            $model->workflow_id = $id;
+        // Xử lý thêm nhiều người
+        if (isset($_POST['staff_ids']) && isset($_POST['step_index']) && isset($_POST['step_name'])) {
+            $staffIds = $_POST['staff_ids'];
+            $stepIndex = $_POST['step_index'];
+            $stepName = trim($_POST['step_name']);
 
-            if ($model->validate()) {
-                $result = $model->storeViaApi();
-                if ($result['success']) {
-                    Yii::app()->user->setFlash('success', 'Thêm người duyệt thành công');
-                    $this->redirect(array('view', 'id' => $id));
-                } else {
-                    Yii::app()->user->setFlash('error', isset($result['message']) ? $result['message'] : 'Có lỗi xảy ra');
+            if (empty($staffIds) || empty($stepIndex) || empty($stepName)) {
+                Yii::app()->user->setFlash('error', 'Vui lòng chọn đầy đủ thông tin');
+            } else {
+                $successCount = 0;
+                $errorCount = 0;
+
+                foreach ($staffIds as $staffId) {
+                    // Lấy thông tin staff
+                    $staff = Staffs::fetchFromApi($staffId);
+                    if ($staff) {
+                        $approver = new ApprovalWorkflowApprovers;
+                        $approver->workflow_id = $id;
+                        $approver->step_index = $stepIndex;
+                        $approver->step_name = $stepName;
+                        $approver->portal_user_id = $staff->id;
+                        $approver->portal_user_name = $staff->full_name;
+                        $approver->portal_user_email = $staff->email;
+                        $approver->organization_id = $staff->property_id;
+                        $approver->is_active = 1;
+
+                        $result = $approver->storeViaApi();
+                        if ($result['success']) {
+                            $successCount++;
+                        } else {
+                            $errorCount++;
+                        }
+                    }
                 }
+
+                if ($successCount > 0) {
+                    Yii::app()->user->setFlash('success', "Đã thêm {$successCount} người duyệt thành công");
+                }
+                if ($errorCount > 0) {
+                    Yii::app()->user->setFlash('warning', "{$errorCount} người không thể thêm");
+                }
+                $this->redirect(array('view', 'id' => $id));
             }
+        }
+
+        // Lấy danh sách staff cho dual listbox
+        $staffList = array();
+        $staffDataProvider = Staffs::getApiDataProvider(array('is_active' => 1), 500);
+        $staffData = $staffDataProvider->getData();
+        foreach ($staffData as $staff) {
+            $label = $staff->full_name;
+            if ($staff->property_name) {
+                $label .= ' - ' . $staff->property_name;
+            }
+            $staffList[$staff->id] = $label;
         }
 
         $this->render('add_approver', array(
             'workflow' => $workflow,
             'model' => $model,
+            'staffList' => $staffList,
         ));
     }
 

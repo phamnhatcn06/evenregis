@@ -6,13 +6,16 @@ $this->breadcrumbs = array(
 
 $this->menu = array(
     array(
-        'label' => 'Danh sách',
+        'label' => Yii::t('app', 'List') . ' ',
+        'labelIcon' => Yii::t('app', 'Manage'),
         'url' => $this->createUrl('admin'),
-        'color' => 'secondary',
-        'icon' => 'fa-list',
+        'color' => 'primary',
+        'icon' => 'fa-th',
+        'id' => 'btn_manage',
     ),
 );
 $this->Tabletitle = 'Thêm quy trình duyệt mới';
 ?>
+
 
 <?php $this->renderPartial('_form', array('model' => $model)); ?>

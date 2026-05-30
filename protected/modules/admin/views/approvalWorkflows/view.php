@@ -6,22 +6,26 @@ $this->breadcrumbs = array(
 
 $this->menu = array(
     array(
-        'label' => 'Danh sách',
+        'label' => Yii::t('app', 'List') . ' ',
+        'labelIcon' => Yii::t('app', 'Manage'),
         'url' => $this->createUrl('admin'),
-        'color' => 'secondary',
-        'icon' => 'fa-list',
+        'color' => 'primary',
+        'icon' => 'fa-th',
+        'id' => 'btn_manage',
     ),
     array(
         'label' => 'Cập nhật',
         'url' => $this->createUrl('update', array('id' => $model->id)),
-        'color' => 'warning',
-        'icon' => 'fa-edit',
+        'color' => 'info',
+        'icon' => 'fa-eye',
+        'id' => 'btn_update',
     ),
     array(
         'label' => 'Thêm người duyệt',
         'url' => $this->createUrl('addApprover', array('id' => $model->id)),
         'color' => 'primary',
         'icon' => 'fa-user-plus',
+        'id' => 'btn_manage',
     ),
 );
 $this->Tabletitle = 'Chi tiết quy trình: ' . CHtml::encode($model->name);
@@ -114,14 +118,14 @@ $this->Tabletitle = 'Chi tiết quy trình: ' . CHtml::encode($model->name);
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#step<?php echo $stepIndex; ?>">
+                                        data-bs-target="#step<?php echo $stepIndex; ?>">
                                         <span class="badge bg-primary me-2"><?php echo $stepIndex; ?></span>
                                         <?php echo CHtml::encode($stepData['step_name']); ?>
                                         <span class="badge bg-secondary ms-2"><?php echo count($stepData['approvers']); ?> người</span>
                                     </button>
                                 </h2>
                                 <div id="step<?php echo $stepIndex; ?>" class="accordion-collapse collapse show"
-                                     data-bs-parent="#approverAccordion">
+                                    data-bs-parent="#approverAccordion">
                                     <div class="accordion-body p-0">
                                         <table class="table table-hover mb-0">
                                             <thead class="table-light">
@@ -157,8 +161,8 @@ $this->Tabletitle = 'Chi tiết quy trình: ' . CHtml::encode($model->name);
                                                                 )
                                                             ); ?>
                                                             <form id="delete-approver-<?php echo $approver->id; ?>"
-                                                                  action="<?php echo $this->createUrl('deleteApprover', array('id' => $model->id, 'approverId' => $approver->id)); ?>"
-                                                                  method="post" style="display:none;">
+                                                                action="<?php echo $this->createUrl('deleteApprover', array('id' => $model->id, 'approverId' => $approver->id)); ?>"
+                                                                method="post" style="display:none;">
                                                                 <input type="hidden" name="YII_CSRF_TOKEN" value="<?php echo Yii::app()->request->csrfToken; ?>">
                                                             </form>
                                                         </td>
@@ -178,20 +182,20 @@ $this->Tabletitle = 'Chi tiết quy trình: ' . CHtml::encode($model->name);
 </div>
 
 <script>
-function confirmDeleteApprover(approverId) {
-    Swal.fire({
-        title: 'Xác nhận xóa',
-        text: 'Bạn có chắc chắn muốn xóa người duyệt này?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Xóa',
-        cancelButtonText: 'Hủy'
-    }).then(function(result) {
-        if (result.isConfirmed) {
-            document.getElementById('delete-approver-' + approverId).submit();
-        }
-    });
-}
+    function confirmDeleteApprover(approverId) {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: 'Bạn có chắc chắn muốn xóa người duyệt này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById('delete-approver-' + approverId).submit();
+            }
+        });
+    }
 </script>

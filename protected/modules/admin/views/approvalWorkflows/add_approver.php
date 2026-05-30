@@ -11,6 +11,7 @@ $this->menu = array(
         'url' => $this->createUrl('view', array('id' => $workflow->id)),
         'color' => 'secondary',
         'icon' => 'fa-arrow-left',
+        'id' => 'btn_create'
     ),
 );
 $this->Tabletitle = 'Thêm người duyệt cho: ' . CHtml::encode($workflow->name);

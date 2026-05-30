@@ -4,19 +4,21 @@ $this->breadcrumbs = array(
     $model->name => array('view', 'id' => $model->id),
     'Cập nhật',
 );
-
 $this->menu = array(
     array(
-        'label' => 'Danh sách',
+        'label' => Yii::t('app', 'List') . ' ',
+        'labelIcon' => Yii::t('app', 'Manage'),
         'url' => $this->createUrl('admin'),
-        'color' => 'secondary',
-        'icon' => 'fa-list',
+        'color' => 'primary',
+        'icon' => 'fa-th',
+        'id' => 'btn_manage',
     ),
     array(
         'label' => 'Chi tiết',
         'url' => $this->createUrl('view', array('id' => $model->id)),
         'color' => 'info',
         'icon' => 'fa-eye',
+        'id' => 'btn_view',
     ),
 );
 $this->Tabletitle = 'Cập nhật: ' . CHtml::encode($model->name);
