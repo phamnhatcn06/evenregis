@@ -1548,18 +1548,18 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         });
     }
 
-    $(document).on("change", ".attendee-personal-email", function() {
+    $(document).on("change", ".contestant-personal-email", function() {
         var input = $(this);
-        var attendeeId = input.data("attendee-id");
+        var contestantId = input.data("contestant-id");
         var email = input.val();
 
         input.removeClass("border-success border-danger").addClass("border-warning");
 
         $.ajax({
-            url: "/admin/registrations/updateAttendeeEmail",
+            url: "/admin/registrations/updateContestantEmail",
             type: "POST",
             data: {
-                attendee_id: attendeeId,
+                contestant_id: contestantId,
                 personal_email: email
             },
             success: function(res) {
