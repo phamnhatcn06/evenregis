@@ -134,18 +134,20 @@ class ApprovalWorkflowsController extends AdminController
                 $successCount = 0;
                 $errorCount = 0;
 
-                foreach ($staffIds as $staffId) {
-                    // Lấy thông tin staff
-                    $staff = Staffs::fetchFromApi($staffId);
-                    if ($staff) {
+                foreach ($staffIds as $userId) {
+                    // Lấy thông tin user từ Portal SSO
+                    $userResult = ApiClient::get(ApiEndpoints::SSO_USERS . '/' . $userId);
+                    if ($userResult['success'] && isset($userResult['data'])) {
+                        $user = isset($userResult['data']['data']) ? $userResult['data']['data'] : $userResult['data'];
+
                         $approver = new ApprovalWorkflowApprovers;
                         $approver->workflow_id = $id;
                         $approver->step_index = $stepIndex;
                         $approver->step_name = $stepName;
-                        $approver->portal_user_id = $staff->id;
-                        $approver->portal_user_name = $staff->full_name;
-                        $approver->portal_user_email = $staff->email;
-                        $approver->organization_id = $staff->property_id;
+                        $approver->portal_user_id = $user['id'];
+                        $approver->portal_user_name = isset($user['full_name']) ? $user['full_name'] : '';
+                        $approver->portal_user_email = isset($user['email']) ? $user['email'] : '';
+                        $approver->organization_id = isset($user['property_id']) ? $user['property_id'] : null;
                         $approver->is_active = 1;
 
                         $result = $approver->storeViaApi();
@@ -154,6 +156,8 @@ class ApprovalWorkflowsController extends AdminController
                         } else {
                             $errorCount++;
                         }
+                    } else {
+                        $errorCount++;
                     }
                 }
 
