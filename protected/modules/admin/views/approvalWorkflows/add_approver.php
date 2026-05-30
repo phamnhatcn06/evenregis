@@ -16,150 +16,133 @@ $this->menu = array(
 );
 $this->Tabletitle = 'Thêm người duyệt cho: ' . CHtml::encode($workflow->name);
 
-$form = $this->beginWidget('CActiveForm', array(
-    'id' => 'add-approver-form',
-    'enableAjaxValidation' => false,
-    'htmlOptions' => array('class' => 'form-horizontal'),
-));
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/css/plugins/dual-listbox.min.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/js/plugins/dual-listbox.min.js', CClientScript::POS_END);
 ?>
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Thông tin người duyệt</h5>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <label class="col-md-3 col-form-label">Bước duyệt <span class="text-danger">*</span></label>
-                    <div class="col-md-3">
-                        <?php
-                        $stepOptions = array();
-                        for ($i = 1; $i <= $workflow->total_steps; $i++) {
-                            $stepOptions[$i] = 'Bước ' . $i;
-                        }
-                        echo $form->dropDownList($model, 'step_index', $stepOptions, array(
-                            'class' => 'form-select',
-                            'prompt' => '-- Chọn bước --',
-                        ));
-                        ?>
-                        <?php echo $form->error($model, 'step_index', array('class' => 'text-danger')); ?>
-                    </div>
+<form id="add-approver-form" method="post">
+    <input type="hidden" name="<?php echo Yii::app()->request->csrfTokenName; ?>" value="<?php echo Yii::app()->request->csrfToken; ?>">
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Chọn người duyệt</h5>
                 </div>
-
-                <div class="row mb-3">
-                    <label class="col-md-3 col-form-label">Tên bước <span class="text-danger">*</span></label>
-                    <div class="col-md-9">
-                        <?php echo $form->textField($model, 'step_name', array(
-                            'class' => 'form-control',
-                            'placeholder' => 'VD: Giám đốc đơn vị, Nhân sự TĐ...',
-                            'maxlength' => 255,
-                        )); ?>
-                        <?php echo $form->error($model, 'step_name', array('class' => 'text-danger')); ?>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <label class="col-md-3 col-form-label">Bước duyệt <span class="text-danger">*</span></label>
+                        <div class="col-md-3">
+                            <select name="step_index" class="form-select" required>
+                                <option value="">-- Chọn bước --</option>
+                                <?php for ($i = 1; $i <= $workflow->total_steps; $i++): ?>
+                                    <option value="<?php echo $i; ?>">Bước <?php echo $i; ?></option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <hr>
-
-                <div class="row mb-3">
-                    <label class="col-md-3 col-form-label">Portal User ID <span class="text-danger">*</span></label>
-                    <div class="col-md-4">
-                        <?php echo $form->numberField($model, 'portal_user_id', array(
-                            'class' => 'form-control',
-                            'placeholder' => 'ID từ Portal SSO',
-                        )); ?>
-                        <?php echo $form->error($model, 'portal_user_id', array('class' => 'text-danger')); ?>
+                    <div class="row mb-3">
+                        <label class="col-md-3 col-form-label">Tên bước <span class="text-danger">*</span></label>
+                        <div class="col-md-9">
+                            <input type="text" name="step_name" class="form-control"
+                                   placeholder="VD: Giám đốc đơn vị, Nhân sự TĐ..." maxlength="255" required>
+                        </div>
                     </div>
-                    <div class="col-md-5">
-                        <small class="text-muted">Lấy từ JWT token (trường "sub")</small>
-                    </div>
-                </div>
 
-                <div class="row mb-3">
-                    <label class="col-md-3 col-form-label">Tên người duyệt</label>
-                    <div class="col-md-9">
-                        <?php echo $form->textField($model, 'portal_user_name', array(
-                            'class' => 'form-control',
-                            'placeholder' => 'Tên hiển thị',
-                            'maxlength' => 255,
-                        )); ?>
-                    </div>
-                </div>
+                    <hr>
 
-                <div class="row mb-3">
-                    <label class="col-md-3 col-form-label">Email</label>
-                    <div class="col-md-9">
-                        <?php echo $form->textField($model, 'portal_user_email', array(
-                            'class' => 'form-control',
-                            'placeholder' => 'Email từ Portal',
-                            'maxlength' => 255,
-                        )); ?>
-                    </div>
-                </div>
-
-                <hr>
-
-                <div class="row mb-3">
-                    <label class="col-md-3 col-form-label">Áp dụng cho đơn vị</label>
-                    <div class="col-md-9">
-                        <?php echo $form->numberField($model, 'organization_id', array(
-                            'class' => 'form-control',
-                            'placeholder' => 'Để trống = tất cả đơn vị',
-                        )); ?>
-                        <small class="text-muted">Để trống nếu người này duyệt cho tất cả đơn vị</small>
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <label class="col-md-3 col-form-label">Trạng thái</label>
-                    <div class="col-md-9">
-                        <div class="form-check form-switch">
-                            <?php echo $form->checkBox($model, 'is_active', array(
-                                'class' => 'form-check-input',
-                                'id' => 'is_active',
-                                'checked' => true,
-                            )); ?>
-                            <label class="form-check-label" for="is_active">Hoạt động</label>
+                    <div class="row mb-3">
+                        <label class="col-md-12 col-form-label mb-2">
+                            <strong>Chọn nhân viên</strong> <span class="text-danger">*</span>
+                            <small class="text-muted ms-2">(Kéo từ trái sang phải hoặc double-click)</small>
+                        </label>
+                        <div class="col-md-12">
+                            <select id="staff-listbox" name="staff_ids[]" multiple="multiple" style="height:350px;">
+                                <?php foreach ($staffList as $id => $name): ?>
+                                    <option value="<?php echo $id; ?>"><?php echo CHtml::encode($name); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                 </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="<?php echo $this->createUrl('view', array('id' => $workflow->id)); ?>" class="btn btn-secondary">
+                            <i class="fa fa-arrow-left"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="btn-submit">
+                            <i class="fa fa-save"></i> Thêm người duyệt
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="card-footer">
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="<?php echo $this->createUrl('view', array('id' => $workflow->id)); ?>" class="btn btn-secondary">
-                        <i class="fa fa-arrow-left"></i> Quay lại
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-save"></i> Thêm người duyệt
-                    </button>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fa fa-info-circle"></i> Hướng dẫn</h6>
+                    <ul class="small text-muted mb-0">
+                        <li class="mb-2"><strong>Bước duyệt:</strong> Chọn bước trong quy trình (1, 2, 3...)</li>
+                        <li class="mb-2"><strong>Tên bước:</strong> Mô tả vai trò (VD: Giám đốc đơn vị)</li>
+                        <li class="mb-2"><strong>Chọn nhân viên:</strong> Double-click hoặc kéo sang phải</li>
+                        <li class="mb-2">Mỗi nhân viên sẽ được gán <strong>đơn vị của họ</strong> tự động</li>
+                        <li>Có thể chọn nhiều người cho cùng 1 bước</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Workflow: <?php echo CHtml::encode($workflow->name); ?></h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Mã:</strong> <?php echo CHtml::encode($workflow->code); ?></p>
+                    <p class="mb-0"><strong>Số bước:</strong> <?php echo $workflow->total_steps; ?></p>
+                </div>
+            </div>
+
+            <div class="card mt-3 border-info">
+                <div class="card-body">
+                    <h6 class="card-title text-info"><i class="fa fa-lightbulb-o"></i> Ví dụ</h6>
+                    <p class="small mb-2"><strong>Bước 1 - GĐ đơn vị:</strong></p>
+                    <ul class="small text-muted mb-0">
+                        <li>Nguyễn Văn A - KS Hạ Long</li>
+                        <li>Trần Văn B - KS Đà Nẵng</li>
+                        <li>Lê Văn C - KS Nha Trang</li>
+                    </ul>
+                    <p class="small text-muted mt-2 mb-0">→ Mỗi người chỉ duyệt đơn của đơn vị mình</p>
                 </div>
             </div>
         </div>
     </div>
+</form>
 
-    <div class="col-md-4">
-        <div class="card bg-light">
-            <div class="card-body">
-                <h6 class="card-title"><i class="fa fa-info-circle"></i> Lưu ý</h6>
-                <ul class="small text-muted mb-0">
-                    <li class="mb-2"><strong>Portal User ID:</strong> Là ID của user trong hệ thống Portal SSO (trường "sub" trong JWT)</li>
-                    <li class="mb-2"><strong>Tên bước:</strong> Mô tả vai trò duyệt ở bước này (GĐ đơn vị, NS TĐ...)</li>
-                    <li class="mb-2"><strong>Đơn vị:</strong> Nếu chỉ định, người này chỉ duyệt đơn của đơn vị đó</li>
-                    <li>Có thể thêm nhiều người cho cùng 1 bước (bất kỳ ai cũng có thể duyệt)</li>
-                </ul>
-            </div>
-        </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var listbox = new DualListbox('#staff-listbox', {
+        availableTitle: 'Danh sách nhân viên',
+        selectedTitle: 'Đã chọn',
+        addButtonText: '>',
+        removeButtonText: '<',
+        addAllButtonText: '>>',
+        removeAllButtonText: '<<',
+        searchPlaceholder: 'Tìm kiếm...'
+    });
 
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6 class="card-title mb-0">Workflow: <?php echo CHtml::encode($workflow->name); ?></h6>
-            </div>
-            <div class="card-body">
-                <p class="mb-1"><strong>Mã:</strong> <?php echo CHtml::encode($workflow->code); ?></p>
-                <p class="mb-0"><strong>Số bước:</strong> <?php echo $workflow->total_steps; ?></p>
-            </div>
-        </div>
-    </div>
-</div>
+    // Submit validation
+    document.getElementById('add-approver-form').addEventListener('submit', function(e) {
+        var selected = document.querySelectorAll('#staff-listbox option:checked');
+        if (selected.length === 0) {
+            e.preventDefault();
+            alert('Vui lòng chọn ít nhất 1 nhân viên');
+            return false;
+        }
 
-<?php $this->endWidget(); ?>
+        var btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang xử lý...';
+    });
+});
+</script>
