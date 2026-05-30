@@ -121,6 +121,9 @@ class ApprovalWorkflowsController extends AdminController
         $workflow = $this->loadModelById($id);
         $model = new ApprovalWorkflowApprovers;
         $model->workflow_id = $id;
+        // Lấy thông tin user từ Portal SSO
+        $params = Yii::app()->params;
+        $portalApiUrl = $params['portal']['api_url'] . '/api/sso/users';
 
         // Xử lý thêm nhiều người
         if (isset($_POST['staff_ids']) && isset($_POST['step_index']) && isset($_POST['step_name'])) {
@@ -134,9 +137,6 @@ class ApprovalWorkflowsController extends AdminController
                 $successCount = 0;
                 $errorCount = 0;
 
-                // Lấy thông tin user từ Portal SSO
-                $params = Yii::app()->params;
-                $portalApiUrl = $params['portal']['api_url'] . '/api/sso/users';
 
                 foreach ($staffIds as $userId) {
                     $url = $portalApiUrl . '/' . $userId;
@@ -194,21 +194,22 @@ class ApprovalWorkflowsController extends AdminController
 
         // Lấy danh sách users từ Portal SSO
         $userList = array();
-        $params = Yii::app()->params;
-        $portalApiUrl = $params['portal']['api_url'] . '/api/sso/users';
-
         // Lấy property_code của user hiện tại (nếu có)
         $ssoUser = AuthHandler::getUser();
         $queryParams = array('per_page' => 500);
         if ($ssoUser && isset($ssoUser['property_code']) && $ssoUser['property_code']) {
-            $queryParams['property_code'] = $ssoUser['property_code'];
+            $queryParams['hotelID'] = $ssoUser['property_code'];
         }
 
         $url = $portalApiUrl . '?' . http_build_query($queryParams);
+
+        // Lấy token từ session
+        $token = isset(Yii::app()->session['sso_token']) ? Yii::app()->session['sso_token'] : '';
+
         $context = stream_context_create(array(
             'http' => array(
                 'method' => 'GET',
-                'header' => "Accept: application/json\r\n",
+                'header' => "Accept: application/json\r\nAuthorization: Bearer {$token}\r\n",
                 'timeout' => 30,
             ),
             'ssl' => array(
@@ -216,7 +217,6 @@ class ApprovalWorkflowsController extends AdminController
                 'verify_peer_name' => false,
             ),
         ));
-
         $response = @file_get_contents($url, false, $context);
         if ($response) {
             $data = json_decode($response, true);
