@@ -667,10 +667,10 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_SUBMITTED;
-			$submittedAt = time();
+			$submittedAt = date('Y-m-d H:i:s');
 			$model->submitted_at = $submittedAt;
 			$ssoUser = AuthHandler::getUser();
-			$submittedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			$submittedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 			if ($submittedBy) {
 				$model->submitted_by = $submittedBy;
 			}
