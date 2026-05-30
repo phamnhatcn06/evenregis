@@ -497,24 +497,19 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
         <div class="row">
             <?php if ($sportsHasAlliance): ?>
                 <div class="col-md-3 mb-3 mb-md-0">
+
                     <?php $this->renderPartial('_alliance_sidebar', array(
                         'pendingRequests' => $allianceByContent['sports']['pending'],
                         'historyItems' => $allianceByContent['sports']['history'],
                         'contentCode' => 'sports',
+                        'allianceRequest' => $allianceRequest,
                         'model' => $model,
                     )); ?>
+
                 </div>
             <?php endif; ?>
             <div class="<?php echo $sportsHasAlliance ? 'col-md-9' : 'col-12'; ?>">
-                <?php if (isset($allianceRequest) && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED && !empty($model->relation_property_name)): ?>
-                    <div class="alert alert-success d-flex align-items-center py-2 px-3 mb-3 border-start border-4 border-success">
-                        <i class="fa fa-handshake-o me-2 fa-lg text-success"></i>
-                        <div>
-                            Đơn vị đang liên quân với: <strong><?php echo CHtml::encode($model->relation_property_name); ?></strong>.
-                            Hệ thống đang hiển thị và chia sẻ danh sách các đội thi đấu thể thao của cả hai đơn vị.
-                        </div>
-                    </div>
-                <?php endif; ?>
+
                 <?php if ($canEdit): ?>
                     <!-- Form chọn liên quân và môn thể thao -->
                     <div class="row mb-3 g-3 align-items-end">
@@ -556,7 +551,6 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
                     </div>
                 </div>
 
-                <!-- Danh sách đã đăng ký -->
                 <?php
                 if (!empty($sportTeams)) {
                     // Sắp xếp $sportTeams theo tên bộ môn thi đấu
@@ -574,6 +568,15 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
                             $sportCounts[$sportName] = 0;
                         }
                         $sportCounts[$sportName]++;
+                    }
+                }
+
+                $ownAttendeeIds = array();
+                if (!empty($attendees)) {
+                    foreach ($attendees as $att) {
+                        if (isset($att['id'])) {
+                            $ownAttendeeIds[] = (int)$att['id'];
+                        }
                     }
                 }
                 ?>
@@ -604,6 +607,15 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
                                     $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
                                     $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
                                     $teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
+
+                                    $hasOwnMember = false;
+                                    foreach ($members as $m) {
+                                        $mAttendeeId = isset($m['attendee_id']) ? (int)$m['attendee_id'] : null;
+                                        if ($mAttendeeId && in_array($mAttendeeId, $ownAttendeeIds)) {
+                                            $hasOwnMember = true;
+                                            break;
+                                        }
+                                    }
 
                                     $isFirstRowForSport = !in_array($sportName, $renderedSports);
                                     if ($isFirstRowForSport) {
@@ -651,6 +663,11 @@ $sportsHasAlliance = ($sportsPendingCount > 0 || $sportsHistoryCount > 0);
                                                         <i class="fa fa-trash"></i>
                                                     </button>
                                                 <?php else: ?>
+                                                    <?php if ($hasOwnMember && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED): ?>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editSportTeam(<?php echo $teamId; ?>)" title="Sửa thành viên liên quân">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </button>
+                                                    <?php endif; ?>
                                                     <span class="badge bg-secondary">Liên quân</span>
                                                 <?php endif; ?>
                                             </td>
@@ -1101,6 +1118,10 @@ foreach ($registrationDetails as $d) {
 $existingSportTeams = array();
 // Include sport IDs from existing sport teams
 foreach ($sportTeams as $team) {
+    $teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
+    if ($teamPropertyId != $model->property_id) {
+        continue;
+    }
     $teamSportId = isset($team->sport_id) ? $team->sport_id : (isset($team['sport_id']) ? $team['sport_id'] : null);
     if ($teamSportId && !in_array((int)$teamSportId, $sportIds)) {
         $sportIds[] = (int)$teamSportId;

@@ -2081,15 +2081,10 @@ var RegistrationView = (function() {
                 sportSelectedAttendees = [];
                 originalSportTeamAttendeeIds = [];
                 members.forEach(function(m) {
-                    originalSportTeamAttendeeIds.push(m.attendee_id);
                     var att = sportAllAttendees.find(function(a) { return a.id == m.attendee_id; });
                     if (att) {
+                        originalSportTeamAttendeeIds.push(m.attendee_id);
                         sportSelectedAttendees.push(att);
-                    } else {
-                        sportSelectedAttendees.push({
-                            id: m.attendee_id,
-                            full_name: m.name || m.attendee_name || ''
-                        });
                     }
                 });
                 renderSportAvailableAttendees();
@@ -2126,6 +2121,13 @@ var RegistrationView = (function() {
             return;
         }
 
+        var btnAdd = document.getElementById('btn_add_to_preview');
+        var originalHtml = btnAdd ? btnAdd.innerHTML : '';
+        if (btnAdd) {
+            btnAdd.disabled = true;
+            btnAdd.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang cập nhật...';
+        }
+
         var teamName = document.getElementById('sport_team_name')?.value || '';
         var formData = new FormData();
         formData.append('team_id', editingTeamId);
@@ -2143,6 +2145,10 @@ var RegistrationView = (function() {
         })
         .then(function(response) { return response.json(); })
         .then(function(data) {
+            if (btnAdd) {
+                btnAdd.disabled = false;
+                btnAdd.innerHTML = originalHtml;
+            }
             if (data.success) {
                 Toast.success('Cập nhật đội thành công.');
                 editingTeamId = null;
@@ -2153,6 +2159,10 @@ var RegistrationView = (function() {
             }
         })
         .catch(function() {
+            if (btnAdd) {
+                btnAdd.disabled = false;
+                btnAdd.innerHTML = originalHtml;
+            }
             Toast.error('Lỗi kết nối server.');
         });
     }

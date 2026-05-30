@@ -1387,8 +1387,28 @@ class RegistrationsController extends AdminController
 			if ($userPropertyCode !== '9999') {
 				$userProperty = Properties::fetchByCode($userPropertyCode);
 				if ($userProperty && $team->property_id != $userProperty->id) {
-					echo CJSON::encode(array('success' => false, 'error' => 'Bạn không có quyền sửa đội liên quân này.'));
-					Yii::app()->end();
+					$isAllianceApproved = false;
+					if ($team->event_id) {
+						$allianceRequest = AllianceRequests::findByRegistration(
+							$team->event_id,
+							$team->property_id,
+							$userProperty->id
+						);
+						if (!$allianceRequest) {
+							$allianceRequest = AllianceRequests::findByRegistration(
+								$team->event_id,
+								$userProperty->id,
+								$team->property_id
+							);
+						}
+						if ($allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED) {
+							$isAllianceApproved = true;
+						}
+					}
+					if (!$isAllianceApproved) {
+						echo CJSON::encode(array('success' => false, 'error' => 'Bạn không có quyền sửa đội liên quân này.'));
+						Yii::app()->end();
+					}
 				}
 			}
 
@@ -1435,14 +1455,34 @@ class RegistrationsController extends AdminController
 			$team->updateViaApi();
 		}
 
-		// Delete old members
-		$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
-		foreach ($oldMembers as $m) {
-			SportTeamMembers::deleteViaApi($m->id);
+		if (!$registrationId && $team) {
+			$registrationId = $team->registration_id;
 		}
 
-		// Create new members
+		// Fetch own attendee IDs to identify members belonging to our unit
+		$ownAttendeeIds = array();
+		if ($registrationId) {
+			$attendees = Attendees::getByRegistrationId($registrationId);
+			foreach ($attendees as $att) {
+				if (isset($att['id'])) {
+					$ownAttendeeIds[] = (int)$att['id'];
+				}
+			}
+		}
+
+		// Delete old members belonging to the current unit only
+		$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+		foreach ($oldMembers as $m) {
+			if (in_array((int)$m->attendee_id, $ownAttendeeIds)) {
+				SportTeamMembers::deleteViaApi($m->id);
+			}
+		}
+
+		// Create new members (only for own unit's athletes as a security safeguard)
 		foreach ($attendeeIds as $idx => $attId) {
+			if (!in_array((int)$attId, $ownAttendeeIds)) {
+				continue;
+			}
 			$member = new SportTeamMembers();
 			$member->sport_team_id = $teamId;
 			$member->attendee_id = $attId;

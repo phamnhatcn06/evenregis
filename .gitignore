@@ -10,6 +10,14 @@
 .claude/settings.local.json
 .claude/CLAUDE.local.md
 
+# Yii Framework
+/framework/*
+!/framework/.gitkeep
+/protected/runtime/*
+!/protected/runtime/.gitkeep
+/assets/*
+!/assets/.gitkeep
+
 # Dependencies
 node_modules/
 vendor/
@@ -42,3 +50,4 @@ temp/
 
 # Uploads
 uploads/
+protected/config/database.php

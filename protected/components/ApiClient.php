@@ -113,7 +113,7 @@ class ApiClient extends CComponent
         $ch = curl_init($url);
 
         $headers = array();
-        
+
         if ($method !== 'POST_MULTIPART') {
             $headers[] = 'Content-Type: application/json';
         }
@@ -127,7 +127,7 @@ class ApiClient extends CComponent
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_TIMEOUT => self::$timeout,
-            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_FOLLOWLOCATION => true,
         );
 

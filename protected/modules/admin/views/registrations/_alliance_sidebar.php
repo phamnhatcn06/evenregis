@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alliance sidebar partial - shows pending requests and history in a sidebar column
  *
@@ -19,7 +20,15 @@ if (!$hasPending && !$hasHistory) return;
         <i class="fa fa-handshake-o"></i>
         <span>Liên quân</span>
     </div>
-
+    <?php if (isset($allianceRequest) && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED && !empty($model->relation_property_name)): ?>
+        <div class="alert alert-success d-flex align-items-center py-2 px-3 mb-3 border-start border-4 border-success">
+            <i class="fa fa-handshake-o me-2 fa-lg text-success"></i>
+            <div>
+                Đơn vị đang liên quân với: <strong><?php echo CHtml::encode($model->relation_property_name); ?></strong>.
+                Hệ thống đang hiển thị và chia sẻ danh sách các đội thi đấu thể thao của cả hai đơn vị.
+            </div>
+        </div>
+    <?php endif; ?>
     <?php if ($hasPending): ?>
         <?php foreach ($pendingRequests as $item):
             $req = $item['request'];
@@ -82,20 +91,20 @@ if (!$hasPending && !$hasHistory) return;
                             $statusIcon = 'fa-clock-o';
                         }
                     ?>
-                    <div class="alliance-history-item <?php echo $idx > 0 ? 'has-border' : ''; ?>">
-                        <div class="alliance-history-status <?php echo $statusClass; ?>">
-                            <i class="fa <?php echo $statusIcon; ?>"></i>
-                        </div>
-                        <div class="alliance-history-info">
-                            <div class="alliance-history-partner">
-                                <?php echo $isSent ? 'Đến' : 'Từ'; ?> <strong><?php echo CHtml::encode($partnerName); ?></strong>
+                        <div class="alliance-history-item <?php echo $idx > 0 ? 'has-border' : ''; ?>">
+                            <div class="alliance-history-status <?php echo $statusClass; ?>">
+                                <i class="fa <?php echo $statusIcon; ?>"></i>
                             </div>
-                            <div class="alliance-history-time"><?php echo $requestedAt ? MyHelper::formatDateTime($requestedAt) : ''; ?></div>
-                            <?php if ($rejectionReason && $status == AllianceRequests::STATUS_REJECTED): ?>
-                                <div class="alliance-history-reason"><i class="fa fa-exclamation-triangle"></i><?php echo CHtml::encode($rejectionReason); ?></div>
-                            <?php endif; ?>
+                            <div class="alliance-history-info">
+                                <div class="alliance-history-partner">
+                                    <?php echo $isSent ? 'Đến' : 'Từ'; ?> <strong><?php echo CHtml::encode($partnerName); ?></strong>
+                                </div>
+                                <div class="alliance-history-time"><?php echo $requestedAt ? MyHelper::formatDateTime($requestedAt) : ''; ?></div>
+                                <?php if ($rejectionReason && $status == AllianceRequests::STATUS_REJECTED): ?>
+                                    <div class="alliance-history-reason"><i class="fa fa-exclamation-triangle"></i><?php echo CHtml::encode($rejectionReason); ?></div>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -104,192 +113,227 @@ if (!$hasPending && !$hasHistory) return;
 </div>
 
 <style>
-.alliance-sidebar {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 12px;
-    padding: 16px;
-    height: 100%;
-    border: 1px solid rgba(0,0,0,0.05);
-}
-.alliance-sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-}
-.alliance-sidebar-header i {
-    color: #6c757d;
-}
-.alliance-pending-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-left: 3px solid #ffc107;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-.alliance-pending-icon {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-.alliance-pending-icon i {
-    color: #856404;
-    font-size: 14px;
-}
-.alliance-pending-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #212529;
-}
-.alliance-pending-from {
-    font-size: 12px;
-    color: #6c757d;
-    margin-top: 2px;
-}
-.alliance-pending-from strong {
-    color: #495057;
-}
-.alliance-pending-time {
-    font-size: 11px;
-    color: #adb5bd;
-    margin-top: 4px;
-}
-.alliance-pending-time i {
-    margin-right: 4px;
-}
-.alliance-pending-actions {
-    display: flex;
-    gap: 6px;
-    margin-top: 10px;
-}
-.btn-alliance-accept, .btn-alliance-reject {
-    flex: 1;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-}
-.btn-alliance-accept {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: #fff;
-}
-.btn-alliance-accept:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(40,167,69,0.35);
-}
-.btn-alliance-reject {
-    background: #fff;
-    color: #dc3545;
-    border: 1px solid #dc3545;
-}
-.btn-alliance-reject:hover {
-    background: #dc3545;
-    color: #fff;
-}
-.alliance-history-section {
-    margin-top: 12px;
-}
-.alliance-history-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: #6c757d;
-    text-decoration: none;
-    padding: 8px 10px;
-    background: rgba(0,0,0,0.03);
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-.alliance-history-toggle:hover {
-    background: rgba(0,0,0,0.06);
-    color: #495057;
-}
-.alliance-history-toggle .toggle-icon {
-    margin-left: auto;
-    font-size: 10px;
-    transition: transform 0.2s ease;
-}
-.alliance-history-toggle[aria-expanded="true"] .toggle-icon {
-    transform: rotate(180deg);
-}
-.alliance-history-list {
-    margin-top: 10px;
-    background: #fff;
-    border-radius: 8px;
-    padding: 8px;
-}
-.alliance-history-item {
-    display: flex;
-    gap: 10px;
-    padding: 8px 4px;
-}
-.alliance-history-item.has-border {
-    border-top: 1px solid #f1f3f4;
-}
-.alliance-history-status {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-.alliance-history-status i {
-    font-size: 12px;
-}
-.alliance-history-status.status-approved {
-    background: #d4edda;
-    color: #28a745;
-}
-.alliance-history-status.status-rejected {
-    background: #f8d7da;
-    color: #dc3545;
-}
-.alliance-history-status.status-pending {
-    background: #fff3cd;
-    color: #856404;
-}
-.alliance-history-info {
-    flex: 1;
-    min-width: 0;
-}
-.alliance-history-partner {
-    font-size: 12px;
-    color: #495057;
-}
-.alliance-history-partner strong {
-    color: #212529;
-}
-.alliance-history-time {
-    font-size: 11px;
-    color: #adb5bd;
-    margin-top: 2px;
-}
-.alliance-history-reason {
-    font-size: 11px;
-    color: #dc3545;
-    margin-top: 4px;
-    padding: 4px 6px;
-    background: #fff5f5;
-    border-radius: 4px;
-}
-.alliance-history-reason i {
-    margin-right: 4px;
-}
+    .alliance-sidebar {
+        border-radius: 12px;
+        padding: 16px;
+        height: 100%;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .alliance-sidebar-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .alliance-sidebar-header i {
+        color: #6c757d;
+    }
+
+    .alliance-pending-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-left: 3px solid #ffc107;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .alliance-pending-icon {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .alliance-pending-icon i {
+        color: #856404;
+        font-size: 14px;
+    }
+
+    .alliance-pending-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .alliance-pending-from {
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 2px;
+    }
+
+    .alliance-pending-from strong {
+        color: #495057;
+    }
+
+    .alliance-pending-time {
+        font-size: 11px;
+        color: #adb5bd;
+        margin-top: 4px;
+    }
+
+    .alliance-pending-time i {
+        margin-right: 4px;
+    }
+
+    .alliance-pending-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    .btn-alliance-accept,
+    .btn-alliance-reject {
+        flex: 1;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+    .btn-alliance-accept {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: #fff;
+    }
+
+    .btn-alliance-accept:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.35);
+    }
+
+    .btn-alliance-reject {
+        background: #fff;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+
+    .btn-alliance-reject:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .alliance-history-section {
+        margin-top: 12px;
+    }
+
+    .alliance-history-toggle {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #6c757d;
+        text-decoration: none;
+        padding: 8px 10px;
+        background: rgba(0, 0, 0, 0.03);
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .alliance-history-toggle:hover {
+        background: rgba(0, 0, 0, 0.06);
+        color: #495057;
+    }
+
+    .alliance-history-toggle .toggle-icon {
+        margin-left: auto;
+        font-size: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    .alliance-history-toggle[aria-expanded="true"] .toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    .alliance-history-list {
+        margin-top: 10px;
+        background: #fff;
+        border-radius: 8px;
+        padding: 8px;
+    }
+
+    .alliance-history-item {
+        display: flex;
+        gap: 10px;
+        padding: 8px 4px;
+    }
+
+    .alliance-history-item.has-border {
+        border-top: 1px solid #f1f3f4;
+    }
+
+    .alliance-history-status {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .alliance-history-status i {
+        font-size: 12px;
+    }
+
+    .alliance-history-status.status-approved {
+        background: #d4edda;
+        color: #28a745;
+    }
+
+    .alliance-history-status.status-rejected {
+        background: #f8d7da;
+        color: #dc3545;
+    }
+
+    .alliance-history-status.status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .alliance-history-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .alliance-history-partner {
+        font-size: 12px;
+        color: #495057;
+    }
+
+    .alliance-history-partner strong {
+        color: #212529;
+    }
+
+    .alliance-history-time {
+        font-size: 11px;
+        color: #adb5bd;
+        margin-top: 2px;
+    }
+
+    .alliance-history-reason {
+        font-size: 11px;
+        color: #dc3545;
+        margin-top: 4px;
+        padding: 4px 6px;
+        background: #fff5f5;
+        border-radius: 4px;
+    }
+
+    .alliance-history-reason i {
+        margin-right: 4px;
+    }
 </style>
