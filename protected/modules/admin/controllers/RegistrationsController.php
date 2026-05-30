@@ -303,7 +303,7 @@ class RegistrationsController extends AdminController
 								'attendee_name' => isset($attInfo['full_name']) ? $attInfo['full_name'] : '',
 								'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
 								'division_name' => isset($attInfo['division_name']) ? $attInfo['division_name'] : '',
-								'personal_email' => isset($attInfo['personal_email']) ? $attInfo['personal_email'] : '',
+								'personal_email' => isset($c->personal_email) ? $c->personal_email : (isset($c['personal_email']) ? $c['personal_email'] : ''),
 								'candidate_number' => isset($c->candidate_number) ? $c->candidate_number : (isset($c['candidate_number']) ? $c['candidate_number'] : ''),
 								'height_cm' => isset($c->height_cm) ? $c->height_cm : (isset($c['height_cm']) ? $c['height_cm'] : null),
 								'weight_kg' => isset($c->weight_kg) ? $c->weight_kg : (isset($c['weight_kg']) ? $c['weight_kg'] : null),
