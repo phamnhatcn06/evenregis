@@ -667,12 +667,17 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_SUBMITTED;
-			$model->submitted_at = time();
+			$submittedAt = time();
+			$model->submitted_at = $submittedAt;
 			$ssoUser = AuthHandler::getUser();
-			if (isset($ssoUser['id'])) {
-				$model->submitted_by = $ssoUser['id'];
+			$submittedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			if ($submittedBy) {
+				$model->submitted_by = $submittedBy;
 			}
-			$result = $model->updateViaApi();
+			$result = $model->updateViaApi(array(
+				'submitted_at' => $submittedAt,
+				'submitted_by' => $submittedBy,
+			));
 
 			if ($result['success']) {
 				// Reset rejected attendees to pending (approved attendees keep their status)
