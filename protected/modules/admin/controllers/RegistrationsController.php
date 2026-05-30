@@ -703,12 +703,17 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_APPROVED;
-			$model->reviewed_at = time();
+			$reviewedAt = time();
+			$model->reviewed_at = $reviewedAt;
 			$ssoUser = AuthHandler::getUser();
-			if (isset($ssoUser['id'])) {
-				$model->reviewed_by = $ssoUser['id'];
+			$reviewedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			if ($reviewedBy) {
+				$model->reviewed_by = $reviewedBy;
 			}
-			$result = $model->updateViaApi();
+			$result = $model->updateViaApi(array(
+				'reviewed_at' => $reviewedAt,
+				'reviewed_by' => $reviewedBy,
+			));
 
 			if ($result['success']) {
 				Yii::app()->user->setFlash('success', 'Đã phê duyệt phiếu đăng ký.');
