@@ -729,13 +729,20 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$model->status = Registrations::STATUS_REJECTED;
-			$model->reviewed_at = time();
+			$reviewedAt = time();
+			$model->reviewed_at = $reviewedAt;
 			$ssoUser = AuthHandler::getUser();
-			if (isset($ssoUser['id'])) {
-				$model->reviewed_by = $ssoUser['id'];
+			$reviewedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			if ($reviewedBy) {
+				$model->reviewed_by = $reviewedBy;
 			}
-			$model->rejection_reason = Yii::app()->getRequest()->getPost('rejection_reason', '');
-			$result = $model->updateViaApi();
+			$rejectionReason = Yii::app()->getRequest()->getPost('rejection_reason', '');
+			$model->rejection_reason = $rejectionReason;
+			$result = $model->updateViaApi(array(
+				'reviewed_at' => $reviewedAt,
+				'reviewed_by' => $reviewedBy,
+				'rejection_reason' => $rejectionReason,
+			));
 
 			if ($result['success']) {
 				Yii::app()->user->setFlash('success', 'Đã từ chối phiếu đăng ký.');
