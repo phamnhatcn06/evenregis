@@ -624,3 +624,34 @@ select:focus {
   color: #fff !important;
   border-color: #dc3545 !important;
 }
+
+/* errorSummary styling */
+.errorSummary {
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background-color: #fef2f2 !important; /* Nền đỏ nhạt */
+  border: 1px solid #fca5a5 !important; /* Viền đỏ */
+  border-radius: 0.375rem; /* Bo góc */
+  color: #991b1b !important; /* Chữ tương thích với nền (đỏ đậm dễ đọc) */
+  font-size: 0.875rem;
+}
+
+.errorSummary p {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #7f1d1d !important; /* Tiêu đề đỏ rất đậm */
+}
+
+.errorSummary ul {
+  padding-left: 1.25rem;
+  margin: 0;
+}
+
+.errorSummary li {
+  margin-bottom: 0.25rem;
+  color: #b91c1c !important;
+}
+
+.errorSummary li:last-child {
+  margin-bottom: 0;
+}

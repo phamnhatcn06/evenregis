@@ -33,18 +33,54 @@ class RegistrationsController extends AdminController
 
 		// Load alliance request nếu có liên quân (hỗ trợ tìm kiếm 2 chiều)
 		$allianceRequest = null;
-		if ($model->relation_property_id && $model->event_id && $model->property_id) {
-			$allianceRequest = AllianceRequests::findByRegistration(
-				$model->event_id,
-				$model->property_id,
-				$model->relation_property_id
-			);
-			if (!$allianceRequest) {
+		if ($model->event_id && $model->property_id) {
+			if ($model->relation_property_id) {
 				$allianceRequest = AllianceRequests::findByRegistration(
 					$model->event_id,
-					$model->relation_property_id,
-					$model->property_id
+					$model->property_id,
+					$model->relation_property_id
 				);
+				if (!$allianceRequest) {
+					$allianceRequest = AllianceRequests::findByRegistration(
+						$model->event_id,
+						$model->relation_property_id,
+						$model->property_id
+					);
+				}
+			} else {
+				// Nếu relation_property_id chưa được set (ví dụ ở đơn vị yêu cầu liên quân),
+				// thực hiện tìm kiếm xem có yêu cầu liên quân nào được duyệt liên quan đến đơn vị này hay không.
+				// 1. Tìm với vai trò đơn vị yêu cầu
+				$allianceRequests = AllianceRequests::getApiDataProvider(array(
+					'event_id' => $model->event_id,
+					'requester_org_id' => $model->property_id,
+					'status' => AllianceRequests::STATUS_APPROVED,
+				), 1)->getData();
+
+				if (!empty($allianceRequests)) {
+					$allianceRequest = $allianceRequests[0];
+					$model->relation_property_id = $allianceRequest->target_org_id;
+					if (empty($model->relation_property_name)) {
+						$relProp = Properties::fetchFromApi($model->relation_property_id);
+						$model->relation_property_name = $relProp ? $relProp->name : '';
+					}
+				} else {
+					// 2. Tìm với vai trò đơn vị nhận
+					$allianceRequests = AllianceRequests::getApiDataProvider(array(
+						'event_id' => $model->event_id,
+						'target_org_id' => $model->property_id,
+						'status' => AllianceRequests::STATUS_APPROVED,
+					), 1)->getData();
+
+					if (!empty($allianceRequests)) {
+						$allianceRequest = $allianceRequests[0];
+						$model->relation_property_id = $allianceRequest->requester_org_id;
+						if (empty($model->relation_property_name)) {
+							$relProp = Properties::fetchFromApi($model->relation_property_id);
+							$model->relation_property_name = $relProp ? $relProp->name : '';
+						}
+					}
+				}
 			}
 		}
 		$isAllianceApproved = $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED;
@@ -60,6 +96,7 @@ class RegistrationsController extends AdminController
 			$attId = isset($att['id']) ? $att['id'] : null;
 			if ($attId) {
 				$att['property_name'] = $model->property_name;
+				$att['personal_email'] = isset($att['personal_email']) ? $att['personal_email'] : '';
 				$attendeesMap[$attId] = $att;
 			}
 		}
@@ -79,6 +116,7 @@ class RegistrationsController extends AdminController
 						$attId = isset($att['id']) ? $att['id'] : null;
 						if ($attId) {
 							$att['property_name'] = $model->relation_property_name;
+							$att['personal_email'] = isset($att['personal_email']) ? $att['personal_email'] : '';
 							$attendeesMap[$attId] = $att;
 						}
 					}
@@ -112,6 +150,7 @@ class RegistrationsController extends AdminController
 				'attendee_name' => $attendeeName,
 				'position_name' => $positionName,
 				'division_name' => $divisionName,
+				'personal_email' => isset($attendeeInfo['personal_email']) ? $attendeeInfo['personal_email'] : '',
 				'status' => isset($reg->status) ? $reg->status : (isset($reg['status']) ? $reg['status'] : 0),
 			);
 		}
@@ -129,13 +168,24 @@ class RegistrationsController extends AdminController
 		$sportTeams = array();
 		$sportTeamMembers = array();
 		if ($model->event_id && $model->property_id) {
-			$teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id), 100)->getData();
+			// Tải đội của đơn vị hiện tại theo registration_id
+			$teamsData = SportTeams::getApiDataProvider(array('registration_id' => $model->id), 100)->getData();
 
-			// Nếu liên quân đã được duyệt, tải thêm các đội thi đấu thể thao của đối tác liên quân
+			// Nếu liên quân đã được duyệt, tải thêm các đội thi đấu thể thao của đối tác liên quân theo registration_id của đối tác
 			if ($isAllianceApproved && $model->relation_property_id) {
-				$partnerTeamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->relation_property_id), 100)->getData();
-				if (!empty($partnerTeamsData)) {
-					$teamsData = array_merge($teamsData, $partnerTeamsData);
+				$partnerRegs = Registrations::getApiDataProvider(array(
+					'event_id' => $model->event_id,
+					'property_id' => $model->relation_property_id,
+				), 1)->getData();
+				if (!empty($partnerRegs)) {
+					$partnerReg = $partnerRegs[0];
+					$partnerRegId = isset($partnerReg['id']) ? $partnerReg['id'] : (isset($partnerReg->id) ? $partnerReg->id : null);
+					if ($partnerRegId) {
+						$partnerTeamsData = SportTeams::getApiDataProvider(array('registration_id' => $partnerRegId), 100)->getData();
+						if (!empty($partnerTeamsData)) {
+							$teamsData = array_merge($teamsData, $partnerTeamsData);
+						}
+					}
 				}
 			}
 
@@ -147,6 +197,16 @@ class RegistrationsController extends AdminController
 						$sport = Sports::fetchFromApi($team->sport_id);
 						$team->sport_name = $sport ? $sport->name : '';
 					}
+
+					// Chỉ hiển thị danh sách tham gia của đối tác ở các nội dung có số người min >= 3
+					$teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
+					if ($teamPropertyId != $model->property_id) {
+						$minPlayers = self::getSportMinPlayers($team->sport_name);
+						if ($minPlayers < 3) {
+							continue; // Bỏ qua đội của đối tác nếu số lượng người tối thiểu của môn < 3
+						}
+					}
+
 					$sportTeams[] = $team;
 					$membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
 
@@ -243,6 +303,7 @@ class RegistrationsController extends AdminController
 								'attendee_name' => isset($attInfo['full_name']) ? $attInfo['full_name'] : '',
 								'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
 								'division_name' => isset($attInfo['division_name']) ? $attInfo['division_name'] : '',
+								'personal_email' => isset($attInfo['personal_email']) ? $attInfo['personal_email'] : '',
 								'candidate_number' => isset($c->candidate_number) ? $c->candidate_number : (isset($c['candidate_number']) ? $c['candidate_number'] : ''),
 								'height_cm' => isset($c->height_cm) ? $c->height_cm : (isset($c['height_cm']) ? $c['height_cm'] : null),
 								'weight_kg' => isset($c->weight_kg) ? $c->weight_kg : (isset($c['weight_kg']) ? $c['weight_kg'] : null),
@@ -377,7 +438,7 @@ class RegistrationsController extends AdminController
 				);
 			}
 			// Sort by requested_at desc
-			usort($allianceHistory, function($a, $b) {
+			usort($allianceHistory, function ($a, $b) {
 				$aTime = isset($a['request']->requested_at) ? strtotime($a['request']->requested_at) : 0;
 				$bTime = isset($b['request']->requested_at) ? strtotime($b['request']->requested_at) : 0;
 				return $bTime - $aTime;
@@ -420,7 +481,6 @@ class RegistrationsController extends AdminController
 		}
 
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
-		$periods = RegistrationPeriods::getActiveList();
 
 		if ($isAdmin) {
 			$properties = Properties::getApiDataProvider(array(), 500)->getData();
@@ -461,6 +521,21 @@ class RegistrationsController extends AdminController
 				} else {
 					$errorMsg = isset($result['error']) ? $result['error'] : 'Không thể tạo phiếu đăng ký.';
 					$model->addError('property_id', $errorMsg);
+				}
+			}
+		}
+		// Load periods theo event_id hiện có
+		$periods = array();
+		if ($model->event_id) {
+			$periodsData = RegistrationPeriods::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'is_active' => 1,
+			), 100)->getData();
+			foreach ($periodsData as $p) {
+				$pId = isset($p->id) ? $p->id : (isset($p['id']) ? $p['id'] : null);
+				$pName = isset($p->name) ? $p->name : (isset($p['name']) ? $p['name'] : '');
+				if ($pId) {
+					$periods[$pId] = $pName;
 				}
 			}
 		}
@@ -663,66 +738,57 @@ class RegistrationsController extends AdminController
 
 	public function actionApproveAlliance($request_id, $registration_id)
 	{
-		if (Yii::app()->getRequest()->getIsPostRequest()) {
-			$this->checkRegistrationAccess($registration_id);
-			Yii::log("actionApproveAlliance - request_id={$request_id}, registration_id={$registration_id}", 'info', 'application.alliance');
-			$model = AllianceRequests::fetchFromApi($request_id);
-			if ($model) {
-				$ssoUser = AuthHandler::getUser();
-				$model->status = AllianceRequests::STATUS_APPROVED;
-				$model->reviewed_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
-				$model->reviewed_at = date('Y-m-d H:i:s');
+		$this->checkRegistrationAccess($registration_id);
+		$model = AllianceRequests::fetchFromApi($request_id);
+		if ($model) {
+			$ssoUser = AuthHandler::getUser();
+			$model->status = AllianceRequests::STATUS_APPROVED;
+			$model->reviewed_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+			$model->reviewed_at = date('Y-m-d H:i:s');
 
-				Yii::log("actionApproveAlliance - Updating AllianceRequest model attributes: " . CJSON::encode($model->attributes), 'info', 'application.alliance');
-				$result = $model->updateViaApi();
-				Yii::log("actionApproveAlliance - AllianceRequest update result: " . CJSON::encode($result), 'info', 'application.alliance');
+			$result = $model->updateViaApi();
 
-				if ($result['success']) {
-					$regModel = $this->loadModelById($registration_id);
-					if ($regModel) {
-						$regModel->relation_property_id = $model->requester_org_id;
-						Yii::log("actionApproveAlliance - Updating Registration relation_property_id to {$model->requester_org_id}", 'info', 'application.alliance');
-						$regResult = $regModel->updateViaApi();
-						Yii::log("actionApproveAlliance - Registration update result: " . CJSON::encode($regResult), 'info', 'application.alliance');
-					}
-					Yii::app()->user->setFlash('success', 'Đã chấp nhận yêu cầu liên quân.');
-				} else {
-					Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể chấp nhận yêu cầu.');
+			if ($result['success']) {
+				$regModel = $this->loadModelById($registration_id);
+				if ($regModel) {
+					$regModel->relation_property_id = $model->requester_org_id;
+					$regResult = $regModel->updateViaApi();
 				}
+				Yii::app()->user->setFlash('success', 'Đã chấp nhận yêu cầu liên quân.');
 			} else {
-				Yii::app()->user->setFlash('error', 'Không tìm thấy yêu cầu liên quân.');
+				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể chấp nhận yêu cầu.');
 			}
-			$this->redirect(array('view', 'id' => $registration_id));
+		} else {
+			Yii::app()->user->setFlash('error', 'Không tìm thấy yêu cầu liên quân.');
 		}
+		$this->redirect(array('view', 'id' => $registration_id));
 	}
 
 	public function actionRejectAlliance($request_id, $registration_id)
 	{
-		if (Yii::app()->getRequest()->getIsPostRequest()) {
-			$this->checkRegistrationAccess($registration_id);
-			Yii::log("actionRejectAlliance - request_id={$request_id}, registration_id={$registration_id}", 'info', 'application.alliance');
-			$model = AllianceRequests::fetchFromApi($request_id);
-			if ($model) {
-				$ssoUser = AuthHandler::getUser();
-				$model->status = AllianceRequests::STATUS_REJECTED;
-				$model->reviewed_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
-				$model->reviewed_at = date('Y-m-d H:i:s');
-				$model->rejection_reason = Yii::app()->getRequest()->getPost('rejection_reason', '');
+		$this->checkRegistrationAccess($registration_id);
+		Yii::log("actionRejectAlliance - request_id={$request_id}, registration_id={$registration_id}", 'info', 'application.alliance');
+		$model = AllianceRequests::fetchFromApi($request_id);
+		if ($model) {
+			$ssoUser = AuthHandler::getUser();
+			$model->status = AllianceRequests::STATUS_REJECTED;
+			$model->reviewed_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			$model->reviewed_at = date('Y-m-d H:i:s');
+			$model->rejection_reason = Yii::app()->getRequest()->getParam('rejection_reason', '');
 
-				Yii::log("actionRejectAlliance - Updating AllianceRequest model attributes: " . CJSON::encode($model->attributes), 'info', 'application.alliance');
-				$result = $model->updateViaApi();
-				Yii::log("actionRejectAlliance - AllianceRequest update result: " . CJSON::encode($result), 'info', 'application.alliance');
+			Yii::log("actionRejectAlliance - Updating AllianceRequest model attributes: " . CJSON::encode($model->attributes), 'info', 'application.alliance');
+			$result = $model->updateViaApi();
+			Yii::log("actionRejectAlliance - AllianceRequest update result: " . CJSON::encode($result), 'info', 'application.alliance');
 
-				if ($result['success']) {
-					Yii::app()->user->setFlash('success', 'Đã từ chối yêu cầu liên quân.');
-				} else {
-					Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể từ chối yêu cầu.');
-				}
+			if ($result['success']) {
+				Yii::app()->user->setFlash('success', 'Đã từ chối yêu cầu liên quân.');
 			} else {
-				Yii::app()->user->setFlash('error', 'Không tìm thấy yêu cầu liên quân.');
+				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể từ chối yêu cầu.');
 			}
-			$this->redirect(array('view', 'id' => $registration_id));
+		} else {
+			Yii::app()->user->setFlash('error', 'Không tìm thấy yêu cầu liên quân.');
 		}
+		$this->redirect(array('view', 'id' => $registration_id));
 	}
 
 	protected function loadModelById($id)
@@ -1001,11 +1067,13 @@ class RegistrationsController extends AdminController
 			$roleName = Attendees::resolveRoleNames(isset($att['role_id']) ? $att['role_id'] : '');
 			// Kiểm tra role có chứa "thể thao" hoặc "thi đấu"
 			if (stripos($roleName, 'thể thao') !== false || stripos($roleName, 'thi đấu') !== false) {
+				$sportCount = SportTeamMembers::countSportsByAttendee($att['id']);
 				$result[] = array(
 					'id' => $att['id'],
 					'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
 					'position' => isset($att['position']) ? $att['position'] : '',
 					'department_name' => isset($att['department_name']) ? $att['department_name'] : '',
+					'sport_count' => $sportCount,
 				);
 			}
 		}
@@ -1041,6 +1109,37 @@ class RegistrationsController extends AdminController
 		}
 
 		return 9999;
+	}
+
+	public static function getSportMinPlayers($sportName)
+	{
+		if (empty($sportName)) return 1;
+		$sportNameLower = mb_strtolower($sportName, 'UTF-8');
+
+		if (strpos($sportNameLower, 'bóng đá') !== false || strpos($sportNameLower, 'football') !== false || strpos($sportNameLower, 'soccer') !== false) {
+			return 11;
+		}
+		if (strpos($sportNameLower, 'kéo co') !== false) {
+			return 8;
+		}
+		if (strpos($sportNameLower, 'bóng chuyền') !== false || strpos($sportNameLower, 'volleyball') !== false) {
+			return 6;
+		}
+		if (strpos($sportNameLower, 'bơi tiếp sức') !== false || strpos($sportNameLower, 'bơi đồng đội') !== false) {
+			return 4;
+		}
+		if (strpos($sportNameLower, 'đôi') !== false || strpos($sportNameLower, 'doubles') !== false) {
+			return 2;
+		}
+		if (strpos($sportNameLower, 'đơn') !== false || strpos($sportNameLower, 'singles') !== false || strpos($sportNameLower, 'cờ vua') !== false || strpos($sportNameLower, 'cờ tướng') !== false || strpos($sportNameLower, 'bản đồ') !== false) {
+			return 1;
+		}
+
+		if (strpos($sportNameLower, 'bóng bàn') !== false || strpos($sportNameLower, 'cầu lông') !== false || strpos($sportNameLower, 'tennis') !== false || strpos($sportNameLower, 'quần vợt') !== false || strpos($sportNameLower, 'pickleball') !== false || strpos($sportNameLower, 'pickerball') !== false) {
+			return 1;
+		}
+
+		return 1;
 	}
 
 	public function actionAddSportRegistration()
@@ -1158,6 +1257,7 @@ class RegistrationsController extends AdminController
 			$teamModel->is_alliance = empty($alliancePropertyIds) ? 0 : 1;
 			$teamModel->alliance_property_ids = $alliancePropertyIds;
 			$teamModel->status = SportTeams::STATUS_CONFIRMED;
+			$teamModel->registration_id = $registrationId;
 
 			$teamResult = $teamModel->storeViaApi();
 			if ($teamResult['success']) {
@@ -1272,6 +1372,7 @@ class RegistrationsController extends AdminController
 		$teamName = Yii::app()->request->getPost('team_name');
 		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
 		$attendeeNames = Yii::app()->request->getPost('attendee_names', array());
+		$registrationId = Yii::app()->request->getPost('registration_id');
 
 		if (!$teamId) {
 			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu team_id.'));
@@ -1300,8 +1401,37 @@ class RegistrationsController extends AdminController
 				Yii::app()->end();
 			}
 
+			// Kiểm tra giới hạn 3 bộ môn thể thao
+			$oldAttendeeIds = array();
+			$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+			foreach ($oldMembers as $m) {
+				$oldAttendeeIds[] = $m->attendee_id;
+			}
+
+			$overLimit = array();
+			foreach ($attendeeIds as $idx => $attId) {
+				$count = SportTeamMembers::countSportsByAttendee($attId);
+				$isAlreadyInTeam = in_array($attId, $oldAttendeeIds);
+				$limit = $isAlreadyInTeam ? SportTeamMembers::MAX_SPORTS_PER_ATTENDEE : (SportTeamMembers::MAX_SPORTS_PER_ATTENDEE - 1);
+				if ($count > $limit) {
+					$name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
+					$overLimit[] = "{$name} (đã đăng ký {$count} môn)";
+				}
+			}
+
+			if (!empty($overLimit)) {
+				echo CJSON::encode(array(
+					'success' => false,
+					'error' => 'Không thể cập nhật. Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn thể thao: ' . implode(', ', $overLimit)
+				));
+				Yii::app()->end();
+			}
+
 			$team->team_name = $teamName;
 			$team->name = $teamName;
+			if ($registrationId) {
+				$team->registration_id = $registrationId;
+			}
 			$team->updateViaApi();
 		}
 
@@ -2279,7 +2409,240 @@ class RegistrationsController extends AdminController
 	{
 		$this->checkRegistrationAccess($registration_id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			
+			// 1. Xóa đăng ký thi đấu thể thao (SportTeamMembers)
+			// Theo dõi xem những SportTeam nào bị ảnh hưởng để kiểm tra dọn dẹp sau đó
+			$affectedTeamIds = array();
+			
+			$resSport = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+				'attendee_id' => $id,
+				'per_page' => 500,
+			));
+			if ($resSport['success'] && isset($resSport['data'])) {
+				$items = isset($resSport['data']['data']) ? $resSport['data']['data'] : $resSport['data'];
+				if (is_array($items)) {
+					foreach ($items as $item) {
+						// KIỂM TRA CHẶT CHẼ ATTENDEE_ID TRƯỚC KHI XÓA
+						if (isset($item['attendee_id']) && $item['attendee_id'] == $id) {
+							$itemId = isset($item['id']) ? $item['id'] : null;
+							$teamId = isset($item['sport_team_id']) ? $item['sport_team_id'] : (isset($item['team_id']) ? $item['team_id'] : null);
+							if ($itemId) {
+								SportTeamMembers::deleteViaApi($itemId);
+								if ($teamId && !in_array($teamId, $affectedTeamIds)) {
+									$affectedTeamIds[] = $teamId;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// 2. Xóa đăng ký thi nghiệp vụ (CompetitionRegistrations)
+			// Theo dõi xem những cuộc thi nghiệp vụ nào bị ảnh hưởng
+			$affectedCompetitionIds = array();
+
+			$resComp = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, array(
+				'attendee_id' => $id,
+				'per_page' => 500,
+			));
+			if ($resComp['success'] && isset($resComp['data'])) {
+				$items = isset($resComp['data']['data']) ? $resComp['data']['data'] : $resComp['data'];
+				if (is_array($items)) {
+					foreach ($items as $item) {
+						// KIỂM TRA CHẶT CHẼ ATTENDEE_ID TRƯỚC KHI XÓA
+						if (isset($item['attendee_id']) && $item['attendee_id'] == $id) {
+							$itemId = isset($item['id']) ? $item['id'] : null;
+							$compId = isset($item['competition_id']) ? $item['competition_id'] : null;
+							if ($itemId) {
+								CompetitionRegistrations::deleteViaApi($itemId);
+								if ($compId && !in_array($compId, $affectedCompetitionIds)) {
+									$affectedCompetitionIds[] = $compId;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// 3. Xóa đăng ký thi Miss (BeautyContestants)
+			$resMiss = ApiClient::get(ApiEndpoints::BEAUTY_CONTESTANT_LIST, array(
+				'attendee_id' => $id,
+				'per_page' => 500,
+			));
+			if ($resMiss['success'] && isset($resMiss['data'])) {
+				$items = isset($resMiss['data']['data']) ? $resMiss['data']['data'] : $resMiss['data'];
+				if (is_array($items)) {
+					foreach ($items as $item) {
+						// KIỂM TRA CHẶT CHẼ ATTENDEE_ID TRƯỚC KHI XÓA
+						if (isset($item['attendee_id']) && $item['attendee_id'] == $id) {
+							$itemId = isset($item['id']) ? $item['id'] : null;
+							if ($itemId) {
+								BeautyContestants::deleteViaApi($itemId);
+							}
+						}
+					}
+				}
+			}
+
+			// 4. Xóa đăng ký văn nghệ (TalentEntryMembers)
+			// Theo dõi xem những tiết mục văn nghệ nào bị ảnh hưởng
+			$affectedEntryIds = array();
+
+			$resTalent = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array(
+				'attendee_id' => $id,
+				'per_page' => 500,
+			));
+			if ($resTalent['success'] && isset($resTalent['data'])) {
+				$items = isset($resTalent['data']['data']) ? $resTalent['data']['data'] : $resTalent['data'];
+				if (is_array($items)) {
+					foreach ($items as $item) {
+						// KIỂM TRA CHẶT CHẼ ATTENDEE_ID TRƯỚC KHI XÓA
+						if (isset($item['attendee_id']) && $item['attendee_id'] == $id) {
+							$itemId = isset($item['id']) ? $item['id'] : null;
+							$entryId = isset($item['entry_id']) ? $item['entry_id'] : null;
+							if ($itemId) {
+								TalentEntryMembers::deleteViaApi($itemId);
+								if ($entryId && !in_array($entryId, $affectedEntryIds)) {
+									$affectedEntryIds[] = $entryId;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// 5. Tiến hành xóa Attendee gốc
 			$result = Attendees::deleteViaApi($id);
+
+			// Lấy danh sách ID của những người tham dự còn lại trong phiếu đăng ký
+			$currentAttendeeIds = array();
+			$attendees = Attendees::getByRegistrationId($registration_id);
+			if (is_array($attendees)) {
+				foreach ($attendees as $att) {
+					if (isset($att['id'])) {
+						$currentAttendeeIds[] = $att['id'];
+					}
+				}
+			}
+
+			// ==================== CASCADE CLEAN UP NỘI DUNG RỖNG ====================
+
+			// A. Dọn dẹp đội thể thao rỗng (SportTeams)
+			foreach ($affectedTeamIds as $teamId) {
+				$resMembers = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+					'per_page' => 1000,
+				));
+				$hasMembers = false;
+				if ($resMembers['success'] && isset($resMembers['data'])) {
+					$mItems = isset($resMembers['data']['data']) ? $resMembers['data']['data'] : $resMembers['data'];
+					if (is_array($mItems)) {
+						foreach ($mItems as $mItem) {
+							$mTeamId = isset($mItem['sport_team_id']) ? $mItem['sport_team_id'] : (isset($mItem['team_id']) ? $mItem['team_id'] : null);
+							if ($mTeamId == $teamId) {
+								$hasMembers = true;
+								break;
+							}
+						}
+					}
+				}
+				if (!$hasMembers) {
+					// Nếu đội không còn thành viên nào, xóa đội
+					$teamObj = SportTeams::fetchFromApi($teamId);
+					$sportId = ($teamObj && isset($teamObj->sport_id)) ? $teamObj->sport_id : null;
+					
+					SportTeams::deleteViaApi($teamId);
+					
+					// Đồng thời dọn dẹp dòng RegistrationDetails môn thể thao rỗng
+					if ($sportId) {
+						$resDetails = ApiClient::get(ApiEndpoints::REGISTRATION_DETAIL_LIST, array(
+							'per_page' => 1000,
+						));
+						if ($resDetails['success'] && isset($resDetails['data'])) {
+							$dItems = isset($resDetails['data']['data']) ? $resDetails['data']['data'] : $resDetails['data'];
+							if (is_array($dItems)) {
+								foreach ($dItems as $dItem) {
+									$dRegId = isset($dItem['registration_id']) ? $dItem['registration_id'] : null;
+									$dSportId = isset($dItem['sport_id']) ? $dItem['sport_id'] : null;
+									if ($dRegId == $registration_id && $dSportId == $sportId) {
+										$detailId = isset($dItem['id']) ? $dItem['id'] : null;
+										if ($detailId) {
+											RegistrationDetails::deleteViaApi($detailId);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// B. Dọn dẹp đăng ký nghiệp vụ rỗng (RegistrationDetails)
+			foreach ($affectedCompetitionIds as $compId) {
+				$resCompRegs = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, array(
+					'per_page' => 1000,
+				));
+				$hasRegs = false;
+				if ($resCompRegs['success'] && isset($resCompRegs['data'])) {
+					$rItems = isset($resCompRegs['data']['data']) ? $resCompRegs['data']['data'] : $resCompRegs['data'];
+					if (is_array($rItems)) {
+						foreach ($rItems as $rItem) {
+							$rCompId = isset($rItem['competition_id']) ? $rItem['competition_id'] : null;
+							$rAttendeeId = isset($rItem['attendee_id']) ? $rItem['attendee_id'] : null;
+							if ($rCompId == $compId && in_array($rAttendeeId, $currentAttendeeIds)) {
+								$hasRegs = true;
+								break;
+							}
+						}
+					}
+				}
+				if (!$hasRegs) {
+					// Nếu không còn ai đăng ký cuộc thi này, xóa dòng RegistrationDetails tương ứng
+					$resDetails = ApiClient::get(ApiEndpoints::REGISTRATION_DETAIL_LIST, array(
+						'per_page' => 1000,
+					));
+					if ($resDetails['success'] && isset($resDetails['data'])) {
+						$dItems = isset($resDetails['data']['data']) ? $resDetails['data']['data'] : $resDetails['data'];
+						if (is_array($dItems)) {
+							foreach ($dItems as $dItem) {
+								$dRegId = isset($dItem['registration_id']) ? $dItem['registration_id'] : null;
+								$dCompId = isset($dItem['competition_id']) ? $dItem['competition_id'] : null;
+								if ($dRegId == $registration_id && $dCompId == $compId) {
+									$detailId = isset($dItem['id']) ? $dItem['id'] : null;
+									if ($detailId) {
+										RegistrationDetails::deleteViaApi($detailId);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// C. Dọn dẹp tiết mục văn nghệ rỗng (TalentEntries)
+			foreach ($affectedEntryIds as $entryId) {
+				$resMembers = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array(
+					'per_page' => 1000,
+				));
+				$hasMembers = false;
+				if ($resMembers['success'] && isset($resMembers['data'])) {
+					$mItems = isset($resMembers['data']['data']) ? $resMembers['data']['data'] : $resMembers['data'];
+					if (is_array($mItems)) {
+						foreach ($mItems as $mItem) {
+							$mEntryId = isset($mItem['entry_id']) ? $mItem['entry_id'] : null;
+							if ($mEntryId == $entryId) {
+								$hasMembers = true;
+								break;
+							}
+						}
+					}
+				}
+				if (!$hasMembers) {
+					// Nếu tiết mục văn nghệ không còn ai biểu diễn, xóa tiết mục
+					TalentEntries::deleteViaApi($entryId);
+				}
+			}
+
+			// ==================== END CASCADE CLEAN UP ====================
 
 			if ($result['success']) {
 				Yii::app()->user->setFlash('success', 'Xóa người tham dự thành công.');
@@ -2439,6 +2802,39 @@ class RegistrationsController extends AdminController
 			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật thành công.'));
 		} else {
 			echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể cập nhật.'));
+		}
+		Yii::app()->end();
+	}
+
+	public function actionUpdateAttendeeEmail()
+	{
+		header('Content-Type: application/json');
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$attendeeId = Yii::app()->getRequest()->getPost('attendee_id');
+		$email = Yii::app()->getRequest()->getPost('personal_email');
+
+		if (!$attendeeId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu ID người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$attendee = Attendees::fetchFromApi($attendeeId);
+		if (!$attendee) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$attendee->personal_email = $email;
+		$result = $attendee->updateViaApi();
+
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật email thành công.'));
+		} else {
+			echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể cập nhật email.'));
 		}
 		Yii::app()->end();
 	}
@@ -2913,11 +3309,27 @@ class RegistrationsController extends AdminController
 		}
 
 		$attendeeIds = Yii::app()->request->getParam('attendee_ids', array());
+		$teamId = Yii::app()->request->getParam('team_id');
 		$overLimit = array();
+
+		// Lấy danh sách attendee_id cũ của team nếu có teamId
+		$oldAttendeeIds = array();
+		if ($teamId) {
+			$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+			foreach ($oldMembers as $m) {
+				$oldAttendeeIds[] = $m->attendee_id;
+			}
+		}
 
 		foreach ($attendeeIds as $attId) {
 			$count = SportTeamMembers::countSportsByAttendee($attId);
-			if ($count > SportTeamMembers::MAX_SPORTS_PER_ATTENDEE) {
+			$isAlreadyInTeam = in_array($attId, $oldAttendeeIds);
+
+			// Nếu đã nằm trong team này rồi thì count đã bao gồm team này. Giới hạn tối đa là MAX_SPORTS_PER_ATTENDEE.
+			// Nếu chưa nằm trong team này, thêm vào sẽ làm tăng count lên 1, nên count hiện tại phải nhỏ hơn MAX_SPORTS_PER_ATTENDEE.
+			$limit = $isAlreadyInTeam ? SportTeamMembers::MAX_SPORTS_PER_ATTENDEE : (SportTeamMembers::MAX_SPORTS_PER_ATTENDEE - 1);
+
+			if ($count > $limit) {
 				$attendee = Attendees::fetchFromApi($attId);
 				$name = $attendee ? $attendee->full_name : "ID: $attId";
 				$overLimit[] = "{$name} (đã đăng ký {$count} môn)";
@@ -2929,6 +3341,119 @@ class RegistrationsController extends AdminController
 			echo CJSON::encode(array(
 				'success' => false,
 				'error' => 'Không thể thêm. Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn thể thao: ' . implode(', ', $overLimit)
+			));
+		} else {
+			echo CJSON::encode(array('success' => true));
+		}
+		Yii::app()->end();
+	}
+
+	public function actionCheckSubmitValid($id)
+	{
+		$this->checkRegistrationAccess($id);
+		
+		$model = $this->loadModelById($id);
+		$errors = array();
+
+		// 1. Kiểm tra yêu cầu liên quân gửi đi (nếu có relation_property_id)
+		if ($model->relation_property_id) {
+			$allianceRequest = AllianceRequests::findByRegistration(
+				$model->event_id,
+				$model->property_id,
+				$model->relation_property_id
+			);
+			if (!$allianceRequest) {
+				$allianceRequest = AllianceRequests::findByRegistration(
+					$model->event_id,
+					$model->relation_property_id,
+					$model->property_id
+				);
+			}
+
+			if (!$allianceRequest) {
+				$errors[] = 'Chưa gửi yêu cầu liên quân với đơn vị đối tác.';
+			} else if ($allianceRequest->status != AllianceRequests::STATUS_APPROVED) {
+				$statusLabel = 'chưa được duyệt';
+				if ($allianceRequest->status == AllianceRequests::STATUS_PENDING) {
+					$statusLabel = 'đang chờ xác nhận';
+				} else if ($allianceRequest->status == AllianceRequests::STATUS_REJECTED) {
+					$statusLabel = 'đã bị từ chối';
+				} else if ($allianceRequest->status == AllianceRequests::STATUS_CANCELLED) {
+					$statusLabel = 'đã bị hủy';
+				}
+				$errors[] = "Yêu cầu liên quân giữa đơn vị của bạn và đơn vị đối tác {$statusLabel}.";
+			}
+		}
+
+		// 2. Kiểm tra các yêu cầu liên quân gửi đến đang chờ duyệt (STATUS_PENDING)
+		$incomingAllianceRequests = AllianceRequests::getApiDataProvider(array(
+			'event_id' => $model->event_id,
+			'target_org_id' => $model->property_id,
+			'status' => AllianceRequests::STATUS_PENDING,
+		), 100)->getData();
+
+		if (!empty($incomingAllianceRequests)) {
+			$errors[] = 'Đơn vị của bạn đang có yêu cầu liên quân gửi đến chưa xử lý. Vui lòng duyệt hoặc từ chối yêu cầu liên quân trước khi gửi duyệt phiếu.';
+		}
+
+		// 3. Kiểm tra thông tin người tham dự (Attendees)
+		$attendees = Attendees::getByRegistrationId($id);
+		if (empty($attendees)) {
+			$errors[] = 'Phiếu đăng ký chưa có người tham dự nào.';
+		} else {
+			// Lấy danh sách ID thí sinh thi Miss trong event này để kiểm tra email cá nhân
+			$missAttendeeIds = array();
+			$contests = BeautyContests::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
+			foreach ($contests as $contest) {
+				$contestId = isset($contest->id) ? $contest->id : (isset($contest['id']) ? $contest['id'] : null);
+				if ($contestId) {
+					$contestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 500)->getData();
+					foreach ($contestants as $c) {
+						$attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
+						if ($attId) {
+							$missAttendeeIds[] = $attId;
+						}
+					}
+				}
+			}
+
+			foreach ($attendees as $att) {
+				$name = isset($att['full_name']) ? $att['full_name'] : 'Không rõ tên';
+				$attId = isset($att['id']) ? $att['id'] : null;
+
+				// Kiểm tra 4 tệp tài liệu bắt buộc
+				$missingDocs = array();
+				if (empty($att['cccd_front_path'])) {
+					$missingDocs[] = 'CCCD mặt trước';
+				}
+				if (empty($att['cccd_back_path'])) {
+					$missingDocs[] = 'CCCD mặt sau';
+				}
+				if (empty($att['portrait_path'])) {
+					$missingDocs[] = 'Ảnh chân dung';
+				}
+				if (empty($att['contract_path'])) {
+					$missingDocs[] = 'Hợp đồng lao động';
+				}
+
+				if (!empty($missingDocs)) {
+					$errors[] = "Người tham dự \"{$name}\" chưa tải lên đủ tệp đính kèm bắt buộc: " . implode(', ', $missingDocs) . '.';
+				}
+
+				// Kiểm tra email cá nhân cho thí sinh thi Miss
+				if ($attId && in_array($attId, $missAttendeeIds)) {
+					if (empty($att['personal_email'])) {
+						$errors[] = "Thí sinh thi Miss \"{$name}\" chưa điền email cá nhân.";
+					}
+				}
+			}
+		}
+
+		header('Content-Type: application/json');
+		if (!empty($errors)) {
+			echo CJSON::encode(array(
+				'success' => false,
+				'errors' => $errors,
 			));
 		} else {
 			echo CJSON::encode(array('success' => true));

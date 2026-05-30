@@ -16,6 +16,7 @@ class SportTeams extends BaseSportTeams
     public $is_alliance;
     public $alliance_property_ids;
     public $status;
+    public $registration_id;
 
     public static function model($className = __CLASS__)
     {
@@ -25,7 +26,7 @@ class SportTeams extends BaseSportTeams
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('sport_name, property_name, alliance_org_names, member_count, team_name, is_alliance, alliance_property_ids, status', 'safe');
+        $rules[] = array('sport_name, property_name, alliance_org_names, member_count, team_name, is_alliance, alliance_property_ids, status, registration_id', 'safe');
         return $rules;
     }
 
@@ -39,6 +40,7 @@ class SportTeams extends BaseSportTeams
             'team_name' => 'Tên đội',
             'is_alliance' => 'Liên quân',
             'status' => 'Trạng thái',
+            'registration_id' => 'Phiếu đăng ký',
             'created_at' => 'Ngày tạo',
             'updated_at' => 'Ngày cập nhật',
         );
@@ -54,6 +56,7 @@ class SportTeams extends BaseSportTeams
             $model->setAttributes($data, false);
             $model->sport_name = isset($data['sport_name']) ? $data['sport_name'] : '';
             $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
+            $model->registration_id = isset($data['registration_id']) ? $data['registration_id'] : null;
             $model->id = $id;
             return $model;
         }
@@ -67,6 +70,7 @@ class SportTeams extends BaseSportTeams
         $data['is_alliance'] = $this->is_alliance;
         $data['alliance_property_ids'] = $this->alliance_property_ids;
         $data['status'] = $this->status;
+        $data['registration_id'] = $this->registration_id;
 
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
@@ -81,6 +85,7 @@ class SportTeams extends BaseSportTeams
         $data['is_alliance'] = $this->is_alliance;
         $data['alliance_property_ids'] = $this->alliance_property_ids;
         $data['status'] = $this->status;
+        $data['registration_id'] = $this->registration_id;
 
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_TEAM_UPDATE, array('id' => $this->id));
         return ApiClient::post($url, $data);

@@ -73,24 +73,7 @@
                                 <p>Vui lòng chọn cuộc thi để hiển thị danh sách thí sinh</p>
                             </div>
 
-                            <!-- Danh sách đã đăng ký -->
-                            <div id="miss_registered_wrapper" class="mt-3" style="display:none;">
-                                <label class="form-label">Đã đăng ký (<span id="miss_registered_count">0</span>)</label>
-                                <div class="card">
-                                    <div class="card-body p-0" style="max-height:200px;overflow-y:auto;">
-                                        <table class="table table-sm table-striped mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>SBD</th>
-                                                    <th>Họ tên</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="miss_registered_list">
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>

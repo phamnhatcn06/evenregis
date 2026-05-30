@@ -20,6 +20,7 @@ var RegistrationView = (function() {
     // Sport registration variables
     var sportAllAttendees = [];
     var sportSelectedAttendees = [];
+    var originalSportTeamAttendeeIds = [];
 
     // Pending sport registrations (preview before save)
     var pendingSportRegistrations = [];
@@ -168,7 +169,57 @@ var RegistrationView = (function() {
             });
     }
 
-    function updateSportTeamName() {
+    function getSportMinPlayers(sportName) {
+        if (!sportName) return 1;
+        var nameLower = sportName.toLowerCase();
+        
+        // Strip Vietnamese accents for safe matching (handles both pre-composed and decomposed Unicode)
+        var nameNoSign = nameLower
+            .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, "a")
+            .replace(/[èéẹẻẽêềếệểễ]/g, "e")
+            .replace(/[ìíịỉĩ]/g, "i")
+            .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, "o")
+            .replace(/[ùúụủũưừứựửữ]/g, "u")
+            .replace(/[ỳýỵỷỹ]/g, "y")
+            .replace(/[đĐ]/g, "d");
+
+        // Racket sports (Table tennis, Badminton, Tennis, Pickleball) - Min is always 1 (singles) or 2 (doubles)
+        if (nameNoSign.indexOf('bong ban') !== -1 || 
+            nameNoSign.indexOf('cau long') !== -1 || 
+            nameNoSign.indexOf('tennis') !== -1 || 
+            nameNoSign.indexOf('quan vot') !== -1 || 
+            nameNoSign.indexOf('pickleball') !== -1 || 
+            nameNoSign.indexOf('pickerball') !== -1) {
+            
+            if (nameNoSign.indexOf('doi') !== -1 || nameNoSign.indexOf('doubles') !== -1) {
+                return 2;
+            }
+            return 1; // Default for racket sports is singles (min 1)
+        }
+
+        if (nameNoSign.indexOf('bong da') !== -1 || nameNoSign.indexOf('football') !== -1 || nameNoSign.indexOf('soccer') !== -1) {
+            return 11;
+        }
+        if (nameNoSign.indexOf('keo co') !== -1) {
+            return 8;
+        }
+        if (nameNoSign.indexOf('bong chuyen') !== -1 || nameNoSign.indexOf('volleyball') !== -1) {
+            return 6;
+        }
+        if (nameNoSign.indexOf('boi tiep suc') !== -1 || nameNoSign.indexOf('boi dong doi') !== -1) {
+            return 4;
+        }
+        if (nameNoSign.indexOf('doi') !== -1 || nameNoSign.indexOf('doubles') !== -1) {
+            return 2;
+        }
+        if (nameNoSign.indexOf('don') !== -1 || nameNoSign.indexOf('singles') !== -1 || nameNoSign.indexOf('co vua') !== -1 || nameNoSign.indexOf('co tuong') !== -1) {
+            return 1;
+        }
+        
+        return 1;
+    }
+
+    function updateSportTeamName(sportNameOverride) {
         var teamNameInput = document.getElementById('sport_team_name');
         if (!teamNameInput) return;
 
@@ -191,6 +242,19 @@ var RegistrationView = (function() {
         teamNameInput.readOnly = false;
         teamNameInput.classList.remove('bg-light');
 
+        // Get selected sport name to check min players
+        var sportText = sportNameOverride || '';
+        if (!sportText) {
+            if (modalSportSelect && modalSportSelect.value && modalSportSelect.selectedIndex >= 0) {
+                sportText = modalSportSelect.options[modalSportSelect.selectedIndex].text;
+            } else if (sportSelect && sportSelect.value && sportSelect.selectedIndex >= 0) {
+                sportText = sportSelect.options[sportSelect.selectedIndex].text;
+            }
+        }
+
+        // Clean spaces and HTML entities
+        sportText = sportText.replace(/[\u00a0\s]+/g, ' ').trim();
+
         var allianceSelect = document.getElementById('sport_alliance_property');
         var allianceCodes = [];
         if (allianceSelect) {
@@ -202,7 +266,10 @@ var RegistrationView = (function() {
             });
         }
 
-        if (allianceCodes.length > 0) {
+        var minPlayers = getSportMinPlayers(sportText);
+        console.log('updateSportTeamName debug - text:', sportText, 'minPlayers:', minPlayers, 'allianceCodes:', allianceCodes);
+
+        if (allianceCodes.length > 0 && minPlayers >= 3) {
             // Liên quân + tất cả prefix đơn vị (bao gồm đơn vị hiện tại)
             var allCodes = [propertyCode].concat(allianceCodes);
             teamNameInput.value = 'Liên quân ' + allCodes.join(' - ');
@@ -229,7 +296,8 @@ var RegistrationView = (function() {
         if (modalSportSelect) {
             modalSportSelect.addEventListener('change', function() {
                 renderSportSelectedAttendees();
-                updateSportTeamName();
+                var selectedText = this.options[this.selectedIndex].text;
+                updateSportTeamName(selectedText);
             });
         }
 
@@ -373,7 +441,7 @@ var RegistrationView = (function() {
                 // Load attendees
                 loadSportAttendees();
                 
-                updateSportTeamName();
+                updateSportTeamName(sportName);
             });
         }
     }
@@ -620,6 +688,13 @@ var RegistrationView = (function() {
                 (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
                 e.preventDefault();
+                if (!this.classList.contains('active')) {
+                    var activeCount = list.querySelectorAll('.active').length;
+                    if (maxPerOrg > 0 && (selectedStaff.length + activeCount >= maxPerOrg)) {
+                        Toast.error('Chỉ được chọn tối đa ' + maxPerOrg + ' nhân viên');
+                        return;
+                    }
+                }
                 this.classList.toggle('active');
             });
             list.appendChild(item);
@@ -724,15 +799,24 @@ var RegistrationView = (function() {
     function addSelectedStaff() {
         var list = document.getElementById('available_staff_list');
         var actives = list.querySelectorAll('.active');
+        var limitExceeded = false;
 
         actives.forEach(function(el) {
             var id = el.getAttribute('data-id');
             var staff = allStaff.find(function(s) { return s.id == id; });
-            if (staff && canAddMore()) {
-                selectedStaff.push(staff);
+            if (staff) {
+                if (canAddMore()) {
+                    selectedStaff.push(staff);
+                } else {
+                    limitExceeded = true;
+                }
             }
             el.classList.remove('active');
         });
+
+        if (limitExceeded) {
+            Toast.error('Chỉ được chọn tối đa ' + maxPerOrg + ' nhân viên');
+        }
 
         renderAvailableStaff();
         renderSelectedStaff();
@@ -742,12 +826,19 @@ var RegistrationView = (function() {
         var available = allStaff.filter(function(s) {
             return selectedStaff.findIndex(function(sel) { return sel.id == s.id; }) === -1;
         });
+        var limitExceeded = false;
 
         available.forEach(function(staff) {
             if (canAddMore()) {
                 selectedStaff.push(staff);
+            } else {
+                limitExceeded = true;
             }
         });
+
+        if (limitExceeded) {
+            Toast.error('Chỉ được chọn tối đa ' + maxPerOrg + ' nhân viên');
+        }
 
         renderAvailableStaff();
         renderSelectedStaff();
@@ -1063,7 +1154,7 @@ var RegistrationView = (function() {
     function removePendingSport(idx) {
         if (idx >= 0 && idx < pendingSportRegistrations.length) {
             var removed = pendingSportRegistrations.splice(idx, 1)[0];
-            Toast.info('Đã xóa "' + removed.sportName + '" khỏi danh sách.');
+            Toast.error('Đã xóa "' + removed.sportName + '" khỏi danh sách.');
             renderSportPreview();
         }
     }
@@ -1355,20 +1446,40 @@ var RegistrationView = (function() {
         var sportName = getSelectedSportName();
         var maxPlayers = getSportMaxPlayers(sportName);
         var currentlySelected = sportSelectedAttendees.length;
-        var toAddCount = actives.length;
 
-        if (currentlySelected + toAddCount > maxPlayers) {
-            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
-            return;
-        }
+        var overLimitAttendees = [];
+        var validAttendees = [];
 
         actives.forEach(function(el) {
             var id = el.getAttribute('data-id');
             var att = sportAllAttendees.find(function(a) { return a.id == id; });
             if (att) {
-                sportSelectedAttendees.push(att);
+                var isOriginalMember = originalSportTeamAttendeeIds.some(function(oId) { return String(oId) === String(att.id); });
+                var currentCount = parseInt(att.sport_count || 0);
+                if (!isOriginalMember && currentCount >= 3) {
+                    overLimitAttendees.push(att.full_name + ' (đã đăng ký ' + currentCount + ' môn)');
+                    el.classList.remove('active');
+                } else {
+                    validAttendees.push(att);
+                }
             }
-            el.classList.remove('active');
+        });
+
+        if (overLimitAttendees.length > 0) {
+            Toast.error('Không thể chọn. Những người sau đã đăng ký tối đa 3 môn thể thao: ' + overLimitAttendees.join(', '));
+        }
+
+        if (validAttendees.length === 0) return;
+
+        if (currentlySelected + validAttendees.length > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+            return;
+        }
+
+        validAttendees.forEach(function(att) {
+            sportSelectedAttendees.push(att);
+            var el = list.querySelector('[data-id="' + att.id + '"]');
+            if (el) el.classList.remove('active');
         });
 
         renderSportAvailableAttendees();
@@ -1384,14 +1495,32 @@ var RegistrationView = (function() {
         var sportName = getSelectedSportName();
         var maxPlayers = getSportMaxPlayers(sportName);
         var currentlySelected = sportSelectedAttendees.length;
-        var toAddCount = available.length;
 
-        if (currentlySelected + toAddCount > maxPlayers) {
+        var overLimitAttendees = [];
+        var validAttendees = [];
+
+        available.forEach(function(att) {
+            var isOriginalMember = originalSportTeamAttendeeIds.some(function(oId) { return String(oId) === String(att.id); });
+            var currentCount = parseInt(att.sport_count || 0);
+            if (!isOriginalMember && currentCount >= 3) {
+                overLimitAttendees.push(att.full_name + ' (đã đăng ký ' + currentCount + ' môn)');
+            } else {
+                validAttendees.push(att);
+            }
+        });
+
+        if (overLimitAttendees.length > 0) {
+            Toast.error('Không thể chọn. Những người sau đã đăng ký tối đa 3 môn thể thao: ' + overLimitAttendees.join(', '));
+        }
+
+        if (validAttendees.length === 0) return;
+
+        if (currentlySelected + validAttendees.length > maxPlayers) {
             Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
             return;
         }
 
-        available.forEach(function(att) {
+        validAttendees.forEach(function(att) {
             sportSelectedAttendees.push(att);
         });
 
@@ -1433,6 +1562,7 @@ var RegistrationView = (function() {
 
         sportAllAttendees = [];
         sportSelectedAttendees = [];
+        originalSportTeamAttendeeIds = [];
         removeSportHiddenInputs();
 
         // Reset UI elements
@@ -1455,6 +1585,14 @@ var RegistrationView = (function() {
             cancelButtonText: 'Hủy'
         }).then(function(result) {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
                 doRemoveAllianceProperty(id);
             }
         });
@@ -1517,6 +1655,7 @@ var RegistrationView = (function() {
         })
         .then(function(response) { return response.json(); })
         .then(function(data) {
+            Swal.close();
             if (data.success) {
                 Toast.success('Đã xóa đơn vị liên quân.');
             } else {
@@ -1524,6 +1663,7 @@ var RegistrationView = (function() {
             }
         })
         .catch(function() {
+            Swal.close();
             Toast.error('Lỗi kết nối.');
         });
     }
@@ -1702,6 +1842,13 @@ var RegistrationView = (function() {
                 (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
             item.addEventListener('click', function(e) {
                 e.preventDefault();
+                if (!this.classList.contains('active')) {
+                    var activeCount = list.querySelectorAll('.active').length;
+                    if (editCompMaxPerOrg > 0 && (editCompSelectedStaff.length + activeCount >= editCompMaxPerOrg)) {
+                        Toast.error('Chỉ được chọn tối đa ' + editCompMaxPerOrg + ' nhân viên');
+                        return;
+                    }
+                }
                 this.classList.toggle('active');
             });
             list.appendChild(item);
@@ -1754,30 +1901,43 @@ var RegistrationView = (function() {
 
         document.getElementById('edit_btn_add_staff')?.addEventListener('click', function() {
             var selected = document.querySelectorAll('#edit_available_staff_list .active');
+            var limitExceeded = false;
             selected.forEach(function(el) {
                 var id = el.getAttribute('data-id');
                 var staff = editCompAllStaff.find(function(s) { return s.id == id; });
                 if (staff && editCompSelectedStaff.findIndex(function(s) { return s.id == id; }) === -1) {
                     if (editCompMaxPerOrg > 0 && editCompSelectedStaff.length >= editCompMaxPerOrg) {
-                        Toast.error('Đã đạt số lượng tối đa: ' + editCompMaxPerOrg);
+                        limitExceeded = true;
                         return;
                     }
                     editCompSelectedStaff.push(staff);
                 }
             });
+
+            if (limitExceeded) {
+                Toast.error('Chỉ được chọn tối đa ' + editCompMaxPerOrg + ' nhân viên');
+            }
+
             renderEditCompAvailableStaff();
             renderEditCompSelectedStaff();
         });
 
         document.getElementById('edit_btn_add_all_staff')?.addEventListener('click', function() {
+            var limitExceeded = false;
             editCompAllStaff.forEach(function(staff) {
                 if (editCompSelectedStaff.findIndex(function(s) { return s.id == staff.id; }) === -1) {
                     if (editCompMaxPerOrg > 0 && editCompSelectedStaff.length >= editCompMaxPerOrg) {
+                        limitExceeded = true;
                         return;
                     }
                     editCompSelectedStaff.push(staff);
                 }
             });
+
+            if (limitExceeded) {
+                Toast.error('Chỉ được chọn tối đa ' + editCompMaxPerOrg + ' nhân viên');
+            }
+
             renderEditCompAvailableStaff();
             renderEditCompSelectedStaff();
         });
@@ -1866,6 +2026,14 @@ var RegistrationView = (function() {
             cancelButtonText: 'Hủy'
         }).then(function(result) {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
                 var form = document.getElementById('delete-team-form-' + id);
                 if (form) form.submit();
             }
@@ -1911,7 +2079,9 @@ var RegistrationView = (function() {
             // Load attendees then pre-select members
             loadSportAttendees(function() {
                 sportSelectedAttendees = [];
+                originalSportTeamAttendeeIds = [];
                 members.forEach(function(m) {
+                    originalSportTeamAttendeeIds.push(m.attendee_id);
                     var att = sportAllAttendees.find(function(a) { return a.id == m.attendee_id; });
                     if (att) {
                         sportSelectedAttendees.push(att);
@@ -1960,6 +2130,7 @@ var RegistrationView = (function() {
         var formData = new FormData();
         formData.append('team_id', editingTeamId);
         formData.append('team_name', teamName);
+        formData.append('registration_id', registrationId);
         sportSelectedAttendees.forEach(function(att) {
             formData.append('attendee_ids[]', att.id);
             formData.append('attendee_names[]', att.full_name || '');
@@ -2014,6 +2185,14 @@ var RegistrationView = (function() {
             cancelButtonText: 'Hủy'
         }).then(function(result) {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
                 document.getElementById('delete-detail-form-' + detailId).submit();
             }
         });
@@ -2031,6 +2210,14 @@ var RegistrationView = (function() {
             cancelButtonText: 'Hủy'
         }).then(function(result) {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
                 document.getElementById('delete-talent-form-' + entryId).submit();
             }
         });
@@ -2048,6 +2235,14 @@ var RegistrationView = (function() {
             cancelButtonText: 'Hủy'
         }).then(function(result) {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
                 fetch(window.BASE_URL + '/admin/registrations/deleteCompetitionRegistration', {
                     method: 'POST',
                     headers: {
@@ -2058,6 +2253,7 @@ var RegistrationView = (function() {
                 })
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
+                    Swal.close();
                     if (data.success) {
                         Toast.success('Đã xóa đăng ký thi nghiệp vụ.');
                         var row = document.querySelector('tr[data-competition-id="' + competitionId + '"]');
@@ -2071,6 +2267,10 @@ var RegistrationView = (function() {
                     } else {
                         Toast.error(data.error || 'Có lỗi xảy ra.');
                     }
+                })
+                .catch(function() {
+                    Swal.close();
+                    Toast.error('Lỗi kết nối server.');
                 });
             }
         });
@@ -2871,6 +3071,14 @@ var RegistrationView = (function() {
             cancelButtonText: 'Hủy'
         }).then(function(result) {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
                 document.getElementById('delete-attendee-form-' + attId).submit();
             }
         });
@@ -3059,10 +3267,10 @@ var RegistrationView = (function() {
         var list = document.getElementById('miss_registered_list');
         var count = document.getElementById('miss_registered_count');
 
-        if (!list) return;
+        if (!wrapper || !list) return;
 
         list.innerHTML = '';
-        count.textContent = registered.length;
+        if (count) count.textContent = registered.length;
 
         if (registered.length > 0) {
             wrapper.style.display = 'block';
@@ -3274,6 +3482,14 @@ var RegistrationView = (function() {
             cancelButtonText: 'Hủy'
         }).then(function(result) {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
                 var formData = new FormData();
                 formData.append('id', id);
                 fetch(window.BASE_URL + '/admin/registrations/deleteMissContestant', {
@@ -3283,6 +3499,7 @@ var RegistrationView = (function() {
                 })
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
+                    Swal.close();
                     if (data.success) {
                         Toast.success(data.message || 'Xóa thành công!');
                         location.reload();
@@ -3290,7 +3507,10 @@ var RegistrationView = (function() {
                         Toast.error(data.error || 'Có lỗi xảy ra.');
                     }
                 })
-                .catch(function() { Toast.error('Lỗi kết nối.'); });
+                .catch(function() {
+                    Swal.close();
+                    Toast.error('Lỗi kết nối.');
+                });
             }
         });
     }
@@ -3672,6 +3892,14 @@ var RegistrationView = (function() {
             cancelButtonText: 'Hủy'
         }).then(function(result) {
             if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
                 doRemoveTalentAllianceProperty(id);
             }
         });
@@ -3726,6 +3954,7 @@ var RegistrationView = (function() {
         })
         .then(function(response) { return response.json(); })
         .then(function(data) {
+            Swal.close();
             if (data.success) {
                 Toast.success('Đã xóa đơn vị liên quân.');
             } else {
@@ -3733,6 +3962,7 @@ var RegistrationView = (function() {
             }
         })
         .catch(function() {
+            Swal.close();
             Toast.error('Lỗi kết nối.');
         });
     }

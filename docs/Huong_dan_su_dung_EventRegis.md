@@ -1,137 +1,165 @@
-# TÀI LIỆU HƯỚNG DẪN SỬ DỤNG HỆ THỐNG EVENTREGIS
+# HƯỚNG DẪN SỬ DỤNG HỆ THỐNG EVENTREGIS
+## PHÂN HỆ: QUY TRÌNH ĐĂNG NHẬP & ĐĂNG KÝ SỰ KIỆN
 **Hệ Thống Quản Lý Sự Kiện Đại Hội Tập Trung**  
 *Phiên bản: 2.0 (Cập nhật 2026)*
 
 ---
 
-## 1. Tổng Quan Hệ Thống & Phân Quyền Sử Dụng
+## 1. Tổng Quan & Phân Quyền Vai Trò (Actors)
 
-Hệ thống **EventRegis** là giải pháp số hóa toàn diện được thiết kế để quản lý vòng đời của đại hội tập trung với quy mô ~600 đại biểu từ 50-100 đơn vị trực thuộc. Hệ thống bao gồm các phân hệ: Đăng ký thông tin đại biểu trực tuyến, kiểm duyệt hồ sơ, in thẻ tích hợp mã QR, phân bố sơ đồ bàn tiệc, quản lý thi nghiệp vụ, thi đấu thể thao chuyên nghiệp và trang tra cứu lịch trình cá nhân hóa qua mã QR.
+Hệ thống **EventRegis** được xây dựng nhằm số hóa và tự động hóa toàn bộ quy trình tổ chức sự kiện đại hội tập trung với quy mô ~600 đại biểu từ 50-100 đơn vị thành viên. Để đảm bảo tính đồng bộ dữ liệu, kiểm soát gian lận và tối ưu hóa thời gian xử lý, quy trình đăng nhập và đăng ký sự kiện được kiểm soát chặt chẽ thông qua các vai trò (Actors) sau:
 
-### Bảng phân quyền chi tiết (Actors Permission Matrix)
+*   **Đại diện Đơn vị (Unit Representative):** Sử dụng tài khoản đơn vị liên kết SSO Portal để tạo phiếu đăng ký, thiết lập liên quân, đồng bộ/nhập thông tin đại biểu, tải lên hồ sơ pháp lý bắt buộc, đăng ký các hoạt động thể thao/nghiệp vụ và nộp hồ sơ phê duyệt.
+*   **Nhân sự HO (HR HO):** Kiểm tra tính hợp lệ của hồ sơ đại biểu (CCCD, ảnh chân dung, Hợp đồng lao động), đưa ra quyết định Phê duyệt (Approve) hoặc Từ chối (Reject) toàn bộ phiếu đăng ký kèm lý do lỗi cụ thể, gán vai trò đại biểu và chỉ định Trưởng đoàn.
+*   **Admin HO:** Toàn quyền cấu hình đợt đăng ký, thiết lập số môn thể thao tối đa cho đại biểu, và quản lý in thẻ đại biểu hàng loạt.
 
-| Vai trò (Actor) | Tài khoản sử dụng | Quyền hạn & Luồng nghiệp vụ chính |
+---
+
+## 2. Quy Trình Đăng Nhập Hệ Thống (System Authentication & SSO Portal)
+
+Hệ thống EventRegis sử dụng giải pháp đăng nhập đơn nhất **Single Sign-On (SSO)** thông qua hệ thống **Portal Mường Thanh** nhằm tối ưu bảo mật và đồng nhất thông tin tài khoản nhân viên.
+
+### 2.1 Cơ chế Hoạt động của SSO Portal
+1.  **Chuyển hướng (Redirect):** Khi người dùng truy cập trang chủ `http://event.mt:8080/`, hệ thống kiểm tra session. Nếu chưa đăng nhập, hệ thống sẽ tự động chuyển hướng sang trang đăng nhập của Portal:
+    `https://portal.muongthanh.vn/login?redirect=http://event.mt:8080/`
+2.  **Xác thực và Cấp Token:** Sau khi người dùng đăng nhập thành công trên Portal, Portal sẽ chuyển hướng ngược lại EventRegis kèm theo một mã token JWT an toàn trong URL:
+    `http://event.mt:8080/?sso_token=xxx`
+3.  **Xử lý Callback & Lưu Session:** Controller `SiteController::actionIndex()` tiếp nhận `sso_token`, giải mã chữ ký JWT bằng thuật toán **HS256** và mã khóa bí mật `JWT_SECRET`. Khi token hợp lệ, hệ thống sẽ gọi API `/api/sso/me` để lấy thông tin chi tiết nhân viên (Mã đơn vị, Phòng ban, Chức vụ) và lưu trữ vào Session của Yii.
+
+### 2.2 Quy trình Đăng nhập Thực tế (Khi tài khoản đã đăng nhập sẵn trên Chrome)
+Trong trường hợp tài khoản của bạn đã được đăng nhập sẵn trên trình duyệt Chrome, hệ thống hỗ trợ đăng nhập nhanh thông qua 2 phương thức cực kỳ tiện lợi:
+
+#### Phương thức 1: Đăng nhập từ trang chủ Portal (Portal Dashboard)
+1.  **Mở Portal:** Người dùng mở trình duyệt Chrome đã lưu session và truy cập trang chủ Portal: `https://portal.muongthanh.vn`
+2.  **Click chọn Ứng dụng:** Tại giao diện màn hình chính của Portal (nơi hiển thị các phân hệ/ứng dụng được phân quyền), tìm và click vào biểu tượng ứng dụng **"Đăng ký Sự kiện"** (hoặc **"Event Regis"**).
+3.  **Tự động chuyển hướng:** Hệ thống Portal nhận diện phiên hoạt động, tự động sinh mã Token JWT an toàn và thực hiện chuyển hướng trình duyệt thẳng tới hệ thống EventRegis kèm tham số mã hóa:
+    `http://event.mt:8080/?sso_token=<JWT_TOKEN_CỦA_BẠN>`
+4.  **Vào thẳng Dashboard:** Hệ thống EventRegis tự động xử lý token callback và đưa bạn trực tiếp vào giao diện làm việc chính (`http://event.mt:8080/admin/default/index`) trong chưa đầy 1 giây mà không cần nhập lại bất kỳ thông tin nào.
+
+#### Phương thức 2: Đăng nhập từ trang chủ EventRegis (Silent Login)
+1.  **Mở EventRegis:** Người dùng nhập trực tiếp địa chỉ trang đăng ký sự kiện trên thanh địa chỉ Chrome: `http://event.mt:8080/`
+2.  **Click nút Đăng nhập:** Hệ thống hiển thị trang đăng nhập (Hình 1), người dùng click vào nút màu tím **"Đăng nhập với Portal"**.
+3.  **Nhận diện phiên tự động:** Trình duyệt chuyển hướng nhanh sang Portal (`https://portal.muongthanh.vn/login?redirect=...`). Do Chrome đã lưu sẵn phiên đăng nhập Portal của bạn, hệ thống Portal sẽ nhận diện và xác thực tự động ngay lập tức mà không hiển thị màn hình điền Tên đăng nhập & Mật khẩu.
+4.  **Hoàn tất xác thực:** Portal tự động điều hướng ngược trở lại EventRegis kèm theo mã `sso_token`, hệ thống thiết lập session và cho phép bạn bắt đầu làm việc ngay lập tức.
+
+
+### 2.2 Quản lý Phiên Đăng nhập (Session Lifecycle)
+*   **Thời gian hết hạn (Session Timeout):** Phiên làm việc được cấu hình mặc định là **1800 giây (30 phút)** không có hoạt động.
+*   **Thời gian làm mới (Refresh Interval):** Mỗi **900 giây (15 phút)**, hệ thống sẽ tự động làm mới token ngầm để duy trì đăng nhập mà không làm gián đoạn trải nghiệm của người dùng.
+*   **Đăng xuất (Logout):** Khi người dùng click Đăng xuất, `SiteController::actionLogout()` sẽ hủy toàn bộ session lưu trên server và localStorage trên trình duyệt, sau đó điều hướng người dùng quay trở lại trang đăng nhập.
+
+![Hình 1: Giao diện Trang đăng nhập tích hợp Portal SSO](file:///e:/eventregis/docs/images/actual_login.png)
+*Hình 1: Giao diện Trang đăng nhập tích hợp Portal SSO khi chạy thực tế tại đường dẫn http://event.mt:8080/*
+
+---
+
+## 3. Quy Trình Đăng Ký Sự Kiện (Event Registration Workflow)
+
+Quy trình đăng ký sự kiện là luồng nghiệp vụ khép kín gồm 5 bước tuần tự bắt buộc:
+
+```mermaid
+graph TD
+    A[Bắt đầu] --> B[Bước 3.1: Khởi tạo Phiếu Đăng ký]
+    B --> C[Bước 3.2: Nhập danh sách Đại biểu & Upload Hồ sơ]
+    C --> D[Bước 3.3: Gửi/Nhận yêu cầu Liên quân]
+    D --> E[Bước 3.4: Đăng ký Hoạt động]
+    E --> F[Bước 3.5: Nộp hồ sơ cho HO]
+    F --> G[Kết thúc]
+```
+
+### Bước 3.1: Khởi tạo Phiếu Đăng Ký (Create Registration Ticket)
+*   Đại diện đơn vị đăng nhập vào hệ thống trong khung thời gian đăng ký được mở (`registration_periods`).
+*   Truy cập menu **Đăng ký Sự kiện** và click **Khởi tạo Phiếu Đăng ký**. Hệ thống tự động tạo một phiếu đăng ký với trạng thái mặc định ban đầu là `draft` (Bản nháp) gắn với đơn vị của tài khoản đó.
+*   *Lưu ý:* Mỗi đơn vị chỉ được phép có đúng một phiếu đăng ký hoạt động trong mỗi đợt đăng ký (`uq_registrations_org_period`).
+
+### Bước 3.2: Nhập Danh sách Đại Biểu & Tải lên Hồ sơ Bắt buộc
+Đại diện đơn vị vào trang chi tiết phiếu đăng ký, chọn tab **Danh sách Đại biểu** -> Click **Thêm đại biểu** để nhập nhân sự tham gia đại hội.
+
+#### A. Nguồn dữ liệu nhân sự (BR-REG-01)
+Hệ thống hỗ trợ 2 cơ chế nhập liệu linh hoạt:
+1.  **Đồng bộ từ Hệ thống SMILE (Khuyên dùng):** Người dùng nhập tên hoặc mã nhân viên để tìm kiếm. Hệ thống tự động truy vấn dữ liệu SMILE và điền các trường thông tin: Họ tên, Chức vụ hiện tại, Mã phòng ban.
+    *   **RÀNG BUỘC NGHIỆP VỤ BẮT BUỘC:** Để đảm bảo tính công bằng, hệ thống tự động lọc và **chỉ cho phép đăng ký những nhân sự có ngày gia nhập đơn vị trước ngày 01/06/2026**. Những nhân viên gia nhập từ ngày 01/06/2026 trở đi sẽ bị hệ thống tự động ẩn hoặc chặn không cho đăng ký.
+2.  **Nhập thủ công (Manual CRUD):** Đối với nhân viên chính thức thỏa mãn điều kiện thời gian gia nhập nhưng chưa được cập nhật dữ liệu trên hệ thống SMILE, đại diện đơn vị tích chọn ô **Tự nhập thông tin** để điền thủ công.
+
+#### B. Validate Tài liệu Đính kèm Bắt buộc (BR-REG-02 & BR-REG-03)
+Với mỗi đại biểu được tạo, đơn vị bắt buộc phải tải lên đầy đủ **4 tệp tin hồ sơ pháp lý** sau:
+*   **Ảnh mặt trước CCCD:** Định dạng ảnh JPG/PNG, dung lượng tối đa 5MB.
+*   **Ảnh mặt sau CCCD:** Định dạng ảnh JPG/PNG, dung lượng tối đa 5MB.
+*   **Ảnh chân dung in thẻ (Portrait):** Bắt buộc phải có **kích thước chính xác 530x530 pixel**. Hệ thống kiểm tra kích thước ảnh ở phía server. Nếu ảnh không đúng 530x530px, hệ thống sẽ báo lỗi validation và từ chối lưu hồ sơ.
+*   **Scan Hợp đồng lao động (Labor Contract):** File scan PDF hoặc ảnh JPG rõ chữ ký/dấu đỏ chứng minh đại biểu là nhân viên chính thức của đơn vị, dung lượng tối đa 10MB.
+
+### Bước 3.3: Thiết lập Liên quân theo từng Nội dung (Content-level Alliance)
+Cơ chế **Liên quân theo nội dung** cho phép các đơn vị nhỏ ghép nhân sự để thành lập đội thi đấu thể thao tập thể hoặc tiết mục văn nghệ chung. Liên quân hoạt động độc lập theo từng nội dung cụ thể, không áp dụng chung cho toàn bộ sự kiện.
+
+*   **Gửi yêu cầu liên quân (BR-AL05):** Đại diện đơn vị truy cập tab **Liên quân** -> Chọn nút **Gửi yêu cầu** -> Chọn đơn vị đối tác, chọn nội dung muốn liên quân (Ví dụ: *Bóng đá nam*) và click **Gửi**. Trạng thái yêu cầu sẽ ở dạng `pending` (Chờ duyệt).
+*   **Duyệt yêu cầu liên quân (BR-AL06):** Đơn vị đối tác sau khi đăng nhập sẽ thấy yêu cầu chờ duyệt. Đại diện đơn vị đối tác có quyền click **Đồng ý** (Trạng thái chuyển sang `approved` - kích hoạt liên quân thành công) hoặc **Từ chối** (Trạng thái `rejected` kèm lý do).
+*   **Ràng buộc số lượng (BR-AL02 & BR-AL03):** Một đơn vị chỉ được phép liên quân tối đa với số lượng đơn vị khác được cấu hình cho mỗi nội dung (`max_alliance_orgs`).
+
+### Bước 3.4: Đăng ký Hoạt động Chi tiết (Event Registration)
+Đại diện đơn vị vào phần **Đăng ký hoạt động** để đăng ký các môn thi đấu và nội dung đại hội:
+*   **Đăng ký theo số lượng (Quantity-based):** Áp dụng cho các môn thể thao tập thể (Ví dụ: Bóng đá, Kéo co). Đơn vị chỉ đăng ký tham gia và số lượng đội thi đấu. Bước này chưa cần điền chi tiết danh sách vận động viên.
+*   **Đăng ký theo danh sách cụ thể (Detailed-based):** Áp dụng cho cuộc thi sắc đẹp, thi văn nghệ cá nhân và thi nghiệp vụ. Đơn vị bắt buộc phải chọn trực tiếp đại biểu cụ thể trong danh sách đại biểu đã tạo ở Bước 3.2 để gán vào nội dung thi đấu.
+    *   **Validate môn thể thao tối đa (BR-REG-05):** Mỗi đại biểu chỉ được đăng ký tham gia tối đa **N môn thể thao root** (Cấu hình bởi tham số `max_sports_per_attendee`, mặc định là 3).
+    *   **Validate phòng ban thi nghiệp vụ (BR-REG-06):** Đối với các cuộc thi nghiệp vụ (Ví dụ: Thi Lễ tân xuất sắc), đại biểu đăng ký bắt buộc phải có mã phòng ban thuộc SMILE nằm trong danh mục phòng ban được phép thi (`competition_departments`). Hệ thống tự động từ chối nếu gán nhân sự sai phòng ban chuyên môn.
+
+### Bước 3.5: Nộp Hồ Sơ Đăng Ký (Submit Registration)
+*   Sau khi hoàn thiện danh sách đại biểu, liên quân và nội dung đăng ký, Đại diện đơn vị nhấn nút **Nộp đăng ký**.
+*   Phiếu đăng ký sẽ chuyển trạng thái từ `draft` sang `submitted` (Đã nộp).
+*   **HÀNH VI HỆ THỐNG:** Khi phiếu ở trạng thái `submitted`, hệ thống sẽ **khóa toàn bộ quyền chỉnh sửa** (Read-only) của đơn vị đối với danh sách đại biểu và các nội dung đã đăng ký để đảm bảo tính toàn vẹn dữ liệu trong quá trình phê duyệt.
+
+![Hình 2: Giao diện Danh sách Phiếu đăng ký và Trạng thái xử lý](file:///e:/eventregis/docs/images/actual_dashboard.png)
+*Hình 2: Giao diện Danh sách Phiếu đăng ký của các đơn vị khi chạy thực tế tại đường dẫn http://event.mt:8080/admin/registrations/admin*
+
+---
+
+## 4. Quy Trình Kiểm Duyệt Hồ Sơ & Phê Duyệt (Approval Workflow)
+
+Nhân sự HO (HR HO) thực hiện quy trình kiểm tra và phê duyệt phiếu đăng ký của các đơn vị trên trang Admin.
+
+```mermaid
+graph TD
+    A[Tiếp nhận Phiếu Đăng ký submitted] --> B[Kiểm tra Hồ sơ 4 tệp tin của từng Đại biểu]
+    B --> C{Tất cả Hồ sơ đạt chuẩn?}
+    C -- Không --> D[Nhập lý do từ chối & Nhấn Từ chối]
+    D --> E[Phiếu về rejected - Mở khóa cho Đơn vị sửa]
+    C -- Có --> F[Nhấn Phê duyệt]
+    F --> G[Hệ thống tự động Sinh qr_token & Cấp badge_number]
+    G --> H[Phiếu chuyển sang approved - Khóa vĩnh viễn]
+```
+
+### 4.1 Tiếp nhận & Thẩm định Hồ sơ Đại biểu
+*   HR HO truy cập trang **Kiểm duyệt Đăng ký**, mở chi tiết phiếu của đơn vị đang có trạng thái `submitted`.
+*   Click xem chi tiết từng đại biểu trong danh sách:
+    *   Preview hình ảnh chân dung in thẻ (Đảm bảo sắc nét, phông nền sáng, đúng kích thước).
+    *   Kiểm tra ảnh chụp 2 mặt CCCD và nội dung tệp scan Hợp đồng lao động để xác minh danh tính và tính hợp lệ pháp lý của đại biểu (đảm bảo đúng là nhân viên chính thức của đơn vị đó).
+
+### 4.2 Đưa ra Quyết định Phê duyệt (Approve / Reject)
+*   **Từ chối Phiếu đăng ký (Reject):**
+    *   Nếu phát hiện bất kỳ hồ sơ đại biểu nào bị lỗi (Ví dụ: Ảnh chân dung mờ/không đúng chuẩn, hợp đồng lao động sai tên, gia nhập đơn vị sau ngày 01/06/2026...), HR HO click nút **Từ chối**.
+    *   **Bắt buộc** phải nhập lý do từ chối chi tiết trong hộp thoại hiện ra.
+    *   Phiếu đăng ký chuyển sang trạng thái `rejected`. Hệ thống tự động mở khóa quyền chỉnh sửa cho đơn vị để cập nhật lại hồ sơ lỗi và nộp lại từ đầu.
+*   **Phê duyệt Phiếu đăng ký (Approve):**
+    *   Nếu toàn bộ danh sách đại biểu và hồ sơ đính kèm đạt yêu cầu, HR HO click nút **Phê duyệt**.
+    *   Phiếu đăng ký chuyển sang trạng thái `approved`.
+    *   **TÁC VỤ TỰ ĐỘNG CỦA HỆ THỐNG KHI PHÊ DUYỆT:** Hệ thống tự động thực hiện 2 thao tác ngầm cực kỳ quan trọng cho tất cả đại biểu trong phiếu:
+        1.  **Sinh mã QR duy nhất (`qr_token`):** Tạo một chuỗi token ngẫu nhiên dài 64 ký tự gán cho thuộc tính `qr_token` của đại biểu (dùng để quét camera tra cứu thông tin di động, không lộ ID hệ thống).
+        2.  **Cấp số thứ tự thẻ (`badge_number`):** Tự động sinh số thứ tự in thẻ tăng dần theo sequence (Ví dụ: `001`, `002`, `003`...) để chuẩn bị cho công tác in thẻ vật lý hàng loạt.
+
+![Hình 3: Giao diện Chi tiết Phiếu đăng ký và Phê duyệt của HR HO](file:///e:/eventregis/docs/images/actual_registration_view.png)
+*Hình 3: Giao diện Chi tiết Phiếu đăng ký hiển thị danh sách đại biểu, hồ sơ đính kèm và nút Phê duyệt của HR HO*
+
+---
+
+## 5. Tổng Hợp Các Ràng Buộc Nghiệp Vụ (Business Rules Summary)
+
+| Mã Ràng Buộc | Nội Dung Ràng Buộc | Cơ Chế Kiểm Soát (Validation) |
 | :--- | :--- | :--- |
-| **Đại diện Đơn vị** | Tài khoản đơn vị (`unit_accounts`) | - Gửi và phê duyệt yêu cầu liên quân theo môn.<br>- Nhập danh sách đại biểu (đồng bộ từ SMILE hoặc nhập tay).<br>- Tải lên hồ sơ bắt buộc (Ảnh chân dung 530x530px, ảnh CCCD 2 mặt, Hợp đồng lao động).<br>- Đăng ký tham gia hoạt động (theo số lượng đội hoặc chi tiết người).<br>- Ghép đội thi đấu thể thao (ghép thành viên liên quân).<br>- Nộp phiếu và theo dõi phê duyệt. |
-| **Nhân sự HO (HR)** | Tài khoản nội bộ (`users` - `role=hr`) | - Xem danh sách đăng ký của tất cả các đơn vị.<br>- Xem chi tiết hồ sơ, ảnh chân dung, CCCD, hợp đồng của đại biểu.<br>- Phê duyệt (Approve) toàn bộ phiếu (hệ thống tự sinh `qr_token` và cấp số thẻ `badge_number`).<br>- Từ chối (Reject) phiếu đăng ký kèm nhập lý do lỗi cụ thể.<br>- Gán vai trò sự kiện cho đại biểu, chỉ định Trưởng đoàn của đơn vị. |
-| **Admin HO** | Tài khoản admin (`users` - `role=admin`) | - Toàn quyền cấu hình hệ thống.<br>- Thiết lập các đợt đăng ký và số môn thể thao tối đa của đại biểu.<br>- Quản lý in thẻ đại biểu hàng loạt (Badge Management). |
-| **Trưởng đoàn** | Tài khoản đại biểu (có flag `is_team_lead=1`) | - Xem danh sách thành viên đoàn mình.<br>- Báo cắt suất ăn từng người hoặc toàn bộ đoàn (bulk cutoff) trước giờ khóa sổ. |
-| **BTC Chuyên môn** | Tài khoản ban ngành (`users` - `role=competition/sports/banquet`) | - **BTC Nghiệp vụ**: Cấu hình phòng ban thi đấu, tự động sinh số báo danh (SBD) theo sequence, xuất danh sách phòng thi.<br>- **BTC Thể thao**: Thiết lập môn đấu (cha-con), lịch thi đấu (bracket/round robin), cập nhật tỉ số live score và tự tính xếp hạng.<br>- **BTC Tiệc**: Kéo thả sơ đồ bàn tiệc canvas, xếp ghế cho đại biểu. |
-| **Đại biểu (Public)** | Không cần tài khoản | - Quét QR Code trên thẻ để xem Trang cá nhân di động, tra cứu Agenda chung, lịch thi nghiệp vụ riêng và lịch đấu thể thao của đoàn mình. |
-
----
-
-## 2. Hướng Dẫn Dành Cho Đại Diện Đơn Vị
-
-Đại diện Đơn vị thực hiện quy trình đăng ký cho đoàn của mình thông qua các bước trình tự sau:
-
-### Bước 2.1: Đăng nhập & Thiết lập Liên quân theo từng Nội dung (Content-level Alliance)
-Cơ chế **Liên quân theo nội dung** cho phép các đơn vị ghép nhân sự vào các đội thi đấu thể thao hoặc tiết mục tập thể độc lập theo từng môn, không bị bó buộc ở cấp sự kiện.
-1. Đăng nhập tài khoản đơn vị được cấp.
-2. Truy cập menu **Liên quân** -> Click nút **Gửi yêu cầu liên quân**.
-3. Chọn đơn vị đối tác muốn ghép chung, chọn nội dung muốn liên quân (Ví dụ: *Bóng đá nam*), nhập ghi chú và nhấn **Gửi yêu cầu**.
-4. Trạng thái yêu cầu sẽ lưu là `Chờ duyệt` (pending). Đơn vị đối tác sau khi đăng nhập sẽ nhìn thấy yêu cầu này trong danh sách nhận được và có thể click **Chấp nhận** (yêu cầu chuyển sang trạng thái active) hoặc **Từ chối** kèm lý do.
-
-> **Ràng buộc nghiệp vụ:** Mỗi nội dung thi đấu có cấu hình số lượng đơn vị liên quân tối đa riêng biệt (`max_alliance_orgs`). Hệ thống sẽ tự động chặn nếu đơn vị cố tình gửi vượt quá số lượng đối tác cho phép.
-
-### Bước 2.2: Nhập danh sách Đại biểu & Upload tài liệu bắt buộc
-Trước khi tiến hành đăng ký môn thi hay ghép đội, đơn vị bắt buộc phải điền đầy đủ danh sách đại biểu tham gia để phục vụ việc in thẻ và thẩm định hồ sơ:
-1. Vào phân hệ **Danh sách Đại biểu** -> Click nút **Thêm người tham dự**.
-2. **Chọn nguồn dữ liệu**:
-   - *Chọn từ danh sách nhân viên*: Nhập tên tìm kiếm nhân viên được đồng bộ từ hệ thống dữ liệu SMILE. Hệ thống sẽ tự động điền các thông tin: Họ tên, Chức vụ hiện tại, Phòng ban. **Lưu ý quy định nghiệp vụ đặc biệt: Hệ thống chỉ hiển thị và cho phép đăng ký những nhân viên có ngày gia nhập đơn vị trước ngày 01/06/2026. Những nhân viên có ngày gia nhập từ ngày 01/06/2026 trở đi sẽ bị hệ thống tự động ẩn để đảm bảo tính công bằng chuyên môn.** Nếu nhân viên thỏa mãn điều kiện thời gian nhưng chưa có trên SMILE, tích chọn 'Tự điền thông tin'.
-   - *Tự điền thông tin*: Tích chọn ô này nếu nhân sự chưa có trên hệ thống SMILE để nhập thủ công các trường Họ tên, Chức danh hiển thị trên thẻ.
-3. **Tải lên tài liệu đính kèm bắt buộc (4 file)**:
-   - **Ảnh CCCD Mặt trước**: Định dạng JPG/PNG, dung lượng < 5MB.
-   - **Ảnh CCCD Mặt sau**: Định dạng JPG/PNG, dung lượng < 5MB.
-   - **Ảnh chân dung in thẻ**: Định dạng JPG/PNG. **Lưu ý đặc biệt:** Bắt buộc ảnh tải lên phải có kích thước chuẩn xác là **530x530 pixel**. Hệ thống kiểm tra kích thước ảnh ở phía server; nếu ảnh sai kích thước, hệ thống sẽ báo lỗi validation và chặn không cho lưu hồ sơ.
-   - **Scan Hợp đồng lao động**: File PDF hoặc hình ảnh scan rõ chữ ký/dấu đỏ thể hiện đại biểu là nhân sự chính thức của đơn vị, dung lượng < 10MB.
-4. Nhấn **Lưu thông tin**.
-
-### Bước 2.3: Đăng ký tham gia hoạt động (Event Registration)
-Đại diện đơn vị vào trang **Đăng ký hoạt động** để tick chọn các bộ môn đơn vị sẽ tham gia tranh tài:
-- **Môn đăng ký theo số lượng (Quantity-based):** Áp dụng cho các môn thể thao tập thể (Bóng đá, Kéo co, Cầu lông đôi...). Đơn vị chỉ cần nhập số lượng đội đăng ký (Ví dụ: Bóng đá nam - 2 đội). Bước này chưa cần điền tên vận động viên chi tiết.
-- **Môn đăng ký theo danh sách chi tiết (Detailed-based):** Áp dụng cho thi nghiệp vụ, thi Miss, thi văn nghệ. Người dùng phải chọn trực tiếp đại biểu cụ thể trong danh sách đại biểu đã tạo ở Bước 2.2 để xếp vào nội dung đăng ký ngay lập tức. Số lượng người đăng ký bị khống chế theo giới hạn tối đa của cuộc thi (`max_per_org`).
-
-### Bước 2.4: Ghép đội thi đấu thể thao (Create Teams)
-Sau khi Phiếu đăng ký được HR HO kiểm tra và duyệt thành công:
-1. Đại diện đơn vị truy cập vào menu **Quản lý Đội hình** -> Chọn bộ môn -> Click **Tạo đội**.
-2. Nhập tên đội thi đấu (Ví dụ: *Đội bóng Mường Thanh Hà Nội*).
-3. Tại danh sách lựa chọn thành viên:
-   - Nếu môn thi đấu này đơn vị **không** có liên quân active: Danh sách chỉ hiển thị các đại biểu thuộc đơn vị mình.
-   - Nếu môn thi đấu này đơn vị **đã có liên quân hoạt động** (ở Bước 2.1): Danh sách chọn sẽ tự động hiển thị gộp toàn bộ đại biểu của đơn vị mình cùng đại biểu của (các) đơn vị đối tác liên quân để người dùng thoải mái tick ghép chung thành viên vào một đội.
-4. Chọn các vị trí (Hậu vệ, tiền đạo, thủ môn...), chỉ định số áo, chọn **Đội trưởng** (Captain) và nhấn **Lưu đội**.
-
----
-
-## 3. Hướng Dẫn Ban Nhân Sự HO & Admin
-
-Nhân sự HO và Admin quản trị toàn bộ hoạt động đăng ký, duyệt chất lượng hồ sơ và thực hiện các tác vụ in ấn thẻ đại biểu vật lý.
-
-### Bước 3.1: Tiếp nhận và Phê duyệt/Từ chối đăng ký đại biểu
-Khi đại diện đơn vị nhấn nút **Nộp đăng ký**, phiếu đăng ký của đơn vị chuyển trạng thái sang `submitted` (đã nộp) và khóa hoàn toàn quyền chỉnh sửa của đơn vị.
-1. Nhân sự HR HO truy cập danh sách phiếu đăng ký đang chờ xử lý.
-2. Click xem chi tiết từng đại biểu trong danh sách của đơn vị:
-   - Click preview ảnh chân dung in thẻ (đảm bảo đúng quy chuẩn, sắc nét, không bị nhòe).
-   - Kiểm tra ảnh CCCD 2 mặt và tệp scan Hợp đồng lao động để xác thực đại biểu là nhân sự hợp pháp của đơn vị, tránh gian lận vận động viên chuyên nghiệp bên ngoài tham dự thể thao đại hội.
-3. **Đưa ra quyết định**:
-   - **Phê duyệt (Approve):** Nếu tất cả hồ sơ đại biểu đạt chuẩn, nhấn **Phê duyệt**. Hệ thống sẽ tự động thực hiện 2 thao tác ngầm: Tạo mã token QR Code ngẫu nhiên duy nhất (`qr_token`) và cấp số thứ tự in thẻ (`badge_number` tăng dần theo sequence) cho từng đại biểu của đơn vị đó.
-   - **Từ chối (Reject):** Nếu phát hiện hồ sơ bị lỗi (ví dụ: ảnh chân dung chụp nghiêng, scan hợp đồng mờ, sai phòng ban thi nghiệp vụ...), nhấn **Từ chối** và **bắt buộc phải điền rõ lý do cụ thể**. Phiếu đăng ký chuyển về trạng thái `rejected` và mở khóa quyền sửa đổi để đơn vị cập nhật hồ sơ lỗi và nộp lại.
-
-### Bước 3.2: Quản lý & In thẻ đại biểu hàng loạt (Badge Management)
-1. Admin truy cập trang **Badge Management** (Quản lý thẻ đại biểu).
-2. Sử dụng bộ lọc thông minh ở phía trên: Lọc theo đơn vị trực thuộc, theo vai trò sự kiện hoặc trạng thái in ấn (Đã in / Chưa in).
-3. **Lưới Preview thẻ**: Hiển thị mô phỏng các thẻ đại biểu CR80 hoàn chỉnh theo đúng chuẩn kích thước thực tế (85.6x53.98mm) với đầy đủ thông tin: Ảnh chân dung 530x530px, Họ tên, Chức vụ, Đơn vị hiển thị, Mã QR chứa liên kết cá nhân hóa, và dải màu nổi bật ở chân thẻ chỉ định vai trò (Vai trò VIP màu đỏ rượu, Giám đốc màu tím, Khách mời màu xám, BTC màu hồng sẫm...).
-4. **Xuất lô in ấn hàng loạt**:
-   - Click **Tải xuống ảnh ZIP**: Hệ thống tự động đóng gói toàn bộ ảnh thẻ chất lượng cao 300 DPI dạng file PNG vào một tệp nén ZIP để gửi trực tiếp cho đơn vị in thẻ nhựa.
-   - Click **Xuất lô PDF**: Hệ thống ghép các thẻ đại biểu thành một file PDF nhiều trang để phục vụ việc in ấn trực tiếp từ máy in văn phòng.
-5. Sau khi hoàn thành in ấn vật lý, Admin click chọn đại biểu và chọn **Đánh dấu đã in thẻ** (`badge_printed = 1`) để theo dõi thống kê tiến độ in thẻ của đại hội.
-
----
-
-## 4. Hướng Dẫn Dành Cho Trưởng Đoàn (Team Lead)
-
-Đại biểu được Admin gán cờ Trưởng đoàn (`is_team_lead = 1`) chịu trách nhiệm kiểm soát hậu cần ăn uống của toàn bộ thành viên trong đoàn mình nhằm tránh lãng phí chi phí bữa ăn của ban tổ chức.
-
-### Quy trình Báo cắt suất ăn (Meal Cutoff)
-1. Trưởng đoàn sử dụng mã truy cập quét QR Code hoặc đăng nhập bằng tài khoản đại biểu để vào phân hệ **Quản lý Suất ăn**.
-2. Màn hình hiển thị danh sách các bữa ăn được tổ chức theo ngày đại hội (Bữa sáng, trưa, tối).
-3. **Báo cắt ăn lẻ tẻ:** Tích chọn checkbox trước tên đại biểu muốn báo cắt suất ăn cho bữa ăn cụ thể đó, nhập lý do (tùy chọn) và nhấn **Lưu thay đổi**.
-4. **Báo cắt ăn toàn đoàn (Bulk Cutoff):** Click chọn nút **Báo cắt ăn toàn đoàn** để hủy nhanh suất ăn của toàn bộ đoàn mình cho bữa ăn đó chỉ với 1 click chuột.
-5. Suất ăn báo hủy thành công sẽ tự động trừ trực tiếp vào bảng số liệu nhà bếp chuẩn bị thực phẩm.
-
-> **Quy định giờ khóa sổ (Cutoff Deadline):** Trưởng đoàn chỉ được phép báo cắt ăn trước giờ khóa sổ được quy định cho từng bữa ăn (Ví dụ: Bữa trưa khóa sổ báo cắt lúc 9:00 sáng cùng ngày, Bữa tối khóa sổ lúc 3:00 chiều cùng ngày). Nếu quá giờ, nút thao tác sẽ tự động bị mờ và hệ thống hiện cảnh báo: *"Đã quá giờ khóa sổ quy định, không thể thay đổi suất ăn."*
-
----
-
-## 5. Hướng Dẫn Các Ban Tổ Chức Chuyên Môn
-
-Hệ thống cung cấp các công cụ đồ họa trực quan và tự động hóa giúp các tiểu ban chuyên môn quản lý đại hội thuận tiện.
-
-### 5.1 Ban Tổ Chức Thi Nghiệp Vụ
-BTC Thi nghiệp vụ truy cập phân hệ **Thi Nghiệp Vụ**:
-- **Cấu hình giới hạn phòng ban:** Để đảm bảo tính công bằng chuyên môn, BTC cấu hình giới hạn các mã phòng ban được phép đăng ký tham gia thi (Ví dụ: Cuộc thi Lễ tân xuất sắc chỉ chấp nhận đại biểu có mã phòng ban thuộc SMILE là `LETAN` hoặc `CSKH`). Nếu đơn vị chọn đại biểu sai phòng ban, hệ thống sẽ báo lỗi validation ngay lập tức.
-- **Cấp Số báo danh tự động:** Sau khi chốt danh sách, BTC click nút **Cấp SBD tự động**. Hệ thống tự động tạo mã số báo danh tăng dần dựa trên cấu hình tiền tố cuộc thi (prefix), số bắt đầu và độ rộng đệm. Ví dụ: Cuộc thi Lễ tân có prefix='LT', start=1, pad=3 -> LT001, LT002, LT003...
-- **Xuất danh sách phòng thi:** BTC click xuất file Excel danh sách thí sinh chính thức bao gồm đầy đủ SBD, tên đơn vị và phòng thi để in ấn dán trước phòng thi.
-
-### 5.2 Ban Tổ Chức Thể Thao
-BTC Thể thao quản lý lịch thi đấu và hiển thị trực quan nhánh đấu:
-- **Thiết lập nhánh đấu:** Khởi tạo lịch thi đấu của môn thể thao (theo cấu trúc cha-con, ví dụ môn gốc 'Bóng đá' -> môn con 'Bóng đá nam', 'Bóng đá nữ'). Hỗ trợ tự động phân chia bảng đấu vòng tròn tính điểm (round robin) hoặc thi đấu loại trực tiếp (knockout) hiển thị dạng sơ đồ bracket trực quan.
-- **Cập nhật tỉ số trực tiếp (Live Score):** Trọng tài hoặc BTC cập nhật tỉ số trực tiếp của trận đấu ngay tại sân qua giao diện điện thoại. Hệ thống sẽ tự động tính toán lại bảng xếp hạng standings (đối với bảng đấu vòng tròn) hoặc tự động đẩy đội thắng lên nhánh đấu tiếp theo (đối với thể thức knockout) hiển thị thời gian thực ra màn hình công cộng.
-
-### 5.3 Ban Tổ Chức Tiệc & Phân chỗ ngồi
-BTC Tiệc truy cập trang thiết kế sơ đồ tiệc trực quan bằng Canvas:
-- **Thiết kế sơ đồ tiệc:** BTC kéo thả để đặt vị trí các bàn tiệc dạng hình tròn hoặc chữ nhật trên canvas.
-  - *Bàn VIP:* Thiết lập màu Burgundy đỏ rượu sang trọng, đặt ở hàng ghế đầu gần khu vực sân khấu biểu diễn.
-  - *Bàn thường:* Thiết lập màu xanh Navy thanh lịch dành cho các đoàn đại biểu đơn vị.
-- **Phân chia ghế ngồi trực quan:** Click vào một bàn cụ thể trên canvas để hiển thị 10 vị trí ghế trống. Kéo thả trực tiếp tên đại biểu từ danh sách đại biểu chưa phân ghế ở thanh sidebar bên phải thả vào vị trí ghế mong muốn để xếp chỗ ngồi chi tiết.
-
----
-
-## 6. Hướng Dẫn Dành Cho Đại Biểu (Public QR Page)
-
-Đại biểu sau khi nhận được thẻ in vật lý chỉ cần sử dụng camera điện thoại quét mã QR in trên thẻ để truy cập Trang cá nhân di động (Responsive Mobile Landing Page) mà không cần tạo tài khoản đăng nhập:
-1. **Thẻ Đại biểu Điện tử:** Phần trên cùng hiển thị thẻ điện tử sắc nét tích hợp ảnh đại diện, vai trò và thông tin cá nhân.
-2. **Lịch trình cá nhân (My Agenda):** Hiển thị chi tiết giờ họp, địa điểm phòng hội nghị, chỗ ngồi tiệc tối của chính đại biểu đó.
-3. **Lịch thi nghiệp vụ:** Tra cứu nhanh số báo danh, giờ thi phòng thi nghiệp vụ cá nhân (nếu đại biểu có đăng ký thi nghiệp vụ).
-4. **Lịch thi đấu đoàn:** Xem lịch thi đấu và tỉ số trực tiếp tất cả các môn thể thao mà các đội đại diện cho đơn vị mình đang tham gia thi đấu tại đại hội.
-5. **Agenda Đại hội chung:** Tra cứu nhanh chương trình tổng quan của đại hội theo từng ngày.
+| **BR-REG-01** | Nhập danh sách đại biểu | Cho phép chọn từ SMILE hoặc tự nhập nếu chưa có trên SMILE. |
+| **BR-REG-02** | Hồ sơ đính kèm bắt buộc | Bắt buộc tải lên đủ 4 file: CCCD Mặt trước, CCCD Mặt sau, Ảnh chân dung, Scan HĐLĐ. |
+| **BR-REG-03** | Kích thước ảnh chân dung | Validate phía máy chủ: Kích thước ảnh chân dung bắt buộc phải đúng **530x530 pixel**. |
+| **BR-REG-04** | Thời gian gia nhập của nhân viên | Tự động ẩn hoặc chặn đăng ký với nhân viên gia nhập đơn vị từ ngày **01/06/2026** trở đi. |
+| **BR-REG-05** | Giới hạn môn thể thao của đại biểu | Mỗi đại biểu đăng ký tối đa **N môn thể thao root** (Mặc định `max_sports_per_attendee = 3`). |
+| **BR-REG-06** | Phòng ban thi nghiệp vụ | Đại biểu thi nghiệp vụ phải có mã phòng ban SMILE khớp với cấu hình `competition_departments`. |
+| **BR-AL01** | Điều kiện liên quân nội dung | Chỉ áp dụng liên quân cho các môn thể thao tập thể có cấu hình cho phép liên quân. |
+| **BR-AL03** | Giới hạn số đơn vị liên quân | Số lượng đơn vị ghép đội liên quân không được vượt quá `max_alliance_orgs` cấu hình cho nội dung đó. |
+| **BR-APPROVE**| Đồng bộ trạng thái phê duyệt | Phê duyệt hoặc từ chối thực hiện trên **toàn bộ phiếu đăng ký** của đơn vị, không phê duyệt riêng lẻ từng đại biểu. |

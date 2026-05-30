@@ -52,7 +52,12 @@ $this->Tabletitle = 'Quản lý phiếu đăng ký';
                     'name' => 'status',
                     'header' => 'Trạng thái',
                     'type' => 'raw',
-                    'filter' => Registrations::getStatusList(),
+                    'filter' => array(
+                        'Nháp' => 'Nháp',
+                        'Đã nộp' => 'Đã nộp',
+                        'Đã duyệt' => 'Đã duyệt',
+                        'Từ chối' => 'Từ chối',
+                    ),
                     'value' => function ($data) {
                         return Registrations::getStatusLabel($data->status);
                     }
@@ -60,6 +65,7 @@ $this->Tabletitle = 'Quản lý phiếu đăng ký';
                 array(
                     'name' => 'submitted_at',
                     'header' => 'Ngày nộp',
+                    'filter' => false,
                     'value' => function ($data) {
                         return $data->submitted_at ? MyHelper::formatDateTime($data->submitted_at) : '-';
                     }
@@ -67,6 +73,7 @@ $this->Tabletitle = 'Quản lý phiếu đăng ký';
                 array(
                     'name' => 'created_at',
                     'header' => 'Ngày tạo',
+                    'filter' => false,
                     'value' => function ($data) {
                         return MyHelper::formatDateTime($data->created_at);
                     }

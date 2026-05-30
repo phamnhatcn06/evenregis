@@ -33,7 +33,7 @@ class Attendees extends BaseAttendees
     {
         $rules = parent::rules();
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path', 'length', 'max' => 500);
-        $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path, approval_status, rejection_reason', 'safe');
+        $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path, approval_status, rejection_reason, personal_email', 'safe');
         $rules[] = array('approval_status, transport_id', 'numerical', 'integerOnly' => true);
         $rules[] = array('join_hotel_date, check_in_date, check_out_date, transport_id, transport_name', 'safe');
         return $rules;
@@ -199,7 +199,6 @@ class Attendees extends BaseAttendees
         $data = array_filter($this->attributes, function ($value) {
             return $value !== null && $value !== '';
         });
-        // Thêm các trường không nằm trong attributes
         $extraFields = array(
             'portrait_path',
             'cccd_front_path',
@@ -210,7 +209,8 @@ class Attendees extends BaseAttendees
             'join_hotel_date',
             'check_in_date',
             'check_out_date',
-            'transport_id'
+            'transport_id',
+            'personal_email'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
@@ -235,7 +235,6 @@ class Attendees extends BaseAttendees
         $data = array_filter($this->attributes, function ($value) {
             return $value !== null && $value !== '';
         });
-        // Thêm các trường không nằm trong attributes
         $extraFields = array(
             'portrait_path',
             'cccd_front_path',
@@ -246,7 +245,8 @@ class Attendees extends BaseAttendees
             'join_hotel_date',
             'check_in_date',
             'check_out_date',
-            'transport_id'
+            'transport_id',
+            'personal_email'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {

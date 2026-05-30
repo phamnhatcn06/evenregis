@@ -1,4 +1,8 @@
 <?php
+$user = AuthHandler::getUser();
+$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+$isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
+
 $registrationsByStatus = isset($stats['registrations_by_status']) ? $stats['registrations_by_status'] : array(
     'draft' => 5,
     'submitted' => 12,
@@ -33,6 +37,8 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
     array('name' => 'Bóng bàn đơn nữ', 'count' => 14),
 );
 ?>
+
+<?php if ($isHO): ?>
 
 <div class="row">
     <div class="col-12">
@@ -260,6 +266,23 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                     </div>
                     <?php endforeach; ?>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+<?php else: ?>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm welcome-card text-center py-5 px-4" style="background: linear-gradient(135deg, #3a57e8 0%, #08b1c4 100%); border-radius: 16px; color: white;">
+            <div class="card-body py-5">
+                <div class="mb-4">
+                    <div class="welcome-icon-box mx-auto d-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background-color: rgba(255, 255, 255, 0.2); border-radius: 50%; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);">
+                        <i class="fa fa-handshake-o fa-3x text-white"></i>
+                    </div>
+                </div>
+                <h1 class="text-white fw-bold mb-3" style="font-size: 2.25rem;">Chào mừng đến với hệ thống đăng ký sự kiện Mường Thanh</h1>
+                <p class="lead text-white-50 mb-0" style="max-width: 600px; margin: 0 auto;">Hệ thống quản lý và đăng ký các hoạt động, sự kiện, chương trình nghiệp vụ, thể thao, văn nghệ và sắc đẹp.</p>
             </div>
         </div>
     </div>
