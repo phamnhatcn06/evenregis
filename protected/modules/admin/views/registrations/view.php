@@ -842,8 +842,8 @@ $missHasAlliance = ($missPendingCount > 0 || $missHistoryCount > 0);
                                                 ?>
                                             </td>
                                             <td>
-                                                <input type="email" class="form-control form-control-sm attendee-personal-email"
-                                                    data-attendee-id="<?php echo $c['attendee_id']; ?>"
+                                                <input type="email" class="form-control form-control-sm contestant-personal-email"
+                                                    data-contestant-id="<?php echo $c['id']; ?>"
                                                     value="<?php echo CHtml::encode(isset($c['personal_email']) ? $c['personal_email'] : ''); ?>"
                                                     placeholder="Nhập email cá nhân..."
                                                     style="max-width: 250px;"

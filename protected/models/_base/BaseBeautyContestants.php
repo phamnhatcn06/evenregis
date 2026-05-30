@@ -32,41 +32,47 @@
  * @property BeautyContests $contest
  * @property BeautyScores[] $beautyScores
  */
-abstract class BaseBeautyContestants extends GxActiveRecord {
+abstract class BaseBeautyContestants extends GxActiveRecord
+{
 
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+	{
 		return 'beauty_contestants';
 	}
 
-	public static function label($n = 1) {
+	public static function label($n = 1)
+	{
 		return Yii::t('app', 'BeautyContestants|BeautyContestants', $n);
 	}
 
-	public static function representingColumn() {
+	public static function representingColumn()
+	{
 		return 'candidate_number';
 	}
 
-	public function rules() {
+	public function rules()
+	{
 		return array(
 			array('contest_id, attendee_id, candidate_number', 'required'),
-			array('final_rank', 'numerical', 'integerOnly'=>true),
+			array('final_rank, status', 'numerical', 'integerOnly' => true),
 			array('height_cm, weight_kg', 'numerical'),
-			array('contest_id, attendee_id, candidate_number', 'length', 'max'=>20),
-			array('measurements', 'length', 'max'=>50),
-			array('talent, award', 'length', 'max'=>255),
-			array('photo_portrait, photo_full_body', 'length', 'max'=>500),
-			array('status', 'length', 'max'=>12),
+			array('contest_id, registration_id, attendee_id, candidate_number', 'length', 'max' => 20),
+			array('personal_email, talent, award', 'length', 'max' => 255),
+			array('measurements', 'length', 'max' => 50),
+			array('photo_portrait, photo_full_body', 'length', 'max' => 500),
 			array('bio, registered_at, created_at, updated_at, deleted_at', 'safe'),
-			array('height_cm, weight_kg, measurements, talent, bio, photo_portrait, photo_full_body, award, final_rank, registered_at, status, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, contest_id, attendee_id, candidate_number, height_cm, weight_kg, measurements, talent, bio, photo_portrait, photo_full_body, award, final_rank, registered_at, status, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
+			array('registration_id, personal_email, height_cm, weight_kg, measurements, talent, bio, photo_portrait, photo_full_body, award, final_rank, registered_at, status, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, contest_id, registration_id, attendee_id, candidate_number, personal_email, height_cm, weight_kg, measurements, talent, bio, photo_portrait, photo_full_body, award, final_rank, registered_at, status, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+	{
 		return array(
 			'attendee' => array(self::BELONGS_TO, 'Attendees', 'attendee_id'),
 			'contest' => array(self::BELONGS_TO, 'BeautyContests', 'contest_id'),
@@ -74,12 +80,13 @@ abstract class BaseBeautyContestants extends GxActiveRecord {
 		);
 	}
 
-	public function pivotModels() {
-		return array(
-		);
+	public function pivotModels()
+	{
+		return array();
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+	{
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'contest_id' => null,
@@ -105,7 +112,8 @@ abstract class BaseBeautyContestants extends GxActiveRecord {
 		);
 	}
 
-	public function search() {
+	public function search()
+	{
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);

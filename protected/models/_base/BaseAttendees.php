@@ -57,39 +57,46 @@
  * @property SportTeamMembers[] $sportTeamMembers
  * @property TalentEntryMembers[] $talentEntryMembers
  */
-abstract class BaseAttendees extends GxActiveRecord {
+abstract class BaseAttendees extends GxActiveRecord
+{
 
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+	{
 		return 'attendees';
 	}
 
-	public static function label($n = 1) {
+	public static function label($n = 1)
+	{
 		return Yii::t('app', 'Attendees|Attendees', $n);
 	}
 
-	public static function representingColumn() {
+	public static function representingColumn()
+	{
 		return 'full_name';
 	}
 
-	public function rules() {
+	public function rules()
+	{
 		return array(
 			array('registration_id, property_id, full_name', 'required'),
-			array('badge_generated, badge_printed, is_team_lead, is_active, sort_order', 'numerical', 'integerOnly'=>true),
-			array('event_id, registration_id, property_id, staff_id, role_id, badge_number, transport_id, approved_by, approved_at', 'length', 'max'=>20),
-			array('full_name, position, unit_label', 'length', 'max'=>255),
-			array('photo_path, photo_full_path', 'length', 'max'=>500),
-			array('qr_token', 'length', 'max'=>64),
-			array('check_in_date, check_out_date, note, created_at, updated_at, deleted_at', 'safe'),
-			array('event_id, staff_id, role_id, position, unit_label, photo_path, photo_full_path, qr_token, badge_number, badge_generated, badge_printed, transport_id, check_in_date, check_out_date, is_team_lead, is_active, sort_order, approved_by, approved_at, note, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, event_id, registration_id, property_id, staff_id, role_id, full_name, position, unit_label, photo_path, photo_full_path, qr_token, badge_number, badge_generated, badge_printed, transport_id, check_in_date, check_out_date, is_team_lead, is_active, sort_order, approved_by, approved_at, note, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
+			array('badge_generated, badge_printed, is_team_lead, is_active, sort_order, approval_status, current_approval_index, next_approval_index', 'numerical', 'integerOnly' => true),
+			array('event_id, registration_id, property_id, staff_id, badge_number, transport_id, approved_by, approved_at', 'length', 'max' => 20),
+			array('role_id, full_name, position, unit_label', 'length', 'max' => 255),
+			array('photo_path, photo_full_path, cccd_front_path, cccd_back_path, portrait_path, contract_path', 'length', 'max' => 500),
+			array('qr_token', 'length', 'max' => 64),
+			array('check_in_date, check_out_date, note, created_at, updated_at, deleted_at, join_hotel_date, end_date', 'safe'),
+			array('event_id, staff_id, role_id, position, unit_label, photo_path, photo_full_path, cccd_front_path, cccd_back_path, portrait_path, contract_path, qr_token, badge_number, badge_generated, badge_printed, transport_id, check_in_date, check_out_date, is_team_lead, is_active, sort_order, approved_by, approved_at, note, created_at, updated_at, deleted_at, approval_status, join_hotel_date, end_date, current_approval_index, next_approval_index', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, event_id, registration_id, property_id, staff_id, role_id, full_name, position, unit_label, photo_path, photo_full_path, cccd_front_path, cccd_back_path, portrait_path, contract_path, qr_token, badge_number, badge_generated, badge_printed, transport_id, check_in_date, check_out_date, is_team_lead, is_active, sort_order, approved_by, approved_at, note, created_at, updated_at, deleted_at, approval_status, join_hotel_date, end_date, current_approval_index, next_approval_index', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+	{
 		return array(
 			'attendeeRoles' => array(self::HAS_MANY, 'AttendeeRoles', 'attendee_id'),
 			'event' => array(self::BELONGS_TO, 'Events', 'event_id'),
@@ -113,12 +120,13 @@ abstract class BaseAttendees extends GxActiveRecord {
 		);
 	}
 
-	public function pivotModels() {
-		return array(
-		);
+	public function pivotModels()
+	{
+		return array();
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+	{
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'event_id' => null,
@@ -169,7 +177,8 @@ abstract class BaseAttendees extends GxActiveRecord {
 		);
 	}
 
-	public function search() {
+	public function search()
+	{
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);
