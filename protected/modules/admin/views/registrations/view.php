@@ -842,12 +842,21 @@ $missHasAlliance = ($missPendingCount > 0 || $missHistoryCount > 0);
                                                 ?>
                                             </td>
                                             <td>
-                                                <input type="email" class="form-control form-control-sm contestant-personal-email"
-                                                    data-contestant-id="<?php echo $c['id']; ?>"
-                                                    value="<?php echo CHtml::encode(isset($c['personal_email']) ? $c['personal_email'] : ''); ?>"
-                                                    placeholder="Nhập email cá nhân..."
-                                                    style="max-width: 250px;"
-                                                    <?php echo !$canEdit ? 'disabled' : ''; ?>>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input type="email" class="form-control form-control-sm contestant-personal-email"
+                                                        id="contestant-email-<?php echo $c['id']; ?>"
+                                                        data-contestant-id="<?php echo $c['id']; ?>"
+                                                        value="<?php echo CHtml::encode(isset($c['personal_email']) ? $c['personal_email'] : ''); ?>"
+                                                        placeholder="Nhập email cá nhân..."
+                                                        style="max-width: 250px;"
+                                                        <?php echo !$canEdit ? 'disabled' : ''; ?>>
+                                                    <?php if ($canEdit): ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-success btn-save-contestant-email"
+                                                        data-contestant-id="<?php echo $c['id']; ?>" title="Lưu email">
+                                                        <i class="fa fa-save"></i>
+                                                    </button>
+                                                    <?php endif; ?>
+                                                </div>
                                             </td>
                                             <?php if ($canEdit): ?>
                                                 <td class="text-center">
