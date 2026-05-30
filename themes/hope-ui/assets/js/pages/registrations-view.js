@@ -3780,7 +3780,12 @@ var RegistrationView = (function() {
                     editCategorySelect.innerHTML = '<option value="">-- Chọn thể loại --</option>';
                 }
                 if (data.success && data.data && data.data.length > 0) {
-                    data.data.forEach(function(item) {
+                    var categories = data.data.slice().sort(function(a, b) {
+                        var codeA = (a.code || '').toLowerCase();
+                        var codeB = (b.code || '').toLowerCase();
+                        return codeA.localeCompare(codeB);
+                    });
+                    categories.forEach(function(item) {
                         if (categorySelect) {
                             var opt = document.createElement('option');
                             opt.value = item.id;
