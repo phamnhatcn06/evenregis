@@ -16,8 +16,10 @@ $this->menu = array(
 );
 $this->Tabletitle = 'Thêm người duyệt cho: ' . CHtml::encode($workflow->name);
 
-Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/css/plugins/dual-listbox.min.css');
-Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/js/plugins/dual-listbox.min.js', CClientScript::POS_END);
+$booster = Yii::app()->booster;
+$assetsUrl = $booster->getAssetsUrl();
+Yii::app()->clientScript->registerCssFile($assetsUrl . '/select2/select2.css');
+Yii::app()->clientScript->registerScriptFile($assetsUrl . '/select2/select2.min.js', CClientScript::POS_END);
 ?>
 
 <form id="add-approver-form" method="post">
@@ -53,16 +55,16 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <hr>
 
                     <div class="row mb-3">
-                        <label class="col-md-12 col-form-label mb-2">
-                            <strong>Chọn nhân viên</strong> <span class="text-danger">*</span>
-                            <small class="text-muted ms-2">(Kéo từ trái sang phải hoặc double-click)</small>
+                        <label class="col-md-3 col-form-label">
+                            Chọn nhân viên <span class="text-danger">*</span>
                         </label>
-                        <div class="col-md-12">
-                            <select id="staff-listbox" name="staff_ids[]" multiple="multiple" style="height:350px;">
+                        <div class="col-md-9">
+                            <select id="staff-select" name="staff_ids[]" multiple="multiple" class="form-control" style="width:100%;">
                                 <?php foreach ($staffList as $id => $name): ?>
                                     <option value="<?php echo $id; ?>"><?php echo CHtml::encode($name); ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <small class="text-muted">Gõ để tìm kiếm, có thể chọn nhiều người</small>
                         </div>
                     </div>
                 </div>
@@ -86,7 +88,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <ul class="small text-muted mb-0">
                         <li class="mb-2"><strong>Bước duyệt:</strong> Chọn bước trong quy trình (1, 2, 3...)</li>
                         <li class="mb-2"><strong>Tên bước:</strong> Mô tả vai trò (VD: Giám đốc đơn vị)</li>
-                        <li class="mb-2"><strong>Chọn nhân viên:</strong> Double-click hoặc kéo sang phải</li>
+                        <li class="mb-2"><strong>Chọn nhân viên:</strong> Gõ tên để tìm, click để chọn</li>
                         <li class="mb-2">Mỗi nhân viên sẽ được gán <strong>đơn vị của họ</strong> tự động</li>
                         <li>Có thể chọn nhiều người cho cùng 1 bước</li>
                     </ul>
@@ -121,20 +123,15 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var listbox = new DualListbox('#staff-listbox', {
-        availableTitle: 'Danh sách nhân viên',
-        selectedTitle: 'Đã chọn',
-        addButtonText: '>',
-        removeButtonText: '<',
-        addAllButtonText: '>>',
-        removeAllButtonText: '<<',
-        searchPlaceholder: 'Tìm kiếm...'
+    $('#staff-select').select2({
+        placeholder: 'Gõ tên để tìm kiếm...',
+        allowClear: true,
+        width: '100%'
     });
 
-    // Submit validation
     document.getElementById('add-approver-form').addEventListener('submit', function(e) {
-        var selected = document.querySelectorAll('#staff-listbox option:checked');
-        if (selected.length === 0) {
+        var selected = $('#staff-select').val();
+        if (!selected || selected.length === 0) {
             e.preventDefault();
             alert('Vui lòng chọn ít nhất 1 nhân viên');
             return false;
