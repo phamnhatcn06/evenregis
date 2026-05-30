@@ -134,25 +134,46 @@ class ApprovalWorkflowsController extends AdminController
                 $successCount = 0;
                 $errorCount = 0;
 
+                // Lấy thông tin user từ Portal SSO
+                $params = Yii::app()->params;
+                $portalApiUrl = $params['portal']['api_url'] . '/api/sso/users';
+
                 foreach ($staffIds as $userId) {
-                    // Lấy thông tin user từ Portal SSO
-                    $userResult = ApiClient::get(ApiEndpoints::SSO_USERS . '/' . $userId);
-                    if ($userResult['success'] && isset($userResult['data'])) {
-                        $user = isset($userResult['data']['data']) ? $userResult['data']['data'] : $userResult['data'];
+                    $url = $portalApiUrl . '/' . $userId;
+                    $context = stream_context_create(array(
+                        'http' => array(
+                            'method' => 'GET',
+                            'header' => "Accept: application/json\r\n",
+                            'timeout' => 30,
+                        ),
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                        ),
+                    ));
 
-                        $approver = new ApprovalWorkflowApprovers;
-                        $approver->workflow_id = $id;
-                        $approver->step_index = $stepIndex;
-                        $approver->step_name = $stepName;
-                        $approver->portal_user_id = $user['id'];
-                        $approver->portal_user_name = isset($user['full_name']) ? $user['full_name'] : '';
-                        $approver->portal_user_email = isset($user['email']) ? $user['email'] : '';
-                        $approver->organization_id = isset($user['property_id']) ? $user['property_id'] : null;
-                        $approver->is_active = 1;
+                    $response = @file_get_contents($url, false, $context);
+                    if ($response) {
+                        $data = json_decode($response, true);
+                        $user = isset($data['data']['data']) ? $data['data']['data'] : (isset($data['data']) ? $data['data'] : null);
 
-                        $result = $approver->storeViaApi();
-                        if ($result['success']) {
-                            $successCount++;
+                        if ($user) {
+                            $approver = new ApprovalWorkflowApprovers;
+                            $approver->workflow_id = $id;
+                            $approver->step_index = $stepIndex;
+                            $approver->step_name = $stepName;
+                            $approver->portal_user_id = $user['id'];
+                            $approver->portal_user_name = isset($user['full_name']) ? $user['full_name'] : '';
+                            $approver->portal_user_email = isset($user['email']) ? $user['email'] : '';
+                            $approver->organization_id = isset($user['property_id']) ? $user['property_id'] : null;
+                            $approver->is_active = 1;
+
+                            $result = $approver->storeViaApi();
+                            if ($result['success']) {
+                                $successCount++;
+                            } else {
+                                $errorCount++;
+                            }
                         } else {
                             $errorCount++;
                         }
