@@ -3214,11 +3214,6 @@ class RegistrationsController extends AdminController
 		$musicPath = Yii::app()->getRequest()->getPost('music_path', '');
 		$videoPath = Yii::app()->getRequest()->getPost('video_path', '');
 
-		if (empty($attendeeIds)) {
-			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một người biểu diễn.'));
-			Yii::app()->end();
-		}
-
 		// Tạo talent entry
 		$entry = new TalentEntries;
 		$entry->registration_id = $registrationId;
