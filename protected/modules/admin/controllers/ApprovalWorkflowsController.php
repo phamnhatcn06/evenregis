@@ -39,7 +39,7 @@ class ApprovalWorkflowsController extends AdminController
             $model->setAttributes($_POST['ApprovalWorkflows']);
 
             $ssoUser = AuthHandler::getUser();
-            $model->created_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+            $model->created_by = ($ssoUser && isset($ssoUser['id'])) ? $ssoUser['id'] : null;
 
             if ($model->validate()) {
                 $result = $model->storeViaApi();
