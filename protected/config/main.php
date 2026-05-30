@@ -152,6 +152,12 @@ return array(
                     'categories' => 'application.*',
                     'logFile' => 'application.log',
                 ),
+                // Hiển thị lỗi chi tiết trên browser (chỉ dùng khi dev)
+                array(
+                    'class' => 'CWebLogRoute',
+                    'levels' => 'error, warning, trace',
+                    'showInFireBug' => false,
+                ),
             ),
         ),
     ),
