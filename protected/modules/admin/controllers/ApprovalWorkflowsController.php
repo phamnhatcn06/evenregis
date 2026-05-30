@@ -206,18 +206,23 @@ class ApprovalWorkflowsController extends AdminController
         // Lấy token từ session
         $token = isset(Yii::app()->session['sso_token']) ? Yii::app()->session['sso_token'] : '';
 
-        $context = stream_context_create(array(
-            'http' => array(
-                'method' => 'GET',
-                'header' => "Accept: application/json\r\nAuthorization: Bearer {$token}\r\n",
-                'timeout' => 30,
+        // Dùng CURL thay vì file_get_contents
+        $ch = curl_init($url);
+        curl_setopt_array($ch, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
             ),
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-            ),
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
         ));
-        $response = @file_get_contents($url, false, $context);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        var_dump($response);
+        die;
         if ($response) {
             $data = json_decode($response, true);
             if (isset($data['data'])) {
