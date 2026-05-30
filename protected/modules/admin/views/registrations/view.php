@@ -1557,12 +1557,15 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         });
     }
 
-    $(document).on("change", ".contestant-personal-email", function() {
-        var input = $(this);
-        var contestantId = input.data("contestant-id");
+    $(document).on("click", ".btn-save-contestant-email", function() {
+        var btn = $(this);
+        var contestantId = btn.data("contestant-id");
+        var input = $("#contestant-email-" + contestantId);
         var email = input.val();
+        var originalHtml = btn.html();
 
-        input.removeClass("border-success border-danger").addClass("border-warning");
+        btn.prop("disabled", true).html("<i class=\"fa fa-spinner fa-spin\"></i>");
+        input.removeClass("border-success border-danger");
 
         $.ajax({
             url: "/admin/registrations/updateContestantEmail",
@@ -1572,19 +1575,21 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
                 personal_email: email
             },
             success: function(res) {
+                btn.prop("disabled", false).html(originalHtml);
                 if (res.success) {
-                    input.removeClass("border-warning").addClass("border-success");
+                    input.addClass("border-success");
                     Toast.success("Cập nhật email cá nhân thành công");
                     setTimeout(function() {
                         input.removeClass("border-success");
                     }, 2000);
                 } else {
-                    input.removeClass("border-warning").addClass("border-danger");
+                    input.addClass("border-danger");
                     Toast.error(res.error || "Không thể cập nhật email");
                 }
             },
             error: function() {
-                input.removeClass("border-warning").addClass("border-danger");
+                btn.prop("disabled", false).html(originalHtml);
+                input.addClass("border-danger");
                 Toast.error("Lỗi kết nối máy chủ");
             }
         });
