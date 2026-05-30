@@ -207,11 +207,14 @@ class ApprovalWorkflowsController extends AdminController
         $token = isset(Yii::app()->session['sso_token']) ? Yii::app()->session['sso_token'] : '';
 
         // Dùng CURL thay vì file_get_contents
+        $portalSecret = isset($params['portal']['portal_secret']) ? $params['portal']['portal_secret'] : '';
+
         $ch = curl_init($url);
         curl_setopt_array($ch, array(
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => array(
                 'Authorization: Bearer ' . $token,
+                'X-Portal-Secret: ' . $portalSecret,
                 'Accept: application/json',
             ),
             CURLOPT_TIMEOUT => 30,
