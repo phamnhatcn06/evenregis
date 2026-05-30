@@ -2,6 +2,9 @@
 
 class ApiEndpoints
 {
+    // SSO Portal
+    const SSO_USERS = '/api/sso/users';
+
     // Property
     const PROPERTY_LIST = '/api/properties';
     const PROPERTY_STORE = '/api/properties/store';
