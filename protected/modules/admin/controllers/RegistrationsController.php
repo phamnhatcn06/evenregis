@@ -3247,15 +3247,23 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
-		$entryId = isset($result['data']['id']) ? $result['data']['id'] : null;
+		$entryId = null;
+		if (isset($result['data']['data']['id'])) {
+			$entryId = $result['data']['data']['id'];
+		} elseif (isset($result['data']['id'])) {
+			$entryId = $result['data']['id'];
+		}
 
 		// Thêm thành viên
-		if ($entryId) {
+		if ($entryId && !empty($attendeeIds)) {
 			foreach ($attendeeIds as $attendeeId) {
 				$member = new TalentEntryMembers;
 				$member->entry_id = $entryId;
 				$member->attendee_id = $attendeeId;
-				$member->storeViaApi();
+				$memberResult = $member->storeViaApi();
+				if (!$memberResult['success']) {
+					Yii::log('Lỗi thêm thành viên văn nghệ: entry_id=' . $entryId . ', attendee_id=' . $attendeeId . ', error=' . json_encode($memberResult), 'error');
+				}
 			}
 		}
 
