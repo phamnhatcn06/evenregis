@@ -5,7 +5,6 @@
             <form method="post" action="<?php echo $this->createUrl('addTalentRegistration'); ?>" id="add-talent-form">
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                 <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
-                <input type="hidden" name="category_id" id="talent_category_id_hidden" value="">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa fa-music me-2"></i>Đăng ký văn nghệ</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -14,8 +13,10 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="mb-3">
-                                <label class="form-label">Thể loại</label>
-                                <div class="form-control bg-light" id="talent_category_display" style="pointer-events:none;"></div>
+                                <label class="form-label">Thể loại <span class="text-danger">*</span></label>
+                                <select class="form-select" name="category_id" id="talent_category_select" required>
+                                    <option value="">-- Chọn thể loại --</option>
+                                </select>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Tên tiết mục <span class="text-danger">*</span></label>

@@ -14839,6 +14839,7 @@ th {
 
 .main-content .content-inner {
   min-height: calc(100vh - 7.2rem);
+  margin-bottom: 100px;
 }
 
 .sidebar + .main-content {

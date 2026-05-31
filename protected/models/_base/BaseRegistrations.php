@@ -66,7 +66,7 @@ abstract class BaseRegistrations extends GxActiveRecord
 			array('submitted_at, reviewed_by, reviewed_at', 'length', 'max' => 10),
 			array('rejection_reason, note, created_at, updated_at, deleted_at', 'safe'),
 			array('event_id, relation_property_id, status, document, submitted_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, event_id, property_id, relation_property_id, period_id, submitted_by, status, document, submitted_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
+			array('event_id, property_id, relation_property_id, period_id, submitted_by, status, document, submitted_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 

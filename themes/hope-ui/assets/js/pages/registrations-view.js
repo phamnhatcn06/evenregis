@@ -3568,46 +3568,26 @@ var RegistrationView = (function() {
     var talentSelectedAttendees = [];
 
     function bindTalentEvents() {
-        // Category select outside card
-        var categorySelectMain = document.getElementById('talent_category_select_main');
         var btnOpenModal = document.getElementById('btn_open_talent_modal');
-
-        if (categorySelectMain) {
-            categorySelectMain.addEventListener('change', function() {
-                if (btnOpenModal) {
-                    btnOpenModal.disabled = !this.value;
-                }
-            });
-        }
 
         // Button open modal
         if (btnOpenModal) {
             btnOpenModal.addEventListener('click', function() {
-                var categoryId = categorySelectMain ? categorySelectMain.value : '';
-                if (!categoryId) {
-                    Toast.error('Vui lòng chọn thể loại.');
-                    return;
-                }
-
-                var categoryName = categorySelectMain.options[categorySelectMain.selectedIndex].text;
-
-                // Set category vào modal
-                document.getElementById('talent_category_id_hidden').value = categoryId;
-                document.getElementById('talent_category_display').textContent = categoryName;
-
                 // Copy alliance từ ngoài vào form
                 var allianceSelect = document.getElementById('talent_alliance_property');
                 var form = document.getElementById('add-talent-form');
-                // Remove old hidden inputs
-                form.querySelectorAll('input[name="alliance_property_ids[]"]').forEach(function(el) { el.remove(); });
-                if (allianceSelect) {
-                    Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
-                        var hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.name = 'alliance_property_ids[]';
-                        hidden.value = opt.value;
-                        form.appendChild(hidden);
-                    });
+                if (form) {
+                    // Remove old hidden inputs
+                    form.querySelectorAll('input[name="alliance_property_ids[]"]').forEach(function(el) { el.remove(); });
+                    if (allianceSelect) {
+                        Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
+                            var hidden = document.createElement('input');
+                            hidden.type = 'hidden';
+                            hidden.name = 'alliance_property_ids[]';
+                            hidden.value = opt.value;
+                            form.appendChild(hidden);
+                        });
+                    }
                 }
 
                 // Load attendees
@@ -3755,7 +3735,7 @@ var RegistrationView = (function() {
     }
 
     function loadTalentCategoriesMain() {
-        var categorySelect = document.getElementById('talent_category_select_main');
+        var categorySelect = document.getElementById('talent_category_select');
         var editCategorySelect = document.getElementById('edit_talent_category');
         if (!categorySelect && !editCategorySelect) return;
 
@@ -3813,11 +3793,9 @@ var RegistrationView = (function() {
         talentSelectedAttendees = [];
         removeTalentHiddenInputs();
 
-        // Reset category select outside
-        var categorySelectMain = document.getElementById('talent_category_select_main');
-        if (categorySelectMain) categorySelectMain.value = '';
-        var btnOpenModal = document.getElementById('btn_open_talent_modal');
-        if (btnOpenModal) btnOpenModal.disabled = true;
+        // Reset category select
+        var categorySelect = document.getElementById('talent_category_select');
+        if (categorySelect) categorySelect.value = '';
 
         // Reset alliance display
         var allianceDisplay = document.getElementById('talent_alliance_selected_texts');
@@ -3993,13 +3971,17 @@ var RegistrationView = (function() {
     }
 
     function showTalentDualListbox() {
-        document.getElementById('talent_dual_listbox_wrapper').style.display = 'flex';
-        document.getElementById('talent_placeholder').style.display = 'none';
+        var wrapper = document.getElementById('talent_dual_listbox_wrapper');
+        var placeholder = document.getElementById('talent_placeholder');
+        if (wrapper) wrapper.style.display = 'flex';
+        if (placeholder) placeholder.style.display = 'none';
     }
 
     function hideTalentDualListbox() {
-        document.getElementById('talent_dual_listbox_wrapper').style.display = 'none';
-        document.getElementById('talent_placeholder').style.display = 'block';
+        var wrapper = document.getElementById('talent_dual_listbox_wrapper');
+        var placeholder = document.getElementById('talent_placeholder');
+        if (wrapper) wrapper.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'block';
     }
 
     function renderTalentAvailableList() {

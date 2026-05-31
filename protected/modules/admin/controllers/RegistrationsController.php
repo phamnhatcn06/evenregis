@@ -666,18 +666,30 @@ class RegistrationsController extends AdminController
 		$this->checkRegistrationAccess($id);
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
-			$model->status = Registrations::STATUS_SUBMITTED;
 			$submittedAt = date('Y-m-d H:i:s');
-			$model->submitted_at = $submittedAt;
 			$ssoUser = AuthHandler::getUser();
 			$submittedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
-			if ($submittedBy) {
-				$model->submitted_by = $submittedBy;
-			}
-			$result = $model->updateViaApi(array(
+
+			$updateData = array(
+				'event_id' => $model->event_id,
+				'property_id' => $model->property_id,
+				'relation_property_id' => $model->relation_property_id,
+				'period_id' => $model->period_id,
+				'document' => $model->document,
+				'reviewed_by' => $model->reviewed_by,
+				'reviewed_at' => $model->reviewed_at,
+				'rejection_reason' => $model->rejection_reason,
+				'note' => $model->note,
+				'status' => Registrations::STATUS_SUBMITTED,
 				'submitted_at' => $submittedAt,
 				'submitted_by' => $submittedBy,
-			));
+			);
+
+			$updateData = array_filter($updateData, function ($value) {
+				return $value !== null && $value !== '';
+			});
+
+			$result = $model->updateViaApi($updateData);
 
 			if ($result['success']) {
 				// Reset rejected attendees to pending (approved attendees keep their status)
@@ -1532,18 +1544,12 @@ class RegistrationsController extends AdminController
 		$ssoUser = AuthHandler::getUser();
 		$userPropertyCode = isset($ssoUser['property_code']) ? $ssoUser['property_code'] : null;
 
-		// Debug log
-		Yii::log("actionAdmin - userPropertyCode: " . $userPropertyCode, 'info');
-
 		if ($userPropertyCode !== '9999' && $userPropertyCode) {
 			$userProperty = Properties::fetchByCode($userPropertyCode);
-			Yii::log("actionAdmin - fetchByCode result: " . ($userProperty ? $userProperty->id : 'null'), 'info');
 			if ($userProperty && $userProperty->id) {
 				$params['property_id'] = $userProperty->id;
 			}
 		}
-
-		Yii::log("actionAdmin - params: " . json_encode($params), 'info');
 		$dataProvider = Registrations::getApiDataProvider($params);
 		$this->render('admin', array(
 			'model' => $model,
@@ -3491,7 +3497,7 @@ class RegistrationsController extends AdminController
 			$errors[] = 'Phiếu đăng ký chưa có người tham dự nào.';
 		} else {
 			// Lấy danh sách ID thí sinh thi Miss trong event này để kiểm tra email cá nhân
-			$missAttendeeIds = array();
+			$missAttendeeEmails = array();
 			$contests = BeautyContests::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
 			foreach ($contests as $contest) {
 				$contestId = isset($contest->id) ? $contest->id : (isset($contest['id']) ? $contest['id'] : null);
@@ -3499,8 +3505,9 @@ class RegistrationsController extends AdminController
 					$contestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 500)->getData();
 					foreach ($contestants as $c) {
 						$attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
+						$cEmail = isset($c->personal_email) ? $c->personal_email : (isset($c['personal_email']) ? $c['personal_email'] : null);
 						if ($attId) {
-							$missAttendeeIds[] = $attId;
+							$missAttendeeEmails[$attId] = $cEmail;
 						}
 					}
 				}
@@ -3530,8 +3537,9 @@ class RegistrationsController extends AdminController
 				}
 
 				// Kiểm tra email cá nhân cho thí sinh thi Miss
-				if ($attId && in_array($attId, $missAttendeeIds)) {
-					if (empty($att['personal_email'])) {
+				if ($attId && array_key_exists($attId, $missAttendeeEmails)) {
+					$emailToCheck = !empty($att['personal_email']) ? $att['personal_email'] : $missAttendeeEmails[$attId];
+					if (empty($emailToCheck)) {
 						$errors[] = "Thí sinh thi Miss \"{$name}\" chưa điền email cá nhân.";
 					}
 				}

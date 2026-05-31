@@ -24,8 +24,12 @@
                                 <input type="text" class="form-control" name="full_name" required placeholder="Nhập họ và tên">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Chức danh</label>
-                                <input type="text" class="form-control" name="position" placeholder="Nhập chức danh">
+                                <label class="form-label">Phòng ban <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="department" required id="edit_department">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Chức danh <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="position" required placeholder="Nhập chức danh">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Vai trò <span class="text-danger">*</span></label>
@@ -45,8 +49,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Phương tiện <span class="text-danger">*</span></label>
-                                        <select class="form-select" name="transport_id" required>
+                                        <label class="form-label">Phương tiện</label>
+                                        <select class="form-select" name="transport_id">
                                             <option value="">-- Chọn --</option>
                                             <?php foreach ($transports as $tId => $tName): ?>
                                                 <option value="<?php echo $tId; ?>"><?php echo CHtml::encode($tName); ?></option>
@@ -58,14 +62,14 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Ngày đến <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control datepicker" name="check_in_date" id="add_check_in_date" required placeholder="dd/mm/yyyy" autocomplete="off">
+                                        <label class="form-label">Ngày đến</label>
+                                        <input type="text" class="form-control datepicker" name="check_in_date" id="add_check_in_date" placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Ngày đi <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control datepicker" name="check_out_date" id="add_check_out_date" required placeholder="dd/mm/yyyy" autocomplete="off">
+                                        <label class="form-label">Ngày đi</label>
+                                        <input type="text" class="form-control datepicker" name="check_out_date" id="add_check_out_date" placeholder="dd/mm/yyyy" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
