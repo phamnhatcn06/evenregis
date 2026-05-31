@@ -114,3 +114,52 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('btn_submit_attendee_manual').addEventListener('click', function(e) {
+    const form = document.getElementById('add-attendee-manual-form');
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    let isValid = true;
+    let errorMessage = '';
+
+    const validateFileInput = (inputName, label, isRequired, allowPdf) => {
+        const input = form.querySelector(`input[name="${inputName}"]`);
+        if (!input) return;
+        const file = input.files[0];
+        
+        if (isRequired && !file) {
+            isValid = false;
+            errorMessage += `Vui lòng chọn ${label}.\n`;
+            return;
+        }
+
+        if (file) {
+            let fileName = file.name.toLowerCase();
+            let isValidType = fileName.match(/\.(jpg|jpeg|png)$/);
+            if (allowPdf && (file.type === 'application/pdf' || fileName.endsWith('.pdf'))) {
+                isValidType = true;
+            }
+
+            if (!isValidType) {
+                isValid = false;
+                errorMessage += `${label} không đúng định dạng (chỉ hỗ trợ png, jpg, jpeg${allowPdf ? ', pdf' : ''}).\n`;
+            }
+            if (file.size > maxFileSize) {
+                isValid = false;
+                errorMessage += `${label} vượt quá kích thước cho phép (tối đa 5MB).\n`;
+            }
+        }
+    };
+
+    validateFileInput('portrait_file', 'Ảnh chân dung', true, false);
+    validateFileInput('cccd_front_file', 'Ảnh CCCD mặt trước', true, false);
+    validateFileInput('cccd_back_file', 'Ảnh CCCD mặt sau', true, false);
+    validateFileInput('contract_file', 'Hợp đồng lao động', false, true);
+
+    if (!isValid) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        alert(errorMessage);
+    }
+});
+</script>
