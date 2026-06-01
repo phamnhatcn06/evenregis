@@ -303,18 +303,14 @@ class ReportsController extends AdminController
             if ($deletedAt !== null && $deletedAt !== '') {
                 continue;
             }
+            $status = isset($reg->status) ? (int)$reg->status : 0;
+            if ($status === Registrations::STATUS_DRAFT) {
+                continue;
+            }
             $regPropId = isset($reg->property_id) ? $reg->property_id : (isset($reg['property_id']) ? $reg['property_id'] : null);
             $regId = isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null);
             if ($regPropId && $regId) {
-                if (!isset($propertyRegistrationMap[$regPropId])) {
-                    $propertyRegistrationMap[$regPropId] = $reg;
-                } else {
-                    $existingStatus = isset($propertyRegistrationMap[$regPropId]->status) ? (int)$propertyRegistrationMap[$regPropId]->status : 0;
-                    $newStatus = isset($reg->status) ? (int)$reg->status : 0;
-                    if ($existingStatus === Registrations::STATUS_DRAFT && $newStatus !== Registrations::STATUS_DRAFT) {
-                        $propertyRegistrationMap[$regPropId] = $reg;
-                    }
-                }
+                $propertyRegistrationMap[$regPropId] = $reg;
             }
         }
 
