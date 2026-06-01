@@ -2635,6 +2635,27 @@ var RegistrationView = (function() {
         }
     }
 
+    function reloadAttendeesList() {
+        fetch(window.BASE_URL + '/admin/registrations/getAttendeesAjax?registration_id=' + registrationId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success && data.data) {
+                    // Destroy existing DataTable if exists
+                    if ($.fn.DataTable && $.fn.DataTable.isDataTable('#attendees-table')) {
+                        $('#attendees-table').DataTable().destroy();
+                    }
+                    renderAttendeesTable(data.data);
+                    // Reinitialize DataTable
+                    if (typeof initAttendeesDataTable === 'function') {
+                        initAttendeesDataTable();
+                    }
+                }
+            })
+            .catch(function() {
+                Toast.error('Không thể tải lại danh sách người tham dự.');
+            });
+    }
+
     function loadAttendeeStaffList() {
         var availableList = document.getElementById('attendee_available_staff_list');
         if (!availableList) return;
