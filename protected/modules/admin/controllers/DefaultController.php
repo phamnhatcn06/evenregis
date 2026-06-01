@@ -10,27 +10,124 @@ class DefaultController extends AdminController
 
     protected function fetchDashboardStats()
     {
-        $result = ApiClient::get(ApiEndpoints::DASHBOARD_STATS);
-
-        if ($result['success'] && isset($result['data'])) {
-            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
-            return $data;
+        // 1. Fetch all properties
+        $propertiesResult = ApiClient::get(ApiEndpoints::PROPERTY_LIST, array('per_page' => 1000));
+        $properties = array();
+        if ($propertiesResult['success'] && isset($propertiesResult['data']['data'])) {
+            $properties = $propertiesResult['data']['data'];
         }
 
-        return array(
-            'total_properties' => 0,
-            'registered_properties' => 0,
-            'unregistered_properties' => array(),
-            'registrations_by_status' => array(
-                'draft' => 0,
-                'submitted' => 0,
-                'approved' => 0,
-                'rejected' => 0,
-            ),
-            'sport_teams' => 0,
-            'competition_participants' => 0,
-            'beauty_contestants' => 0,
-            'total_attendees' => 0,
+        // 2. Fetch all registrations
+        $registrationsResult = ApiClient::get(ApiEndpoints::REGISTRATION_LIST, array('per_page' => 1000));
+        $registrations = array();
+        if ($registrationsResult['success'] && isset($registrationsResult['data']['data'])) {
+            $registrations = $registrationsResult['data']['data'];
+        }
+
+        // 3. Count registrations by status and find registered property IDs
+        $registrationsByStatus = array(
+            'draft' => 0,
+            'submitted' => 0,
+            'approved' => 0,
+            'rejected' => 0,
         );
+
+        $registeredPropertyIds = array();
+
+        foreach ($registrations as $reg) {
+            $status = isset($reg['status']) ? (int)$reg['status'] : 0;
+            $propertyId = isset($reg['property_id']) ? $reg['property_id'] : null;
+
+            if ($status === 0) {
+                $registrationsByStatus['draft']++;
+            } elseif ($status === 1) {
+                $registrationsByStatus['submitted']++;
+                if ($propertyId !== null) {
+                    $registeredPropertyIds[$propertyId] = true;
+                }
+            } elseif ($status === 2) {
+                $registrationsByStatus['approved']++;
+                if ($propertyId !== null) {
+                    $registeredPropertyIds[$propertyId] = true;
+                }
+            } elseif ($status === 3) {
+                $registrationsByStatus['rejected']++;
+                if ($propertyId !== null) {
+                    $registeredPropertyIds[$propertyId] = true;
+                }
+            }
+        }
+
+        // 4. Filter out unregistered properties
+        $unregisteredProperties = array();
+        foreach ($properties as $prop) {
+            $propertyId = isset($prop['id']) ? $prop['id'] : null;
+            if ($propertyId === null || !isset($registeredPropertyIds[$propertyId])) {
+                $unregisteredProperties[] = array(
+                    'code' => isset($prop['code']) ? $prop['code'] : '',
+                    'name' => isset($prop['name']) ? $prop['name'] : '',
+                    'regional_name' => isset($prop['region_name']) ? $prop['region_name'] : '',
+                );
+            }
+        }
+
+        // Sort unregistered properties naturally by regional_name, then by name
+        usort($unregisteredProperties, function ($a, $b) {
+            $cmp = strnatcmp($a['regional_name'], $b['regional_name']);
+            if ($cmp === 0) {
+                return strnatcmp($a['name'], $b['name']);
+            }
+            return $cmp;
+        });
+
+        // 5. Fetch other statistics dynamically for cards
+        $sportTeams = 0;
+        $sportRes = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST, array('per_page' => 1));
+        if ($sportRes['success'] && isset($sportRes['data']['pagination']['total'])) {
+            $sportTeams = (int)$sportRes['data']['pagination']['total'];
+        }
+
+        $beautyContestants = 0;
+        $beautyRes = ApiClient::get(ApiEndpoints::BEAUTY_REGISTRATION_LIST, array('per_page' => 1));
+        if ($beautyRes['success'] && isset($beautyRes['data']['pagination']['total'])) {
+            $beautyContestants = (int)$beautyRes['data']['pagination']['total'];
+        }
+
+        $talentEntries = 0;
+        $talentRes = ApiClient::get(ApiEndpoints::TALENT_ENTRY_LIST, array('per_page' => 1));
+        if ($talentRes['success'] && isset($talentRes['data']['pagination']['total'])) {
+            $talentEntries = (int)$talentRes['data']['pagination']['total'];
+        }
+
+        $totalAttendees = 0;
+        $attendeeRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('per_page' => 1));
+        if ($attendeeRes['success'] && isset($attendeeRes['data']['pagination']['total'])) {
+            $totalAttendees = (int)$attendeeRes['data']['pagination']['total'];
+        }
+
+        $competitionParticipants = 0;
+        $compRes = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, array('per_page' => 1));
+        if ($compRes['success'] && isset($compRes['data']['pagination']['total'])) {
+            $competitionParticipants = (int)$compRes['data']['pagination']['total'];
+        }
+
+        $result = ApiClient::get(ApiEndpoints::DASHBOARD_STATS);
+        $data = array();
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+        }
+
+        return array_merge(array(
+            'sport_teams' => $sportTeams,
+            'competition_participants' => $competitionParticipants,
+            'beauty_contestants' => $beautyContestants,
+            'talent_entries' => $talentEntries,
+            'total_attendees' => $totalAttendees,
+        ), $data, array(
+            'total_properties' => count($properties),
+            'registered_properties' => count($registeredPropertyIds),
+            'unregistered_properties' => $unregisteredProperties,
+            'registrations_by_status' => $registrationsByStatus,
+        ));
     }
 }
