@@ -483,7 +483,7 @@ class RegistrationsController extends AdminController
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
 
 		$properties = $userProperty ? array($userProperty) : array();
-		
+
 		if ($isAdmin) {
 			$relationProperties = Properties::getApiDataProvider(array(), 500)->getData();
 		} else {
@@ -498,7 +498,7 @@ class RegistrationsController extends AdminController
 			$model->setAttributes($_POST['Registrations']);
 			$model->status = Registrations::STATUS_DRAFT;
 			$ssoUser = AuthHandler::getUser();
-			$model->submitted_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			$model->submitted_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 			$existingDoc = isset($_POST['Registrations']['document']) ? $_POST['Registrations']['document'] : null;
 			$uploadedFiles = $this->handleDocumentUpload($existingDoc);
 			if ($uploadedFiles) {
