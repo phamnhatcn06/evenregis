@@ -60,7 +60,7 @@ abstract class BaseRegistrations extends GxActiveRecord
 	{
 		return array(
 			array('property_id, period_id, submitted_by', 'required'),
-			array('event_id, property_id, relation_property_id, period_id, submitted_by', 'length', 'max' => 20),
+			array('event_id, property_id, relation_property_id, period_id, submitted_by', 'length', 'max' => 100),
 			array('status', 'length', 'max' => 9),
 			array('document', 'length', 'max' => 500),
 			array('submitted_at, reviewed_by, reviewed_at', 'length', 'max' => 10),

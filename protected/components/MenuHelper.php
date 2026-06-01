@@ -81,6 +81,16 @@ class MenuHelper
             'children' => array(),
             'sort' => -99999, // Dashboard always at top
         );
+
+        // Always add Reports link
+        $menu['reports'] = array(
+            'label' => 'Báo cáo',
+            'icon' => self::getIcon('reports'),
+            'url' => Yii::app()->createUrl('/admin/reports/index'),
+            'active' => Yii::app()->controller->id == 'reports',
+            'children' => array(),
+            'sort' => 80,
+        );
         // print_r($permissions);die();
         // Group permissions by root
         $grouped = array();
