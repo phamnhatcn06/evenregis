@@ -21,6 +21,9 @@ $this->breadcrumbs = array(
     Yii::t('app', 'Report'),
 );
 $tabtile = 'Báo cáo chung sự kiện';
+
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/css/pages/reports-index.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/js/pages/reports-index.js', CClientScript::POS_END);
 ?>
 <div class="card">
     <div class="card-body">
