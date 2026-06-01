@@ -2590,7 +2590,7 @@ var RegistrationView = (function() {
                     contract: att.contract_path || ''
                 };
                 if (docs.portrait || docs.cccd_front || docs.cccd_back || docs.contract) {
-                    var docsJson = escapeHtml(JSON.stringify(docs));
+                    var docsJson = JSON.stringify(docs).replace(/'/g, "\\'").replace(/"/g, '&quot;');
                     docsBtn = '<button type="button" class="btn btn-sm btn-outline-info me-1" onclick="viewAllDocuments(this)" data-docs="' + docsJson + '" title="Xem tài liệu đính kèm"><i class="fa fa-folder-open-o"></i></button>';
                 }
                 
