@@ -86,7 +86,7 @@ class MenuHelper
         $menu['reports'] = array(
             'label' => 'Báo cáo',
             'icon' => self::getIcon('reports'),
-            'url' => Yii::app()->createUrl('/admin/reports/index'),
+            'url' => Yii::app()->createUrl('/admin/reports/admin'),
             'active' => Yii::app()->controller->id == 'reports',
             'children' => array(),
             'sort' => 80,

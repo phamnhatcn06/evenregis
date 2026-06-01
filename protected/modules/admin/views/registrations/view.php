@@ -18,6 +18,14 @@ $this->menu = array(
         'icon' => 'fa-plus',
         'id' => 'btn_create',
     ),
+    array(
+        'label' => 'Xuất Excel',
+        'labelIcon' => 'Xuất Excel',
+        'url' => Yii::app()->createUrl('/admin/reports/exportUnit', array('id' => $model->id)),
+        'color' => 'info',
+        'icon' => 'fa-file-excel-o',
+        'id' => 'btn_export_excel',
+    ),
 );
 if ($canEdit) {
     $this->menu[] = array(
