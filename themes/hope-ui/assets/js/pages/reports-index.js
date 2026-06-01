@@ -21,10 +21,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    var searchTalentPropInput = document.getElementById('searchTalentProp');
-    if (searchTalentPropInput) {
-        searchTalentPropInput.addEventListener('keyup', function() {
-            filterTable('tableTalentProp', this.value);
+    var searchBeautyInput = document.getElementById('searchBeauty');
+    if (searchBeautyInput) {
+        searchBeautyInput.addEventListener('keyup', function() {
+            filterTable('tableBeauty', this.value);
+        });
+    }
+
+    var searchSportsTeamsInput = document.getElementById('searchSportsTeams');
+    if (searchSportsTeamsInput) {
+        searchSportsTeamsInput.addEventListener('keyup', function() {
+            filterTable('tableSportsTeams', this.value);
         });
     }
 
