@@ -397,6 +397,107 @@ class ReportsController extends AdminController
             });
         }
 
+        // Fetch all sports to pre-cache sport names and initialize stats
+        $sportsList = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $sportNameMap = array();
+        $statsBySport = array();
+        foreach ($sportsList as $sp) {
+            $spId = isset($sp->id) ? $sp->id : (isset($sp['id']) ? $sp['id'] : null);
+            $spName = isset($sp->name) ? $sp->name : (isset($sp['name']) ? $sp['name'] : '');
+            if ($spId) {
+                $sportNameMap[$spId] = $spName;
+                $statsBySport[$spId] = array(
+                    'name' => $spName,
+                    'team_count' => 0,
+                );
+            }
+        }
+
+        // Build property name and code map for pre-caching
+        $propertyNameMap = array();
+        $propertyCodeMap = array();
+        foreach ($properties as $prop) {
+            $propId = isset($prop->id) ? $prop->id : (isset($prop['id']) ? $prop['id'] : null);
+            if ($propId) {
+                $propertyNameMap[$propId] = isset($prop->name) ? $prop->name : '';
+                $propertyCodeMap[$propId] = isset($prop->code) ? $prop->code : '';
+            }
+        }
+
+        // Fetch Sport Teams
+        $sportTeams = array();
+        if ($selectedEventId) {
+            $teamParams = array(
+                'event_id' => $selectedEventId,
+                'per_page' => 1000,
+            );
+            if (!$isHO && $userPropertyId) {
+                $teamParams['property_id'] = $userPropertyId;
+            }
+            $rawTeams = SportTeams::getApiDataProvider($teamParams, 1000)->getData();
+            foreach ($rawTeams as $team) {
+                $teamDeletedAt = isset($team->deleted_at) ? $team->deleted_at : (isset($team['deleted_at']) ? $team['deleted_at'] : null);
+                if ($teamDeletedAt !== null && $teamDeletedAt !== '') {
+                    continue;
+                }
+                $regId = isset($team->registration_id) ? $team->registration_id : (isset($team['registration_id']) ? $team['registration_id'] : null);
+                if (!$regId || !isset($activeRegistrationIds[$regId])) {
+                    continue;
+                }
+
+                // Hydrate sport and property names/codes from pre-cached maps
+                $spId = isset($team->sport_id) ? $team->sport_id : (isset($team['sport_id']) ? $team['sport_id'] : null);
+                if ($spId && isset($sportNameMap[$spId])) {
+                    if (is_object($team)) {
+                        $team->sport_name = $sportNameMap[$spId];
+                    } else {
+                        $team['sport_name'] = $sportNameMap[$spId];
+                    }
+                    if (isset($statsBySport[$spId])) {
+                        $statsBySport[$spId]['team_count']++;
+                    }
+                }
+
+                $propId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
+                if ($propId) {
+                    if (is_object($team)) {
+                        $team->property_name = isset($propertyNameMap[$propId]) ? $propertyNameMap[$propId] : '';
+                        $team->property_code = isset($propertyCodeMap[$propId]) ? $propertyCodeMap[$propId] : '';
+                    } else {
+                        $team['property_name'] = isset($propertyNameMap[$propId]) ? $propertyNameMap[$propId] : '';
+                        $team['property_code'] = isset($propertyCodeMap[$propId]) ? $propertyCodeMap[$propId] : '';
+                    }
+                }
+
+                $sportTeams[] = $team;
+            }
+
+            // Filter out sports that have 0 registered teams for a cleaner report
+            $activeStatsBySport = array();
+            foreach ($statsBySport as $spId => $spStat) {
+                if ($spStat['team_count'] > 0) {
+                    $activeStatsBySport[$spId] = $spStat;
+                }
+            }
+            $statsBySport = $activeStatsBySport;
+
+            usort($statsBySport, function ($a, $b) {
+                return strnatcasecmp($a['name'], $b['name']);
+            });
+
+            // Sort sportTeams list by sport_name, then property_code naturally
+            usort($sportTeams, function ($a, $b) {
+                $sportA = is_object($a) ? (isset($a->sport_name) ? $a->sport_name : '') : (isset($a['sport_name']) ? $a['sport_name'] : '');
+                $sportB = is_object($b) ? (isset($b->sport_name) ? $b->sport_name : '') : (isset($b['sport_name']) ? $b['sport_name'] : '');
+                $cmp = strnatcasecmp($sportA, $sportB);
+                if ($cmp !== 0) return $cmp;
+
+                $codeA = is_object($a) ? (isset($a->property_code) ? $a->property_code : '') : (isset($a['property_code']) ? $a['property_code'] : '');
+                $codeB = is_object($b) ? (isset($b->property_code) ? $b->property_code : '') : (isset($b['property_code']) ? $b['property_code'] : '');
+                return strnatcasecmp($codeA, $codeB);
+            });
+        }
+
         $this->title = 'Báo cáo tổng hợp Sự kiện';
         $this->breadcrumbs = array(
             'Báo cáo' => array('index'),
@@ -417,6 +518,8 @@ class ReportsController extends AdminController
             'statsByProperty' => $statsByProperty,
             'propertyRegistrationMap' => $propertyRegistrationMap,
             'beautyContestantsList' => $beautyContestantsList,
+            'sportTeams' => $sportTeams,
+            'statsBySport' => $statsBySport,
             'kpis' => array(
                 'registered_units' => count($uniqueRegisteredOrgs),
                 'total_units' => count($properties),

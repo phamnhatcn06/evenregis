@@ -1,0 +1,90 @@
+.bg-gradient-blue {
+    background: linear-gradient(135deg, #3a57e8 0%, #08b1c4 100%);
+}
+
+.bg-gradient-teal {
+    background: linear-gradient(135deg, #1aa1b6 0%, #00cae3 100%);
+}
+
+.bg-gradient-orange {
+    background: linear-gradient(135deg, #f16a1b 0%, #feb272 100%);
+}
+
+.bg-gradient-purple {
+    background: linear-gradient(135deg, #8533ff 0%, #c299ff 100%);
+}
+
+.bg-white-20 {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.tracking-wider {
+    letter-spacing: 0.05em;
+}
+
+.kpi-card {
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+#reportsTab .nav-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+}
+
+#reportsTab .nav-link:hover {
+    background-color: #e9ecef;
+    color: #3f434a;
+}
+
+#reportsTab .nav-link.active {
+    color: #fff;
+    background: linear-gradient(135deg, #3a57e8 0%, #08b1c4 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(58, 87, 232, 0.3);
+}
+
+.border-top-2 {
+    border-top: 2px solid #3a57e8 !important;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.sticky-bottom {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.btn-soft-primary {
+    background-color: rgba(58, 87, 232, 0.1);
+    color: #3a57e8;
+    border-color: transparent;
+}
+
+.btn-soft-primary:hover {
+    background-color: #3a57e8;
+    color: #fff;
+}

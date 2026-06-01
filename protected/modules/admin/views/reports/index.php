@@ -143,6 +143,12 @@ $tabtile = 'Báo cáo chung sự kiện';
                                     <span>4. Danh sách thí sinh thi Miss</span>
                                 </button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link text-start text-md-center px-4 py-3 rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-md-center gap-2" id="sports-teams-tab" data-bs-toggle="tab" data-bs-target="#sports-teams-pane" type="button" role="tab" aria-controls="sports-teams-pane" aria-selected="false">
+                                    <i class="fa fa-trophy fa-lg"></i>
+                                    <span>5. Đội thể thao theo môn</span>
+                                </button>
+                            </li>
                         </ul>
                     </div>
 
@@ -433,6 +439,102 @@ $tabtile = 'Báo cáo chung sự kiện';
                                 </div>
                             </div>
 
+                            <!-- TAB 5: ĐỘI THỂ THAO THEO MÔN -->
+                            <div class="tab-pane fade" id="sports-teams-pane" role="tabpanel" aria-labelledby="sports-teams-tab" tabindex="0">
+                                <div class="row g-4 mb-4">
+                                    <!-- Left side: Summary Table -->
+                                    <div class="col-lg-4">
+                                        <div class="card border border-2 shadow-none h-100">
+                                            <div class="card-header bg-light py-3">
+                                                <h6 class="fw-bold mb-0 text-dark"><i class="fa fa-pie-chart text-primary me-2"></i>Tổng hợp theo môn</h6>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <div class="table-responsive">
+                                                    <table class="table align-middle mb-0">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Môn thi đấu</th>
+                                                                <th class="text-center" width="100">Số đội</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php if (empty($statsBySport)): ?>
+                                                                <tr>
+                                                                    <td colspan="2" class="text-center py-4 text-muted small italic">Chưa có đội đăng ký môn nào</td>
+                                                                </tr>
+                                                            <?php else: ?>
+                                                                <?php foreach ($statsBySport as $spId => $spStat): ?>
+                                                                    <tr>
+                                                                        <td class="fw-bold text-dark"><?php echo CHtml::encode($spStat['name']); ?></td>
+                                                                        <td class="text-center"><span class="badge bg-soft-primary text-primary rounded-3 px-3 py-2 fw-bold fs-6"><?php echo $spStat['team_count']; ?></span></td>
+                                                                    </tr>
+                                                                <?php endforeach; ?>
+                                                            <?php endif; ?>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right side: Detail List -->
+                                    <div class="col-lg-8">
+                                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                                            <h5 class="fw-bold mb-0 text-dark"><i class="fa fa-trophy text-primary me-2"></i>Chi tiết các đội thể thao</h5>
+                                            <div class="search-box" style="max-width: 300px;">
+                                                <input type="text" id="searchSportsTeams" class="form-control form-control-sm" placeholder="Tìm tên môn, tên đội, đơn vị...">
+                                            </div>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle border mb-0" id="tableSportsTeams">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th class="text-center" width="60">STT</th>
+                                                        <th>Môn thi đấu</th>
+                                                        <th class="fw-bold text-primary">Tên đội thể thao</th>
+                                                        <th>Đơn vị đăng ký</th>
+                                                        <th class="text-center" width="150">Trạng thái</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php if (empty($sportTeams)): ?>
+                                                        <tr>
+                                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                                <i class="fa fa-trophy fa-3x mb-3 text-white-50 d-block"></i>
+                                                                Chưa có đội thể thao nào được đăng ký cho sự kiện này.
+                                                            </td>
+                                                        </tr>
+                                                    <?php else: ?>
+                                                        <?php $stt = 1; foreach ($sportTeams as $team): ?>
+                                                            <?php
+                                                            $spName = isset($team->sport_name) ? $team->sport_name : '';
+                                                            $tName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
+                                                            $pCode = isset($team->property_code) ? $team->property_code : '';
+                                                            $pName = isset($team->property_name) ? $team->property_name : '';
+                                                            $status = isset($team->status) ? (int)$team->status : 0;
+                                                            ?>
+                                                            <tr>
+                                                                <td class="text-center fw-bold text-muted"><?php echo $stt++; ?></td>
+                                                                <td><span class="badge bg-soft-info text-info rounded-3 px-3 py-2"><?php echo CHtml::encode($spName); ?></span></td>
+                                                                <td class="fw-bold text-dark fs-6"><?php echo CHtml::encode($tName); ?></td>
+                                                                <td>
+                                                                    <?php if ($pCode): ?>
+                                                                        <code><?php echo CHtml::encode($pCode); ?></code> - 
+                                                                    <?php endif; ?>
+                                                                    <span class="small text-muted"><?php echo CHtml::encode($pName); ?></span>
+                                                                </td>
+                                                                <td class="text-center"><?php echo SportTeams::getStatusLabel($status); ?></td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -569,6 +671,14 @@ $tabtile = 'Báo cáo chung sự kiện';
         if (searchBeautyInput) {
             searchBeautyInput.addEventListener('keyup', function() {
                 filterTable('tableBeauty', this.value);
+            });
+        }
+
+        // TAB 5 Search: tableSportsTeams
+        const searchSportsTeamsInput = document.getElementById('searchSportsTeams');
+        if (searchSportsTeamsInput) {
+            searchSportsTeamsInput.addEventListener('keyup', function() {
+                filterTable('tableSportsTeams', this.value);
             });
         }
 
