@@ -19,7 +19,7 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Số lượng tối đa</label>
+                                <label class="form-label">Số lượng thí sinh đăng ký</label>
                                 <input type="text" class="form-control" id="miss_max_per_org" readonly value="-">
                             </div>
                             <div class="mb-3">
