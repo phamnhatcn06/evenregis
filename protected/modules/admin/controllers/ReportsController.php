@@ -9,6 +9,8 @@ class ReportsController extends AdminController
             throw new CHttpException(403, 'Bạn cần đăng nhập để xem báo cáo.');
         }
 
+        PermissionHelper::requirePermission('reports', 'read');
+
         $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
         $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
         $userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
@@ -536,6 +538,8 @@ class ReportsController extends AdminController
         if (!$user) {
             throw new CHttpException(403, 'Bạn cần đăng nhập để xuất báo cáo.');
         }
+
+        PermissionHelper::requirePermission('reports', 'read');
 
         $model = Registrations::fetchFromApi($id);
         if ($model === null) {

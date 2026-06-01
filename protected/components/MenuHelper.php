@@ -82,15 +82,17 @@ class MenuHelper
             'sort' => -99999, // Dashboard always at top
         );
 
-        // Always add Reports link
-        $menu['reports'] = array(
-            'label' => 'Báo cáo',
-            'icon' => self::getIcon('reports'),
-            'url' => Yii::app()->createUrl('/admin/reports/admin'),
-            'active' => Yii::app()->controller->id == 'reports',
-            'children' => array(),
-            'sort' => 80,
-        );
+        // Add Reports link only if permitted
+        if (PermissionHelper::canRead('reports')) {
+            $menu['reports'] = array(
+                'label' => 'Báo cáo',
+                'icon' => self::getIcon('reports'),
+                'url' => Yii::app()->createUrl('/admin/reports/admin'),
+                'active' => Yii::app()->controller->id == 'reports',
+                'children' => array(),
+                'sort' => 80,
+            );
+        }
         // print_r($permissions);die();
         // Group permissions by root
         $grouped = array();
