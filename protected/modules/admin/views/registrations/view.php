@@ -176,7 +176,7 @@ if (!empty($model->document)) {
                     <?php if ($canEdit): ?>
                         <form id="form-submit-registration" method="post" action="<?php echo $this->createUrl('submit', array('id' => $model->id)); ?>" style="display:inline;">
                             <button type="button" class="btn btn-sm btn-info" onclick="confirmSubmitRegistration()">
-                                <i class="fa fa-paper-plane me-1"></i>Gửi duyệt
+                                <i class="fa fa-paper-plane me-1"></i>Gửi bản đăng ký
                             </button>
                         </form>
                     <?php endif; ?>
@@ -326,6 +326,9 @@ foreach ($eventContents as $ec) {
                 <?php else: ?>
                     <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addAttendeeManualModal">
                         <i class="fa fa-user-plus me-1"></i>Thêm người tham dự
+                    </button>
+                    <button type="button" class="btn btn-sm btn-success text-white ms-1" data-bs-toggle="modal" data-bs-target="#importExcelModal">
+                        <i class="fa fa-file-excel-o me-1"></i>Import Excel
                     </button>
                 <?php endif; ?>
             </div>
@@ -999,6 +1002,7 @@ foreach ($registrationDetails as $detail) {
 <?php $this->renderPartial('_modal_add_attendee_staff', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
 <?php $this->renderPartial('_modal_edit_attendee', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
 <?php $this->renderPartial('_modal_add_attendee_manual', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
+<?php $this->renderPartial('_modal_import_attendees', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_all_documents'); ?>
 
 <!-- Modal Upload Document -->
@@ -1358,7 +1362,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
 
                 if (!data.success) {
                     var errorHtml = "<div class=\"text-start\" style=\"max-height: 400px; overflow-y: auto;\">";
-                    errorHtml += "<p class=\"text-danger fw-bold mb-2\">Phiếu đăng ký chưa đủ điều kiện gửi duyệt:</p>";
+                    errorHtml += "<p class=\"text-danger fw-bold mb-2\">Phiếu đăng ký chưa đủ điều kiện gửi đăng ký:</p>";
                     errorHtml += "<ul class=\"ps-3 mb-0\">";
                     data.errors.forEach(function(err) {
                         errorHtml += "<li class=\"mb-1 text-muted\" style=\"list-style-type: disc;\"><small>" + escapeHtml(err) + "</small></li>";
@@ -1380,13 +1384,13 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
 
                 // Nếu hợp lệ, tiến hành xác nhận nộp
                 Swal.fire({
-                    title: "Xác nhận gửi duyệt",
-                    text: "Bạn có chắc muốn gửi duyệt phiếu đăng ký này? Những người tham dự bị từ chối trước đó sẽ được chuyển về trạng thái chờ duyệt.",
+                    title: "Xác nhận gửi bản đăng ký",
+                    text: "Bạn có chắc muốn gửi phiếu đăng ký này? Những người tham dự bị từ chối trước đó sẽ được chuyển về trạng thái chờ duyệt.",
                     icon: "question",
                     showCancelButton: true,
                     confirmButtonColor: "#17a2b8",
                     cancelButtonColor: "#6c757d",
-                    confirmButtonText: "Gửi duyệt",
+                    confirmButtonText: "Gửi bản đăng ký",
                     cancelButtonText: "Hủy"
                 }).then(function(result) {
                     if (result.isConfirmed) {

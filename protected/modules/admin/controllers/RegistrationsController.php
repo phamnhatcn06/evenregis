@@ -2343,6 +2343,233 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	public function actionDownloadImportTemplate()
+	{
+		try {
+			$phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+			spl_autoload_unregister(array('YiiBase','autoload'));
+			require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+			
+			$objPHPExcel = new PHPExcel();
+			
+			spl_autoload_register(array('YiiBase','autoload'));
+			
+			$objPHPExcel->getProperties()->setCreator("System")
+								 ->setLastModifiedBy("System")
+								 ->setTitle("Mau import nguoi tham du")
+								 ->setSubject("Mau import nguoi tham du");
+								 
+			// Fetch roles for validation
+			$rolesData = Roles::getApiDataProvider(array(), 100)->getData();
+			$roleNames = array();
+			foreach ($rolesData as $r) {
+				$rName = isset($r['name']) ? $r['name'] : (isset($r->name) ? $r->name : '');
+				if ($rName) {
+					$roleNames[] = trim($rName);
+				}
+			}
+			
+			// Create a hidden sheet for categories
+			$sheet2 = $objPHPExcel->createSheet(1);
+			$sheet2->setTitle('Danh_muc');
+			$row = 1;
+			foreach ($roleNames as $role) {
+				$sheet2->setCellValue('A'.$row, $role);
+				$row++;
+			}
+			$sheet2->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
+			$lastRoleRow = $row - 1;
+			
+			// Set active sheet to 1st sheet
+			$sheet = $objPHPExcel->setActiveSheetIndex(0);
+			
+			// Header
+			$headers = array('Họ và tên (*)', 'Phòng ban', 'Chức danh (*)', 'Vai trò 1 (*)', 'Vai trò 2', 'Vai trò 3', 'Ngày vào làm (dd/mm/yyyy) (*)', 'Ghi chú');
+			$col = 'A';
+			foreach ($headers as $header) {
+				$sheet->setCellValue($col . '1', $header);
+				$sheet->getStyle($col . '1')->getFont()->setBold(true);
+				$col++;
+			}
+			
+			// Add Data Validation for column D, E, F
+			if ($lastRoleRow >= 1) {
+				for ($c = 'D'; $c <= 'F'; $c++) {
+					$objValidation = $sheet->getDataValidation($c . "2:" . $c . "1000");
+					$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
+					$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
+					$objValidation->setAllowBlank(true);
+					$objValidation->setShowInputMessage(true);
+					$objValidation->setShowErrorMessage(true); // Since it's dropdown only now, we can show error
+					$objValidation->setShowDropDown(true);
+					$objValidation->setPromptTitle('Chọn vai trò');
+					$objValidation->setPrompt('Vui lòng chọn từ danh sách thả xuống.');
+					$objValidation->setFormula1('Danh_muc!$A$1:$A$' . $lastRoleRow);
+				}
+			}
+			
+			// Sample data
+			$sheet->setCellValue('A2', 'Nguyễn Văn A');
+			$sheet->setCellValue('B2', 'Kinh doanh');
+			$sheet->setCellValue('C2', 'Nhân viên');
+			$sheet->setCellValue('D2', 'Vận động viên');
+			$sheet->setCellValue('E2', 'Khách');
+			$sheet->setCellValue('F2', '');
+			$sheet->setCellValue('G2', '01/01/2023');
+			$sheet->setCellValue('H2', 'Ghi chú mẫu');
+			
+			foreach(range('A','H') as $columnID) {
+				$sheet->getColumnDimension($columnID)->setAutoSize(true);
+			}
+			
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			header('Content-Disposition: attachment;filename="mau_import_nguoi_tham_du.xlsx"');
+			header('Cache-Control: max-age=0');
+			
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+			$objWriter->save('php://output');
+			Yii::app()->end();
+		} catch (Throwable $e) {
+			die("Error: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
+		}
+	}
+
+	public function actionImportExcelAttendees()
+	{
+		try {
+			if (!Yii::app()->getRequest()->getIsPostRequest()) {
+				throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+			}
+
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+		$this->checkRegistrationAccess($registrationId);
+		$eventId = Yii::app()->getRequest()->getPost('event_id');
+		$propertyId = Yii::app()->getRequest()->getPost('property_id');
+
+		if (!isset($_FILES['excel_file']) || $_FILES['excel_file']['error'] != UPLOAD_ERR_OK) {
+			Yii::app()->user->setFlash('error', 'Vui lòng chọn file Excel hợp lệ.');
+			$this->redirect(array('view', 'id' => $registrationId));
+		}
+
+		$phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+		spl_autoload_unregister(array('YiiBase','autoload'));
+		require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+		
+		$filePath = $_FILES['excel_file']['tmp_name'];
+		
+		try {
+			$objPHPExcel = PHPExcel_IOFactory::load($filePath);
+			spl_autoload_register(array('YiiBase','autoload'));
+		} catch(Exception $e) {
+			spl_autoload_register(array('YiiBase','autoload'));
+			Yii::app()->user->setFlash('error', 'Lỗi đọc file Excel: ' . $e->getMessage());
+			$this->redirect(array('view', 'id' => $registrationId));
+		}
+
+		$sheet = $objPHPExcel->getActiveSheet();
+		$highestRow = $sheet->getHighestRow();
+		$highestColumn = $sheet->getHighestColumn();
+		
+		if ($highestRow < 2) {
+			Yii::app()->user->setFlash('error', 'File Excel không có dữ liệu.');
+			$this->redirect(array('view', 'id' => $registrationId));
+		}
+
+		// Cache role names to IDs
+		$rolesData = Roles::getApiDataProvider(array(), 100)->getData();
+		$rolesMap = array();
+		foreach ($rolesData as $r) {
+			$rId = isset($r['id']) ? $r['id'] : (isset($r->id) ? $r->id : null);
+			$rName = isset($r['name']) ? $r['name'] : (isset($r->name) ? $r->name : '');
+			if ($rId && $rName) {
+				$rolesMap[mb_strtolower(trim($rName), 'UTF-8')] = $rId;
+			}
+		}
+
+		$successCount = 0;
+		$errorCount = 0;
+
+		for ($row = 2; $row <= $highestRow; $row++) {
+			$fullName = trim($sheet->getCell('A' . $row)->getValue() ?? '');
+			$department = trim($sheet->getCell('B' . $row)->getValue() ?? '');
+			$position = trim($sheet->getCell('C' . $row)->getValue() ?? '');
+			$role1 = trim($sheet->getCell('D' . $row)->getValue() ?? '');
+			$role2 = trim($sheet->getCell('E' . $row)->getValue() ?? '');
+			$role3 = trim($sheet->getCell('F' . $row)->getValue() ?? '');
+			$startDateVal = $sheet->getCell('G' . $row)->getValue();
+			$note = trim($sheet->getCell('H' . $row)->getValue() ?? '');
+
+			if (empty($fullName) || empty($position) || empty($startDateVal)) {
+				if (!empty($fullName)) $errorCount++; // Chỉ tính lỗi nếu có nhập tên nhưng thiếu trường required
+				continue;
+			}
+
+			// Format start_date
+			$startDate = null;
+			if (PHPExcel_Shared_Date::isDateTime($sheet->getCell('G' . $row))) {
+				$startDate = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($startDateVal));
+			} else {
+				// Cố gắng parse dạng text dd/mm/yyyy
+				$dateParts = explode('/', $startDateVal);
+				if (count($dateParts) == 3) {
+					$startDate = $dateParts[2] . '-' . $dateParts[1] . '-' . $dateParts[0];
+				}
+			}
+
+			// Parse roles
+			$roleIds = array();
+			$rNames = array_filter(array($role1, $role2, $role3));
+			foreach ($rNames as $rName) {
+				$key = mb_strtolower(trim($rName), 'UTF-8');
+				if (isset($rolesMap[$key])) {
+					$roleIds[] = $rolesMap[$key];
+				}
+			}
+
+			$attendee = new Attendees;
+			$attendee->event_id = $eventId;
+			$attendee->registration_id = $registrationId;
+			$attendee->property_id = $propertyId;
+			$attendee->full_name = $fullName;
+			$attendee->position = $position;
+			// Gộp phòng ban vào chức danh hoặc bỏ qua vì base attendee ko có unit_label ở form add manual?
+			// Nhưng DB model có unit_label. Ta sẽ lưu vào unit_label.
+			$attendee->unit_label = $department;
+			if (!empty($roleIds)) {
+				$attendee->role_id = implode(', ', $roleIds);
+			}
+			$attendee->join_hotel_date = $startDate;
+			$attendee->note = $note;
+			$attendee->approval_status = Attendees::APPROVAL_PENDING;
+
+			$result = $attendee->storeViaApi();
+			if ($result['success']) {
+				$successCount++;
+			} else {
+				$errorCount++;
+				Yii::log("ImportExcel - Store failed for row $row: " . json_encode($result), 'error', 'application.registration');
+			}
+		}
+
+		$msg = '';
+		if ($successCount > 0) {
+			$msg .= "Đã import thành công {$successCount} người tham dự. ";
+			Yii::app()->user->setFlash('success', $msg);
+		}
+		if ($errorCount > 0) {
+			$msgError = "Có {$errorCount} dòng dữ liệu bị lỗi hoặc thiếu thông tin.";
+			Yii::app()->user->setFlash($successCount > 0 ? 'warning' : 'error', $msgError);
+		}
+		if ($successCount == 0 && $errorCount == 0) {
+			Yii::app()->user->setFlash('warning', 'Không có dữ liệu hợp lệ để import.');
+		}
+
+		$this->redirect(array('view', 'id' => $registrationId));
+		} catch (Throwable $e) {
+			die("Error: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
+		}
+	}
+
 	public function actionAddAttendeeManual()
 	{
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {

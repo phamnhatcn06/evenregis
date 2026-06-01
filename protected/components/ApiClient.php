@@ -105,6 +105,19 @@ class ApiClient extends CComponent
     {
         self::init();
 
+        // Add auth_email for Create, Update, Delete actions
+        if (in_array($method, array('POST', 'PUT', 'PATCH', 'DELETE', 'POST_MULTIPART'))) {
+            $ssoUser = class_exists('AuthHandler') ? AuthHandler::getUser() : null;
+            $authEmail = isset($ssoUser['email']) ? $ssoUser['email'] : '';
+            
+            if ($data === null) {
+                $data = array();
+            }
+            if (is_array($data)) {
+                $data['auth_email'] = $authEmail;
+            }
+        }
+
         $url = rtrim(self::$baseUrl, '/') . '/' . ltrim($endpoint, '/');
         if (!empty($params)) {
             $url .= '?' . http_build_query($params);

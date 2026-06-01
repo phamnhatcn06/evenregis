@@ -120,52 +120,52 @@
 </div>
 
 <script>
-document.getElementById('btn_save_attendee').addEventListener('click', function(e) {
-    const form = document.getElementById('edit-attendee-form');
-    const maxFileSize = 5 * 1024 * 1024; // 5MB
-    let isValid = true;
-    let errorMessage = '';
+    document.getElementById('btn_save_attendee').addEventListener('click', function(e) {
+        const form = document.getElementById('edit-attendee-form');
+        const maxFileSize = 5 * 1024 * 1024; // 5MB
+        let isValid = true;
+        let errorMessage = '';
 
-    const validateFileInput = (inputName, label, previewId, isRequired, allowPdf) => {
-        const input = form.querySelector(`input[name="${inputName}"]`);
-        if (!input) return;
-        const file = input.files[0];
-        const preview = document.getElementById(previewId);
-        const hasExisting = preview && (preview.innerHTML.trim() !== '');
-        
-        if (isRequired && !file && !hasExisting) {
-            isValid = false;
-            errorMessage += `Vui lòng chọn ${label}.\n`;
-            return;
-        }
+        const validateFileInput = (inputName, label, previewId, isRequired, allowPdf) => {
+            const input = form.querySelector(`input[name="${inputName}"]`);
+            if (!input) return;
+            const file = input.files[0];
+            const preview = document.getElementById(previewId);
+            const hasExisting = preview && (preview.innerHTML.trim() !== '');
 
-        if (file) {
-            let fileName = file.name.toLowerCase();
-            let isValidType = fileName.match(/\.(jpg|jpeg|png)$/);
-            if (allowPdf && (file.type === 'application/pdf' || fileName.endsWith('.pdf'))) {
-                isValidType = true;
-            }
-
-            if (!isValidType) {
+            if (isRequired && !file && !hasExisting) {
                 isValid = false;
-                errorMessage += `${label} không đúng định dạng (chỉ hỗ trợ png, jpg, jpeg${allowPdf ? ', pdf' : ''}).\n`;
+                errorMessage += `Vui lòng chọn ${label}.\n`;
+                return;
             }
-            if (file.size > maxFileSize) {
-                isValid = false;
-                errorMessage += `${label} vượt quá kích thước cho phép (tối đa 5MB).\n`;
+
+            if (file) {
+                let fileName = file.name.toLowerCase();
+                let isValidType = fileName.match(/\.(jpg|jpeg|png)$/);
+                if (allowPdf && (file.type === 'application/pdf' || fileName.endsWith('.pdf'))) {
+                    isValidType = true;
+                }
+
+                if (!isValidType) {
+                    isValid = false;
+                    errorMessage += `${label} không đúng định dạng (chỉ hỗ trợ png, jpg, jpeg${allowPdf ? ', pdf' : ''}).\n`;
+                }
+                if (file.size > maxFileSize) {
+                    isValid = false;
+                    errorMessage += `${label} vượt quá kích thước cho phép (tối đa 5MB).\n`;
+                }
             }
+        };
+
+        validateFileInput('portrait_file', 'Ảnh chân dung', 'edit_portrait_preview', true, false);
+        validateFileInput('cccd_front_file', 'Ảnh CCCD mặt trước', 'edit_cccd_front_preview', true, false);
+        validateFileInput('cccd_back_file', 'Ảnh CCCD mặt sau', 'edit_cccd_back_preview', true, false);
+        validateFileInput('contract_file', 'Hợp đồng lao động', 'edit_contract_preview', false, true);
+
+        if (!isValid) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            alert(errorMessage);
         }
-    };
-
-    validateFileInput('portrait_file', 'Ảnh chân dung', 'edit_portrait_preview', true, false);
-    validateFileInput('cccd_front_file', 'Ảnh CCCD mặt trước', 'edit_cccd_front_preview', true, false);
-    validateFileInput('cccd_back_file', 'Ảnh CCCD mặt sau', 'edit_cccd_back_preview', true, false);
-    validateFileInput('contract_file', 'Hợp đồng lao động', 'edit_contract_preview', false, true);
-
-    if (!isValid) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        alert(errorMessage);
-    }
-});
+    });
 </script>
