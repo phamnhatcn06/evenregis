@@ -62,9 +62,9 @@ if (isset($relationProperties)) {
                 <?php echo $form->dropDownList($model, 'property_id', $propertyList, array(
                     'class' => 'form-select',
                     'prompt' => '-- Chọn đơn vị --',
-                    'disabled' => !$isHO && count($propertyList) == 1,
+                    'disabled' => count($propertyList) == 1,
                 )); ?>
-                <?php if (!$isHO && count($propertyList) == 1): ?>
+                <?php if (count($propertyList) == 1): ?>
                     <input type="hidden" name="Registrations[property_id]" value="<?php echo $model->property_id; ?>">
                 <?php endif; ?>
                 <?php echo $form->error($model, 'property_id'); ?>

@@ -472,7 +472,7 @@ class RegistrationsController extends AdminController
 		$userProperty = null;
 		$userPropertyId = null;
 		$userRegionalId = null;
-		if ($userPropertyCode && !$isAdmin) {
+		if ($userPropertyCode) {
 			$userProperty = Properties::fetchByCode($userPropertyCode);
 			if ($userProperty) {
 				$userPropertyId = $userProperty->id;
@@ -482,11 +482,11 @@ class RegistrationsController extends AdminController
 
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
 
+		$properties = $userProperty ? array($userProperty) : array();
+		
 		if ($isAdmin) {
-			$properties = Properties::getApiDataProvider(array(), 500)->getData();
-			$relationProperties = $properties;
+			$relationProperties = Properties::getApiDataProvider(array(), 500)->getData();
 		} else {
-			$properties = $userProperty ? array($userProperty) : array();
 			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('region_id' => $userRegionalId), 500)->getData() : array();
 		}
 
@@ -584,14 +584,9 @@ class RegistrationsController extends AdminController
 
 		// Load properties và relationProperties
 		if ($isAdmin) {
-			$properties = Properties::getApiDataProvider(array(), 500)->getData();
-			$relationProperties = array();
-			if ($model->property_id) {
-				$property = Properties::fetchFromApi($model->property_id);
-				if ($property && $property->region_id) {
-					$relationProperties = Properties::getApiDataProvider(array('region_id' => $property->region_id), 500)->getData();
-				}
-			}
+			$property = Properties::fetchFromApi($model->property_id);
+			$properties = $property ? array($property) : array();
+			$relationProperties = Properties::getApiDataProvider(array(), 500)->getData();
 		} else {
 			$properties = $userPropertyId ? Properties::getApiDataProvider(array('id' => $userPropertyId), 100)->getData() : array();
 			$relationProperties = $userRegionalId ? Properties::getApiDataProvider(array('region_id' => $userRegionalId), 500)->getData() : array();
