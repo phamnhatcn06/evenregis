@@ -3087,6 +3087,14 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	public function actionGetAttendeesAjax($registration_id)
+	{
+		header('Content-Type: application/json');
+		$attendees = Attendees::getByRegistrationId($registration_id);
+		echo CJSON::encode(array('success' => true, 'data' => $attendees));
+		Yii::app()->end();
+	}
+
 	public function actionUpdateAttendeeEmail()
 	{
 		header('Content-Type: application/json');
