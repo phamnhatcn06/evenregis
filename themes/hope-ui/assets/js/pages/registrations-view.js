@@ -3056,7 +3056,7 @@ var RegistrationView = (function() {
                 if (data.success) {
                     Toast.success(data.message || 'Cập nhật thành công.');
                     bootstrap.Modal.getInstance(document.getElementById('editAttendeeModal')).hide();
-                    setTimeout(function() { location.reload(); }, 1000);
+                    reloadAttendeesList();
                 } else {
                     Toast.error(data.error || 'Không thể cập nhật.');
                 }
