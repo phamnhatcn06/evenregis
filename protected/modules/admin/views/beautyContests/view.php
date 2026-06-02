@@ -101,3 +101,49 @@ $this->Tabletitle = 'Chi tiết cuộc thi: ' . CHtml::encode($model->name);
         </div>
     </div>
 </div>
+
+<div class="card mt-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-female me-2"></i>Danh sách thí sinh (<?php echo $contestants->getTotalItemCount(); ?>)</h5>
+        <a href="<?php echo $this->createUrl('/admin/beautyContestants/admin', array('BeautyContestants[contest_id]' => $model->id)); ?>" class="btn btn-sm btn-outline-primary">
+            <i class="fa fa-list me-1"></i>Xem tất cả
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:80px">SBD</th>
+                        <th>Họ tên</th>
+                        <th>Đơn vị</th>
+                        <th style="width:80px">Cao (cm)</th>
+                        <th style="width:80px">Nặng (kg)</th>
+                        <th style="width:120px">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $items = $contestants->getData();
+                    if (empty($items)):
+                    ?>
+                    <tr><td colspan="6" class="text-center text-muted py-4">Chưa có thí sinh đăng ký</td></tr>
+                    <?php else: foreach ($items as $c): ?>
+                    <tr>
+                        <td><strong><?php echo CHtml::encode($c->contestant_number ?: '-'); ?></strong></td>
+                        <td>
+                            <a href="<?php echo $this->createUrl('/admin/beautyContestants/view', array('id' => $c->id)); ?>">
+                                <?php echo CHtml::encode(isset($c->attendee_name) ? $c->attendee_name : $c->attendee_id); ?>
+                            </a>
+                        </td>
+                        <td><?php echo CHtml::encode(isset($c->property_name) ? $c->property_name : ''); ?></td>
+                        <td><?php echo CHtml::encode($c->height_cm ?: '-'); ?></td>
+                        <td><?php echo CHtml::encode($c->weight_kg ?: '-'); ?></td>
+                        <td><?php echo BeautyContestants::getStatusLabel($c->status); ?></td>
+                    </tr>
+                    <?php endforeach; endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
