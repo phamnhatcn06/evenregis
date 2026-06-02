@@ -174,6 +174,28 @@ if (!empty($model->document)) {
     }
 </style>
 
+<?php if ((int)$model->status === Registrations::STATUS_RETURNED): ?>
+<div class="alert alert-warning d-flex align-items-start mb-3" role="alert">
+    <i class="fa fa-exclamation-triangle fa-lg me-3 mt-1 text-warning flex-shrink-0"></i>
+    <div class="flex-grow-1">
+        <strong>Phiếu đăng ký đã được trả về — cần chỉnh sửa và gửi lại.</strong>
+        <?php if (!empty($model->rejection_reason)): ?>
+            <div class="mt-1">Lý do: <?php echo CHtml::encode($model->rejection_reason); ?></div>
+        <?php endif; ?>
+    </div>
+    <div class="d-flex gap-2 ms-3 flex-shrink-0">
+        <a href="<?php echo $this->createUrl('update', array('id' => $model->id)); ?>" class="btn btn-sm btn-outline-warning">
+            <i class="fa fa-pencil me-1"></i>Chỉnh sửa
+        </a>
+        <form id="form-resubmit-registration" method="post" action="<?php echo $this->createUrl('resubmit', array('id' => $model->id)); ?>" style="display:inline;">
+            <button type="button" class="btn btn-sm btn-warning" onclick="confirmResubmitRegistration()">
+                <i class="fa fa-paper-plane me-1"></i>Gửi lại
+            </button>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="row mb-3">
     <!-- Thông tin chung -->
     <div class="col-md-6">
@@ -181,7 +203,7 @@ if (!empty($model->document)) {
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin chung <?= ($pendingRequestCount > 0 ? '<span class="badge bg-danger rounded-pill ms-2">' . $pendingRequestCount . ' yêu cầu chờ xử lý</span>' : '')  ?></h5>
                 <div class="btn-group">
-                    <?php if ($canEdit): ?>
+                    <?php if ((int)$model->status === Registrations::STATUS_DRAFT): ?>
                         <form id="form-submit-registration" method="post" action="<?php echo $this->createUrl('submit', array('id' => $model->id)); ?>" style="display:inline;">
                             <button type="button" class="btn btn-sm btn-info" onclick="confirmSubmitRegistration()">
                                 <i class="fa fa-paper-plane me-1"></i>Gửi bản đăng ký
