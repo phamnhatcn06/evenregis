@@ -85,6 +85,8 @@ $appName = Yii::app()->name;
                 // Build menu tree from permissions
                 $menuPermissions = PermissionHelper::getMenuPermissions();
                 $menuTree = MenuHelper::buildMenuTree($menuPermissions);
+                $ssoToken = Yii::app()->session['sso_token'];
+                $tokenHash = $ssoToken ? md5($ssoToken) : '';
                 ?>
                 <ul class="navbar-nav iq-main-menu" id="sidebar-menu">
                     <li class="nav-item static-item">
