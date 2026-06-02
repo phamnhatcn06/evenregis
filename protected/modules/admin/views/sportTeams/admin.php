@@ -33,6 +33,15 @@ foreach ($sports as $sport) {
                 array('name' => 'id', 'header' => 'ID', 'width' => '60px', 'filter' => false),
                 array('name' => 'team_name', 'header' => 'Tên đội', 'width' => '200px'),
                 array(
+                    'name' => 'event_id',
+                    'header' => 'Sự kiện',
+                    'type' => 'raw',
+                    'filter' => $events,
+                    'value' => function ($data) {
+                        return isset($data->event_name) ? CHtml::encode($data->event_name) : $data->event_id;
+                    }
+                ),
+                array(
                     'name' => 'sport_id',
                     'header' => 'Môn thể thao',
                     'type' => 'raw',
