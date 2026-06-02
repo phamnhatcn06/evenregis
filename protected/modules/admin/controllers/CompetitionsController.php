@@ -5,8 +5,14 @@ class CompetitionsController extends AdminController
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
+        $registrations = CompetitionRegistrations::getApiDataProvider(
+            array('competition_id' => $id),
+            10
+        );
+
         $this->render('view', array(
             'model' => $model,
+            'registrations' => $registrations,
         ));
     }
 
