@@ -82,3 +82,47 @@ $perColumn = ceil($totalAttrs / $columns);
         </div>
     </div>
 </div>
+
+<div class="card mt-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-music me-2"></i>Danh sách tiết mục (<?php echo $entries->getTotalItemCount(); ?>)</h5>
+        <a href="<?php echo $this->createUrl('/admin/talentEntries/admin', array('TalentEntries[show_id]' => $model->id)); ?>" class="btn btn-sm btn-outline-primary">
+            <i class="fa fa-list me-1"></i>Xem tất cả
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên tiết mục</th>
+                        <th>Thể loại</th>
+                        <th>Đơn vị</th>
+                        <th style="width:80px">Số người</th>
+                        <th style="width:120px">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $items = $entries->getData();
+                    if (empty($items)):
+                    ?>
+                    <tr><td colspan="5" class="text-center text-muted py-4">Chưa có tiết mục đăng ký</td></tr>
+                    <?php else: foreach ($items as $entry): ?>
+                    <tr>
+                        <td>
+                            <a href="<?php echo $this->createUrl('/admin/talentEntries/view', array('id' => $entry->id)); ?>">
+                                <?php echo CHtml::encode($entry->title); ?>
+                            </a>
+                        </td>
+                        <td><?php echo CHtml::encode(isset($entry->category_name) ? $entry->category_name : ''); ?></td>
+                        <td><?php echo CHtml::encode(isset($entry->property_name) ? $entry->property_name : ''); ?></td>
+                        <td><?php echo CHtml::encode($entry->participant_count ?: '-'); ?></td>
+                        <td><?php echo TalentEntries::getStatusLabel($entry->status); ?></td>
+                    </tr>
+                    <?php endforeach; endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
