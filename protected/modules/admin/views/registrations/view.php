@@ -1302,8 +1302,9 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
                     Toast.error(data.message || "Không thể tải thông tin tiết mục");
                 }
             })
-            .catch(function() {
-                Toast.error("Lỗi kết nối server");
+            .catch(function(err) {
+                console.error("Get talent error:", err);
+                Toast.error("Lỗi kết nối đến server");
             });
     }
     function previewEditVideo() {
