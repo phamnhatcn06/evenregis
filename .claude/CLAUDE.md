@@ -711,8 +711,8 @@ if (!PermissionHelper::can('attendee', 'create')) {
 ```php
 // ✅ ĐÚNG — Lấy từ SSO token
 $ssoUser = AuthHandler::getUser();
-$model->submitted_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
-$model->created_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+$model->submitted_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+$model->created_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
 // ❌ SAI — Dùng local user
 $model->submitted_by = Yii::app()->user->id;
@@ -722,11 +722,11 @@ $model->submitted_by = Yii::app()->user->id;
 
 | Field | Mô tả | Lấy từ |
 |-------|-------|--------|
-| `submitted_by` | Người nộp/submit | `AuthHandler::getUser()['id']` |
-| `created_by` | Người tạo | `AuthHandler::getUser()['id']` |
-| `updated_by` | Người cập nhật | `AuthHandler::getUser()['id']` |
-| `approved_by` | Người phê duyệt | `AuthHandler::getUser()['id']` |
-| `deleted_by` | Người xóa | `AuthHandler::getUser()['id']` |
+| `submitted_by` | Người nộp/submit | `AuthHandler::getUser()['email']` |
+| `created_by` | Người tạo | `AuthHandler::getUser()['email']` |
+| `updated_by` | Người cập nhật | `AuthHandler::getUser()['email']` |
+| `approved_by` | Người phê duyệt | `AuthHandler::getUser()['email']` |
+| `deleted_by` | Người xóa | `AuthHandler::getUser()['email']` |
 
 ---
 
