@@ -10,7 +10,7 @@ return array(
 
     // Portal SSO Configuration
     'portal' => array(
-        'url' => 'https://portal.muongthanh.vn',
+        'url' => 'http://localhost:5993/',
         'api_url' => 'http://localhost:6689',
         'sso_me_endpoint' => '/api/sso/me',
         'sso_permissions_endpoint' => '/api/sso/permissions/me',
