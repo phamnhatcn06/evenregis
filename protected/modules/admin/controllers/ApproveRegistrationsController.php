@@ -555,10 +555,9 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $ssoUser = AuthHandler::getUser();
-        $reviewedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+        $reviewedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
-        // Return registration to rejected status
-        $model->status = Registrations::STATUS_REJECTED;
+        $model->status = Registrations::STATUS_RETURNED;
         $model->reviewed_at = time();
         $model->reviewed_by = $reviewedBy;
         $model->rejection_reason = $reason;
@@ -567,10 +566,10 @@ class ApproveRegistrationsController extends AdminController
         if ($result['success']) {
             echo CJSON::encode(array(
                 'success' => true,
-                'message' => 'Đã từ chối phiếu đăng ký.',
+                'message' => 'Đã trả phiếu đăng ký về đơn vị để chỉnh sửa.',
             ));
         } else {
-            echo CJSON::encode(array('success' => false, 'error' => 'Không thể từ chối phiếu đăng ký.'));
+            echo CJSON::encode(array('success' => false, 'error' => 'Không thể trả phiếu đăng ký về.'));
         }
         Yii::app()->end();
     }
