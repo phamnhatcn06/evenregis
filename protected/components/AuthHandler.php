@@ -333,8 +333,8 @@ class AuthHandler extends CApplicationComponent
             return false;
         }
 
-        // Extract permissions from response
-        $permissionsData = isset($data['data']) ? $data['data'] : $data;
+        // Extract permissions from response - API trả về { permissions: [...] }
+        $permissionsData = isset($data['permissions']) ? $data['permissions'] : (isset($data['data']) ? $data['data'] : $data);
 
         // Process permissions
         $crudPermissions = array();
@@ -345,15 +345,25 @@ class AuthHandler extends CApplicationComponent
         } elseif (is_array($permissionsData)) {
             foreach ($permissionsData as $item) {
                 if (is_array($item) && isset($item['controller'])) {
-                    $menuPermissions[] = $item;
-                    if (isset($item['action'])) {
-                        $crudPermissions[$item['controller']] = $item['action'];
+                    // Map API fields to expected format
+                    $menuItem = array(
+                        'name' => isset($item['role']) ? $item['role'] : $item['controller'],
+                        'module' => isset($item['module']) ? $item['module'] : 'admin',
+                        'controller' => strtolower($item['controller']),
+                        'action' => isset($item['action']) ? $item['action'] : '*',
+                        'root' => isset($item['value']) ? $item['value'] : 'other',
+                        'sort' => isset($item['sort']) ? (int)$item['sort'] : 100,
+                    );
+                    $menuPermissions[] = $menuItem;
+
+                    // CRUD permissions
+                    $action = isset($item['action']) ? $item['action'] : '*';
+                    if ($action === '*') {
+                        $crudPermissions[strtolower($item['controller'])] = '1 1 1 1';
+                    } else {
+                        $crudPermissions[strtolower($item['controller'])] = $action;
                     }
                 }
-            }
-
-            if (empty($menuPermissions) && !empty($permissionsData)) {
-                $crudPermissions = $permissionsData;
             }
         }
 
