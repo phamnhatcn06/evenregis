@@ -665,7 +665,7 @@ class RegistrationsController extends AdminController
 			var_dump($submittedAt);
 			die;
 			$ssoUser = AuthHandler::getUser();
-			$submittedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			$submittedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
 			$updateData = array(
 				'event_id' => $model->event_id,
