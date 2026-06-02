@@ -14,7 +14,11 @@ class ApproveRegistrationsController extends AdminController
             $model->setAttributes($_GET['Registrations']);
         }
 
-        $params = array('status' => Registrations::STATUS_SUBMITTED);
+        // Mặc định chỉ hiện SUBMITTED nếu không có filter
+        $params = array();
+        if (!isset($_GET['Registrations']['status']) || $_GET['Registrations']['status'] === '') {
+            $params['status'] = Registrations::STATUS_SUBMITTED;
+        }
         foreach ($model->attributes as $key => $value) {
             if ($value !== null && $value !== '') {
                 $params[$key] = $value;
@@ -22,10 +26,12 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $dataProvider = Registrations::getApiDataProvider($params);
+        $statusList = array('' => 'Tất cả') + Registrations::getStatusList();
 
         $this->render('admin', array(
             'model' => $model,
             'dataProvider' => $dataProvider,
+            'statusList' => $statusList,
         ));
     }
 
