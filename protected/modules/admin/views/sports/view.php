@@ -105,3 +105,45 @@ $perColumn = ceil($totalAttrs / $columns);
         </div>
     </div>
 </div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách đội thi đấu (<?php echo $teams->getTotalItemCount(); ?>)</h5>
+        <a href="<?php echo $this->createUrl('/admin/sportTeams/admin', array('SportTeams[sport_id]' => $model->id)); ?>" class="btn btn-sm btn-outline-primary">
+            <i class="fa fa-list me-1"></i>Xem tất cả
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên đội</th>
+                        <th>Đơn vị</th>
+                        <th style="width:100px">Liên quân</th>
+                        <th style="width:120px">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $items = $teams->getData();
+                    if (empty($items)):
+                    ?>
+                    <tr><td colspan="4" class="text-center text-muted py-4">Chưa có đội đăng ký</td></tr>
+                    <?php else: foreach ($items as $team): ?>
+                    <tr>
+                        <td>
+                            <a href="<?php echo $this->createUrl('/admin/sportTeams/view', array('id' => $team->id)); ?>">
+                                <?php echo CHtml::encode($team->team_name); ?>
+                            </a>
+                        </td>
+                        <td><?php echo CHtml::encode(isset($team->property_name) ? $team->property_name : ''); ?></td>
+                        <td><?php echo $team->is_alliance ? '<span class="badge bg-info">Liên quân</span>' : '<span class="badge bg-secondary">Đơn lẻ</span>'; ?></td>
+                        <td><?php echo SportTeams::getStatusLabel($team->status); ?></td>
+                    </tr>
+                    <?php endforeach; endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
