@@ -119,6 +119,39 @@ class SiteController extends Controller
     }
 
     /**
+     * Debug SSO token (temporary)
+     */
+    public function actionDebugToken()
+    {
+        header('Content-Type: application/json');
+        $token = Yii::app()->request->getParam('token');
+
+        if (!$token) {
+            echo CJSON::encode(array('error' => 'No token provided'));
+            Yii::app()->end();
+        }
+
+        // Decode without validation to see payload
+        $debug = AuthHandler::debugToken($token);
+
+        // Try to validate
+        $params = require Yii::getPathOfAlias('application.config') . '/params.php';
+        $secret = $params['portal']['jwt_secret'];
+
+        require_once Yii::getPathOfAlias('application.extensions.jwt') . '/JWT.php';
+        $payload = JWT::decode($token, $secret, 'HS256');
+
+        echo CJSON::encode(array(
+            'debug' => $debug,
+            'jwt_secret_length' => strlen($secret),
+            'jwt_secret_first_10' => substr($secret, 0, 10),
+            'validation_result' => $payload ? 'VALID' : 'INVALID',
+            'payload' => $payload,
+        ));
+        Yii::app()->end();
+    }
+
+    /**
      * API endpoint to get current user info and permissions
      */
     public function actionMe()
