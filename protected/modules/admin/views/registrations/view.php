@@ -1330,10 +1330,11 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
                 Toast.error(data.message || "Cập nhật thất bại");
             }
         })
-        .catch(function() {
+        .catch(function(err) {
+            console.error("Edit talent error:", err);
             btn.disabled = false;
             btn.innerHTML = originalHtml;
-            Toast.error("Lỗi kết nối server");
+            Toast.error("Lỗi kết nối đến server");
         });
     });
     function confirmSubmitRegistration() {
