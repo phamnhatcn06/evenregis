@@ -38,9 +38,20 @@ class SiteController extends Controller
     {
         $ssoToken = Yii::app()->request->getParam('sso_token');
         if ($ssoToken) {
+            // Debug: show token processing
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+
             // Clear old session before processing new token
             AuthHandler::logout();
             $userData = AuthHandler::handleCallback($ssoToken);
+
+            // Debug: show result
+            if (!$userData) {
+                echo '<pre>Token decode failed. Debug info:</pre>';
+                echo '<pre>' . print_r(AuthHandler::debugToken($ssoToken), true) . '</pre>';
+                die();
+            }
             if ($userData) {
                 // Fetch permissions from SSO API
                 AuthHandler::fetchPermissions($ssoToken);
