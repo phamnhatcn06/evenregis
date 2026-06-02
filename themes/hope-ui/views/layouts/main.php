@@ -282,6 +282,21 @@ $appName = Yii::app()->name;
                 });
             }
         })();
+
+        // Sync menu permissions to localStorage
+        (function() {
+            var serverTokenHash = '<?php echo $tokenHash; ?>';
+            var storedTokenHash = localStorage.getItem('sso_token_hash');
+            var serverPermissions = <?php echo !empty($menuPermissions) ? CJSON::encode($menuPermissions) : '[]'; ?>;
+
+            // Update localStorage if token changed or permissions empty
+            if (serverTokenHash && serverTokenHash !== storedTokenHash) {
+                localStorage.setItem('sso_token_hash', serverTokenHash);
+                if (serverPermissions && serverPermissions.length > 0) {
+                    localStorage.setItem('sso_menu_permissions', JSON.stringify(serverPermissions));
+                }
+            }
+        })();
     </script>
 </body>
 
