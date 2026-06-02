@@ -10,9 +10,14 @@ class TalentShowsController extends AdminController
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
+        $entries = TalentEntries::getApiDataProvider(
+            array('show_id' => $id),
+            10
+        );
 
         $this->render('view', array(
             'model' => $model,
+            'entries' => $entries,
         ));
     }
 
