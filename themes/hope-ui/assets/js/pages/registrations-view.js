@@ -4255,7 +4255,83 @@ var RegistrationView = (function() {
                 var modal = bootstrap.Modal.getInstance(document.getElementById('addTalentModal'));
                 if (modal) modal.hide();
                 Toast.success(data.message || 'Đăng ký thành công!');
-                location.reload();
+
+                // Thêm dòng mới vào bảng văn nghệ mà không cần reload
+                var title = document.getElementById('talent_title').value;
+                var catSelect = document.getElementById('talent_category_select');
+                var categoryName = catSelect.options[catSelect.selectedIndex].text;
+                var origin = document.getElementById('talent_origin').value;
+                var newId = data.id;
+
+                var container = document.getElementById('talent-entries-container');
+                if (container) {
+                    var noMsg = container.querySelector('.no-talent-message');
+                    if (noMsg) noMsg.style.display = 'none';
+
+                    var tableWrapper = container.querySelector('.table-responsive');
+                    if (tableWrapper) tableWrapper.style.display = 'block';
+
+                    var table = document.getElementById('talent-entries-table');
+                    if (table) {
+                        var tbody = table.querySelector('tbody');
+                        if (tbody) {
+                            var tr = document.createElement('tr');
+                            tr.id = 'talent-row-' + newId;
+
+                            var tdTitle = document.createElement('td');
+                            tdTitle.className = 'talent-title';
+                            tdTitle.textContent = title;
+
+                            var tdCategory = document.createElement('td');
+                            var badgeSpan = document.createElement('span');
+                            badgeSpan.className = 'badge bg-info talent-category';
+                            badgeSpan.textContent = categoryName;
+                            tdCategory.appendChild(badgeSpan);
+
+                            var tdOrigin = document.createElement('td');
+                            tdOrigin.className = 'talent-origin';
+                            tdOrigin.textContent = origin;
+
+                            var tdActions = document.createElement('td');
+                            tdActions.className = 'text-center text-nowrap';
+
+                            var editBtn = document.createElement('button');
+                            editBtn.type = 'button';
+                            editBtn.className = 'btn btn-sm btn-outline-primary me-1';
+                            editBtn.title = 'Sửa';
+                            editBtn.innerHTML = '<i class="fa fa-pencil"></i>';
+                            editBtn.onclick = (function(id) {
+                                return function() { editTalentEntry(id); };
+                            })(newId);
+
+                            var deleteForm = document.createElement('form');
+                            deleteForm.method = 'post';
+                            deleteForm.action = window.BASE_URL + '/admin/registrations/deleteTalentEntry?id=' + newId + '&registration_id=' + registrationId;
+                            deleteForm.id = 'delete-talent-form-' + newId;
+                            deleteForm.style.display = 'none';
+
+                            var deleteBtn = document.createElement('button');
+                            deleteBtn.type = 'button';
+                            deleteBtn.className = 'btn btn-sm btn-outline-danger';
+                            deleteBtn.title = 'Xóa';
+                            deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
+                            deleteBtn.onclick = (function(id) {
+                                return function() { confirmDeleteTalent(id); };
+                            })(newId);
+
+                            tdActions.appendChild(editBtn);
+                            tdActions.appendChild(deleteForm);
+                            tdActions.appendChild(deleteBtn);
+
+                            tr.appendChild(tdTitle);
+                            tr.appendChild(tdCategory);
+                            tr.appendChild(tdOrigin);
+                            tr.appendChild(tdActions);
+
+                            tbody.appendChild(tr);
+                        }
+                    }
+                }
             } else {
                 Toast.error(data.error || 'Có lỗi xảy ra.');
             }

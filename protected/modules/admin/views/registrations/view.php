@@ -845,46 +845,68 @@ foreach ($registrationDetails as $detail) {
                             </div>
                         <?php endif; ?>
 
-                        <?php if (empty($talentEntries)): ?>
-                            <p class="text-muted mb-0">Chưa đăng ký tiết mục văn nghệ nào.</p>
-                        <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped table-sm mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Tiết mục</th>
-                                            <th style="width:120px;">Thể loại</th>
-                                            <?php if ($canEdit): ?>
-                                                <th style="width:60px;"></th>
-                                            <?php endif; ?>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($talentEntries as $entry):
-                                            $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
-                                            $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
-                                            $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
-                                        ?>
+                        <div id="talent-entries-container">
+                            <?php if (empty($talentEntries)): ?>
+                                <p class="text-muted mb-0 no-talent-message">Chưa đăng ký tiết mục văn nghệ nào.</p>
+                                <div class="table-responsive" style="display: none;">
+                                    <table class="table table-bordered table-striped table-sm mb-0" id="talent-entries-table">
+                                        <thead class="table-light">
                                             <tr>
-                                                <td><?php echo CHtml::encode($entryTitle); ?></td>
-                                                <td><span class="badge bg-info"><?php echo CHtml::encode($categoryName); ?></span></td>
+                                                <th>Tiết mục</th>
+                                                <th style="width:120px;">Thể loại</th>
+                                                <th>Nguồn gốc/Xuất xứ</th>
                                                 <?php if ($canEdit): ?>
-                                                    <td class="text-center text-nowrap">
-                                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editTalentEntry(<?php echo $entryId; ?>)" title="Sửa">
-                                                            <i class="fa fa-pencil"></i>
-                                                        </button>
-                                                        <form method="post" action="<?php echo $this->createUrl('deleteTalentEntry', array('id' => $entryId, 'registration_id' => $model->id)); ?>" id="delete-talent-form-<?php echo $entryId; ?>" style="display:none;"></form>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTalent(<?php echo $entryId; ?>)" title="Xóa">
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    </td>
+                                                    <th style="width:60px;"></th>
                                                 <?php endif; ?>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div><!-- end table-responsive -->
-                        <?php endif; ?>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php else: ?>
+                                <p class="text-muted mb-0 no-talent-message" style="display: none;">Chưa đăng ký tiết mục văn nghệ nào.</p>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-sm mb-0" id="talent-entries-table">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Tiết mục</th>
+                                                <th style="width:120px;">Thể loại</th>
+                                                <th>Nguồn gốc/Xuất xứ</th>
+                                                <?php if ($canEdit): ?>
+                                                    <th style="width:60px;"></th>
+                                                <?php endif; ?>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($talentEntries as $entry):
+                                                $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+                                                $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
+                                                $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
+                                                $entryOrigin = isset($entry->origin) ? $entry->origin : (isset($entry['origin']) ? $entry['origin'] : '');
+                                            ?>
+                                                <tr id="talent-row-<?php echo $entryId; ?>">
+                                                    <td class="talent-title"><?php echo CHtml::encode($entryTitle); ?></td>
+                                                    <td><span class="badge bg-info talent-category"><?php echo CHtml::encode($categoryName); ?></span></td>
+                                                    <td class="talent-origin"><?php echo CHtml::encode($entryOrigin); ?></td>
+                                                    <?php if ($canEdit): ?>
+                                                        <td class="text-center text-nowrap">
+                                                            <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editTalentEntry(<?php echo $entryId; ?>)" title="Sửa">
+                                                                <i class="fa fa-pencil"></i>
+                                                            </button>
+                                                            <form method="post" action="<?php echo $this->createUrl('deleteTalentEntry', array('id' => $entryId, 'registration_id' => $model->id)); ?>" id="delete-talent-form-<?php echo $entryId; ?>" style="display:none;"></form>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTalent(<?php echo $entryId; ?>)" title="Xóa">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    <?php endif; ?>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div><!-- end main col -->
                 </div><!-- end row -->
             </div>
@@ -1335,8 +1357,25 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         .then(function(data) {
             if (data.success) {
                 Toast.success("Cập nhật tiết mục thành công");
-                bootstrap.Modal.getInstance(document.getElementById("editTalentModal")).hide();
-                setTimeout(function() { location.reload(); }, 1000);
+                var modalEl = document.getElementById("editTalentModal");
+                var modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                // Cập nhật dòng tương ứng trong bảng trực tiếp
+                var entryId = document.getElementById("edit_talent_id").value;
+                var row = document.getElementById("talent-row-" + entryId);
+                if (row) {
+                    var titleVal = document.getElementById("edit_talent_title").value;
+                    var catSelect = document.getElementById("edit_talent_category");
+                    var categoryName = catSelect.options[catSelect.selectedIndex].text;
+                    var originVal = document.getElementById("edit_talent_origin").value;
+
+                    row.querySelector(".talent-title").textContent = titleVal;
+                    row.querySelector(".talent-category").textContent = categoryName;
+                    row.querySelector(".talent-origin").textContent = originVal;
+                }
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
             } else {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;

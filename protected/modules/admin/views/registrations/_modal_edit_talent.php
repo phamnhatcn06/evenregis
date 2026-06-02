@@ -23,6 +23,10 @@
                                     <option value="">-- Chọn thể loại --</option>
                                 </select>
                             </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nguồn gốc/Xuất xứ</label>
+                                <input type="text" class="form-control" name="origin" id="edit_talent_origin" placeholder="VD: Dân ca Bắc Bộ...">
+                            </div>
                         </div>
                     </div>
                 </div>

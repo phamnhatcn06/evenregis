@@ -3493,7 +3493,7 @@ class RegistrationsController extends AdminController
 			}
 		}
 
-		echo CJSON::encode(array('success' => true, 'message' => 'Đăng ký tiết mục thành công.'));
+		echo CJSON::encode(array('success' => true, 'message' => 'Đăng ký tiết mục thành công.', 'id' => $entryId));
 		Yii::app()->end();
 	}
 
