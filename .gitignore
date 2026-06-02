@@ -51,3 +51,4 @@ temp/
 # Uploads
 uploads/
 protected/config/database.php
+protected/config/params.php
