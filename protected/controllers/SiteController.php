@@ -20,7 +20,7 @@ class SiteController extends Controller
         return array(
             array(
                 'allow',
-                'actions' => array('index', 'error', 'login', 'logout'),
+                'actions' => array('index', 'error', 'login', 'logout', 'debugToken'),
                 'users' => array('*'),
             ),
             array(
