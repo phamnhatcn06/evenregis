@@ -305,7 +305,7 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $ssoUser = AuthHandler::getUser();
-        $approvedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+        $approvedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
         $all = Yii::app()->request->getPost('all');
         $registrationId = Yii::app()->request->getPost('registration_id');
 
@@ -365,7 +365,7 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $ssoUser = AuthHandler::getUser();
-        $approvedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+        $approvedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
         $reason = Yii::app()->request->getPost('reason', '');
         $all = Yii::app()->request->getPost('all');
         $registrationId = Yii::app()->request->getPost('registration_id');
@@ -436,7 +436,7 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $ssoUser = AuthHandler::getUser();
-        $approvedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+        $approvedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
         // Approve all attendees
         $attendees = Attendees::getByRegistrationId($registrationId);
@@ -496,7 +496,7 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $ssoUser = AuthHandler::getUser();
-        $approvedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+        $approvedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
         // Reject all attendees
         $attendees = Attendees::getByRegistrationId($registrationId);
