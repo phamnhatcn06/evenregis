@@ -157,7 +157,7 @@ public function actionResubmit($id)
         $updateData = array(
             'status'       => Registrations::STATUS_SUBMITTED,
             'submitted_at' => date('Y-m-d H:i:s'),
-            'submitted_by' => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+            'submitted_by' => isset($ssoUser['id']) ? $ssoUser['id'] : null,
         );
 
         $result = $model->updateViaApi($updateData);
