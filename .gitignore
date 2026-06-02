@@ -13,10 +13,8 @@
 # Yii Framework
 /framework/*
 !/framework/.gitkeep
-/protected/runtime/*
-!/protected/runtime/.gitkeep
-/assets/*
-!/assets/.gitkeep
+protected/runtime/
+assets/
 
 # Dependencies
 node_modules/
