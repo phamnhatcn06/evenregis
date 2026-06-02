@@ -1264,8 +1264,15 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         container.innerHTML = "";
     }
     function editTalentEntry(id) {
-        fetch(window.BASE_URL + "/admin/registrations/getTalentEntry?id=" + id)
-            .then(function(res) { return res.json(); })
+        fetch(window.BASE_URL + "/admin/registrations/getTalentEntry?id=" + id, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+            .then(function(res) {
+                if (!res.ok) {
+                    throw new Error("HTTP " + res.status);
+                }
+                return res.json();
+            })
             .then(function(data) {
                 if (data.success && data.data) {
                     var entry = data.data;
