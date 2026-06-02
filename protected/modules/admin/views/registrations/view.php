@@ -1411,6 +1411,26 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
             Toast.error("Lỗi kết nối đến server");
         });
     });
+    function confirmResubmitRegistration() {
+        var form = document.getElementById("form-resubmit-registration");
+        if (!form) return;
+
+        Swal.fire({
+            title: "Gửi lại phiếu đăng ký?",
+            text: "Phiếu sẽ được gửi lại cho HO xem xét phê duyệt.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#e6a817",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Gửi lại",
+            cancelButtonText: "Hủy"
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
     function confirmSubmitRegistration() {
         var form = document.getElementById("form-submit-registration");
         if (!form) return;
