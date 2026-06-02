@@ -4,7 +4,7 @@ $this->breadcrumbs = array(
     'Danh sách',
 );
 
-$this->Tabletitle = 'Danh sách đăng ký chờ phê duyệt';
+$this->Tabletitle = 'Phê duyệt đăng ký';
 ?>
 
 <div class="card">
@@ -49,7 +49,10 @@ $this->Tabletitle = 'Danh sách đăng ký chờ phê duyệt';
                     'name' => 'status',
                     'header' => 'Trạng thái',
                     'type' => 'raw',
-                    'filter' => false,
+                    'filter' => CHtml::activeDropDownList(
+                        $model, 'status', $statusList,
+                        array('class' => 'form-select form-select-sm', 'id' => '')
+                    ),
                     'value' => function ($data) {
                         return Registrations::getStatusLabel($data->status);
                     }
@@ -61,13 +64,15 @@ $this->Tabletitle = 'Danh sách đăng ký chờ phê duyệt';
                     'filter' => false,
                     'sortable' => false,
                     'value' => function ($data) {
-                        return '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm btn-primary"><i class="fa fa-eye me-1"></i>Xem & Duyệt</a>';
+                        $btnClass = ((int)$data->status === Registrations::STATUS_SUBMITTED) ? 'btn-primary' : 'btn-outline-secondary';
+                        $label = ((int)$data->status === Registrations::STATUS_SUBMITTED) ? 'Xem & Duyệt' : 'Xem';
+                        return '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm ' . $btnClass . '"><i class="fa fa-eye me-1"></i>' . $label . '</a>';
                     }
                 ),
             ),
             'options' => array(
                 'pageLength' => 25,
-                'order' => array(array(4, 'desc')), // Order by submitted_at desc
+                'order' => array(array(4, 'desc')),
             ),
         ));
         ?>
