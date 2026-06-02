@@ -4,10 +4,11 @@ Yii::import('application.models._base.BaseRegistrations');
 
 class Registrations extends BaseRegistrations
 {
-	const STATUS_DRAFT = 0;
+	const STATUS_DRAFT     = 0;
 	const STATUS_SUBMITTED = 1;
-	const STATUS_APPROVED = 2;
-	const STATUS_REJECTED = 3;
+	const STATUS_APPROVED  = 2;
+	const STATUS_REJECTED  = 3;
+	const STATUS_RETURNED  = 4;
 
 	// Virtual properties từ API (joined data)
 	public $event_name;
