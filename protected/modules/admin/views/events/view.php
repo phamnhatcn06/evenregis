@@ -342,40 +342,6 @@ $perColumn = ceil($totalAttrs / $columns);
                                                     <i class="fa fa-plus me-1"></i>Thêm môn
                                                 </button>
                                             <?php endif; ?>
-                                        <?php elseif ($contentCode === 'beauty'): ?>
-                                            <?php if (!empty($eventBeautyContests)): ?>
-                                                <ul class="list-unstyled mb-2">
-                                                    <?php foreach ($eventBeautyContests as $bc): ?>
-                                                        <li class="d-flex justify-content-between align-items-center mb-1">
-                                                            <span>
-                                                                <i class="fa fa-female me-1"></i><?php echo CHtml::encode($bc->name); ?>
-                                                                <a href="<?php echo Yii::app()->createUrl('/admin/beautyContestants/admin', array('BeautyContestants[contest_id]' => $bc->id)); ?>" class="badge bg-info ms-1" title="Xem danh sách thí sinh">
-                                                                    <i class="fa fa-users"></i>
-                                                                </a>
-                                                            </span>
-                                                        </li>
-                                                    <?php endforeach; ?>
-                                                </ul>
-                                            <?php else: ?>
-                                                <small class="text-muted">Chưa có cuộc thi Miss</small>
-                                            <?php endif; ?>
-                                        <?php elseif ($contentCode === 'talent'): ?>
-                                            <?php if (!empty($eventTalentShows)): ?>
-                                                <ul class="list-unstyled mb-2">
-                                                    <?php foreach ($eventTalentShows as $ts): ?>
-                                                        <li class="d-flex justify-content-between align-items-center mb-1">
-                                                            <span>
-                                                                <i class="fa fa-music me-1"></i><?php echo CHtml::encode($ts->name); ?>
-                                                                <a href="<?php echo Yii::app()->createUrl('/admin/talentEntries/admin', array('TalentEntries[show_id]' => $ts->id)); ?>" class="badge bg-info ms-1" title="Xem danh sách tiết mục">
-                                                                    <i class="fa fa-list"></i>
-                                                                </a>
-                                                            </span>
-                                                        </li>
-                                                    <?php endforeach; ?>
-                                                </ul>
-                                            <?php else: ?>
-                                                <small class="text-muted">Chưa có hội diễn văn nghệ</small>
-                                            <?php endif; ?>
                                         <?php else: ?>
                                             <small class="text-muted">Chưa có chi tiết</small>
                                         <?php endif; ?>
