@@ -55,7 +55,8 @@ class AuthHandler extends CApplicationComponent
     }
 
     /**
-     * Create user session from JWT payload
+     * Create user session from JWT payload (basic info only)
+     * Permissions will be fetched separately via fetchPermissions()
      */
     private static function createSession($payload, $token)
     {
@@ -80,45 +81,13 @@ class AuthHandler extends CApplicationComponent
             'regional_id' => isset($data['regional_id']) ? $data['regional_id'] : null,
         );
 
-        // Decode permissions (encrypted/encoded string from Portal)
-        $permissionsData = isset($data['perm']) ? self::decodePermissions($data['perm']) : array();
-
-        // Extract CRUD permissions (key => "C R U D") and menu permissions (array format)
-        $crudPermissions = array();
-        $menuPermissions = array();
-
-        // Check if permission is "*" (full access)
-        if ($permissionsData === '*' || (is_array($permissionsData) && count($permissionsData) === 1 && reset($permissionsData) === '*')) {
-            $crudPermissions = array('*' => '1 1 1 1');
-        } elseif (is_array($permissionsData)) {
-            foreach ($permissionsData as $item) {
-                if (is_array($item) && isset($item['controller'])) {
-                    // New format: {name, module, controller, action, root}
-                    $menuPermissions[] = $item;
-                    // Also create CRUD entry if action is defined
-                    if (isset($item['action'])) {
-                        $crudPermissions[$item['controller']] = $item['action'];
-                    }
-                } else {
-                    // Old format: key => "C R U D"
-                    // Keep as is
-                }
-            }
-
-            // If no menu permissions extracted, assume old format
-            if (empty($menuPermissions) && !empty($permissionsData)) {
-                $crudPermissions = $permissionsData;
-            }
-        }
-
-        // Auto-inherit permissions for related controllers
-        $crudPermissions = self::inheritRelatedPermissions($crudPermissions);
-
         $session[self::SESSION_USER_KEY] = $userData;
-        $session[self::SESSION_PERMISSIONS_KEY] = $crudPermissions;
-        $session['sso_menu_permissions'] = $menuPermissions;
         $session[self::SESSION_TOKEN_KEY] = $token;
         $session[self::SESSION_LAST_ACTIVITY_KEY] = time();
+
+        // Initialize empty permissions (will be fetched separately)
+        $session[self::SESSION_PERMISSIONS_KEY] = array();
+        $session['sso_menu_permissions'] = array();
 
         Yii::log('SSO login successful for user: ' . $userData['email'], CLogger::LEVEL_INFO, 'auth');
 
