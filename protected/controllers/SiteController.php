@@ -123,31 +123,41 @@ class SiteController extends Controller
      */
     public function actionDebugToken()
     {
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
         header('Content-Type: application/json');
-        $token = Yii::app()->request->getParam('token');
 
-        if (!$token) {
-            echo CJSON::encode(array('error' => 'No token provided'));
-            Yii::app()->end();
+        try {
+            $token = Yii::app()->request->getParam('token');
+
+            if (!$token) {
+                echo CJSON::encode(array('error' => 'No token provided. Use POST or pass shorter token.'));
+                Yii::app()->end();
+            }
+
+            // Decode without validation to see payload
+            $debug = AuthHandler::debugToken($token);
+
+            // Try to validate
+            $params = require Yii::getPathOfAlias('application.config') . '/params.php';
+            $secret = $params['portal']['jwt_secret'];
+
+            require_once Yii::getPathOfAlias('application.extensions.jwt') . '/JWT.php';
+            $payload = JWT::decode($token, $secret, 'HS256');
+
+            echo CJSON::encode(array(
+                'debug' => $debug,
+                'jwt_secret_length' => strlen($secret),
+                'validation_result' => $payload ? 'VALID' : 'INVALID',
+                'payload' => $payload,
+            ));
+        } catch (Exception $e) {
+            echo CJSON::encode(array(
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ));
         }
-
-        // Decode without validation to see payload
-        $debug = AuthHandler::debugToken($token);
-
-        // Try to validate
-        $params = require Yii::getPathOfAlias('application.config') . '/params.php';
-        $secret = $params['portal']['jwt_secret'];
-
-        require_once Yii::getPathOfAlias('application.extensions.jwt') . '/JWT.php';
-        $payload = JWT::decode($token, $secret, 'HS256');
-
-        echo CJSON::encode(array(
-            'debug' => $debug,
-            'jwt_secret_length' => strlen($secret),
-            'jwt_secret_first_10' => substr($secret, 0, 10),
-            'validation_result' => $payload ? 'VALID' : 'INVALID',
-            'payload' => $payload,
-        ));
         Yii::app()->end();
     }
 
