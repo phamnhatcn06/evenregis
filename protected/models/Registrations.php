@@ -130,10 +130,11 @@ class Registrations extends BaseRegistrations
 	public static function getStatusLabel($status)
 	{
 		$labels = array(
-			self::STATUS_DRAFT => '<span class="badge bg-secondary">Nháp</span>',
+			self::STATUS_DRAFT     => '<span class="badge bg-secondary">Nháp</span>',
 			self::STATUS_SUBMITTED => '<span class="badge bg-info">Đã nộp</span>',
-			self::STATUS_APPROVED => '<span class="badge bg-success">Đã duyệt</span>',
-			self::STATUS_REJECTED => '<span class="badge bg-danger">Từ chối</span>',
+			self::STATUS_APPROVED  => '<span class="badge bg-success">Đã duyệt</span>',
+			self::STATUS_REJECTED  => '<span class="badge bg-danger">Từ chối</span>',
+			self::STATUS_RETURNED  => '<span class="badge bg-warning text-dark">Trả về</span>',
 		);
 		return isset($labels[$status]) ? $labels[$status] : $status;
 	}
@@ -141,10 +142,21 @@ class Registrations extends BaseRegistrations
 	public static function getStatusList()
 	{
 		return array(
-			self::STATUS_DRAFT => 'Nháp',
+			self::STATUS_DRAFT     => 'Nháp',
 			self::STATUS_SUBMITTED => 'Đã nộp',
-			self::STATUS_APPROVED => 'Đã duyệt',
-			self::STATUS_REJECTED => 'Từ chối',
+			self::STATUS_APPROVED  => 'Đã duyệt',
+			self::STATUS_REJECTED  => 'Từ chối',
+			self::STATUS_RETURNED  => 'Trả về',
 		);
+	}
+
+	public function isEditable()
+	{
+		return in_array($this->status, array(self::STATUS_DRAFT, self::STATUS_RETURNED));
+	}
+
+	public function isSubmittable()
+	{
+		return in_array($this->status, array(self::STATUS_DRAFT, self::STATUS_RETURNED));
 	}
 }
