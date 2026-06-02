@@ -1314,7 +1314,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         btn.innerHTML = "<i class=\"fa fa-spinner fa-spin me-1\"></i>Đang lưu...";
 
         var formData = new FormData(form);
-        fetch("/admin/registrations/updateTalentEntry", {
+        fetch(window.BASE_URL + "/admin/registrations/updateTalentEntry", {
             method: "POST",
             body: formData
         })
