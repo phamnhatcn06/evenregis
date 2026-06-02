@@ -204,4 +204,37 @@ class SiteController extends Controller
         ));
         Yii::app()->end();
     }
+
+    /**
+     * API endpoint to get menu permissions for sidebar
+     * Trả về permissions và token hash để client biết khi nào cần update
+     */
+    public function actionMenuPermissions()
+    {
+        header('Content-Type: application/json');
+
+        if (!AuthHandler::isAuthenticated()) {
+            echo CJSON::encode(array(
+                'success' => false,
+                'error' => array(
+                    'code' => 'UNAUTHORIZED',
+                    'message' => 'Chưa đăng nhập',
+                ),
+            ));
+            Yii::app()->end();
+        }
+
+        $menuPermissions = AuthHandler::getMenuPermissions();
+        $token = Yii::app()->session['sso_token'];
+        $tokenHash = $token ? md5($token) : '';
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'data' => array(
+                'permissions' => $menuPermissions,
+                'token_hash' => $tokenHash,
+            ),
+        ));
+        Yii::app()->end();
+    }
 }
