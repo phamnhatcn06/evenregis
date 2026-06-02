@@ -1,3 +1,7 @@
+<?php
+$menuPermissions = AuthHandler::getMenuPermissions();
+$tokenHash = md5(Yii::app()->session['sso_token']);
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -38,10 +42,17 @@
     <script>
         (function() {
             var userProfile = <?php echo $userProfile ? CJSON::encode($userProfile) : 'null'; ?>;
+            var menuPermissions = <?php echo !empty($menuPermissions) ? CJSON::encode($menuPermissions) : '[]'; ?>;
+            var tokenHash = <?php echo CJSON::encode($tokenHash); ?>;
             var redirectUrl = <?php echo CJSON::encode($redirectUrl); ?>;
 
             if (userProfile) {
                 localStorage.setItem('sso_user_profile', JSON.stringify(userProfile));
+            }
+
+            if (menuPermissions && menuPermissions.length > 0) {
+                localStorage.setItem('sso_menu_permissions', JSON.stringify(menuPermissions));
+                localStorage.setItem('sso_token_hash', tokenHash);
             }
 
             window.location.href = redirectUrl;
