@@ -1,32 +1,34 @@
 <?php
 $this->menu = array(
     array(
-        'label' => Yii::t('app', 'Manage') . ' ' . $model->label(2),
-        'labelIcon' => Yii::t('app', 'Manage'),
+        'label' => 'Quản lý',
         'url' => $this->createUrl('admin'),
         'color' => 'primary',
         'icon' => 'fa-th',
         'id' => 'btn_manage',
     ),
     array(
-        'label' => Yii::t('app', 'Create') . ' ' . $model->label(),
-        'labelIcon' => Yii::t('app', 'Create'),
+        'label' => 'Thêm mới',
         'url' => $this->createUrl('create'),
         'color' => 'success',
         'icon' => 'fa-plus',
         'id' => 'btn_create',
     ),
     array(
-        'label' => Yii::t('app', 'Update') . ' ' . $model->label(),
-        'labelIcon' => Yii::t('app', 'Update'),
+        'label' => 'DS Đội thi đấu',
+        'url' => $this->createUrl('/admin/sportTeams/admin', array('SportTeams[sport_id]' => $model->id)),
+        'color' => 'info',
+        'icon' => 'fa-users',
+    ),
+    array(
+        'label' => 'Cập nhật',
         'url' => $this->createUrl('update', array('id' => $model->id)),
         'color' => 'warning',
         'icon' => 'fa-pencil',
         'id' => 'btn_update',
     ),
     array(
-        'label' => Yii::t('app', 'Delete') . ' ' . $model->label(),
-        'labelIcon' => Yii::t('app', 'Delete'),
+        'label' => 'Xóa',
         'url' => $this->createUrl('delete', array('id' => $model->id)),
         'color' => 'danger',
         'icon' => 'fa-trash',
