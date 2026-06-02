@@ -10,9 +10,14 @@ class BeautyContestsController extends AdminController
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
+        $contestants = BeautyContestants::getApiDataProvider(
+            array('contest_id' => $id),
+            10
+        );
 
         $this->render('view', array(
             'model' => $model,
+            'contestants' => $contestants,
         ));
     }
 
