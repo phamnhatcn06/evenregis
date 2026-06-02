@@ -348,6 +348,93 @@ class AuthHandler extends CApplicationComponent
     }
 
     /**
+     * Fetch permissions from SSO API and update session
+     * @param string $token JWT token
+     * @return bool Success or failure
+     */
+    public static function fetchPermissions($token)
+    {
+        $params = self::getParams();
+        $url = rtrim($params['portal']['api_url'], '/') . $params['portal']['sso_permissions_endpoint'];
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+            ),
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ));
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        Yii::log('SSO permissions API response: HTTP ' . $httpCode . ' | Body: ' . substr($response, 0, 500), CLogger::LEVEL_INFO, 'auth');
+
+        if ($error || $httpCode !== 200) {
+            Yii::log('SSO permissions API failed: ' . ($error ?: 'HTTP ' . $httpCode), CLogger::LEVEL_WARNING, 'auth');
+            return false;
+        }
+
+        $data = json_decode($response, true);
+        if (!is_array($data)) {
+            Yii::log('SSO permissions API invalid response', CLogger::LEVEL_WARNING, 'auth');
+            return false;
+        }
+
+        // Extract permissions from response
+        $permissionsData = isset($data['data']) ? $data['data'] : $data;
+
+        // Process permissions
+        $crudPermissions = array();
+        $menuPermissions = array();
+
+        if ($permissionsData === '*' || (is_array($permissionsData) && count($permissionsData) === 1 && reset($permissionsData) === '*')) {
+            $crudPermissions = array('*' => '1 1 1 1');
+        } elseif (is_array($permissionsData)) {
+            foreach ($permissionsData as $item) {
+                if (is_array($item) && isset($item['controller'])) {
+                    $menuPermissions[] = $item;
+                    if (isset($item['action'])) {
+                        $crudPermissions[$item['controller']] = $item['action'];
+                    }
+                }
+            }
+
+            if (empty($menuPermissions) && !empty($permissionsData)) {
+                $crudPermissions = $permissionsData;
+            }
+        }
+
+        // Auto-inherit permissions for related controllers
+        $crudPermissions = self::inheritRelatedPermissions($crudPermissions);
+
+        // Update session
+        $session = Yii::app()->session;
+        $session[self::SESSION_PERMISSIONS_KEY] = $crudPermissions;
+        $session['sso_menu_permissions'] = $menuPermissions;
+
+        Yii::log('Permissions loaded: ' . count($crudPermissions) . ' CRUD, ' . count($menuPermissions) . ' menu items', CLogger::LEVEL_INFO, 'auth');
+
+        return true;
+    }
+
+    /**
+     * Get menu permissions for rendering sidebar
+     * @return array
+     */
+    public static function getMenuPermissions()
+    {
+        $session = Yii::app()->session;
+        return isset($session['sso_menu_permissions']) ? $session['sso_menu_permissions'] : array();
+    }
+
+    /**
      * Fetch full user profile from SSO API
      * @param string $token JWT token
      * @return array|null User profile data or null on failure
