@@ -29,6 +29,30 @@ $attributes = array(
 );
 ?>
 
+<?php if ((int)$model->status === Registrations::STATUS_RETURNED): ?>
+<div class="alert alert-warning d-flex align-items-start mb-3" role="alert">
+    <i class="fa fa-exclamation-triangle fa-lg me-3 mt-1 text-warning"></i>
+    <div>
+        <strong>Phiếu đã được trả về đơn vị để chỉnh sửa.</strong>
+        <?php if (!empty($model->rejection_reason)): ?>
+            <div class="mt-1">Lý do: <?php echo CHtml::encode($model->rejection_reason); ?></div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if ((int)$model->status === Registrations::STATUS_REJECTED): ?>
+<div class="alert alert-danger d-flex align-items-start mb-3" role="alert">
+    <i class="fa fa-times-circle fa-lg me-3 mt-1"></i>
+    <div>
+        <strong>Phiếu đã bị từ chối.</strong>
+        <?php if (!empty($model->rejection_reason)): ?>
+            <div class="mt-1">Lý do: <?php echo CHtml::encode($model->rejection_reason); ?></div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="row mb-3">
     <div class="col-md-8">
         <div class="card h-100">
