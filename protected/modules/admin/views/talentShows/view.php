@@ -13,6 +13,12 @@ $this->menu = array(
         'id' => 'btn_manage',
     ),
     array(
+        'label' => 'DS Tiết mục',
+        'url' => $this->createUrl('/admin/talentEntries/admin', array('TalentEntries[show_id]' => $model->id)),
+        'color' => 'info',
+        'icon' => 'fa-music',
+    ),
+    array(
         'label' => 'Cập nhật',
         'url' => $this->createUrl('update', array('id' => $model->id)),
         'color' => 'warning',
