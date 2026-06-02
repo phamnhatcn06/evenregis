@@ -43,6 +43,9 @@ class SiteController extends Controller
             AuthHandler::logout();
             $userData = AuthHandler::handleCallback($ssoToken);
             if ($userData) {
+                // Fetch permissions from SSO API
+                AuthHandler::fetchPermissions($ssoToken);
+
                 // Fetch full user profile from SSO API
                 $userProfile = AuthHandler::fetchUserProfile($ssoToken);
 
