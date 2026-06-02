@@ -1530,7 +1530,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         input.removeClass("border-success border-danger");
 
         $.ajax({
-            url: "/admin/registrations/updateContestantEmail",
+            url: window.BASE_URL + "/admin/registrations/updateContestantEmail",
             type: "POST",
             data: {
                 contestant_id: contestantId,
