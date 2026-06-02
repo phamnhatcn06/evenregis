@@ -120,7 +120,7 @@ $perColumn = ceil($totalAttrs / $columns);
 </div>
 
 <?php if ($model->description): ?>
-<div class="card">
+<div class="card mb-3">
     <div class="card-header">
         <h5 class="mb-0"><i class="fa fa-file-text-o me-2"></i>Mô tả</h5>
     </div>
@@ -129,3 +129,47 @@ $perColumn = ceil($totalAttrs / $columns);
     </div>
 </div>
 <?php endif; ?>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách thí sinh đăng ký (<?php echo $registrations->getTotalItemCount(); ?>)</h5>
+        <a href="<?php echo $this->createUrl('/admin/competitionRegistrations/admin', array('CompetitionRegistrations[competition_id]' => $model->id)); ?>" class="btn btn-sm btn-outline-primary">
+            <i class="fa fa-list me-1"></i>Xem tất cả
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:80px">SBD</th>
+                        <th>Họ tên</th>
+                        <th>Đơn vị</th>
+                        <th style="width:120px">Trạng thái</th>
+                        <th style="width:140px">Ngày đăng ký</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $items = $registrations->getData();
+                    if (empty($items)):
+                    ?>
+                    <tr><td colspan="5" class="text-center text-muted py-4">Chưa có thí sinh đăng ký</td></tr>
+                    <?php else: foreach ($items as $reg): ?>
+                    <tr>
+                        <td><strong><?php echo CHtml::encode($reg->candidate_number ?: '-'); ?></strong></td>
+                        <td>
+                            <a href="<?php echo $this->createUrl('/admin/competitionRegistrations/view', array('id' => $reg->id)); ?>">
+                                <?php echo CHtml::encode(isset($reg->attendee) ? $reg->attendee->full_name : $reg->attendee_id); ?>
+                            </a>
+                        </td>
+                        <td><?php echo CHtml::encode(isset($reg->property_name) ? $reg->property_name : ''); ?></td>
+                        <td><?php echo CompetitionRegistrations::getStatusLabel($reg->status); ?></td>
+                        <td><?php echo MyHelper::formatDateTime($reg->registered_at); ?></td>
+                    </tr>
+                    <?php endforeach; endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
