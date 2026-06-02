@@ -206,6 +206,56 @@ class SiteController extends Controller
     }
 
     /**
+     * Debug permissions - xem raw response từ SSO API
+     */
+    public function actionDebugPermissions()
+    {
+        header('Content-Type: application/json');
+
+        $session = Yii::app()->session;
+        $token = isset($session['sso_token']) ? $session['sso_token'] : null;
+
+        if (!$token) {
+            echo CJSON::encode(array('error' => 'No token in session'));
+            Yii::app()->end();
+        }
+
+        $params = require Yii::getPathOfAlias('application.config') . '/params.php';
+        $url = rtrim($params['portal']['api_url'], '/') . $params['portal']['sso_permissions_endpoint'];
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+            ),
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ));
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        $menuPermissions = AuthHandler::getMenuPermissions();
+        $crudPermissions = AuthHandler::getPermissions();
+
+        echo CJSON::encode(array(
+            'api_url' => $url,
+            'http_code' => $httpCode,
+            'curl_error' => $error,
+            'raw_response' => $response,
+            'parsed_response' => json_decode($response, true),
+            'session_menu_permissions' => $menuPermissions,
+            'session_crud_permissions' => $crudPermissions,
+        ));
+        Yii::app()->end();
+    }
+
+    /**
      * API endpoint to get menu permissions for sidebar
      * Trả về permissions và token hash để client biết khi nào cần update
      */
