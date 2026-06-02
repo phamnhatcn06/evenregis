@@ -262,60 +262,6 @@ class AuthHandler extends CApplicationComponent
     }
 
     /**
-     * Decode permissions string from Portal (AES encrypted)
-     * @param string $permString Base64 encoded AES encrypted string
-     * @return array
-     */
-    private static function decodePermissions($permString)
-    {
-        $params = self::getParams();
-        $secretKey = $params['portal']['jwt_secret'];
-
-        try {
-            // Derive key using SHA256 (same as C# DeriveKey)
-            $key = hash('sha256', $secretKey, true);
-
-            // Decode base64
-            $encrypted = base64_decode($permString);
-            if ($encrypted === false || strlen($encrypted) < 16) {
-                return array();
-            }
-
-            // Extract IV (first 16 bytes) and ciphertext
-            $iv = substr($encrypted, 0, 16);
-            $ciphertext = substr($encrypted, 16);
-
-            // Decrypt using AES-256-CBC
-            $decrypted = openssl_decrypt($ciphertext, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
-            if ($decrypted === false) {
-                Yii::log('Permission decryption failed', CLogger::LEVEL_WARNING, 'auth');
-                return array();
-            }
-
-            // Parse JSON
-            $permissions = json_decode($decrypted, true);
-            if (!is_array($permissions)) {
-                return array();
-            }
-
-            return $permissions;
-        } catch (Exception $e) {
-            Yii::log('Permission decode error: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'auth');
-            return array();
-        }
-    }
-
-    /**
-     * Debug: decrypt and show permissions
-     * @param string $permString
-     * @return array
-     */
-    public static function debugPermissions($permString)
-    {
-        return self::decodePermissions($permString);
-    }
-
-    /**
      * Debug: decode token without validation to see raw payload
      * @param string $token
      * @return array
