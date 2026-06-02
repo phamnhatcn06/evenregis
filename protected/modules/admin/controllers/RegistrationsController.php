@@ -776,7 +776,7 @@ class RegistrationsController extends AdminController
 			$reviewedAt = time();
 			$model->reviewed_at = $reviewedAt;
 			$ssoUser = AuthHandler::getUser();
-			$reviewedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			$reviewedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 			if ($reviewedBy) {
 				$model->reviewed_by = $reviewedBy;
 			}
@@ -833,7 +833,7 @@ class RegistrationsController extends AdminController
 		if ($model) {
 			$ssoUser = AuthHandler::getUser();
 			$model->status = AllianceRequests::STATUS_REJECTED;
-			$model->reviewed_by = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			$model->reviewed_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 			$model->reviewed_at = date('Y-m-d H:i:s');
 			$model->rejection_reason = Yii::app()->getRequest()->getParam('rejection_reason', '');
 
@@ -1230,7 +1230,7 @@ class RegistrationsController extends AdminController
 		}
 
 		$ssoUser = AuthHandler::getUser();
-		$createdBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+		$createdBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
 		$registration = Registrations::fetchFromApi($registrationId);
 		if (!$registration) {
