@@ -11,7 +11,7 @@ return array(
     // Portal SSO Configuration
     'portal' => array(
         'url' => 'https://portal.muongthanh.vn',
-        'api_url' => 'https://api.portal.muongthanh.vn',
+        'api_url' => 'http://localhost:6689',
         'sso_me_endpoint' => '/api/sso/me',
         'sso_permissions_endpoint' => '/api/sso/permissions/me',
         'jwt_secret' => getenv('JWT_SECRET') ?: 'B7BFCA89BF11459E898B26310C2794E6819FB0AD0565B4C3',

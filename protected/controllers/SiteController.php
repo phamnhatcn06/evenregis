@@ -37,7 +37,6 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $ssoToken = Yii::app()->request->getParam('sso_token');
-
         if ($ssoToken) {
             // Clear old session before processing new token
             AuthHandler::logout();
