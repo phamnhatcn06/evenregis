@@ -802,6 +802,55 @@ function returnRegistration() {
     });
 }
 
+function rejectRegistration() {
+    Swal.fire({
+        title: 'Từ chối đăng ký',
+        html: '<div class=\"text-start\"><p class=\"mb-2\">Hành động này sẽ <strong>từ chối vĩnh viễn</strong> phiếu đăng ký. Đơn vị sẽ không thể gửi lại.</p></div>',
+        input: 'textarea',
+        inputLabel: 'Lý do từ chối',
+        inputPlaceholder: 'Nhập lý do từ chối...',
+        inputAttributes: { 'aria-label': 'Lý do từ chối' },
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Từ chối',
+        cancelButtonText: 'Hủy',
+        allowOutsideClick: false,
+        showLoaderOnConfirm: true,
+        inputValidator: function(value) {
+            if (!value || !value.trim()) {
+                return 'Vui lòng nhập lý do từ chối!';
+            }
+        },
+        preConfirm: function(reason) {
+            return new Promise(function(resolve, reject) {
+                $.post('{$rejectUrl}', { registration_id: registrationId, reason: reason }, function(response) {
+                    resolve(response);
+                }, 'json').fail(function() {
+                    reject('Có lỗi xảy ra khi gọi API.');
+                });
+            }).catch(function(error) {
+                Swal.showValidationMessage(error);
+            });
+        }
+    }).then(function(result) {
+        if (result.isConfirmed && result.value) {
+            if (result.value.success) {
+                Swal.fire({
+                    title: 'Đã từ chối!',
+                    text: result.value.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(function() {
+                    window.location.href = '{$adminUrl}';
+                });
+            } else {
+                Toast.error(result.value.error || 'Có lỗi xảy ra.');
+            }
+        }
+    });
+}
+
 function approveAllAttendees() {
     Swal.fire({
         title: 'Duyệt tất cả người tham dự',
