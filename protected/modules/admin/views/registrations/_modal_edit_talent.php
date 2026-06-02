@@ -8,8 +8,6 @@
             </div>
             <form id="editTalentForm" method="post">
                 <div class="modal-body">
-                    <input type="hidden" name="talent_entry_id" id="edit_talent_id">
-
                     <div class="row">
                         <!-- Cột trái: Form fields -->
                         <div class="col-md-12">

@@ -39,7 +39,6 @@ class TalentEntries extends BaseTalentEntries
     public function attributeLabels()
     {
         return array(
-            'id' => 'ID',
             'show_id' => 'Hội diễn',
             'property_id' => 'Đơn vị',
             'category_id' => 'Thể loại',
@@ -90,6 +89,7 @@ class TalentEntries extends BaseTalentEntries
     public function storeViaApi()
     {
         $data = $this->attributes;
+        $data['category_id'] = $this->category_id;
         $data['director'] = $this->director;
         $data['director_phone'] = $this->director_phone;
         $data['origin'] = $this->origin;
@@ -108,12 +108,14 @@ class TalentEntries extends BaseTalentEntries
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
         });
+
         return ApiClient::post(ApiEndpoints::TALENT_ENTRY_STORE, $data);
     }
 
     public function updateViaApi()
     {
         $data = $this->attributes;
+        $data['category_id'] = $this->category_id;
         $data['director'] = $this->director;
         $data['director_phone'] = $this->director_phone;
         $data['origin'] = $this->origin;
@@ -125,7 +127,7 @@ class TalentEntries extends BaseTalentEntries
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
         });
-
+        unset($data['id']);
         $url = ApiEndpoints::url(ApiEndpoints::TALENT_ENTRY_UPDATE, array('id' => $this->id));
         return ApiClient::post($url, $data);
     }

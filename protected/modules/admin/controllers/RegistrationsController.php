@@ -662,6 +662,8 @@ class RegistrationsController extends AdminController
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
 			$model = $this->loadModelById($id);
 			$submittedAt = date('Y-m-d H:i:s');
+			var_dump($submittedAt);
+			die;
 			$ssoUser = AuthHandler::getUser();
 			$submittedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
@@ -1784,18 +1786,12 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
-	public function actionUpdateTalentEntry()
+	public function actionUpdateTalentEntry($id)
 	{
 		header('Content-Type: application/json');
 
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
 			echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
-			Yii::app()->end();
-		}
-
-		$id = Yii::app()->request->getPost('talent_entry_id');
-		if (!$id) {
-			echo CJSON::encode(array('success' => false, 'message' => 'Thiếu ID tiết mục.'));
 			Yii::app()->end();
 		}
 
@@ -1830,12 +1826,7 @@ class RegistrationsController extends AdminController
 		$entry->note = Yii::app()->request->getPost('note', $entry->note);
 
 		// Log request details to find the exact reason for the failure
-		Yii::log("updateTalentEntry POST data: " . CJSON::encode($_POST), 'info', 'application.registration');
-		Yii::log("updateTalentEntry entry model attributes: " . CJSON::encode($entry->attributes), 'info', 'application.registration');
-
 		$result = $entry->updateViaApi();
-		Yii::log("updateTalentEntry updateViaApi result: " . CJSON::encode($result), 'info', 'application.registration');
-
 		if ($result['success']) {
 			// Xóa các thành viên cũ
 			$oldMembers = TalentEntryMembers::getApiDataProvider(array('entry_id' => $id), 100)->getData();
@@ -2653,7 +2644,7 @@ class RegistrationsController extends AdminController
 		);
 
 		$allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
-		$maxSize = 10 * 1024 * 1024; // Increase to 10MB to support PDF contracts
+		$maxSize = 50 * 1024 * 1024; // Increase to 10MB to support PDF contracts
 
 		foreach ($fileFields as $fieldName => $attrName) {
 			if (!isset($_FILES[$fieldName]) || $_FILES[$fieldName]['error'] === UPLOAD_ERR_NO_FILE) {

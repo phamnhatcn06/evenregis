@@ -37,40 +37,47 @@
  * @property TalentEntryMembers[] $talentEntryMembers
  * @property TalentScores[] $talentScores
  */
-abstract class BaseTalentEntries extends GxActiveRecord {
+abstract class BaseTalentEntries extends GxActiveRecord
+{
 
-	public static function model($className=__CLASS__) {
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	public function tableName() {
+	public function tableName()
+	{
 		return 'talent_entries';
 	}
 
-	public static function label($n = 1) {
+	public static function label($n = 1)
+	{
 		return Yii::t('app', 'TalentEntries|TalentEntries', $n);
 	}
 
-	public static function representingColumn() {
+	public static function representingColumn()
+	{
 		return 'title';
 	}
 
-	public function rules() {
+	public function rules()
+	{
 		return array(
 			array('show_id, category_id, property_id, title', 'required'),
-			array('duration_seconds, performance_order, final_rank', 'numerical', 'integerOnly'=>true),
+			array('duration_seconds, performance_order, final_rank', 'numerical', 'integerOnly' => true),
 			array('final_score', 'numerical'),
-			array('show_id, category_id, property_id, approved_by', 'length', 'max'=>20),
-			array('title, award', 'length', 'max'=>255),
-			array('music_path, video_path', 'length', 'max'=>500),
-			array('status', 'length', 'max'=>9),
+			array('show_id, category_id, property_id, approved_by', 'length', 'max' => 20),
+			array('title, award', 'length', 'max' => 255),
+			array('music_path, video_path', 'length', 'max' => 500),
+			array('status', 'length', 'max' => 9),
 			array('description, note, submitted_at, approved_at, created_at, updated_at, deleted_at', 'safe'),
 			array('description, duration_seconds, music_path, video_path, performance_order, status, final_score, final_rank, award, note, submitted_at, approved_by, approved_at, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, show_id, category_id, property_id, title, description, duration_seconds, music_path, video_path, performance_order, status, final_score, final_rank, award, note, submitted_at, approved_by, approved_at, created_at, updated_at, deleted_at', 'safe', 'on'=>'search'),
+			array('show_id, category_id, property_id, title, description, duration_seconds, music_path, video_path, performance_order, status, final_score, final_rank, award, note, submitted_at, approved_by, approved_at, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 
-	public function relations() {
+	public function relations()
+	{
 		return array(
 			'category' => array(self::BELONGS_TO, 'TalentCategories', 'category_id'),
 			'property' => array(self::BELONGS_TO, 'Properties', 'property_id'),
@@ -80,14 +87,14 @@ abstract class BaseTalentEntries extends GxActiveRecord {
 		);
 	}
 
-	public function pivotModels() {
-		return array(
-		);
+	public function pivotModels()
+	{
+		return array();
 	}
 
-	public function attributeLabels() {
+	public function attributeLabels()
+	{
 		return array(
-			'id' => Yii::t('app', 'ID'),
 			'show_id' => null,
 			'category_id' => null,
 			'property_id' => null,
@@ -116,10 +123,9 @@ abstract class BaseTalentEntries extends GxActiveRecord {
 		);
 	}
 
-	public function search() {
+	public function search()
+	{
 		$criteria = new CDbCriteria;
-
-		$criteria->compare('id', $this->id, true);
 		$criteria->compare('show_id', $this->show_id);
 		$criteria->compare('category_id', $this->category_id);
 		$criteria->compare('property_id', $this->property_id);

@@ -1285,7 +1285,9 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         var container = document.getElementById("videoContainer");
         container.innerHTML = "";
     }
+    var currentEditingTalentId = null;
     function editTalentEntry(id) {
+        currentEditingTalentId = id;
         fetch(window.BASE_URL + "/admin/registrations/getTalentEntry?id=" + id, {
             headers: { "X-Requested-With": "XMLHttpRequest" }
         })
@@ -1302,7 +1304,6 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
                         var el = document.getElementById(id);
                         if (el) el.value = val || "";
                     };
-                    setVal("edit_talent_id", entry.id);
                     setVal("edit_talent_title", entry.title);
                     setVal("edit_talent_category", entry.category_id);
                     setVal("edit_talent_duration", entry.duration_seconds);
@@ -1348,7 +1349,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         btn.innerHTML = "<i class=\"fa fa-spinner fa-spin me-1\"></i>Đang lưu...";
 
         var formData = new FormData(form);
-        fetch(window.BASE_URL + "/admin/registrations/updateTalentEntry", {
+        fetch(window.BASE_URL + "/admin/registrations/updateTalentEntry?id=" + currentEditingTalentId, {
             method: "POST",
             body: formData,
             headers: { "X-Requested-With": "XMLHttpRequest" }
@@ -1362,8 +1363,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
                 if (modal) modal.hide();
 
                 // Cập nhật dòng tương ứng trong bảng trực tiếp
-                var entryId = document.getElementById("edit_talent_id").value;
-                var row = document.getElementById("talent-row-" + entryId);
+                var row = document.getElementById("talent-row-" + currentEditingTalentId);
                 if (row) {
                     var titleVal = document.getElementById("edit_talent_title").value;
                     var catSelect = document.getElementById("edit_talent_category");

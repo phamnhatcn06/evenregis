@@ -11,6 +11,7 @@ return array(
     'theme' => 'hope-ui',
     'sourceLanguage' => 'en',
     'language' => 'vi',
+    'timeZone' => 'Asia/Ho_Chi_Minh',
     'defaultController' => 'site',
     // preloading 'log' component
     'preload' => array('log', 'chartjs'),

@@ -188,35 +188,29 @@ $appName = Yii::app()->name;
                     $flashInfo = Yii::app()->user->getFlash('info');
                     if ($flashSuccess || $flashError || $flashWarning || $flashInfo):
                     ?>
-                    <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        <?php if ($flashSuccess): ?>
-                        Toast.success('<?php echo addslashes($flashSuccess); ?>');
-                        <?php endif; ?>
-                        <?php if ($flashError): ?>
-                        Toast.error('<?php echo addslashes($flashError); ?>');
-                        <?php endif; ?>
-                        <?php if ($flashWarning): ?>
-                        Toast.warning('<?php echo addslashes($flashWarning); ?>');
-                        <?php endif; ?>
-                        <?php if ($flashInfo): ?>
-                        Toast.info('<?php echo addslashes($flashInfo); ?>');
-                        <?php endif; ?>
-                    });
-                    </script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                <?php if ($flashSuccess): ?>
+                                    Toast.success('<?php echo addslashes($flashSuccess); ?>');
+                                <?php endif; ?>
+                                <?php if ($flashError): ?>
+                                    Toast.error('<?php echo addslashes($flashError); ?>');
+                                <?php endif; ?>
+                                <?php if ($flashWarning): ?>
+                                    Toast.warning('<?php echo addslashes($flashWarning); ?>');
+                                <?php endif; ?>
+                                <?php if ($flashInfo): ?>
+                                    Toast.info('<?php echo addslashes($flashInfo); ?>');
+                                <?php endif; ?>
+                            });
+                        </script>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-body">
-                <ul class="left-panel list-inline mb-0 p-0">
-                    <li class="list-inline-item">&copy; <?php echo date('Y'); ?> <?php echo CHtml::encode($appName); ?></li>
-                </ul>
-            </div>
-        </footer>
+
     </main>
 
     <!-- Scripts -->
@@ -233,22 +227,22 @@ $appName = Yii::app()->name;
     <script src="<?php echo $baseUrl; ?>/assets/js/plugins/toast.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-    function confirmDelete(formId) {
-        Swal.fire({
-            title: 'Xác nhận xóa',
-            text: 'Bạn có chắc chắn muốn xóa? Hành động này không thể hoàn tác.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy'
-        }).then(function(result) {
-            if (result.isConfirmed) {
-                document.getElementById(formId).submit();
-            }
-        });
-    }
+        function confirmDelete(formId) {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: 'Bạn có chắc chắn muốn xóa? Hành động này không thể hoàn tác.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        }
     </script>
     <script>
         (function() {

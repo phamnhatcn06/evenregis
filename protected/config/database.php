@@ -13,4 +13,7 @@ return array(
     'charset' => 'utf8',
     'enableParamLogging' => true,
     'enableProfiling' => true,
+    'initSQLs' => array(
+        "SET time_zone = '+07:00'",
+    ),
 );
