@@ -61,10 +61,13 @@ $attributes = array(
                 <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED): ?>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-success btn-sm px-3" onclick="approveRegistration()">
-                            <i class="fa fa-check-circle me-1"></i>Duyệt đăng ký
+                            <i class="fa fa-check-circle me-1"></i>Duyệt
                         </button>
                         <button type="button" class="btn btn-outline-warning btn-sm px-3" onclick="returnRegistration()">
-                            <i class="fa fa-undo me-1"></i>Trả lại
+                            <i class="fa fa-undo me-1"></i>Trả về
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm px-3" onclick="rejectRegistration()">
+                            <i class="fa fa-ban me-1"></i>Từ chối
                         </button>
                     </div>
                 <?php endif; ?>
