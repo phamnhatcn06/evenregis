@@ -16,8 +16,14 @@ class SportsController extends AdminController
 	public function actionView($id)
 	{
 		$model = $this->loadModelById($id);
+		$teams = SportTeams::getApiDataProvider(
+			array('sport_id' => $id),
+			10
+		);
+
 		$this->render('view', array(
 			'model' => $model,
+			'teams' => $teams,
 		));
 	}
 
