@@ -1316,7 +1316,8 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         var formData = new FormData(form);
         fetch(window.BASE_URL + "/admin/registrations/updateTalentEntry", {
             method: "POST",
-            body: formData
+            body: formData,
+            headers: { "X-Requested-With": "XMLHttpRequest" }
         })
         .then(function(res) { return res.json(); })
         .then(function(data) {
