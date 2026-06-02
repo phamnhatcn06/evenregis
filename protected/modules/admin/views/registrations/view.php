@@ -1068,11 +1068,17 @@ foreach ($registrationDetails as $detail) {
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Chọn tệp <span class="text-danger">*</span></label>
-                        <input type="file" class="form-control" name="documents[]" id="upload_documents" multiple required>
-                        <small class="text-muted">Hỗ trợ: JPG, PNG, PDF, DOC, DOCX, XLS, XLSX (tối đa 10MB/tệp)</small>
+                        <label class="form-label fw-bold">Chọn tệp đính kèm <span class="text-danger">*</span></label>
+                        <div class="premium-upload-zone">
+                            <input type="file" name="documents[]" id="upload_documents" multiple required>
+                            <div class="upload-info">
+                                <i class="fa fa-cloud-upload upload-icon text-primary"></i>
+                                <div class="upload-title">Kéo thả các tệp vào đây hoặc click để chọn</div>
+                                <div class="upload-hint">JPG, PNG, PDF, DOC, DOCX, XLS, XLSX (Tối đa 10MB/tệp)</div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="upload_preview" class="row g-2"></div>
+                    <div id="upload_preview" class="row g-2 mt-2"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>

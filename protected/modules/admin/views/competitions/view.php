@@ -20,6 +20,12 @@ $this->menu = array(
         'id' => 'btn_create',
     ),
     array(
+        'label' => 'DS Đăng ký',
+        'url' => $this->createUrl('/admin/competitionRegistrations/admin', array('CompetitionRegistrations[competition_id]' => $model->id)),
+        'color' => 'info',
+        'icon' => 'fa-users',
+    ),
+    array(
         'label' => 'Cập nhật',
         'url' => $this->createUrl('update', array('id' => $model->id)),
         'color' => 'warning',

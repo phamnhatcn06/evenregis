@@ -85,25 +85,52 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Ảnh chân dung (530x530px)</label>
-                                <div id="edit_portrait_preview" class="mb-2"></div>
-                                <input type="file" class="form-control" name="portrait_file" accept="image/*">
-                                <small class="text-muted">Để trống nếu không thay đổi</small>
+                                <label class="form-label fw-bold">Ảnh chân dung (530x530px)</label>
+                                <div id="edit_portrait_preview" class="premium-preview-box"></div>
+                                <div class="premium-upload-zone">
+                                    <input type="file" name="portrait_file" accept="image/*">
+                                    <div class="upload-info">
+                                        <i class="fa fa-user-circle-o upload-icon"></i>
+                                        <div class="upload-title">Kéo thả ảnh hoặc click để chọn</div>
+                                        <div class="upload-hint">Để trống nếu không thay đổi (Tối đa 5MB)</div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Ảnh CCCD mặt trước</label>
-                                <div id="edit_cccd_front_preview" class="mb-2"></div>
-                                <input type="file" class="form-control" name="cccd_front_file" accept="image/*">
+                                <label class="form-label fw-bold">Ảnh CCCD mặt trước</label>
+                                <div id="edit_cccd_front_preview" class="premium-preview-box"></div>
+                                <div class="premium-upload-zone">
+                                    <input type="file" name="cccd_front_file" accept="image/*">
+                                    <div class="upload-info">
+                                        <i class="fa fa-id-card upload-icon"></i>
+                                        <div class="upload-title">Kéo thả ảnh hoặc click để chọn</div>
+                                        <div class="upload-hint">Để trống nếu không thay đổi (Tối đa 5MB)</div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Ảnh CCCD mặt sau</label>
-                                <div id="edit_cccd_back_preview" class="mb-2"></div>
-                                <input type="file" class="form-control" name="cccd_back_file" accept="image/*">
+                                <label class="form-label fw-bold">Ảnh CCCD mặt sau</label>
+                                <div id="edit_cccd_back_preview" class="premium-preview-box"></div>
+                                <div class="premium-upload-zone">
+                                    <input type="file" name="cccd_back_file" accept="image/*">
+                                    <div class="upload-info">
+                                        <i class="fa fa-id-card upload-icon"></i>
+                                        <div class="upload-title">Kéo thả ảnh hoặc click để chọn</div>
+                                        <div class="upload-hint">Để trống nếu không thay đổi (Tối đa 5MB)</div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Hợp đồng lao động</label>
-                                <div id="edit_contract_preview" class="mb-2"></div>
-                                <input type="file" class="form-control" name="contract_file" accept="image/*,.pdf">
+                                <label class="form-label fw-bold">Hợp đồng lao động</label>
+                                <div id="edit_contract_preview" class="premium-preview-box"></div>
+                                <div class="premium-upload-zone">
+                                    <input type="file" name="contract_file" accept="image/*,.pdf">
+                                    <div class="upload-info">
+                                        <i class="fa fa-file-text-o upload-icon"></i>
+                                        <div class="upload-title">Kéo thả file hoặc click để chọn</div>
+                                        <div class="upload-hint">Để trống nếu không thay đổi (Tối đa 5MB)</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

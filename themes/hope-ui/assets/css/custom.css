@@ -655,3 +655,176 @@ select:focus {
 .errorSummary li:last-child {
   margin-bottom: 0;
 }
+
+/* Premium File Upload Modern Styling */
+.premium-upload-zone {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.premium-upload-zone:hover {
+  border-color: #3a57e8;
+  background-color: rgba(58, 87, 232, 0.04);
+  box-shadow: 0 4px 12px rgba(58, 87, 232, 0.08);
+}
+
+.premium-upload-zone input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.premium-upload-zone .upload-icon {
+  font-size: 2.25rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  transition: transform 0.25s ease-in-out, color 0.25s ease-in-out;
+}
+
+.premium-upload-zone:hover .upload-icon {
+  color: #3a57e8;
+  transform: translateY(-3px) scale(1.05);
+}
+
+.premium-upload-zone .upload-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.premium-upload-zone .upload-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Beautiful preview container styling */
+.premium-preview-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  min-height: 80px;
+  padding: 0.5rem;
+}
+
+.premium-preview-box:empty {
+  display: none;
+}
+
+.premium-preview-box img {
+  max-height: 110px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-preview-box img:hover {
+  transform: scale(1.05);
+}
+
+.premium-preview-box .badge {
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Dynamic uploads preview in main documents popup */
+#upload_preview > div {
+  margin-bottom: 0.5rem;
+}
+
+#upload_preview .border {
+  border-color: #cbd5e1 !important;
+  background-color: #f8fafc !important;
+  border-radius: 10px !important;
+  padding: 0.75rem !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+#upload_preview .border:hover {
+  border-color: #3a57e8 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(58, 87, 232, 0.08);
+}
+
+#upload_preview img {
+  border-radius: 6px;
+}
+
+#upload_preview i {
+  font-size: 1.75rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+/* Document upload widget inside attendees form (CCCD grid) */
+.document-upload-widget .upload-box {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 1.25rem 1rem !important;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.document-upload-widget .upload-box:hover {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.document-upload-widget .preview-box {
+  background: #f8fafc !important;
+  border: 1px dashed #cbd5e1 !important;
+  border-radius: 10px !important;
+  height: 110px !important;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.document-upload-widget .preview-box img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.2s ease;
+}
+
+.document-upload-widget .preview-box img:hover {
+  transform: scale(1.05);
+}
+
+.document-upload-widget .doc-upload {
+  margin-top: 0.75rem;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  font-size: 0.8rem !important;
+  padding: 0.35rem 0.5rem !important;
+}
+
+.document-upload-widget .doc-upload:focus {
+  border-color: #3a57e8 !important;
+  box-shadow: 0 0 0 0.15rem rgba(58, 87, 232, 0.15) !important;
+}
