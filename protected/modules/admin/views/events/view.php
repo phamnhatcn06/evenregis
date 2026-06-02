@@ -312,12 +312,7 @@ $perColumn = ceil($totalAttrs / $columns);
                                                                 <ul class="list-unstyled ms-3">
                                                                     <?php foreach ($sports as $es): ?>
                                                                         <li class="d-flex justify-content-between align-items-center mb-1">
-                                                                            <span>
-                                                                                <i class="fa fa-futbol-o me-1"></i><?php echo CHtml::encode($es['sport_name']); ?>
-                                                                                <a href="<?php echo Yii::app()->createUrl('/admin/sportTeams/admin', array('SportTeams[event_id]' => $model->id, 'SportTeams[sport_id]' => $es['sport_id'])); ?>" class="badge bg-info ms-1" title="Xem danh sách đội">
-                                                                                    <i class="fa fa-users"></i>
-                                                                                </a>
-                                                                            </span>
+                                                                            <span><i class="fa fa-futbol-o me-1"></i><?php echo CHtml::encode($es['sport_name']); ?></span>
                                                                             <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeSport', array('id' => $model->id, 'sportId' => $es['id'])); ?>" style="display:inline;" id="form-remove-sport-<?php echo $es['id']; ?>">
                                                                                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-sport-<?php echo $es['id']; ?>')">
                                                                                     <i class="fa fa-times"></i>
