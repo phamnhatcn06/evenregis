@@ -258,7 +258,12 @@ $perColumn = ceil($totalAttrs / $columns);
                                                 <ul class="list-unstyled mb-2">
                                                     <?php foreach ($eventCompetitions as $ecomp): ?>
                                                         <li class="d-flex justify-content-between align-items-center mb-1">
-                                                            <span><i class="fa fa-trophy me-1"></i><?php echo CHtml::encode($ecomp['competition_name']); ?></span>
+                                                            <span>
+                                                                <i class="fa fa-trophy me-1"></i><?php echo CHtml::encode($ecomp['competition_name']); ?>
+                                                                <a href="<?php echo Yii::app()->createUrl('/admin/competitionRegistrations/admin', array('CompetitionRegistrations[competition_id]' => $ecomp['competition_id'])); ?>" class="badge bg-info ms-1" title="Xem danh sách thí sinh">
+                                                                    <i class="fa fa-users"></i>
+                                                                </a>
+                                                            </span>
                                                             <form method="post" action="<?php echo Yii::app()->createUrl('admin/events/removeCompetition', array('id' => $model->id, 'competitionId' => $ecomp['id'])); ?>" style="display:inline;" id="form-remove-comp-<?php echo $ecomp['id']; ?>">
                                                                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="confirmDelete('form-remove-comp-<?php echo $ecomp['id']; ?>')">
                                                                     <i class="fa fa-times"></i>
