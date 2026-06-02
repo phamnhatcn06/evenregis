@@ -1276,19 +1276,23 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
             .then(function(data) {
                 if (data.success && data.data) {
                     var entry = data.data;
-                    document.getElementById("edit_talent_id").value = entry.id;
-                    document.getElementById("edit_talent_title").value = entry.title || "";
-                    document.getElementById("edit_talent_category").value = entry.category_id || "";
-                    document.getElementById("edit_talent_duration").value = entry.duration_seconds || "";
-                    document.getElementById("edit_talent_director").value = entry.director || "";
-                    document.getElementById("edit_talent_director_phone").value = entry.director_phone || "";
-                    document.getElementById("edit_talent_description").value = entry.description || "";
-                    document.getElementById("edit_talent_content").value = entry.content || "";
-                    document.getElementById("edit_talent_origin").value = entry.origin || "";
-                    document.getElementById("edit_talent_participant_count").value = entry.participant_count || "";
-                    document.getElementById("edit_talent_music_path").value = entry.music_path || "";
-                    document.getElementById("edit_talent_video_path").value = entry.video_path || "";
-                    document.getElementById("edit_talent_note").value = entry.note || "";
+                    var setVal = function(id, val) {
+                        var el = document.getElementById(id);
+                        if (el) el.value = val || "";
+                    };
+                    setVal("edit_talent_id", entry.id);
+                    setVal("edit_talent_title", entry.title);
+                    setVal("edit_talent_category", entry.category_id);
+                    setVal("edit_talent_duration", entry.duration_seconds);
+                    setVal("edit_talent_director", entry.director);
+                    setVal("edit_talent_director_phone", entry.director_phone);
+                    setVal("edit_talent_description", entry.description);
+                    setVal("edit_talent_content", entry.content);
+                    setVal("edit_talent_origin", entry.origin);
+                    setVal("edit_talent_participant_count", entry.participant_count);
+                    setVal("edit_talent_music_path", entry.music_path);
+                    setVal("edit_talent_video_path", entry.video_path);
+                    setVal("edit_talent_note", entry.note);
 
                     var selectedMemberIds = [];
                     if (data.members && Array.isArray(data.members)) {
