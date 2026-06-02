@@ -12,6 +12,17 @@
   "skills_dir": ".claude/skills",
   "agents_dir": ".claude/agents",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'CMD=$(cat | jq -r \".tool_input.command // empty\"); if echo \"$CMD\" | grep -qE \"git (commit|add -A|add \\.)\"; then IGNORED=$(git status --porcelain 2>/dev/null | grep -E \"^[MADRCU]\" | cut -c4- | while read f; do git check-ignore -q \"$f\" 2>/dev/null && echo \"$f\"; done); if [ -n \"$IGNORED\" ]; then echo \"{\\\"continue\\\":false,\\\"stopReason\\\":\\\"BLOCKED: Các file sau nằm trong .gitignore: $IGNORED\\\"}\"; exit 0; fi; fi'"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
