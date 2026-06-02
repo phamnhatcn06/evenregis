@@ -1,5 +1,5 @@
 <?php
-$canEdit = in_array($model->status, array(Registrations::STATUS_DRAFT, Registrations::STATUS_REJECTED));
+$canEdit = $model->isEditable();
 
 $this->menu = array(
     array(
