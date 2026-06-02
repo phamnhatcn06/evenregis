@@ -705,6 +705,43 @@ class RegistrationsController extends AdminController
 		}
 	}
 
+	public function actionResubmit($id)
+	{
+		$this->checkRegistrationAccess($id);
+		if (Yii::app()->getRequest()->getIsPostRequest()) {
+			$model = $this->loadModelById($id);
+
+			if ($model->status != Registrations::STATUS_RETURNED) {
+				Yii::app()->user->setFlash('error', 'Phiếu không ở trạng thái có thể gửi lại.');
+				$this->redirect(array('view', 'id' => $id));
+				return;
+			}
+
+			$ssoUser = AuthHandler::getUser();
+			$submittedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+			$updateData = array(
+				'status'       => Registrations::STATUS_SUBMITTED,
+				'submitted_at' => date('Y-m-d H:i:s'),
+				'submitted_by' => $submittedBy,
+			);
+
+			$result = $model->updateViaApi($updateData);
+
+			if ($result['success']) {
+				$resetResult = Attendees::resetRejectedToPending($id);
+				$msg = 'Đã gửi lại phiếu đăng ký.';
+				if ($resetResult['count'] > 0) {
+					$msg .= ' Đã chuyển ' . $resetResult['count'] . ' người bị từ chối về trạng thái chờ duyệt.';
+				}
+				Yii::app()->user->setFlash('success', $msg);
+			} else {
+				Yii::app()->user->setFlash('error', 'Không thể gửi lại phiếu đăng ký.');
+			}
+			$this->redirect(array('view', 'id' => $id));
+		}
+	}
+
 	public function actionApprove($id)
 	{
 		if (Yii::app()->getRequest()->getIsPostRequest()) {
@@ -713,7 +750,7 @@ class RegistrationsController extends AdminController
 			$reviewedAt = time();
 			$model->reviewed_at = $reviewedAt;
 			$ssoUser = AuthHandler::getUser();
-			$reviewedBy = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+			$reviewedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 			if ($reviewedBy) {
 				$model->reviewed_by = $reviewedBy;
 			}
