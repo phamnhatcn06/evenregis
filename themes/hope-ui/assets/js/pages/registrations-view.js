@@ -329,8 +329,8 @@ var RegistrationView = (function() {
             });
         }
 
-        var minPlayers = getSportMinPlayers(sportText);
-        console.log('updateSportTeamName debug - text:', sportText, 'minPlayers:', minPlayers, 'allianceCodes:', allianceCodes);
+        var minPlayers = getSportMinMembersById(sportId);
+        console.log('updateSportTeamName debug - sportId:', sportId, 'minPlayers:', minPlayers, 'allianceCodes:', allianceCodes);
 
         if (allianceCodes.length > 0 && minPlayers >= 3) {
             // Liên quân + tất cả prefix đơn vị (bao gồm đơn vị hiện tại)
