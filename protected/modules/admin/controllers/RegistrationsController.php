@@ -1146,11 +1146,23 @@ class RegistrationsController extends AdminController
 	public function actionGetSportAttendees($registration_id)
 	{
 		$this->checkRegistrationAccess($registration_id);
+		$sportId = Yii::app()->request->getQuery('sport_id', null);
 		$result = array();
+
+		// Lấy danh sách attendee_id đã đăng ký team của môn này (nếu có sport_id)
+		$excludeAttendeeIds = array();
+		if ($sportId) {
+			$excludeAttendeeIds = SportTeamMembers::getAttendeeIdsBySport($sportId, $registration_id);
+		}
 
 		// Lấy attendees từ registration hiện tại có role "Thi đấu thể thao"
 		$attendees = Attendees::getByRegistrationId($registration_id);
 		foreach ($attendees as $att) {
+			// Loại trừ người đã đăng ký team của môn này
+			if (in_array($att['id'], $excludeAttendeeIds)) {
+				continue;
+			}
+
 			$roleName = Attendees::resolveRoleNames(isset($att['role_id']) ? $att['role_id'] : '');
 			// Kiểm tra role có chứa "thể thao" hoặc "thi đấu"
 			if (stripos($roleName, 'thể thao') !== false || stripos($roleName, 'thi đấu') !== false) {
