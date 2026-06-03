@@ -240,17 +240,31 @@ class ApprovalworkflowsController extends AdminController
 
         if ($response) {
             $data = json_decode($response, true);
+            // Response là array trực tiếp, không có wrapper
+            $users = is_array($data) ? $data : array();
+            // Nếu có wrapper data thì lấy từ đó
             if (isset($data['data'])) {
                 $users = isset($data['data']['data']) ? $data['data']['data'] : $data['data'];
-                if (is_array($users)) {
-                    foreach ($users as $user) {
-                        $label = isset($user['full_name']) ? $user['full_name'] : (isset($user['email']) ? $user['email'] : 'N/A');
-                        if (isset($user['property_name']) && $user['property_name']) {
-                            $label .= ' - ' . $user['property_name'];
-                        }
-                        $userList[$user['id']] = $label;
-                    }
+            }
+
+            foreach ($users as $user) {
+                // Portal trả về: AccountId, DisplayName, Email, Employee.PropertyName
+                $userId = isset($user['AccountId']) ? $user['AccountId'] : (isset($user['id']) ? $user['id'] : null);
+                if (!$userId) continue;
+
+                $label = isset($user['DisplayName']) ? $user['DisplayName'] : (isset($user['full_name']) ? $user['full_name'] : '');
+                if (!$label) {
+                    $label = isset($user['Email']) ? $user['Email'] : (isset($user['email']) ? $user['email'] : 'N/A');
                 }
+
+                // Lấy property name từ Employee object nếu có
+                if (isset($user['Employee']['PropertyName']) && $user['Employee']['PropertyName']) {
+                    $label .= ' - ' . $user['Employee']['PropertyName'];
+                } elseif (isset($user['property_name']) && $user['property_name']) {
+                    $label .= ' - ' . $user['property_name'];
+                }
+
+                $userList[$userId] = $label;
             }
         }
 
