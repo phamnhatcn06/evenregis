@@ -273,11 +273,17 @@ class ApprovalworkflowsController extends AdminController
             }
         }
 
-        // Nếu không lấy được từ Portal, thông báo lỗi với chi tiết debug
-        if (empty($userList)) {
-            $responsePreview = $response ? substr($response, 0, 300) : 'EMPTY';
-            $debugInfo = "HTTP: {$httpCode} | Response: {$responsePreview}";
-            Yii::app()->user->setFlash('warning', 'Debug: ' . $debugInfo);
+        // Debug: hiển thị 1 user đầu tiên để xem structure
+        if (!empty($userList)) {
+            $data = json_decode($response, true);
+            $firstUser = is_array($data) && isset($data[0]) ? $data[0] : null;
+            if ($firstUser && isset($firstUser['Employee'])) {
+                $empKeys = implode(', ', array_keys($firstUser['Employee']));
+                Yii::app()->user->setFlash('info', 'Employee fields: ' . $empKeys);
+            }
+        } elseif (empty($userList)) {
+            $responsePreview = $response ? substr($response, 0, 500) : 'EMPTY';
+            Yii::app()->user->setFlash('warning', 'Debug: ' . $responsePreview);
         }
 
         $this->render('add_approver', array(
