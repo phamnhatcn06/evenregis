@@ -1018,15 +1018,6 @@ var RegistrationView = (function() {
             return;
         }
 
-        // Check if sport already in pending list (only when adding new)
-        if (editingSportIndex === -1) {
-            var existingIdx = pendingSportRegistrations.findIndex(function(r) { return r.sportId == sportId; });
-            if (existingIdx !== -1) {
-                Toast.error('Môn "' + sportName + '" đã có trong danh sách. Vui lòng xóa trước khi thêm lại.');
-                return;
-            }
-        }
-
         // AJAX check sport limits on the backend first!
         var btnAdd = document.getElementById('btn_add_to_preview');
         var originalHtml = btnAdd.innerHTML;
