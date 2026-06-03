@@ -473,7 +473,7 @@ class ApproveRegistrationsController extends AdminController
             // Ghi vào registration_approvals
             $approval = RegistrationApprovals::getActiveByRegistrationId($registrationId);
             if ($approval) {
-                $ssoId = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+                $ssoId = isset($ssoUser['email']) ? $ssoUser['email'] : null;
                 $fullName = isset($ssoUser['full_name']) ? $ssoUser['full_name'] : $approvedBy;
                 RegistrationApprovals::approveViaApi($approval->id, $ssoId, $fullName);
             }
@@ -543,7 +543,7 @@ class ApproveRegistrationsController extends AdminController
             // Ghi vào registration_approvals
             $approval = RegistrationApprovals::getActiveByRegistrationId($registrationId);
             if ($approval) {
-                $ssoId = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+                $ssoId = isset($ssoUser['email']) ? $ssoUser['email'] : null;
                 $fullName = isset($ssoUser['full_name']) ? $ssoUser['full_name'] : $approvedBy;
                 RegistrationApprovals::rejectViaApi($approval->id, $ssoId, $fullName, $reason);
             }
@@ -589,7 +589,7 @@ class ApproveRegistrationsController extends AdminController
             // Ghi vào registration_approvals
             $approval = RegistrationApprovals::getActiveByRegistrationId($registrationId);
             if ($approval) {
-                $ssoId = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+                $ssoId = isset($ssoUser['email']) ? $ssoUser['email'] : null;
                 $fullName = isset($ssoUser['full_name']) ? $ssoUser['full_name'] : $reviewedBy;
                 RegistrationApprovals::revisionViaApi($approval->id, $ssoId, $fullName, 0, $reason);
             }
