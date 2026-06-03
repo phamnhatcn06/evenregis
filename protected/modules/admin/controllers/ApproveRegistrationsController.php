@@ -534,7 +534,7 @@ class ApproveRegistrationsController extends AdminController
 
         // Reject registration
         $model->status = Registrations::STATUS_REJECTED;
-        $model->reviewed_at = time();
+        $model->reviewed_at = date('Y-m-d H:i:s');
         $model->reviewed_by = $approvedBy;
         $model->rejection_reason = $reason;
         $result = $model->updateViaApi();
