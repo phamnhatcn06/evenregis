@@ -1015,6 +1015,7 @@ var RegistrationView = (function() {
         btnAdd.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang kiểm tra...';
 
         var formData = new FormData();
+        formData.append('sport_id', sportId);
         sportSelectedAttendees.forEach(function(att) {
             formData.append('attendee_ids[]', att.id);
         });
