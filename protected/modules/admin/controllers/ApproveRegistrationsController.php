@@ -472,11 +472,23 @@ class ApproveRegistrationsController extends AdminController
         if ($result['success']) {
             // Ghi vào registration_approvals
             $approval = RegistrationApprovals::getActiveByRegistrationId($registrationId);
+            $ssoId = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+            $fullName = isset($ssoUser['full_name']) ? $ssoUser['full_name'] : $approvedBy;
+            $stepIndex = $approval ? $approval->current_index : 1;
+
             if ($approval) {
-                $ssoId = isset($ssoUser['email']) ? $ssoUser['email'] : null;
-                $fullName = isset($ssoUser['full_name']) ? $ssoUser['full_name'] : $approvedBy;
                 RegistrationApprovals::approveViaApi($approval->id, $ssoId, $fullName);
             }
+
+            // Ghi log duyệt
+            RegistrationApprovalLogs::createLog(
+                $registrationId,
+                RegistrationApprovalLogs::ACTION_APPROVED,
+                $stepIndex,
+                'Phê duyệt',
+                $ssoId,
+                $fullName
+            );
 
             echo CJSON::encode(array(
                 'success' => true,
