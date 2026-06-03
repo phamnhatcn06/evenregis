@@ -579,7 +579,7 @@ class ApproveRegistrationsController extends AdminController
         $ssoUser = AuthHandler::getUser();
         $reviewedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
-        $model->status = Registrations::STATUS_RETURNED;
+        $model->status = Registrations::STATUS_DRAFT; // Trả về = chuyển về draft
         $model->reviewed_at = date('Y-m-d H:i:s');
         $model->reviewed_by = $reviewedBy;
         $model->rejection_reason = $reason;
