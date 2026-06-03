@@ -301,15 +301,7 @@ var RegistrationView = (function() {
             ? modalSportSelect.value 
             : (sportSelect ? sportSelect.value : '');
 
-        var existingTeam = existingSportTeams.find(function(t) { return t.sportId == sportId; });
-        if (existingTeam) {
-            teamNameInput.value = existingTeam.teamName;
-            teamNameInput.readOnly = true;
-            teamNameInput.classList.add('bg-light');
-            return;
-        }
-
-        // Reset readOnly if no existing team is found
+        // Luôn cho phép sửa tên team (tạo team mới, không dùng team cũ)
         teamNameInput.readOnly = false;
         teamNameInput.classList.remove('bg-light');
 
