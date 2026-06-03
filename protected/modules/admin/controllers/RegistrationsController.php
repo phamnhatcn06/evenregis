@@ -445,6 +445,9 @@ class RegistrationsController extends AdminController
 			});
 		}
 
+		// Load approval logs for registration
+		$approvalLogs = RegistrationApprovalLogs::getHistory($id);
+
 		$this->render('view', array(
 			'model' => $model,
 			'registrationDetails' => $registrationDetails,
@@ -457,6 +460,7 @@ class RegistrationsController extends AdminController
 			'talentEntryMembers' => $talentEntryMembers,
 			'incomingRequestsData' => $incomingRequestsData,
 			'allianceHistory' => $allianceHistory,
+			'approvalLogs' => $approvalLogs,
 		));
 	}
 
