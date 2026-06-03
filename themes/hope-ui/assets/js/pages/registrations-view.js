@@ -1734,7 +1734,7 @@ var RegistrationView = (function() {
         var prefixes = ['Bóng bàn', 'Bóng đá', 'Cầu lông', 'Pickerball', 'Bơi ếch', 'Bơi tự do', 'Kéo co', 'Tennis', 'Cờ vua', 'Cờ tướng'];
 
         data.forEach(function(item) {
-            if (excludeIds.indexOf(parseInt(item.id)) !== -1) return;
+            // Không check excludeIds - cho phép đăng ký nhiều đội cho cùng 1 môn
             var groupName = 'Khác';
             for (var i = 0; i < prefixes.length; i++) {
                 if (item.name.indexOf(prefixes[i]) === 0) {
