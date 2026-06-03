@@ -137,51 +137,49 @@ class ApprovalworkflowsController extends AdminController
                 $successCount = 0;
                 $errorCount = 0;
 
+                // Gọi API lấy thông tin tất cả users một lần
+                $idsString = implode(',', $staffIds);
+                $url = $params['portal']['api_url'] . '/api/sso/users/detail?id=' . $idsString;
+                $context = stream_context_create(array(
+                    'http' => array(
+                        'method' => 'GET',
+                        'header' => "Accept: application/json\r\n",
+                        'timeout' => 30,
+                    ),
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ),
+                ));
 
-                foreach ($staffIds as $userId) {
-                    $url = $portalApiUrl . '/' . $userId;
-                    $context = stream_context_create(array(
-                        'http' => array(
-                            'method' => 'GET',
-                            'header' => "Accept: application/json\r\n",
-                            'timeout' => 30,
-                        ),
-                        'ssl' => array(
-                            'verify_peer' => false,
-                            'verify_peer_name' => false,
-                        ),
-                    ));
+                $response = @file_get_contents($url, false, $context);
+                if ($response) {
+                    $data = json_decode($response, true);
+                    $users = isset($data['data']['data']) ? $data['data']['data'] : (isset($data['data']) ? $data['data'] : array());
 
-                    $response = @file_get_contents($url, false, $context);
-                    if ($response) {
-                        $data = json_decode($response, true);
-                        $user = isset($data['data']['data']) ? $data['data']['data'] : (isset($data['data']) ? $data['data'] : null);
+                    $ssoUser = AuthHandler::getUser();
+                    foreach ($users as $user) {
+                        $approver = new ApprovalWorkflowApprovers;
+                        $approver->workflow_id = $id;
+                        $approver->step_index = $stepIndex;
+                        $approver->step_name = $stepName;
+                        $approver->portal_user_id = $user['id'];
+                        $approver->portal_user_name = isset($user['full_name']) ? $user['full_name'] : '';
+                        $approver->portal_user_email = isset($user['email']) ? $user['email'] : '';
+                        $approver->organization_id = isset($user['property_id']) ? $user['property_id'] : null;
+                        $approver->is_active = 1;
+                        $approver->auth_email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
-                        if ($user) {
-                            $ssoUser = AuthHandler::getUser();
-                            $approver = new ApprovalWorkflowApprovers;
-                            $approver->workflow_id = $id;
-                            $approver->step_index = $stepIndex;
-                            $approver->step_name = $stepName;
-                            $approver->portal_user_id = $user['id'];
-                            $approver->portal_user_name = isset($user['full_name']) ? $user['full_name'] : '';
-                            $approver->portal_user_email = isset($user['email']) ? $user['email'] : '';
-                            $approver->organization_id = isset($user['property_id']) ? $user['property_id'] : null;
-                            $approver->is_active = 1;
-                            $approver->auth_email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
-
-                            $result = $approver->storeViaApi();
-                            if ($result['success']) {
-                                $successCount++;
-                            } else {
-                                $errorCount++;
-                            }
+                        $result = $approver->storeViaApi();
+                        if ($result['success']) {
+                            $successCount++;
                         } else {
                             $errorCount++;
                         }
-                    } else {
-                        $errorCount++;
                     }
+                } else {
+                    Yii::app()->user->setFlash('error', 'Không thể lấy thông tin người dùng từ Portal');
+                    $this->redirect(array('addApprover', 'id' => $id));
                 }
 
                 if ($successCount > 0) {
