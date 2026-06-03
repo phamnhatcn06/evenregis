@@ -146,7 +146,10 @@ class ApprovalworkflowsController extends AdminController
                     CURLOPT_URL => $url,
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTPHEADER => array('Accept: application/json'),
+                    CURLOPT_HTTPHEADER => array(
+                        'Accept: application/json',
+                        'X-Portal-Secret: ' . $params['portal']['secret'],
+                    ),
                     CURLOPT_SSL_VERIFYPEER => false,
                     CURLOPT_SSL_VERIFYHOST => false,
                 ));
