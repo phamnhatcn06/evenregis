@@ -453,7 +453,7 @@ class ApproveRegistrationsController extends AdminController
                 $attendee = Attendees::fetchFromApi($attId);
                 if ($attendee && $attendee->approval_status != Attendees::APPROVAL_APPROVED) {
                     $attendee->approval_status = Attendees::APPROVAL_APPROVED;
-                    $attendee->approved_at = time();
+                    $attendee->approved_at = date('Y-m-d H:i:s');
                     $attendee->approved_by = $approvedBy;
                     $result = $attendee->updateViaApi();
                     if ($result['success']) {
