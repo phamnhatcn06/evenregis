@@ -1448,8 +1448,8 @@ var RegistrationView = (function() {
         var maxSpan = document.getElementById('sport_max_count');
         if (maxSpan) {
             var sportName = getSelectedSportName();
-            var maxPlayers = getSportMaxPlayers(sportName);
-            maxSpan.textContent = isFinite(maxPlayers) ? maxPlayers : '∞';
+            var minPlayers = getSportMinPlayers(sportName);
+            maxSpan.textContent = minPlayers;
         }
 
         removeSportHiddenInputs();
