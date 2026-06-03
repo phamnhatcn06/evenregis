@@ -998,7 +998,7 @@ var RegistrationView = (function() {
         }
 
         // Validate số người = min_members (mỗi đăng ký tạo 1 team)
-        var minPlayers = getSportMinPlayers(sportName);
+        var minPlayers = getSportMinMembersById(sportId);
         if (sportSelectedAttendees.length !== minPlayers) {
             Toast.error('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
             return;
