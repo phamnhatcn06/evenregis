@@ -26,7 +26,6 @@ var RegistrationView = (function() {
     // Pending sport registrations (preview before save)
     var pendingSportRegistrations = [];
     var editingSportIndex = -1; // -1 = adding new, >= 0 = editing existing
-    var existingSportTeams = [];
 
     function initBootstrapFileInput(selector, options) {
         if (typeof $.fn.fileinput === 'undefined') return;
