@@ -1102,6 +1102,47 @@ foreach ($registrationDetails as $detail) {
     <input type="hidden" name="document_index" id="delete_document_index">
 </form>
 
+<!-- Modal Log duyệt nhân viên -->
+<div class="modal fade" id="approvalLogModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-history me-2"></i>Log duyệt nhân viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered mb-0">
+                    <tbody>
+                        <tr>
+                            <th style="width:35%;background:#f8f9fa;">Họ tên</th>
+                            <td id="log_attendee_name"></td>
+                        </tr>
+                        <tr>
+                            <th style="background:#f8f9fa;">Trạng thái duyệt</th>
+                            <td id="log_approval_status"></td>
+                        </tr>
+                        <tr>
+                            <th style="background:#f8f9fa;">Người duyệt</th>
+                            <td id="log_approved_by"></td>
+                        </tr>
+                        <tr>
+                            <th style="background:#f8f9fa;">Ngày duyệt</th>
+                            <td id="log_approved_at"></td>
+                        </tr>
+                        <tr id="log_rejection_row" style="display:none;">
+                            <th style="background:#f8f9fa;">Lý do từ chối</th>
+                            <td id="log_rejection_reason" class="text-danger"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Chọn Đơn vị liên quân -->
 <div class="modal fade" id="alliancePropertyModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
