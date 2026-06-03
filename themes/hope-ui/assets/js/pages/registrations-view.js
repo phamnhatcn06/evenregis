@@ -1451,18 +1451,34 @@ var RegistrationView = (function() {
         available.forEach(function(att) {
             var item = document.createElement('a');
             item.href = '#';
-            item.className = 'list-group-item list-group-item-action py-2';
+            var canRegister = att.can_register !== false;
+            item.className = 'list-group-item list-group-item-action py-2' + (canRegister ? '' : ' disabled text-muted');
             item.setAttribute('data-id', att.id);
+            item.setAttribute('data-can-register', canRegister ? '1' : '0');
+
             var subInfo = [];
             if (att.department_name) subInfo.push(att.department_name);
             if (att.property_name) subInfo.push(att.property_name);
             if (att.position) subInfo.push(att.position);
+
+            var reasonHtml = '';
+            if (!canRegister && att.reason) {
+                reasonHtml = '<br><span class="text-danger" style="font-size:10px;"><i class="fa fa-exclamation-circle"></i> ' + escapeHtml(att.reason) + '</span>';
+            }
+
             item.innerHTML = '<small>' + escapeHtml(att.full_name) + '</small>' +
-                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                this.classList.toggle('active');
-            });
+                (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '') +
+                reasonHtml;
+
+            if (canRegister) {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.classList.toggle('active');
+                });
+            } else {
+                item.style.pointerEvents = 'none';
+                item.style.opacity = '0.6';
+            }
             list.appendChild(item);
         });
     }
