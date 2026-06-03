@@ -248,23 +248,28 @@ class ApprovalworkflowsController extends AdminController
             }
 
             foreach ($users as $user) {
-                // Portal trả về: AccountId, DisplayName, Email, Employee.PropertyName
+                // Portal trả về: AccountId, DisplayName, Email, Employee{PropertyName, PositionName, ...}
                 $userId = isset($user['AccountId']) ? $user['AccountId'] : (isset($user['id']) ? $user['id'] : null);
                 if (!$userId) continue;
 
-                $label = isset($user['DisplayName']) ? $user['DisplayName'] : (isset($user['full_name']) ? $user['full_name'] : '');
-                if (!$label) {
-                    $label = isset($user['Email']) ? $user['Email'] : (isset($user['email']) ? $user['email'] : 'N/A');
+                $name = isset($user['DisplayName']) ? $user['DisplayName'] : (isset($user['full_name']) ? $user['full_name'] : '');
+                if (!$name) {
+                    $name = isset($user['Email']) ? $user['Email'] : (isset($user['email']) ? $user['email'] : 'N/A');
                 }
 
-                // Lấy property name từ Employee object nếu có
-                if (isset($user['Employee']['PropertyName']) && $user['Employee']['PropertyName']) {
-                    $label .= ' - ' . $user['Employee']['PropertyName'];
-                } elseif (isset($user['property_name']) && $user['property_name']) {
-                    $label .= ' - ' . $user['property_name'];
-                }
+                $parts = array($name);
 
-                $userList[$userId] = $label;
+                // Chức danh
+                $position = isset($user['Employee']['PositionName']) ? $user['Employee']['PositionName'] : '';
+                if (!$position) $position = isset($user['Employee']['Title']) ? $user['Employee']['Title'] : '';
+                if ($position) $parts[] = $position;
+
+                // Đơn vị
+                $property = isset($user['Employee']['PropertyName']) ? $user['Employee']['PropertyName'] : '';
+                if (!$property) $property = isset($user['property_name']) ? $user['property_name'] : '';
+                if ($property) $parts[] = $property;
+
+                $userList[$userId] = implode(' - ', $parts);
             }
         }
 
