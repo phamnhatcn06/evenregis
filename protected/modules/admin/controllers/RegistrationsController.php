@@ -1651,11 +1651,15 @@ class RegistrationsController extends AdminController
 		if ($content_type === 'sports') {
 			$sports = EventSports::getByEventId($event_id);
 			foreach ($sports as $item) {
+				$sportName = isset($item['sport_name']) ? $item['sport_name'] : (isset($item['name']) ? $item['name'] : '');
+				// Lấy min_members từ API hoặc fallback về hardcode
+				$minMembers = isset($item['min_members']) ? (int)$item['min_members'] : self::getSportMinPlayers($sportName);
 				$result[] = array(
 					'id' => isset($item['sport_id']) ? $item['sport_id'] : $item['id'],
-					'name' => isset($item['sport_name']) ? $item['sport_name'] : (isset($item['name']) ? $item['name'] : ''),
+					'name' => $sportName,
 					'parent_id' => isset($item['parent_id']) ? $item['parent_id'] : 0,
 					'parent_name' => isset($item['parent_name']) ? $item['parent_name'] : '',
+					'min_members' => $minMembers,
 				);
 			}
 		} elseif ($content_type === 'competition') {
