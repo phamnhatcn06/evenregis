@@ -40,7 +40,7 @@ class BaseRegistrationApprovals extends CActiveRecord
         return array(
             array('registration_id, workflow_id, total_steps', 'required'),
             array('registration_id, workflow_id, current_index, total_steps', 'numerical', 'integerOnly' => true),
-            array('status', 'in', 'range' => array('pending', 'approved', 'rejected', 'revision')),
+            array('status', 'in', 'range' => array(self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_REJECTED, self::STATUS_REVISION)),
             array('started_at, completed_at', 'safe'),
             array('id, registration_id, workflow_id, current_index, status', 'safe', 'on' => 'search'),
         );
