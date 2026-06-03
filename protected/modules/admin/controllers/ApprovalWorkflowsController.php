@@ -226,8 +226,17 @@ class ApprovalworkflowsController extends AdminController
         $curlError = curl_error($ch);
         curl_close($ch);
 
-        // Debug log
-        Yii::log("Portal SSO Users API: URL={$url}, HTTP={$httpCode}, Error={$curlError}", 'info', 'application.approvalworkflows');
+        // Debug - hiển thị trực tiếp để kiểm tra
+        Yii::log("Portal SSO Users API: URL={$url}, HTTP={$httpCode}, Error={$curlError}, Token=" . substr($token, 0, 20) . "..., Response=" . substr($response, 0, 500), 'info', 'application.approvalworkflows');
+
+        // Tạm thời dump để debug
+        if (YII_DEBUG) {
+            error_log("=== Portal SSO Debug ===");
+            error_log("URL: " . $url);
+            error_log("HTTP Code: " . $httpCode);
+            error_log("Token: " . ($token ? 'Yes (' . strlen($token) . ' chars)' : 'NO TOKEN'));
+            error_log("Response: " . substr($response, 0, 1000));
+        }
 
         if ($response) {
             $data = json_decode($response, true);
