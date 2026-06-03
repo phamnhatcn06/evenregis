@@ -588,6 +588,8 @@ class ApproveRegistrationsController extends AdminController
         if ($result['success']) {
             // Ghi vào registration_approvals
             $approval = RegistrationApprovals::getActiveByRegistrationId($registrationId);
+            var_dump($approval);
+            die;
             if ($approval) {
                 $ssoId = isset($ssoUser['email']) ? $ssoUser['email'] : null;
                 $fullName = isset($ssoUser['full_name']) ? $ssoUser['full_name'] : $reviewedBy;

@@ -174,26 +174,23 @@ if (!empty($model->document)) {
     }
 </style>
 
-<?php if ((int)$model->status === Registrations::STATUS_RETURNED): ?>
-<div class="alert alert-warning d-flex align-items-start mb-3" role="alert">
-    <i class="fa fa-exclamation-triangle fa-lg me-3 mt-1 text-warning flex-shrink-0"></i>
-    <div class="flex-grow-1">
-        <strong>Phiếu đăng ký đã được trả về — cần chỉnh sửa và gửi lại.</strong>
-        <?php if (!empty($model->rejection_reason)): ?>
-            <div class="mt-1">Lý do: <?php echo CHtml::encode($model->rejection_reason); ?></div>
-        <?php endif; ?>
+<?php if ((int)$model->status === Registrations::STATUS_REJECTED): ?>
+    <div class="alert alert-warning d-flex align-items-start mb-3" role="alert">
+        <i class="fa fa-exclamation-triangle fa-lg me-3 mt-1 text-warning flex-shrink-0"></i>
+        <div class="flex-grow-1">
+            <strong>Phiếu đăng ký đã được trả về — cần chỉnh sửa và gửi lại.</strong>
+            <?php if (!empty($model->rejection_reason)): ?>
+                <div class="mt-1">Lý do: <?php echo CHtml::encode($model->rejection_reason); ?></div>
+            <?php endif; ?>
+        </div>
+        <div class="d-flex gap-2 ms-3 flex-shrink-0">
+            <form id="form-resubmit-registration" method="post" action="<?php echo $this->createUrl('resubmit', array('id' => $model->id)); ?>" style="display:inline;">
+                <button type="button" class="btn btn-sm btn-warning" onclick="confirmResubmitRegistration()">
+                    <i class="fa fa-paper-plane me-1"></i>Gửi lại
+                </button>
+            </form>
+        </div>
     </div>
-    <div class="d-flex gap-2 ms-3 flex-shrink-0">
-        <a href="<?php echo $this->createUrl('update', array('id' => $model->id)); ?>" class="btn btn-sm btn-outline-warning">
-            <i class="fa fa-pencil me-1"></i>Chỉnh sửa
-        </a>
-        <form id="form-resubmit-registration" method="post" action="<?php echo $this->createUrl('resubmit', array('id' => $model->id)); ?>" style="display:inline;">
-            <button type="button" class="btn btn-sm btn-warning" onclick="confirmResubmitRegistration()">
-                <i class="fa fa-paper-plane me-1"></i>Gửi lại
-            </button>
-        </form>
-    </div>
-</div>
 <?php endif; ?>
 
 <div class="row mb-3">
@@ -295,43 +292,43 @@ if (!empty($model->document)) {
 </div>
 
 <?php if (!empty($approvalLogs)): ?>
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fa fa-history me-2"></i>Lịch sử duyệt bản đăng ký</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width:50px;">STT</th>
-                                <th>Bước duyệt</th>
-                                <th style="width:120px;">Hành động</th>
-                                <th>Người thực hiện</th>
-                                <th>Thời gian</th>
-                                <th>Ghi chú / Lý do</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($approvalLogs as $idx => $log): ?>
-                            <tr>
-                                <td class="text-center"><?php echo $idx + 1; ?></td>
-                                <td><?php echo CHtml::encode($log->step_name ?: 'Bước ' . $log->step_index); ?></td>
-                                <td><?php echo BaseRegistrationApprovalLogs::getActionLabel($log->action); ?></td>
-                                <td><?php echo CHtml::encode($log->approver_name ?: '-'); ?></td>
-                                <td><?php echo $log->acted_at ? date('d/m/Y H:i', $log->acted_at) : '-'; ?></td>
-                                <td><?php echo CHtml::encode($log->comment ?: '-'); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fa fa-history me-2"></i>Lịch sử duyệt bản đăng ký</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:50px;">STT</th>
+                                    <th>Bước duyệt</th>
+                                    <th style="width:120px;">Hành động</th>
+                                    <th>Người thực hiện</th>
+                                    <th>Thời gian</th>
+                                    <th>Ghi chú / Lý do</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($approvalLogs as $idx => $log): ?>
+                                    <tr>
+                                        <td class="text-center"><?php echo $idx + 1; ?></td>
+                                        <td><?php echo CHtml::encode($log->step_name ?: 'Bước ' . $log->step_index); ?></td>
+                                        <td><?php echo BaseRegistrationApprovalLogs::getActionLabel($log->action); ?></td>
+                                        <td><?php echo CHtml::encode($log->approver_name ?: '-'); ?></td>
+                                        <td><?php echo $log->acted_at ? date('d/m/Y H:i', $log->acted_at) : '-'; ?></td>
+                                        <td><?php echo CHtml::encode($log->comment ?: '-'); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 <?php endif; ?>
 
 <?php
@@ -504,12 +501,12 @@ foreach ($eventContents as $ec) {
                                     <?php if ($approvalStatus != Attendees::APPROVAL_PENDING): ?>
                                         <button type="button" class="btn btn-xs btn-link p-0 ms-1"
                                             onclick="showApprovalLog(<?php echo CHtml::encode(CJSON::encode(array(
-                                                'name' => $fullName,
-                                                'status' => $approvalStatus,
-                                                'approved_by' => isset($att['approved_by']) ? $att['approved_by'] : '',
-                                                'approved_at' => isset($att['approved_at']) ? $att['approved_at'] : '',
-                                                'rejection_reason' => isset($att['rejection_reason']) ? $att['rejection_reason'] : '',
-                                            ))); ?>)" title="Xem log duyệt">
+                                                                            'name' => $fullName,
+                                                                            'status' => $approvalStatus,
+                                                                            'approved_by' => isset($att['approved_by']) ? $att['approved_by'] : '',
+                                                                            'approved_at' => isset($att['approved_at']) ? $att['approved_at'] : '',
+                                                                            'rejection_reason' => isset($att['rejection_reason']) ? $att['rejection_reason'] : '',
+                                                                        ))); ?>)" title="Xem log duyệt">
                                             <i class="fa fa-history text-info"></i>
                                         </button>
                                     <?php endif; ?>

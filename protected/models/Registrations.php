@@ -152,11 +152,11 @@ class Registrations extends BaseRegistrations
 
 	public function isEditable()
 	{
-		return in_array($this->status, array(self::STATUS_DRAFT, self::STATUS_RETURNED));
+		return in_array($this->status, array(self::STATUS_DRAFT, self::STATUS_RETURNED, self::STATUS_REJECTED));
 	}
 
 	public function isSubmittable()
 	{
-		return in_array($this->status, array(self::STATUS_DRAFT, self::STATUS_RETURNED));
+		return in_array($this->status, array(self::STATUS_DRAFT, self::STATUS_RETURNED, self::STATUS_REJECTED));
 	}
 }
