@@ -140,19 +140,18 @@ class ApprovalworkflowsController extends AdminController
                 // Gọi API lấy thông tin tất cả users một lần
                 $idsString = implode(',', $staffIds);
                 $url = $params['portal']['api_url'] . '/api/sso/users/detail?id=' . $idsString;
-                $context = stream_context_create(array(
-                    'http' => array(
-                        'method' => 'GET',
-                        'header' => "Accept: application/json\r\n",
-                        'timeout' => 30,
-                    ),
-                    'ssl' => array(
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                    ),
-                ));
 
-                $response = @file_get_contents($url, false, $context);
+                $ch = curl_init();
+                curl_setopt_array($ch, array(
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTPHEADER => array('Accept: application/json'),
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => false,
+                ));
+                $response = curl_exec($ch);
+                curl_close($ch);
                 if ($response) {
                     $data = json_decode($response, true);
                     $users = isset($data['data']['data']) ? $data['data']['data'] : (isset($data['data']) ? $data['data'] : array());
