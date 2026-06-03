@@ -3720,38 +3720,40 @@ class RegistrationsController extends AdminController
 		}
 
 		$attendeeIds = Yii::app()->request->getParam('attendee_ids', array());
+		$sportId = Yii::app()->request->getParam('sport_id');
 		$teamId = Yii::app()->request->getParam('team_id');
-		$overLimit = array();
 
 		// Lấy danh sách attendee_id cũ của team nếu có teamId
 		$oldAttendeeIds = array();
 		if ($teamId) {
 			$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
 			foreach ($oldMembers as $m) {
-				$oldAttendeeIds[] = $m->attendee_id;
+				$oldAttendeeIds[] = (int)$m->attendee_id;
 			}
 		}
 
+		$errors = array();
 		foreach ($attendeeIds as $attId) {
-			$count = SportTeamMembers::countSportsByAttendee($attId);
-			$isAlreadyInTeam = in_array($attId, $oldAttendeeIds);
+			$isAlreadyInTeam = in_array((int)$attId, $oldAttendeeIds);
+			if ($isAlreadyInTeam) {
+				continue; // Người đã có trong team này, không cần kiểm tra
+			}
 
-			// Nếu đã nằm trong team này rồi thì count đã bao gồm team này. Giới hạn tối đa là MAX_SPORTS_PER_ATTENDEE.
-			// Nếu chưa nằm trong team này, thêm vào sẽ làm tăng count lên 1, nên count hiện tại phải nhỏ hơn MAX_SPORTS_PER_ATTENDEE.
-			$limit = $isAlreadyInTeam ? SportTeamMembers::MAX_SPORTS_PER_ATTENDEE : (SportTeamMembers::MAX_SPORTS_PER_ATTENDEE - 1);
-
-			if ($count > $limit) {
-				$attendee = Attendees::fetchFromApi($attId);
-				$name = $attendee ? $attendee->full_name : "ID: $attId";
-				$overLimit[] = "{$name} (đã đăng ký {$count} môn)";
+			if ($sportId) {
+				$checkResult = SportTeamMembers::canRegisterSport($attId, $sportId);
+				if (!$checkResult['can_register']) {
+					$attendee = Attendees::fetchFromApi($attId);
+					$name = $attendee ? $attendee->full_name : "ID: $attId";
+					$errors[] = "{$name}: {$checkResult['error']}";
+				}
 			}
 		}
 
 		header('Content-Type: application/json');
-		if (!empty($overLimit)) {
+		if (!empty($errors)) {
 			echo CJSON::encode(array(
 				'success' => false,
-				'error' => 'Không thể thêm. Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn thể thao: ' . implode(', ', $overLimit)
+				'error' => 'Không thể thêm. ' . implode('; ', $errors)
 			));
 		} else {
 			echo CJSON::encode(array('success' => true));
