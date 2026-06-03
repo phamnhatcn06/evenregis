@@ -1543,22 +1543,19 @@ var RegistrationView = (function() {
         var actives = list.querySelectorAll('.active');
         if (actives.length === 0) return;
 
-        var sportId = getSelectedSportId();
         var sportName = getSelectedSportName();
-        var minPlayers = getSportMinMembersById(sportId);
         var currentlySelected = sportSelectedAttendees.length;
 
-        var overLimitAttendees = [];
+        var invalidAttendees = [];
         var validAttendees = [];
 
         actives.forEach(function(el) {
             var id = el.getAttribute('data-id');
+            var canRegister = el.getAttribute('data-can-register') === '1';
             var att = sportAllAttendees.find(function(a) { return a.id == id; });
             if (att) {
-                var isOriginalMember = originalSportTeamAttendeeIds.some(function(oId) { return String(oId) === String(att.id); });
-                var currentCount = parseInt(att.sport_count || 0);
-                if (!isOriginalMember && currentCount >= 3) {
-                    overLimitAttendees.push(att.full_name + ' (đã đăng ký ' + currentCount + ' môn)');
+                if (!canRegister) {
+                    invalidAttendees.push(att.full_name + ': ' + (att.reason || 'Không thể đăng ký'));
                     el.classList.remove('active');
                 } else {
                     validAttendees.push(att);
@@ -1566,8 +1563,8 @@ var RegistrationView = (function() {
             }
         });
 
-        if (overLimitAttendees.length > 0) {
-            Toast.error('Không thể chọn. Những người sau đã đăng ký tối đa 3 môn thể thao: ' + overLimitAttendees.join(', '));
+        if (invalidAttendees.length > 0) {
+            Toast.error('Không thể chọn: ' + invalidAttendees.join('; '));
         }
 
         if (validAttendees.length === 0) return;
