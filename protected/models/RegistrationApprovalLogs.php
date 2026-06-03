@@ -21,6 +21,28 @@ class RegistrationApprovalLogs extends BaseRegistrationApprovalLogs
     }
 
     /**
+     * Ghi log duyệt qua API
+     */
+    public static function createLog($registrationId, $action, $stepIndex = 0, $stepName = null, $approverPortalId = null, $approverName = null, $comment = null, $returnToIndex = null)
+    {
+        $data = array(
+            'registration_id' => (int)$registrationId,
+            'step_index' => (int)$stepIndex,
+            'step_name' => $stepName,
+            'action' => $action,
+            'approver_portal_id' => $approverPortalId,
+            'approver_name' => $approverName,
+            'comment' => $comment,
+            'return_to_index' => $returnToIndex,
+            'acted_at' => time(),
+        );
+
+        $data = array_filter($data, function($v) { return $v !== null; });
+
+        return ApiClient::post(ApiEndpoints::REGISTRATION_APPROVAL_LOG_STORE, $data);
+    }
+
+    /**
      * Lấy lịch sử của một đăng ký - gọi API
      */
     public static function getHistory($registrationId)
