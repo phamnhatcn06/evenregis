@@ -39,7 +39,13 @@ class RegistrationApprovalLogs extends BaseRegistrationApprovalLogs
 
         $data = array_filter($data, function($v) { return $v !== null; });
 
-        return ApiClient::post(ApiEndpoints::REGISTRATION_APPROVAL_LOG_STORE, $data);
+        $result = ApiClient::post(ApiEndpoints::REGISTRATION_APPROVAL_LOG_STORE, $data);
+
+        if (!$result['success']) {
+            Yii::log('createLog failed: ' . json_encode($result) . ' | Data: ' . json_encode($data), CLogger::LEVEL_ERROR);
+        }
+
+        return $result;
     }
 
     /**
