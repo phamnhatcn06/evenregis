@@ -586,6 +586,14 @@ class ApproveRegistrationsController extends AdminController
         $result = $model->updateViaApi();
 
         if ($result['success']) {
+            // Ghi vào registration_approvals
+            $approval = RegistrationApprovals::getActiveByRegistrationId($registrationId);
+            if ($approval) {
+                $ssoId = isset($ssoUser['id']) ? $ssoUser['id'] : null;
+                $fullName = isset($ssoUser['full_name']) ? $ssoUser['full_name'] : $reviewedBy;
+                RegistrationApprovals::revisionViaApi($approval->id, $ssoId, $fullName, 0, $reason);
+            }
+
             echo CJSON::encode(array(
                 'success' => true,
                 'message' => 'Đã trả phiếu đăng ký về đơn vị để chỉnh sửa.',
