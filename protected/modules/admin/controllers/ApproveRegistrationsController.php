@@ -580,7 +580,7 @@ class ApproveRegistrationsController extends AdminController
         $reviewedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
         $model->status = Registrations::STATUS_RETURNED;
-        $model->reviewed_at = time();
+        $model->reviewed_at = date('Y-m-d H:i:s');
         $model->reviewed_by = $reviewedBy;
         $model->rejection_reason = $reason;
         $result = $model->updateViaApi();
