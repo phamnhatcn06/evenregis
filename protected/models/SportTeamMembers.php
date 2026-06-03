@@ -78,16 +78,18 @@ class SportTeamMembers extends BaseSportTeamMembers
         ));
     }
 
-    public static function countSportsByAttendee($attendeeId)
+    /**
+     * Đếm số bộ môn CHA mà người đó đã đăng ký
+     * Ví dụ: Bóng bàn đơn nam + Bóng bàn đôi nam = 1 bộ môn (Bóng bàn)
+     */
+    public static function countParentSportsByAttendee($attendeeId)
     {
-        // Đếm qua API list với filter attendee_id
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'attendee_id' => $attendeeId,
             'per_page' => 500,
         ));
 
         if (!$result['success']) {
-            Yii::log('countSportsByAttendee API failed: ' . print_r($result, true), 'error');
             return 0;
         }
 
@@ -96,21 +98,146 @@ class SportTeamMembers extends BaseSportTeamMembers
             return 0;
         }
 
-        // Filter thủ công để đảm bảo chỉ đếm đúng attendee
-        $count = 0;
+        $parentSportIds = array();
         foreach ($items as $item) {
-            if (isset($item['attendee_id']) && $item['attendee_id'] == $attendeeId) {
-                $count++;
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $sportId = isset($item['sport_id']) ? $item['sport_id'] : null;
+            if (!$sportId && isset($item['sport_team_id'])) {
+                $team = SportTeams::fetchFromApi($item['sport_team_id']);
+                $sportId = $team ? $team->sport_id : null;
+            }
+            if ($sportId) {
+                $sport = Sports::fetchFromApi($sportId);
+                if ($sport) {
+                    $parentId = $sport->parent_id ? $sport->parent_id : $sportId;
+                    $parentSportIds[$parentId] = true;
+                }
             }
         }
 
-        Yii::log("countSportsByAttendee($attendeeId) = $count", 'info');
-        return $count;
+        return count($parentSportIds);
+    }
+
+    /**
+     * Kiểm tra người đó đã có team trong cùng nội dung con (sport_id) chưa
+     * Trả về team_id nếu đã có, null nếu chưa
+     */
+    public static function getExistingTeamInSport($attendeeId, $sportId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 500,
+        ));
+
+        if (!$result['success']) {
+            return null;
+        }
+
+        $items = isset($result['data']['data']) ? $result['data']['data'] : (isset($result['data']) ? $result['data'] : array());
+        if (!is_array($items)) {
+            return null;
+        }
+
+        foreach ($items as $item) {
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $itemSportId = isset($item['sport_id']) ? $item['sport_id'] : null;
+            $teamId = isset($item['sport_team_id']) ? $item['sport_team_id'] : null;
+
+            if (!$itemSportId && $teamId) {
+                $team = SportTeams::fetchFromApi($teamId);
+                $itemSportId = $team ? $team->sport_id : null;
+            }
+
+            if ($itemSportId == $sportId) {
+                return $teamId;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Kiểm tra xem người đó có thể đăng ký thêm môn mới không
+     * @param int $attendeeId
+     * @param int $newSportId Sport ID mới muốn đăng ký
+     * @return array ['can_register' => bool, 'error' => string|null]
+     */
+    public static function canRegisterSport($attendeeId, $newSportId)
+    {
+        $newSport = Sports::fetchFromApi($newSportId);
+        if (!$newSport) {
+            return array('can_register' => false, 'error' => 'Không tìm thấy môn thể thao.');
+        }
+        $newParentId = $newSport->parent_id ? $newSport->parent_id : $newSportId;
+
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 500,
+        ));
+
+        if (!$result['success']) {
+            return array('can_register' => true, 'error' => null);
+        }
+
+        $items = isset($result['data']['data']) ? $result['data']['data'] : (isset($result['data']) ? $result['data'] : array());
+        if (!is_array($items)) {
+            return array('can_register' => true, 'error' => null);
+        }
+
+        $parentSportIds = array();
+        foreach ($items as $item) {
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $sportId = isset($item['sport_id']) ? $item['sport_id'] : null;
+            $teamId = isset($item['sport_team_id']) ? $item['sport_team_id'] : null;
+
+            if (!$sportId && $teamId) {
+                $team = SportTeams::fetchFromApi($teamId);
+                $sportId = $team ? $team->sport_id : null;
+            }
+
+            if ($sportId == $newSportId) {
+                return array(
+                    'can_register' => false,
+                    'error' => 'Người này đã đăng ký nội dung "' . $newSport->name . '" ở một đội khác.'
+                );
+            }
+
+            if ($sportId) {
+                $sport = Sports::fetchFromApi($sportId);
+                if ($sport) {
+                    $parentId = $sport->parent_id ? $sport->parent_id : $sportId;
+                    $parentSportIds[$parentId] = true;
+                }
+            }
+        }
+
+        if (!isset($parentSportIds[$newParentId]) && count($parentSportIds) >= self::MAX_SPORTS_PER_ATTENDEE) {
+            return array(
+                'can_register' => false,
+                'error' => 'Người này đã đăng ký tối đa ' . self::MAX_SPORTS_PER_ATTENDEE . ' bộ môn thể thao.'
+            );
+        }
+
+        return array('can_register' => true, 'error' => null);
+    }
+
+    /**
+     * @deprecated Use countParentSportsByAttendee instead
+     */
+    public static function countSportsByAttendee($attendeeId)
+    {
+        return self::countParentSportsByAttendee($attendeeId);
     }
 
     public static function canRegisterMore($attendeeId)
     {
-        return self::countSportsByAttendee($attendeeId) < self::MAX_SPORTS_PER_ATTENDEE;
+        return self::countParentSportsByAttendee($attendeeId) < self::MAX_SPORTS_PER_ATTENDEE;
     }
 
     /**
