@@ -1,6 +1,6 @@
 <?php
 
-class ApprovalWorkflowsController extends AdminController
+class ApprovalworkflowsController extends AdminController
 {
     // Bypass permission check tạm thời
     protected $publicActions = array('index', 'view', 'list', 'search', 'admin', 'create', 'update', 'delete', 'addApprover', 'deleteApprover');
@@ -223,19 +223,31 @@ class ApprovalWorkflowsController extends AdminController
         ));
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
+
+        // Debug log
+        Yii::log("Portal SSO Users API: URL={$url}, HTTP={$httpCode}, Error={$curlError}", 'info', 'application.approvalworkflows');
+
         if ($response) {
             $data = json_decode($response, true);
             if (isset($data['data'])) {
                 $users = isset($data['data']['data']) ? $data['data']['data'] : $data['data'];
-                foreach ($users as $user) {
-                    $label = isset($user['full_name']) ? $user['full_name'] : (isset($user['email']) ? $user['email'] : 'N/A');
-                    if (isset($user['property_name']) && $user['property_name']) {
-                        $label .= ' - ' . $user['property_name'];
+                if (is_array($users)) {
+                    foreach ($users as $user) {
+                        $label = isset($user['full_name']) ? $user['full_name'] : (isset($user['email']) ? $user['email'] : 'N/A');
+                        if (isset($user['property_name']) && $user['property_name']) {
+                            $label .= ' - ' . $user['property_name'];
+                        }
+                        $userList[$user['id']] = $label;
                     }
-                    $userList[$user['id']] = $label;
                 }
             }
+        }
+
+        // Nếu không lấy được từ Portal, thông báo lỗi
+        if (empty($userList)) {
+            Yii::app()->user->setFlash('warning', 'Không thể tải danh sách người dùng từ Portal. Vui lòng kiểm tra cấu hình.');
         }
 
         $this->render('add_approver', array(
