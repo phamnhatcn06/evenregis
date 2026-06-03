@@ -2204,8 +2204,9 @@ var RegistrationView = (function() {
             return;
         }
 
+        var sportId = getSelectedSportId();
         var sportName = getSelectedSportName();
-        var minPlayers = getSportMinPlayers(sportName);
+        var minPlayers = getSportMinMembersById(sportId);
         if (sportSelectedAttendees.length !== minPlayers) {
             Toast.error('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
             return;
