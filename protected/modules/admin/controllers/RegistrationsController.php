@@ -1520,28 +1520,31 @@ class RegistrationsController extends AdminController
 				Yii::app()->end();
 			}
 
-			// Kiểm tra giới hạn 3 bộ môn thể thao
+			// Kiểm tra giới hạn: tối đa 3 bộ môn cha + không được tham gia cùng nội dung con ở nhiều team
 			$oldAttendeeIds = array();
 			$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
 			foreach ($oldMembers as $m) {
-				$oldAttendeeIds[] = $m->attendee_id;
+				$oldAttendeeIds[] = (int)$m->attendee_id;
 			}
 
-			$overLimit = array();
+			$errors = array();
 			foreach ($attendeeIds as $idx => $attId) {
-				$count = SportTeamMembers::countSportsByAttendee($attId);
-				$isAlreadyInTeam = in_array($attId, $oldAttendeeIds);
-				$limit = $isAlreadyInTeam ? SportTeamMembers::MAX_SPORTS_PER_ATTENDEE : (SportTeamMembers::MAX_SPORTS_PER_ATTENDEE - 1);
-				if ($count > $limit) {
-					$name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
-					$overLimit[] = "{$name} (đã đăng ký {$count} môn)";
+				$isAlreadyInTeam = in_array((int)$attId, $oldAttendeeIds);
+				if ($isAlreadyInTeam) {
+					continue; // Người đã có trong team này rồi, không cần kiểm tra
+				}
+
+				$name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
+				$checkResult = SportTeamMembers::canRegisterSport($attId, $team->sport_id);
+				if (!$checkResult['can_register']) {
+					$errors[] = "{$name}: {$checkResult['error']}";
 				}
 			}
 
-			if (!empty($overLimit)) {
+			if (!empty($errors)) {
 				echo CJSON::encode(array(
 					'success' => false,
-					'error' => 'Không thể cập nhật. Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn thể thao: ' . implode(', ', $overLimit)
+					'error' => 'Không thể cập nhật. ' . implode('; ', $errors)
 				));
 				Yii::app()->end();
 			}
