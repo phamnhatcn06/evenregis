@@ -248,26 +248,31 @@ class ApprovalworkflowsController extends AdminController
             }
 
             foreach ($users as $user) {
-                // Portal trả về: AccountId, DisplayName, Email, Employee{PropertyName, PositionName, ...}
+                // Portal trả về: AccountId, DisplayName, Email, Employee{Hotel, Position, Department, ...}
                 $userId = isset($user['AccountId']) ? $user['AccountId'] : (isset($user['id']) ? $user['id'] : null);
                 if (!$userId) continue;
 
-                $name = isset($user['DisplayName']) ? $user['DisplayName'] : (isset($user['full_name']) ? $user['full_name'] : '');
+                $name = isset($user['DisplayName']) ? $user['DisplayName'] : '';
                 if (!$name) {
-                    $name = isset($user['Email']) ? $user['Email'] : (isset($user['email']) ? $user['email'] : 'N/A');
+                    $name = isset($user['Email']) ? $user['Email'] : 'N/A';
                 }
 
                 $parts = array($name);
 
-                // Chức danh
-                $position = isset($user['Employee']['PositionName']) ? $user['Employee']['PositionName'] : '';
-                if (!$position) $position = isset($user['Employee']['Title']) ? $user['Employee']['Title'] : '';
+                // Chức danh - Position có thể là object hoặc string
+                $emp = isset($user['Employee']) ? $user['Employee'] : array();
+                $position = '';
+                if (isset($emp['Position'])) {
+                    $position = is_array($emp['Position']) ? (isset($emp['Position']['Name']) ? $emp['Position']['Name'] : '') : $emp['Position'];
+                }
                 if ($position) $parts[] = $position;
 
-                // Đơn vị
-                $property = isset($user['Employee']['PropertyName']) ? $user['Employee']['PropertyName'] : '';
-                if (!$property) $property = isset($user['property_name']) ? $user['property_name'] : '';
-                if ($property) $parts[] = $property;
+                // Đơn vị - Hotel có thể là object hoặc string
+                $hotel = '';
+                if (isset($emp['Hotel'])) {
+                    $hotel = is_array($emp['Hotel']) ? (isset($emp['Hotel']['Name']) ? $emp['Hotel']['Name'] : '') : $emp['Hotel'];
+                }
+                if ($hotel) $parts[] = $hotel;
 
                 $userList[$userId] = implode(' - ', $parts);
             }
