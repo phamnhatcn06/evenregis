@@ -21,6 +21,7 @@ var RegistrationView = (function() {
     var sportAllAttendees = [];
     var sportSelectedAttendees = [];
     var originalSportTeamAttendeeIds = [];
+    var sportsDataCache = []; // Cache danh sách môn thể thao với min_members
 
     // Pending sport registrations (preview before save)
     var pendingSportRegistrations = [];
