@@ -45,7 +45,7 @@ class RegistrationApprovals extends BaseRegistrationApprovals
         if (!$workflowId) {
             $workflow = ApprovalWorkflows::getDefault();
             if (!$workflow) {
-                return array('success' => false, 'message' => 'Không tìm thấy workflow mặc định');
+                return array('success' => false, 'message' => 'Không tìm thấy workflow mặc định. Vui lòng tạo workflow và đánh dấu là mặc định.');
             }
             $workflowId = $workflow->id;
             $totalSteps = $workflow->total_steps;
@@ -65,7 +65,20 @@ class RegistrationApprovals extends BaseRegistrationApprovals
             'status' => self::STATUS_PENDING,
         );
 
-        return ApiClient::post(ApiEndpoints::REGISTRATION_APPROVAL_STORE, $data);
+        $result = ApiClient::post(ApiEndpoints::REGISTRATION_APPROVAL_STORE, $data);
+
+        // Trả về message chi tiết nếu API thất bại
+        if (!$result['success']) {
+            $errorMsg = 'Lỗi tạo luồng duyệt';
+            if (isset($result['message'])) {
+                $errorMsg .= ': ' . $result['message'];
+            } elseif (isset($result['data']['message'])) {
+                $errorMsg .= ': ' . $result['data']['message'];
+            }
+            return array('success' => false, 'message' => $errorMsg);
+        }
+
+        return $result;
     }
 
     /**
