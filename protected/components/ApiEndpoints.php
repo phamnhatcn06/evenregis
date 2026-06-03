@@ -464,6 +464,7 @@ class ApiEndpoints
 
     // Registration Approval Log
     const REGISTRATION_APPROVAL_LOG_LIST = '/api/registration-approval-logs';
+    const REGISTRATION_APPROVAL_LOG_STORE = '/api/registration-approval-logs/store';
     const REGISTRATION_APPROVAL_LOG_BY_REGISTRATION = '/api/registration-approval-logs/by-registration/{registration_id}';
 
     public static function url($endpoint, $params = array())
