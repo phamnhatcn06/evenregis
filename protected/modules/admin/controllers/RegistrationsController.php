@@ -687,15 +687,13 @@ class RegistrationsController extends AdminController
 			$result = $model->updateViaApi($updateData);
 
 			if ($result['success']) {
-				// Reset rejected attendees to pending (approved attendees keep their status)
+				// Tạo registration_approval record để tracking workflow
+				RegistrationApprovals::createForRegistration($id);
+
 				$resetResult = Attendees::resetRejectedToPending($id);
 				$msg = 'Đã nộp phiếu đăng ký.';
 				if ($resetResult['count'] > 0) {
 					$msg .= ' Đã chuyển ' . $resetResult['count'] . ' người bị từ chối về trạng thái chờ duyệt.';
-				}
-				// Debug: hiển thị lỗi nếu có
-				if (!empty($resetResult['errors'])) {
-					$msg .= ' [Errors: ' . CJSON::encode($resetResult['errors']) . ']';
 				}
 				Yii::app()->user->setFlash('success', $msg);
 			} else {
@@ -729,6 +727,12 @@ class RegistrationsController extends AdminController
 			$result = $model->updateViaApi($updateData);
 
 			if ($result['success']) {
+				// Ghi resubmit vào registration_approvals
+				$approval = RegistrationApprovals::getActiveByRegistrationId($id);
+				if ($approval) {
+					RegistrationApprovals::resubmitViaApi($approval->id);
+				}
+
 				$resetResult = Attendees::resetRejectedToPending($id);
 				$msg = 'Đã gửi lại phiếu đăng ký.';
 				if ($resetResult['count'] > 0) {
