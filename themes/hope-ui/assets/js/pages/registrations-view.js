@@ -988,9 +988,10 @@ var RegistrationView = (function() {
             return;
         }
 
-        var maxPlayers = getSportMaxPlayers(sportName);
-        if (sportSelectedAttendees.length > maxPlayers) {
-            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+        // Validate số người = min_members (mỗi đăng ký tạo 1 team)
+        var minPlayers = getSportMinPlayers(sportName);
+        if (sportSelectedAttendees.length !== minPlayers) {
+            Toast.error('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
             return;
         }
 
