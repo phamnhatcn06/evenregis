@@ -1286,6 +1286,29 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
     function confirmDeleteAttendee(id) { RegistrationView.confirmDeleteAttendee(id); }
     function removeAllianceProperty(id) { RegistrationView.removeAllianceProperty(id); }
     function confirmDeleteTeam(id) { RegistrationView.confirmDeleteTeam(id); }
+    function showApprovalLog(data) {
+        document.getElementById("log_attendee_name").textContent = data.name || "-";
+        var statusLabels = {0: "Chờ duyệt", 1: "Đã duyệt", 2: "Từ chối"};
+        var statusClasses = {0: "bg-warning text-dark", 1: "bg-success", 2: "bg-danger"};
+        var status = parseInt(data.status) || 0;
+        document.getElementById("log_approval_status").innerHTML = "<span class=\"badge " + statusClasses[status] + "\">" + statusLabels[status] + "</span>";
+        document.getElementById("log_approved_by").textContent = data.approved_by || "-";
+        var approvedAt = "-";
+        if (data.approved_at) {
+            var d = new Date(data.approved_at * 1000);
+            approvedAt = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth()+1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+        }
+        document.getElementById("log_approved_at").textContent = approvedAt;
+        var rejectionRow = document.getElementById("log_rejection_row");
+        if (status === 2 && data.rejection_reason) {
+            rejectionRow.style.display = "";
+            document.getElementById("log_rejection_reason").textContent = data.rejection_reason;
+        } else {
+            rejectionRow.style.display = "none";
+        }
+        var modal = new bootstrap.Modal(document.getElementById("approvalLogModal"));
+        modal.show();
+    }
     function confirmApproveAlliance(id) {
         Swal.fire({
             title: "Xác nhận liên quân",
