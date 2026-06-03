@@ -2170,9 +2170,9 @@ var RegistrationView = (function() {
         }
 
         var sportName = getSelectedSportName();
-        var maxPlayers = getSportMaxPlayers(sportName);
-        if (sportSelectedAttendees.length > maxPlayers) {
-            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+        var minPlayers = getSportMinPlayers(sportName);
+        if (sportSelectedAttendees.length !== minPlayers) {
+            Toast.error('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
             return;
         }
 
