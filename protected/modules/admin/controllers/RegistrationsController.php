@@ -1651,15 +1651,31 @@ class RegistrationsController extends AdminController
 		if ($content_type === 'sports') {
 			$sports = EventSports::getByEventId($event_id);
 			foreach ($sports as $item) {
+				$sportId = isset($item['sport_id']) ? $item['sport_id'] : $item['id'];
 				$sportName = isset($item['sport_name']) ? $item['sport_name'] : (isset($item['name']) ? $item['name'] : '');
-				// Lấy min_members từ API hoặc fallback về hardcode
-				$minMembers = isset($item['min_members']) ? (int)$item['min_members'] : self::getSportMinPlayers($sportName);
+
+				// Lấy min_members từ API response, hoặc từ Sports model, hoặc fallback về hardcode
+				$minMembers = 1;
+				if (isset($item['min_members']) && $item['min_members'] !== null && $item['min_members'] !== '') {
+					$minMembers = (int)$item['min_members'];
+				} elseif (isset($item['min_per_team_member']) && $item['min_per_team_member'] !== null && $item['min_per_team_member'] !== '') {
+					$minMembers = (int)$item['min_per_team_member'];
+				} else {
+					// Fetch từ Sports model nếu API không trả về
+					$sport = Sports::fetchFromApi($sportId);
+					if ($sport && isset($sport->min_per_team_member) && $sport->min_per_team_member !== null) {
+						$minMembers = (int)$sport->min_per_team_member;
+					} else {
+						$minMembers = self::getSportMinPlayers($sportName);
+					}
+				}
 				$result[] = array(
-					'id' => isset($item['sport_id']) ? $item['sport_id'] : $item['id'],
+					'id' => $sportId,
 					'name' => $sportName,
 					'parent_id' => isset($item['parent_id']) ? $item['parent_id'] : 0,
 					'parent_name' => isset($item['parent_name']) ? $item['parent_name'] : '',
 					'min_members' => $minMembers,
+					'min_per_team_member' => $minMembers,
 				);
 			}
 		} elseif ($content_type === 'competition') {

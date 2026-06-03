@@ -149,7 +149,15 @@ var RegistrationView = (function() {
     // Lấy min_members từ cache theo sport_id
     function getSportMinMembersById(sportId) {
         var sport = sportsDataCache.find(function(s) { return s.id == sportId; });
-        return sport && sport.min_members ? parseInt(sport.min_members) : 1;
+        if (sport) {
+            if (sport.min_members !== undefined && sport.min_members !== null && sport.min_members !== '') {
+                return parseInt(sport.min_members);
+            }
+            if (sport.min_per_team_member !== undefined && sport.min_per_team_member !== null && sport.min_per_team_member !== '') {
+                return parseInt(sport.min_per_team_member);
+            }
+        }
+        return 1;
     }
 
     // Load danh sách đơn vị có thể liên quân vào dropdown
