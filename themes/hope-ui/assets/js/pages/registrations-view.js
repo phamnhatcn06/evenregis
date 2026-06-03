@@ -1384,8 +1384,20 @@ var RegistrationView = (function() {
 
         availableList.innerHTML = '<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
 
+        // Lấy sport_id đang chọn để loại trừ người đã đăng ký team của môn này
+        var sportSelect = document.getElementById('sport_select_main');
+        var modalSportSelect = document.getElementById('sport_item_id');
+        var sportId = modalSportSelect && modalSportSelect.value
+            ? modalSportSelect.value
+            : (sportSelect ? sportSelect.value : '');
+
+        var url = window.BASE_URL + '/admin/registrations/getSportAttendees?registration_id=' + registrationId;
+        if (sportId) {
+            url += '&sport_id=' + sportId;
+        }
+
         // Load attendees with sports role from current registration only
-        fetch(window.BASE_URL + '/admin/registrations/getSportAttendees?registration_id=' + registrationId)
+        fetch(url)
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 sportAllAttendees = data.success && data.data ? data.data : [];
