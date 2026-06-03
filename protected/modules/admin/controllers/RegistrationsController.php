@@ -692,7 +692,12 @@ class RegistrationsController extends AdminController
 
 			if ($result['success']) {
 				// Tạo registration_approval record để tracking workflow
-				RegistrationApprovals::createForRegistration($id);
+				$approvalResult = RegistrationApprovals::createForRegistration($id);
+				if (!$approvalResult['success']) {
+					Yii::app()->user->setFlash('error', 'Đã nộp phiếu nhưng không tạo được luồng duyệt: ' . (isset($approvalResult['message']) ? $approvalResult['message'] : 'Lỗi không xác định'));
+					$this->redirect(array('view', 'id' => $id));
+					return;
+				}
 
 				$resetResult = Attendees::resetRejectedToPending($id);
 				$msg = 'Đã nộp phiếu đăng ký.';

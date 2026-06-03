@@ -183,13 +183,6 @@ if (!empty($model->document)) {
                 <div class="mt-1">Lý do: <?php echo CHtml::encode($model->rejection_reason); ?></div>
             <?php endif; ?>
         </div>
-        <div class="d-flex gap-2 ms-3 flex-shrink-0">
-            <form id="form-resubmit-registration" method="post" action="<?php echo $this->createUrl('resubmit', array('id' => $model->id)); ?>" style="display:inline;">
-                <button type="button" class="btn btn-sm btn-warning" onclick="confirmResubmitRegistration()">
-                    <i class="fa fa-paper-plane me-1"></i>Gửi lại
-                </button>
-            </form>
-        </div>
     </div>
 <?php endif; ?>
 
@@ -198,9 +191,9 @@ if (!empty($model->document)) {
     <div class="col-md-6">
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin chung <?= ($pendingRequestCount > 0 ? '<span class="badge bg-danger rounded-pill ms-2">' . $pendingRequestCount . ' yêu cầu chờ xử lý</span>' : '')  ?></h5>
+                <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin chung <?= ($pendingRequestCount > 0 ? '<span class="badge bg-danger rounded-pill ms-2">' . $pendingRequestCount . ' yêu cầu chờ xử lý</span>' : '') ?></h5>
                 <div class="btn-group">
-                    <?php if ((int)$model->status === Registrations::STATUS_DRAFT): ?>
+                    <?php if ((int)$model->status === Registrations::STATUS_DRAFT || (int)$model->status === Registrations::STATUS_REJECTED): ?>
                         <form id="form-submit-registration" method="post" action="<?php echo $this->createUrl('submit', array('id' => $model->id)); ?>" style="display:inline;">
                             <button type="button" class="btn btn-sm btn-info" onclick="confirmSubmitRegistration()">
                                 <i class="fa fa-paper-plane me-1"></i>Gửi bản đăng ký
