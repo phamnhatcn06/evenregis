@@ -1592,29 +1592,18 @@ var RegistrationView = (function() {
         });
         if (available.length === 0) return;
 
-        var sportId = getSelectedSportId();
         var sportName = getSelectedSportName();
-        var minPlayers = getSportMinMembersById(sportId);
         var currentlySelected = sportSelectedAttendees.length;
 
-        var overLimitAttendees = [];
-        var validAttendees = [];
-
-        available.forEach(function(att) {
-            var isOriginalMember = originalSportTeamAttendeeIds.some(function(oId) { return String(oId) === String(att.id); });
-            var currentCount = parseInt(att.sport_count || 0);
-            if (!isOriginalMember && currentCount >= 3) {
-                overLimitAttendees.push(att.full_name + ' (đã đăng ký ' + currentCount + ' môn)');
-            } else {
-                validAttendees.push(att);
-            }
+        // Chỉ thêm những người có thể đăng ký
+        var validAttendees = available.filter(function(att) {
+            return att.can_register !== false;
         });
 
-        if (overLimitAttendees.length > 0) {
-            Toast.error('Không thể chọn. Những người sau đã đăng ký tối đa 3 môn thể thao: ' + overLimitAttendees.join(', '));
+        if (validAttendees.length === 0) {
+            Toast.error('Không có người nào có thể đăng ký môn này.');
+            return;
         }
-
-        if (validAttendees.length === 0) return;
 
         // Cảnh báo nếu chọn vượt quá số lượng tối đa
         var maxPlayers = getSportMaxPlayers(sportName);
