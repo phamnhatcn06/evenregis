@@ -64,7 +64,8 @@ class RegistrationApprovals extends BaseRegistrationApprovals
             'total_steps' => $totalSteps,
             'status' => self::STATUS_PENDING,
         );
-
+        var_dump(json_encode($data));
+        exit;
         $result = ApiClient::post(ApiEndpoints::REGISTRATION_APPROVAL_STORE, $data);
 
         // Trả về message chi tiết nếu API thất bại
