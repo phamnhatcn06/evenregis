@@ -248,7 +248,7 @@ class ApproveRegistrationsController extends AdminController
                             }
                         }
                     }
-                    
+
                     if (is_object($entry)) {
                         $entry->video_path = $this->cleanStorageUrl($entry->video_path);
                         $entry->music_path = $this->cleanStorageUrl($entry->music_path);
@@ -256,7 +256,7 @@ class ApproveRegistrationsController extends AdminController
                         $entry['video_path'] = $this->cleanStorageUrl($entry['video_path']);
                         $entry['music_path'] = $this->cleanStorageUrl($entry['music_path']);
                     }
-                    
+
                     $talentEntries[] = $entry;
                     $membersResult = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array('entry_id' => $entryId));
                     $membersData = array();
@@ -579,7 +579,7 @@ class ApproveRegistrationsController extends AdminController
         $ssoUser = AuthHandler::getUser();
         $reviewedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
-        $model->status = Registrations::STATUS_DRAFT; // Trả về = chuyển về draft
+        $model->status = Registrations::STATUS_REJECTED; // Trả về = chuyển về draft
         $model->reviewed_at = date('Y-m-d H:i:s');
         $model->reviewed_by = $reviewedBy;
         $model->rejection_reason = $reason;

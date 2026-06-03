@@ -459,7 +459,21 @@ foreach ($eventContents as $ec) {
                                 <td><?php echo $checkInDate ? date('d/m/Y', strtotime($checkInDate)) : '-'; ?></td>
                                 <td><?php echo $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-'; ?></td>
                                 <td><?php echo CHtml::encode($transportName ?: '-'); ?></td>
-                                <td><?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?></td>
+                                <td>
+                                    <?php echo Attendees::getApprovalStatusLabel($approvalStatus); ?>
+                                    <?php if ($approvalStatus != Attendees::APPROVAL_PENDING): ?>
+                                        <button type="button" class="btn btn-xs btn-link p-0 ms-1"
+                                            onclick="showApprovalLog(<?php echo CHtml::encode(CJSON::encode(array(
+                                                'name' => $fullName,
+                                                'status' => $approvalStatus,
+                                                'approved_by' => isset($att['approved_by']) ? $att['approved_by'] : '',
+                                                'approved_at' => isset($att['approved_at']) ? $att['approved_at'] : '',
+                                                'rejection_reason' => isset($att['rejection_reason']) ? $att['rejection_reason'] : '',
+                                            ))); ?>)" title="Xem log duyệt">
+                                            <i class="fa fa-history text-info"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
                                 <?php if ($canEdit): ?>
                                     <td class="text-center">
                                         <?php if (!empty($att['contract_path']) || !empty($att['portrait_path']) || !empty($att['cccd_front_path']) || !empty($att['cccd_back_path'])):
