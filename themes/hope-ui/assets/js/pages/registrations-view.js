@@ -1387,6 +1387,18 @@ var RegistrationView = (function() {
         return sportName;
     }
 
+    function getSelectedSportId() {
+        var sportSelect = document.getElementById('sport_select_main');
+        var modalSportSelect = document.getElementById('sport_item_id');
+        if (modalSportSelect && modalSportSelect.value) {
+            return modalSportSelect.value;
+        }
+        if (sportSelect && sportSelect.value) {
+            return sportSelect.value;
+        }
+        return '';
+    }
+
     function loadSportAttendees(callback) {
         var availableList = document.getElementById('sport_available_attendee_list');
         if (!availableList) return;
