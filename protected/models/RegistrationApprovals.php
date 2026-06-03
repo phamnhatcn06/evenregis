@@ -58,14 +58,13 @@ class RegistrationApprovals extends BaseRegistrationApprovals
         }
 
         $data = array(
-            'registration_id' => $registrationId,
-            'workflow_id' => $workflowId,
+            'registration_id' => (int)$registrationId,
+            'workflow_id' => (int)$workflowId,
             'current_index' => 1,
-            'total_steps' => $totalSteps,
+            'total_steps' => (int)$totalSteps,
             'status' => self::STATUS_PENDING,
         );
-        var_dump(json_encode($data));
-        exit;
+
         $result = ApiClient::post(ApiEndpoints::REGISTRATION_APPROVAL_STORE, $data);
 
         // Trả về message chi tiết nếu API thất bại
