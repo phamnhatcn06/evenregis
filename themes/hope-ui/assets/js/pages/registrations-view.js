@@ -1581,8 +1581,9 @@ var RegistrationView = (function() {
         });
         if (available.length === 0) return;
 
+        var sportId = getSelectedSportId();
         var sportName = getSelectedSportName();
-        var minPlayers = getSportMinPlayers(sportName);
+        var minPlayers = getSportMinMembersById(sportId);
         var currentlySelected = sportSelectedAttendees.length;
 
         var overLimitAttendees = [];
