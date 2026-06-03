@@ -158,6 +158,7 @@ class ApprovalworkflowsController extends AdminController
                         $user = isset($data['data']['data']) ? $data['data']['data'] : (isset($data['data']) ? $data['data'] : null);
 
                         if ($user) {
+                            $ssoUser = AuthHandler::getUser();
                             $approver = new ApprovalWorkflowApprovers;
                             $approver->workflow_id = $id;
                             $approver->step_index = $stepIndex;
@@ -167,6 +168,7 @@ class ApprovalworkflowsController extends AdminController
                             $approver->portal_user_email = isset($user['email']) ? $user['email'] : '';
                             $approver->organization_id = isset($user['property_id']) ? $user['property_id'] : null;
                             $approver->is_active = 1;
+                            $approver->auth_email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
                             $result = $approver->storeViaApi();
                             if ($result['success']) {
