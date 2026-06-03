@@ -140,6 +140,19 @@ class RegistrationApprovals extends BaseRegistrationApprovals
     }
 
     /**
+     * Lấy bản ghi approval đang active (pending/revision) của một registration
+     */
+    public static function getActiveByRegistrationId($registrationId)
+    {
+        $dataProvider = self::getApiDataProvider(
+            array('registration_id' => $registrationId),
+            1
+        );
+        $data = $dataProvider->getData();
+        return !empty($data) ? $data[0] : null;
+    }
+
+    /**
      * Lấy danh sách đơn chờ duyệt của user - gọi API
      */
     public static function getPendingForApprover($portalUserId)
