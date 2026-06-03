@@ -127,6 +127,7 @@ var RegistrationView = (function() {
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success && data.data && data.data.length > 0) {
+                    sportsDataCache = data.data; // Lưu cache để lấy min_members
                     var html = renderSportsTree(data.data, registeredSports);
                     sportSelect.innerHTML = html;
                     var modalSportSelect = document.getElementById('sport_item_id');
@@ -134,6 +135,7 @@ var RegistrationView = (function() {
                         modalSportSelect.innerHTML = html;
                     }
                 } else {
+                    sportsDataCache = [];
                     var emptyHtml = '<option value="">-- Không có môn nào --</option>';
                     sportSelect.innerHTML = emptyHtml;
                     var modalSportSelect = document.getElementById('sport_item_id');
@@ -142,6 +144,12 @@ var RegistrationView = (function() {
                     }
                 }
             });
+    }
+
+    // Lấy min_members từ cache theo sport_id
+    function getSportMinMembersById(sportId) {
+        var sport = sportsDataCache.find(function(s) { return s.id == sportId; });
+        return sport && sport.min_members ? parseInt(sport.min_members) : 1;
     }
 
     // Load danh sách đơn vị có thể liên quân vào dropdown
