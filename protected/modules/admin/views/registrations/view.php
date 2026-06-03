@@ -479,7 +479,7 @@ foreach ($eventContents as $ec) {
                                 <td>
                                     <?php if (!empty($roleName)): ?>
                                         <?php foreach (array_map('trim', explode(',', $roleName)) as $role): ?>
-                                            <span class="badge <?php echo Attendees::getRoleBadgeClass($role); ?> me-1 mb-1"><?php echo CHtml::encode($role); ?></span>
+                                            <span class="badge <?php echo Attendees::getRoleBadgeClass($role); ?> me-1 mb-1"><?php echo CHtml::encode($role); ?></span><br />
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         -

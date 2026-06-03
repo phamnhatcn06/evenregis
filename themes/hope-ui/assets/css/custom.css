@@ -703,3 +703,9 @@ select:focus {
   border-color: #3a57e8 !important;
   box-shadow: 0 0 0 0.15rem rgba(58, 87, 232, 0.15) !important;
 }
+
+/* Action menu buttons - preserve original text case */
+.label.btn,
+a.label.btn {
+  text-transform: none !important;
+}
