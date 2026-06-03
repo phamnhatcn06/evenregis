@@ -1296,17 +1296,17 @@ class RegistrationsController extends AdminController
 			return;
 		}
 
-		// Kiểm tra giới hạn số môn thể thao trước khi tạo đội
-		$overLimitAttendees = array();
+		// Kiểm tra giới hạn: tối đa 3 bộ môn cha + không được tham gia cùng nội dung con ở nhiều team
+		$errors = array();
 		foreach ($attendeeIds as $idx => $attId) {
-			$count = SportTeamMembers::countSportsByAttendee($attId);
-			if ($count > SportTeamMembers::MAX_SPORTS_PER_ATTENDEE) {
-				$name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
-				$overLimitAttendees[] = "{$name} (đã đăng ký {$count} môn)";
+			$name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : "ID: $attId";
+			$checkResult = SportTeamMembers::canRegisterSport($attId, $sportId);
+			if (!$checkResult['can_register']) {
+				$errors[] = "{$name}: {$checkResult['error']}";
 			}
 		}
-		if (!empty($overLimitAttendees)) {
-			$msg = 'Không thể lưu. Những người sau đã đăng ký tối đa ' . SportTeamMembers::MAX_SPORTS_PER_ATTENDEE . ' môn: ' . implode(', ', $overLimitAttendees);
+		if (!empty($errors)) {
+			$msg = 'Không thể lưu. ' . implode('; ', $errors);
 			if ($isAjax) {
 				echo CJSON::encode(array('success' => false, 'error' => $msg));
 				Yii::app()->end();
