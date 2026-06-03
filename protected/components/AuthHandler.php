@@ -349,7 +349,7 @@ class AuthHandler extends CApplicationComponent
                     $menuItem = array(
                         'name' => isset($item['role']) ? $item['role'] : $item['controller'],
                         'module' => isset($item['module']) ? $item['module'] : 'admin',
-                        'controller' => strtolower($item['controller']),
+                        'controller' => $item['controller'],
                         'action' => isset($item['action']) ? $item['action'] : '*',
                         'root' => isset($item['value']) ? $item['value'] : 'other',
                         'sort' => isset($item['sort']) ? (int)$item['sort'] : 100,
