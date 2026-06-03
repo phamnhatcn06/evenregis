@@ -256,8 +256,9 @@ class ApprovalworkflowsController extends AdminController
 
         // Nếu không lấy được từ Portal, thông báo lỗi với chi tiết debug
         if (empty($userList)) {
-            $debugInfo = "URL: {$url} | HTTP: {$httpCode} | Token: " . ($token ? 'Yes' : 'NO') . " | Error: {$curlError}";
-            Yii::app()->user->setFlash('warning', 'Không thể tải danh sách người dùng. Debug: ' . $debugInfo);
+            $responsePreview = $response ? substr($response, 0, 300) : 'EMPTY';
+            $debugInfo = "HTTP: {$httpCode} | Response: {$responsePreview}";
+            Yii::app()->user->setFlash('warning', 'Debug: ' . $debugInfo);
         }
 
         $this->render('add_approver', array(
