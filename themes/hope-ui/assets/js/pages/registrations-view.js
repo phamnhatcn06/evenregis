@@ -1511,7 +1511,7 @@ var RegistrationView = (function() {
         if (actives.length === 0) return;
 
         var sportName = getSelectedSportName();
-        var maxPlayers = getSportMaxPlayers(sportName);
+        var minPlayers = getSportMinPlayers(sportName);
         var currentlySelected = sportSelectedAttendees.length;
 
         var overLimitAttendees = [];
@@ -1538,9 +1538,9 @@ var RegistrationView = (function() {
 
         if (validAttendees.length === 0) return;
 
-        if (currentlySelected + validAttendees.length > maxPlayers) {
-            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
-            return;
+        // Cảnh báo nếu chọn vượt quá số lượng yêu cầu
+        if (currentlySelected + validAttendees.length > minPlayers) {
+            Toast.warning('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
         }
 
         validAttendees.forEach(function(att) {
