@@ -112,4 +112,41 @@ class SportTeamMembers extends BaseSportTeamMembers
     {
         return self::countSportsByAttendee($attendeeId) < self::MAX_SPORTS_PER_ATTENDEE;
     }
+
+    /**
+     * Lấy danh sách attendee_id đã đăng ký team của 1 môn thể thao
+     * @param int $sportId ID môn thể thao
+     * @param int|null $registrationId Lọc theo registration (optional)
+     * @return array Danh sách attendee_id
+     */
+    public static function getAttendeeIdsBySport($sportId, $registrationId = null)
+    {
+        $params = array(
+            'sport_id' => $sportId,
+            'per_page' => 500,
+        );
+        if ($registrationId) {
+            $params['registration_id'] = $registrationId;
+        }
+
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, $params);
+
+        if (!$result['success']) {
+            return array();
+        }
+
+        $items = isset($result['data']['data']) ? $result['data']['data'] : (isset($result['data']) ? $result['data'] : array());
+        if (!is_array($items)) {
+            return array();
+        }
+
+        $attendeeIds = array();
+        foreach ($items as $item) {
+            if (isset($item['attendee_id'])) {
+                $attendeeIds[] = $item['attendee_id'];
+            }
+        }
+
+        return array_unique($attendeeIds);
+    }
 }
