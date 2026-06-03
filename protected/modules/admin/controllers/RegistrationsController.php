@@ -699,6 +699,16 @@ class RegistrationsController extends AdminController
 					return;
 				}
 
+				// Ghi log nộp đăng ký
+				RegistrationApprovalLogs::createLog(
+					$id,
+					RegistrationApprovalLogs::ACTION_SUBMITTED,
+					0,
+					'Nộp đăng ký',
+					isset($ssoUser['id']) ? $ssoUser['id'] : null,
+					$submittedBy
+				);
+
 				$resetResult = Attendees::resetRejectedToPending($id);
 				$msg = 'Đã nộp phiếu đăng ký.';
 				if ($resetResult['count'] > 0) {
