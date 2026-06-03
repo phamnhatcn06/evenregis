@@ -700,7 +700,7 @@ class RegistrationsController extends AdminController
 				}
 
 				// Ghi log nộp đăng ký
-				RegistrationApprovalLogs::createLog(
+				$logResult = RegistrationApprovalLogs::createLog(
 					$id,
 					RegistrationApprovalLogs::ACTION_SUBMITTED,
 					0,
@@ -708,6 +708,9 @@ class RegistrationsController extends AdminController
 					isset($ssoUser['id']) ? $ssoUser['id'] : null,
 					$submittedBy
 				);
+				if (!$logResult['success']) {
+					Yii::app()->user->setFlash('warning', 'Không ghi được log: ' . json_encode($logResult));
+				}
 
 				$resetResult = Attendees::resetRejectedToPending($id);
 				$msg = 'Đã nộp phiếu đăng ký.';
