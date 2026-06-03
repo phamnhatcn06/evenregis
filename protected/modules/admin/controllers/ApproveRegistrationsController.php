@@ -599,7 +599,9 @@ class ApproveRegistrationsController extends AdminController
                 'message' => 'Đã trả phiếu đăng ký về đơn vị để chỉnh sửa.',
             ));
         } else {
-            echo CJSON::encode(array('success' => false, 'error' => 'Không thể trả phiếu đăng ký về.'));
+            $errorMsg = isset($result['message']) ? $result['message'] : (isset($result['error']) ? $result['error'] : 'Không thể trả phiếu đăng ký về.');
+            Yii::log('Return registration failed: ' . print_r($result, true), 'error', 'application.controllers.ApproveRegistrationsController');
+            echo CJSON::encode(array('success' => false, 'error' => $errorMsg));
         }
         Yii::app()->end();
     }
