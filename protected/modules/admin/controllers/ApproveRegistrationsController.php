@@ -465,7 +465,7 @@ class ApproveRegistrationsController extends AdminController
 
         // Approve registration
         $model->status = Registrations::STATUS_APPROVED;
-        $model->reviewed_at = time();
+        $model->reviewed_at = date('Y-m-d H:i:s');
         $model->reviewed_by = $approvedBy;
         $result = $model->updateViaApi();
 
