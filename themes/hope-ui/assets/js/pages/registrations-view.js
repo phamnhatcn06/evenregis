@@ -997,10 +997,16 @@ var RegistrationView = (function() {
             return;
         }
 
-        // Validate số người = min_members (mỗi đăng ký tạo 1 team)
+        // Validate số người >= min_members
         var minPlayers = getSportMinMembersById(sportId);
-        if (sportSelectedAttendees.length !== minPlayers) {
-            Toast.error('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
+        if (sportSelectedAttendees.length < minPlayers) {
+            Toast.error('Môn "' + sportName + '" yêu cầu chọn ít nhất ' + minPlayers + ' người.');
+            return;
+        }
+
+        var maxPlayers = getSportMaxPlayers(sportName);
+        if (sportSelectedAttendees.length > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
             return;
         }
 
@@ -1560,9 +1566,11 @@ var RegistrationView = (function() {
 
         if (validAttendees.length === 0) return;
 
-        // Cảnh báo nếu chọn vượt quá số lượng yêu cầu
-        if (currentlySelected + validAttendees.length > minPlayers) {
-            Toast.warning('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
+        // Cảnh báo nếu chọn vượt quá số lượng tối đa
+        var maxPlayers = getSportMaxPlayers(sportName);
+        if (currentlySelected + validAttendees.length > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+            return;
         }
 
         validAttendees.forEach(function(att) {
@@ -1605,9 +1613,11 @@ var RegistrationView = (function() {
 
         if (validAttendees.length === 0) return;
 
-        // Cảnh báo nếu chọn vượt quá số lượng yêu cầu
-        if (currentlySelected + validAttendees.length > minPlayers) {
-            Toast.warning('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
+        // Cảnh báo nếu chọn vượt quá số lượng tối đa
+        var maxPlayers = getSportMaxPlayers(sportName);
+        if (currentlySelected + validAttendees.length > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+            return;
         }
 
         validAttendees.forEach(function(att) {
@@ -2207,8 +2217,14 @@ var RegistrationView = (function() {
         var sportId = getSelectedSportId();
         var sportName = getSelectedSportName();
         var minPlayers = getSportMinMembersById(sportId);
-        if (sportSelectedAttendees.length !== minPlayers) {
-            Toast.error('Môn "' + sportName + '" yêu cầu chọn đúng ' + minPlayers + ' người.');
+        if (sportSelectedAttendees.length < minPlayers) {
+            Toast.error('Môn "' + sportName + '" yêu cầu chọn ít nhất ' + minPlayers + ' người.');
+            return;
+        }
+
+        var maxPlayers = getSportMaxPlayers(sportName);
+        if (sportSelectedAttendees.length > maxPlayers) {
+            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
             return;
         }
 
