@@ -294,6 +294,46 @@ if (!empty($model->document)) {
     </div>
 </div>
 
+<?php if (!empty($approvalLogs)): ?>
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fa fa-history me-2"></i>Lịch sử duyệt bản đăng ký</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:50px;">STT</th>
+                                <th>Bước duyệt</th>
+                                <th style="width:120px;">Hành động</th>
+                                <th>Người thực hiện</th>
+                                <th>Thời gian</th>
+                                <th>Ghi chú / Lý do</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($approvalLogs as $idx => $log): ?>
+                            <tr>
+                                <td class="text-center"><?php echo $idx + 1; ?></td>
+                                <td><?php echo CHtml::encode($log->step_name ?: 'Bước ' . $log->step_index); ?></td>
+                                <td><?php echo BaseRegistrationApprovalLogs::getActionLabel($log->action); ?></td>
+                                <td><?php echo CHtml::encode($log->approver_name ?: '-'); ?></td>
+                                <td><?php echo $log->acted_at ? date('d/m/Y H:i', $log->acted_at) : '-'; ?></td>
+                                <td><?php echo CHtml::encode($log->comment ?: '-'); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php
 // Load attendees
 $attendees = Attendees::getByRegistrationId($model->id);
