@@ -27,6 +27,28 @@ var RegistrationView = (function() {
     var editingSportIndex = -1; // -1 = adding new, >= 0 = editing existing
     var existingSportTeams = [];
 
+    function initBootstrapFileInput(selector, options) {
+        if (typeof $.fn.fileinput === 'undefined') return;
+        var defaultOptions = {
+            language: 'vi',
+            showUpload: false,
+            showRemove: true,
+            showCaption: true,
+            dropZoneEnabled: true,
+            browseClass: "btn btn-primary btn-sm",
+            removeClass: "btn btn-danger btn-sm",
+            browseIcon: "<i class=\"fa fa-folder-open-o\"></i> ",
+            removeIcon: "<i class=\"fa fa-trash-o\"></i> ",
+            fileActionSettings: {
+                showUpload: false,
+                showRemove: true,
+                showZoom: true
+            }
+        };
+        var mergedOptions = $.extend(true, {}, defaultOptions, options);
+        $(selector).fileinput('destroy').fileinput(mergedOptions);
+    }
+
     function init(config) {
         eventId = config.eventId;
         registrationId = config.registrationId;
@@ -59,6 +81,38 @@ var RegistrationView = (function() {
         if (isHotel && propertyId) {
             loadAttendeeStaffList();
         }
+
+        // Initialize bootstrap-fileinput for static forms
+        initBootstrapFileInput("#import_excel_file", {
+            allowedFileExtensions: ["xls", "xlsx"],
+            maxFileSize: 10240,
+            dropZoneTitle: 'Kéo & thả file Excel vào đây ...'
+        });
+        initBootstrapFileInput("#upload_documents", {
+            allowedFileExtensions: ["jpg", "jpeg", "png", "pdf", "doc", "docx", "xls", "xlsx"],
+            maxFileSize: 10240,
+            dropZoneTitle: 'Kéo & thả nhiều tệp đính kèm vào đây ...'
+        });
+        initBootstrapFileInput("#add_portrait_file", {
+            allowedFileExtensions: ["jpg", "jpeg", "png"],
+            maxFileSize: 5120,
+            dropZoneTitle: 'Kéo thả ảnh chân dung vào đây ...'
+        });
+        initBootstrapFileInput("#add_cccd_front_file", {
+            allowedFileExtensions: ["jpg", "jpeg", "png"],
+            maxFileSize: 5120,
+            dropZoneTitle: 'Kéo thả ảnh CCCD mặt trước vào đây ...'
+        });
+        initBootstrapFileInput("#add_cccd_back_file", {
+            allowedFileExtensions: ["jpg", "jpeg", "png"],
+            maxFileSize: 5120,
+            dropZoneTitle: 'Kéo thả ảnh CCCD mặt sau vào đây ...'
+        });
+        initBootstrapFileInput("#add_contract_file", {
+            allowedFileExtensions: ["jpg", "jpeg", "png", "pdf"],
+            maxFileSize: 5120,
+            dropZoneTitle: 'Kéo thả ảnh hoặc tệp PDF hợp đồng ...'
+        });
     }
 
     // Load danh sách môn thể thao vào dropdown chính (ngoài card)
@@ -2897,18 +2951,41 @@ var RegistrationView = (function() {
                     document.getElementById('edit_start_date').value = formatDate(att.start_date);
                     document.getElementById('edit_transport_id').value = att.transport_id || '';
 
-                    if (att.portrait_path) {
-                        showPreview('edit_portrait_preview', att.portrait_path);
-                    }
-                    if (att.cccd_front_path) {
-                        showPreview('edit_cccd_front_preview', att.cccd_front_path);
-                    }
-                    if (att.cccd_back_path) {
-                        showPreview('edit_cccd_back_preview', att.cccd_back_path);
-                    }
-                    if (att.contract_path) {
-                        showPreview('edit_contract_preview', att.contract_path, att.contract_path.indexOf('.pdf') > -1);
-                    }
+                    // Initialize edit file fields with active initial previews
+                    initBootstrapFileInput("#edit_portrait_file", {
+                        allowedFileExtensions: ["jpg", "jpeg", "png"],
+                        maxFileSize: 5120,
+                        dropZoneTitle: 'Kéo thả ảnh chân dung mới vào đây ...',
+                        initialPreview: att.portrait_path ? [att.portrait_path] : [],
+                        initialPreviewAsData: true
+                    });
+                    initBootstrapFileInput("#edit_cccd_front_file", {
+                        allowedFileExtensions: ["jpg", "jpeg", "png"],
+                        maxFileSize: 5120,
+                        dropZoneTitle: 'Kéo thả ảnh CCCD mặt trước mới vào đây ...',
+                        initialPreview: att.cccd_front_path ? [att.cccd_front_path] : [],
+                        initialPreviewAsData: true
+                    });
+                    initBootstrapFileInput("#edit_cccd_back_file", {
+                        allowedFileExtensions: ["jpg", "jpeg", "png"],
+                        maxFileSize: 5120,
+                        dropZoneTitle: 'Kéo thả ảnh CCCD mặt sau mới vào đây ...',
+                        initialPreview: att.cccd_back_path ? [att.cccd_back_path] : [],
+                        initialPreviewAsData: true
+                    });
+                    
+                    var isContractPdf = att.contract_path && att.contract_path.indexOf('.pdf') > -1;
+                    initBootstrapFileInput("#edit_contract_file", {
+                        allowedFileExtensions: ["jpg", "jpeg", "png", "pdf"],
+                        maxFileSize: 5120,
+                        dropZoneTitle: 'Kéo thả ảnh hoặc tệp PDF hợp đồng mới vào đây ...',
+                        initialPreview: att.contract_path ? [att.contract_path] : [],
+                        initialPreviewAsData: true,
+                        initialPreviewConfig: att.contract_path ? [{
+                            type: isContractPdf ? "pdf" : "image",
+                            filetype: isContractPdf ? "application/pdf" : "image/*"
+                        }] : []
+                    });
 
                     var bsModal = new bootstrap.Modal(modal);
                     bsModal.show();
@@ -2932,10 +3009,12 @@ var RegistrationView = (function() {
     }
 
     function clearPreviews() {
-        ['edit_portrait_preview', 'edit_cccd_front_preview', 'edit_cccd_back_preview', 'edit_contract_preview'].forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) el.innerHTML = '';
-        });
+        if (typeof $.fn.fileinput !== 'undefined') {
+            $('#edit_portrait_file').fileinput('clear');
+            $('#edit_cccd_front_file').fileinput('clear');
+            $('#edit_cccd_back_file').fileinput('clear');
+            $('#edit_contract_file').fileinput('clear');
+        }
     }
 
     function showPreview(elementId, url, isPdf) {
@@ -3014,38 +3093,9 @@ var RegistrationView = (function() {
         }
     }
 
-    function bindFilePreview() {
-        var selectors = '#editAttendeeModal input[type="file"], #addAttendeeManualModal input[type="file"]';
-        var fileInputs = document.querySelectorAll(selectors);
-        fileInputs.forEach(function(input) {
-            input.addEventListener('change', function(e) {
-                var file = e.target.files[0];
-                if (!file) return;
-
-                var baseName = input.name.replace('_file', '_preview');
-                var previewId = input.closest('#editAttendeeModal') ? 'edit_' + baseName : 'add_' + baseName;
-                var previewEl = document.getElementById(previewId);
-
-                if (!previewEl) return;
-
-                if (file.type.startsWith('image/')) {
-                    var reader = new FileReader();
-                    reader.onload = function(ev) {
-                        previewEl.innerHTML = '<img src="' + ev.target.result + '" class="img-thumbnail" style="max-height:100px;">';
-                    };
-                    reader.readAsDataURL(file);
-                } else if (file.type === 'application/pdf') {
-                    previewEl.innerHTML = '<span class="badge bg-secondary"><i class="fa fa-file-pdf-o me-1"></i>' + escapeHtml(file.name) + '</span>';
-                }
-            });
-        });
-    }
-
     function bindEditAttendeeForm() {
         var form = document.getElementById('edit-attendee-form');
         if (!form) return;
-
-        bindFilePreview();
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();

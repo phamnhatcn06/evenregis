@@ -24,15 +24,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Chọn file Excel <span class="text-danger">*</span></label>
-                        <div id="import_excel_preview" class="premium-preview-box mb-2"></div>
-                        <div class="premium-upload-zone">
-                            <input type="file" name="excel_file" accept=".xls,.xlsx" required>
-                            <div class="upload-info">
-                                <i class="fa fa-file-excel-o upload-icon text-success"></i>
-                                <div class="upload-title">Kéo thả file Excel vào đây hoặc click để chọn</div>
-                                <div class="upload-hint">Chỉ hỗ trợ định dạng .xls và .xlsx (Tối đa 10MB)</div>
-                            </div>
-                        </div>
+                        <input type="file" id="import_excel_file" name="excel_file" accept=".xls,.xlsx" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -45,18 +37,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.querySelector('input[name="excel_file"]').addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        var preview = document.getElementById('import_excel_preview');
-        if (file && preview) {
-            preview.innerHTML = '<span class="badge bg-success"><i class="fa fa-file-excel-o me-1"></i>' + file.name + '</span>';
-        } else if (preview) {
-            preview.innerHTML = '';
-        }
-    });
-</script>
 
 <script>
     document.getElementById('import-excel-form').addEventListener('submit', function() {

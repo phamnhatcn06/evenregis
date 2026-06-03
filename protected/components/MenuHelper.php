@@ -81,7 +81,6 @@ class MenuHelper
             'children' => array(),
             'sort' => -99999, // Dashboard always at top
         );
-
         // Add Reports link only if permitted
         // if (PermissionHelper::canRead('reports')) {
         //     $menu['reports'] = array(

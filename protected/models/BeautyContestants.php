@@ -9,6 +9,7 @@ class BeautyContestants extends BaseBeautyContestants
     const STATUS_DISQUALIFIED = 2;
 
     public $attendee_name;
+    public $property_code;
     public $property_name;
     public $contest_name;
     public $registration_id;

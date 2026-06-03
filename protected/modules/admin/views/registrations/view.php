@@ -1069,16 +1069,8 @@ foreach ($registrationDetails as $detail) {
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Chọn tệp đính kèm <span class="text-danger">*</span></label>
-                        <div class="premium-upload-zone">
-                            <input type="file" name="documents[]" id="upload_documents" multiple required>
-                            <div class="upload-info">
-                                <i class="fa fa-cloud-upload upload-icon text-primary"></i>
-                                <div class="upload-title">Kéo thả các tệp vào đây hoặc click để chọn</div>
-                                <div class="upload-hint">JPG, PNG, PDF, DOC, DOCX, XLS, XLSX (Tối đa 10MB/tệp)</div>
-                            </div>
-                        </div>
+                        <input type="file" name="documents[]" id="upload_documents" multiple required>
                     </div>
-                    <div id="upload_preview" class="row g-2 mt-2"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -1122,6 +1114,15 @@ foreach ($registrationDetails as $detail) {
 $baseUrl = Yii::app()->theme->baseUrl;
 Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.css');
 Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.js', CClientScript::POS_END);
+
+// Register Bootstrap FileInput (Krajee) from CDN
+Yii::app()->clientScript->registerCssFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/css/fileinput.min.css');
+Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/plugins/buffer.min.js', CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/plugins/filetype.min.js', CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/plugins/piexif.min.js', CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/plugins/sortable.min.js', CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/fileinput.min.js', CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/locales/vi.js', CClientScript::POS_END);
 
 // Register JS file
 Yii::app()->clientScript->registerScriptFile(
@@ -1552,30 +1553,6 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
             }
         });
     }
-
-    document.getElementById("upload_documents").addEventListener("change", function(e) {
-        var preview = document.getElementById("upload_preview");
-        preview.innerHTML = "";
-        var files = e.target.files;
-        for (var i = 0; i < files.length; i++) {
-            var file = files[i];
-            var col = document.createElement("div");
-            col.className = "col-4";
-            var isImage = file.type.startsWith("image/");
-            if (isImage) {
-                var reader = new FileReader();
-                reader.onload = (function(col) {
-                    return function(e) {
-                        col.innerHTML = "<div class=\"border rounded p-1 text-center\"><img src=\"" + e.target.result + "\" class=\"img-fluid\" style=\"max-height:60px;\"></div>";
-                    };
-                })(col);
-                reader.readAsDataURL(file);
-            } else {
-                col.innerHTML = "<div class=\"border rounded p-2 text-center\"><i class=\"fa fa-file-o\"></i><br><small class=\"text-truncate d-block\">" + file.name + "</small></div>";
-            }
-            preview.appendChild(col);
-        }
-    });
 
     function initAttendeesDataTable() {
         if (typeof $.fn.DataTable === "undefined") return;
