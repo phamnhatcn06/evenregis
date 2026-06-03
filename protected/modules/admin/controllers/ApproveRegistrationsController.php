@@ -522,7 +522,7 @@ class ApproveRegistrationsController extends AdminController
                 if ($attendee && $attendee->approval_status != Attendees::APPROVAL_REJECTED) {
                     $attendee->approval_status = Attendees::APPROVAL_REJECTED;
                     $attendee->note = $reason;
-                    $attendee->approved_at = time();
+                    $attendee->approved_at = date('Y-m-d H:i:s');
                     $attendee->approved_by = $approvedBy;
                     $result = $attendee->updateViaApi();
                     if ($result['success']) {
