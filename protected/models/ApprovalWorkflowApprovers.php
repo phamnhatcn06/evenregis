@@ -4,6 +4,8 @@ Yii::import('application.models._base.BaseApprovalWorkflowApprovers');
 
 class ApprovalWorkflowApprovers extends BaseApprovalWorkflowApprovers
 {
+    public $auth_email;
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
