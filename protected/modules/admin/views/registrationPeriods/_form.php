@@ -76,7 +76,8 @@ $selectedContents = isset($selectedContentIds) ? $selectedContentIds : array();
                 <?php
                 $endValue = '';
                 if ($model->end_time) {
-                    $endValue = date('d-m-Y H:i', $model->end_time);
+                    $ts = is_numeric($model->end_time) ? $model->end_time : strtotime($model->end_time);
+                    if ($ts) $endValue = date('d-m-Y H:i', $ts);
                 }
                 ?>
                 <input type="text" id="end_time_picker" class="form-control"
