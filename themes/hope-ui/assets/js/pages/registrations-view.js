@@ -3024,12 +3024,14 @@ var RegistrationView = (function() {
     }
 
     function clearPreviews() {
-        if (typeof $.fn.fileinput !== 'undefined') {
-            $('#edit_portrait_file').fileinput('clear');
-            $('#edit_cccd_front_file').fileinput('clear');
-            $('#edit_cccd_back_file').fileinput('clear');
-            $('#edit_contract_file').fileinput('clear');
-        }
+        ['edit_portrait_preview', 'edit_cccd_front_preview', 'edit_cccd_back_preview', 'edit_contract_preview'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.innerHTML = '';
+        });
+        ['edit_portrait_file', 'edit_cccd_front_file', 'edit_cccd_back_file', 'edit_contract_file'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.value = '';
+        });
     }
 
     function showPreview(elementId, url, isPdf) {
