@@ -379,15 +379,18 @@ foreach ($eventContents as $ec) {
         <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự (<?php echo count($attendees); ?>)</h5>
         <?php if ($canEdit): ?>
             <div>
-                <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addAttendeeFromStaffModal">
-                    <i class="fa fa-user-plus me-1"></i>Chọn từ danh sách nhân viên
-                </button>
+                <?php if ($isHotel): ?>
+                    <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addAttendeeFromStaffModal">
+                        <i class="fa fa-user-plus me-1"></i>Chọn từ danh sách nhân viên
+                    </button>
+                <?php endif; ?>
                 <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addAttendeeManualModal">
                     <i class="fa fa-user-plus me-1"></i>Thêm người tham dự
                 </button>
                 <button type="button" class="btn btn-sm btn-success text-white ms-1" data-bs-toggle="modal" data-bs-target="#importExcelModal">
                     <i class="fa fa-file-excel-o me-1"></i>Import Excel
                 </button>
+
             </div>
         <?php endif; ?>
     </div>
@@ -1220,15 +1223,6 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 $baseUrl = Yii::app()->theme->baseUrl;
 Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.css');
 Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.js', CClientScript::POS_END);
-
-// Register Bootstrap FileInput (Krajee) from CDN
-Yii::app()->clientScript->registerCssFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/css/fileinput.min.css');
-Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/plugins/buffer.min.js', CClientScript::POS_END);
-Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/plugins/filetype.min.js', CClientScript::POS_END);
-Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/plugins/piexif.min.js', CClientScript::POS_END);
-Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/plugins/sortable.min.js', CClientScript::POS_END);
-Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/fileinput.min.js', CClientScript::POS_END);
-Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap-fileinput@5.5.2/js/locales/vi.js', CClientScript::POS_END);
 
 // Register JS file
 Yii::app()->clientScript->registerScriptFile(
