@@ -30,6 +30,8 @@ $this->Tabletitle = 'Cập nhật đợt đăng ký #' . $model->id;
         <?php echo $this->renderPartial('_form', array(
             'model' => $model,
             'events' => $events,
+            'contents' => $contents,
+            'selectedContentIds' => $selectedContentIds,
         )); ?>
     </div>
 </div>
