@@ -31,6 +31,27 @@ class RegistrationsController extends AdminController
 			$model->period_name = $period ? $period->name : '';
 		}
 
+		// Load allowed contents from registration period
+		$allowedContentCodes = array();
+		if ($model->period_id) {
+			$periodContents = RegistrationPeriodContents::getContentsByPeriod($model->period_id);
+			foreach ($periodContents as $pc) {
+				$code = '';
+				if (is_array($pc)) {
+					$code = isset($pc['content_code']) ? $pc['content_code'] : (isset($pc['content']['code']) ? $pc['content']['code'] : '');
+				} else {
+					$code = isset($pc->content_code) ? $pc->content_code : (isset($pc->content) && isset($pc->content->code) ? $pc->content->code : '');
+				}
+				if ($code) {
+					if ($code === 'sport') $code = 'sports';
+					if ($code === 'competitions') $code = 'competition';
+					if ($code === 'talents') $code = 'talent';
+					if ($code === 'beauty_contests') $code = 'miss';
+					$allowedContentCodes[] = $code;
+				}
+			}
+		}
+
 		// Load alliance request nếu có liên quân (hỗ trợ tìm kiếm 2 chiều)
 		$allianceRequest = null;
 		if ($model->event_id && $model->property_id) {
