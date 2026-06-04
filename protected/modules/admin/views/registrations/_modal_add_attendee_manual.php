@@ -120,19 +120,35 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh chân dung (530x530px) <span class="text-danger">*</span></label>
-                                <input type="file" id="add_portrait_file" name="portrait_file" accept="image/*" required>
+                                <div id="add_portrait_preview" class="file-preview-box mb-2"></div>
+                                <div class="file-upload-wrapper">
+                                    <label class="file-upload-btn" for="add_portrait_file"><i class="fa fa-folder-open"></i>Chọn ảnh</label>
+                                    <input type="file" id="add_portrait_file" name="portrait_file" accept="image/*" onchange="previewFileAdd(this, 'add_portrait_preview')">
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh CCCD mặt trước <span class="text-danger">*</span></label>
-                                <input type="file" id="add_cccd_front_file" name="cccd_front_file" accept="image/*" required>
+                                <div id="add_cccd_front_preview" class="file-preview-box mb-2"></div>
+                                <div class="file-upload-wrapper">
+                                    <label class="file-upload-btn" for="add_cccd_front_file"><i class="fa fa-folder-open"></i>Chọn ảnh</label>
+                                    <input type="file" id="add_cccd_front_file" name="cccd_front_file" accept="image/*" onchange="previewFileAdd(this, 'add_cccd_front_preview')">
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh CCCD mặt sau <span class="text-danger">*</span></label>
-                                <input type="file" id="add_cccd_back_file" name="cccd_back_file" accept="image/*" required>
+                                <div id="add_cccd_back_preview" class="file-preview-box mb-2"></div>
+                                <div class="file-upload-wrapper">
+                                    <label class="file-upload-btn" for="add_cccd_back_file"><i class="fa fa-folder-open"></i>Chọn ảnh</label>
+                                    <input type="file" id="add_cccd_back_file" name="cccd_back_file" accept="image/*" onchange="previewFileAdd(this, 'add_cccd_back_preview')">
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Hợp đồng lao động</label>
-                                <input type="file" id="add_contract_file" name="contract_file" accept="image/*,.pdf">
+                                <div id="add_contract_preview" class="file-preview-box mb-2"></div>
+                                <div class="file-upload-wrapper">
+                                    <label class="file-upload-btn" for="add_contract_file"><i class="fa fa-folder-open"></i>Chọn file</label>
+                                    <input type="file" id="add_contract_file" name="contract_file" accept="image/*,.pdf" onchange="previewFileAdd(this, 'add_contract_preview')">
+                                </div>
                             </div>
                         </div>
                     </div>
