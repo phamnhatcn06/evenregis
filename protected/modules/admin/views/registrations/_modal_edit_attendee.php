@@ -170,6 +170,26 @@
 </div>
 
 <script>
+    function previewFile(input, previewId) {
+        var preview = document.getElementById(previewId);
+        if (!preview) return;
+
+        if (input.files && input.files[0]) {
+            var file = input.files[0];
+            var isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+            if (isPdf) {
+                preview.innerHTML = '<i class="fa fa-file-pdf-o fa-2x text-danger"></i><div class="small text-muted mt-1">' + file.name + '</div>';
+            } else {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result + '" onclick="window.open(this.src)" title="Click để xem lớn">';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
     document.getElementById('btn_save_attendee').addEventListener('click', function(e) {
         const form = document.getElementById('edit-attendee-form');
         const maxFileSize = 5 * 1024 * 1024; // 5MB
