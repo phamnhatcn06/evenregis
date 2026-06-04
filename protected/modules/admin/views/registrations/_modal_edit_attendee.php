@@ -85,20 +85,20 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Ảnh chân dung (530x530px)</label>
-                                <input type="file" id="edit_portrait_file" name="portrait_file" accept="image/*">
+                                <label class="form-label fw-bold"><i class="fa fa-user-circle-o me-1 text-primary"></i>Ảnh chân dung <small class="text-muted">(530x530px)</small></label>
+                                <input type="file" id="edit_portrait_file" name="portrait_file" accept="image/*" class="file-input-styled">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Ảnh CCCD mặt trước</label>
-                                <input type="file" id="edit_cccd_front_file" name="cccd_front_file" accept="image/*">
+                                <label class="form-label fw-bold"><i class="fa fa-id-card-o me-1 text-info"></i>Ảnh CCCD mặt trước</label>
+                                <input type="file" id="edit_cccd_front_file" name="cccd_front_file" accept="image/*" class="file-input-styled">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Ảnh CCCD mặt sau</label>
-                                <input type="file" id="edit_cccd_back_file" name="cccd_back_file" accept="image/*">
+                                <label class="form-label fw-bold"><i class="fa fa-id-card me-1 text-info"></i>Ảnh CCCD mặt sau</label>
+                                <input type="file" id="edit_cccd_back_file" name="cccd_back_file" accept="image/*" class="file-input-styled">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Hợp đồng lao động</label>
-                                <input type="file" id="edit_contract_file" name="contract_file" accept="image/*,.pdf">
+                                <label class="form-label fw-bold"><i class="fa fa-file-text-o me-1 text-success"></i>Hợp đồng lao động</label>
+                                <input type="file" id="edit_contract_file" name="contract_file" accept="image/*,.pdf" class="file-input-styled">
                             </div>
                         </div>
                     </div>
