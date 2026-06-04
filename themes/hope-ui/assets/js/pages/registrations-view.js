@@ -3048,14 +3048,14 @@ var RegistrationView = (function() {
         var el = document.getElementById(elementId);
         if (!el) return;
         if (!url) {
-            el.innerHTML = '<span class="text-muted small"><i class="fa fa-image me-1"></i>Chưa có ảnh</span>';
+            el.innerHTML = '<i class="fa fa-image fa-2x text-muted"></i><div class="small text-muted mt-1">Chưa có ảnh</div>';
             return;
         }
         var isPdf = url.toLowerCase().indexOf('.pdf') > -1;
         if (isPdf) {
-            el.innerHTML = '<a href="' + url + '" target="_blank" class="btn btn-sm btn-outline-danger"><i class="fa fa-file-pdf-o me-1"></i>Xem PDF hiện tại</a>';
+            el.innerHTML = '<a href="' + url + '" target="_blank"><i class="fa fa-file-pdf-o fa-2x text-danger"></i></a><div class="small text-muted mt-1">Click để xem PDF</div>';
         } else {
-            el.innerHTML = '<img src="' + url + '" class="img-thumbnail" style="max-height:70px;cursor:pointer;" onclick="RegistrationView.viewDocument(\'' + url + '\', \'image\')" title="Click để xem lớn">';
+            el.innerHTML = '<img src="' + url + '" onclick="RegistrationView.viewDocument(\'' + url + '\', \'image\')" title="Click để xem lớn">';
         }
     }
 
