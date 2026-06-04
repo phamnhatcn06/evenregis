@@ -12,6 +12,7 @@ class RegistrationPeriodsController extends AdminController
 	{
 		$model = new RegistrationPeriods;
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
+		$contents = Contents::getApiDataProvider(array('status' => 1), 100)->getData();
 
 		if (isset($_POST['RegistrationPeriods'])) {
 			$model->setAttributes($_POST['RegistrationPeriods']);
@@ -20,8 +21,13 @@ class RegistrationPeriodsController extends AdminController
 				$result = $model->storeViaApi();
 
 				if ($result['success']) {
-					Yii::app()->user->setFlash('success', 'Tạo đợt đăng ký thành công.');
 					$newId = isset($result['data']['id']) ? $result['data']['id'] : null;
+
+					if ($newId && isset($_POST['content_ids'])) {
+						RegistrationPeriodContents::syncContentsForPeriod($newId, $_POST['content_ids']);
+					}
+
+					Yii::app()->user->setFlash('success', 'Tạo đợt đăng ký thành công.');
 					$this->redirect($newId ? array('view', 'id' => $newId) : array('admin'));
 				} else {
 					$errorMsg = isset($result['error']) ? $result['error'] : 'Không thể tạo đợt đăng ký.';
@@ -33,6 +39,8 @@ class RegistrationPeriodsController extends AdminController
 		$this->render('create', array(
 			'model' => $model,
 			'events' => $events,
+			'contents' => $contents,
+			'selectedContentIds' => array(),
 		));
 	}
 
