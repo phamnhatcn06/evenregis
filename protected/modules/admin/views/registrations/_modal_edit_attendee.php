@@ -86,19 +86,23 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh chân dung (530x530px)</label>
-                                <input type="file" id="edit_portrait_file" name="portrait_file" accept="image/*">
+                                <div id="edit_portrait_preview" class="mb-2"></div>
+                                <input type="file" class="form-control form-control-sm" id="edit_portrait_file" name="portrait_file" accept="image/*">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh CCCD mặt trước</label>
-                                <input type="file" id="edit_cccd_front_file" name="cccd_front_file" accept="image/*">
+                                <div id="edit_cccd_front_preview" class="mb-2"></div>
+                                <input type="file" class="form-control form-control-sm" id="edit_cccd_front_file" name="cccd_front_file" accept="image/*">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh CCCD mặt sau</label>
-                                <input type="file" id="edit_cccd_back_file" name="cccd_back_file" accept="image/*">
+                                <div id="edit_cccd_back_preview" class="mb-2"></div>
+                                <input type="file" class="form-control form-control-sm" id="edit_cccd_back_file" name="cccd_back_file" accept="image/*">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Hợp đồng lao động</label>
-                                <input type="file" id="edit_contract_file" name="contract_file" accept="image/*,.pdf">
+                                <div id="edit_contract_preview" class="mb-2"></div>
+                                <input type="file" class="form-control form-control-sm" id="edit_contract_file" name="contract_file" accept="image/*,.pdf">
                             </div>
                         </div>
                     </div>
