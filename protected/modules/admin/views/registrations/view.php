@@ -769,11 +769,13 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                 </div><!-- end row -->
             </div>
         </div>
+        <?php endif; ?>
 
     </div>
     <div class="col-md-12">
 
         <!-- 2. ĐĂNG KÝ THI NGHIỆP VỤ -->
+        <?php if ($canShowCompetition): ?>
         <?php
         $competitionPendingCount = count($allianceByContent['competition']['pending']);
         $competitionHistoryCount = count($allianceByContent['competition']['history']);
