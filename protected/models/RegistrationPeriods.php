@@ -66,10 +66,12 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		$data['note'] = $this->note ?: null;
 
 		if ($this->start_time) {
-			$data['start_time'] = date('Y-m-d H:i:s', $this->start_time);
+			$ts = is_numeric($this->start_time) ? $this->start_time : strtotime($this->start_time);
+			if ($ts) $data['start_time'] = date('Y-m-d H:i:s', $ts);
 		}
 		if ($this->end_time) {
-			$data['end_time'] = date('Y-m-d H:i:s', $this->end_time);
+			$ts = is_numeric($this->end_time) ? $this->end_time : strtotime($this->end_time);
+			if ($ts) $data['end_time'] = date('Y-m-d H:i:s', $ts);
 		}
 
 		return $data;
