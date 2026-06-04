@@ -109,9 +109,31 @@ $selectedContents = isset($selectedContentIds) ? $selectedContentIds : array();
                 <?php echo $form->error($model, 'note'); ?>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label class="form-label required">Nội dung cho phép đăng ký <span class="text-danger">*</span></label>
+                <div class="border rounded p-3" style="background:#fafafa;">
+                    <?php if (empty($contentList)): ?>
+                        <p class="text-muted mb-0">Chưa có nội dung nào.</p>
+                    <?php else: ?>
+                        <?php foreach ($contentList as $cId => $cName): ?>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input"
+                                    name="content_ids[]"
+                                    id="content_<?php echo $cId; ?>"
+                                    value="<?php echo $cId; ?>"
+                                    <?php echo in_array($cId, $selectedContents) ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="content_<?php echo $cId; ?>">
+                                    <?php echo CHtml::encode($cName); ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                <small class="text-muted">Chọn các nội dung mà đơn vị được đăng ký trong đợt này</small>
+            </div>
+        </div>
     </div>
-
-
 
     <hr />
     <div class="footer-action">
