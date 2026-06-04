@@ -5,7 +5,11 @@ class RegistrationPeriodsController extends AdminController
 	public function actionView($id)
 	{
 		$model = $this->loadModelById($id);
-		$this->render('view', array('model' => $model));
+		$periodContents = RegistrationPeriodContents::getContentsByPeriod($id);
+		$this->render('view', array(
+			'model' => $model,
+			'periodContents' => $periodContents,
+		));
 	}
 
 	public function actionCreate()
