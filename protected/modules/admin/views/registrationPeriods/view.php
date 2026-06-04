@@ -112,3 +112,29 @@ $perColumn = ceil($totalAttrs / $columns);
         </div>
     </div>
 </div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fa fa-list-ul me-2"></i>Nội dung cho phép đăng ký</h5>
+    </div>
+    <div class="card-body">
+        <?php if (empty($periodContents)): ?>
+            <p class="text-muted mb-0"><i class="fa fa-info-circle me-1"></i>Chưa cấu hình nội dung cho đợt đăng ký này.</p>
+        <?php else: ?>
+            <div class="row">
+                <?php foreach ($periodContents as $pc):
+                    $contentName = '';
+                    if (is_array($pc)) {
+                        $contentName = isset($pc['content_name']) ? $pc['content_name'] : (isset($pc['content']['name']) ? $pc['content']['name'] : '');
+                    } else {
+                        $contentName = isset($pc->content_name) ? $pc->content_name : (isset($pc->content) && isset($pc->content->name) ? $pc->content->name : '');
+                    }
+                ?>
+                    <div class="col-md-3 col-sm-6 mb-2">
+                        <span class="badge bg-primary"><i class="fa fa-check me-1"></i><?php echo CHtml::encode($contentName); ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
