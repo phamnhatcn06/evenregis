@@ -7,6 +7,17 @@ foreach ($events as $e) {
         $eventList[$eId] = $eName;
     }
 }
+
+$contentList = array();
+foreach ($contents as $c) {
+    $cId = isset($c['id']) ? $c['id'] : (isset($c->id) ? $c->id : null);
+    $cName = isset($c['name']) ? $c['name'] : (isset($c->name) ? $c->name : '');
+    if ($cId) {
+        $contentList[$cId] = $cName;
+    }
+}
+
+$selectedContents = isset($selectedContentIds) ? $selectedContentIds : array();
 ?>
 
 <div class="form-wrap">
