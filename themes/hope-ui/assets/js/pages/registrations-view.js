@@ -2996,41 +2996,11 @@ var RegistrationView = (function() {
                     document.getElementById('edit_start_date').value = formatDate(att.start_date);
                     document.getElementById('edit_transport_id').value = att.transport_id || '';
 
-                    // Initialize edit file fields with active initial previews
-                    initBootstrapFileInput("#edit_portrait_file", {
-                        allowedFileExtensions: ["jpg", "jpeg", "png"],
-                        maxFileSize: 5120,
-                        dropZoneTitle: 'Kéo thả ảnh chân dung mới vào đây ...',
-                        initialPreview: att.portrait_path ? [att.portrait_path] : [],
-                        initialPreviewAsData: true
-                    });
-                    initBootstrapFileInput("#edit_cccd_front_file", {
-                        allowedFileExtensions: ["jpg", "jpeg", "png"],
-                        maxFileSize: 5120,
-                        dropZoneTitle: 'Kéo thả ảnh CCCD mặt trước mới vào đây ...',
-                        initialPreview: att.cccd_front_path ? [att.cccd_front_path] : [],
-                        initialPreviewAsData: true
-                    });
-                    initBootstrapFileInput("#edit_cccd_back_file", {
-                        allowedFileExtensions: ["jpg", "jpeg", "png"],
-                        maxFileSize: 5120,
-                        dropZoneTitle: 'Kéo thả ảnh CCCD mặt sau mới vào đây ...',
-                        initialPreview: att.cccd_back_path ? [att.cccd_back_path] : [],
-                        initialPreviewAsData: true
-                    });
-
-                    var isContractPdf = att.contract_path && att.contract_path.indexOf('.pdf') > -1;
-                    initBootstrapFileInput("#edit_contract_file", {
-                        allowedFileExtensions: ["jpg", "jpeg", "png", "pdf"],
-                        maxFileSize: 5120,
-                        dropZoneTitle: 'Kéo thả ảnh hoặc tệp PDF hợp đồng mới vào đây ...',
-                        initialPreview: att.contract_path ? [att.contract_path] : [],
-                        initialPreviewAsData: true,
-                        initialPreviewConfig: att.contract_path ? [{
-                            type: isContractPdf ? "pdf" : "image",
-                            filetype: isContractPdf ? "application/pdf" : "image/*"
-                        }] : []
-                    });
+                    // Show simple previews for existing files
+                    showSimplePreview('edit_portrait_preview', att.portrait_path);
+                    showSimplePreview('edit_cccd_front_preview', att.cccd_front_path);
+                    showSimplePreview('edit_cccd_back_preview', att.cccd_back_path);
+                    showSimplePreview('edit_contract_preview', att.contract_path);
 
                     var bsModal = new bootstrap.Modal(modal);
                     bsModal.show();
