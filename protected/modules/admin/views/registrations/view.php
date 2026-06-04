@@ -1096,6 +1096,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                 </div><!-- end row -->
             </div>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 
