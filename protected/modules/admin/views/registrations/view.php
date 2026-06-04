@@ -990,9 +990,11 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                 </div><!-- end row -->
             </div>
         </div>
+        <?php endif; ?>
     </div>
     <div class="col-md-12">
         <!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
+        <?php if ($canShowMiss): ?>
         <?php
         $missPendingCount = count($allianceByContent['miss']['pending']);
         $missHistoryCount = count($allianceByContent['miss']['history']);
