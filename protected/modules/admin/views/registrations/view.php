@@ -553,10 +553,19 @@ foreach ($registrationDetails as $detail) {
         $detailsByContent[$code][] = $detail;
     }
 }
+
+// Check allowed contents - nếu không có cấu hình thì cho phép tất cả
+$allowedContents = isset($allowedContentCodes) ? $allowedContentCodes : array();
+$showAllContents = empty($allowedContents);
+$canShowSports = $showAllContents || in_array('sports', $allowedContents);
+$canShowCompetition = $showAllContents || in_array('competition', $allowedContents);
+$canShowTalent = $showAllContents || in_array('talent', $allowedContents);
+$canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 ?>
 <div class="row">
     <div class="col-md-12">
         <!-- 1. ĐĂNG KÝ THI ĐẤU THỂ THAO -->
+        <?php if ($canShowSports): ?>
         <?php
         $sportsPendingCount = count($allianceByContent['sports']['pending']);
         $sportsHistoryCount = count($allianceByContent['sports']['history']);
