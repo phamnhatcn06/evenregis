@@ -11,6 +11,45 @@
                         background-color: #0d6efd !important;
                         color: #fff !important;
                     }
+                    .file-upload-wrapper {
+                        position: relative;
+                    }
+                    .file-upload-wrapper input[type="file"] {
+                        display: none;
+                    }
+                    .file-upload-btn {
+                        display: inline-block;
+                        padding: 6px 12px;
+                        font-size: 13px;
+                        border: 1px solid #dee2e6;
+                        border-radius: 4px;
+                        background: #f8f9fa;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    }
+                    .file-upload-btn:hover {
+                        background: #e9ecef;
+                        border-color: #0d6efd;
+                    }
+                    .file-upload-btn i {
+                        margin-right: 5px;
+                    }
+                    .file-preview-box {
+                        min-height: 60px;
+                        padding: 8px;
+                        border: 1px dashed #dee2e6;
+                        border-radius: 6px;
+                        background: #fafafa;
+                        text-align: center;
+                    }
+                    .file-preview-box img {
+                        max-height: 60px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
+                    .file-preview-box img:hover {
+                        opacity: 0.8;
+                    }
                 </style>
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa fa-pencil me-2"></i>Sửa thông tin người tham dự</h5>
