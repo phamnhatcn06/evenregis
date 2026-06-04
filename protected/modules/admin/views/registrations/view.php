@@ -1294,11 +1294,14 @@ Yii::app()->clientScript->registerScript('flatpickr-locale', '
         firstDayOfWeek: 1
     };
     window.initDatePickers = function() {
-        console.log("initDatePickers called, found elements:", document.querySelectorAll(".datepicker").length);
+        if (typeof flatpickr === "undefined") {
+            console.warn("flatpickr not loaded yet, retrying...");
+            setTimeout(window.initDatePickers, 100);
+            return;
+        }
         document.querySelectorAll(".datepicker").forEach(function(el) {
-            console.log("Processing element:", el.id, "already has flatpickr:", !!el._flatpickr);
             if (el._flatpickr || el.classList.contains("flatpickr-input")) return;
-            var fp = flatpickr(el, {
+            flatpickr(el, {
                 dateFormat: "Y-m-d",
                 altInput: true,
                 altFormat: "d/m/Y",
@@ -1306,7 +1309,6 @@ Yii::app()->clientScript->registerScript('flatpickr-locale', '
                 allowInput: true,
                 locale: Vietnamese
             });
-            console.log("Flatpickr initialized for:", el.id, "instance:", fp);
         });
     };
 ', CClientScript::POS_END);
