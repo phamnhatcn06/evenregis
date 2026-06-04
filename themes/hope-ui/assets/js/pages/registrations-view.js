@@ -2996,77 +2996,40 @@ var RegistrationView = (function() {
                     document.getElementById('edit_start_date').value = formatDate(att.start_date);
                     document.getElementById('edit_transport_id').value = att.transport_id || '';
 
-                    // Initialize edit file fields with compact initial previews
-                    var previewSettings = {
-                        frameClass: 'krajee-default kv-preview-thumb',
-                        width: '100px',
-                        height: '80px'
-                    };
-                    var previewZoomSettings = {
-                        zoomFromUrl: true
-                    };
+                    // Initialize edit file fields with active initial previews
                     initBootstrapFileInput("#edit_portrait_file", {
                         allowedFileExtensions: ["jpg", "jpeg", "png"],
                         maxFileSize: 5120,
-                        dropZoneTitle: '<i class="fa fa-cloud-upload fa-2x text-muted"></i><br><small>Kéo thả ảnh chân dung</small>',
+                        dropZoneTitle: 'Kéo thả ảnh chân dung mới vào đây ...',
                         initialPreview: att.portrait_path ? [att.portrait_path] : [],
-                        initialPreviewAsData: true,
-                        initialPreviewFileType: 'image',
-                        previewSettings: { image: previewSettings },
-                        previewZoomSettings: previewZoomSettings,
-                        layoutTemplates: { footer: '' },
-                        maxImageWidth: 100,
-                        maxImageHeight: 80,
-                        resizePreference: 'height'
+                        initialPreviewAsData: true
                     });
                     initBootstrapFileInput("#edit_cccd_front_file", {
                         allowedFileExtensions: ["jpg", "jpeg", "png"],
                         maxFileSize: 5120,
-                        dropZoneTitle: '<i class="fa fa-cloud-upload fa-2x text-muted"></i><br><small>Kéo thả ảnh CCCD trước</small>',
+                        dropZoneTitle: 'Kéo thả ảnh CCCD mặt trước mới vào đây ...',
                         initialPreview: att.cccd_front_path ? [att.cccd_front_path] : [],
-                        initialPreviewAsData: true,
-                        initialPreviewFileType: 'image',
-                        previewSettings: { image: previewSettings },
-                        previewZoomSettings: previewZoomSettings,
-                        layoutTemplates: { footer: '' },
-                        maxImageWidth: 100,
-                        maxImageHeight: 80
+                        initialPreviewAsData: true
                     });
                     initBootstrapFileInput("#edit_cccd_back_file", {
                         allowedFileExtensions: ["jpg", "jpeg", "png"],
                         maxFileSize: 5120,
-                        dropZoneTitle: '<i class="fa fa-cloud-upload fa-2x text-muted"></i><br><small>Kéo thả ảnh CCCD sau</small>',
+                        dropZoneTitle: 'Kéo thả ảnh CCCD mặt sau mới vào đây ...',
                         initialPreview: att.cccd_back_path ? [att.cccd_back_path] : [],
-                        initialPreviewAsData: true,
-                        initialPreviewFileType: 'image',
-                        previewSettings: { image: previewSettings },
-                        previewZoomSettings: previewZoomSettings,
-                        layoutTemplates: { footer: '' },
-                        maxImageWidth: 100,
-                        maxImageHeight: 80
+                        initialPreviewAsData: true
                     });
 
-                    var isContractPdf = att.contract_path && att.contract_path.toLowerCase().indexOf('.pdf') > -1;
+                    var isContractPdf = att.contract_path && att.contract_path.indexOf('.pdf') > -1;
                     initBootstrapFileInput("#edit_contract_file", {
                         allowedFileExtensions: ["jpg", "jpeg", "png", "pdf"],
                         maxFileSize: 5120,
-                        dropZoneTitle: '<i class="fa fa-cloud-upload fa-2x text-muted"></i><br><small>Kéo thả hợp đồng (ảnh/PDF)</small>',
+                        dropZoneTitle: 'Kéo thả ảnh hoặc tệp PDF hợp đồng mới vào đây ...',
                         initialPreview: att.contract_path ? [att.contract_path] : [],
                         initialPreviewAsData: true,
-                        initialPreviewFileType: isContractPdf ? 'pdf' : 'image',
                         initialPreviewConfig: att.contract_path ? [{
-                            type: isContractPdf ? 'pdf' : 'image',
-                            filetype: isContractPdf ? 'application/pdf' : 'image/*',
-                            caption: isContractPdf ? 'Hợp đồng.pdf' : ''
-                        }] : [],
-                        previewSettings: {
-                            image: previewSettings,
-                            pdf: { width: '100px', height: '80px' }
-                        },
-                        previewZoomSettings: previewZoomSettings,
-                        layoutTemplates: { footer: '' },
-                        maxImageWidth: 100,
-                        maxImageHeight: 80
+                            type: isContractPdf ? "pdf" : "image",
+                            filetype: isContractPdf ? "application/pdf" : "image/*"
+                        }] : []
                     });
 
                     var bsModal = new bootstrap.Modal(modal);
