@@ -482,6 +482,7 @@ class RegistrationsController extends AdminController
 			'incomingRequestsData' => $incomingRequestsData,
 			'allianceHistory' => $allianceHistory,
 			'approvalLogs' => $approvalLogs,
+			'allowedContentCodes' => $allowedContentCodes,
 		));
 	}
 
