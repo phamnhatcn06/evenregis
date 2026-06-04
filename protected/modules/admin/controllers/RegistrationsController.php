@@ -2034,11 +2034,11 @@ class RegistrationsController extends AdminController
 				$startDate = isset($staff['start_date']) ? $staff['start_date'] : (isset($staff->start_date) ? $staff->start_date : '');
 				$departmentCode = isset($staff['division_code']) ? $staff['division_code'] : (isset($staff->division_code) ? $staff->division_code : '');
 
-				if (!$id) continue;
+				// if (!$id) continue;
 
-				if (!empty($allowedDepartments) && !in_array($departmentCode, $allowedDepartments)) {
-					continue;
-				}
+				// if (!empty($allowedDepartments) && !in_array($departmentCode, $allowedDepartments)) {
+				// 	continue;
+				// }
 
 				$result[] = array(
 					'id' => $id,
