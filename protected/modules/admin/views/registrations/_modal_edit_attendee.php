@@ -11,67 +11,6 @@
                         background-color: #0d6efd !important;
                         color: #fff !important;
                     }
-                    /* Compact file preview styles */
-                    #editAttendeeModal .file-preview {
-                        border: 1px dashed #dee2e6;
-                        border-radius: 8px;
-                        padding: 8px;
-                        background: #f8f9fa;
-                        min-height: 100px;
-                    }
-                    #editAttendeeModal .file-preview-thumbnails {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                    }
-                    #editAttendeeModal .file-preview-frame {
-                        margin: 4px !important;
-                        border: 2px solid #dee2e6 !important;
-                        border-radius: 6px !important;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-                        max-width: 110px !important;
-                        max-height: 90px !important;
-                        overflow: hidden;
-                    }
-                    #editAttendeeModal .file-preview-frame:hover {
-                        border-color: #0d6efd !important;
-                    }
-                    #editAttendeeModal .file-preview-image {
-                        max-width: 100px !important;
-                        max-height: 80px !important;
-                        object-fit: contain;
-                    }
-                    #editAttendeeModal .file-drop-zone {
-                        min-height: 80px !important;
-                        padding: 10px !important;
-                    }
-                    #editAttendeeModal .file-drop-zone-title {
-                        font-size: 12px !important;
-                        padding: 10px !important;
-                    }
-                    #editAttendeeModal .krajee-default.file-preview-frame .kv-file-content {
-                        width: 100px !important;
-                        height: 80px !important;
-                    }
-                    #editAttendeeModal .file-footer-caption,
-                    #editAttendeeModal .file-footer-buttons {
-                        display: none !important;
-                    }
-                    #editAttendeeModal .kv-file-zoom {
-                        position: absolute;
-                        top: 2px;
-                        right: 2px;
-                        padding: 2px 6px;
-                        font-size: 10px;
-                    }
-                    #editAttendeeModal .file-preview-other-frame {
-                        padding: 15px;
-                        text-align: center;
-                    }
-                    #editAttendeeModal .file-preview-other-frame i {
-                        font-size: 32px;
-                        color: #dc3545;
-                    }
                 </style>
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa fa-pencil me-2"></i>Sửa thông tin người tham dự</h5>

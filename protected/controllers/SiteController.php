@@ -54,8 +54,7 @@ class SiteController extends Controller
             }
             if ($userData) {
                 // Fetch permissions from SSO API
-                AuthHandler::fetchPermissions($ssoToken);
-
+                $permiss = AuthHandler::fetchPermissions($ssoToken);
                 // Fetch full user profile from SSO API
                 $userProfile = AuthHandler::fetchUserProfile($ssoToken);
 
