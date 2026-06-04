@@ -48,6 +48,8 @@ class RegistrationPeriodsController extends AdminController
 	{
 		$model = $this->loadModelById($id);
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
+		$contents = Contents::getApiDataProvider(array('status' => 1), 100)->getData();
+		$selectedContentIds = RegistrationPeriodContents::getContentIdsByPeriod($id);
 
 		if (isset($_POST['RegistrationPeriods'])) {
 			$model->setAttributes($_POST['RegistrationPeriods']);
@@ -57,6 +59,9 @@ class RegistrationPeriodsController extends AdminController
 				$result = $model->updateViaApi();
 
 				if ($result['success']) {
+					$contentIds = isset($_POST['content_ids']) ? $_POST['content_ids'] : array();
+					RegistrationPeriodContents::syncContentsForPeriod($id, $contentIds);
+
 					Yii::app()->user->setFlash('success', 'Cập nhật đợt đăng ký thành công.');
 					$this->redirect(array('view', 'id' => $id));
 				} else {
@@ -68,6 +73,8 @@ class RegistrationPeriodsController extends AdminController
 		$this->render('update', array(
 			'model' => $model,
 			'events' => $events,
+			'contents' => $contents,
+			'selectedContentIds' => $selectedContentIds,
 		));
 	}
 
