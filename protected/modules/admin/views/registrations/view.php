@@ -865,6 +865,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                 </div><!-- end row -->
             </div>
         </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -873,6 +874,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
     <div class="col-md-12">
 
         <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
+        <?php if ($canShowTalent): ?>
         <?php
         $talentPendingCount = count($allianceByContent['talent']['pending']);
         $talentHistoryCount = count($allianceByContent['talent']['history']);
