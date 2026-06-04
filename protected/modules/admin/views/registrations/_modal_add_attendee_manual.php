@@ -6,51 +6,6 @@
                 <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                 <input type="hidden" name="event_id" value="<?php echo $model->event_id; ?>">
                 <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
-                <style>
-                    #addAttendeeManualModal select[multiple] option:checked {
-                        background-color: #0d6efd !important;
-                        color: #fff !important;
-                    }
-                    .file-upload-wrapper {
-                        position: relative;
-                    }
-                    .file-upload-wrapper input[type="file"] {
-                        display: none;
-                    }
-                    .file-upload-btn {
-                        display: inline-block;
-                        padding: 6px 12px;
-                        font-size: 13px;
-                        border: 1px solid #dee2e6;
-                        border-radius: 4px;
-                        background: #f8f9fa;
-                        cursor: pointer;
-                        transition: all 0.2s;
-                    }
-                    .file-upload-btn:hover {
-                        background: #e9ecef;
-                        border-color: #0d6efd;
-                    }
-                    .file-upload-btn i {
-                        margin-right: 5px;
-                    }
-                    .file-preview-box {
-                        min-height: 60px;
-                        padding: 8px;
-                        border: 1px dashed #dee2e6;
-                        border-radius: 6px;
-                        background: #fafafa;
-                        text-align: center;
-                    }
-                    .file-preview-box img {
-                        max-height: 60px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                    }
-                    .file-preview-box img:hover {
-                        opacity: 0.8;
-                    }
-                </style>
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa fa-user-plus me-2"></i>Thêm người tham dự</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
