@@ -59,7 +59,8 @@ $selectedContents = isset($selectedContentIds) ? $selectedContentIds : array();
                 <?php
                 $startValue = '';
                 if ($model->start_time) {
-                    $startValue = date('d-m-Y H:i', $model->start_time);
+                    $ts = is_numeric($model->start_time) ? $model->start_time : strtotime($model->start_time);
+                    if ($ts) $startValue = date('d-m-Y H:i', $ts);
                 }
                 ?>
                 <input type="text" id="start_time_picker" class="form-control"
