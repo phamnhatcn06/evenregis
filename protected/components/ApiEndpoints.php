@@ -142,6 +142,13 @@ class ApiEndpoints
     const REGISTRATION_PERIOD_UPDATE = '/api/registration-periods/update/{id}';
     const REGISTRATION_PERIOD_DESTROY = '/api/registration-periods/destroy/{id}';
 
+    // Registration Period Content
+    const REGISTRATION_PERIOD_CONTENT_LIST = '/api/registration-period-contents';
+    const REGISTRATION_PERIOD_CONTENT_STORE = '/api/registration-period-contents/store';
+    const REGISTRATION_PERIOD_CONTENT_DETAIL = '/api/registration-period-contents/detail/{id}';
+    const REGISTRATION_PERIOD_CONTENT_UPDATE = '/api/registration-period-contents/update/{id}';
+    const REGISTRATION_PERIOD_CONTENT_DESTROY = '/api/registration-period-contents/destroy/{id}';
+
     // Registration
     const REGISTRATION_LIST = '/api/registrations';
     const REGISTRATION_STORE = '/api/registrations/store';

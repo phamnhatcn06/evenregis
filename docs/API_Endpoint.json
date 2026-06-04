@@ -2096,6 +2096,16 @@
                                             "value": "admin@example.com",
                                             "type": "text",
                                             "description": "Email người thực hiện thao tác"
+                                        },
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "personal_email",
+                                            "value": "beauty@gmail.com",
+                                            "type": "text"
                                         }
                                     ]
                                 },
@@ -2233,6 +2243,16 @@
                                             "value": "admin@example.com",
                                             "type": "text",
                                             "description": "Email người thực hiện thao tác"
+                                        },
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "personal_email",
+                                            "value": "beauty@gmail.com",
+                                            "type": "text"
                                         }
                                     ]
                                 },
@@ -2492,7 +2512,7 @@
                                     }
                                 ],
                                 "url": {
-                                    "raw": "{{base_url}}/api/beauty-registrations?per_page=20&page=1&registration_id=1&event_id=1&property_id=1&period_id=1&status=1",
+                                    "raw": "{{base_url}}/api/beauty-registrations?per_page=20&page=1&status=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -2511,19 +2531,19 @@
                                         },
                                         {
                                             "key": "registration_id",
-                                            "value": "1"
+                                            "value": null
                                         },
                                         {
                                             "key": "event_id",
-                                            "value": "1"
+                                            "value": null
                                         },
                                         {
                                             "key": "property_id",
-                                            "value": "1"
+                                            "value": null
                                         },
                                         {
                                             "key": "period_id",
-                                            "value": "1"
+                                            "value": null
                                         },
                                         {
                                             "key": "status",
@@ -6459,7 +6479,7 @@
                                     }
                                 ],
                                 "url": {
-                                    "raw": "{{base_url}}/api/registrations?per_page=20&page=1&registration_id=1&event_id=1&property_id=1&period_id=1&status=1",
+                                    "raw": "{{base_url}}/api/registrations?per_page=20&page=1&status=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -6478,19 +6498,19 @@
                                         },
                                         {
                                             "key": "registration_id",
-                                            "value": "1"
+                                            "value": null
                                         },
                                         {
                                             "key": "event_id",
-                                            "value": "1"
+                                            "value": null
                                         },
                                         {
                                             "key": "property_id",
-                                            "value": "1"
+                                            "value": null
                                         },
                                         {
                                             "key": "period_id",
-                                            "value": "1"
+                                            "value": null
                                         },
                                         {
                                             "key": "status",
@@ -6557,13 +6577,43 @@
                                         },
                                         {
                                             "key": "submitted_by",
-                                            "value": "1",
+                                            "value": "john_doe_123",
                                             "type": "text"
                                         },
                                         {
                                             "key": "rejection_reason",
                                             "value": "",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "reviewed_by",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "ID người duyệt"
+                                        },
+                                        {
+                                            "key": "reviewed_at",
+                                            "value": "2026-06-01 10:00:00",
+                                            "type": "text",
+                                            "description": "Thời gian duyệt"
+                                        },
+                                        {
+                                            "key": "submitted_at",
+                                            "value": "2026-06-01 10:00:00",
+                                            "type": "text",
+                                            "description": "Thời gian gửi"
+                                        },
+                                        {
+                                            "key": "current_approval_index",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Index cấp duyệt hiện tại"
+                                        },
+                                        {
+                                            "key": "next_approval_index",
+                                            "value": "2",
+                                            "type": "text",
+                                            "description": "Index cấp duyệt tiếp theo"
                                         },
                                         {
                                             "key": "auth_email",
@@ -6669,13 +6719,43 @@
                                         },
                                         {
                                             "key": "submitted_by",
-                                            "value": "1",
+                                            "value": "john_doe_123",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "submitted_at",
+                                            "value": "2026-06-01 10:00:00",
+                                            "type": "text",
+                                            "description": "Thời gian gửi"
                                         },
                                         {
                                             "key": "rejection_reason",
                                             "value": "",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "reviewed_by",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "ID người duyệt"
+                                        },
+                                        {
+                                            "key": "reviewed_at",
+                                            "value": "2026-06-01 10:00:00",
+                                            "type": "text",
+                                            "description": "Thời gian duyệt"
+                                        },
+                                        {
+                                            "key": "current_approval_index",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Index cấp duyệt hiện tại"
+                                        },
+                                        {
+                                            "key": "next_approval_index",
+                                            "value": "2",
+                                            "type": "text",
+                                            "description": "Index cấp duyệt tiếp theo"
                                         },
                                         {
                                             "key": "auth_email",
@@ -7227,7 +7307,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"event_id\": 1,\n    \"requester_org_id\": 1,\n    \"target_org_id\": 2,\n    \"event_content_id\": 1,\n    \"requested_by\": 1,\n    \"note\": \"Alliance request note\",\n    \"auth_email\": \"admin@example.com\"\n}"
+                                    "raw": "{\n    \"registration_id\": 1,\n    \"event_id\": 1,\n    \"requester_org_id\": 1,\n    \"target_org_id\": 2,\n    \"event_content_id\": 1,\n    \"requested_by\": 1,\n    \"note\": \"Alliance request note\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/alliance-requests/store",
@@ -7276,7 +7356,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"status\": 2,\n    \"reviewed_by\": 1,\n    \"rejection_reason\": \"\",\n    \"note\": \"Approved alliance\",\n    \"auth_email\": \"admin@example.com\"\n}"
+                                    "raw": "{\n    \"registration_id\": 1,\n    \"status\": 2,\n    \"reviewed_by\": 1,\n    \"rejection_reason\": \"\",\n    \"note\": \"Approved alliance\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/alliance-requests/update/1",
@@ -9709,6 +9789,187 @@
                                         "api",
                                         "registration-approval-logs",
                                         "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "RegistrationPeriodContent",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-period-contents?per_page=20&page=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-period-contents"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Store",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "period_id",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "content_id",
+                                            "value": "1",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-period-contents/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-period-contents",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-period-contents/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-period-contents",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "period_id",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "content_id",
+                                            "value": "2",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-period-contents/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-period-contents",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/registration-period-contents/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "registration-period-contents",
+                                        "destroy",
                                         "1"
                                     ]
                                 }
