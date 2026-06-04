@@ -1101,13 +1101,21 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 </div>
 
 
+<?php if ($canShowSports): ?>
 <?php $this->renderPartial('_modal_add_sport', array('model' => $model)); ?>
+<?php endif; ?>
+<?php if ($canShowCompetition): ?>
 <?php $this->renderPartial('_modal_add_competition', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_edit_competition', array('model' => $model)); ?>
+<?php endif; ?>
+<?php if ($canShowMiss): ?>
 <?php $this->renderPartial('_modal_add_miss', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_edit_miss', array('model' => $model)); ?>
+<?php endif; ?>
+<?php if ($canShowTalent): ?>
 <?php $this->renderPartial('_modal_add_talent', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_edit_talent'); ?>
+<?php endif; ?>
 <?php $this->renderPartial('_modal_document'); ?>
 <?php $this->renderPartial('_modal_video'); ?>
 <?php $this->renderPartial('_modal_reject', array('model' => $model)); ?>
