@@ -27,10 +27,7 @@
                 <div class="mb-3">
                     <label for="select_sport" class="form-label">Bộ môn <span class="text-danger">*</span></label>
                     <select id="select_sport" class="form-select" required>
-                        <option value="">-- Chọn bộ môn --</option>
-                        <?php foreach ($sports as $sport): ?>
-                            <option value="<?php echo $sport->id; ?>"><?php echo CHtml::encode($sport->name); ?></option>
-                        <?php endforeach; ?>
+                        <option value="">-- Chọn sự kiện trước --</option>
                     </select>
                 </div>
             </div>
