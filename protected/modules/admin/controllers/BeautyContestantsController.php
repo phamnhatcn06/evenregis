@@ -102,7 +102,8 @@ class BeautyContestantsController extends AdminController
         }
 
         $params = array(
-            'with' => 'attendee,attendee.property,contest',
+            'with' => 'attendee,attendee.property,attendee.property.regional,contest',
+            'sort' => 'attendee.property.regional.code',
         );
         foreach ($model->attributes as $key => $value) {
             if ($value !== null && $value !== '') {
