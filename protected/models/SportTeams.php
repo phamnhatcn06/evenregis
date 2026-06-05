@@ -8,8 +8,10 @@ class SportTeams extends BaseSportTeams
     const STATUS_CONFIRMED = 1;
     const STATUS_CANCELLED = 2;
 
+    public $event_name;
     public $sport_name;
     public $property_name;
+    public $registration_name;
     public $alliance_org_names;
     public $member_count;
     public $team_name;
