@@ -83,10 +83,12 @@ class ApiDataProvider extends CDataProvider
             if ($this->modelClass) {
                 $model = new $this->modelClass;
                 $model->setAttributes($item, false);
-                // Set thêm các property không phải DB column
+                // Set thêm các property (public hoặc magic)
                 foreach ($item as $key => $value) {
-                    if (property_exists($model, $key)) {
+                    try {
                         $model->$key = $value;
+                    } catch (Exception $e) {
+                        // Ignore if property not settable
                     }
                 }
                 $models[] = $model;
