@@ -9,7 +9,7 @@ $assetsUrl = $booster->getAssetsUrl();
 Yii::app()->clientScript->registerCssFile($assetsUrl . '/select2/select2.css');
 Yii::app()->clientScript->registerScriptFile($assetsUrl . '/select2/select2.min.js', CClientScript::POS_END);
 ?>
-<div class="modal fade" id="modalSelectProperty" tabindex="-1" aria-labelledby="modalSelectPropertyLabel" aria-hidden="true">
+<div class="modal fade" id="modalSelectProperty" aria-labelledby="modalSelectPropertyLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
