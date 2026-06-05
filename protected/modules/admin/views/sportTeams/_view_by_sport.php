@@ -140,8 +140,84 @@
     </div>
 </div>
 
+<!-- Modal xem chi tiết đội -->
+<div class="modal fade" id="modalViewTeam" tabindex="-1" aria-labelledby="modalViewTeamLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalViewTeamLabel">Chi tiết đội</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body" id="modalViewTeamBody">
+                <div class="text-center py-4">
+                    <i class="fa fa-spinner fa-spin fa-2x"></i>
+                    <p class="mt-2">Đang tải...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     (function() {
+        var ajaxViewUrl = '<?php echo Yii::app()->createUrl("/admin/sportTeams/ajaxView"); ?>';
+
+        // View team modal
+        document.querySelectorAll('.btn-view-team').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var teamId = this.getAttribute('data-team-id');
+                var modalBody = document.getElementById('modalViewTeamBody');
+                var modal = new bootstrap.Modal(document.getElementById('modalViewTeam'));
+
+                modalBody.innerHTML = '<div class="text-center py-4"><i class="fa fa-spinner fa-spin fa-2x"></i><p class="mt-2">Đang tải...</p></div>';
+                modal.show();
+
+                fetch(ajaxViewUrl + '?id=' + teamId, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        var d = data.data;
+                        var html = '<div class="row">';
+                        html += '<div class="col-md-5">';
+                        html += '<h6 class="border-bottom pb-2 mb-3"><i class="fa fa-info-circle me-2"></i>Thông tin đội</h6>';
+                        html += '<table class="table table-sm table-bordered">';
+                        html += '<tr><th style="width:40%;background:#f8f9fa;">Tên đội</th><td>' + (d.team_name || '-') + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Môn thể thao</th><td>' + (d.sport_name || '-') + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Đơn vị</th><td>' + (d.property_name || '-') + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Liên quân</th><td>' + (d.is_alliance ? '<span class="badge bg-info">Có</span>' : '<span class="badge bg-secondary">Không</span>') + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Trạng thái</th><td>' + (d.status_label || '-') + '</td></tr>';
+                        html += '</table></div>';
+
+                        html += '<div class="col-md-7">';
+                        html += '<h6 class="border-bottom pb-2 mb-3"><i class="fa fa-users me-2"></i>Danh sách thành viên (' + d.members.length + ')</h6>';
+                        if (d.members.length > 0) {
+                            html += '<div class="table-responsive" style="max-height:300px;overflow-y:auto;">';
+                            html += '<table class="table table-sm table-bordered table-hover">';
+                            html += '<thead class="table-light sticky-top"><tr><th style="width:40px;">#</th><th>Họ tên</th><th>Chức danh</th><th>Đơn vị</th></tr></thead><tbody>';
+                            d.members.forEach(function(m, i) {
+                                html += '<tr><td>' + (i + 1) + '</td><td>' + (m.name || '-') + '</td><td>' + (m.position || '-') + '</td><td>' + (m.property_name || '-') + '</td></tr>';
+                            });
+                            html += '</tbody></table></div>';
+                        } else {
+                            html += '<p class="text-muted text-center">Chưa có thành viên</p>';
+                        }
+                        html += '</div></div>';
+                        modalBody.innerHTML = html;
+                    } else {
+                        modalBody.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Có lỗi xảy ra') + '</div>';
+                    }
+                })
+                .catch(function() {
+                    modalBody.innerHTML = '<div class="alert alert-danger">Lỗi kết nối server</div>';
+                });
+            });
+        });
+
         var filterRegion = document.getElementById('filter-region-sport');
         var filterProperty = document.getElementById('filter-property-sport');
 
