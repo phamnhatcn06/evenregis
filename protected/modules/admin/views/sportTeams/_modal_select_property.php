@@ -43,25 +43,3 @@
         </div>
     </div>
 </div>
-
-<style>
-.select2-container { z-index: 9999; }
-.select2-drop { z-index: 99999; }
-.select2-drop-mask { z-index: 99998; }
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var modal = document.getElementById('modalSelectProperty');
-    modal.addEventListener('shown.bs.modal', function() {
-        if (typeof $ !== 'undefined' && $.fn.select2) {
-            $('#select_property').select2({
-                dropdownParent: $('#modalSelectProperty'),
-                placeholder: '-- Chọn đơn vị --',
-                allowClear: true,
-                width: '100%'
-            });
-        }
-    });
-});
-</script>
