@@ -10,6 +10,7 @@ class TalentEntries extends BaseTalentEntries
     const STATUS_REJECTED = 4;
     const STATUS_PENDING = 5;
 
+    public $show_id;
     public $property_name;
     public $category_name;
     public $show_name;
@@ -32,7 +33,7 @@ class TalentEntries extends BaseTalentEntries
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team', 'safe');
+        $rules[] = array('show_id, property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team', 'safe');
         return $rules;
     }
 

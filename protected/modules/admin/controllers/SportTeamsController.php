@@ -484,6 +484,44 @@ class SportTeamsController extends AdminController
         ));
     }
 
+    public function actionAjaxView($id)
+    {
+        $model = SportTeams::fetchFromApi($id);
+        if ($model === null) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy đội'));
+            Yii::app()->end();
+        }
+
+        $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
+        $memberList = array();
+        foreach ($members as $m) {
+            $pos = $m->attendee_position;
+            if (empty($pos) && $m->attendee) {
+                $pos = $m->attendee->position;
+            }
+            $memberList[] = array(
+                'name' => $m->attendee_name ?: $m->name,
+                'position' => $pos,
+                'property_name' => isset($m->property_name) ? $m->property_name : '',
+            );
+        }
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'data' => array(
+                'id' => $model->id,
+                'team_name' => $model->team_name,
+                'sport_name' => $model->sport_name,
+                'property_name' => $model->property_name,
+                'is_alliance' => $model->is_alliance,
+                'status' => $model->status,
+                'status_label' => SportTeams::getStatusLabel($model->status),
+                'members' => $memberList,
+            ),
+        ));
+        Yii::app()->end();
+    }
+
     public function actionCreate()
     {
         $model = new SportTeams;
