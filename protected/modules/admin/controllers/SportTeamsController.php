@@ -7,6 +7,117 @@ class SportTeamsController extends AdminController
         $this->redirect(array('admin'));
     }
 
+    public function actionOverview()
+    {
+        $events = Events::getActiveList();
+        $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        $properties = Properties::getListForDropdown();
+
+        $this->render('overview', array(
+            'events' => $events,
+            'sports' => $sports,
+            'properties' => $properties,
+        ));
+    }
+
+    public function actionAjaxViewByProperty()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        $propertyId = Yii::app()->request->getQuery('property_id');
+
+        $teams = SportTeams::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'property_id' => $propertyId,
+        ), 500)->getData();
+
+        $teamsBySport = array();
+        foreach ($teams as $team) {
+            $sportName = $team->sport_name ?: 'Chưa xác định';
+            if (!isset($teamsBySport[$sportName])) {
+                $teamsBySport[$sportName] = array(
+                    'sport_name' => $sportName,
+                    'teams' => array(),
+                );
+            }
+            $teamsBySport[$sportName]['teams'][] = array(
+                'id' => $team->id,
+                'team_name' => $team->team_name,
+                'name' => isset($team->name) ? $team->name : '',
+                'is_alliance' => $team->is_alliance,
+                'status' => $team->status,
+                'member_count' => isset($team->member_count) ? $team->member_count : 0,
+            );
+        }
+
+        $eventName = '';
+        $propertyName = '';
+        $eventList = Events::getActiveList();
+        if (isset($eventList[$eventId])) {
+            $eventName = $eventList[$eventId];
+        }
+        $propList = Properties::getListForDropdown();
+        if (isset($propList[$propertyId])) {
+            $propertyName = $propList[$propertyId];
+        }
+
+        $this->renderPartial('_view_by_property', array(
+            'propertyName' => $propertyName,
+            'eventName' => $eventName,
+            'teamsBySport' => array_values($teamsBySport),
+        ));
+    }
+
+    public function actionAjaxViewBySport()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        $sportId = Yii::app()->request->getQuery('sport_id');
+
+        $teams = SportTeams::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'sport_id' => $sportId,
+        ), 500)->getData();
+
+        $teamsByProperty = array();
+        foreach ($teams as $team) {
+            $propName = $team->property_name ?: 'Chưa xác định';
+            $propId = $team->property_id;
+            if (!isset($teamsByProperty[$propId])) {
+                $teamsByProperty[$propId] = array(
+                    'property_name' => $propName,
+                    'teams' => array(),
+                );
+            }
+            $teamsByProperty[$propId]['teams'][] = array(
+                'id' => $team->id,
+                'team_name' => $team->team_name,
+                'name' => isset($team->name) ? $team->name : '',
+                'is_alliance' => $team->is_alliance,
+                'status' => $team->status,
+                'member_count' => isset($team->member_count) ? $team->member_count : 0,
+            );
+        }
+
+        $eventName = '';
+        $sportName = '';
+        $eventList = Events::getActiveList();
+        if (isset($eventList[$eventId])) {
+            $eventName = $eventList[$eventId];
+        }
+        $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        foreach ($sports as $sport) {
+            if ($sport->id == $sportId) {
+                $sportName = $sport->name;
+                break;
+            }
+        }
+
+        $this->renderPartial('_view_by_sport', array(
+            'sportName' => $sportName,
+            'eventName' => $eventName,
+            'teamsByProperty' => array_values($teamsByProperty),
+        ));
+    }
+
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
