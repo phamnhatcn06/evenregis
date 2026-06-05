@@ -18,5 +18,6 @@ $this->Tabletitle = 'Đội thể thao theo bộ môn: ' . CHtml::encode($sportN
 <?php $this->renderPartial('_view_by_sport', array(
     'sportName' => $sportName,
     'eventName' => $eventName,
-    'teamsByProperty' => $teamsByProperty,
+    'teamsByRegion' => $teamsByRegion,
+    'regionList' => $regionList,
 )); ?>
