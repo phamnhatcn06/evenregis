@@ -148,11 +148,6 @@ class SportTeamsController extends AdminController
         }
         unset($region);
 
-        // Sắp xếp theo mã cụm (region_code)
-        usort($teamsByRegion, function($a, $b) {
-            return strcmp($a['region_code'], $b['region_code']);
-        });
-
         $eventName = '';
         $sportName = '';
         $eventList = Events::getActiveList();
