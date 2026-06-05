@@ -12,6 +12,13 @@ $this->menu = array(
         'icon' => 'fa-plus',
         'id' => 'btn_create',
     ),
+    array(
+        'label' => 'Xuất Excel',
+        'url' => '#',
+        'color' => 'success',
+        'icon' => 'fa-file-excel-o',
+        'id' => 'btn_export_excel',
+    ),
 );
 $this->Tabletitle = 'Danh sách tiết mục văn nghệ';
 ?>
@@ -45,7 +52,6 @@ $this->Tabletitle = 'Danh sách tiết mục văn nghệ';
                         return isset($data->property_name) ? CHtml::encode($data->property_name) : $data->property_id;
                     }
                 ),
-                array('name' => 'participant_count', 'header' => 'Số người', 'width' => '80px', 'filter' => false),
                 array(
                     'name' => 'status',
                     'header' => 'Trạng thái',
@@ -74,3 +80,34 @@ $this->Tabletitle = 'Danh sách tiết mục văn nghệ';
         ?>
     </div>
 </div>
+
+<?php
+Yii::app()->clientScript->registerScript('talent-entries-export', "
+    // Prevent filter clicks from triggering column sorting
+    $('#talent-entries-grid thead').on('click', 'input, select', function(e) {
+        e.stopPropagation();
+    });
+
+    $('#btn_export_excel').click(function(e) {
+        e.preventDefault();
+        var baseUrl = '" . $this->createUrl('export') . "';
+        
+        var filters = {};
+        $('#talent-entries-grid thead input, #talent-entries-grid thead select').each(function() {
+            var name = $(this).attr('name');
+            var val = $(this).val();
+            if (name && val !== '' && val !== null) {
+                filters[name] = val;
+            }
+        });
+        
+        var queryString = $.param(filters);
+        var exportUrl = baseUrl;
+        if (queryString) {
+            exportUrl += (baseUrl.indexOf('?') >= 0 ? '&' : '?') + queryString;
+        }
+        
+        window.location.href = exportUrl;
+    });
+", CClientScript::POS_READY);
+?>

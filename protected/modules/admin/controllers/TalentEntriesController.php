@@ -2,6 +2,12 @@
 
 class TalentEntriesController extends AdminController
 {
+    public function init()
+    {
+        parent::init();
+        $this->publicActions[] = 'export';
+    }
+
     public function actionIndex()
     {
         $this->redirect(array('admin'));
@@ -128,6 +134,124 @@ class TalentEntriesController extends AdminController
             'categories' => $categories,
             'properties' => $properties,
         ));
+    }
+
+    public function actionExport()
+    {
+        $model = new TalentEntries('search');
+        $model->unsetAttributes();
+
+        if (isset($_GET['TalentEntries'])) {
+            $model->setAttributes($_GET['TalentEntries']);
+        }
+
+        $params = array(
+            'per_page' => 5000,
+        );
+        foreach ($model->attributes as $key => $value) {
+            if ($value !== null && $value !== '') {
+                $params[$key] = $value;
+            }
+        }
+
+        $dataProvider = TalentEntries::getApiDataProvider($params, 5000);
+        $data = $dataProvider->getData();
+
+        // Initialize PHPExcel
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $objPHPExcel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        $objPHPExcel->getProperties()->setCreator("System")
+            ->setLastModifiedBy("System")
+            ->setTitle("Danh sach tiet muc van nghe")
+            ->setSubject("Danh sach tiet muc van nghe");
+
+        $sheet = $objPHPExcel->setActiveSheetIndex(0);
+        $sheet->setTitle('Tiet_Muc_Van_Nghe');
+
+        $headerStyle = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '3A57E8')
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('rgb' => 'CCCCCC')
+                )
+            )
+        );
+
+        $borderStyle = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('rgb' => 'E9ECEF')
+                )
+            )
+        );
+
+        $headers = array('STT', 'Tên tiết mục', 'Thể loại', 'Đơn vị', 'Thời lượng (giây)', 'Đạo diễn/Biên đạo', 'SĐT đạo diễn', 'Nguồn gốc/Xuất xứ', 'Trạng thái');
+        $col = 'A';
+        foreach ($headers as $h) {
+            $sheet->setCellValue($col . '1', $h);
+            $sheet->getStyle($col . '1')->applyFromArray($headerStyle);
+            $col++;
+        }
+
+        $rowNum = 2;
+        $stt = 1;
+        foreach ($data as $item) {
+            $statusText = '';
+            if ($item->status == TalentEntries::STATUS_DRAFT) {
+                $statusText = 'Nháp';
+            } elseif ($item->status == TalentEntries::STATUS_SUBMITTED) {
+                $statusText = 'Đã nộp';
+            } elseif ($item->status == TalentEntries::STATUS_APPROVED) {
+                $statusText = 'Đã duyệt';
+            } elseif ($item->status == TalentEntries::STATUS_REJECTED) {
+                $statusText = 'Từ chối';
+            } elseif ($item->status == TalentEntries::STATUS_PENDING) {
+                $statusText = 'Chờ xử lý';
+            } else {
+                $statusText = $item->status;
+            }
+
+            $sheet->setCellValue('A' . $rowNum, $stt++);
+            $sheet->setCellValue('B' . $rowNum, $item->title);
+            $sheet->setCellValue('C' . $rowNum, isset($item->category_name) ? $item->category_name : $item->category_id);
+            $sheet->setCellValue('D' . $rowNum, isset($item->property_name) ? $item->property_name : $item->property_id);
+            $sheet->setCellValue('E' . $rowNum, $item->duration_seconds);
+            $sheet->setCellValue('F' . $rowNum, $item->director);
+            $sheet->setCellValue('G' . $rowNum, $item->director_phone);
+            $sheet->setCellValue('H' . $rowNum, $item->origin);
+            $sheet->setCellValue('I' . $rowNum, $statusText);
+
+            $sheet->getStyle('A' . $rowNum . ':I' . $rowNum)->applyFromArray($borderStyle);
+            $rowNum++;
+        }
+
+        foreach (range('A', 'I') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $filename = "Danh_sach_tiet_muc_van_nghe_" . date('Ymd_His') . ".xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        Yii::app()->end();
     }
 
     public function actionAddMember($entryId)
