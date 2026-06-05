@@ -41,9 +41,12 @@ class SportTeamsController extends AdminController
             }
 
             $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $team->id), 100)->getData();
-            $memberNames = array();
+            $memberList = array();
             foreach ($members as $m) {
-                $memberNames[] = $m->attendee_name;
+                $memberList[] = array(
+                    'name' => $m->attendee_name,
+                    'department' => isset($m->department_name) ? $m->department_name : '',
+                );
             }
 
             $teamsBySport[$sportName]['teams'][] = array(
@@ -53,7 +56,7 @@ class SportTeamsController extends AdminController
                 'is_alliance' => $team->is_alliance,
                 'status' => $team->status,
                 'member_count' => count($members),
-                'members' => $memberNames,
+                'members' => $memberList,
             );
         }
 
