@@ -22,7 +22,7 @@ $this->Tabletitle = 'Tổng quan đội thể thao';
                 <i class="fa fa-building fa-3x text-primary mb-3"></i>
                 <h4>Xem theo đơn vị</h4>
                 <p class="text-muted">Hiển thị tất cả môn thể thao và đội thi của một đơn vị</p>
-                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalSelectProperty">
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalSelectProperty">
                     <i class="fa fa-search me-2"></i>Chọn đơn vị
                 </button>
             </div>
@@ -34,7 +34,7 @@ $this->Tabletitle = 'Tổng quan đội thể thao';
                 <i class="fa fa-futbol-o fa-3x text-success mb-3"></i>
                 <h4>Xem theo bộ môn</h4>
                 <p class="text-muted">Hiển thị tất cả đội thi đấu của một bộ môn</p>
-                <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#modalSelectSport">
+                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalSelectSport">
                     <i class="fa fa-search me-2"></i>Chọn bộ môn
                 </button>
             </div>

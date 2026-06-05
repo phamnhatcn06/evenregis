@@ -35,8 +35,8 @@
                                     <thead>
                                         <tr>
                                             <th>Tên đội</th>
-                                            <th style="width:100px">Liên quân</th>
-                                            <th style="width:120px">Trạng thái</th>
+                                            <th>Thành viên</th>
+                                            <th style="width:80px">Liên quân</th>
                                             <th style="width:80px">SL</th>
                                         </tr>
                                     </thead>
@@ -49,14 +49,20 @@
                                                     </a>
                                                 </td>
                                                 <td>
+                                                    <?php if (!empty($team['members'])): ?>
+                                                        <?php echo CHtml::encode(implode(', ', $team['members'])); ?>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">-</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td>
                                                     <?php if ($team['is_alliance']): ?>
                                                         <span class="badge bg-info">Có</span>
                                                     <?php else: ?>
                                                         <span class="badge bg-secondary">Không</span>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td><?php echo SportTeams::getStatusLabel($team['status']); ?></td>
-                                                <td><?php echo isset($team['member_count']) ? $team['member_count'] : '-'; ?></td>
+                                                <td><?php echo $team['member_count']; ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
