@@ -234,12 +234,14 @@ class SportTeamsController extends AdminController
         $dataProvider = SportTeams::getApiDataProvider($params);
         $events = Events::getActiveList();
         $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        $properties = Properties::getListForDropdown();
 
         $this->render('admin', array(
             'model' => $model,
             'dataProvider' => $dataProvider,
             'events' => $events,
             'sports' => $sports,
+            'properties' => $properties,
         ));
     }
 
