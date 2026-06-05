@@ -117,7 +117,8 @@ class MyHelper
             $class = '';
             $target = '';
             $action = '';
-            if ($item['id'] == 'btn_create') {
+            $itemId = isset($item['id']) ? $item['id'] : '';
+            if ($itemId == 'btn_create') {
                 $class = 'btn btn-primary btn-sm';
                 $action = (isset($item['grid_id']) && $item['grid_id'] != '') ? 'createItem("' . $item['grid_id'] . '",this);return false;' : '';
             } elseif ($item['id'] == 'btn_update') {
