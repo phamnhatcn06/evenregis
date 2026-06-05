@@ -58,7 +58,8 @@ foreach ($sports as $sport) {
                     'type' => 'raw',
                     'filter' => false,
                     'value' => function ($data) {
-                        return isset($data->property_name) ? CHtml::encode($data->property_name) : $data->property_id;
+                        $name = is_array($data) ? ($data['property_name'] ?? null) : ($data->property_name ?? null);
+                        return $name ? CHtml::encode($name) : (is_array($data) ? $data['property_id'] : $data->property_id);
                     }
                 ),
                 array(
