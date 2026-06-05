@@ -106,9 +106,9 @@
                                             <td><?php echo SportTeams::getStatusLabel($team['status']); ?></td>
                                             <td><?php echo isset($team['member_count']) ? $team['member_count'] : '-'; ?></td>
                                             <td>
-                                                <a target="_blank" href="<?php echo Yii::app()->createUrl('/admin/sportTeams/view', array('id' => $team['id'])); ?>" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                                <button type="button" class="btn btn-sm btn-outline-primary btn-view-team" data-team-id="<?php echo $team['id']; ?>" title="Xem chi tiết">
                                                     <i class="fa fa-eye"></i>
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
