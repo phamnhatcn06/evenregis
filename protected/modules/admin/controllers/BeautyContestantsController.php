@@ -2,6 +2,12 @@
 
 class BeautyContestantsController extends AdminController
 {
+    public function init()
+    {
+        parent::init();
+        $this->publicActions[] = 'export';
+    }
+
     public function actionIndex()
     {
         $this->redirect(array('admin'));
@@ -119,6 +125,164 @@ class BeautyContestantsController extends AdminController
             'dataProvider' => $dataProvider,
             'contests' => $contests,
         ));
+    }
+
+    public function actionExport()
+    {
+        $model = new BeautyContestants('search');
+        $model->unsetAttributes();
+
+        if (isset($_GET['BeautyContestants'])) {
+            $model->setAttributes($_GET['BeautyContestants']);
+        }
+
+        $params = array(
+            'with' => 'attendee,attendee.property,attendee.property.regional,contest',
+            'sort' => 'attendee.property.regional.code',
+            'per_page' => 5000,
+        );
+        foreach ($model->attributes as $key => $value) {
+            if ($value !== null && $value !== '') {
+                $params[$key] = $value;
+            }
+        }
+
+        $dataProvider = BeautyContestants::getApiDataProvider($params, 5000);
+        $data = $dataProvider->getData();
+
+        // Initialize PHPExcel
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $objPHPExcel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        $objPHPExcel->getProperties()->setCreator("System")
+            ->setLastModifiedBy("System")
+            ->setTitle("Danh sach thi sinh Miss")
+            ->setSubject("Danh sach thi sinh Miss");
+
+        $sheet = $objPHPExcel->setActiveSheetIndex(0);
+        $sheet->setTitle('Miss_Contestants');
+
+        $headerStyle = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '3A57E8')
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('rgb' => 'CCCCCC')
+                )
+            )
+        );
+
+        $borderStyle = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('rgb' => 'E9ECEF')
+                )
+            )
+        );
+
+        $headers = array('STT', 'Sự kiện', 'Cuộc thi', 'Đơn vị', 'Thí sinh', 'Chiều cao (cm)', 'Cân nặng (kg)', 'Số đo', 'Năng khiếu', 'Tiểu sử', 'Trạng thái');
+        $col = 'A';
+        foreach ($headers as $h) {
+            $sheet->setCellValue($col . '1', $h);
+            $sheet->getStyle($col . '1')->applyFromArray($headerStyle);
+            $col++;
+        }
+
+        $rowNum = 2;
+        $stt = 1;
+        foreach ($data as $item) {
+            $eventName = '';
+            if (!empty($item->event_name)) {
+                $eventName = $item->event_name;
+            } elseif (isset($item->contest) && isset($item->contest->event)) {
+                $eventName = $item->contest->event->name;
+            }
+
+            $contestName = '';
+            if (!empty($item->contest_name)) {
+                $contestName = $item->contest_name;
+            } elseif (isset($item->contest)) {
+                $contestName = $item->contest->name;
+            } else {
+                $contestName = $item->contest_id;
+            }
+
+            $unitName = '';
+            if (!empty($item->registration_id)) {
+                $unitName = BeautyContestants::getPropertyNameByRegistrationId($item->registration_id);
+            }
+            if (empty($unitName) && !empty($item->property_name)) {
+                $unitName = $item->property_name;
+            }
+            if (empty($unitName) && isset($item->attendee)) {
+                if (isset($item->attendee->property)) {
+                    $unitName = $item->attendee->property->name;
+                } elseif (!empty($item->attendee->unit_label)) {
+                    $unitName = $item->attendee->unit_label;
+                }
+            }
+
+            $attendeeName = '';
+            if (isset($item->members) && !empty($item->members)) {
+                $attendeeName = $item->members[0]['attendee_name'];
+            } elseif (isset($item->attendee)) {
+                $attendeeName = $item->attendee->full_name;
+            } else {
+                $attendeeName = $item->attendee_id;
+            }
+
+            $statusText = '';
+            if ($item->status == BeautyContestants::STATUS_REGISTERED) {
+                $statusText = 'Đã đăng ký';
+            } elseif ($item->status == BeautyContestants::STATUS_CONFIRMED) {
+                $statusText = 'Đã xác nhận';
+            } elseif ($item->status == BeautyContestants::STATUS_DISQUALIFIED) {
+                $statusText = 'Loại';
+            } else {
+                $statusText = $item->status;
+            }
+
+            $sheet->setCellValue('A' . $rowNum, $stt++);
+            $sheet->setCellValue('B' . $rowNum, $eventName);
+            $sheet->setCellValue('C' . $rowNum, $contestName);
+            $sheet->setCellValue('D' . $rowNum, $unitName);
+            $sheet->setCellValue('E' . $rowNum, $attendeeName);
+            $sheet->setCellValue('F' . $rowNum, $item->height_cm);
+            $sheet->setCellValue('G' . $rowNum, $item->weight_kg);
+            $sheet->setCellValue('H' . $rowNum, $item->measurements);
+            $sheet->setCellValue('I' . $rowNum, $item->talent);
+            $sheet->setCellValue('J' . $rowNum, $item->bio);
+            $sheet->setCellValue('K' . $rowNum, $statusText);
+
+            $sheet->getStyle('A' . $rowNum . ':K' . $rowNum)->applyFromArray($borderStyle);
+            $rowNum++;
+        }
+
+        foreach (range('A', 'K') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $filename = "Danh_sach_thi_sinh_Miss_" . date('Ymd_His') . ".xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        Yii::app()->end();
     }
 
     public function actionGetFemaleAttendees($propertyId)

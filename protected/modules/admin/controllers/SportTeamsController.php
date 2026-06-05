@@ -20,6 +20,132 @@ class SportTeamsController extends AdminController
         ));
     }
 
+    public function actionGetOverviewStats()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        if (empty($eventId)) {
+            $activeEvents = Events::getActiveList();
+            if (!empty($activeEvents)) {
+                $eventId = key($activeEvents);
+            }
+        }
+
+        if (empty($eventId)) {
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'success' => true,
+                'total_teams' => 0,
+                'total_athletes' => 0,
+                'sports' => array(),
+            ));
+            Yii::app()->end();
+        }
+
+        // 1. Fetch active sports
+        $sportsRes = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $sportStats = array();
+        foreach ($sportsRes as $sport) {
+            $sportStats[$sport->id] = array(
+                'id' => $sport->id,
+                'name' => $sport->name,
+                'team_count' => 0,
+                'attendee_ids' => array(),
+            );
+        }
+
+        // 2. Fetch registrations for checking deleted status
+        $registrationsRes = Registrations::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'per_page' => 1000,
+        ), 1000)->getData();
+
+        $activeRegsMap = array();
+        foreach ($registrationsRes as $reg) {
+            if (isset($reg->deleted_at) && $reg->deleted_at !== null && $reg->deleted_at !== '') {
+                continue;
+            }
+            $activeRegsMap[$reg->id] = true;
+        }
+
+        // 3. Fetch sport teams
+        $teamsRes = SportTeams::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'per_page' => 1000,
+        ), 1000)->getData();
+
+        $activeTeamsMap = array();
+        foreach ($teamsRes as $team) {
+            if (isset($team->deleted_at) && $team->deleted_at !== null && $team->deleted_at !== '') {
+                continue;
+            }
+            if ($team->status == SportTeams::STATUS_CANCELLED) {
+                continue;
+            }
+            if (!isset($activeRegsMap[$team->registration_id])) {
+                continue;
+            }
+            $activeTeamsMap[$team->id] = $team;
+
+            if (isset($sportStats[$team->sport_id])) {
+                $sportStats[$team->sport_id]['team_count']++;
+            }
+        }
+
+        // 4. Fetch sport team members
+        $membersRes = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'event_id' => $eventId,
+            'per_page' => 5000,
+        ));
+
+        $uniqueAttendeeIds = array();
+        if ($membersRes['success']) {
+            $membersData = isset($membersRes['data']['data']) ? $membersRes['data']['data'] : $membersRes['data'];
+            if (is_array($membersData)) {
+                foreach ($membersData as $member) {
+                    $teamId = isset($member['sport_team_id']) ? $member['sport_team_id'] : null;
+                    $attendeeId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
+                    if (!$teamId || !$attendeeId || !isset($activeTeamsMap[$teamId])) {
+                        continue;
+                    }
+
+                    $uniqueAttendeeIds[$attendeeId] = true;
+                    $team = $activeTeamsMap[$teamId];
+                    if (isset($sportStats[$team->sport_id])) {
+                        $sportStats[$team->sport_id]['attendee_ids'][$attendeeId] = true;
+                    }
+                }
+            }
+        }
+
+        // Format stats per sport
+        $formattedSports = array();
+        foreach ($sportStats as $sportId => $stats) {
+            if ($stats['team_count'] > 0 || count($stats['attendee_ids']) > 0) {
+                $formattedSports[] = array(
+                    'id' => $stats['id'],
+                    'name' => $stats['name'],
+                    'team_count' => $stats['team_count'],
+                    'athlete_count' => count($stats['attendee_ids']),
+                );
+            }
+        }
+
+        // Sort by sport name naturally
+        usort($formattedSports, function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
+        header('Content-Type: application/json');
+        echo json_encode(array(
+            'success' => true,
+            'total_teams' => count($activeTeamsMap),
+            'total_athletes' => count($uniqueAttendeeIds),
+            'sports' => $formattedSports,
+        ));
+        Yii::app()->end();
+    }
+
+
     public function actionViewByProperty()
     {
         $eventId = Yii::app()->request->getQuery('event_id');
@@ -43,9 +169,14 @@ class SportTeamsController extends AdminController
             $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $team->id), 100)->getData();
             $memberList = array();
             foreach ($members as $m) {
+                $pos = $m->attendee_position;
+                if (empty($pos) && $m->attendee) {
+                    $pos = $m->attendee->position;
+                }
                 $memberList[] = array(
-                    'name' => $m->attendee_name,
+                    'name' => $m->attendee_name ?: $m->name,
                     'department' => isset($m->department_name) ? $m->department_name : '',
+                    'attendee_position' => $pos,
                 );
             }
 
@@ -203,9 +334,14 @@ class SportTeamsController extends AdminController
             $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $team->id), 100)->getData();
             $memberList = array();
             foreach ($members as $m) {
+                $pos = $m->attendee_position;
+                if (empty($pos) && $m->attendee) {
+                    $pos = $m->attendee->position;
+                }
                 $memberList[] = array(
-                    'name' => $m->attendee_name,
+                    'name' => $m->attendee_name ?: $m->name,
                     'department' => isset($m->department_name) ? $m->department_name : '',
+                    'attendee_position' => $pos,
                 );
             }
 

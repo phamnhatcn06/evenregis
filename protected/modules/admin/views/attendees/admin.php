@@ -109,7 +109,10 @@ asort($propertyList);
                                     $id = isset($item->id) ? $item->id : (isset($item['id']) ? $item['id'] : '');
                                     $fullName = isset($item->full_name) ? $item->full_name : (isset($item['full_name']) ? $item['full_name'] : '');
                                     $position = isset($item->position) ? $item->position : (isset($item['position']) ? $item['position'] : '');
-                                    $unitLabel = isset($item->unit_label) ? $item->unit_label : (isset($item['unit_label']) ? $item['unit_label'] : '');
+                                    $unitLabel = isset($item->unit_label) && trim($item->unit_label) !== '' ? $item->unit_label : (isset($item['unit_label']) && trim($item['unit_label']) !== '' ? $item['unit_label'] : '');
+                                    if ($unitLabel === '') {
+                                        $unitLabel = isset($item->property_name) ? $item->property_name : (isset($item['property_name']) ? $item['property_name'] : '');
+                                    }
                                     $photoPath = isset($item->photo_path) ? $item->photo_path : (isset($item['photo_path']) ? $item['photo_path'] : '');
                                     $portraitPath = isset($item->portrait_path) ? $item->portrait_path : (isset($item['portrait_path']) ? $item['portrait_path'] : '');
 

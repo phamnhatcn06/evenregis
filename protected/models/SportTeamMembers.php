@@ -7,6 +7,7 @@ class SportTeamMembers extends BaseSportTeamMembers
     const MAX_SPORTS_PER_ATTENDEE = 3;
 
     public $attendee_name;
+    public $attendee_position;
     public $sport_name;
     public $team_name;
     public $property_name;
@@ -83,8 +84,13 @@ class SportTeamMembers extends BaseSportTeamMembers
      */
     public function setAttendee($value)
     {
-        if (is_array($value) && isset($value['full_name'])) {
-            $this->attendee_name = $value['full_name'];
+        if (is_array($value)) {
+            if (isset($value['full_name'])) {
+                $this->attendee_name = $value['full_name'];
+            }
+            if (isset($value['position'])) {
+                $this->attendee_position = $value['position'];
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hiển thị tất cả đội thể thao theo đơn vị
  * @var string $propertyName Tên đơn vị
@@ -7,7 +8,7 @@
  */
 ?>
 <div class="card">
-    <div class="card-header bg-primary text-white">
+    <div class="card-header bg-warning text-white">
         <h5 class="mb-0">
             <i class="fa fa-building me-2"></i>
             <?php echo CHtml::encode($propertyName); ?> - <?php echo CHtml::encode($eventName); ?>
@@ -57,28 +58,30 @@
                                                 <td><?php echo $team['member_count']; ?></td>
                                             </tr>
                                             <?php if (!empty($team['members'])): ?>
-                                            <tr>
-                                                <td colspan="3" class="p-0">
-                                                    <table class="table table-sm table-bordered mb-0 ms-4" style="width:calc(100% - 2rem)">
-                                                        <thead class="table-light">
-                                                            <tr>
-                                                                <th style="width:50px">STT</th>
-                                                                <th>Họ tên</th>
-                                                                <th>Phòng ban</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <?php foreach ($team['members'] as $idx => $member): ?>
-                                                            <tr>
-                                                                <td><?php echo $idx + 1; ?></td>
-                                                                <td><?php echo CHtml::encode($member['name']); ?></td>
-                                                                <td><?php echo CHtml::encode($member['department']); ?></td>
-                                                            </tr>
-                                                            <?php endforeach; ?>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td colspan="3" class="p-0">
+                                                        <table class="table table-sm table-bordered mb-0 ms-4" style="width:calc(100% - 2rem)">
+                                                            <thead class="table-light">
+                                                                <tr>
+                                                                    <th style="width:50px">STT</th>
+                                                                    <th>Họ tên</th>
+                                                                    <th>Chức danh</th>
+                                                                    <th>Phòng ban</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php foreach ($team['members'] as $idx => $member): ?>
+                                                                    <tr>
+                                                                        <td><?php echo $idx + 1; ?></td>
+                                                                        <td><?php echo CHtml::encode($member['name']); ?></td>
+                                                                        <td><?php echo CHtml::encode(isset($member['attendee_position']) ? $member['attendee_position'] : ''); ?></td>
+                                                                        <td><?php echo CHtml::encode($member['department']); ?></td>
+                                                                    </tr>
+                                                                <?php endforeach; ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     </tbody>

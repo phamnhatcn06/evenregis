@@ -12,6 +12,7 @@ class BeautyContestants extends BaseBeautyContestants
     public $property_code;
     public $property_name;
     public $contest_name;
+    public $event_name;
     public $registration_id;
     public $note;
     public $members;
@@ -19,6 +20,13 @@ class BeautyContestants extends BaseBeautyContestants
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
+    }
+
+    public function relations()
+    {
+        return array_merge(parent::relations(), array(
+            'registration' => array(self::BELONGS_TO, 'Registrations', 'registration_id'),
+        ));
     }
 
     public function rules()
@@ -67,6 +75,7 @@ class BeautyContestants extends BaseBeautyContestants
             $model->attendee_name = isset($data['attendee_name']) ? $data['attendee_name'] : '';
             $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
             $model->contest_name = isset($data['contest_name']) ? $data['contest_name'] : '';
+            $model->event_name = isset($data['event_name']) ? $data['event_name'] : '';
             $model->id = $id;
             return $model;
         }
@@ -125,5 +134,54 @@ class BeautyContestants extends BaseBeautyContestants
             self::STATUS_CONFIRMED => 'Đã xác nhận',
             self::STATUS_DISQUALIFIED => 'Loại',
         );
+    }
+
+    private static $_registrationPropertyCache = array();
+
+    public static function getPropertyNameByRegistrationId($registrationId)
+    {
+        if (empty($registrationId)) {
+            return '';
+        }
+        
+        if (isset(self::$_registrationPropertyCache[$registrationId])) {
+            return self::$_registrationPropertyCache[$registrationId];
+        }
+        
+        // 1. Try to find the registration in the local database
+        $registration = Registrations::model()->findByPk($registrationId);
+        if ($registration) {
+            if (isset($registration->property)) {
+                $name = $registration->property->name;
+                self::$_registrationPropertyCache[$registrationId] = $name;
+                return $name;
+            }
+            if (!empty($registration->property_name)) {
+                $name = $registration->property_name;
+                self::$_registrationPropertyCache[$registrationId] = $name;
+                return $name;
+            }
+        }
+        
+        // 2. Try to fetch the registration from the API
+        try {
+            $registration = Registrations::fetchFromApi($registrationId);
+            if ($registration) {
+                if (isset($registration->property)) {
+                    $name = $registration->property->name;
+                    self::$_registrationPropertyCache[$registrationId] = $name;
+                    return $name;
+                }
+                if (!empty($registration->property_name)) {
+                    $name = $registration->property_name;
+                    self::$_registrationPropertyCache[$registrationId] = $name;
+                    return $name;
+                }
+            }
+        } catch (Exception $e) {
+            // Ignore API exceptions
+        }
+        
+        return '';
     }
 }

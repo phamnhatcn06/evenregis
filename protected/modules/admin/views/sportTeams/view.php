@@ -75,15 +75,25 @@ $this->Tabletitle = 'Chi tiết đội: ' . CHtml::encode($model->team_name);
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th style="width: 50px;">#</th>
                                 <th>Họ tên</th>
+                                <th>Chức danh</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($members as $index => $member): ?>
                                 <tr>
                                     <td><?php echo $index + 1; ?></td>
-                                    <td><?php echo CHtml::encode($member->attendee_name); ?></td>
+                                    <td><?php echo CHtml::encode($member->attendee_name ?: $member->name); ?></td>
+                                    <td>
+                                        <?php 
+                                        $pos = $member->attendee_position;
+                                        if (empty($pos) && $member->attendee) {
+                                            $pos = $member->attendee->position;
+                                        }
+                                        echo CHtml::encode($pos); 
+                                        ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
