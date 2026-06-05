@@ -106,8 +106,8 @@
                                             <td><?php echo SportTeams::getStatusLabel($team['status']); ?></td>
                                             <td><?php echo isset($team['member_count']) ? $team['member_count'] : '-'; ?></td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-outline-primary btn-view-team" data-team-id="<?php echo $team['id']; ?>" title="Xem chi tiết">
-                                                    <i class="fa fa-eye"></i>
+                                                <button type="button" class="btn btn-sm btn-info btn-view-team" data-team-id="<?php echo $team['id']; ?>" title="Xem chi tiết" style="width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;">
+                                                    <?php echo IconHelper::render('view', 'icon-20', 20); ?>
                                                 </button>
                                             </td>
                                         </tr>
