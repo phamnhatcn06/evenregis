@@ -270,10 +270,13 @@ class SportTeamsController extends AdminController
             $regionId = isset($propertyRegionMap[$propId]) ? $propertyRegionMap[$propId] : null;
             $regionName = ($regionId && isset($regionalMap[$regionId])) ? $regionalMap[$regionId] : 'Chưa phân cụm';
 
+            $regionCode = ($regionId && isset($regionalCodeMap[$regionId])) ? $regionalCodeMap[$regionId] : 'ZZZ';
+
             if (!isset($teamsByRegion[$regionId])) {
                 $teamsByRegion[$regionId] = array(
                     'region_id' => $regionId,
                     'region_name' => $regionName,
+                    'region_code' => $regionCode,
                     'properties' => array(),
                 );
             }
@@ -300,6 +303,11 @@ class SportTeamsController extends AdminController
             $region['properties'] = array_values($region['properties']);
         }
         unset($region);
+
+        // Sắp xếp theo mã cụm (region_code)
+        usort($teamsByRegion, function($a, $b) {
+            return strcmp($a['region_code'], $b['region_code']);
+        });
 
         $eventName = '';
         $sportName = '';
