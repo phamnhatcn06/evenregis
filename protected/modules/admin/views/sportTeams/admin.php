@@ -114,3 +114,15 @@ foreach ($sports as $sport) {
         ?>
     </div>
 </div>
+
+<div id="result-container" class="mt-4"></div>
+
+<?php $this->renderPartial('_modal_select_property', array('properties' => $properties, 'events' => $events)); ?>
+<?php $this->renderPartial('_modal_select_sport', array('sports' => $sports, 'events' => $events)); ?>
+
+<?php
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js',
+    CClientScript::POS_END
+);
+?>
