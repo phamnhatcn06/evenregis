@@ -1306,7 +1306,7 @@ class RegistrationsController extends AdminController
 		// Kiểm tra số lượng vận động viên tối đa của môn
 		$sport = Sports::fetchFromApi($sportId);
 		$sportName = $sport ? $sport->name : '';
-		$maxPlayers = self::getSportMaxPlayers($sportName);
+		$maxPlayers = ($sport && $sport->max_per_team_member) ? (int)$sport->max_per_team_member : self::getSportMaxPlayers($sportName);
 		if (count($attendeeIds) > $maxPlayers) {
 			$msg = "Môn {$sportName} tối đa chỉ cho phép chọn {$maxPlayers} người.";
 			if ($isAjax) {
