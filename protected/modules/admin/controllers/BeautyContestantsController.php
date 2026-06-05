@@ -101,7 +101,9 @@ class BeautyContestantsController extends AdminController
             $model->setAttributes($_GET['BeautyContestants']);
         }
 
-        $params = array();
+        $params = array(
+            'with' => 'attendee,attendee.property,contest',
+        );
         foreach ($model->attributes as $key => $value) {
             if ($value !== null && $value !== '') {
                 $params[$key] = $value;
