@@ -41,6 +41,9 @@ $this->Tabletitle = 'Danh sách thí sinh thi Miss';
                     'header' => 'Thí sinh',
                     'type' => 'raw',
                     'value' => function ($data) {
+                        if (isset($data->attendee) && isset($data->attendee['full_name'])) {
+                            return CHtml::encode($data->attendee['full_name']);
+                        }
                         return isset($data->attendee_name) ? CHtml::encode($data->attendee_name) : $data->attendee_id;
                     }
                 ),
@@ -49,6 +52,9 @@ $this->Tabletitle = 'Danh sách thí sinh thi Miss';
                     'type' => 'raw',
                     'filter' => false,
                     'value' => function ($data) {
+                        if (isset($data->attendee) && isset($data->attendee['property']) && isset($data->attendee['property']['name'])) {
+                            return CHtml::encode($data->attendee['property']['name']);
+                        }
                         return isset($data->property_name) ? CHtml::encode($data->property_name) : '';
                     }
                 ),
