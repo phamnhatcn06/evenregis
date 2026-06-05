@@ -14,6 +14,7 @@ class BeautyContestants extends BaseBeautyContestants
     public $contest_name;
     public $registration_id;
     public $note;
+    public $members;
 
     public static function model($className = __CLASS__)
     {
