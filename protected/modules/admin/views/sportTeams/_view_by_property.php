@@ -35,7 +35,6 @@
                                     <thead>
                                         <tr>
                                             <th>Tên đội</th>
-                                            <th>Thành viên</th>
                                             <th style="width:80px">Liên quân</th>
                                             <th style="width:80px">SL</th>
                                         </tr>
@@ -49,13 +48,6 @@
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <?php if (!empty($team['members'])): ?>
-                                                        <?php echo CHtml::encode(implode(', ', $team['members'])); ?>
-                                                    <?php else: ?>
-                                                        <span class="text-muted">-</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td>
                                                     <?php if ($team['is_alliance']): ?>
                                                         <span class="badge bg-info">Có</span>
                                                     <?php else: ?>
@@ -64,6 +56,30 @@
                                                 </td>
                                                 <td><?php echo $team['member_count']; ?></td>
                                             </tr>
+                                            <?php if (!empty($team['members'])): ?>
+                                            <tr>
+                                                <td colspan="3" class="p-0">
+                                                    <table class="table table-sm table-bordered mb-0 ms-4" style="width:calc(100% - 2rem)">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th style="width:50px">STT</th>
+                                                                <th>Họ tên</th>
+                                                                <th>Phòng ban</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php foreach ($team['members'] as $idx => $member): ?>
+                                                            <tr>
+                                                                <td><?php echo $idx + 1; ?></td>
+                                                                <td><?php echo CHtml::encode($member['name']); ?></td>
+                                                                <td><?php echo CHtml::encode($member['department']); ?></td>
+                                                            </tr>
+                                                            <?php endforeach; ?>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <?php endif; ?>
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
