@@ -145,7 +145,7 @@ class MyHelper
             if (isset($item['target']) && $item['target'] != '') {
                 $target = $item['target'];
             }
-            echo CHtml::link(' <i class="fa ' . $item['icon'] . '"></i> ' . $item['label'], $item['url'], ['class' => $class, 'target' => $target, 'onclick' => $action, 'id' => $item['id']]);
+            echo CHtml::link(' <i class="fa ' . $item['icon'] . '"></i> ' . $item['label'], $item['url'], ['class' => $class, 'target' => $target, 'onclick' => $action, 'id' => $itemId]);
         }
     }
 
