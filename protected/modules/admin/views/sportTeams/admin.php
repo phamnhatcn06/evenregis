@@ -6,10 +6,18 @@ $this->breadcrumbs = array(
 
 $this->menu = array(
     array(
-        'label' => 'Tổng quan',
-        'url' => $this->createUrl('overview'),
+        'label' => 'Xem theo đơn vị',
+        'url' => '#',
         'color' => 'info',
-        'icon' => 'fa-th-large',
+        'icon' => 'fa-building',
+        'htmlOptions' => array('data-bs-toggle' => 'modal', 'data-bs-target' => '#modalSelectProperty'),
+    ),
+    array(
+        'label' => 'Xem theo bộ môn',
+        'url' => '#',
+        'color' => 'success',
+        'icon' => 'fa-futbol-o',
+        'htmlOptions' => array('data-bs-toggle' => 'modal', 'data-bs-target' => '#modalSelectSport'),
     ),
     array(
         'label' => 'Thêm đội mới',
