@@ -48,7 +48,8 @@ foreach ($sports as $sport) {
                     'type' => 'raw',
                     'filter' => $sportOptions,
                     'value' => function ($data) {
-                        return isset($data->sport_name) ? CHtml::encode($data->sport_name) : $data->sport_id;
+                        $name = is_array($data) ? ($data['sport_name'] ?? null) : ($data->sport_name ?? null);
+                        return $name ? CHtml::encode($name) : (is_array($data) ? $data['sport_id'] : $data->sport_id);
                     }
                 ),
                 array(
