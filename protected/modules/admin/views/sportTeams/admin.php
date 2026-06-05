@@ -17,7 +17,7 @@ $this->Tabletitle = 'Danh sách đội thể thao';
 
 $sportOptions = array();
 foreach ($sports as $sport) {
-    $sportOptions[$sport->id] = $sport->name;
+    $sportOptions[$sport->name] = $sport->name;
 }
 ?>
 
