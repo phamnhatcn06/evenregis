@@ -121,6 +121,10 @@ foreach ($sports as $sport) {
 <?php $this->renderPartial('_modal_select_sport', array('sports' => $sports, 'events' => $events)); ?>
 
 <?php
+$booster = Yii::app()->booster;
+$assetsUrl = $booster->getAssetsUrl();
+Yii::app()->clientScript->registerCssFile($assetsUrl . '/select2/select2.css');
+Yii::app()->clientScript->registerScriptFile($assetsUrl . '/select2/select2.min.js', CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js',
     CClientScript::POS_END
