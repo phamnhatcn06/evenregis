@@ -158,6 +158,22 @@ var RegistrationView = (function() {
         return 1;
     }
 
+    // Lấy max_members từ cache theo sport_id
+    function getSportMaxMembersById(sportId) {
+        var sport = sportsDataCache.find(function(s) { return s.id == sportId; });
+        if (sport) {
+            if (sport.max_members !== undefined && sport.max_members !== null && sport.max_members !== '') {
+                var val = parseInt(sport.max_members);
+                if (!isNaN(val) && val > 0) return val;
+            }
+            if (sport.max_per_team_member !== undefined && sport.max_per_team_member !== null && sport.max_per_team_member !== '') {
+                var val = parseInt(sport.max_per_team_member);
+                if (!isNaN(val) && val > 0) return val;
+            }
+        }
+        return null;
+    }
+
     // Load danh sách đơn vị có thể liên quân vào dropdown
     function loadAlliancePropertiesDropdown() {
         var allianceSelect = document.getElementById('sport_alliance_property');
@@ -1002,7 +1018,7 @@ var RegistrationView = (function() {
             return;
         }
 
-        var maxPlayers = getSportMaxPlayers(sportName);
+        var maxPlayers = getSportMaxPlayers(sportName, sportId);
         if (sportSelectedAttendees.length > maxPlayers) {
             Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
             return;
@@ -1343,7 +1359,13 @@ var RegistrationView = (function() {
             });
     }
 
-    function getSportMaxPlayers(sportName) {
+    function getSportMaxPlayers(sportName, sportId) {
+        if (sportId) {
+            var cachedMax = getSportMaxMembersById(sportId);
+            if (cachedMax !== null && cachedMax !== undefined) {
+                return cachedMax;
+            }
+        }
         if (!sportName) return Infinity;
         sportName = sportName.toLowerCase();
         
@@ -1544,6 +1566,7 @@ var RegistrationView = (function() {
         if (actives.length === 0) return;
 
         var sportName = getSelectedSportName();
+        var sportId = getSelectedSportId();
         var currentlySelected = sportSelectedAttendees.length;
 
         var invalidAttendees = [];
@@ -1570,7 +1593,7 @@ var RegistrationView = (function() {
         if (validAttendees.length === 0) return;
 
         // Cảnh báo nếu chọn vượt quá số lượng tối đa
-        var maxPlayers = getSportMaxPlayers(sportName);
+        var maxPlayers = getSportMaxPlayers(sportName, sportId);
         if (currentlySelected + validAttendees.length > maxPlayers) {
             Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
             return;
@@ -1593,6 +1616,7 @@ var RegistrationView = (function() {
         if (available.length === 0) return;
 
         var sportName = getSelectedSportName();
+        var sportId = getSelectedSportId();
         var currentlySelected = sportSelectedAttendees.length;
 
         // Chỉ thêm những người có thể đăng ký
@@ -1606,7 +1630,7 @@ var RegistrationView = (function() {
         }
 
         // Cảnh báo nếu chọn vượt quá số lượng tối đa
-        var maxPlayers = getSportMaxPlayers(sportName);
+        var maxPlayers = getSportMaxPlayers(sportName, sportId);
         if (currentlySelected + validAttendees.length > maxPlayers) {
             Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
             return;
@@ -2214,7 +2238,7 @@ var RegistrationView = (function() {
             return;
         }
 
-        var maxPlayers = getSportMaxPlayers(sportName);
+        var maxPlayers = getSportMaxPlayers(sportName, sportId);
         if (sportSelectedAttendees.length > maxPlayers) {
             Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
             return;

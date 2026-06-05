@@ -1675,9 +1675,22 @@ class RegistrationsController extends AdminController
 
 		if ($content_type === 'sports') {
 			$sports = EventSports::getByEventId($event_id);
+			
+			// Pre-fetch all sports once to avoid N+1 API calls in the loop
+			$allSportsData = Sports::getApiDataProvider(array('is_active' => 1), 1000)->getData();
+			$sportsMap = array();
+			foreach ($allSportsData as $sp) {
+				$spId = isset($sp->id) ? $sp->id : (isset($sp['id']) ? $sp['id'] : null);
+				if ($spId) {
+					$sportsMap[$spId] = $sp;
+				}
+			}
+
 			foreach ($sports as $item) {
 				$sportId = isset($item['sport_id']) ? $item['sport_id'] : $item['id'];
 				$sportName = isset($item['sport_name']) ? $item['sport_name'] : (isset($item['name']) ? $item['name'] : '');
+
+				$sport = isset($sportsMap[$sportId]) ? $sportsMap[$sportId] : null;
 
 				// Lấy min_members từ API response, hoặc từ Sports model, hoặc fallback về hardcode
 				$minMembers = 1;
@@ -1685,22 +1698,33 @@ class RegistrationsController extends AdminController
 					$minMembers = (int)$item['min_members'];
 				} elseif (isset($item['min_per_team_member']) && $item['min_per_team_member'] !== null && $item['min_per_team_member'] !== '') {
 					$minMembers = (int)$item['min_per_team_member'];
+				} elseif ($sport && isset($sport->min_per_team_member) && $sport->min_per_team_member !== null && $sport->min_per_team_member !== '') {
+					$minMembers = (int)$sport->min_per_team_member;
 				} else {
-					// Fetch từ Sports model nếu API không trả về
-					$sport = Sports::fetchFromApi($sportId);
-					if ($sport && isset($sport->min_per_team_member) && $sport->min_per_team_member !== null) {
-						$minMembers = (int)$sport->min_per_team_member;
-					} else {
-						$minMembers = self::getSportMinPlayers($sportName);
-					}
+					$minMembers = self::getSportMinPlayers($sportName);
 				}
+
+				// Lấy max_members từ API response, hoặc từ Sports model, hoặc fallback về hardcode
+				$maxMembers = null;
+				if (isset($item['max_members']) && $item['max_members'] !== null && $item['max_members'] !== '') {
+					$maxMembers = (int)$item['max_members'];
+				} elseif (isset($item['max_per_team_member']) && $item['max_per_team_member'] !== null && $item['max_per_team_member'] !== '') {
+					$maxMembers = (int)$item['max_per_team_member'];
+				} elseif ($sport && isset($sport->max_per_team_member) && $sport->max_per_team_member !== null && $sport->max_per_team_member !== '') {
+					$maxMembers = (int)$sport->max_per_team_member;
+				} else {
+					$maxMembers = self::getSportMaxPlayers($sportName);
+				}
+
 				$result[] = array(
 					'id' => $sportId,
 					'name' => $sportName,
-					'parent_id' => isset($item['parent_id']) ? $item['parent_id'] : 0,
+					'parent_id' => isset($item['parent_id']) ? $item['parent_id'] : (($sport && isset($sport->parent_id)) ? $sport->parent_id : 0),
 					'parent_name' => isset($item['parent_name']) ? $item['parent_name'] : '',
 					'min_members' => $minMembers,
 					'min_per_team_member' => $minMembers,
+					'max_members' => $maxMembers,
+					'max_per_team_member' => $maxMembers,
 				);
 			}
 		} elseif ($content_type === 'competition') {
