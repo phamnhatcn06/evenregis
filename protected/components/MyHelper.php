@@ -121,10 +121,10 @@ class MyHelper
             if ($itemId == 'btn_create') {
                 $class = 'btn btn-primary btn-sm';
                 $action = (isset($item['grid_id']) && $item['grid_id'] != '') ? 'createItem("' . $item['grid_id'] . '",this);return false;' : '';
-            } elseif ($item['id'] == 'btn_update') {
+            } elseif ($itemId == 'btn_update') {
                 $class = 'btn btn-warning btn-sm';
                 $action = (isset($item['grid_id']) && $item['grid_id'] != '') ? 'updateItem("' . $item['grid_id'] . '",this);return false;' : '';
-            } elseif ($item['id'] == 'btn_delete') {
+            } elseif ($itemId == 'btn_delete') {
                 $class = 'btn btn-danger btn-sm';
                 if (isset($item['grid_id']) && $item['grid_id'] != '') {
                     $action = 'deleteItem("' . $item['grid_id'] . '",this);return false;';
@@ -132,10 +132,10 @@ class MyHelper
                     self::renderDeleteButton($item, $class);
                     continue;
                 }
-            } elseif ($item['id'] == 'btn_view') {
+            } elseif ($itemId == 'btn_view') {
                 $class = 'btn btn-' . $item['color'] . ' btn-bitbucket btn-sm';
                 $action = (isset($item['grid_id']) && $item['grid_id'] != '') ? 'viewItem("' . $item['grid_id'] . '",this);return false;' : '';
-            } elseif ($item['url'] == '') {
+            } elseif (!isset($item['url']) || $item['url'] == '') {
                 $class = (isset($item['class']) && $item['class'] != '') ? 'right-sidebar-toggle btn btn-sm  btn-bitbucket btn-success' : 'btn btn-bitbucket btn-sm';
                 $action = (isset($item['action']) && $item['action'] != '') ? $item['action'] . ';return false;' : '';
             } else {
