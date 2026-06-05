@@ -110,14 +110,13 @@ class SportTeamsController extends AdminController
         $model = new SportTeams('search');
         $model->unsetAttributes();
 
+        $params = array();
         if (isset($_GET['SportTeams'])) {
             $model->setAttributes($_GET['SportTeams']);
-        }
-
-        $params = array();
-        foreach ($model->attributes as $key => $value) {
-            if ($value !== null && $value !== '') {
-                $params[$key] = $value;
+            foreach ($_GET['SportTeams'] as $key => $value) {
+                if ($value !== null && $value !== '') {
+                    $params[$key] = $value;
+                }
             }
         }
 
