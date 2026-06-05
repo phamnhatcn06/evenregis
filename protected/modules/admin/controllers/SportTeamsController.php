@@ -201,17 +201,42 @@ class SportTeamsController extends AdminController
             'sport_id' => $sportId,
         ), 500)->getData();
 
-        $teamsByProperty = array();
+        // Lấy danh sách khu vực và property để map
+        $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
+        $regionalMap = array();
+        foreach ($regionals as $r) {
+            $regionalMap[$r->id] = $r->name;
+        }
+
+        $properties = Properties::getApiDataProvider(array(), 500)->getData();
+        $propertyRegionMap = array();
+        foreach ($properties as $p) {
+            $propertyRegionMap[$p->id] = isset($p->region_id) ? $p->region_id : null;
+        }
+
+        $teamsByRegion = array();
         foreach ($teams as $team) {
             $propName = $team->property_name ?: 'Chưa xác định';
             $propId = $team->property_id;
-            if (!isset($teamsByProperty[$propId])) {
-                $teamsByProperty[$propId] = array(
+            $regionId = isset($propertyRegionMap[$propId]) ? $propertyRegionMap[$propId] : null;
+            $regionName = ($regionId && isset($regionalMap[$regionId])) ? $regionalMap[$regionId] : 'Chưa phân cụm';
+
+            if (!isset($teamsByRegion[$regionId])) {
+                $teamsByRegion[$regionId] = array(
+                    'region_id' => $regionId,
+                    'region_name' => $regionName,
+                    'properties' => array(),
+                );
+            }
+
+            if (!isset($teamsByRegion[$regionId]['properties'][$propId])) {
+                $teamsByRegion[$regionId]['properties'][$propId] = array(
                     'property_name' => $propName,
                     'teams' => array(),
                 );
             }
-            $teamsByProperty[$propId]['teams'][] = array(
+
+            $teamsByRegion[$regionId]['properties'][$propId]['teams'][] = array(
                 'id' => $team->id,
                 'team_name' => $team->team_name,
                 'name' => isset($team->name) ? $team->name : '',
@@ -220,6 +245,12 @@ class SportTeamsController extends AdminController
                 'member_count' => isset($team->member_count) ? $team->member_count : 0,
             );
         }
+
+        // Convert properties từ associative array sang indexed array
+        foreach ($teamsByRegion as &$region) {
+            $region['properties'] = array_values($region['properties']);
+        }
+        unset($region);
 
         $eventName = '';
         $sportName = '';
@@ -235,10 +266,17 @@ class SportTeamsController extends AdminController
             }
         }
 
+        // Lấy danh sách khu vực có đội để hiển thị filter
+        $regionList = array();
+        foreach ($teamsByRegion as $regionId => $regionData) {
+            $regionList[$regionId] = $regionData['region_name'];
+        }
+
         $this->renderPartial('_view_by_sport', array(
             'sportName' => $sportName,
             'eventName' => $eventName,
-            'teamsByProperty' => array_values($teamsByProperty),
+            'teamsByRegion' => array_values($teamsByRegion),
+            'regionList' => $regionList,
         ));
     }
 
