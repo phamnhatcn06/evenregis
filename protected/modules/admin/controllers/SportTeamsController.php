@@ -164,10 +164,15 @@ class SportTeamsController extends AdminController
             $sportName = $sport->name;
         }
 
-        // Lấy danh sách khu vực có đội để hiển thị filter
+        // Sắp xếp theo mã cụm (region_code)
+        uasort($teamsByRegion, function($a, $b) {
+            return strcmp($a['region_code'], $b['region_code']);
+        });
+
+        // Lấy danh sách khu vực có đội để hiển thị filter (sau khi sort)
         $regionList = array();
-        foreach ($teamsByRegion as $regionId => $regionData) {
-            $regionList[$regionId] = $regionData['region_name'];
+        foreach ($teamsByRegion as $regionData) {
+            $regionList[$regionData['region_id']] = $regionData['region_name'];
         }
 
         $this->render('view_by_sport', array(
