@@ -119,12 +119,14 @@ class TalentEntriesController extends AdminController
         $dataProvider = TalentEntries::getApiDataProvider($params);
         $shows = $this->getActiveShows();
         $categories = TalentCategories::getListForDropdown();
+        $properties = Properties::getListForDropdown();
 
         $this->render('admin', array(
             'model' => $model,
             'dataProvider' => $dataProvider,
             'shows' => $shows,
             'categories' => $categories,
+            'properties' => $properties,
         ));
     }
 

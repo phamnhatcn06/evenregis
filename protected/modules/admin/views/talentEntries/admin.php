@@ -28,15 +28,6 @@ $this->Tabletitle = 'Danh sách tiết mục văn nghệ';
                 array('name' => 'id', 'header' => 'ID', 'width' => '60px', 'filter' => false),
                 array('name' => 'title', 'header' => 'Tên tiết mục', 'width' => '250px'),
                 array(
-                    'name' => 'show_id',
-                    'header' => 'Hội diễn',
-                    'type' => 'raw',
-                    'filter' => $shows,
-                    'value' => function ($data) {
-                        return isset($data->show_name) ? CHtml::encode($data->show_name) : $data->show_id;
-                    }
-                ),
-                array(
                     'name' => 'category_id',
                     'header' => 'Thể loại',
                     'type' => 'raw',
@@ -46,11 +37,12 @@ $this->Tabletitle = 'Danh sách tiết mục văn nghệ';
                     }
                 ),
                 array(
+                    'name' => 'property_id',
                     'header' => 'Đơn vị',
                     'type' => 'raw',
-                    'filter' => false,
+                    'filter' => $properties,
                     'value' => function ($data) {
-                        return isset($data->property_name) ? CHtml::encode($data->property_name) : '';
+                        return isset($data->property_name) ? CHtml::encode($data->property_name) : $data->property_id;
                     }
                 ),
                 array('name' => 'participant_count', 'header' => 'Số người', 'width' => '80px', 'filter' => false),

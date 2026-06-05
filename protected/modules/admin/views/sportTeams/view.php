@@ -78,6 +78,7 @@ $this->Tabletitle = 'Chi tiết đội: ' . CHtml::encode($model->team_name);
                                 <th style="width: 50px;">#</th>
                                 <th>Họ tên</th>
                                 <th>Chức danh</th>
+                                <th>Đơn vị</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -85,15 +86,8 @@ $this->Tabletitle = 'Chi tiết đội: ' . CHtml::encode($model->team_name);
                                 <tr>
                                     <td><?php echo $index + 1; ?></td>
                                     <td><?php echo CHtml::encode($member->attendee_name ?: $member->name); ?></td>
-                                    <td>
-                                        <?php 
-                                        $pos = $member->attendee_position;
-                                        if (empty($pos) && $member->attendee) {
-                                            $pos = $member->attendee->position;
-                                        }
-                                        echo CHtml::encode($pos); 
-                                        ?>
-                                    </td>
+                                    <td><?php echo CHtml::encode($member->attendee_position); ?></td>
+                                    <td><?php echo CHtml::encode($member->property_name); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
