@@ -1232,6 +1232,64 @@ class RegistrationsController extends AdminController
 		return 9999;
 	}
 
+	/**
+	 * Kiểm tra môn thể thao có phải là môn đội (bóng đá, kéo co) cần liên quân không
+	 */
+	public static function isTeamSportRequiringAlliance($sportName)
+	{
+		if (empty($sportName)) return false;
+		$sportNameLower = mb_strtolower($sportName, 'UTF-8');
+
+		if (strpos($sportNameLower, 'bóng đá') !== false || strpos($sportNameLower, 'football') !== false || strpos($sportNameLower, 'soccer') !== false) {
+			return true;
+		}
+		if (strpos($sportNameLower, 'kéo co') !== false) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Kiểm tra đơn vị có pending alliance request cho nội dung thể thao không
+	 * Trả về array('has_pending' => bool, 'message' => string)
+	 */
+	protected function checkPendingSportAllianceRequest($eventId, $propertyId, $sportName)
+	{
+		if (!self::isTeamSportRequiringAlliance($sportName)) {
+			return array('has_pending' => false, 'message' => '');
+		}
+
+		// Kiểm tra với vai trò đơn vị gửi yêu cầu
+		$sentRequests = AllianceRequests::getApiDataProvider(array(
+			'event_id' => $eventId,
+			'requester_org_id' => $propertyId,
+			'status' => AllianceRequests::STATUS_PENDING,
+		), 10)->getData();
+
+		if (!empty($sentRequests)) {
+			return array(
+				'has_pending' => true,
+				'message' => 'Đơn vị đang có yêu cầu liên quân chờ xác nhận. Vui lòng chờ đối tác xác nhận hoặc hủy yêu cầu trước khi thêm thành viên đội ' . $sportName . '.'
+			);
+		}
+
+		// Kiểm tra với vai trò đơn vị nhận yêu cầu
+		$receivedRequests = AllianceRequests::getApiDataProvider(array(
+			'event_id' => $eventId,
+			'target_org_id' => $propertyId,
+			'status' => AllianceRequests::STATUS_PENDING,
+		), 10)->getData();
+
+		if (!empty($receivedRequests)) {
+			return array(
+				'has_pending' => true,
+				'message' => 'Đơn vị đang có yêu cầu liên quân chờ xác nhận. Vui lòng xác nhận hoặc từ chối yêu cầu trước khi thêm thành viên đội ' . $sportName . '.'
+			);
+		}
+
+		return array('has_pending' => false, 'message' => '');
+	}
+
 	public static function getSportMinPlayers($sportName)
 	{
 		if (empty($sportName)) return 1;
