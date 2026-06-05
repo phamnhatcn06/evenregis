@@ -251,8 +251,10 @@ class SportTeamsController extends AdminController
         // Lấy danh sách khu vực và property để map
         $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
         $regionalMap = array();
+        $regionalCodeMap = array();
         foreach ($regionals as $r) {
             $regionalMap[$r->id] = $r->name;
+            $regionalCodeMap[$r->id] = isset($r->code) ? $r->code : '';
         }
 
         $properties = Properties::getApiDataProvider(array(), 500)->getData();
