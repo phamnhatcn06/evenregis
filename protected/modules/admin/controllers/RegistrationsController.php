@@ -1612,6 +1612,13 @@ class RegistrationsController extends AdminController
 				Yii::app()->end();
 			}
 
+			// Kiểm tra pending alliance request cho môn bóng đá/kéo co
+			$allianceCheck = $this->checkPendingSportAllianceRequest($team->event_id, $team->property_id, $sportName);
+			if ($allianceCheck['has_pending']) {
+				echo CJSON::encode(array('success' => false, 'error' => $allianceCheck['message']));
+				Yii::app()->end();
+			}
+
 			// Kiểm tra giới hạn: tối đa 3 bộ môn cha + không được tham gia cùng nội dung con ở nhiều team
 			$oldAttendeeIds = array();
 			$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
