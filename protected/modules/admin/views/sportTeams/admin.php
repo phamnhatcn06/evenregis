@@ -70,13 +70,13 @@ foreach ($sports as $sport) {
                     }
                 ),
                 array(
-                    'name' => 'status',
+                    'name' => 'is_active',
                     'header' => 'Trạng thái',
                     'width' => '120px',
                     'type' => 'raw',
-                    'filter' => SportTeams::getStatusOptions(),
+                    'filter' => array(0 => 'Ngừng', 1 => 'Hoạt động'),
                     'value' => function ($data) {
-                        return SportTeams::getStatusLabel($data->status);
+                        return $data->is_active ? '<span class="badge bg-success">Hoạt động</span>' : '<span class="badge bg-secondary">Ngừng</span>';
                     }
                 ),
                 array(
