@@ -31,7 +31,7 @@ foreach ($sports as $sport) {
             'filter' => true,
             'columns' => array(
                 array('name' => 'id', 'header' => 'ID', 'width' => '60px', 'filter' => false),
-                array('name' => 'team_name', 'header' => 'Tên đội', 'width' => '200px'),
+                array('name' => 'name', 'header' => 'Tên đội', 'width' => '200px'),
                 array(
                     'name' => 'event_id',
                     'header' => 'Sự kiện',
