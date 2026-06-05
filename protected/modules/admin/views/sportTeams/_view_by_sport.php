@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hiển thị tất cả đội thể thao theo bộ môn
  * @var string $sportName Tên môn thể thao
@@ -24,9 +25,9 @@
                     <thead class="table-light">
                         <tr>
                             <th style="width:50px">#</th>
-                            <th>Đơn vị</th>
+                            <th>Đơn vị đăng ký</th>
                             <th>Tên đội</th>
-                            <th style="width:100px">Liên quân</th>
+                            <th style="width:100px">Liên quân?</th>
                             <th style="width:120px">Trạng thái</th>
                             <th style="width:80px">SL</th>
                             <th style="width:100px">Thao tác</th>
@@ -54,7 +55,7 @@
                                     <td><?php echo SportTeams::getStatusLabel($team['status']); ?></td>
                                     <td><?php echo isset($team['member_count']) ? $team['member_count'] : '-'; ?></td>
                                     <td>
-                                        <a href="<?php echo Yii::app()->createUrl('/admin/sportTeams/view', array('id' => $team['id'])); ?>" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                        <a target="_blank" href="<?php echo Yii::app()->createUrl('/admin/sportTeams/view', array('id' => $team['id'])); ?>" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
                                             <i class="fa fa-eye"></i>
                                         </a>
                                     </td>
@@ -66,12 +67,12 @@
             </div>
             <div class="mt-3">
                 <strong>Tổng:</strong> <?php
-                $total = 0;
-                foreach ($teamsByProperty as $propData) {
-                    $total += count($propData['teams']);
-                }
-                echo $total . ' đội từ ' . count($teamsByProperty) . ' đơn vị';
-                ?>
+                                        $total = 0;
+                                        foreach ($teamsByProperty as $propData) {
+                                            $total += count($propData['teams']);
+                                        }
+                                        echo $total . ' đội từ ' . count($teamsByProperty) . ' đơn vị';
+                                        ?>
             </div>
         <?php endif; ?>
     </div>

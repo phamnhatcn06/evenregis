@@ -26,11 +26,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="select_property" class="form-label">Đơn vị <span class="text-danger">*</span></label>
-                    <select id="select_property" class="form-select select2-property" required>
-                        <option value="">-- Chọn đơn vị --</option>
-                        <?php foreach ($properties as $id => $name): ?>
-                            <option value="<?php echo $id; ?>"><?php echo CHtml::encode($name); ?></option>
-                        <?php endforeach; ?>
+                    <select id="select_property" class="form-select" required>
+                        <option value="">-- Chọn sự kiện trước --</option>
                     </select>
                 </div>
             </div>

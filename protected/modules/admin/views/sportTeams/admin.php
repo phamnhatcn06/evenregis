@@ -1,128 +1,73 @@
 <?php
 $this->breadcrumbs = array(
-    'Đội thể thao',
-    'Quản lý',
+    'Đội thể thao' => array('admin'),
+    'Tổng quan',
 );
 
 $this->menu = array(
     array(
-        'label' => 'Xem theo đơn vị',
-        'url' => '#',
-        'color' => 'info',
-        'icon' => 'fa-building',
-        'htmlOptions' => array('data-bs-toggle' => 'modal', 'data-bs-target' => '#modalSelectProperty'),
-    ),
-    array(
-        'label' => 'Xem theo bộ môn',
-        'url' => '#',
-        'color' => 'success',
-        'icon' => 'fa-futbol-o',
-        'htmlOptions' => array('data-bs-toggle' => 'modal', 'data-bs-target' => '#modalSelectSport'),
-    ),
-    array(
-        'label' => 'Thêm đội mới',
-        'url' => $this->createUrl('create'),
-        'color' => 'primary',
-        'icon' => 'fa-plus',
-        'id' => 'btn_create',
+        'label' => 'Danh sách',
+        'url' => $this->createUrl('admin'),
+        'color' => 'secondary',
+        'icon' => 'fa-list',
     ),
 );
-$this->Tabletitle = 'Danh sách đội thể thao';
-
-$sportOptions = array();
-foreach ($sports as $sport) {
-    $sportOptions[$sport->name] = $sport->name;
-}
+$this->Tabletitle = 'Tổng quan đội thể thao';
 ?>
 
-<div class="card">
-    <div class="card-body">
-        <?php
-        $this->widget('ext.edatatables.EDataTables', array(
-            'id' => 'sport-teams-grid',
-            'dataProvider' => $dataProvider,
-            'language' => 'vi',
-            'filter' => true,
-            'columns' => array(
-                array('name' => 'id', 'header' => 'ID', 'width' => '60px', 'filter' => false),
-                array('name' => 'name', 'header' => 'Tên đội', 'width' => '200px'),
-                array(
-                    'name' => 'event_id',
-                    'header' => 'Sự kiện',
-                    'type' => 'raw',
-                    'filter' => $events,
-                    'value' => function ($data) {
-                        $name = is_array($data) ? ($data['event_name'] ?? null) : ($data->event_name ?? null);
-                        return $name ? CHtml::encode($name) : (is_array($data) ? $data['event_id'] : $data->event_id);
-                    }
-                ),
-                array(
-                    'name' => 'sport_id',
-                    'header' => 'Môn thể thao',
-                    'type' => 'raw',
-                    'filter' => $sportOptions,
-                    'value' => function ($data) {
-                        $name = is_array($data) ? ($data['sport_name'] ?? null) : ($data->sport_name ?? null);
-                        return $name ? CHtml::encode($name) : (is_array($data) ? $data['sport_id'] : $data->sport_id);
-                    }
-                ),
-                array(
-                    'name' => 'property_id',
-                    'header' => 'Đơn vị',
-                    'type' => 'raw',
-                    'filter' => false,
-                    'value' => function ($data) {
-                        $name = is_array($data) ? ($data['property_name'] ?? null) : ($data->property_name ?? null);
-                        return $name ? CHtml::encode($name) : (is_array($data) ? $data['property_id'] : $data->property_id);
-                    }
-                ),
-                array(
-                    'name' => 'is_alliance',
-                    'header' => 'Liên quân',
-                    'width' => '100px',
-                    'type' => 'raw',
-                    'filter' => array(0 => 'Không', 1 => 'Có'),
-                    'value' => function ($data) {
-                        return $data->is_alliance ? '<span class="badge bg-info">Liên quân</span>' : '<span class="badge bg-secondary">Đơn lẻ</span>';
-                    }
-                ),
-                array(
-                    'name' => 'is_active',
-                    'header' => 'Trạng thái',
-                    'width' => '120px',
-                    'type' => 'raw',
-                    'filter' => array(0 => 'Ngừng', 1 => 'Hoạt động'),
-                    'value' => function ($data) {
-                        return $data->is_active ? '<span class="badge bg-success">Hoạt động</span>' : '<span class="badge bg-secondary">Ngừng</span>';
-                    }
-                ),
-                array(
-                    'header' => 'Thao tác',
-                    'width' => '100px',
-                    'type' => 'raw',
-                    'filter' => false,
-                    'sortable' => false,
-                    'value' => function ($data) {
-                        return IconHelper::actionButtons($data, array('view', 'update', 'delete'), '/admin/sportTeams');
-                    }
-                ),
-            ),
-            'options' => array(
-                'pageLength' => 25,
-            ),
-        ));
-        ?>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center py-5">
+                <i class="fa fa-building fa-3x text-primary mb-3"></i>
+                <h4>Xem theo đơn vị</h4>
+                <p class="text-muted">Hiển thị tất cả môn thể thao và đội thi của một đơn vị</p>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalSelectProperty">
+                    <i class="fa fa-search me-2"></i>Chọn đơn vị
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center py-5">
+                <i class="fa fa-futbol-o fa-3x text-success mb-3"></i>
+                <h4>Xem theo bộ môn</h4>
+                <p class="text-muted">Hiển thị tất cả đội thi đấu của một bộ môn</p>
+                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalSelectSport">
+                    <i class="fa fa-search me-2"></i>Chọn bộ môn
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
-<div id="result-container" class="mt-4"></div>
+<div id="result-container"></div>
 
 <?php $this->renderPartial('_modal_select_property', array('properties' => $properties, 'events' => $events)); ?>
 <?php $this->renderPartial('_modal_select_sport', array('sports' => $sports, 'events' => $events)); ?>
 
 <?php
+$booster = Yii::app()->booster;
+$assetsUrl = $booster->getAssetsUrl();
+Yii::app()->clientScript->registerCssFile($assetsUrl . '/select2/select2.css');
+Yii::app()->clientScript->registerScriptFile($assetsUrl . '/select2/select2.min.js', CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js',
     CClientScript::POS_END
 );
 ?>
+
+<style>
+    .select2-container {
+        z-index: 99999 !important;
+    }
+
+    .select2-drop {
+        z-index: 99999 !important;
+    }
+
+    .select2-drop-mask {
+        z-index: 99998 !important;
+    }
+</style>

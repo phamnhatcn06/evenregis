@@ -7,7 +7,7 @@ class SportTeamsController extends AdminController
         $this->redirect(array('admin'));
     }
 
-    public function actionOverview()
+    public function actionAdmin()
     {
         $events = Events::getActiveList();
         $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
@@ -227,34 +227,34 @@ class SportTeamsController extends AdminController
         }
     }
 
-    public function actionAdmin()
-    {
-        $model = new SportTeams('search');
-        $model->unsetAttributes();
+    // public function actionAdmin()
+    // {
+    //     $model = new SportTeams('search');
+    //     $model->unsetAttributes();
 
-        $params = array();
-        if (isset($_GET['SportTeams'])) {
-            $model->setAttributes($_GET['SportTeams']);
-            foreach ($_GET['SportTeams'] as $key => $value) {
-                if ($value !== null && $value !== '') {
-                    $params[$key] = $value;
-                }
-            }
-        }
+    //     $params = array();
+    //     if (isset($_GET['SportTeams'])) {
+    //         $model->setAttributes($_GET['SportTeams']);
+    //         foreach ($_GET['SportTeams'] as $key => $value) {
+    //             if ($value !== null && $value !== '') {
+    //                 $params[$key] = $value;
+    //             }
+    //         }
+    //     }
 
-        $dataProvider = SportTeams::getApiDataProvider($params);
-        $events = Events::getActiveList();
-        $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
-        $properties = Properties::getListForDropdown();
+    //     $dataProvider = SportTeams::getApiDataProvider($params);
+    //     $events = Events::getActiveList();
+    //     $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
+    //     $properties = Properties::getListForDropdown();
 
-        $this->render('admin', array(
-            'model' => $model,
-            'dataProvider' => $dataProvider,
-            'events' => $events,
-            'sports' => $sports,
-            'properties' => $properties,
-        ));
-    }
+    //     $this->render('admin', array(
+    //         'model' => $model,
+    //         'dataProvider' => $dataProvider,
+    //         'events' => $events,
+    //         'sports' => $sports,
+    //         'properties' => $properties,
+    //     ));
+    // }
 
     public function actionAddMember($teamId)
     {
@@ -337,6 +337,36 @@ class SportTeamsController extends AdminController
 
         header('Content-Type: application/json');
         echo json_encode(array('success' => true, 'data' => $properties));
+        Yii::app()->end();
+    }
+
+    public function actionGetPropertiesByEvent()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        $result = array();
+
+        if ($eventId) {
+            $eventUnits = EventUnits::getByEventId($eventId);
+            $propertyIds = array();
+            foreach ($eventUnits as $eu) {
+                if (isset($eu['property_id'])) {
+                    $propertyIds[] = $eu['property_id'];
+                }
+            }
+
+            $allProperties = Properties::getListForDropdown();
+            foreach ($allProperties as $id => $name) {
+                if (in_array($id, $propertyIds)) {
+                    $result[] = array(
+                        'id' => $id,
+                        'name' => $name,
+                    );
+                }
+            }
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(array('success' => true, 'data' => $result));
         Yii::app()->end();
     }
 
