@@ -75,29 +75,15 @@ $this->Tabletitle = 'Chi tiết đội: ' . CHtml::encode($model->team_name);
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Họ tên</th>
-                                <th width="80">Số áo</th>
-                                <th width="80">Vị trí</th>
-                                <th width="60">Đội trưởng</th>
-                                <th width="80">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($members as $member): ?>
+                            <?php foreach ($members as $index => $member): ?>
                                 <tr>
+                                    <td><?php echo $index + 1; ?></td>
                                     <td><?php echo CHtml::encode($member->attendee_name); ?></td>
-                                    <td><?php echo CHtml::encode($member->jersey_number); ?></td>
-                                    <td><?php echo CHtml::encode($member->position); ?></td>
-                                    <td><?php echo $member->is_captain ? '<i class="fa fa-star text-warning"></i>' : ''; ?></td>
-                                    <td>
-                                        <?php echo CHtml::beginForm(array('removeMember', 'id' => $member->id), 'post', array('style' => 'display:inline')); ?>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete('remove-member-<?php echo $member->id; ?>')">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                        <?php echo CHtml::hiddenField('_method', 'delete'); ?>
-                                        <?php echo CHtml::endForm(); ?>
-                                        <form id="remove-member-<?php echo $member->id; ?>" method="post" action="<?php echo $this->createUrl('removeMember', array('id' => $member->id)); ?>" style="display:none;"></form>
-                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
