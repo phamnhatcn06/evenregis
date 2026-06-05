@@ -93,6 +93,8 @@ class BeautyContestants extends BaseBeautyContestants
         if ($this->note) {
             $data['note'] = $this->note;
         }
+        var_dump(json_encode($data));
+        die;
         return ApiClient::post(ApiEndpoints::BEAUTY_CONTESTANT_STORE, $data);
     }
 
@@ -143,11 +145,11 @@ class BeautyContestants extends BaseBeautyContestants
         if (empty($registrationId)) {
             return '';
         }
-        
+
         if (isset(self::$_registrationPropertyCache[$registrationId])) {
             return self::$_registrationPropertyCache[$registrationId];
         }
-        
+
         // 1. Try to find the registration in the local database
         $registration = Registrations::model()->findByPk($registrationId);
         if ($registration) {
@@ -162,7 +164,7 @@ class BeautyContestants extends BaseBeautyContestants
                 return $name;
             }
         }
-        
+
         // 2. Try to fetch the registration from the API
         try {
             $registration = Registrations::fetchFromApi($registrationId);
@@ -181,7 +183,7 @@ class BeautyContestants extends BaseBeautyContestants
         } catch (Exception $e) {
             // Ignore API exceptions
         }
-        
+
         return '';
     }
 }

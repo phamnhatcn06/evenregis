@@ -1675,7 +1675,7 @@ class RegistrationsController extends AdminController
 
 		if ($content_type === 'sports') {
 			$sports = EventSports::getByEventId($event_id);
-			
+
 			// Pre-fetch all sports once to avoid N+1 API calls in the loop
 			$allSportsData = Sports::getApiDataProvider(array('is_active' => 1), 1000)->getData();
 			$sportsMap = array();
@@ -3405,8 +3405,7 @@ class RegistrationsController extends AdminController
 		$successCount = 0;
 		$errors = array();
 		foreach ($attendeeIds as $attendeeId) {
-			$candidateNumber = $prefix . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
-
+			$candidateNumber = $prefix . $attendeeId;
 			$model = new BeautyContestants;
 			$model->contest_id = $contestId;
 			$model->attendee_id = $attendeeId;
