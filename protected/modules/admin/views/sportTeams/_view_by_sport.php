@@ -20,6 +20,22 @@
                 <i class="fa fa-info-circle me-2"></i>Chưa có đội đăng ký môn này.
             </div>
         <?php else: ?>
+            <div class="row mb-3">
+                <div class="col-md-4 d-flex align-items-center">
+                    <label for="filter-property-sport" class="form-label mb-0 me-2 text-nowrap fw-semibold">
+                        Lọc theo đơn vị:
+                    </label>
+                    <select id="filter-property-sport" class="form-select form-select-sm">
+                        <option value="">-- Tất cả đơn vị --</option>
+                        <?php foreach ($teamsByProperty as $propData): ?>
+                            <option value="<?php echo CHtml::encode($propData['property_name']); ?>">
+                                <?php echo CHtml::encode($propData['property_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
@@ -37,8 +53,8 @@
                         <?php $index = 1; ?>
                         <?php foreach ($teamsByProperty as $propData): ?>
                             <?php foreach ($propData['teams'] as $team): ?>
-                                <tr>
-                                    <td><?php echo $index++; ?></td>
+                                <tr class="team-row" data-property="<?php echo CHtml::encode($propData['property_name']); ?>">
+                                    <td class="row-index"><?php echo $index++; ?></td>
                                     <td><?php echo CHtml::encode($propData['property_name']); ?></td>
                                     <td>
                                         <a href="<?php echo Yii::app()->createUrl('/admin/sportTeams/view', array('id' => $team['id'])); ?>">
@@ -71,9 +87,48 @@
                                         foreach ($teamsByProperty as $propData) {
                                             $total += count($propData['teams']);
                                         }
-                                        echo $total . ' đội từ ' . count($teamsByProperty) . ' đơn vị';
+                                        $originalText = $total . ' đội từ ' . count($teamsByProperty) . ' đơn vị';
                                         ?>
+                <span id="total-teams-text" data-original="<?php echo CHtml::encode($originalText); ?>">
+                    <?php echo CHtml::encode($originalText); ?>
+                </span>
             </div>
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+(function() {
+    var filterSelect = document.getElementById('filter-property-sport');
+    if (filterSelect) {
+        filterSelect.addEventListener('change', function() {
+            var selectedVal = this.value;
+            var rows = document.querySelectorAll('.team-row');
+            var idx = 1;
+            
+            rows.forEach(function(row) {
+                if (!selectedVal || row.getAttribute('data-property') === selectedVal) {
+                    row.style.display = '';
+                    var idxCol = row.querySelector('.row-index');
+                    if (idxCol) {
+                        idxCol.textContent = idx++;
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            var totalCount = idx - 1;
+            var totalText = document.getElementById('total-teams-text');
+            if (totalText) {
+                if (selectedVal) {
+                    totalText.textContent = totalCount + ' đội thuộc đơn vị "' + selectedVal + '"';
+                } else {
+                    var originalText = totalText.getAttribute('data-original');
+                    totalText.textContent = originalText;
+                }
+            }
+        });
+    }
+})();
+</script>

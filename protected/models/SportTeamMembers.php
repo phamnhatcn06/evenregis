@@ -75,15 +75,17 @@ class SportTeamMembers extends BaseSportTeamMembers
             'modelClass' => 'SportTeamMembers',
             'params' => $params,
             'pagination' => array('pageSize' => $pageSize),
-            'afterFetch' => function ($models) {
-                foreach ($models as $model) {
-                    if (empty($model->attendee_name) && isset($model->attendee) && is_array($model->attendee)) {
-                        $model->attendee_name = isset($model->attendee['full_name']) ? $model->attendee['full_name'] : '';
-                    }
-                }
-                return $models;
-            },
         ));
+    }
+
+    /**
+     * Map attendee_name từ nested attendee object
+     */
+    public function setAttendee($value)
+    {
+        if (is_array($value) && isset($value['full_name'])) {
+            $this->attendee_name = $value['full_name'];
+        }
     }
 
     /**
