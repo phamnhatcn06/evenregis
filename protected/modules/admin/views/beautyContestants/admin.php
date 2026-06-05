@@ -48,6 +48,18 @@ $this->Tabletitle = 'Danh sách thí sinh thi Miss';
                     }
                 ),
                 array(
+                    'header' => 'Mã cụm',
+                    'type' => 'raw',
+                    'width' => '80px',
+                    'filter' => false,
+                    'value' => function ($data) {
+                        if (isset($data->attendee['property']['regional']['code'])) {
+                            return CHtml::encode($data->attendee['property']['regional']['code']);
+                        }
+                        return '';
+                    }
+                ),
+                array(
                     'header' => 'Đơn vị',
                     'type' => 'raw',
                     'filter' => false,
