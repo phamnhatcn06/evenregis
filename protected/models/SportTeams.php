@@ -60,6 +60,7 @@ class SportTeams extends BaseSportTeams
             $model->sport_name = isset($data['sport_name']) ? $data['sport_name'] : '';
             $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
             $model->registration_id = isset($data['registration_id']) ? $data['registration_id'] : null;
+            $model->members = isset($data['members']) ? $data['members'] : array();
             $model->id = $id;
             return $model;
         }
