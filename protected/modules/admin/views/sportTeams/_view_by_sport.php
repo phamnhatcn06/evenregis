@@ -272,11 +272,24 @@
                     block.style.display = 'none';
                 } else {
                     block.style.display = '';
-                    // Update region team count
+                    // Update region team count and alliance stats
+                    var totalCount = visibleRows.length;
+                    var allianceCount = 0;
+                    var nonAllianceCount = 0;
+                    visibleRows.forEach(function(row) {
+                        if (row.getAttribute('data-is-alliance') === '1') {
+                            allianceCount++;
+                        } else {
+                            nonAllianceCount++;
+                        }
+                    });
+
                     var countBadge = block.querySelector('.region-team-count');
-                    if (countBadge) {
-                        countBadge.textContent = visibleRows.length + ' đội';
-                    }
+                    var allianceBadge = block.querySelector('.region-alliance-count');
+                    var nonAllianceBadge = block.querySelector('.region-non-alliance-count');
+                    if (countBadge) countBadge.textContent = totalCount + ' đội';
+                    if (allianceBadge) allianceBadge.textContent = allianceCount + ' liên quân';
+                    if (nonAllianceBadge) nonAllianceBadge.textContent = nonAllianceCount + ' đơn lẻ';
                 }
             });
 
