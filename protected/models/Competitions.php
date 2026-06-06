@@ -83,12 +83,19 @@ class Competitions extends BaseCompetitions
 
     public static function getActiveList()
     {
-        $list = array();
-        $competitions = self::getApiDataProvider(array('is_active' => 1), 100)->getData();
-        foreach ($competitions as $comp) {
-            $list[$comp->id] = $comp->name;
-        }
-        return $list;
+        return CacheHelper::getDropdown('competitions_active', function () {
+            $list = array();
+            $competitions = self::getApiDataProvider(array('is_active' => 1), 100)->getData();
+            foreach ($competitions as $comp) {
+                $list[$comp->id] = $comp->name;
+            }
+            return $list;
+        });
+    }
+
+    public static function clearCache()
+    {
+        CacheHelper::clearDropdownCache('competitions_active');
     }
 
     public static function assignCandidateNumbers($id)
