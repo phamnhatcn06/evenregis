@@ -355,6 +355,32 @@ var RegistrationView = (function() {
         }
     }
 
+    // Kiểm tra pending alliance ngay khi chọn môn có max_per_team_member > 3
+    function checkSportPendingAlliance(sportId) {
+        var sport = sportsDataCache.find(function(s) { return s.id == sportId; });
+        var maxPerTeam = sport ? (parseInt(sport.max_per_team_member) || parseInt(sport.max_members) || 999) : 999;
+
+        // Chỉ check nếu max_per_team_member > 3 (môn đồng đội lớn)
+        if (maxPerTeam <= 3) {
+            return;
+        }
+
+        fetch(window.BASE_URL + '/admin/registrations/checkSportPendingAlliance?registration_id=' + registrationId + '&sport_id=' + sportId, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.success && data.error) {
+                Toast.error(data.error);
+                // Reset dropdown và disable nút
+                var sportSelect = document.getElementById('sport_select_main');
+                var btnOpen = document.getElementById('btn_open_sport_modal');
+                if (sportSelect) sportSelect.value = '';
+                if (btnOpen) btnOpen.disabled = true;
+            }
+        });
+    }
+
     // Bind events cho sport card (dropdown chọn môn, liên quân, button mở modal)
     function bindSportCardEvents() {
         var sportSelect = document.getElementById('sport_select_main');
@@ -363,8 +389,13 @@ var RegistrationView = (function() {
 
         if (sportSelect) {
             sportSelect.addEventListener('change', function() {
+                var sportId = this.value;
                 if (btnOpen) {
-                    btnOpen.disabled = !this.value;
+                    btnOpen.disabled = !sportId;
+                }
+                // Kiểm tra pending alliance ngay khi chọn môn có max_per_team_member > 3
+                if (sportId) {
+                    checkSportPendingAlliance(sportId);
                 }
             });
         }
