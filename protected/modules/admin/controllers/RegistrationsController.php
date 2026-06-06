@@ -1534,22 +1534,45 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
-		// Fetch sport name if not available
+		// Fetch sport info
 		$sportName = $team->sport_name;
-		if (empty($sportName) && $team->sport_id) {
+		$maxPerTeamMember = null;
+		if ($team->sport_id) {
 			$sport = Sports::fetchFromApi($team->sport_id);
-			$sportName = $sport ? $sport->name : '';
+			if ($sport) {
+				if (empty($sportName)) {
+					$sportName = $sport->name;
+				}
+				$maxPerTeamMember = $sport->max_per_team_member ? (int)$sport->max_per_team_member : self::getSportMaxPlayers($sportName);
+			}
+		}
+
+		// Lấy attendees của đơn vị hiện tại để đếm số thành viên liên quân từ đơn vị khác
+		$ownAttendeeIds = array();
+		if ($team->registration_id) {
+			$attendees = Attendees::getByRegistrationId($team->registration_id);
+			foreach ($attendees as $att) {
+				if (isset($att['id'])) {
+					$ownAttendeeIds[] = (int)$att['id'];
+				}
+			}
 		}
 
 		$members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
 		$membersArr = array();
+		$allianceMemberCount = 0;
 		foreach ($members as $m) {
+			$isOwnMember = in_array((int)$m->attendee_id, $ownAttendeeIds);
 			$membersArr[] = array(
 				'id' => $m->id,
 				'attendee_id' => $m->attendee_id,
 				'name' => $m->name,
 				'attendee_name' => $m->attendee_name,
+				'is_own_member' => $isOwnMember,
 			);
+			if (!$isOwnMember) {
+				$allianceMemberCount++;
+			}
 		}
 
 		echo CJSON::encode(array(
@@ -1562,6 +1585,8 @@ class RegistrationsController extends AdminController
 					'team_name' => $team->team_name,
 					'name' => $team->name,
 					'is_alliance' => $team->is_alliance,
+					'max_per_team_member' => $maxPerTeamMember,
+					'alliance_member_count' => $allianceMemberCount,
 				),
 				'members' => $membersArr,
 			),
