@@ -55,4 +55,21 @@ class Roles extends BaseRoles
 			),
 		));
 	}
+
+	public static function getListForDropdown()
+	{
+		return CacheHelper::getDropdown('roles_active', function () {
+			$list = array();
+			$items = self::getApiDataProvider(array('is_active' => 1), 100)->getData();
+			foreach ($items as $item) {
+				$list[$item->id] = $item->name;
+			}
+			return $list;
+		});
+	}
+
+	public static function clearCache()
+	{
+		CacheHelper::clearDropdownCache('roles_active');
+	}
 }
