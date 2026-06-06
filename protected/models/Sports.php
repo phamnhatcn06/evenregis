@@ -114,4 +114,10 @@ class Sports extends BaseSports
 			}
 		}
 	}
+
+	public static function clearCache()
+	{
+		CacheHelper::clearDropdownCache('sports_tree');
+		CacheHelper::clearDropdownCache('sports_parent');
+	}
 }
