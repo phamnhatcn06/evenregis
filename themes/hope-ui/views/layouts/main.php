@@ -6,7 +6,7 @@
  * @var string $content
  */
 $baseUrl = Yii::app()->theme->baseUrl;
-$user = AuthHandler::getUser();
+$user = CacheHelper::getHeader();
 $appName = Yii::app()->name;
 ?>
 <!DOCTYPE html>
