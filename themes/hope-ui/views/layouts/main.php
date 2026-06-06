@@ -232,6 +232,26 @@ $appName = Yii::app()->name;
     <script src="<?php echo $baseUrl; ?>/assets/js/plugins/toast.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function clearUserCache() {
+            fetch('<?php echo Yii::app()->createUrl('/admin/default/clearCache'); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    Toast.success('Đã xóa cache thành công!');
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    Toast.error(data.message || 'Có lỗi xảy ra');
+                }
+            })
+            .catch(function() { Toast.error('Lỗi kết nối server'); });
+        }
+
         function confirmDelete(formId) {
             Swal.fire({
                 title: 'Xác nhận xóa',
