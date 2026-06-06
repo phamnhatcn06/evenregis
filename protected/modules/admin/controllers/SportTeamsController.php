@@ -505,6 +505,7 @@ class SportTeamsController extends AdminController
             'success' => true,
             'data' => array(
                 'id' => $model->id,
+                'name' => $model->name,
                 'team_name' => $model->team_name,
                 'sport_name' => $model->sport_name,
                 'property_name' => $model->property_name,
