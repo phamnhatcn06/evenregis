@@ -335,4 +335,28 @@ class CacheHelper
 
         return $stats;
     }
+
+    /**
+     * Clear all static data cache (dropdowns, lists)
+     * Used for admin "Clear all cache" button
+     */
+    public static function clearAllStaticCache()
+    {
+        $keys = array(
+            'events_active',
+            'properties_active',
+            'roles_active',
+            'competitions_active',
+            'contents_active',
+            'regionals_active',
+            'sports_tree',
+            'sports_parent',
+        );
+
+        $results = array();
+        foreach ($keys as $key) {
+            $results[$key] = self::delete(self::PREFIX_DROPDOWN . ':' . $key);
+        }
+        return $results;
+    }
 }
