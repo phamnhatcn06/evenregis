@@ -1423,6 +1423,22 @@ class RegistrationsController extends AdminController
 		}
 
 		if ($teamId) {
+			// Kiểm tra tổng số thành viên của team (bao gồm liên quân) không vượt quá max_per_team_member
+			$existingMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+			$currentMemberCount = count($existingMembers);
+			$totalAfterAdd = $currentMemberCount + count($attendeeIds);
+
+			if ($totalAfterAdd > $maxPlayers) {
+				$msg = "Môn {$sportName} tối đa chỉ cho phép {$maxPlayers} người/đội. Đội liên quân hiện có {$currentMemberCount} người, không thể thêm " . count($attendeeIds) . " người nữa.";
+				if ($isAjax) {
+					echo CJSON::encode(array('success' => false, 'error' => $msg));
+					Yii::app()->end();
+				}
+				Yii::app()->user->setFlash('error', $msg);
+				$this->redirect(array('view', 'id' => $registrationId));
+				return;
+			}
+
 			// Thêm thành viên vào đội liên quân có sẵn của đối tác
 			foreach ($attendeeIds as $idx => $attId) {
 				$member = new SportTeamMembers();
