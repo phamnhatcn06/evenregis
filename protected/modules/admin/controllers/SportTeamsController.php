@@ -148,6 +148,8 @@ class SportTeamsController extends AdminController
             'success' => true,
             'total_teams' => count($activeTeamsMap),
             'total_athletes' => count($uniqueAttendeeIds),
+            'single_team_count' => $singleTeamCount,
+            'alliance_team_count' => $allianceTeamCount,
             'sports' => $formattedSports,
         ));
         Yii::app()->end();
