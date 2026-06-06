@@ -155,6 +155,11 @@ $appName = Yii::app()->name;
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="<?php echo Yii::app()->createUrl('/admin/profile'); ?>">Hồ sơ</a></li>
                                     <li>
+                                        <a class="dropdown-item" href="#" onclick="clearUserCache(); return false;">
+                                            <i class="fa fa-refresh me-1"></i>Xóa cache
+                                        </a>
+                                    </li>
+                                    <li>
                                         <hr class="dropdown-divider">
                                     </li>
                                     <li><a class="dropdown-item" href="<?php echo Yii::app()->createUrl('/site/logout'); ?>">Đăng xuất</a></li>
