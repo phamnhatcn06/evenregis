@@ -2248,9 +2248,15 @@ var RegistrationView = (function() {
             return;
         }
 
-        var maxPlayers = getSportMaxPlayers(sportName, sportId);
-        if (sportSelectedAttendees.length > maxPlayers) {
-            Toast.error('Môn "' + sportName + '" tối đa chỉ cho phép chọn ' + maxPlayers + ' người.');
+        // Sử dụng max từ API nếu có, tính cả thành viên liên quân từ đơn vị khác
+        var maxPlayers = editingTeamMaxMembers || getSportMaxPlayers(sportName, sportId);
+        var availableSlots = maxPlayers - editingTeamAllianceMemberCount;
+        if (sportSelectedAttendees.length > availableSlots) {
+            var msg = 'Môn "' + sportName + '" tối đa chỉ cho phép ' + maxPlayers + ' người/đội.';
+            if (editingTeamAllianceMemberCount > 0) {
+                msg += ' Đội liên quân hiện có ' + editingTeamAllianceMemberCount + ' thành viên từ đơn vị khác, bạn chỉ có thể chọn tối đa ' + availableSlots + ' người.';
+            }
+            Toast.error(msg);
             return;
         }
 
