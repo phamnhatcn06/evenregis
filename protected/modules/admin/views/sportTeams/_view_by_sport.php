@@ -54,33 +54,43 @@
             <?php
             $globalIndex = 1;
             foreach ($teamsByRegion as $regionData):
+                $regionTeamCount = 0;
+                $regionAllianceCount = 0;
+                $regionNonAllianceCount = 0;
+                foreach ($regionData['properties'] as $propData) {
+                    foreach ($propData['teams'] as $team) {
+                        $regionTeamCount++;
+                        if ($team['is_alliance']) {
+                            $regionAllianceCount++;
+                        } else {
+                            $regionNonAllianceCount++;
+                        }
+                    }
+                }
             ?>
-                <div class="region-block mb-4" data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>">
+                <div class="region-block mb-4" data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
+                     data-total="<?php echo $regionTeamCount; ?>"
+                     data-alliance="<?php echo $regionAllianceCount; ?>"
+                     data-non-alliance="<?php echo $regionNonAllianceCount; ?>">
                     <h5 class="bg-light p-2 rounded border-start border-4 border-primary mb-3">
                         <i class="fa fa-map-marker me-2"></i>
                         <?php echo CHtml::encode($regionData['region_name']); ?>
-                        <span class="badge bg-primary ms-2 region-team-count">
-                            <?php
-                            $regionTeamCount = 0;
-                            foreach ($regionData['properties'] as $propData) {
-                                $regionTeamCount += count($propData['teams']);
-                            }
-                            echo $regionTeamCount . ' đội';
-                            ?>
-                        </span>
+                        <span class="badge bg-primary ms-2 region-team-count"><?php echo $regionTeamCount; ?> đội</span>
+                        <span class="badge bg-info ms-1 region-alliance-count"><?php echo $regionAllianceCount; ?> liên quân</span>
+                        <span class="badge bg-secondary ms-1 region-non-alliance-count"><?php echo $regionNonAllianceCount; ?> đơn lẻ</span>
                     </h5>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
+                        <table class="table table-bordered table-hover table-fixed-cols">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width:50px">#</th>
-                                    <th>Đơn vị đăng ký</th>
-                                    <th>Tên đội</th>
-                                    <th style="width:100px">Liên quân?</th>
-                                    <th style="width:120px">Trạng thái</th>
-                                    <th style="width:80px">SL</th>
-                                    <th style="width:100px">Thao tác</th>
+                                    <th style="width:5%">#</th>
+                                    <th style="width:25%">Đơn vị đăng ký</th>
+                                    <th style="width:25%">Tên đội</th>
+                                    <th style="width:12%">Liên quân?</th>
+                                    <th style="width:13%">Trạng thái</th>
+                                    <th style="width:10%">SL</th>
+                                    <th style="width:10%">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
