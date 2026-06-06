@@ -8,6 +8,10 @@
  * @var array $regionList Danh sách khu vực để filter
  */
 ?>
+<style>
+.table-fixed-cols { table-layout: fixed; width: 100%; }
+.table-fixed-cols td, .table-fixed-cols th { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
 <div class="card">
     <div class="card-header bg-success text-white">
         <h5 class="mb-0">
