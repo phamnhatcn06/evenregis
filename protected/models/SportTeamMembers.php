@@ -91,6 +91,9 @@ class SportTeamMembers extends BaseSportTeamMembers
             if (isset($value['position'])) {
                 $this->attendee_position = $value['position'];
             }
+            if (isset($value['property_name'])) {
+                $this->property_name = $value['property_name'];
+            }
         }
     }
 
