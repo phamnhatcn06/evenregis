@@ -2,6 +2,25 @@
 
 class DefaultController extends AdminController
 {
+    /**
+     * Clear all cache for current user
+     */
+    public function actionClearCache()
+    {
+        if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
+            throw new CHttpException(400, 'Bad Request');
+        }
+
+        $results = CacheHelper::clearUserCache();
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'message' => 'Đã xóa cache thành công',
+            'details' => $results,
+        ));
+        Yii::app()->end();
+    }
+
     public function actionIndex()
     {
         $stats = $this->fetchDashboardStats();
