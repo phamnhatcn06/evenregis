@@ -3947,6 +3947,59 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	/**
+	 * API kiểm tra pending alliance khi chọn môn thể thao có max_per_team_member > 3
+	 * Trả về lỗi ngay nếu có yêu cầu liên quân chưa duyệt
+	 */
+	public function actionCheckSportPendingAlliance()
+	{
+		if (!Yii::app()->request->isAjaxRequest) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		$registrationId = Yii::app()->request->getParam('registration_id');
+		$sportId = Yii::app()->request->getParam('sport_id');
+
+		header('Content-Type: application/json');
+
+		if (!$registrationId || !$sportId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin.'));
+			Yii::app()->end();
+		}
+
+		$registration = Registrations::fetchFromApi($registrationId);
+		if (!$registration) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy phiếu đăng ký.'));
+			Yii::app()->end();
+		}
+
+		$sport = Sports::fetchFromApi($sportId);
+		if (!$sport) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy môn thể thao.'));
+			Yii::app()->end();
+		}
+
+		$maxPerTeam = $sport->max_per_team_member ? (int)$sport->max_per_team_member : self::getSportMaxPlayers($sport->name);
+
+		// Chỉ check pending alliance nếu max_per_team_member > 3
+		if ($maxPerTeam <= 3) {
+			echo CJSON::encode(array('success' => true, 'requires_alliance_check' => false));
+			Yii::app()->end();
+		}
+
+		$allianceCheck = $this->checkPendingSportAllianceRequest($registration->event_id, $registration->property_id, $sport->name);
+		if ($allianceCheck['has_pending']) {
+			echo CJSON::encode(array(
+				'success' => false,
+				'error' => $allianceCheck['message'],
+				'requires_alliance_check' => true
+			));
+		} else {
+			echo CJSON::encode(array('success' => true, 'requires_alliance_check' => true));
+		}
+		Yii::app()->end();
+	}
+
 	public function actionCheckSubmitValid($id)
 	{
 		$this->checkRegistrationAccess($id);
