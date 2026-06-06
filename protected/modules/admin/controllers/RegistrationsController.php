@@ -1623,8 +1623,37 @@ class RegistrationsController extends AdminController
 			$sport = Sports::fetchFromApi($team->sport_id);
 			$sportName = $sport ? $sport->name : '';
 			$maxPlayers = ($sport && $sport->max_per_team_member) ? (int)$sport->max_per_team_member : self::getSportMaxPlayers($sportName);
-			if (count($attendeeIds) > $maxPlayers) {
-				echo CJSON::encode(array('success' => false, 'error' => "Môn {$sportName} tối đa chỉ cho phép chọn {$maxPlayers} người."));
+
+			// Lấy attendees của đơn vị hiện tại để xác định thành viên liên quân từ đơn vị khác
+			$ownAttendeeIdsForCheck = array();
+			if ($registrationId) {
+				$ownAttendeesCheck = Attendees::getByRegistrationId($registrationId);
+				foreach ($ownAttendeesCheck as $att) {
+					if (isset($att['id'])) {
+						$ownAttendeeIdsForCheck[] = (int)$att['id'];
+					}
+				}
+			}
+
+			// Đếm số thành viên liên quân từ đơn vị khác (sẽ được giữ lại)
+			$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+			$allianceMemberCount = 0;
+			$oldAttendeeIds = array();
+			foreach ($oldMembers as $m) {
+				$oldAttendeeIds[] = (int)$m->attendee_id;
+				if (!in_array((int)$m->attendee_id, $ownAttendeeIdsForCheck)) {
+					$allianceMemberCount++;
+				}
+			}
+
+			// Tổng số thành viên sau khi update = liên quân giữ lại + số người submit mới
+			$totalAfterUpdate = $allianceMemberCount + count($attendeeIds);
+			if ($totalAfterUpdate > $maxPlayers) {
+				$msg = "Môn {$sportName} tối đa chỉ cho phép {$maxPlayers} người/đội.";
+				if ($allianceMemberCount > 0) {
+					$msg .= " Đội liên quân hiện có {$allianceMemberCount} thành viên từ đơn vị khác, bạn chỉ có thể chọn tối đa " . ($maxPlayers - $allianceMemberCount) . " người.";
+				}
+				echo CJSON::encode(array('success' => false, 'error' => $msg));
 				Yii::app()->end();
 			}
 
@@ -1636,11 +1665,6 @@ class RegistrationsController extends AdminController
 			}
 
 			// Kiểm tra giới hạn: tối đa 3 bộ môn cha + không được tham gia cùng nội dung con ở nhiều team
-			$oldAttendeeIds = array();
-			$oldMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
-			foreach ($oldMembers as $m) {
-				$oldAttendeeIds[] = (int)$m->attendee_id;
-			}
 
 			$errors = array();
 			foreach ($attendeeIds as $idx => $attId) {
