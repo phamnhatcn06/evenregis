@@ -74,6 +74,8 @@ class SportTeamsController extends AdminController
         ), 1000)->getData();
 
         $activeTeamsMap = array();
+        $singleTeamCount = 0;
+        $allianceTeamCount = 0;
         foreach ($teamsRes as $team) {
             if (isset($team->deleted_at) && $team->deleted_at !== null && $team->deleted_at !== '') {
                 continue;
@@ -88,6 +90,12 @@ class SportTeamsController extends AdminController
 
             if (isset($sportStats[$team->sport_id])) {
                 $sportStats[$team->sport_id]['team_count']++;
+            }
+
+            if (!empty($team->is_alliance) && $team->is_alliance == 1) {
+                $allianceTeamCount++;
+            } else {
+                $singleTeamCount++;
             }
         }
 
