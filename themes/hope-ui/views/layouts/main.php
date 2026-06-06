@@ -68,7 +68,7 @@ $appName = Yii::app()->name;
                         </svg>
                     </div>
                 </div>
-                <h4 class="logo-title">Sự kiện</h4>
+                <img src="<?php echo Yii::app()->theme->baseUrl; ?>/logo_daihoi.png" alt="Logo Đại hội" style="height: 40px;">
             </a>
             <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
                 <i class="icon">
