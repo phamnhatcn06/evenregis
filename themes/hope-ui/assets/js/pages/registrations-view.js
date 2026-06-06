@@ -2157,9 +2157,13 @@ var RegistrationView = (function() {
     }
 
     var editingTeamId = null;
+    var editingTeamMaxMembers = null;
+    var editingTeamAllianceMemberCount = 0;
 
     function editSportTeam(teamId) {
         editingTeamId = teamId;
+        editingTeamMaxMembers = null;
+        editingTeamAllianceMemberCount = 0;
 
         fetch(window.BASE_URL + '/admin/registrations/getSportTeamDetail?id=' + teamId, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -2173,6 +2177,10 @@ var RegistrationView = (function() {
 
             var team = data.data.team;
             var members = data.data.members || [];
+
+            // Lưu thông tin giới hạn số người
+            editingTeamMaxMembers = team.max_per_team_member || null;
+            editingTeamAllianceMemberCount = team.alliance_member_count || 0;
 
             // Set sport (readonly)
             var modalSportSelect = document.getElementById('sport_item_id');
@@ -2192,15 +2200,17 @@ var RegistrationView = (function() {
                 teamNameInput.classList.add('bg-light');
             }
 
-            // Load attendees then pre-select members
+            // Load attendees then pre-select members (chỉ lấy những thành viên thuộc đơn vị mình)
             loadSportAttendees(function() {
                 sportSelectedAttendees = [];
                 originalSportTeamAttendeeIds = [];
                 members.forEach(function(m) {
-                    var att = sportAllAttendees.find(function(a) { return a.id == m.attendee_id; });
-                    if (att) {
-                        originalSportTeamAttendeeIds.push(m.attendee_id);
-                        sportSelectedAttendees.push(att);
+                    if (m.is_own_member) {
+                        var att = sportAllAttendees.find(function(a) { return a.id == m.attendee_id; });
+                        if (att) {
+                            originalSportTeamAttendeeIds.push(m.attendee_id);
+                            sportSelectedAttendees.push(att);
+                        }
                     }
                 });
                 renderSportAvailableAttendees();
