@@ -201,9 +201,10 @@
                             if (d.members.length > 0) {
                                 html += '<div class="table-responsive" style="max-height:300px;overflow-y:auto;">';
                                 html += '<table class="table table-sm table-bordered table-hover">';
-                                html += '<thead class="table-light sticky-top"><tr><th style="width:40px;">#</th><th>Họ tên</th><th>Chức danh</th><th>Đơn vị</th></tr></thead><tbody>';
+                                html += '<thead class="table-light sticky-top"><tr><th style="width:40px;">#</th><th>Họ tên</th><th>Giới tính</th><th>Chức danh</th><th>Đơn vị</th></tr></thead><tbody>';
                                 d.members.forEach(function(m, i) {
-                                    html += '<tr><td>' + (i + 1) + '</td><td>' + (m.name || '-') + '</td><td>' + (m.position || '-') + '</td><td>' + (m.property_name || '-') + '</td></tr>';
+                                    var genderLabel = m.gender === 'male' ? 'Nam' : (m.gender === 'female' ? 'Nữ' : '-');
+                                    html += '<tr><td>' + (i + 1) + '</td><td>' + (m.name || '-') + '</td><td>' + genderLabel + '</td><td>' + (m.position || '-') + '</td><td>' + (m.property_name || '-') + '</td></tr>';
                                 });
                                 html += '</tbody></table></div>';
                             } else {
