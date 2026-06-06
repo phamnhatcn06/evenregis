@@ -142,35 +142,107 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
             </div>
         </div>
 
-        <!-- Unregistered Properties -->
-        <div class="col-lg-8">
+    </div>
+
+    <!-- Row: 3 cột trạng thái đăng ký đơn vị -->
+    <?php
+    $notStarted = isset($stats['properties_not_started']) ? $stats['properties_not_started'] : array();
+    $draft = isset($stats['properties_draft']) ? $stats['properties_draft'] : array();
+    $submitted = isset($stats['properties_submitted']) ? $stats['properties_submitted'] : array();
+    ?>
+    <div class="row">
+        <!-- Chưa khởi tạo đăng ký -->
+        <div class="col-lg-4">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Đơn vị chưa đăng ký</h5>
-                    <span class="badge bg-warning"><?php echo count($unregisteredProperties); ?> đơn vị</span>
+                    <h6 class="card-title mb-0"><i class="fa fa-times-circle text-danger me-2"></i>Chưa khởi tạo</h6>
+                    <span class="badge bg-danger"><?php echo count($notStarted); ?></span>
                 </div>
                 <div class="card-body p-0">
-                    <?php if (empty($unregisteredProperties)): ?>
-                        <div class="p-4 text-center text-muted">
-                            <i class="fa fa-check-circle fa-2x text-success mb-2"></i>
-                            <p class="mb-0">Tất cả đơn vị đã gửi đăng ký</p>
-                        </div>
+                    <?php if (empty($notStarted)): ?>
+                        <div class="p-3 text-center text-muted small">Không có</div>
                     <?php else: ?>
-                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                            <table class="table table-hover mb-0">
+                        <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+                            <table class="table table-sm table-hover mb-0">
                                 <thead class="table-light sticky-top">
                                     <tr>
                                         <th>Mã</th>
                                         <th>Tên đơn vị</th>
-                                        <th>Khu vực</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($unregisteredProperties as $property): ?>
+                                    <?php foreach ($notStarted as $p): ?>
                                         <tr>
-                                            <td><code><?php echo CHtml::encode(isset($property['code']) ? $property['code'] : ''); ?></code></td>
-                                            <td><?php echo CHtml::encode(isset($property['name']) ? $property['name'] : ''); ?></td>
-                                            <td><?php echo CHtml::encode(isset($property['regional_name']) ? $property['regional_name'] : ''); ?></td>
+                                            <td><code><?php echo CHtml::encode(isset($p['code']) ? $p['code'] : ''); ?></code></td>
+                                            <td class="small"><?php echo CHtml::encode(isset($p['name']) ? $p['name'] : ''); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đã tạo nhưng chưa gửi (Nháp) -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="card-title mb-0"><i class="fa fa-edit text-secondary me-2"></i>Nháp (chưa gửi)</h6>
+                    <span class="badge bg-secondary"><?php echo count($draft); ?></span>
+                </div>
+                <div class="card-body p-0">
+                    <?php if (empty($draft)): ?>
+                        <div class="p-3 text-center text-muted small">Không có</div>
+                    <?php else: ?>
+                        <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Mã</th>
+                                        <th>Tên đơn vị</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($draft as $p): ?>
+                                        <tr>
+                                            <td><code><?php echo CHtml::encode(isset($p['code']) ? $p['code'] : ''); ?></code></td>
+                                            <td class="small"><?php echo CHtml::encode(isset($p['name']) ? $p['name'] : ''); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đã gửi đăng ký -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="card-title mb-0"><i class="fa fa-paper-plane text-info me-2"></i>Đã gửi đăng ký</h6>
+                    <span class="badge bg-info"><?php echo count($submitted); ?></span>
+                </div>
+                <div class="card-body p-0">
+                    <?php if (empty($submitted)): ?>
+                        <div class="p-3 text-center text-muted small">Không có</div>
+                    <?php else: ?>
+                        <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Mã</th>
+                                        <th>Tên đơn vị</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($submitted as $p): ?>
+                                        <tr>
+                                            <td><code><?php echo CHtml::encode(isset($p['code']) ? $p['code'] : ''); ?></code></td>
+                                            <td class="small"><?php echo CHtml::encode(isset($p['name']) ? $p['name'] : ''); ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

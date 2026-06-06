@@ -3412,7 +3412,6 @@ class RegistrationsController extends AdminController
 		foreach ($existingContestants as $c) {
 			$attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
 			if ($attId) $registeredAttendeeIds[] = $attId;
-
 			$registered[] = array(
 				'id' => isset($c->id) ? $c->id : $c['id'],
 				'attendee_id' => $attId,
