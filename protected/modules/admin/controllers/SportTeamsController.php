@@ -492,17 +492,12 @@ class SportTeamsController extends AdminController
             Yii::app()->end();
         }
 
-        $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
         $memberList = array();
-        foreach ($members as $m) {
-            $pos = $m->attendee_position;
-            if (empty($pos) && $m->attendee) {
-                $pos = $m->attendee->position;
-            }
+        foreach ($model->members as $m) {
             $memberList[] = array(
-                'name' => $m->attendee_name ?: $m->name,
-                'position' => $pos,
-                'property_name' => isset($m->property_name) ? $m->property_name : '',
+                'name' => isset($m['attendee_name']) ? $m['attendee_name'] : (isset($m['name']) ? $m['name'] : ''),
+                'position' => isset($m['attendee_position']) ? $m['attendee_position'] : '',
+                'property_name' => isset($m['property_name']) ? $m['property_name'] : '',
             );
         }
 
