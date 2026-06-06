@@ -68,29 +68,31 @@ class Sports extends BaseSports
 
 	public static function buildTreeData()
 	{
-		$sports = self::getApiDataProvider(array(), 200)->getData();
+		return CacheHelper::getDropdown('sports_tree', function () {
+			$sports = self::getApiDataProvider(array(), 200)->getData();
 
-		$items = array();
-		$children = array();
+			$items = array();
+			$children = array();
 
-		foreach ($sports as $sport) {
-			$items[$sport->id] = $sport;
-			$parentId = $sport->parent_id ? $sport->parent_id : 0;
-			if (!isset($children[$parentId])) {
-				$children[$parentId] = array();
+			foreach ($sports as $sport) {
+				$items[$sport->id] = $sport;
+				$parentId = $sport->parent_id ? $sport->parent_id : 0;
+				if (!isset($children[$parentId])) {
+					$children[$parentId] = array();
+				}
+				$children[$parentId][] = $sport->id;
 			}
-			$children[$parentId][] = $sport->id;
-		}
 
-		$result = array();
-		$levelMap = array();
+			$result = array();
+			$levelMap = array();
 
-		self::buildTreeRecursive($items, $children, 0, 0, $result, $levelMap);
+			self::buildTreeRecursive($items, $children, 0, 0, $result, $levelMap);
 
-		return array(
-			'items' => $result,
-			'levelMap' => $levelMap,
-		);
+			return array(
+				'items' => $result,
+				'levelMap' => $levelMap,
+			);
+		});
 	}
 
 	private static function buildTreeRecursive($items, $children, $parentId, $level, &$result, &$levelMap)
