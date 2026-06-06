@@ -76,6 +76,23 @@ class Regionals extends BaseRegionals
 		));
 	}
 
+	public static function getListForDropdown()
+	{
+		return CacheHelper::getDropdown('regionals_active', function () {
+			$list = array();
+			$items = self::getApiDataProvider(array('is_active' => 1), 100)->getData();
+			foreach ($items as $item) {
+				$list[$item->id] = $item->name;
+			}
+			return $list;
+		});
+	}
+
+	public static function clearCache()
+	{
+		CacheHelper::clearDropdownCache('regionals_active');
+	}
+
 	public static function getOrganizations($regionalId)
 	{
 		$dataProvider = Properties::getApiDataProvider(array('region_id' => $regionalId), 500);
