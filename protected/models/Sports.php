@@ -56,14 +56,19 @@ class Sports extends BaseSports
 
 	public static function getParentList($excludeId = null)
 	{
-		$list = array('0' => '-- Root (Gốc) --');
-		$sports = self::getApiDataProvider(array('is_active' => 1), 100)->getData();
-		foreach ($sports as $sport) {
-			if ($excludeId === null || $sport->id != $excludeId) {
+		$allList = CacheHelper::getDropdown('sports_parent', function () {
+			$list = array('0' => '-- Root (Gốc) --');
+			$sports = self::getApiDataProvider(array('is_active' => 1), 100)->getData();
+			foreach ($sports as $sport) {
 				$list[$sport->id] = $sport->name;
 			}
+			return $list;
+		});
+
+		if ($excludeId !== null) {
+			unset($allList[$excludeId]);
 		}
-		return $list;
+		return $allList;
 	}
 
 	public static function buildTreeData()
