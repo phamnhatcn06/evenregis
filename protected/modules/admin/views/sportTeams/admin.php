@@ -68,28 +68,54 @@ $this->Tabletitle = 'Tổng quan đội thể thao';
         <div id="stats-content" class="d-none">
             <!-- KPI Row -->
             <div class="row g-4 mb-4">
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <div class="card border-0 shadow-sm" style="background: rgba(58, 87, 232, 0.08); border-radius: 12px;">
                         <div class="card-body d-flex align-items-center py-4">
                             <div class="flex-shrink-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3);">
                                 <i class="fa fa-users fa-lg"></i>
                             </div>
                             <div class="ms-3">
-                                <h6 class="text-muted mb-1 fw-bold">Tổng số VĐV đăng ký</h6>
+                                <h6 class="text-muted mb-1 fw-bold">Tổng số VĐV</h6>
                                 <h2 class="mb-0 text-primary fw-extrabold" id="stat-total-athletes">0</h2>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <div class="card border-0 shadow-sm" style="background: rgba(26, 186, 130, 0.08); border-radius: 12px;">
                         <div class="card-body d-flex align-items-center py-4">
                             <div class="flex-shrink-0 bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; box-shadow: 0 4px 10px rgba(26, 186, 130, 0.3);">
                                 <i class="fa fa-shield fa-lg"></i>
                             </div>
                             <div class="ms-3">
-                                <h6 class="text-muted mb-1 fw-bold">Tổng số đội thi đấu</h6>
+                                <h6 class="text-muted mb-1 fw-bold">Tổng số đội</h6>
                                 <h2 class="mb-0 text-success fw-extrabold" id="stat-total-teams">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm" style="background: rgba(255, 159, 67, 0.08); border-radius: 12px;">
+                        <div class="card-body d-flex align-items-center py-4">
+                            <div class="flex-shrink-0 text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; background: #ff9f43; box-shadow: 0 4px 10px rgba(255, 159, 67, 0.3);">
+                                <i class="fa fa-user fa-lg"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="text-muted mb-1 fw-bold">Số đội đơn</h6>
+                                <h2 class="mb-0 fw-extrabold" style="color: #ff9f43;" id="stat-single-teams">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm" style="background: rgba(115, 103, 240, 0.08); border-radius: 12px;">
+                        <div class="card-body d-flex align-items-center py-4">
+                            <div class="flex-shrink-0 text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; background: #7367f0; box-shadow: 0 4px 10px rgba(115, 103, 240, 0.3);">
+                                <i class="fa fa-handshake-o fa-lg"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="text-muted mb-1 fw-bold">Số đội liên quân</h6>
+                                <h2 class="mb-0 fw-extrabold" style="color: #7367f0;" id="stat-alliance-teams">0</h2>
                             </div>
                         </div>
                     </div>
