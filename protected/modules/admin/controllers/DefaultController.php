@@ -142,9 +142,11 @@ class DefaultController extends AdminController
             'total_attendees' => $totalAttendees,
         ), $data, array(
             'total_properties' => count($properties),
-            'registered_properties' => count($registeredPropertyIds),
-            'unregistered_properties' => $unregisteredProperties,
+            'registered_properties' => count($propertiesSubmitted),
             'registrations_by_status' => $registrationsByStatus,
+            'properties_not_started' => $propertiesNotStarted,
+            'properties_draft' => $propertiesDraft,
+            'properties_submitted' => $propertiesSubmitted,
         ));
     }
 }
