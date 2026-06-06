@@ -82,11 +82,18 @@ class Properties extends BaseProperties
 
 	public static function getListForDropdown()
 	{
-		$list = array();
-		$items = self::getApiDataProvider(array('is_active' => 1), 500)->getData();
-		foreach ($items as $item) {
-			$list[$item->id] = $item->name . ' (' . $item->code . ')';
-		}
-		return $list;
+		return CacheHelper::getDropdown('properties_active', function () {
+			$list = array();
+			$items = self::getApiDataProvider(array('is_active' => 1), 500)->getData();
+			foreach ($items as $item) {
+				$list[$item->id] = $item->name . ' (' . $item->code . ')';
+			}
+			return $list;
+		});
+	}
+
+	public static function clearCache()
+	{
+		CacheHelper::clearDropdownCache('properties_active');
 	}
 }
