@@ -82,9 +82,9 @@ $appName = Yii::app()->name;
         <div class="sidebar-body pt-0 data-scrollbar">
             <div class="sidebar-list">
                 <?php
-                // Build menu tree from permissions
-                $menuPermissions = PermissionHelper::getMenuPermissions();
-                $menuTree = MenuHelper::buildMenuTree($menuPermissions);
+                // Build menu tree from permissions (with cache)
+                $menuPermissions = CacheHelper::getPermissions();
+                $menuTree = CacheHelper::getMenu($menuPermissions);
                 $ssoToken = Yii::app()->session['sso_token'];
                 $tokenHash = $ssoToken ? md5($ssoToken) : '';
                 ?>
