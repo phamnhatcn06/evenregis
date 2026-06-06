@@ -11,12 +11,16 @@ class DefaultController extends AdminController
             throw new CHttpException(400, 'Bad Request');
         }
 
-        $results = CacheHelper::clearUserCache();
+        $userResults = CacheHelper::clearUserCache();
+        $staticResults = CacheHelper::clearAllStaticCache();
 
         echo CJSON::encode(array(
             'success' => true,
             'message' => 'Đã xóa cache thành công',
-            'details' => $results,
+            'details' => array(
+                'user' => $userResults,
+                'static' => $staticResults,
+            ),
         ));
         Yii::app()->end();
     }
