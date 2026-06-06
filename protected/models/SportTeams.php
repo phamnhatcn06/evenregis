@@ -19,6 +19,7 @@ class SportTeams extends BaseSportTeams
     public $alliance_property_ids;
     public $status;
     public $registration_id;
+    public $members = array();
 
     public static function model($className = __CLASS__)
     {
