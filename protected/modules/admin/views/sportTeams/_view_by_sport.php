@@ -142,7 +142,7 @@
 
 <!-- Modal xem chi tiết đội -->
 <div class="modal fade" id="modalViewTeam" tabindex="-1" aria-labelledby="modalViewTeamLabel" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 800px;">
+    <div class="modal-dialog" style="max-width: 70%;">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="modalViewTeamLabel">Chi tiết đội thi đấu</h5>
@@ -190,11 +190,10 @@
                             html += '<div class="col-md-5">';
                             html += '<h6 class="border-bottom pb-2 mb-3"><i class="fa fa-info-circle me-2"></i>Thông tin đội</h6>';
                             html += '<table class="table table-sm table-bordered">';
-                            html += '<tr><th style="width:40%;background:#f8f9fa;">Tên đội</th><td>' + (d.team_name || '-') + '</td></tr>';
+                            html += '<tr><th style="width:40%;background:#f8f9fa;">Tên đội</th><td>' + (d.team_name || d.name || '-') + '</td></tr>';
                             html += '<tr><th style="background:#f8f9fa;">Môn thể thao</th><td>' + (d.sport_name || '-') + '</td></tr>';
                             html += '<tr><th style="background:#f8f9fa;">Đơn vị</th><td>' + (d.property_name || '-') + '</td></tr>';
                             html += '<tr><th style="background:#f8f9fa;">Liên quân</th><td>' + (d.is_alliance ? '<span class="badge bg-info">Có</span>' : '<span class="badge bg-secondary">Không</span>') + '</td></tr>';
-                            html += '<tr><th style="background:#f8f9fa;">Trạng thái</th><td>' + (d.status_label || '-') + '</td></tr>';
                             html += '</table></div>';
 
                             html += '<div class="col-md-7">';
