@@ -24,7 +24,7 @@ class DefaultController extends AdminController
             $registrations = $registrationsResult['data']['data'];
         }
 
-        // 3. Count registrations by status and find registered property IDs
+        // 3. Count registrations by status and group property IDs by status
         $registrationsByStatus = array(
             'draft' => 0,
             'submitted' => 0,
@@ -32,7 +32,12 @@ class DefaultController extends AdminController
             'rejected' => 0,
         );
 
-        $registeredPropertyIds = array();
+        $propertyIdsByStatus = array(
+            'draft' => array(),
+            'submitted' => array(),
+            'approved' => array(),
+            'rejected' => array(),
+        );
 
         foreach ($registrations as $reg) {
             $status = isset($reg['status']) ? (int)$reg['status'] : 0;
@@ -40,45 +45,57 @@ class DefaultController extends AdminController
 
             if ($status === 0) {
                 $registrationsByStatus['draft']++;
+                if ($propertyId !== null) {
+                    $propertyIdsByStatus['draft'][$propertyId] = true;
+                }
             } elseif ($status === 1) {
                 $registrationsByStatus['submitted']++;
                 if ($propertyId !== null) {
-                    $registeredPropertyIds[$propertyId] = true;
+                    $propertyIdsByStatus['submitted'][$propertyId] = true;
                 }
             } elseif ($status === 2) {
                 $registrationsByStatus['approved']++;
                 if ($propertyId !== null) {
-                    $registeredPropertyIds[$propertyId] = true;
+                    $propertyIdsByStatus['approved'][$propertyId] = true;
                 }
             } elseif ($status === 3) {
                 $registrationsByStatus['rejected']++;
                 if ($propertyId !== null) {
-                    $registeredPropertyIds[$propertyId] = true;
+                    $propertyIdsByStatus['rejected'][$propertyId] = true;
                 }
             }
         }
 
-        // 4. Filter out unregistered properties
-        $unregisteredProperties = array();
+        // 4. Group properties by registration status
+        $propertiesNotStarted = array();
+        $propertiesDraft = array();
+        $propertiesSubmitted = array();
+
         foreach ($properties as $prop) {
             $propertyId = isset($prop['id']) ? $prop['id'] : null;
-            if ($propertyId === null || !isset($registeredPropertyIds[$propertyId])) {
-                $unregisteredProperties[] = array(
-                    'code' => isset($prop['code']) ? $prop['code'] : '',
-                    'name' => isset($prop['name']) ? $prop['name'] : '',
-                    'regional_name' => isset($prop['region_name']) ? $prop['region_name'] : '',
-                );
+            $propData = array(
+                'code' => isset($prop['code']) ? $prop['code'] : '',
+                'name' => isset($prop['name']) ? $prop['name'] : '',
+            );
+
+            if ($propertyId === null) {
+                $propertiesNotStarted[] = $propData;
+            } elseif (isset($propertyIdsByStatus['submitted'][$propertyId]) || isset($propertyIdsByStatus['approved'][$propertyId]) || isset($propertyIdsByStatus['rejected'][$propertyId])) {
+                $propertiesSubmitted[] = $propData;
+            } elseif (isset($propertyIdsByStatus['draft'][$propertyId])) {
+                $propertiesDraft[] = $propData;
+            } else {
+                $propertiesNotStarted[] = $propData;
             }
         }
 
-        // Sort unregistered properties naturally by regional_name, then by name
-        usort($unregisteredProperties, function ($a, $b) {
-            $cmp = strnatcmp($a['regional_name'], $b['regional_name']);
-            if ($cmp === 0) {
-                return strnatcmp($a['name'], $b['name']);
-            }
-            return $cmp;
-        });
+        // Sort by name
+        $sortByName = function ($a, $b) {
+            return strnatcmp($a['name'], $b['name']);
+        };
+        usort($propertiesNotStarted, $sortByName);
+        usort($propertiesDraft, $sortByName);
+        usort($propertiesSubmitted, $sortByName);
 
         // 5. Fetch other statistics dynamically for cards
         $sportTeams = 0;
