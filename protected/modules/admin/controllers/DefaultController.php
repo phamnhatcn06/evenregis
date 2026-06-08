@@ -150,33 +150,41 @@ class DefaultController extends AdminController
         usort($propertiesDraft, $sortByName);
         usort($propertiesSubmitted, $sortByName);
 
-        // 5. Fetch other statistics dynamically for cards
+        // 5. Fetch other statistics dynamically for cards (with filter)
+        $statsFilterParams = array('per_page' => 1);
+        if ($eventId) {
+            $statsFilterParams['event_id'] = $eventId;
+        }
+        if ($periodId) {
+            $statsFilterParams['period_id'] = $periodId;
+        }
+
         $sportTeams = 0;
-        $sportRes = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST, array('per_page' => 1));
+        $sportRes = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST, $statsFilterParams);
         if ($sportRes['success'] && isset($sportRes['data']['pagination']['total'])) {
             $sportTeams = (int)$sportRes['data']['pagination']['total'];
         }
 
         $beautyContestants = 0;
-        $beautyRes = ApiClient::get(ApiEndpoints::BEAUTY_REGISTRATION_LIST, array('per_page' => 1));
+        $beautyRes = ApiClient::get(ApiEndpoints::BEAUTY_REGISTRATION_LIST, $statsFilterParams);
         if ($beautyRes['success'] && isset($beautyRes['data']['pagination']['total'])) {
             $beautyContestants = (int)$beautyRes['data']['pagination']['total'];
         }
 
         $talentEntries = 0;
-        $talentRes = ApiClient::get(ApiEndpoints::TALENT_ENTRY_LIST, array('per_page' => 1));
+        $talentRes = ApiClient::get(ApiEndpoints::TALENT_ENTRY_LIST, $statsFilterParams);
         if ($talentRes['success'] && isset($talentRes['data']['pagination']['total'])) {
             $talentEntries = (int)$talentRes['data']['pagination']['total'];
         }
 
         $totalAttendees = 0;
-        $attendeeRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('per_page' => 1));
+        $attendeeRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $statsFilterParams);
         if ($attendeeRes['success'] && isset($attendeeRes['data']['pagination']['total'])) {
             $totalAttendees = (int)$attendeeRes['data']['pagination']['total'];
         }
 
         $competitionParticipants = 0;
-        $compRes = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, array('per_page' => 1));
+        $compRes = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, $statsFilterParams);
         if ($compRes['success'] && isset($compRes['data']['pagination']['total'])) {
             $competitionParticipants = (int)$compRes['data']['pagination']['total'];
         }
