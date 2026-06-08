@@ -49,7 +49,17 @@ class DefaultController extends AdminController
     public function actionIndex()
     {
         $stats = $this->fetchDashboardStats();
-        $this->render('index', array('stats' => $stats));
+
+        $events = array();
+        $eventsResult = ApiClient::get(ApiEndpoints::EVENT_LIST, array('per_page' => 100, 'is_active' => 1));
+        if ($eventsResult['success'] && isset($eventsResult['data']['data'])) {
+            $events = $eventsResult['data']['data'];
+        }
+
+        $this->render('index', array(
+            'stats' => $stats,
+            'events' => $events,
+        ));
     }
 
     protected function fetchDashboardStats($eventId = null, $periodId = null)
