@@ -1082,8 +1082,19 @@ class RegistrationsController extends AdminController
 		}
 	}
 
-	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId, $eventContentId = null, $registrationId = null)
+	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId, $eventContentId = null, $registrationId = null, $targetRegistrationId = null)
 	{
+		// Nếu chưa có targetRegistrationId, tự động tìm registration của đơn vị nhận
+		if (!$targetRegistrationId && $targetOrgId && $eventId) {
+			$targetRegs = Registrations::getApiDataProvider(array(
+				'event_id' => $eventId,
+				'property_id' => $targetOrgId,
+			), 1)->getData();
+			if (!empty($targetRegs)) {
+				$targetRegistrationId = isset($targetRegs[0]['id']) ? $targetRegs[0]['id'] : (isset($targetRegs[0]->id) ? $targetRegs[0]->id : null);
+			}
+		}
+
 		$ssoUser = AuthHandler::getUser();
 		$alliance = new AllianceRequests;
 		$alliance->event_id = $eventId;
@@ -1092,8 +1103,9 @@ class RegistrationsController extends AdminController
 		$alliance->requested_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 		$alliance->event_content_id = $eventContentId ? $eventContentId : null;
 		$alliance->registration_id = $registrationId ? $registrationId : null;
+		$alliance->target_registration_id = $targetRegistrationId ? $targetRegistrationId : null;
 		$result = $alliance->storeViaApi();
-		Yii::log("Alliance storeViaApi - event_content_id=$eventContentId, registration_id=$registrationId, result: " . json_encode($result), 'info', 'application.alliance');
+		Yii::log("Alliance storeViaApi - event_content_id=$eventContentId, registration_id=$registrationId, target_registration_id=$targetRegistrationId, result: " . json_encode($result), 'info', 'application.alliance');
 
 		return $result;
 	}
