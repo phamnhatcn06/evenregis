@@ -169,19 +169,19 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span><i class="fa fa-circle text-secondary me-2"></i> Nháp</span>
-                            <span class="badge bg-secondary rounded-pill"><?php echo isset($registrationsByStatus['draft']) ? $registrationsByStatus['draft'] : 0; ?></span>
+                            <span class="badge bg-secondary rounded-pill" id="stat-status-draft"><?php echo isset($registrationsByStatus['draft']) ? $registrationsByStatus['draft'] : 0; ?></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span><i class="fa fa-circle text-info me-2"></i> Đã nộp</span>
-                            <span class="badge bg-info rounded-pill"><?php echo isset($registrationsByStatus['submitted']) ? $registrationsByStatus['submitted'] : 0; ?></span>
+                            <span class="badge bg-info rounded-pill" id="stat-status-submitted"><?php echo isset($registrationsByStatus['submitted']) ? $registrationsByStatus['submitted'] : 0; ?></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span><i class="fa fa-circle text-success me-2"></i> Đã duyệt</span>
-                            <span class="badge bg-success rounded-pill"><?php echo isset($registrationsByStatus['approved']) ? $registrationsByStatus['approved'] : 0; ?></span>
+                            <span class="badge bg-success rounded-pill" id="stat-status-approved"><?php echo isset($registrationsByStatus['approved']) ? $registrationsByStatus['approved'] : 0; ?></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span><i class="fa fa-circle text-danger me-2"></i> Từ chối</span>
-                            <span class="badge bg-danger rounded-pill"><?php echo isset($registrationsByStatus['rejected']) ? $registrationsByStatus['rejected'] : 0; ?></span>
+                            <span class="badge bg-danger rounded-pill" id="stat-status-rejected"><?php echo isset($registrationsByStatus['rejected']) ? $registrationsByStatus['rejected'] : 0; ?></span>
                         </li>
                     </ul>
                 </div>
