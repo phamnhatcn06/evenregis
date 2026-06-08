@@ -267,6 +267,13 @@ class RegistrationsController extends AdminController
 			), 100)->getData();
 
 			foreach ($incomingAllianceRequests as $req) {
+				// Kiểm tra registration_id trong request có bằng id của registration hiện tại không
+				// Nếu request có registration_id và không khớp với registration hiện tại, bỏ qua
+				$reqRegistrationId = isset($req->registration_id) ? $req->registration_id : null;
+				if ($reqRegistrationId && $reqRegistrationId != $id) {
+					continue;
+				}
+
 				$requesterRegId = null;
 				$requesterRegs = Registrations::getApiDataProvider(array(
 					'event_id' => $model->event_id,
