@@ -837,8 +837,9 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($competitionRegistrations as $compId => $compData): ?>
+                                            <?php $compIdx = 0; foreach ($competitionRegistrations as $compId => $compData): $compIdx++; ?>
                                                 <tr data-competition-id="<?php echo $compId; ?>">
+                                                    <td class="text-center"><?php echo $compIdx; ?></td>
                                                     <td><?php echo CHtml::encode($compData['competition_name']); ?></td>
                                                     <td class="text-center"><?php echo count($compData['attendees']); ?></td>
                                                     <td>
