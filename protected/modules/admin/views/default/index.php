@@ -49,6 +49,43 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
 
 <?php if ($isHO): ?>
 
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body py-3">
+                    <div class="row align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label mb-1">Sự kiện</label>
+                            <select id="filter-event" class="form-select"
+                                data-api-url="<?php echo Yii::app()->params['externalApiUrl']; ?><?php echo ApiEndpoints::REGISTRATION_PERIOD_LIST_ACTIVE; ?>"
+                                data-api-key="<?php echo Yii::app()->params['externalApiKey']; ?>">
+                                <option value="">-- Tất cả sự kiện --</option>
+                                <?php foreach ($eventList as $event): ?>
+                                    <option value="<?php echo $event['id']; ?>"><?php echo CHtml::encode($event['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label mb-1">Đợt đăng ký</label>
+                            <select id="filter-period" class="form-select" disabled>
+                                <option value="">-- Chọn sự kiện trước --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" id="btn-filter" class="btn btn-primary">
+                                <i class="fa fa-filter me-1"></i>Lọc dữ liệu
+                            </button>
+                            <button type="button" id="btn-reset" class="btn btn-outline-secondary ms-2">
+                                <i class="fa fa-refresh me-1"></i>Đặt lại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <h4 class="mb-3">Tổng quan đăng ký</h4>
