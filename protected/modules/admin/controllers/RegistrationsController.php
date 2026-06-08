@@ -1082,7 +1082,7 @@ class RegistrationsController extends AdminController
 		}
 	}
 
-	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId, $eventContentId = null)
+	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId, $eventContentId = null, $registrationId = null)
 	{
 		$ssoUser = AuthHandler::getUser();
 		$alliance = new AllianceRequests;
@@ -1091,10 +1091,9 @@ class RegistrationsController extends AdminController
 		$alliance->target_org_id = $targetOrgId;
 		$alliance->requested_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 		$alliance->event_content_id = $eventContentId ? $eventContentId : null;
-
+		$alliance->registration_id = $registrationId ? $registrationId : null;
 		$result = $alliance->storeViaApi();
-		// Debug: log kết quả
-		Yii::log("Alliance storeViaApi - event_content_id=$eventContentId, result: " . json_encode($result), 'info', 'application.alliance');
+		Yii::log("Alliance storeViaApi - event_content_id=$eventContentId, registration_id=$registrationId, result: " . json_encode($result), 'info', 'application.alliance');
 
 		return $result;
 	}
