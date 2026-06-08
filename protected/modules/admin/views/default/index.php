@@ -83,7 +83,7 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted small">Chưa đăng ký</span>
+                            <span class="text-muted small">Chưa gửi đăng ký</span>
                             <h3 class="mb-0"><?php echo (isset($stats['total_properties']) ? $stats['total_properties'] : 0) - (isset($stats['registered_properties']) ? $stats['registered_properties'] : 0); ?></h3>
                         </div>
                         <div class="bg-soft-warning rounded-3 p-3">

@@ -4048,7 +4048,38 @@ class RegistrationsController extends AdminController
 			$errors[] = 'Đơn vị của bạn đang có yêu cầu liên quân gửi đến chưa xử lý. Vui lòng duyệt hoặc từ chối yêu cầu liên quân trước khi gửi duyệt phiếu.';
 		}
 
-		// 3. Kiểm tra thông tin người tham dự (Attendees)
+		// 3. Kiểm tra số lượng thành viên đội thi đấu thể thao
+		$sportTeams = SportTeams::getApiDataProvider(array('registration_id' => $id), 100)->getData();
+		foreach ($sportTeams as $team) {
+			$teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+			$teamName = isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : 'Không rõ tên');
+			$sportId = isset($team->sport_id) ? $team->sport_id : (isset($team['sport_id']) ? $team['sport_id'] : null);
+			$sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
+
+			if (!$teamId) continue;
+
+			// Lấy thông tin môn thể thao để lấy max_per_team_member
+			$sport = $sportId ? Sports::fetchFromApi($sportId) : null;
+			$maxPerTeam = 0;
+			if ($sport && isset($sport->max_per_team_member) && $sport->max_per_team_member !== null && $sport->max_per_team_member !== '') {
+				$maxPerTeam = (int)$sport->max_per_team_member;
+				if (empty($sportName)) {
+					$sportName = $sport->name;
+				}
+			} else {
+				$maxPerTeam = self::getSportMaxPlayers($sportName);
+			}
+
+			// Đếm số thành viên trong đội
+			$membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+			$memberCount = count($membersData);
+
+			if ($maxPerTeam > 0 && $memberCount > $maxPerTeam) {
+				$errors[] = "Đội \"{$teamName}\" (môn {$sportName}) có {$memberCount} thành viên, vượt quá giới hạn {$maxPerTeam} người.";
+			}
+		}
+
+		// 4. Kiểm tra thông tin người tham dự (Attendees)
 		$attendees = Attendees::getByRegistrationId($id);
 		if (empty($attendees)) {
 			$errors[] = 'Phiếu đăng ký chưa có người tham dự nào.';
