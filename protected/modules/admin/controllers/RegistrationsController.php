@@ -1233,7 +1233,7 @@ class RegistrationsController extends AdminController
 		if (!empty($targetOrgIds)) {
 			foreach ($targetOrgIds as $targetId) {
 				if (!in_array($targetId, $existingTargetIds)) {
-					$result = $this->createAllianceRequest($eventId, $requesterOrgId, $targetId, $eventContentId);
+					$result = $this->createAllianceRequest($eventId, $requesterOrgId, $targetId, $eventContentId, $registrationId);
 					if ($result && !$result['success']) {
 						$errors[] = $result;
 					}
