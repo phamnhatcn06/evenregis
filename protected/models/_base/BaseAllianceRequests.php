@@ -12,6 +12,7 @@
  * @property string $id
  * @property string $event_id
  * @property string $registration_id
+ * @property string $target_registration_id
  * @property string $requester_org_id
  * @property string $target_org_id
  * @property integer $status
