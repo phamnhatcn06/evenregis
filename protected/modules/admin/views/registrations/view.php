@@ -973,15 +973,16 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach ($talentEntries as $entry):
+                                                <?php $talentIdx = 0; foreach ($talentEntries as $entry): $talentIdx++;
                                                     $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
                                                     $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
                                                     $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
                                                     $entryOrigin = isset($entry->origin) ? $entry->origin : (isset($entry['origin']) ? $entry['origin'] : '');
                                                 ?>
                                                     <tr id="talent-row-<?php echo $entryId; ?>">
+                                                        <td class="text-center"><?php echo $talentIdx; ?></td>
                                                         <td class="talent-title"><?php echo CHtml::encode($entryTitle); ?></td>
-                                                        <td><span class="badge bg-info talent-category"><?php echo CHtml::encode($categoryName); ?></span></td>
+                                                        <td class="text-center"><span class="badge bg-info talent-category"><?php echo CHtml::encode($categoryName); ?></span></td>
                                                         <td class="talent-origin"><?php echo CHtml::encode($entryOrigin); ?></td>
                                                         <?php if ($canEdit): ?>
                                                             <td class="text-center text-nowrap">
