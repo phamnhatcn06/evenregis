@@ -1103,15 +1103,36 @@ class RegistrationsController extends AdminController
 
 	protected function createAllianceRequest($eventId, $requesterOrgId, $targetOrgId, $eventContentId = null, $registrationId = null, $targetRegistrationId = null)
 	{
+		// Lấy period_id từ registration hiện tại để validate
+		$periodId = null;
+		if ($registrationId) {
+			$currentReg = Registrations::fetchFromApi($registrationId);
+			if ($currentReg) {
+				$periodId = $currentReg->period_id;
+			}
+		}
+
 		// Nếu chưa có targetRegistrationId, tự động tìm registration của đơn vị nhận
 		if (!$targetRegistrationId && $targetOrgId && $eventId) {
-			$targetRegs = Registrations::getApiDataProvider(array(
+			$params = array(
 				'event_id' => $eventId,
 				'property_id' => $targetOrgId,
-			), 1)->getData();
+			);
+			if ($periodId) {
+				$params['period_id'] = $periodId;
+			}
+			$targetRegs = Registrations::getApiDataProvider($params, 1)->getData();
 			if (!empty($targetRegs)) {
 				$targetRegistrationId = isset($targetRegs[0]['id']) ? $targetRegs[0]['id'] : (isset($targetRegs[0]->id) ? $targetRegs[0]->id : null);
 			}
+		}
+
+		// Kiểm tra đơn vị nhận đã có phiếu đăng ký chưa
+		if (!$targetRegistrationId) {
+			return array(
+				'success' => false,
+				'message' => 'Đơn vị đối tác chưa khởi tạo phiếu đăng ký cho đợt đăng ký này. Vui lòng chờ đối tác khởi tạo đăng ký trước.',
+			);
 		}
 
 		$ssoUser = AuthHandler::getUser();
