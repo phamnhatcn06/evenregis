@@ -682,16 +682,16 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 <p class="text-muted mb-0" id="no_sport_msg">Chưa đăng ký môn thể thao nào.</p>
                             <?php else: ?>
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-sm mb-0">
+                                    <table class="table table-bordered table-striped table-sm mb-0 content-table">
                                         <thead class="table-light">
                                             <tr>
-                                                <th style="width:50px;" class="text-center">STT</th>
-                                                <th>Môn thi đấu</th>
-                                                <th>Tên đội</th>
-                                                <th style="width:100px;">Số VĐV</th>
-                                                <th>Danh sách VĐV</th>
+                                                <th class="col-stt text-center">STT</th>
+                                                <th class="col-name">Môn thi đấu</th>
+                                                <th style="width:120px;">Tên đội</th>
+                                                <th class="col-count text-center">Số VĐV</th>
+                                                <th class="col-list">Danh sách VĐV</th>
                                                 <?php if ($canEdit): ?>
-                                                    <th style="width:80px;"></th>
+                                                    <th class="col-action text-center">Thao tác</th>
                                                 <?php endif; ?>
                                             </tr>
                                         </thead>
