@@ -64,6 +64,7 @@ class AllianceRequests extends BaseAllianceRequests
 	{
 		$data = array(
 			'event_id' => $this->event_id,
+			'registration_id' => $this->registration_id,
 			'requester_org_id' => $this->requester_org_id,
 			'target_org_id' => $this->target_org_id,
 			'event_content_id' => $this->event_content_id,
