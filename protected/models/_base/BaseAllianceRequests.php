@@ -60,8 +60,8 @@ abstract class BaseAllianceRequests extends GxActiveRecord
 			array('status', 'numerical', 'integerOnly' => true),
 			array('event_id, registration_id, target_registration_id, requester_org_id, target_org_id, reviewed_by', 'length', 'max' => 20),
 			array('requested_at, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe'),
-			array('registration_id, status, requested_by, requested_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, event_id, registration_id, requester_org_id, target_org_id, status, requested_by, requested_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
+			array('registration_id, target_registration_id, status, requested_by, requested_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, event_id, registration_id, target_registration_id, requester_org_id, target_org_id, status, requested_by, requested_at, reviewed_by, reviewed_at, rejection_reason, note, created_at, updated_at, deleted_at', 'safe', 'on' => 'search'),
 		);
 	}
 
