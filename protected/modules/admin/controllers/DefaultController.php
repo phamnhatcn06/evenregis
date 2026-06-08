@@ -219,8 +219,16 @@ class DefaultController extends AdminController
             $talentEntries = (int)$talentRes['data']['pagination']['total'];
         }
 
+        // Attendees need to be filtered by registration -> period
+        $attendeeFilterParams = array('per_page' => 1);
+        if ($periodId) {
+            $attendeeFilterParams['period_id'] = $periodId;
+        } elseif ($eventId) {
+            $attendeeFilterParams['event_id'] = $eventId;
+        }
+
         $totalAttendees = 0;
-        $attendeeRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $statsFilterParams);
+        $attendeeRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $attendeeFilterParams);
         if ($attendeeRes['success'] && isset($attendeeRes['data']['pagination']['total'])) {
             $totalAttendees = (int)$attendeeRes['data']['pagination']['total'];
         }
