@@ -70,8 +70,8 @@ class DefaultController extends AdminController
             $properties = $propertiesResult['data']['data'];
         }
 
-        // 2. Fetch all registrations
-        $registrationsResult = ApiClient::get(ApiEndpoints::REGISTRATION_LIST, array('per_page' => 1000));
+        // 2. Fetch all registrations (with filter)
+        $registrationsResult = ApiClient::get(ApiEndpoints::REGISTRATION_LIST, $filterParams);
         $registrations = array();
         if ($registrationsResult['success'] && isset($registrationsResult['data']['data'])) {
             $registrations = $registrationsResult['data']['data'];
