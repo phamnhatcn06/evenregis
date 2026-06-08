@@ -640,7 +640,7 @@ class RegistrationsController extends AdminController
 						}
 						// Tạo alliance request mới nếu có chọn đơn vị liên quân mới
 						if ($newRelationPropertyId && $model->event_id && $model->property_id) {
-							$this->createAllianceRequest($model->event_id, $model->property_id, $newRelationPropertyId);
+							$this->createAllianceRequest($model->event_id, $model->property_id, $newRelationPropertyId, null, $id);
 						}
 					}
 
