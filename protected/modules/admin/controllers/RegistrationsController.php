@@ -539,7 +539,7 @@ class RegistrationsController extends AdminController
 					$newId = isset($result['data']['id']) ? $result['data']['id'] : null;
 
 					if ($model->relation_property_id && $model->event_id && $model->property_id) {
-						$this->createAllianceRequest($model->event_id, $model->property_id, $model->relation_property_id);
+						$this->createAllianceRequest($model->event_id, $model->property_id, $model->relation_property_id, null, $newId);
 					}
 
 					Yii::app()->user->setFlash('success', 'Tạo phiếu đăng ký thành công.');
