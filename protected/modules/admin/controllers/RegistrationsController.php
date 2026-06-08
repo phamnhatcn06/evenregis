@@ -1295,7 +1295,9 @@ class RegistrationsController extends AdminController
 
 		header('Content-Type: application/json');
 		if (!empty($errors)) {
-			echo CJSON::encode(array('success' => false, 'errors' => $errors));
+			$firstError = $errors[0];
+			$errorMessage = isset($firstError['message']) ? $firstError['message'] : 'Có lỗi xảy ra khi tạo yêu cầu liên kết.';
+			echo CJSON::encode(array('success' => false, 'message' => $errorMessage, 'errors' => $errors));
 		} else {
 			echo CJSON::encode(array('success' => true));
 		}
