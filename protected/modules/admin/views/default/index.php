@@ -204,7 +204,7 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                     <h6 class="card-title mb-0"><i class="fa fa-times-circle text-danger me-2"></i>Chưa khởi tạo</h6>
                     <span class="badge bg-danger" id="stat-count-notstarted"><?php echo count($notStarted); ?></span>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0" id="table-notstarted">
                     <?php if (empty($notStarted)): ?>
                         <div class="p-3 text-center text-muted small">Không có</div>
                     <?php else: ?>
@@ -236,9 +236,9 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0"><i class="fa fa-edit text-secondary me-2"></i>Nháp (chưa gửi)</h6>
-                    <span class="badge bg-secondary"><?php echo count($draft); ?></span>
+                    <span class="badge bg-secondary" id="stat-count-draft"><?php echo count($draft); ?></span>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0" id="table-draft">
                     <?php if (empty($draft)): ?>
                         <div class="p-3 text-center text-muted small">Không có</div>
                     <?php else: ?>
@@ -270,9 +270,9 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0"><i class="fa fa-paper-plane text-info me-2"></i>Đã gửi đăng ký</h6>
-                    <span class="badge bg-info"><?php echo count($submitted); ?></span>
+                    <span class="badge bg-info" id="stat-count-submitted"><?php echo count($submitted); ?></span>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0" id="table-submitted">
                     <?php if (empty($submitted)): ?>
                         <div class="p-3 text-center text-muted small">Không có</div>
                     <?php else: ?>
