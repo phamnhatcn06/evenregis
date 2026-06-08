@@ -202,7 +202,7 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0"><i class="fa fa-times-circle text-danger me-2"></i>Chưa khởi tạo</h6>
-                    <span class="badge bg-danger"><?php echo count($notStarted); ?></span>
+                    <span class="badge bg-danger" id="stat-count-notstarted"><?php echo count($notStarted); ?></span>
                 </div>
                 <div class="card-body p-0">
                     <?php if (empty($notStarted)): ?>
