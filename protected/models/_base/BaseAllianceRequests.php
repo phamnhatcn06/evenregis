@@ -85,6 +85,7 @@ abstract class BaseAllianceRequests extends GxActiveRecord
 			'id' => Yii::t('app', 'ID'),
 			'event_id' => null,
 			'registration_id' => Yii::t('app', 'Registration'),
+			'target_registration_id' => Yii::t('app', 'Target Registration'),
 			'requester_org_id' => null,
 			'target_org_id' => null,
 			'status' => Yii::t('app', 'Status'),
