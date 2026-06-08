@@ -824,14 +824,15 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 <p class="text-muted mb-0">Chưa đăng ký thi nghiệp vụ nào.</p>
                             <?php else: ?>
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-sm mb-0" id="competition-list-table">
+                                    <table class="table table-bordered table-striped table-sm mb-0 content-table" id="competition-list-table">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>Cuộc thi</th>
-                                                <th style="width:100px;">Số người</th>
-                                                <th>Danh sách thí sinh</th>
+                                                <th class="col-stt text-center">STT</th>
+                                                <th class="col-name">Cuộc thi</th>
+                                                <th class="col-count text-center">Số người</th>
+                                                <th class="col-list">Danh sách thí sinh</th>
                                                 <?php if ($canEdit): ?>
-                                                    <th style="width:100px;">Thao tác</th>
+                                                    <th class="col-action text-center">Thao tác</th>
                                                 <?php endif; ?>
                                             </tr>
                                         </thead>
