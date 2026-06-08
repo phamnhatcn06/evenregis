@@ -3,6 +3,27 @@
 class DefaultController extends AdminController
 {
     /**
+     * AJAX action to get dashboard stats filtered by event and period
+     */
+    public function actionGetStats()
+    {
+        if (!Yii::app()->request->isAjaxRequest) {
+            throw new CHttpException(400, 'Bad Request');
+        }
+
+        $eventId = Yii::app()->request->getParam('event_id');
+        $periodId = Yii::app()->request->getParam('period_id');
+
+        $stats = $this->fetchDashboardStats($eventId, $periodId);
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'data' => $stats,
+        ));
+        Yii::app()->end();
+    }
+
+    /**
      * Clear all cache for current user
      */
     public function actionClearCache()
