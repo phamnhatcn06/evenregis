@@ -424,15 +424,21 @@ class RegistrationsController extends AdminController
 			}
 		}
 
-		// Load alliance history (all requests related to this property)
+		// Load alliance history (all requests related to this registration)
 		$allianceHistory = array();
 		if ($model->event_id && $model->property_id) {
-			// Requests sent by this property
+			// Requests sent by this registration
 			$sentRequests = AllianceRequests::getApiDataProvider(array(
 				'event_id' => $model->event_id,
 				'requester_org_id' => $model->property_id,
 			), 50)->getData();
 			foreach ($sentRequests as $req) {
+				// Chỉ hiển thị requests của registration hiện tại
+				$reqRegistrationId = isset($req->registration_id) ? $req->registration_id : null;
+				if ($reqRegistrationId && $reqRegistrationId != $id) {
+					continue;
+				}
+
 				$targetName = isset($req->target_org_name) ? $req->target_org_name : '';
 				if (empty($targetName) && $req->target_org_id) {
 					$prop = Properties::fetchFromApi($req->target_org_id);
@@ -445,13 +451,20 @@ class RegistrationsController extends AdminController
 					'content_name' => isset($req->content_name) ? $req->content_name : '',
 				);
 			}
-			// Requests received by this property (exclude pending - already shown in incomingRequestsData)
+			// Requests received by this registration (exclude pending - already shown in incomingRequestsData)
 			$receivedRequests = AllianceRequests::getApiDataProvider(array(
 				'event_id' => $model->event_id,
 				'target_org_id' => $model->property_id,
 			), 50)->getData();
 			foreach ($receivedRequests as $req) {
 				if ($req->status == AllianceRequests::STATUS_PENDING) continue;
+
+				// Chỉ hiển thị requests gửi đến registration hiện tại
+				$targetRegId = isset($req->target_registration_id) ? $req->target_registration_id : null;
+				if ($targetRegId && $targetRegId != $id) {
+					continue;
+				}
+
 				$requesterName = isset($req->requester_org_name) ? $req->requester_org_name : '';
 				if (empty($requesterName) && $req->requester_org_id) {
 					$prop = Properties::fetchFromApi($req->requester_org_id);
