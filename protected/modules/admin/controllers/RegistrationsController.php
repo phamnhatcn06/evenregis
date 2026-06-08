@@ -767,6 +767,14 @@ class RegistrationsController extends AdminController
 				return;
 			}
 
+			// Validate thi nghiệp vụ (content_id = 2) phải đủ max_per_org
+			$validationError = $this->validateCompetitionRequirements($model);
+			if ($validationError) {
+				Yii::app()->user->setFlash('error', $validationError);
+				$this->redirect(array('view', 'id' => $id));
+				return;
+			}
+
 			$ssoUser = AuthHandler::getUser();
 			$submittedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
