@@ -237,7 +237,7 @@ class RegistrationsController extends AdminController
 						$attId = isset($member->attendee_id) ? $member->attendee_id : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
 						$attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
 
-						$memberArr = is_object($member) ? get_object_vars($member) : $member;
+						$memberArr = is_object($member) ? array_merge($member->attributes, get_object_vars($member)) : $member;
 						if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
 							$memberArr['attendee_name'] = $attInfo['full_name'];
 						}
@@ -304,8 +304,14 @@ class RegistrationsController extends AdminController
 		// Load Beauty Contestants (Miss) cho registration
 		$beautyContestants = array();
 		if ($model->event_id) {
-			$attendeeIds = array_keys($attendeesMap);
-			if (!empty($attendeeIds)) {
+			$ownAttendeeIds = array();
+			foreach ($attendeesData as $att) {
+				$attId = isset($att['id']) ? $att['id'] : null;
+				if ($attId) {
+					$ownAttendeeIds[] = $attId;
+				}
+			}
+			if (!empty($ownAttendeeIds)) {
 				$contests = BeautyContests::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
 				foreach ($contests as $contest) {
 					$contestId = isset($contest->id) ? $contest->id : (isset($contest['id']) ? $contest['id'] : null);
@@ -315,7 +321,7 @@ class RegistrationsController extends AdminController
 					$contestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 500)->getData();
 					foreach ($contestants as $c) {
 						$attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
-						if ($attId && in_array($attId, $attendeeIds)) {
+						if ($attId && in_array($attId, $ownAttendeeIds)) {
 							if (!isset($beautyContestants[$contestId])) {
 								$beautyContestants[$contestId] = array(
 									'contest_id' => $contestId,
@@ -407,7 +413,7 @@ class RegistrationsController extends AdminController
 					foreach ($membersData as $member) {
 						$attId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
 						$attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
-						$memberArr = is_array($member) ? $member : get_object_vars($member);
+						$memberArr = is_array($member) ? $member : array_merge($member->attributes, get_object_vars($member));
 						if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
 							$memberArr['attendee_name'] = $attInfo['full_name'];
 						}
@@ -898,6 +904,95 @@ class RegistrationsController extends AdminController
 					$regModel->relation_property_id = $model->requester_org_id;
 					$regResult = $regModel->updateViaApi();
 				}
+
+				// Tìm các sport team member thuộc về 2 nội dung bóng đá + kéo co của đơn vị nhận yêu cầu, sau đó cập nhật sang đơn vị gửi
+				try {
+					if ($model->target_registration_id && $model->registration_id) {
+						$targetTeams = SportTeams::getApiDataProvider(array('registration_id' => $model->target_registration_id), 1000)->getData();
+						$senderTeams = SportTeams::getApiDataProvider(array('registration_id' => $model->registration_id), 1000)->getData();
+
+						$senderTeamsMap = array();
+						foreach ($senderTeams as $st) {
+							$senderTeamsMap[$st->sport_id] = $st;
+						}
+
+						foreach ($targetTeams as $targetTeam) {
+							if (self::isTeamSportRequiringAlliance($targetTeam->sport_name)) {
+								$senderTeam = isset($senderTeamsMap[$targetTeam->sport_id]) ? $senderTeamsMap[$targetTeam->sport_id] : null;
+
+								if (!$senderTeam) {
+									// Tạo mới team cho đơn vị gửi yêu cầu
+									$newTeam = new SportTeams();
+									$newTeam->event_id = $model->event_id;
+									$newTeam->sport_id = $targetTeam->sport_id;
+									$newTeam->property_id = $model->requester_org_id;
+									$newTeam->registration_id = $model->registration_id;
+									$newTeam->team_name = $targetTeam->team_name;
+									$newTeam->is_alliance = 1;
+									$newTeam->alliance_property_ids = array($model->target_org_id);
+									$newTeam->status = SportTeams::STATUS_CONFIRMED;
+
+									$createResult = $newTeam->storeViaApi();
+									if ($createResult['success']) {
+										$createdTeamId = isset($createResult['data']['data']['id']) ? $createResult['data']['data']['id'] : (isset($createResult['data']['id']) ? $createResult['data']['id'] : null);
+										if ($createdTeamId) {
+											$senderTeam = SportTeams::fetchFromApi($createdTeamId);
+											if ($senderTeam) {
+												$senderTeamsMap[$targetTeam->sport_id] = $senderTeam;
+											}
+										}
+									} else {
+										Yii::log("Failed to create alliance sport team for requester org={$model->requester_org_id}: " . json_encode($createResult), 'error', 'application.alliance');
+									}
+								} else {
+									// Cập nhật existing team
+									$changed = false;
+									if (!$senderTeam->is_alliance) {
+										$senderTeam->is_alliance = 1;
+										$changed = true;
+									}
+									$propIds = $senderTeam->alliance_property_ids;
+									if (is_string($propIds)) {
+										$propIds = array_filter(explode(',', $propIds));
+									} elseif (!is_array($propIds)) {
+										$propIds = array();
+									}
+									if (!in_array($model->target_org_id, $propIds)) {
+										$propIds[] = $model->target_org_id;
+										$senderTeam->alliance_property_ids = $propIds;
+										$changed = true;
+									}
+									if ($changed) {
+										$updateRes = $senderTeam->updateViaApi();
+										if (!$updateRes['success']) {
+											Yii::log("Failed to update alliance sport team id={$senderTeam->id} for requester: " . json_encode($updateRes), 'error', 'application.alliance');
+										}
+									}
+								}
+
+								if ($senderTeam && isset($senderTeam->id)) {
+									// Chuyển toàn bộ thành viên sang team của đơn vị gửi
+									$members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $targetTeam->id), 1000)->getData();
+									foreach ($members as $member) {
+										$member->sport_team_id = $senderTeam->id;
+										$memberRes = $member->updateViaApi();
+										if (!$memberRes['success']) {
+											Yii::log("Failed to update sport team member id={$member->id} to team id={$senderTeam->id}: " . json_encode($memberRes), 'error', 'application.alliance');
+										}
+									}
+									// Xóa team trống của đơn vị nhận
+									$deleteRes = SportTeams::deleteViaApi($targetTeam->id);
+									if (!$deleteRes['success']) {
+										Yii::log("Failed to delete empty target sport team id={$targetTeam->id}: " . json_encode($deleteRes), 'error', 'application.alliance');
+									}
+								}
+							}
+						}
+					}
+				} catch (Exception $e) {
+					Yii::log("Error transferring alliance sport team members: " . $e->getMessage(), 'error', 'application.alliance');
+				}
+
 				Yii::app()->user->setFlash('success', 'Đã chấp nhận yêu cầu liên quân.');
 			} else {
 				Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể chấp nhận yêu cầu.');
@@ -1687,9 +1782,11 @@ class RegistrationsController extends AdminController
 		}
 
 		// Lấy attendees của đơn vị hiện tại để đếm số thành viên liên quân từ đơn vị khác
+		$registrationId = Yii::app()->request->getQuery('registration_id');
 		$ownAttendeeIds = array();
-		if ($team->registration_id) {
-			$attendees = Attendees::getByRegistrationId($team->registration_id);
+		$ownRegId = $registrationId ? $registrationId : $team->registration_id;
+		if ($ownRegId) {
+			$attendees = Attendees::getByRegistrationId($ownRegId);
 			foreach ($attendees as $att) {
 				if (isset($att['id'])) {
 					$ownAttendeeIds[] = (int)$att['id'];
@@ -1855,7 +1952,10 @@ class RegistrationsController extends AdminController
 			$team->team_name = $teamName;
 			$team->name = $teamName;
 			if ($registrationId) {
-				$team->registration_id = $registrationId;
+				$reg = Registrations::fetchFromApi($registrationId);
+				if ($reg && $team->property_id == $reg->property_id) {
+					$team->registration_id = $registrationId;
+				}
 			}
 			$team->updateViaApi();
 		}

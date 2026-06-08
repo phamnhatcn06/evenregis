@@ -2224,7 +2224,7 @@ var RegistrationView = (function() {
         editingTeamMaxMembers = null;
         editingTeamAllianceMemberCount = 0;
 
-        fetch(window.BASE_URL + '/admin/registrations/getSportTeamDetail?id=' + teamId, {
+        fetch(window.BASE_URL + '/admin/registrations/getSportTeamDetail?id=' + teamId + '&registration_id=' + registrationId, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
         .then(function(response) { return response.json(); })

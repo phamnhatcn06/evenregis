@@ -145,7 +145,7 @@ class ApproveRegistrationsController extends AdminController
                         $attId = isset($member->attendee_id) ? $member->attendee_id : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
                         $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
 
-                        $memberArr = is_object($member) ? get_object_vars($member) : $member;
+                        $memberArr = is_object($member) ? array_merge($member->attributes, get_object_vars($member)) : $member;
                         if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
                             $memberArr['attendee_name'] = $attInfo['full_name'];
                         }
@@ -267,7 +267,7 @@ class ApproveRegistrationsController extends AdminController
                     foreach ($membersData as $member) {
                         $attId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
                         $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
-                        $memberArr = is_array($member) ? $member : get_object_vars($member);
+                        $memberArr = is_array($member) ? $member : array_merge($member->attributes, get_object_vars($member));
                         if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
                             $memberArr['attendee_name'] = $attInfo['full_name'];
                         }
