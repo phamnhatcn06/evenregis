@@ -1050,14 +1050,14 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 <?php foreach ($beautyContestants as $contestData): ?>
                                     <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped table-sm mb-3">
+                                        <table class="table table-bordered table-striped table-sm mb-3 content-table">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th style="width:50px;" class="text-center">STT</th>
-                                                    <th>Họ tên</th>
-                                                    <th>Email cá nhân</th>
+                                                    <th class="col-stt text-center">STT</th>
+                                                    <th class="col-name">Họ tên</th>
+                                                    <th class="col-list">Email cá nhân</th>
                                                     <?php if ($canEdit): ?>
-                                                        <th style="width:60px;"></th>
+                                                        <th class="col-action text-center">Thao tác</th>
                                                     <?php endif; ?>
                                                 </tr>
                                             </thead>
