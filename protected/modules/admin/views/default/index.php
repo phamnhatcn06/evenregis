@@ -93,14 +93,14 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
     </div>
 
     <!-- Row 1: Summary Cards -->
-    <div class="row">
+    <div class="row" id="stats-cards">
         <div class="col-md-6 col-lg-3">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <span class="text-muted small">Tổng đơn vị</span>
-                            <h3 class="mb-0"><?php echo isset($stats['total_properties']) ? $stats['total_properties'] : 0; ?></h3>
+                            <h3 class="mb-0" id="stat-total-properties"><?php echo isset($stats['total_properties']) ? $stats['total_properties'] : 0; ?></h3>
                         </div>
                         <div class="bg-soft-primary rounded-3 p-3">
                             <i class="fa fa-building fa-lg text-primary"></i>
@@ -115,7 +115,7 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <span class="text-muted small">Đã gửi đăng ký</span>
-                            <h3 class="mb-0"><?php echo isset($stats['registered_properties']) ? $stats['registered_properties'] : 0; ?></h3>
+                            <h3 class="mb-0" id="stat-registered-properties"><?php echo isset($stats['registered_properties']) ? $stats['registered_properties'] : 0; ?></h3>
                         </div>
                         <div class="bg-soft-success rounded-3 p-3">
                             <i class="fa fa-check-circle fa-lg text-success"></i>
@@ -130,7 +130,7 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <span class="text-muted small">Chưa gửi đăng ký</span>
-                            <h3 class="mb-0"><?php echo (isset($stats['total_properties']) ? $stats['total_properties'] : 0) - (isset($stats['registered_properties']) ? $stats['registered_properties'] : 0); ?></h3>
+                            <h3 class="mb-0" id="stat-unregistered-properties"><?php echo (isset($stats['total_properties']) ? $stats['total_properties'] : 0) - (isset($stats['registered_properties']) ? $stats['registered_properties'] : 0); ?></h3>
                         </div>
                         <div class="bg-soft-warning rounded-3 p-3">
                             <i class="fa fa-exclamation-triangle fa-lg text-warning"></i>
@@ -145,7 +145,7 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <span class="text-muted small">Tổng người tham dự</span>
-                            <h3 class="mb-0"><?php echo isset($stats['total_attendees']) ? $stats['total_attendees'] : 0; ?></h3>
+                            <h3 class="mb-0" id="stat-total-attendees"><?php echo isset($stats['total_attendees']) ? $stats['total_attendees'] : 0; ?></h3>
                         </div>
                         <div class="bg-soft-info rounded-3 p-3">
                             <i class="fa fa-users fa-lg text-info"></i>
