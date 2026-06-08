@@ -941,14 +941,15 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 <?php if (empty($talentEntries)): ?>
                                     <p class="text-muted mb-0 no-talent-message">Chưa đăng ký tiết mục văn nghệ nào.</p>
                                     <div class="table-responsive" style="display: none;">
-                                        <table class="table table-bordered table-striped table-sm mb-0" id="talent-entries-table">
+                                        <table class="table table-bordered table-striped table-sm mb-0 content-table" id="talent-entries-table">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>Tiết mục</th>
-                                                    <th style="width:120px;">Thể loại</th>
-                                                    <th>Nguồn gốc/Xuất xứ</th>
+                                                    <th class="col-stt text-center">STT</th>
+                                                    <th class="col-name">Tiết mục</th>
+                                                    <th class="col-count text-center">Thể loại</th>
+                                                    <th class="col-list">Nguồn gốc/Xuất xứ</th>
                                                     <?php if ($canEdit): ?>
-                                                        <th style="width:60px;"></th>
+                                                        <th class="col-action text-center">Thao tác</th>
                                                     <?php endif; ?>
                                                 </tr>
                                             </thead>
@@ -959,14 +960,15 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 <?php else: ?>
                                     <p class="text-muted mb-0 no-talent-message" style="display: none;">Chưa đăng ký tiết mục văn nghệ nào.</p>
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped table-sm mb-0" id="talent-entries-table">
+                                        <table class="table table-bordered table-striped table-sm mb-0 content-table" id="talent-entries-table">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>Tiết mục</th>
-                                                    <th style="width:120px;">Thể loại</th>
-                                                    <th>Nguồn gốc/Xuất xứ</th>
+                                                    <th class="col-stt text-center">STT</th>
+                                                    <th class="col-name">Tiết mục</th>
+                                                    <th class="col-count text-center">Thể loại</th>
+                                                    <th class="col-list">Nguồn gốc/Xuất xứ</th>
                                                     <?php if ($canEdit): ?>
-                                                        <th style="width:60px;"></th>
+                                                        <th class="col-action text-center">Thao tác</th>
                                                     <?php endif; ?>
                                                 </tr>
                                             </thead>
