@@ -856,8 +856,10 @@ var RegistrationView = (function() {
         if (!card) return;
 
         var cardBody = card.querySelector('.card-body');
-        var table = cardBody.querySelector('table#competition-list-table');
-        var emptyMsg = cardBody.querySelector('p.text-muted');
+        // Tìm table trong col chính (tránh lấy nhầm table trong alliance sidebar)
+        var mainCol = cardBody.querySelector('.col-12, .col-md-9');
+        var table = mainCol ? mainCol.querySelector('table#competition-list-table') : cardBody.querySelector('table#competition-list-table');
+        var emptyMsg = mainCol ? mainCol.querySelector('p.text-muted') : cardBody.querySelector('p.text-muted');
 
         // Tạo danh sách thí sinh theo dòng
         var listHtml = '';
@@ -875,26 +877,52 @@ var RegistrationView = (function() {
             });
         }
 
-        // Tạo row HTML (không có nút xóa tạm thời, reload để xóa)
+        // Tính STT mới
+        var newStt = 1;
+        if (table) {
+            var existingRows = table.querySelectorAll('tbody tr');
+            newStt = existingRows.length + 1;
+        }
+
+        // Tạo row HTML với nút sửa/xóa
+        var actionsHtml = '<td class="text-center">' +
+            '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editCompetitionRegistration(' + data.competitionId + ', \'' + escapeHtml(data.competitionName).replace(/'/g, "\\'") + '\')" title="Sửa">' +
+                '<i class="fa fa-pencil"></i>' +
+            '</button>' +
+            '<button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteCompetitionRegistration(' + data.competitionId + ')" title="Xóa">' +
+                '<i class="fa fa-trash"></i>' +
+            '</button>' +
+        '</td>';
+
         var rowHtml = '<tr data-competition-id="' + data.competitionId + '">' +
+            '<td class="text-center">' + newStt + '</td>' +
             '<td>' + escapeHtml(data.competitionName) + '</td>' +
             '<td class="text-center">' + (data.attendees ? data.attendees.length : 0) + '</td>' +
             '<td>' + listHtml + '</td>' +
+            actionsHtml +
         '</tr>';
 
         if (!table) {
             // Tạo table mới nếu chưa có
-            var tableHtml = '<table class="table table-bordered table-striped table-sm mb-0">' +
+            var tableWrapper = document.createElement('div');
+            tableWrapper.className = 'table-responsive';
+            tableWrapper.innerHTML = '<table class="table table-bordered table-striped table-sm mb-0 content-table" id="competition-list-table">' +
                 '<thead class="table-light"><tr>' +
-                    '<th>Cuộc thi</th>' +
-                    '<th style="width:100px;">Số người</th>' +
-                    '<th>Danh sách thí sinh</th>' +
+                    '<th class="col-stt text-center">STT</th>' +
+                    '<th class="col-name">Cuộc thi</th>' +
+                    '<th class="col-count text-center">Số người</th>' +
+                    '<th class="col-list">Danh sách thí sinh</th>' +
+                    '<th class="col-action text-center">Thao tác</th>' +
                 '</tr></thead>' +
                 '<tbody>' + rowHtml + '</tbody>' +
             '</table>';
 
             if (emptyMsg) emptyMsg.remove();
-            cardBody.insertAdjacentHTML('beforeend', tableHtml);
+            if (mainCol) {
+                mainCol.appendChild(tableWrapper);
+            } else {
+                cardBody.appendChild(tableWrapper);
+            }
         } else {
             // Append vào tbody
             var tbody = table.querySelector('tbody');
