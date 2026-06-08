@@ -3,6 +3,15 @@ $user = AuthHandler::getUser();
 $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
 $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
 
+// Get events list for filter
+$eventList = isset($events) ? $events : array();
+$periodList = isset($periods) ? $periods : array();
+
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/dashboard-index.js',
+    CClientScript::POS_END
+);
+
 $registrationsByStatus = isset($stats['registrations_by_status']) ? $stats['registrations_by_status'] : array(
     'draft' => 5,
     'submitted' => 12,
