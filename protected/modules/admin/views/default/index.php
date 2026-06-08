@@ -64,14 +64,21 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                                 data-api-key="<?php echo Yii::app()->params['externalApiKey']; ?>">
                                 <option value="">-- Tất cả sự kiện --</option>
                                 <?php foreach ($eventList as $event): ?>
-                                    <option value="<?php echo $event['id']; ?>"><?php echo CHtml::encode($event['name']); ?></option>
+                                    <option value="<?php echo $event['id']; ?>"<?php echo (isset($defaultEventId) && $defaultEventId == $event['id']) ? ' selected' : ''; ?>><?php echo CHtml::encode($event['name']); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label mb-1">Đợt đăng ký</label>
-                            <select id="filter-period" class="form-select" disabled>
-                                <option value="">-- Chọn sự kiện trước --</option>
+                            <select id="filter-period" class="form-select"<?php echo empty($periodList) ? ' disabled' : ''; ?>>
+                                <?php if (empty($periodList)): ?>
+                                    <option value="">-- Chọn sự kiện trước --</option>
+                                <?php else: ?>
+                                    <option value="">-- Tất cả đợt --</option>
+                                    <?php foreach ($periodList as $period): ?>
+                                        <option value="<?php echo $period['id']; ?>"<?php echo (isset($defaultPeriodId) && $defaultPeriodId == $period['id']) ? ' selected' : ''; ?>><?php echo CHtml::encode($period['name']); ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
                         <div class="col-md-4">
