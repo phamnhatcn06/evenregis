@@ -67,9 +67,10 @@ class DefaultController extends AdminController
         if (!empty($events)) {
             $defaultEventId = $events[0]['id'];
 
-            // Get periods for default event
+            // Get periods for default event (sort by created_at ASC to get oldest first)
             $periodsResult = ApiClient::get(ApiEndpoints::REGISTRATION_PERIOD_LIST_ACTIVE, array(
-                'event_id' => $defaultEventId
+                'event_id' => $defaultEventId,
+                'sort' => 'created_at'
             ));
             if ($periodsResult['success'] && isset($periodsResult['data'])) {
                 $periods = is_array($periodsResult['data']) ? $periodsResult['data'] : array();
@@ -77,6 +78,7 @@ class DefaultController extends AdminController
                     $periods = $periodsResult['data']['data'];
                 }
                 if (!empty($periods)) {
+                    // Lấy đợt cũ nhất (đầu tiên trong list đã sort ASC)
                     $defaultPeriodId = $periods[0]['id'];
                 }
             }
