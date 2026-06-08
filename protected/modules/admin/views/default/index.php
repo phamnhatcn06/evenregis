@@ -49,6 +49,8 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
 
 <?php if ($isHO): ?>
 
+    <input type="hidden" id="stats-url" value="<?php echo $this->createUrl('getStats'); ?>">
+
     <!-- Filter Section -->
     <div class="row mb-4">
         <div class="col-12">
