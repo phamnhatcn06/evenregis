@@ -52,8 +52,17 @@ class DefaultController extends AdminController
         $this->render('index', array('stats' => $stats));
     }
 
-    protected function fetchDashboardStats()
+    protected function fetchDashboardStats($eventId = null, $periodId = null)
     {
+        // Build filter params
+        $filterParams = array('per_page' => 1000);
+        if ($eventId) {
+            $filterParams['event_id'] = $eventId;
+        }
+        if ($periodId) {
+            $filterParams['period_id'] = $periodId;
+        }
+
         // 1. Fetch all properties
         $propertiesResult = ApiClient::get(ApiEndpoints::PROPERTY_LIST, array('per_page' => 1000));
         $properties = array();
