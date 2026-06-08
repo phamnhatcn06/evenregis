@@ -110,6 +110,7 @@ abstract class BaseAllianceRequests extends GxActiveRecord
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('event_id', $this->event_id);
 		$criteria->compare('registration_id', $this->registration_id);
+		$criteria->compare('target_registration_id', $this->target_registration_id);
 		$criteria->compare('requester_org_id', $this->requester_org_id);
 		$criteria->compare('target_org_id', $this->target_org_id);
 		$criteria->compare('status', $this->status);
