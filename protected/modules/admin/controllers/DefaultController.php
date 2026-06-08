@@ -48,17 +48,49 @@ class DefaultController extends AdminController
 
     public function actionIndex()
     {
-        $stats = $this->fetchDashboardStats();
-
+        // Get active events (newest first)
         $events = array();
-        $eventsResult = ApiClient::get(ApiEndpoints::EVENT_LIST, array('per_page' => 100, 'is_active' => 1));
+        $eventsResult = ApiClient::get(ApiEndpoints::EVENT_LIST, array(
+            'per_page' => 100,
+            'is_active' => 1,
+            'sort' => '-created_at'
+        ));
         if ($eventsResult['success'] && isset($eventsResult['data']['data'])) {
             $events = $eventsResult['data']['data'];
         }
 
+        // Default to first (newest) event
+        $defaultEventId = null;
+        $defaultPeriodId = null;
+        $periods = array();
+
+        if (!empty($events)) {
+            $defaultEventId = $events[0]['id'];
+
+            // Get periods for default event
+            $periodsResult = ApiClient::get(ApiEndpoints::REGISTRATION_PERIOD_LIST_ACTIVE, array(
+                'event_id' => $defaultEventId
+            ));
+            if ($periodsResult['success'] && isset($periodsResult['data'])) {
+                $periods = is_array($periodsResult['data']) ? $periodsResult['data'] : array();
+                if (isset($periodsResult['data']['data'])) {
+                    $periods = $periodsResult['data']['data'];
+                }
+                if (!empty($periods)) {
+                    $defaultPeriodId = $periods[0]['id'];
+                }
+            }
+        }
+
+        // Fetch stats with default filters
+        $stats = $this->fetchDashboardStats($defaultEventId, $defaultPeriodId);
+
         $this->render('index', array(
             'stats' => $stats,
             'events' => $events,
+            'periods' => $periods,
+            'defaultEventId' => $defaultEventId,
+            'defaultPeriodId' => $defaultPeriodId,
         ));
     }
 
