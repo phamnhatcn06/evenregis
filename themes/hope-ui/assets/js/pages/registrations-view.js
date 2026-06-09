@@ -1019,6 +1019,9 @@ var RegistrationView = (function() {
 
     // ==================== SPORT REGISTRATION ====================
 
+    // Cache danh sách approved alliances
+    var approvedAlliances = [];
+
     function bindSportEvents() {
         var searchInput = document.getElementById('sport_attendee_search');
         if (searchInput) {
@@ -1056,6 +1059,115 @@ var RegistrationView = (function() {
                 }
             });
         }
+
+        // Bind checkbox "Có liên quân"
+        bindAllianceCheckbox();
+    }
+
+    // Bind sự kiện cho checkbox "Có liên quân"
+    function bindAllianceCheckbox() {
+        var isAllianceCheckbox = document.getElementById('sport_is_alliance');
+        var sportAllianceWrapper = document.getElementById('sport_alliance_wrapper');
+
+        if (isAllianceCheckbox) {
+            isAllianceCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    sportAllianceWrapper.classList.remove('d-none');
+                    loadApprovedAlliances();
+                } else {
+                    sportAllianceWrapper.classList.add('d-none');
+                    // Reset team name về mặc định
+                    updateSportTeamNameFromAlliance();
+                }
+            });
+        }
+    }
+
+    // Load danh sách đơn vị liên quân đã được approved
+    function loadApprovedAlliances() {
+        var allianceList = document.getElementById('sport_alliance_list');
+        if (!allianceList) return;
+
+        allianceList.innerHTML = '<div class="text-center py-2"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
+
+        fetch(window.BASE_URL + '/admin/registrations/getApprovedAlliances?registration_id=' + registrationId)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                approvedAlliances = data.success && data.data ? data.data : [];
+
+                if (approvedAlliances.length === 0) {
+                    allianceList.innerHTML = '<div class="text-muted small py-2">Chưa có đơn vị liên quân nào được xác nhận. Vui lòng gửi yêu cầu liên quân trước.</div>';
+                    return;
+                }
+
+                var html = '';
+                approvedAlliances.forEach(function(item) {
+                    html += '<div class="form-check">' +
+                        '<input class="form-check-input sport-alliance-cb" type="checkbox" value="' + item.id + '" ' +
+                        'data-code="' + escapeHtml(item.code) + '" data-name="' + escapeHtml(item.name) + '" ' +
+                        'id="sport_alliance_' + item.id + '">' +
+                        '<label class="form-check-label small" for="sport_alliance_' + item.id + '">' +
+                        escapeHtml(item.code + ' - ' + item.name) + '</label></div>';
+                });
+                allianceList.innerHTML = html;
+
+                // Bind change event để update team name
+                var checkboxes = allianceList.querySelectorAll('.sport-alliance-cb');
+                checkboxes.forEach(function(cb) {
+                    cb.addEventListener('change', function() {
+                        updateSportTeamNameFromAlliance();
+                    });
+                });
+            })
+            .catch(function() {
+                allianceList.innerHTML = '<div class="text-danger small py-2">Lỗi tải dữ liệu liên quân.</div>';
+            });
+    }
+
+    // Cập nhật tên đội dựa trên các đơn vị liên quân đã chọn
+    function updateSportTeamNameFromAlliance() {
+        var teamNameInput = document.getElementById('sport_team_name');
+        if (!teamNameInput) return;
+
+        var isAllianceCheckbox = document.getElementById('sport_is_alliance');
+        var isAlliance = isAllianceCheckbox && isAllianceCheckbox.checked;
+
+        if (!isAlliance) {
+            // Team độc lập - tên theo property code
+            teamNameInput.value = propertyCode || 'Team';
+            return;
+        }
+
+        // Lấy danh sách alliance đã chọn
+        var checkboxes = document.querySelectorAll('.sport-alliance-cb:checked');
+        var allianceCodes = [];
+        checkboxes.forEach(function(cb) {
+            var code = cb.getAttribute('data-code');
+            if (code) allianceCodes.push(code);
+        });
+
+        if (allianceCodes.length > 0) {
+            // Tên đội: Liên quân [Code đơn vị hiện tại] - [Code đơn vị liên quân 1] - ...
+            var allCodes = [propertyCode].concat(allianceCodes);
+            teamNameInput.value = 'Liên quân ' + allCodes.join(' - ');
+        } else {
+            teamNameInput.value = propertyCode || 'Team';
+        }
+    }
+
+    // Lấy danh sách alliance_property_ids đã chọn từ form
+    function getSelectedAlliancePropertyIds() {
+        var isAllianceCheckbox = document.getElementById('sport_is_alliance');
+        if (!isAllianceCheckbox || !isAllianceCheckbox.checked) {
+            return [];
+        }
+
+        var checkboxes = document.querySelectorAll('.sport-alliance-cb:checked');
+        var ids = [];
+        checkboxes.forEach(function(cb) {
+            ids.push(cb.value);
+        });
+        return ids;
     }
 
     function addSportToPreview() {
