@@ -584,6 +584,7 @@ var RegistrationView = (function() {
         var sportAllianceWrapper = document.getElementById('sport_alliance_wrapper');
         if (isAllianceCheckbox) {
             isAllianceCheckbox.checked = false;
+            isAllianceCheckbox.disabled = false;
         }
         if (sportAllianceWrapper) {
             sportAllianceWrapper.classList.add('d-none');
