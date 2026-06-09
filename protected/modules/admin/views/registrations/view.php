@@ -609,7 +609,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                 <div class="card-body">
                     <div class="row">
                         <?php if ($sportsHasAlliance): ?>
-                            <div class="col-md-2 mb-2 mb-md-0">
+                            <div class="col-md-3 mb-3 mb-md-0">
 
                                 <?php $this->renderPartial('_alliance_sidebar', array(
                                     'pendingRequests' => $allianceByContent['sports']['pending'],
@@ -621,7 +621,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 
                             </div>
                         <?php endif; ?>
-                        <div class="<?php echo $sportsHasAlliance ? 'col-md-10' : 'col-12'; ?>">
+                        <div class="<?php echo $sportsHasAlliance ? 'col-md-9' : 'col-12'; ?>">
 
                             <?php if ($canEdit): ?>
                                 <!-- Form chọn liên quân và môn thể thao -->
@@ -726,7 +726,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 );
                             }
                             // Sắp xếp theo tên môn
-                            usort($teamsData, function($a, $b) {
+                            usort($teamsData, function ($a, $b) {
                                 return strcmp($a['sport_name'], $b['sport_name']);
                             });
                             ?>
