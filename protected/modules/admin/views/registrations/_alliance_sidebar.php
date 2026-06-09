@@ -454,30 +454,4 @@ if (!$hasPending && !$hasActive && !$hasFilteredHistory) return;
         margin-right: 4px;
     }
 
-    .alliance-active-actions {
-        flex-shrink: 0;
-    }
-
-    .btn-alliance-delete {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        border: 1px solid #dc3545;
-        background: #fff;
-        color: #dc3545;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-    }
-
-    .btn-alliance-delete:hover {
-        background: #dc3545;
-        color: #fff;
-    }
-
-    .btn-alliance-delete i {
-        font-size: 12px;
-    }
 </style>
