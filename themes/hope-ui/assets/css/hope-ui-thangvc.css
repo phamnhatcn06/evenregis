@@ -27188,62 +27188,108 @@ panel-title {
   /* Giảm chiều cao tối đa của table container */
   .table-responsive,
   .datatable-responsive {
-    max-height: calc(100vh - 18rem);
+    max-height: calc(100vh - 16rem);
+    overflow-x: auto;
+    overflow-y: auto;
   }
 
   /* Giảm font-size cho table */
   .table {
     font-size: 12px;
+    margin-bottom: 0;
   }
 
   /* Giảm padding cho cell */
   .table thead th,
   .table tbody td {
-    padding: 6px 8px;
+    padding: 5px 6px;
+    vertical-align: middle;
+  }
+
+  /* Header sticky */
+  .table thead th {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    z-index: 10;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 600;
   }
 
   /* DataTables specific */
   .dataTables_wrapper .table thead th,
   .dataTables_wrapper .table tbody td {
-    padding: 6px 8px;
+    padding: 5px 6px;
     font-size: 12px;
   }
 
   /* Giảm kích thước pagination */
   .dataTables_wrapper .dataTables_paginate .paginate_button {
-    padding: 4px 10px;
-    font-size: 12px;
+    padding: 3px 8px;
+    font-size: 11px;
+    min-width: auto;
   }
 
   /* Giảm kích thước length select và search input */
   .dataTables_wrapper .dataTables_length select,
   .dataTables_wrapper .dataTables_filter input {
-    font-size: 12px;
-    padding: 4px 8px;
+    font-size: 11px;
+    padding: 3px 6px;
+    height: auto;
   }
 
   /* Giảm kích thước info text */
   .dataTables_wrapper .dataTables_info {
-    font-size: 12px;
+    font-size: 11px;
+    padding-top: 0.5rem;
+  }
+
+  /* Compact DataTables controls */
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter {
+    margin-bottom: 0.5rem;
   }
 
   /* Action buttons nhỏ hơn */
   .table .btn-sm,
   .table .btn-group-sm .btn {
-    padding: 3px 6px;
-    font-size: 11px;
+    padding: 2px 5px;
+    font-size: 10px;
+    line-height: 1.4;
   }
 
   /* Icon trong action buttons */
   .table .btn-sm i,
   .table .btn-sm .fa {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   /* Badge nhỏ hơn */
   .table .badge {
-    font-size: 10px;
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+
+  /* Text truncate cho cột dài */
+  .table td.text-truncate {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Form trong bảng */
+  .table input.form-control,
+  .table select.form-control {
+    font-size: 11px;
     padding: 3px 6px;
+    height: auto;
+  }
+
+  /* Sidebar thu gọn hơn trên 1366 */
+  .sidebar-mini .sidebar .sidebar-body {
+    width: 220px;
   }
 }
 
