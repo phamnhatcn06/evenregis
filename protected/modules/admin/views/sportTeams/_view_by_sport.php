@@ -4,8 +4,11 @@
  * Hiển thị tất cả đội thể thao theo bộ môn, phân chia theo cụm (khu vực)
  * @var string $sportName Tên môn thể thao
  * @var string $eventName Tên sự kiện
+ * @var int $sportId ID môn thể thao hiện tại
+ * @var int $eventId ID sự kiện hiện tại
  * @var array $teamsByRegion Đội nhóm theo khu vực [{region_name, properties: [{property_name, teams: [...]}]}]
  * @var array $regionList Danh sách khu vực để filter
+ * @var array $groupedSports Danh sách môn thể thao theo nhóm
  */
 ?>
 <style>
@@ -19,13 +22,30 @@
         </h5>
     </div>
     <div class="card-body">
-        <?php if (empty($teamsByRegion)): ?>
-            <div class="alert alert-info">
-                <i class="fa fa-info-circle me-2"></i>Chưa có đội đăng ký môn này.
+        <div class="row mb-3">
+            <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
+                <label for="filter-change-sport" class="form-label mb-0 me-2 text-nowrap fw-semibold">
+                    Bộ môn:
+                </label>
+                <select id="filter-change-sport" class="form-select form-select-sm">
+                    <?php foreach ($groupedSports as $groupName => $items): ?>
+                        <?php if (count($items) > 1): ?>
+                            <option value="" disabled style="font-weight:bold;background:#e9ecef;">▸ <?php echo CHtml::encode($groupName); ?></option>
+                            <?php foreach ($items as $item): ?>
+                                <option value="<?php echo CHtml::encode($item['id']); ?>" <?php echo $item['id'] == $sportId ? 'selected="selected"' : ''; ?>>
+                                    &nbsp;&nbsp;&nbsp;<?php echo CHtml::encode($item['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="<?php echo CHtml::encode($items[0]['id']); ?>" <?php echo $items[0]['id'] == $sportId ? 'selected="selected"' : ''; ?>>
+                                <?php echo CHtml::encode($items[0]['name']); ?>
+                            </option>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </select>
             </div>
-        <?php else: ?>
-            <div class="row mb-3">
-                <div class="col-md-4 d-flex align-items-center">
+            <?php if (!empty($teamsByRegion)): ?>
+                <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
                     <label for="filter-region-sport" class="form-label mb-0 me-2 text-nowrap fw-semibold">
                         Lọc theo cụm:
                     </label>
@@ -38,7 +58,7 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-4 d-flex align-items-center">
+                <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
                     <label for="filter-property-sport" class="form-label mb-0 me-2 text-nowrap fw-semibold">
                         Lọc theo đơn vị:
                     </label>
@@ -53,7 +73,14 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
+            <?php endif; ?>
+        </div>
+
+        <?php if (empty($teamsByRegion)): ?>
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle me-2"></i>Chưa có đội đăng ký môn này.
             </div>
+        <?php else: ?>
 
             <?php
             $globalIndex = 1;
@@ -329,6 +356,18 @@
 
         if (filterProperty) {
             filterProperty.addEventListener('change', applyFilters);
+        }
+
+        var filterChangeSport = document.getElementById('filter-change-sport');
+        if (filterChangeSport) {
+            filterChangeSport.addEventListener('change', function() {
+                var selectedSportId = this.value;
+                if (selectedSportId) {
+                    var currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('sport_id', selectedSportId);
+                    window.location.href = currentUrl.toString();
+                }
+            });
         }
     })();
 </script>

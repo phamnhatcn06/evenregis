@@ -1438,6 +1438,70 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	/**
+	 * Lấy danh sách liên quân đã được xác nhận (approved) cho đơn vị hiện tại
+	 * Dùng cho form đăng ký thể thao - chọn liên quân đã có sẵn
+	 */
+	public function actionGetApprovedAlliances($registration_id)
+	{
+		$this->checkRegistrationAccess($registration_id);
+		$registration = Registrations::fetchFromApi($registration_id);
+		$result = array();
+
+		if ($registration && $registration->property_id && $registration->event_id) {
+			// Lấy các alliance request đã được approved mà đơn vị này là requester hoặc target
+			$params = array(
+				'event_id' => $registration->event_id,
+				'status' => AllianceRequests::STATUS_APPROVED,
+			);
+			$allRequests = AllianceRequests::getApiDataProvider($params, 500)->getData();
+
+			$propertyId = $registration->property_id;
+			$addedOrgIds = array($propertyId); // Tránh trùng lặp
+
+			foreach ($allRequests as $req) {
+				$requesterId = isset($req['requester_org_id']) ? $req['requester_org_id'] : (isset($req->requester_org_id) ? $req->requester_org_id : null);
+				$targetId = isset($req['target_org_id']) ? $req['target_org_id'] : (isset($req->target_org_id) ? $req->target_org_id : null);
+				$requesterName = isset($req['requester_org_name']) ? $req['requester_org_name'] : (isset($req->requester_org_name) ? $req->requester_org_name : '');
+				$targetName = isset($req['target_org_name']) ? $req['target_org_name'] : (isset($req->target_org_name) ? $req->target_org_name : '');
+
+				// Nếu đơn vị hiện tại là requester -> lấy target làm đối tác liên quân
+				if ($requesterId == $propertyId && $targetId && !in_array($targetId, $addedOrgIds)) {
+					$targetProperty = Properties::fetchFromApi($targetId);
+					$code = $targetProperty ? ($targetProperty->prefix ?: $targetProperty->code) : '';
+					$name = $targetProperty ? $targetProperty->name : $targetName;
+					$result[] = array(
+						'id' => $targetId,
+						'code' => $code,
+						'name' => $name,
+					);
+					$addedOrgIds[] = $targetId;
+				}
+
+				// Nếu đơn vị hiện tại là target -> lấy requester làm đối tác liên quân
+				if ($targetId == $propertyId && $requesterId && !in_array($requesterId, $addedOrgIds)) {
+					$requesterProperty = Properties::fetchFromApi($requesterId);
+					$code = $requesterProperty ? ($requesterProperty->prefix ?: $requesterProperty->code) : '';
+					$name = $requesterProperty ? $requesterProperty->name : $requesterName;
+					$result[] = array(
+						'id' => $requesterId,
+						'code' => $code,
+						'name' => $name,
+					);
+					$addedOrgIds[] = $requesterId;
+				}
+			}
+
+			usort($result, function ($a, $b) {
+				return strcmp($a['code'], $b['code']);
+			});
+		}
+
+		header('Content-Type: application/json');
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
 	public static function getSportMaxPlayers($sportName)
 	{
 		if (empty($sportName)) return 9999;

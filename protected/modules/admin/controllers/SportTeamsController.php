@@ -300,6 +300,43 @@ class SportTeamsController extends AdminController
             $sportName = $sport->name;
         }
 
+        // Fetch and group event sports for navigation filter
+        $eventSports = EventSports::getByEventId($eventId);
+        $sportsList = array();
+        foreach ($eventSports as $item) {
+            $spId = isset($item['sport_id']) ? $item['sport_id'] : (isset($item['id']) ? $item['id'] : null);
+            $spName = isset($item['sport_name']) ? $item['sport_name'] : (isset($item['name']) ? $item['name'] : '');
+            if ($spId) {
+                $sportsList[] = array(
+                    'id' => $spId,
+                    'name' => $spName,
+                );
+            }
+        }
+
+        $groupedSports = array();
+        $prefixes = array('Bóng bàn', 'Bóng đá', 'Cầu lông', 'Pickerball', 'Bơi ếch', 'Bơi tự do', 'Kéo co', 'Tennis', 'Cờ vua', 'Cờ tướng');
+        foreach ($sportsList as $item) {
+            $groupName = 'Khác';
+            foreach ($prefixes as $prefix) {
+                if (mb_strpos($item['name'], $prefix) === 0) {
+                    $groupName = $prefix;
+                    break;
+                }
+            }
+            if (!isset($groupedSports[$groupName])) {
+                $groupedSports[$groupName] = array();
+            }
+            $groupedSports[$groupName][] = $item;
+        }
+        uksort($groupedSports, 'strnatcasecmp');
+        foreach ($groupedSports as $groupName => &$items) {
+            usort($items, function($a, $b) {
+                return strnatcasecmp($a['name'], $b['name']);
+            });
+        }
+        unset($items);
+
         // Sắp xếp theo mã cụm (region_code)
         uasort($teamsByRegion, function($a, $b) {
             return strcmp($a['region_code'], $b['region_code']);
@@ -318,6 +355,7 @@ class SportTeamsController extends AdminController
             'sportId' => $sportId,
             'teamsByRegion' => array_values($teamsByRegion),
             'regionList' => $regionList,
+            'groupedSports' => $groupedSports,
         ));
     }
 
@@ -464,6 +502,43 @@ class SportTeamsController extends AdminController
             }
         }
 
+        // Fetch and group event sports for navigation filter
+        $eventSports = EventSports::getByEventId($eventId);
+        $sportsList = array();
+        foreach ($eventSports as $item) {
+            $spId = isset($item['sport_id']) ? $item['sport_id'] : (isset($item['id']) ? $item['id'] : null);
+            $spName = isset($item['sport_name']) ? $item['sport_name'] : (isset($item['name']) ? $item['name'] : '');
+            if ($spId) {
+                $sportsList[] = array(
+                    'id' => $spId,
+                    'name' => $spName,
+                );
+            }
+        }
+
+        $groupedSports = array();
+        $prefixes = array('Bóng bàn', 'Bóng đá', 'Cầu lông', 'Pickerball', 'Bơi ếch', 'Bơi tự do', 'Kéo co', 'Tennis', 'Cờ vua', 'Cờ tướng');
+        foreach ($sportsList as $item) {
+            $groupName = 'Khác';
+            foreach ($prefixes as $prefix) {
+                if (mb_strpos($item['name'], $prefix) === 0) {
+                    $groupName = $prefix;
+                    break;
+                }
+            }
+            if (!isset($groupedSports[$groupName])) {
+                $groupedSports[$groupName] = array();
+            }
+            $groupedSports[$groupName][] = $item;
+        }
+        uksort($groupedSports, 'strnatcasecmp');
+        foreach ($groupedSports as $groupName => &$items) {
+            usort($items, function($a, $b) {
+                return strnatcasecmp($a['name'], $b['name']);
+            });
+        }
+        unset($items);
+
         // Sắp xếp theo mã cụm (region_code)
         uasort($teamsByRegion, function($a, $b) {
             return strcmp($a['region_code'], $b['region_code']);
@@ -478,8 +553,11 @@ class SportTeamsController extends AdminController
         $this->renderPartial('_view_by_sport', array(
             'sportName' => $sportName,
             'eventName' => $eventName,
+            'eventId' => $eventId,
+            'sportId' => $sportId,
             'teamsByRegion' => array_values($teamsByRegion),
             'regionList' => $regionList,
+            'groupedSports' => $groupedSports,
         ));
     }
 
