@@ -694,8 +694,9 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                             }
                             ?>
                             <?php
-                            // Nhóm VĐV theo môn thi đấu
+                            // Nhóm VĐV theo môn thi đấu, lưu thêm team_id để sửa
                             $membersBySport = array();
+                            $teamIdBySport = array();
                             foreach ($sportTeams as $team) {
                                 $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
                                 $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
@@ -703,6 +704,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 
                                 if (!isset($membersBySport[$sportName])) {
                                     $membersBySport[$sportName] = array();
+                                    $teamIdBySport[$sportName] = $teamId;
                                 }
 
                                 foreach ($members as $member) {
@@ -719,7 +721,14 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 <p class="text-muted mb-0" id="no_sport_msg">Chưa đăng ký môn thể thao nào.</p>
                             <?php else: ?>
                                 <?php foreach ($membersBySport as $sportName => $members): ?>
-                                    <h6 class="mb-2 mt-3"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($sportName); ?> (<?php echo count($members); ?> VĐV)</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+                                        <h6 class="mb-0"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($sportName); ?> (<?php echo count($members); ?> VĐV)</h6>
+                                        <?php if ($canEdit && isset($teamIdBySport[$sportName])): ?>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="RegistrationView.editSportTeam(<?php echo $teamIdBySport[$sportName]; ?>)" title="Sửa danh sách VĐV">
+                                                <i class="fa fa-pencil me-1"></i>Sửa
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-striped table-sm mb-0 content-table">
                                             <thead class="table-light">
