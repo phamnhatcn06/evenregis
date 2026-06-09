@@ -315,9 +315,8 @@ var RegistrationView = (function() {
             ? modalSportSelect.value 
             : (sportSelect ? sportSelect.value : '');
 
-        // Luôn cho phép sửa tên team (tạo team mới, không dùng team cũ)
-        teamNameInput.readOnly = false;
-        teamNameInput.classList.remove('bg-light');
+        // Tên đội readonly - tự động sinh
+        teamNameInput.readOnly = true;
 
         // Get selected sport name to check min players
         var sportText = sportNameOverride || '';
