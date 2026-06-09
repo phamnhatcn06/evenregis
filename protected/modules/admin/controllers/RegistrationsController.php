@@ -1992,6 +1992,17 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		// Thu thập tên các đơn vị liên quân từ members
+		$allianceProperties = array();
+		$registration = Registrations::fetchFromApi($ownRegId);
+		$ownPropertyName = $registration ? $registration->property_name : '';
+		foreach ($members as $m) {
+			$memberPropertyName = isset($m->property_name) ? $m->property_name : '';
+			if (!empty($memberPropertyName) && $memberPropertyName !== $ownPropertyName && !in_array($memberPropertyName, $allianceProperties)) {
+				$allianceProperties[] = $memberPropertyName;
+			}
+		}
+
 		echo CJSON::encode(array(
 			'success' => true,
 			'data' => array(
@@ -2001,7 +2012,8 @@ class RegistrationsController extends AdminController
 					'sport_name' => $sportName,
 					'team_name' => $team->team_name,
 					'name' => $team->name,
-					'is_alliance' => $team->is_alliance,
+					'is_alliance' => $team->is_alliance || !empty($allianceProperties),
+					'alliance_properties' => $allianceProperties,
 					'max_per_team_member' => $maxPerTeamMember,
 					'alliance_member_count' => $allianceMemberCount,
 				),
