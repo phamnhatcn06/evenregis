@@ -1707,23 +1707,57 @@ class RegistrationsController extends AdminController
 			return;
 		}
 
-		// Lấy SportTeam của đối tác liên quân nếu bộ môn có 3 người trở lên
-		$teamId = null;
-		if ($registration->relation_property_id && count($attendeeIds) >= 3) {
-			$partnerTeams = SportTeams::getApiDataProvider(array(
-				'event_id' => $registration->event_id,
-				'property_id' => $registration->relation_property_id,
-				'sport_id' => $sportId,
-			), 10)->getData();
-			if (!empty($partnerTeams)) {
-				$partnerTeam = $partnerTeams[0];
-				$teamId = isset($partnerTeam->id) ? $partnerTeam->id : (isset($partnerTeam['id']) ? $partnerTeam['id'] : null);
+		// Nếu chọn liên quân, tìm team đã có của đơn vị liên quân để ghép vào
+		$existingAllianceTeamId = null;
+		$existingTeamName = null;
+
+		if ($isAlliance && !empty($alliancePropertyIds)) {
+			$allianceIds = is_array($alliancePropertyIds) ? $alliancePropertyIds : explode(',', $alliancePropertyIds);
+
+			foreach ($allianceIds as $alliancePropertyId) {
+				if (empty($alliancePropertyId)) continue;
+
+				// Tìm team đã có của đơn vị liên quân cho môn này
+				$partnerTeams = SportTeams::getApiDataProvider(array(
+					'event_id' => $registration->event_id,
+					'property_id' => $alliancePropertyId,
+					'sport_id' => $sportId,
+				), 10)->getData();
+
+				if (!empty($partnerTeams)) {
+					$partnerTeam = $partnerTeams[0];
+					$existingAllianceTeamId = isset($partnerTeam->id) ? $partnerTeam->id : (isset($partnerTeam['id']) ? $partnerTeam['id'] : null);
+					$existingTeamName = isset($partnerTeam->team_name) ? $partnerTeam->team_name : (isset($partnerTeam['team_name']) ? $partnerTeam['team_name'] : null);
+
+					if ($existingAllianceTeamId) {
+						// Cập nhật team để đánh dấu là liên quân và thêm property_id hiện tại vào alliance_org_ids
+						$existingOrgIds = isset($partnerTeam->alliance_org_ids) ? $partnerTeam->alliance_org_ids : (isset($partnerTeam['alliance_org_ids']) ? $partnerTeam['alliance_org_ids'] : '');
+						$orgIdsList = $existingOrgIds ? explode(',', $existingOrgIds) : array();
+						if (!in_array($registration->property_id, $orgIdsList)) {
+							$orgIdsList[] = $registration->property_id;
+						}
+
+						// Cập nhật team với is_alliance=1 và alliance_org_ids mới
+						$updateTeam = new SportTeams();
+						$updateTeam->id = $existingAllianceTeamId;
+						$updateTeam->is_alliance = 1;
+						$updateTeam->alliance_property_ids = implode(',', array_filter($orgIdsList));
+						// Cập nhật tên đội nếu chưa có prefix "Liên quân"
+						if ($existingTeamName && strpos($existingTeamName, 'Liên quân') === false) {
+							$updateTeam->team_name = $teamName; // Dùng tên đội mới từ form
+							$updateTeam->name = $teamName;
+						}
+						$updateTeam->updateViaApi();
+
+						break;
+					}
+				}
 			}
 		}
 
-		if ($teamId) {
+		if ($existingAllianceTeamId) {
 			// Kiểm tra tổng số thành viên của team (bao gồm liên quân) không vượt quá max_per_team_member
-			$existingMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+			$existingMembers = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $existingAllianceTeamId), 500)->getData();
 			$currentMemberCount = count($existingMembers);
 			$totalAfterAdd = $currentMemberCount + count($attendeeIds);
 
@@ -1741,13 +1775,13 @@ class RegistrationsController extends AdminController
 			// Thêm thành viên vào đội liên quân có sẵn của đối tác
 			foreach ($attendeeIds as $idx => $attId) {
 				$member = new SportTeamMembers();
-				$member->sport_team_id = $teamId;
+				$member->sport_team_id = $existingAllianceTeamId;
 				$member->attendee_id = $attId;
 				$member->name = isset($attendeeNames[$idx]) ? $attendeeNames[$idx] : '';
 				$member->storeViaApi();
 			}
 			if ($isAjax) {
-				echo CJSON::encode(array('success' => true, 'message' => 'Ghép đội liên quân thành công.', 'team_id' => $teamId));
+				echo CJSON::encode(array('success' => true, 'message' => 'Ghép đội liên quân thành công.', 'team_id' => $existingAllianceTeamId));
 				Yii::app()->end();
 			}
 			Yii::app()->user->setFlash('success', 'Ghép đội liên quân thành công.');
