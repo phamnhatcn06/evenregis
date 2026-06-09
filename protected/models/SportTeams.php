@@ -73,7 +73,8 @@ class SportTeams extends BaseSportTeams
         $data = $this->attributes;
         $data['team_name'] = $this->team_name;
         $data['is_alliance'] = $this->is_alliance;
-        $data['alliance_property_ids'] = $this->alliance_property_ids;
+        // Gửi alliance_org_ids dưới dạng chuỗi id1,id2,id3
+        $data['alliance_org_ids'] = $this->alliance_property_ids;
         $data['status'] = $this->status;
         $data['registration_id'] = $this->registration_id;
 
@@ -88,7 +89,8 @@ class SportTeams extends BaseSportTeams
         $data = $this->attributes;
         $data['team_name'] = $this->team_name;
         $data['is_alliance'] = $this->is_alliance;
-        $data['alliance_property_ids'] = $this->alliance_property_ids;
+        // Gửi alliance_org_ids dưới dạng chuỗi id1,id2,id3
+        $data['alliance_org_ids'] = $this->alliance_property_ids;
         $data['status'] = $this->status;
         $data['registration_id'] = $this->registration_id;
 
