@@ -693,7 +693,30 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 }
                             }
                             ?>
-                            <?php if (empty($sportTeams)): ?>
+                            <?php
+                            // Tạo danh sách VĐV phẳng từ tất cả các đội
+                            $allSportMembers = array();
+                            foreach ($sportTeams as $team) {
+                                $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+                                $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
+                                $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
+                                $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
+                                $teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
+
+                                foreach ($members as $member) {
+                                    $allSportMembers[] = array(
+                                        'team_id' => $teamId,
+                                        'sport_name' => $sportName,
+                                        'team_name' => $teamName,
+                                        'team_property_id' => $teamPropertyId,
+                                        'attendee_name' => isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : ''),
+                                        'gender' => isset($member['gender']) ? $member['gender'] : '',
+                                        'property_name' => isset($member['property_name']) ? $member['property_name'] : '',
+                                    );
+                                }
+                            }
+                            ?>
+                            <?php if (empty($allSportMembers)): ?>
                                 <p class="text-muted mb-0" id="no_sport_msg">Chưa đăng ký môn thể thao nào.</p>
                             <?php else: ?>
                                 <div class="table-responsive">
@@ -701,90 +724,29 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                         <thead class="table-light">
                                             <tr>
                                                 <th class="col-stt text-center">STT</th>
-                                                <th class="col-name">Môn thi đấu</th>
-                                                <th style="width:200px;">Tên đội</th>
-                                                <th class="col-count text-center">Số VĐV</th>
-                                                <th class="col-list">Danh sách VĐV</th>
-                                                <?php if ($canEdit): ?>
-                                                    <th class="col-action text-center">Thao tác</th>
-                                                <?php endif; ?>
+                                                <th>Họ tên</th>
+                                                <th style="width:100px;" class="text-center">Giới tính</th>
+                                                <th>Đơn vị</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php
-                                            $renderedSports = array();
-                                            $sportIdx = 0;
-                                            foreach ($sportTeams as $team):
-                                                $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
-                                                $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
-                                                $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
-                                                $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
-                                                $teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
-
-                                                $hasOwnMember = false;
-                                                foreach ($members as $m) {
-                                                    $mAttendeeId = isset($m['attendee_id']) ? (int)$m['attendee_id'] : null;
-                                                    if ($mAttendeeId && in_array($mAttendeeId, $ownAttendeeIds)) {
-                                                        $hasOwnMember = true;
-                                                        break;
-                                                    }
-                                                }
-
-                                                $isFirstRowForSport = !in_array($sportName, $renderedSports);
-                                                if ($isFirstRowForSport) {
-                                                    $renderedSports[] = $sportName;
-                                                    $sportIdx++;
-                                                }
-                                            ?>
+                                            <?php foreach ($allSportMembers as $idx => $member): ?>
                                                 <tr>
-                                                    <?php if ($isFirstRowForSport): ?>
-                                                        <td class="text-center align-middle fw-bold" rowspan="<?php echo $sportCounts[$sportName]; ?>">
-                                                            <?php echo $sportIdx; ?>
-                                                        </td>
-                                                        <td class="align-middle fw-bold text-primary" rowspan="<?php echo $sportCounts[$sportName]; ?>">
-                                                            <?php echo CHtml::encode($sportName); ?>
-                                                        </td>
-                                                    <?php endif; ?>
-                                                    <td class="align-middle"><span class="badge bg-primary"><?php echo CHtml::encode($teamName); ?></span></td>
-                                                    <td class="text-center align-middle"><?php echo count($members); ?></td>
-                                                    <td>
-                                                        <?php foreach ($members as $idx => $member):
-                                                            $memberName = isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : '');
-                                                            $memberPosition = isset($member['position_name']) ? $member['position_name'] : '';
-                                                            $memberDivision = isset($member['division_name']) ? $member['division_name'] : '';
-                                                            $memberProperty = isset($member['property_name']) ? $member['property_name'] : '';
-                                                            $nameInfo = CHtml::encode($memberName);
-                                                            $details = array();
-                                                            if ($memberPosition) $details[] = CHtml::encode($memberPosition);
-                                                            if ($memberDivision) $details[] = 'Bộ phận: ' . CHtml::encode($memberDivision);
-                                                            if ($memberProperty) $details[] = 'Đơn vị: ' . CHtml::encode($memberProperty);
-                                                            if (!empty($details)) {
-                                                                $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
-                                                            }
+                                                    <td class="text-center"><?php echo $idx + 1; ?></td>
+                                                    <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
+                                                    <td class="text-center">
+                                                        <?php
+                                                        $gender = strtolower($member['gender']);
+                                                        if ($gender === 'male' || $gender === 'nam') {
+                                                            echo '<span class="badge bg-primary">Nam</span>';
+                                                        } elseif ($gender === 'female' || $gender === 'nữ' || $gender === 'nu') {
+                                                            echo '<span class="badge bg-danger">Nữ</span>';
+                                                        } else {
+                                                            echo '-';
+                                                        }
                                                         ?>
-                                                            <div><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
-                                                        <?php endforeach; ?>
                                                     </td>
-                                                    <?php if ($canEdit): ?>
-                                                        <td class="text-center text-nowrap align-middle">
-                                                            <?php if ($teamPropertyId == $model->property_id): ?>
-                                                                <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editSportTeam(<?php echo $teamId; ?>)" title="Sửa">
-                                                                    <i class="fa fa-pencil"></i>
-                                                                </button>
-                                                                <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamId, 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamId; ?>" style="display:none;"></form>
-                                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamId; ?>)" title="Xóa">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
-                                                            <?php else: ?>
-                                                                <?php if ($hasOwnMember && $allianceRequest && $allianceRequest->status == AllianceRequests::STATUS_APPROVED): ?>
-                                                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editSportTeam(<?php echo $teamId; ?>)" title="Sửa thành viên liên quân">
-                                                                        <i class="fa fa-pencil"></i>
-                                                                    </button>
-                                                                <?php endif; ?>
-                                                                <span class="badge bg-secondary">Liên quân</span>
-                                                            <?php endif; ?>
-                                                        </td>
-                                                    <?php endif; ?>
+                                                    <td><?php echo CHtml::encode($member['property_name'] ?: '-'); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
