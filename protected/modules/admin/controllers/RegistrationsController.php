@@ -1992,14 +1992,16 @@ class RegistrationsController extends AdminController
 			}
 		}
 
-		// Thu thập tên các đơn vị liên quân từ members
+		// Lấy tên các đơn vị liên quân từ alliance_org_ids
 		$allianceProperties = array();
-		$registration = Registrations::fetchFromApi($ownRegId);
-		$ownPropertyName = $registration ? $registration->property_name : '';
-		foreach ($members as $m) {
-			$memberPropertyName = isset($m->property_name) ? $m->property_name : '';
-			if (!empty($memberPropertyName) && $memberPropertyName !== $ownPropertyName && !in_array($memberPropertyName, $allianceProperties)) {
-				$allianceProperties[] = $memberPropertyName;
+		$allianceOrgIds = isset($team->alliance_org_ids) ? $team->alliance_org_ids : '';
+		if (!empty($allianceOrgIds)) {
+			$orgIds = array_filter(array_map('trim', explode(',', $allianceOrgIds)));
+			foreach ($orgIds as $orgId) {
+				$org = Properties::fetchFromApi($orgId);
+				if ($org && !empty($org->name)) {
+					$allianceProperties[] = $org->name;
+				}
 			}
 		}
 
