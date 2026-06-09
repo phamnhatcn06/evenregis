@@ -79,6 +79,7 @@ class MyHelper
             "/assets/css/dark.min.css",
             "/assets/css/customizer.min.css",
             "/assets/css/rtl.min.css",
+            "/assets/css/responsive-1366.css?v=1.0.0",
         );
         foreach ($listCss as $css) { ?>
             <link href=" <?= Yii::app()->theme->getBaseUrl() . $css ?>" rel="stylesheet" type="text/css" />
