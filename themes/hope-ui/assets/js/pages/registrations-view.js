@@ -1172,6 +1172,49 @@ var RegistrationView = (function() {
         return ids;
     }
 
+    // Kiểm tra xem đơn vị liên quân đã có team cho môn này chưa
+    function checkExistingAllianceTeam() {
+        var sportSelect = document.getElementById('sport_select_main');
+        var modalSportSelect = document.getElementById('sport_item_id');
+        var sportId = modalSportSelect && modalSportSelect.value
+            ? modalSportSelect.value
+            : (sportSelect ? sportSelect.value : '');
+
+        var allianceIds = getSelectedAlliancePropertyIds();
+        var hintEl = document.getElementById('sport_team_name_hint');
+
+        if (!sportId || allianceIds.length === 0) {
+            if (hintEl) {
+                hintEl.innerHTML = '<span class="text-muted">Tên đội sẽ tự động sinh theo đơn vị liên quân.</span>';
+                hintEl.classList.remove('text-info', 'text-warning');
+            }
+            return;
+        }
+
+        var url = window.BASE_URL + '/admin/registrations/checkAllianceTeam?registration_id=' + registrationId +
+            '&sport_id=' + sportId + '&alliance_property_ids=' + allianceIds.join(',');
+
+        fetch(url)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (hintEl && data.success) {
+                    if (data.has_existing_team) {
+                        hintEl.innerHTML = '<i class="fa fa-info-circle"></i> ' + escapeHtml(data.message);
+                        hintEl.classList.remove('text-muted');
+                        hintEl.classList.add('text-info');
+                    } else {
+                        hintEl.innerHTML = '<span class="text-muted">' + escapeHtml(data.message) + '</span>';
+                        hintEl.classList.remove('text-info', 'text-warning');
+                    }
+                }
+            })
+            .catch(function() {
+                if (hintEl) {
+                    hintEl.innerHTML = '<span class="text-muted">Tên đội sẽ tự động sinh theo đơn vị liên quân.</span>';
+                }
+            });
+    }
+
     function addSportToPreview() {
         var sportSelect = document.getElementById('sport_select_main');
         var modalSportSelect = document.getElementById('sport_item_id');
