@@ -331,26 +331,28 @@ var RegistrationView = (function() {
         // Clean spaces and HTML entities
         sportText = sportText.replace(/[\u00a0\s]+/g, ' ').trim();
 
-        var allianceSelect = document.getElementById('sport_alliance_property');
-        var allianceCodes = [];
-        if (allianceSelect) {
-            Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
-                var code = opt.getAttribute('data-code');
-                if (code) {
-                    allianceCodes.push(code);
-                }
+        // Kiểm tra checkbox liên quân mới
+        var isAllianceCheckbox = document.getElementById('sport_is_alliance');
+        var isAlliance = isAllianceCheckbox && isAllianceCheckbox.checked;
+
+        if (isAlliance) {
+            // Lấy danh sách alliance đã chọn từ checkbox mới
+            var checkboxes = document.querySelectorAll('.sport-alliance-cb:checked');
+            var allianceCodes = [];
+            checkboxes.forEach(function(cb) {
+                var code = cb.getAttribute('data-code');
+                if (code) allianceCodes.push(code);
             });
-        }
 
-        var minPlayers = getSportMinMembersById(sportId);
-        console.log('updateSportTeamName debug - sportId:', sportId, 'minPlayers:', minPlayers, 'allianceCodes:', allianceCodes);
-
-        if (allianceCodes.length > 0 && minPlayers >= 3) {
-            // Liên quân + tất cả prefix đơn vị (bao gồm đơn vị hiện tại)
-            var allCodes = [propertyCode].concat(allianceCodes);
-            teamNameInput.value = 'Liên quân ' + allCodes.join(' - ');
+            if (allianceCodes.length > 0) {
+                var allCodes = [propertyCode].concat(allianceCodes);
+                teamNameInput.value = 'Liên quân ' + allCodes.join(' - ');
+            } else {
+                teamNameInput.value = propertyCode || 'Team';
+            }
         } else {
-            teamNameInput.value = propertyCode;
+            // Team độc lập - tên theo property code
+            teamNameInput.value = propertyCode || 'Team';
         }
     }
 
