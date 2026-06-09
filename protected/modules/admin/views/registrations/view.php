@@ -1425,6 +1425,22 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
             }
         });
     }
+    function confirmDeleteAlliance(id) {
+        Swal.fire({
+            title: "Huỷ liên quân",
+            text: "Bạn có chắc chắn muốn huỷ liên quân với đơn vị này?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Huỷ liên quân",
+            cancelButtonText: "Đóng"
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                document.getElementById("delete-alliance-form-" + id).submit();
+            }
+        });
+    }
     function confirmDeleteTalent(id) {
         Swal.fire({
             title: "Xác nhận xóa",
