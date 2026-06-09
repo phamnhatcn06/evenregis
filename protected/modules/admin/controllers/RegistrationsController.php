@@ -1502,6 +1502,86 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	/**
+	 * Kiểm tra xem đơn vị liên quân đã có team cho môn này chưa
+	 * Trả về thông tin team nếu có để hiển thị cho user biết sẽ ghép vào team đó
+	 */
+	public function actionCheckAllianceTeam()
+	{
+		$registrationId = Yii::app()->request->getQuery('registration_id');
+		$sportId = Yii::app()->request->getQuery('sport_id');
+		$alliancePropertyIds = Yii::app()->request->getQuery('alliance_property_ids', array());
+
+		if (!$registrationId || !$sportId) {
+			header('Content-Type: application/json');
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin.'));
+			Yii::app()->end();
+		}
+
+		$registration = Registrations::fetchFromApi($registrationId);
+		if (!$registration) {
+			header('Content-Type: application/json');
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy phiếu đăng ký.'));
+			Yii::app()->end();
+		}
+
+		$existingTeam = null;
+		$allianceIds = is_array($alliancePropertyIds) ? $alliancePropertyIds : explode(',', $alliancePropertyIds);
+
+		foreach ($allianceIds as $alliancePropertyId) {
+			if (empty($alliancePropertyId)) continue;
+
+			$partnerTeams = SportTeams::getApiDataProvider(array(
+				'event_id' => $registration->event_id,
+				'property_id' => $alliancePropertyId,
+				'sport_id' => $sportId,
+			), 10)->getData();
+
+			if (!empty($partnerTeams)) {
+				$partnerTeam = $partnerTeams[0];
+				$teamId = isset($partnerTeam->id) ? $partnerTeam->id : (isset($partnerTeam['id']) ? $partnerTeam['id'] : null);
+				$teamName = isset($partnerTeam->team_name) ? $partnerTeam->team_name : (isset($partnerTeam['team_name']) ? $partnerTeam['team_name'] : '');
+				$memberCount = isset($partnerTeam->member_count) ? $partnerTeam->member_count : 0;
+
+				// Lấy số thành viên hiện tại
+				if ($teamId && !$memberCount) {
+					$members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+					$memberCount = count($members);
+				}
+
+				// Lấy tên đơn vị
+				$property = Properties::fetchFromApi($alliancePropertyId);
+				$propertyName = $property ? ($property->prefix ?: $property->code) . ' - ' . $property->name : '';
+
+				$existingTeam = array(
+					'team_id' => $teamId,
+					'team_name' => $teamName,
+					'property_id' => $alliancePropertyId,
+					'property_name' => $propertyName,
+					'member_count' => $memberCount,
+				);
+				break;
+			}
+		}
+
+		header('Content-Type: application/json');
+		if ($existingTeam) {
+			echo CJSON::encode(array(
+				'success' => true,
+				'has_existing_team' => true,
+				'team' => $existingTeam,
+				'message' => "Đơn vị {$existingTeam['property_name']} đã có đội \"{$existingTeam['team_name']}\" ({$existingTeam['member_count']} VĐV). Khi lưu, VĐV của bạn sẽ được ghép vào đội này."
+			));
+		} else {
+			echo CJSON::encode(array(
+				'success' => true,
+				'has_existing_team' => false,
+				'message' => 'Chưa có đội nào. Sẽ tạo đội mới khi lưu.'
+			));
+		}
+		Yii::app()->end();
+	}
+
 	public static function getSportMaxPlayers($sportName)
 	{
 		if (empty($sportName)) return 9999;
