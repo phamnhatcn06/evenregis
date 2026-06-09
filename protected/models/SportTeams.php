@@ -30,7 +30,7 @@ class SportTeams extends BaseSportTeams
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('event_name, sport_name, property_name, registration_name, alliance_org_names, member_count, team_name, is_alliance, alliance_property_ids, status, registration_id', 'safe');
+        $rules[] = array('event_name, sport_name, property_name, registration_name, alliance_org_names, alliance_org_ids, member_count, team_name, is_alliance, alliance_property_ids, status, registration_id', 'safe');
         return $rules;
     }
 
