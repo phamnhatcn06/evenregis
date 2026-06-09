@@ -1235,20 +1235,23 @@ var RegistrationView = (function() {
             }
 
             // Proceed with adding to preview
-            // Get alliance info
-            var allianceSelect = document.getElementById('sport_alliance_property');
+            // Get alliance info từ checkbox mới trong modal
+            var isAllianceCheckbox = document.getElementById('sport_is_alliance');
+            var isAlliance = isAllianceCheckbox && isAllianceCheckbox.checked;
             var allianceIds = [];
             var allianceCodes = [];
-            if (allianceSelect) {
-                Array.from(allianceSelect.selectedOptions).forEach(function(opt) {
-                    allianceIds.push(opt.value);
-                    allianceCodes.push(opt.getAttribute('data-code'));
+
+            if (isAlliance) {
+                var checkboxes = document.querySelectorAll('.sport-alliance-cb:checked');
+                checkboxes.forEach(function(cb) {
+                    allianceIds.push(cb.value);
+                    allianceCodes.push(cb.getAttribute('data-code'));
                 });
             }
 
-            // Tự động sinh tên đội theo quy tắc
+            // Lấy tên đội từ input (đã được tự động sinh)
             var teamName = document.getElementById('sport_team_name')?.value || '';
-            if (!teamName || teamName === propertyCode) {
+            if (!teamName) {
                 if (allianceCodes.length > 0) {
                     var allCodes = [propertyCode].concat(allianceCodes);
                     teamName = 'Liên quân ' + allCodes.join(' - ');
@@ -1261,6 +1264,7 @@ var RegistrationView = (function() {
                 sportId: sportId,
                 sportName: sportName,
                 teamName: teamName,
+                isAlliance: isAlliance ? 1 : 0,
                 allianceIds: allianceIds,
                 allianceCodes: allianceCodes,
                 attendees: sportSelectedAttendees.slice() // clone array
