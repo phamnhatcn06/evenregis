@@ -88,12 +88,9 @@ if (!$hasPending && !$hasActive && !$hasFilteredHistory) return;
             </div>
             <?php foreach ($activeAlliances as $item):
                 $req = $item['request'];
-                $reqId = isset($req->id) ? $req->id : 0;
                 $isSent = $item['type'] === 'sent';
                 $partnerName = $item['partner_name'];
                 $requestedAt = isset($req->requested_at) ? $req->requested_at : '';
-                // Chỉ cho xoá nếu là đơn vị nhận yêu cầu (received)
-                $canDelete = !$isSent;
             ?>
                 <div class="alliance-active-card">
                     <div class="alliance-active-icon">
@@ -110,14 +107,6 @@ if (!$hasPending && !$hasActive && !$hasFilteredHistory) return;
                             <div class="alliance-active-time"><i class="fa fa-clock-o"></i><?php echo MyHelper::formatDateTime($requestedAt); ?></div>
                         <?php endif; ?>
                     </div>
-                    <?php if ($canDelete): ?>
-                        <div class="alliance-active-actions">
-                            <button type="button" class="btn-alliance-delete" onclick="confirmDeleteAlliance(<?php echo $reqId; ?>)" title="Huỷ liên quân">
-                                <i class="fa fa-times"></i>
-                            </button>
-                            <form id="delete-alliance-form-<?php echo $reqId; ?>" method="post" action="<?php echo $this->createUrl('deleteAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:none;"></form>
-                        </div>
-                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
