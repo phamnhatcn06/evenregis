@@ -1423,7 +1423,6 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
                 document.getElementById("rejection_reason_" + id).value = result.value;
                 document.getElementById("reject-alliance-form-" + id).submit();
             }
-            }
         });
     }
     function confirmDeleteTalent(id) {
