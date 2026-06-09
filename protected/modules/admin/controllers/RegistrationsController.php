@@ -1629,6 +1629,7 @@ class RegistrationsController extends AdminController
 		$this->checkRegistrationAccess($registrationId);
 		$sportId = Yii::app()->request->getPost('sport_id');
 		$alliancePropertyIds = Yii::app()->request->getPost('alliance_property_ids', array());
+		$isAlliance = Yii::app()->request->getPost('is_alliance', 0);
 		$teamName = Yii::app()->request->getPost('team_name');
 		$note = Yii::app()->request->getPost('note');
 		$attendeeIds = Yii::app()->request->getPost('attendee_ids', array());
