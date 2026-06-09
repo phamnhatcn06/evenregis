@@ -1112,11 +1112,12 @@ var RegistrationView = (function() {
                 });
                 allianceList.innerHTML = html;
 
-                // Bind change event để update team name
+                // Bind change event để update team name và check existing team
                 var checkboxes = allianceList.querySelectorAll('.sport-alliance-cb');
                 checkboxes.forEach(function(cb) {
                     cb.addEventListener('change', function() {
                         updateSportTeamNameFromAlliance();
+                        checkExistingAllianceTeam();
                     });
                 });
             })
