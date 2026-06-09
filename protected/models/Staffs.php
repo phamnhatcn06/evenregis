@@ -77,7 +77,7 @@ class Staffs extends BaseStaffs
 	}
 
 	
-	public static function getApiDataProvider($params = array(), $pageSize = 2500)
+	public static function getApiDataProvider($params = array(), $pageSize = 10000)
 	{
 		return new ApiDataProvider(ApiEndpoints::STAFF_LIST, array(
 			'modelClass' => 'Staffs',

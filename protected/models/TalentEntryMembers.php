@@ -53,7 +53,7 @@ class TalentEntryMembers extends BaseTalentEntryMembers
         return ApiClient::delete($url);
     }
 
-    public static function getApiDataProvider($params = array(), $pageSize = 25)
+    public static function getApiDataProvider($params = array(), $pageSize = 10000)
     {
         return new ApiDataProvider(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array(
             'modelClass' => 'TalentEntryMembers',

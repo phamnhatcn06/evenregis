@@ -47,7 +47,7 @@ class ApprovalWorkflowApprovers extends BaseApprovalWorkflowApprovers
         return ApiClient::delete($url);
     }
 
-    public static function getApiDataProvider($params = array(), $pageSize = 25)
+    public static function getApiDataProvider($params = array(), $pageSize = 10000)
     {
         return new ApiDataProvider(ApiEndpoints::APPROVAL_WORKFLOW_APPROVER_LIST, array(
             'modelClass' => 'ApprovalWorkflowApprovers',

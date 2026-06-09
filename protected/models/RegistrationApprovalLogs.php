@@ -11,7 +11,7 @@ class RegistrationApprovalLogs extends BaseRegistrationApprovalLogs
 
     // ==================== API Methods ====================
 
-    public static function getApiDataProvider($params = array(), $pageSize = 25)
+    public static function getApiDataProvider($params = array(), $pageSize = 10000)
     {
         return new ApiDataProvider(ApiEndpoints::REGISTRATION_APPROVAL_LOG_LIST, array(
             'modelClass' => 'RegistrationApprovalLogs',

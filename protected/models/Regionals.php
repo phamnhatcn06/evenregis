@@ -65,7 +65,7 @@ class Regionals extends BaseRegionals
 		return ApiClient::delete($url);
 	}
 
-	public static function getApiDataProvider($params = array(), $pageSize = 25)
+	public static function getApiDataProvider($params = array(), $pageSize = 10000)
 	{
 		return new ApiDataProvider(ApiEndpoints::REGIONAL_LIST, array(
 			'modelClass' => 'Regionals',

@@ -94,7 +94,7 @@ class CompetitionDepartments extends BaseCompetitionDepartments
         return ApiClient::delete($url);
     }
 
-    public static function getApiDataProvider($params = array(), $pageSize = 100)
+    public static function getApiDataProvider($params = array(), $pageSize = 10000)
     {
         return new ApiDataProvider(ApiEndpoints::COMPETITION_DEPARTMENT_LIST, array(
             'modelClass' => 'CompetitionDepartments',

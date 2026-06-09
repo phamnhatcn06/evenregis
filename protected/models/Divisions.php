@@ -47,7 +47,7 @@ class Divisions extends BaseDivisions
 		return ApiClient::delete($url);
 	}
 
-	public static function getApiDataProvider($params = array(), $pageSize = 25)
+	public static function getApiDataProvider($params = array(), $pageSize = 10000)
 	{
 		return new ApiDataProvider(ApiEndpoints::DIVISION_LIST, array(
 			'modelClass' => 'Divisions',

@@ -69,7 +69,7 @@ class Properties extends BaseProperties
 		return ApiClient::delete($url);
 	}
 
-	public static function getApiDataProvider($params = array(), $pageSize = 100)
+	public static function getApiDataProvider($params = array(), $pageSize = 10000)
 	{
 		return new ApiDataProvider(ApiEndpoints::PROPERTY_LIST, array(
 			'modelClass' => 'Properties',

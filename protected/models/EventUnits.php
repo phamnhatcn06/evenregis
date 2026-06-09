@@ -37,7 +37,7 @@ class EventUnits extends BaseEventUnits
 		return ApiClient::delete($url);
 	}
 
-	public static function getApiDataProvider($params = array(), $pageSize = 25)
+	public static function getApiDataProvider($params = array(), $pageSize = 10000)
 	{
 		return new ApiDataProvider(ApiEndpoints::EVENT_UNIT_LIST, array(
 			'modelClass' => 'EventUnits',

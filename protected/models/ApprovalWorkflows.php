@@ -60,7 +60,7 @@ class ApprovalWorkflows extends BaseApprovalWorkflows
     /**
      * DataProvider cho danh sách
      */
-    public static function getApiDataProvider($params = array(), $pageSize = 25)
+    public static function getApiDataProvider($params = array(), $pageSize = 10000)
     {
         return new ApiDataProvider(ApiEndpoints::APPROVAL_WORKFLOW_LIST, array(
             'modelClass' => 'ApprovalWorkflows',

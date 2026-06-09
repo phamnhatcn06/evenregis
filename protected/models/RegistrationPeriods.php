@@ -83,7 +83,7 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		return ApiClient::delete($url);
 	}
 
-	public static function getApiDataProvider($params = array(), $pageSize = 25)
+	public static function getApiDataProvider($params = array(), $pageSize = 10000)
 	{
 		return new ApiDataProvider(ApiEndpoints::REGISTRATION_PERIOD_LIST, array(
 			'modelClass' => 'RegistrationPeriods',

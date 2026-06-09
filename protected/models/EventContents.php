@@ -37,7 +37,7 @@ class EventContents extends BaseEventContents
 		return ApiClient::delete($url);
 	}
 
-	public static function getApiDataProvider($params = array(), $pageSize = 25)
+	public static function getApiDataProvider($params = array(), $pageSize = 10000)
 	{
 		return new ApiDataProvider(ApiEndpoints::EVENT_CONTENT_LIST, array(
 			'modelClass' => 'EventContents',
