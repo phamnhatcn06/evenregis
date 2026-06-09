@@ -694,64 +694,66 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                             }
                             ?>
                             <?php
-                            // Tạo danh sách VĐV phẳng từ tất cả các đội
-                            $allSportMembers = array();
+                            // Nhóm VĐV theo môn thi đấu
+                            $membersBySport = array();
                             foreach ($sportTeams as $team) {
                                 $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
                                 $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
-                                $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
                                 $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
-                                $teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
+
+                                if (!isset($membersBySport[$sportName])) {
+                                    $membersBySport[$sportName] = array();
+                                }
 
                                 foreach ($members as $member) {
-                                    $allSportMembers[] = array(
-                                        'team_id' => $teamId,
-                                        'sport_name' => $sportName,
-                                        'team_name' => $teamName,
-                                        'team_property_id' => $teamPropertyId,
+                                    $membersBySport[$sportName][] = array(
                                         'attendee_name' => isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : ''),
                                         'gender' => isset($member['gender']) ? $member['gender'] : '',
                                         'property_name' => isset($member['property_name']) ? $member['property_name'] : '',
                                     );
                                 }
                             }
+                            ksort($membersBySport);
                             ?>
-                            <?php if (empty($allSportMembers)): ?>
+                            <?php if (empty($membersBySport)): ?>
                                 <p class="text-muted mb-0" id="no_sport_msg">Chưa đăng ký môn thể thao nào.</p>
                             <?php else: ?>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-sm mb-0 content-table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th class="col-stt text-center">STT</th>
-                                                <th>Họ tên</th>
-                                                <th style="width:100px;" class="text-center">Giới tính</th>
-                                                <th>Đơn vị</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($allSportMembers as $idx => $member): ?>
+                                <?php foreach ($membersBySport as $sportName => $members): ?>
+                                    <h6 class="mb-2 mt-3"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($sportName); ?> (<?php echo count($members); ?> VĐV)</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped table-sm mb-0 content-table">
+                                            <thead class="table-light">
                                                 <tr>
-                                                    <td class="text-center"><?php echo $idx + 1; ?></td>
-                                                    <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
-                                                    <td class="text-center">
-                                                        <?php
-                                                        $gender = strtolower($member['gender']);
-                                                        if ($gender === 'male' || $gender === 'nam') {
-                                                            echo '<span class="badge bg-primary">Nam</span>';
-                                                        } elseif ($gender === 'female' || $gender === 'nữ' || $gender === 'nu') {
-                                                            echo '<span class="badge bg-danger">Nữ</span>';
-                                                        } else {
-                                                            echo '-';
-                                                        }
-                                                        ?>
-                                                    </td>
-                                                    <td><?php echo CHtml::encode($member['property_name'] ?: '-'); ?></td>
+                                                    <th class="col-stt text-center">STT</th>
+                                                    <th>Họ tên</th>
+                                                    <th style="width:100px;" class="text-center">Giới tính</th>
+                                                    <th>Đơn vị</th>
                                                 </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div><!-- end table-responsive -->
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($members as $idx => $member): ?>
+                                                    <tr>
+                                                        <td class="text-center"><?php echo $idx + 1; ?></td>
+                                                        <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
+                                                        <td class="text-center">
+                                                            <?php
+                                                            $gender = strtolower($member['gender']);
+                                                            if ($gender === 'male' || $gender === 'nam') {
+                                                                echo '<span class="badge bg-primary">Nam</span>';
+                                                            } elseif ($gender === 'female' || $gender === 'nữ' || $gender === 'nu') {
+                                                                echo '<span class="badge bg-danger">Nữ</span>';
+                                                            } else {
+                                                                echo '-';
+                                                            }
+                                                            ?>
+                                                        </td>
+                                                        <td><?php echo CHtml::encode($member['property_name'] ?: '-'); ?></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </div><!-- end main col -->
                     </div><!-- end row -->
