@@ -694,9 +694,10 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                             }
                             ?>
                             <?php
-                            // Nhóm VĐV theo môn thi đấu, lưu thêm team_id để sửa
+                            // Nhóm VĐV theo môn thi đấu, lưu thêm team_id và thông tin liên quân
                             $membersBySport = array();
                             $teamIdBySport = array();
+                            $allianceInfoBySport = array();
                             foreach ($sportTeams as $team) {
                                 $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
                                 $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
@@ -705,14 +706,20 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 if (!isset($membersBySport[$sportName])) {
                                     $membersBySport[$sportName] = array();
                                     $teamIdBySport[$sportName] = $teamId;
+                                    $allianceInfoBySport[$sportName] = array();
                                 }
 
                                 foreach ($members as $member) {
+                                    $memberPropertyName = isset($member['property_name']) ? $member['property_name'] : '';
                                     $membersBySport[$sportName][] = array(
                                         'attendee_name' => isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : ''),
                                         'gender' => isset($member['gender']) ? $member['gender'] : '',
-                                        'property_name' => isset($member['property_name']) ? $member['property_name'] : '',
+                                        'property_name' => $memberPropertyName,
                                     );
+                                    // Thu thập các đơn vị liên quân (khác với đơn vị hiện tại)
+                                    if (!empty($memberPropertyName) && $memberPropertyName !== $model->property_name && !in_array($memberPropertyName, $allianceInfoBySport[$sportName])) {
+                                        $allianceInfoBySport[$sportName][] = $memberPropertyName;
+                                    }
                                 }
                             }
                             ksort($membersBySport);
@@ -722,7 +729,12 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                             <?php else: ?>
                                 <?php foreach ($membersBySport as $sportName => $members): ?>
                                     <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
-                                        <h6 class="mb-0"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($sportName); ?> (<?php echo count($members); ?> VĐV)</h6>
+                                        <div>
+                                            <h6 class="mb-0 d-inline"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($sportName); ?> (<?php echo count($members); ?> VĐV)</h6>
+                                            <?php if (!empty($allianceInfoBySport[$sportName])): ?>
+                                                <span class="badge bg-info ms-2"><i class="fa fa-handshake-o me-1"></i>Liên quân: <?php echo CHtml::encode(implode(', ', $allianceInfoBySport[$sportName])); ?></span>
+                                            <?php endif; ?>
+                                        </div>
                                         <?php if ($canEdit && isset($teamIdBySport[$sportName])): ?>
                                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="RegistrationView.editSportTeam(<?php echo $teamIdBySport[$sportName]; ?>)" title="Sửa danh sách VĐV">
                                                 <i class="fa fa-pencil me-1"></i>Sửa
