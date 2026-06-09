@@ -13,6 +13,7 @@ class SportTeams extends BaseSportTeams
     public $property_name;
     public $registration_name;
     public $alliance_org_names;
+    public $alliance_org_ids; // Lưu dạng id1,id2,id3
     public $member_count;
     public $team_name;
     public $is_alliance;
