@@ -1457,6 +1457,7 @@ var RegistrationView = (function() {
             formData.append('content_id', sportsContentId || '');
             formData.append('sport_id', reg.sportId);
             formData.append('team_name', reg.teamName);
+            formData.append('is_alliance', reg.isAlliance || 0);
             reg.allianceIds.forEach(function(id) {
                 formData.append('alliance_property_ids[]', id);
             });
