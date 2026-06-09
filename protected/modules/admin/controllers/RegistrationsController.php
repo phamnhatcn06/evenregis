@@ -1030,44 +1030,6 @@ class RegistrationsController extends AdminController
 		$this->redirect(array('view', 'id' => $registration_id));
 	}
 
-	/**
-	 * Huỷ liên quân đã được duyệt (chỉ đơn vị nhận yêu cầu mới được huỷ)
-	 */
-	public function actionDeleteAlliance($request_id, $registration_id)
-	{
-		$this->checkRegistrationAccess($registration_id);
-		$model = AllianceRequests::fetchFromApi($request_id);
-
-		if (!$model) {
-			Yii::app()->user->setFlash('error', 'Không tìm thấy yêu cầu liên quân.');
-			$this->redirect(array('view', 'id' => $registration_id));
-			return;
-		}
-
-		// Kiểm tra đơn vị hiện tại có phải là đơn vị nhận yêu cầu không
-		$regModel = $this->loadModelById($registration_id);
-		if ($model->target_org_id != $regModel->property_id) {
-			Yii::app()->user->setFlash('error', 'Chỉ đơn vị nhận yêu cầu mới có thể huỷ liên quân.');
-			$this->redirect(array('view', 'id' => $registration_id));
-			return;
-		}
-
-		// Xoá alliance request
-		$result = AllianceRequests::deleteViaApi($request_id);
-
-		if ($result['success']) {
-			// Xoá relation_property_id trên registration
-			$regModel->relation_property_id = null;
-			$regModel->updateViaApi();
-
-			Yii::app()->user->setFlash('success', 'Đã huỷ liên quân thành công.');
-		} else {
-			Yii::app()->user->setFlash('error', isset($result['error']) ? $result['error'] : 'Không thể huỷ liên quân.');
-		}
-
-		$this->redirect(array('view', 'id' => $registration_id));
-	}
-
 	protected function loadModelById($id)
 	{
 		$model = Registrations::fetchFromApi($id);
