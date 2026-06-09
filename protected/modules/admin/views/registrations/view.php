@@ -178,11 +178,11 @@ if (!empty($model->document)) {
         table-layout: fixed;
         width: 100%;
     }
-    .content-table .col-stt { width: 50px; }
-    .content-table .col-name { width: auto; }
-    .content-table .col-count { width: 100px; }
+    .content-table .col-stt { width: 45px; }
+    .content-table .col-name { width: 150px; }
+    .content-table .col-count { width: 80px; }
     .content-table .col-list { width: auto; }
-    .content-table .col-action { width: 100px; }
+    .content-table .col-action { width: 90px; }
 </style>
 
 <?php if ((int)$model->status === Registrations::STATUS_REJECTED): ?>
