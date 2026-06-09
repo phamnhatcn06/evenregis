@@ -178,11 +178,26 @@ if (!empty($model->document)) {
         table-layout: fixed;
         width: 100%;
     }
-    .content-table .col-stt { width: 45px; }
-    .content-table .col-name { width: 150px; }
-    .content-table .col-count { width: 80px; }
-    .content-table .col-list { width: auto; }
-    .content-table .col-action { width: 90px; }
+
+    .content-table .col-stt {
+        width: 45px;
+    }
+
+    .content-table .col-name {
+        width: 200px;
+    }
+
+    .content-table .col-count {
+        width: 80px;
+    }
+
+    .content-table .col-list {
+        width: auto;
+    }
+
+    .content-table .col-action {
+        width: 90px;
+    }
 </style>
 
 <?php if ((int)$model->status === Registrations::STATUS_REJECTED): ?>
@@ -594,7 +609,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                 <div class="card-body">
                     <div class="row">
                         <?php if ($sportsHasAlliance): ?>
-                            <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="col-md-2 mb-2 mb-md-0">
 
                                 <?php $this->renderPartial('_alliance_sidebar', array(
                                     'pendingRequests' => $allianceByContent['sports']['pending'],
@@ -606,7 +621,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 
                             </div>
                         <?php endif; ?>
-                        <div class="<?php echo $sportsHasAlliance ? 'col-md-9' : 'col-12'; ?>">
+                        <div class="<?php echo $sportsHasAlliance ? 'col-md-10' : 'col-12'; ?>">
 
                             <?php if ($canEdit): ?>
                                 <!-- Form chọn liên quân và môn thể thao -->
@@ -687,7 +702,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                             <tr>
                                                 <th class="col-stt text-center">STT</th>
                                                 <th class="col-name">Môn thi đấu</th>
-                                                <th style="width:120px;">Tên đội</th>
+                                                <th style="width:200px;">Tên đội</th>
                                                 <th class="col-count text-center">Số VĐV</th>
                                                 <th class="col-list">Danh sách VĐV</th>
                                                 <?php if ($canEdit): ?>
@@ -837,7 +852,8 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php $compIdx = 0; foreach ($competitionRegistrations as $compId => $compData): $compIdx++; ?>
+                                            <?php $compIdx = 0;
+                                            foreach ($competitionRegistrations as $compId => $compData): $compIdx++; ?>
                                                 <tr data-competition-id="<?php echo $compId; ?>">
                                                     <td class="text-center"><?php echo $compIdx; ?></td>
                                                     <td><?php echo CHtml::encode($compData['competition_name']); ?></td>
@@ -973,7 +989,8 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php $talentIdx = 0; foreach ($talentEntries as $entry): $talentIdx++;
+                                                <?php $talentIdx = 0;
+                                                foreach ($talentEntries as $entry): $talentIdx++;
                                                     $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
                                                     $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
                                                     $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
