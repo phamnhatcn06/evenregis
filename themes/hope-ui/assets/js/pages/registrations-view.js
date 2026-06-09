@@ -574,8 +574,18 @@ var RegistrationView = (function() {
         }
         if (teamNameInput) {
             teamNameInput.value = '';
-            teamNameInput.readOnly = false;
+            teamNameInput.readOnly = true;
             teamNameInput.classList.remove('bg-light');
+        }
+
+        // Reset alliance checkbox
+        var isAllianceCheckbox = document.getElementById('sport_is_alliance');
+        var sportAllianceWrapper = document.getElementById('sport_alliance_wrapper');
+        if (isAllianceCheckbox) {
+            isAllianceCheckbox.checked = false;
+        }
+        if (sportAllianceWrapper) {
+            sportAllianceWrapper.classList.add('d-none');
         }
 
         // Reset button text and editing state
