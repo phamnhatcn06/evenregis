@@ -80,16 +80,59 @@ if (!$hasPending && !$hasActive && !$hasFilteredHistory) return;
         <?php endforeach; ?>
     <?php endif; ?>
 
-    <?php if ($hasHistory): ?>
+    <?php if ($hasActive): ?>
+        <div class="alliance-active-section mb-3">
+            <div class="alliance-section-title">
+                <i class="fa fa-link text-success"></i>
+                <span>Đang liên quân (<?php echo count($activeAlliances); ?>)</span>
+            </div>
+            <?php foreach ($activeAlliances as $item):
+                $req = $item['request'];
+                $reqId = isset($req->id) ? $req->id : 0;
+                $isSent = $item['type'] === 'sent';
+                $partnerName = $item['partner_name'];
+                $requestedAt = isset($req->requested_at) ? $req->requested_at : '';
+                // Chỉ cho xoá nếu là đơn vị nhận yêu cầu (received)
+                $canDelete = !$isSent;
+            ?>
+                <div class="alliance-active-card">
+                    <div class="alliance-active-icon">
+                        <i class="fa fa-handshake-o"></i>
+                    </div>
+                    <div class="alliance-active-content">
+                        <div class="alliance-active-partner">
+                            <strong><?php echo CHtml::encode($partnerName); ?></strong>
+                        </div>
+                        <div class="alliance-active-type">
+                            <?php echo $isSent ? '<span class="badge bg-info-light text-info">Đã gửi</span>' : '<span class="badge bg-success-light text-success">Đã nhận</span>'; ?>
+                        </div>
+                        <?php if ($requestedAt): ?>
+                            <div class="alliance-active-time"><i class="fa fa-clock-o"></i><?php echo MyHelper::formatDateTime($requestedAt); ?></div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($canDelete): ?>
+                        <div class="alliance-active-actions">
+                            <button type="button" class="btn-alliance-delete" onclick="confirmDeleteAlliance(<?php echo $reqId; ?>)" title="Huỷ liên quân">
+                                <i class="fa fa-times"></i>
+                            </button>
+                            <form id="delete-alliance-form-<?php echo $reqId; ?>" method="post" action="<?php echo $this->createUrl('deleteAlliance', array('request_id' => $reqId, 'registration_id' => $model->id)); ?>" style="display:none;"></form>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($hasFilteredHistory): ?>
         <div class="alliance-history-section">
             <a class="alliance-history-toggle" data-bs-toggle="collapse" href="#allianceHistory-<?php echo $contentCode; ?>" role="button" aria-expanded="false">
                 <i class="fa fa-history"></i>
-                <span>Lịch sử (<?php echo count($historyItems); ?>)</span>
+                <span>Lịch sử (<?php echo count($filteredHistory); ?>)</span>
                 <i class="fa fa-chevron-down toggle-icon"></i>
             </a>
             <div class="collapse" id="allianceHistory-<?php echo $contentCode; ?>">
                 <div class="alliance-history-list">
-                    <?php foreach ($historyItems as $idx => $item):
+                    <?php foreach ($filteredHistory as $idx => $item):
                         $req = $item['request'];
                         $isSent = $item['type'] === 'sent';
                         $partnerName = $item['partner_name'];
@@ -97,16 +140,8 @@ if (!$hasPending && !$hasActive && !$hasFilteredHistory) return;
                         $requestedAt = isset($req->requested_at) ? $req->requested_at : '';
                         $rejectionReason = isset($req->rejection_reason) ? $req->rejection_reason : '';
 
-                        if ($status == AllianceRequests::STATUS_APPROVED) {
-                            $statusClass = 'status-approved';
-                            $statusIcon = 'fa-check-circle';
-                        } elseif ($status == AllianceRequests::STATUS_REJECTED) {
-                            $statusClass = 'status-rejected';
-                            $statusIcon = 'fa-times-circle';
-                        } else {
-                            $statusClass = 'status-pending';
-                            $statusIcon = 'fa-clock-o';
-                        }
+                        $statusClass = 'status-rejected';
+                        $statusIcon = 'fa-times-circle';
                     ?>
                         <div class="alliance-history-item <?php echo $idx > 0 ? 'has-border' : ''; ?>">
                             <div class="alliance-history-status <?php echo $statusClass; ?>">
