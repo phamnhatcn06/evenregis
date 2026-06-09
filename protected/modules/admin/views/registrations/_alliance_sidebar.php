@@ -388,4 +388,107 @@ if (!$hasPending && !$hasActive && !$hasFilteredHistory) return;
     .alliance-history-reason i {
         margin-right: 4px;
     }
+
+    /* Active alliances */
+    .alliance-section-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #28a745;
+        margin-bottom: 10px;
+    }
+
+    .alliance-active-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 8px;
+        border-left: 3px solid #28a745;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .alliance-active-icon {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .alliance-active-icon i {
+        color: #28a745;
+        font-size: 14px;
+    }
+
+    .alliance-active-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .alliance-active-partner {
+        font-size: 13px;
+        color: #212529;
+    }
+
+    .alliance-active-type {
+        margin-top: 4px;
+    }
+
+    .alliance-active-type .badge {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+
+    .bg-info-light {
+        background: #d1ecf1;
+    }
+
+    .bg-success-light {
+        background: #d4edda;
+    }
+
+    .alliance-active-time {
+        font-size: 11px;
+        color: #adb5bd;
+        margin-top: 4px;
+    }
+
+    .alliance-active-time i {
+        margin-right: 4px;
+    }
+
+    .alliance-active-actions {
+        flex-shrink: 0;
+    }
+
+    .btn-alliance-delete {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1px solid #dc3545;
+        background: #fff;
+        color: #dc3545;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .btn-alliance-delete:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .btn-alliance-delete i {
+        font-size: 12px;
+    }
 </style>
