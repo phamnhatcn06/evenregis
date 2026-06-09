@@ -1760,8 +1760,10 @@ class RegistrationsController extends AdminController
 			$teamModel->name = $teamName ? $teamName : 'Team';
 			$teamModel->code = $teamName ? $teamName : 'TEAM';
 			$teamModel->team_name = $teamName;
-			$teamModel->is_alliance = empty($alliancePropertyIds) ? 0 : 1;
-			$teamModel->alliance_property_ids = $alliancePropertyIds;
+			// Xác định is_alliance từ checkbox hoặc từ alliance_property_ids
+			$teamModel->is_alliance = $isAlliance ? 1 : (!empty($alliancePropertyIds) ? 1 : 0);
+			// Lưu alliance_property_ids dưới dạng chuỗi id1,id2,id3 vào alliance_org_ids
+			$teamModel->alliance_property_ids = is_array($alliancePropertyIds) ? implode(',', $alliancePropertyIds) : $alliancePropertyIds;
 			$teamModel->status = SportTeams::STATUS_CONFIRMED;
 			$teamModel->registration_id = $registrationId;
 
