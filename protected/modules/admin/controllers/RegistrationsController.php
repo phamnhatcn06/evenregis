@@ -231,6 +231,14 @@ class RegistrationsController extends AdminController
 					$sportTeams[] = $team;
 					$membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
 
+					// Lấy property_name của team để fallback
+					$teamPropertyName = isset($team->property_name) ? $team->property_name : (isset($team['property_name']) ? $team['property_name'] : '');
+					if (empty($teamPropertyName) && $teamPropertyId == $model->property_id) {
+						$teamPropertyName = $model->property_name;
+					} elseif (empty($teamPropertyName) && $teamPropertyId == $model->relation_property_id) {
+						$teamPropertyName = $model->relation_property_name;
+					}
+
 					// Enrich member info from attendees map
 					$enrichedMembers = array();
 					foreach ($membersData as $member) {
@@ -249,6 +257,10 @@ class RegistrationsController extends AdminController
 						}
 						if (empty($memberArr['property_name']) && !empty($attInfo['property_name'])) {
 							$memberArr['property_name'] = $attInfo['property_name'];
+						}
+						// Fallback: lấy property_name từ team nếu vẫn chưa có
+						if (empty($memberArr['property_name']) && !empty($teamPropertyName)) {
+							$memberArr['property_name'] = $teamPropertyName;
 						}
 						$enrichedMembers[] = $memberArr;
 					}
