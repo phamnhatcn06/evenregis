@@ -21,8 +21,24 @@
                                 <div id="sport_selected_name" class="form-control bg-light d-none" style="pointer-events:none;"></div>
                             </div>
                             <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="sport_is_alliance" name="is_alliance" value="1">
+                                    <label class="form-check-label" for="sport_is_alliance">
+                                        <strong>Có liên quân?</strong>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mb-3 d-none" id="sport_alliance_wrapper">
+                                <label class="form-label">Chọn đơn vị liên quân <span class="text-danger">*</span></label>
+                                <div id="sport_alliance_list" class="border rounded p-2" style="max-height:150px;overflow-y:auto;">
+                                    <div class="text-muted small">Chưa có đơn vị liên quân nào được xác nhận.</div>
+                                </div>
+                                <small class="text-muted">Chỉ hiển thị đơn vị đã gửi yêu cầu liên quân và được xác nhận.</small>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Tên đội</label>
-                                <input type="text" class="form-control" name="team_name" id="sport_team_name" placeholder="Nhập tên đội (nếu có)">
+                                <input type="text" class="form-control" name="team_name" id="sport_team_name" placeholder="Tự động sinh theo liên quân" readonly>
+                                <small class="text-muted" id="sport_team_name_hint">Tên đội sẽ tự động sinh theo đơn vị liên quân.</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Ghi chú</label>
