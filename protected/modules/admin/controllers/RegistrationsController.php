@@ -3169,6 +3169,7 @@ class RegistrationsController extends AdminController
 		$attendee->property_id = $propertyId;
 		$attendee->full_name = Yii::app()->getRequest()->getPost('full_name');
 		$attendee->position = Yii::app()->getRequest()->getPost('position');
+		$attendee->gender = Yii::app()->getRequest()->getPost('gender');
 		$roleId = Yii::app()->getRequest()->getPost('role_id');
 		if (is_array($roleId)) {
 			$roleId = implode(', ', $roleId);
