@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Alliance sidebar partial - shows pending requests and history in a sidebar column
+ * Alliance sidebar partial - shows pending requests, active alliances, and history in a sidebar column
  *
  * @var array $pendingRequests
  * @var array $historyItems
@@ -12,7 +12,24 @@
 $hasPending = !empty($pendingRequests);
 $hasHistory = !empty($historyItems);
 
-if (!$hasPending && !$hasHistory) return;
+// Tách active alliances (approved) ra khỏi history
+$activeAlliances = array();
+$filteredHistory = array();
+if (!empty($historyItems)) {
+    foreach ($historyItems as $item) {
+        $req = $item['request'];
+        $status = isset($req->status) ? (int)$req->status : 0;
+        if ($status == AllianceRequests::STATUS_APPROVED) {
+            $activeAlliances[] = $item;
+        } else {
+            $filteredHistory[] = $item;
+        }
+    }
+}
+$hasActive = !empty($activeAlliances);
+$hasFilteredHistory = !empty($filteredHistory);
+
+if (!$hasPending && !$hasActive && !$hasFilteredHistory) return;
 ?>
 
 <div class="alliance-sidebar">
