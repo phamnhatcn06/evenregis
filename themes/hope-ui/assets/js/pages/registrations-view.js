@@ -2431,6 +2431,33 @@ var RegistrationView = (function() {
                 teamNameInput.classList.add('bg-light');
             }
 
+            // Set alliance checkbox và hiển thị đơn vị liên quân
+            var allianceCheckbox = document.getElementById('sport_is_alliance');
+            var allianceWrapper = document.getElementById('sport_alliance_wrapper');
+            var allianceList = document.getElementById('sport_alliance_list');
+            var isAlliance = team.is_alliance || (team.alliance_properties && team.alliance_properties.length > 0);
+
+            if (allianceCheckbox) {
+                allianceCheckbox.checked = isAlliance;
+                allianceCheckbox.disabled = true; // Không cho sửa khi edit
+            }
+
+            if (allianceWrapper && allianceList) {
+                if (isAlliance && team.alliance_properties && team.alliance_properties.length > 0) {
+                    allianceWrapper.classList.remove('d-none');
+                    var html = '';
+                    team.alliance_properties.forEach(function(prop) {
+                        html += '<div class="form-check">';
+                        html += '<input type="checkbox" class="form-check-input" checked disabled>';
+                        html += '<label class="form-check-label">' + prop + '</label>';
+                        html += '</div>';
+                    });
+                    allianceList.innerHTML = html;
+                } else {
+                    allianceWrapper.classList.add('d-none');
+                }
+            }
+
             // Load attendees then pre-select members (chỉ lấy những thành viên thuộc đơn vị mình)
             loadSportAttendees(function() {
                 sportSelectedAttendees = [];
