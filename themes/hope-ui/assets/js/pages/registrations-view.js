@@ -4786,6 +4786,7 @@ var RegistrationView = (function() {
         confirmDeleteAttendee: confirmDeleteAttendee,
         removeAllianceProperty: removeAllianceProperty,
         confirmDeleteTeam: confirmDeleteTeam,
+        confirmDeleteTeamMember: confirmDeleteTeamMember,
         removePendingSport: removePendingSport,
         removeAthleteFromSport: removeAthleteFromSport,
         editPendingSport: editPendingSport,
