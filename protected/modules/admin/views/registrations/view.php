@@ -756,18 +756,18 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                 <span class="badge bg-info ms-2"><i class="fa fa-handshake-o me-1"></i>Liên quân: <?php echo CHtml::encode(implode(', ', $teamData['alliance_properties'])); ?></span>
                                             <?php endif; ?>
                                         </div>
-                                        <?php if ($canEdit): ?>
+                                        <?php if ($canEdit && ($teamData['is_team_owner'] || $teamData['has_own_members'])): ?>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="RegistrationView.editSportTeam(<?php echo $teamData['team_id']; ?>)" title="Sửa danh sách VĐV">
                                                     <i class="fa fa-pencil me-1"></i>Sửa
                                                 </button>
-                                                <?php if (!$teamData['is_alliance']): ?>
+                                                <?php if (!$teamData['is_alliance'] && $teamData['is_team_owner']): ?>
                                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamData['team_id']; ?>)" title="Xóa đội">
                                                         <i class="fa fa-trash me-1"></i>Xóa
                                                     </button>
                                                 <?php endif; ?>
                                             </div>
-                                            <?php if (!$teamData['is_alliance']): ?>
+                                            <?php if (!$teamData['is_alliance'] && $teamData['is_team_owner']): ?>
                                                 <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamData['team_id'], 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamData['team_id']; ?>" style="display:none;"></form>
                                             <?php endif; ?>
                                         <?php endif; ?>
