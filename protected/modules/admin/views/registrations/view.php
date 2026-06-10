@@ -751,11 +751,15 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="RegistrationView.editSportTeam(<?php echo $teamData['team_id']; ?>)" title="Sửa danh sách VĐV">
                                                     <i class="fa fa-pencil me-1"></i>Sửa
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamData['team_id']; ?>)" title="Xóa đội">
-                                                    <i class="fa fa-trash me-1"></i>Xóa
-                                                </button>
+                                                <?php if (!$teamData['is_alliance']): ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamData['team_id']; ?>)" title="Xóa đội">
+                                                        <i class="fa fa-trash me-1"></i>Xóa
+                                                    </button>
+                                                <?php endif; ?>
                                             </div>
-                                            <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamData['team_id'], 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamData['team_id']; ?>" style="display:none;"></form>
+                                            <?php if (!$teamData['is_alliance']): ?>
+                                                <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamData['team_id'], 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamData['team_id']; ?>" style="display:none;"></form>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </div>
                                     <?php if ($teamData['is_alliance']): ?>
