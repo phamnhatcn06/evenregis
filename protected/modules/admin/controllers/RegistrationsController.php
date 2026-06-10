@@ -1955,6 +1955,53 @@ class RegistrationsController extends AdminController
 		}
 	}
 
+	public function actionDeleteTeamMember()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		$memberId = Yii::app()->getRequest()->getPost('member_id');
+		$teamId = Yii::app()->getRequest()->getPost('team_id');
+		$registrationId = Yii::app()->getRequest()->getPost('registration_id');
+
+		if (!$memberId || !$teamId || !$registrationId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin.'));
+			Yii::app()->end();
+		}
+
+		$this->checkRegistrationAccess($registrationId);
+		$registration = Registrations::fetchFromApi($registrationId);
+		$team = SportTeams::fetchFromApi($teamId);
+
+		if (!$team || !$registration) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy đội hoặc phiếu đăng ký.'));
+			Yii::app()->end();
+		}
+
+		// Chỉ cho phép xóa member thuộc đơn vị của mình
+		$member = SportTeamMembers::fetchFromApi($memberId);
+		if (!$member) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy thành viên.'));
+			Yii::app()->end();
+		}
+
+		// Kiểm tra attendee thuộc đơn vị nào
+		$attendee = Attendees::fetchFromApi($member->attendee_id);
+		if ($attendee && $attendee->property_id != $registration->property_id) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Bạn không có quyền xóa VĐV của đơn vị khác.'));
+			Yii::app()->end();
+		}
+
+		$result = SportTeamMembers::deleteViaApi($memberId);
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Đã xóa VĐV khỏi đội.'));
+		} else {
+			echo CJSON::encode(array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không thể xóa VĐV.'));
+		}
+		Yii::app()->end();
+	}
+
 	public function actionGetSportTeamDetail($id)
 	{
 		$team = SportTeams::fetchFromApi($id);
