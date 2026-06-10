@@ -5,6 +5,7 @@ Yii::import('application.models._base.BaseProperties');
 class Properties extends BaseProperties
 {
 	public $region_id;
+	public $has_golf;
 
 	public static function model($className = __CLASS__)
 	{
@@ -22,6 +23,9 @@ class Properties extends BaseProperties
 			$model->id = $id;
 			if (isset($data['region_id'])) {
 				$model->region_id = $data['region_id'];
+			}
+			if (isset($data['has_golf'])) {
+				$model->has_golf = (int)$data['has_golf'];
 			}
 			return $model;
 		}

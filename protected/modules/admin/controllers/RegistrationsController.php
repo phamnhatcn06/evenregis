@@ -2358,7 +2358,8 @@ class RegistrationsController extends AdminController
 					}
 				}
 			}
-
+			var_dump($property);
+			die;
 			// Lấy số lượng đã đăng ký cho từng cuộc thi của registration này
 			$registeredCounts = array();
 			if ($registrationId) {
