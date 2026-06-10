@@ -18,6 +18,8 @@ class AllianceRequests extends BaseAllianceRequests
 	public $event_content_id;
 	public $content_name;
 	public $event_content_name;
+	public $registration_id;
+	public $target_registration_id;
 
 	public static function model($className = __CLASS__)
 	{
