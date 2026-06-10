@@ -772,136 +772,55 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                             <?php endif; ?>
                                         <?php endif; ?>
                                     </div>
-                                    <?php if ($teamData['is_alliance']): ?>
-                                        <?php
-                                        // Nhóm thành viên theo đơn vị cho đội liên quân
-                                        $membersByProperty = array();
-                                        foreach ($teamData['members'] as $member) {
-                                            $propName = !empty($member['property_name']) ? $member['property_name'] : 'Chưa xác định';
-                                            if (!isset($membersByProperty[$propName])) {
-                                                $membersByProperty[$propName] = array();
-                                            }
-                                            $membersByProperty[$propName][] = $member;
-                                        }
-                                        // Đưa đơn vị chính lên đầu
-                                        $sortedProperties = array();
-                                        if (isset($membersByProperty[$model->property_name])) {
-                                            $sortedProperties[$model->property_name] = $membersByProperty[$model->property_name];
-                                        }
-                                        foreach ($membersByProperty as $propName => $members) {
-                                            if ($propName !== $model->property_name) {
-                                                $sortedProperties[$propName] = $members;
-                                            }
-                                        }
-                                        $overallIdx = 0;
-                                        ?>
-                                        <?php
-                                        $isOwnerProperty = ($propName === $model->property_name);
-                                        foreach ($sortedProperties as $propName => $propMembers):
-                                            $isOwnerProperty = ($propName === $model->property_name);
-                                        ?>
-                                            <div class="ms-3 mb-2">
-                                                <small class="fw-bold text-secondary">
-                                                    <i class="fa fa-building-o me-1"></i><?php echo CHtml::encode($propName); ?>
-                                                    <?php if ($isOwnerProperty): ?>
-                                                        <span class="badge bg-success ms-1">Đơn vị của bạn</span>
-                                                    <?php else: ?>
-                                                        <span class="badge bg-secondary ms-1">Đơn vị liên quân</span>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped table-sm mb-3 content-table">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width:50px;" class="text-center">STT</th>
+                                                    <th>Họ tên</th>
+                                                    <th style="width:100px;" class="text-center">Giới tính</th>
+                                                    <th style="width:200px;">Đơn vị</th>
+                                                    <?php if ($canEdit): ?>
+                                                        <th style="width:80px;" class="text-center">Thao tác</th>
                                                     <?php endif; ?>
-                                                    (<?php echo count($propMembers); ?> VĐV)
-                                                </small>
-                                            </div>
-                                            <div class="table-responsive ms-3">
-                                                <table class="table table-bordered table-striped table-sm mb-2 content-table">
-                                                    <thead class="table-light">
-                                                        <tr>
-                                                            <th class="col-stt text-center">STT</th>
-                                                            <th>Họ tên</th>
-                                                            <th style="width:100px;" class="text-center">Giới tính</th>
-                                                            <?php if ($canEdit && $isOwnerProperty): ?>
-                                                                <th style="width:80px;" class="text-center">Thao tác</th>
-                                                            <?php endif; ?>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php foreach ($propMembers as $idx => $member): $overallIdx++;
-                                                            $memberId = isset($member['id']) ? $member['id'] : null;
-                                                        ?>
-                                                            <tr>
-                                                                <td class="text-center"><?php echo $overallIdx; ?></td>
-                                                                <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
-                                                                <td class="text-center">
-                                                                    <?php
-                                                                    $gender = strtolower($member['gender']);
-                                                                    if ($gender === 'male' || $gender === 'nam') {
-                                                                        echo '<span class="badge bg-primary">Nam</span>';
-                                                                    } elseif ($gender === 'female' || $gender === 'nữ' || $gender === 'nu') {
-                                                                        echo '<span class="badge bg-danger">Nữ</span>';
-                                                                    } else {
-                                                                        echo '-';
-                                                                    }
-                                                                    ?>
-                                                                </td>
-                                                                <?php if ($canEdit && $isOwnerProperty && $memberId): ?>
-                                                                    <td class="text-center">
-                                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeamMember(<?php echo $memberId; ?>, <?php echo $teamData['team_id']; ?>)" title="Xóa khỏi đội">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </button>
-                                                                    </td>
-                                                                <?php endif; ?>
-                                                            </tr>
-                                                        <?php endforeach; ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-striped table-sm mb-3 content-table">
-                                                <thead class="table-light">
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($teamData['members'] as $idx => $member):
+                                                    $memberId = isset($member['id']) ? $member['id'] : null;
+                                                    $memberPropertyName = isset($member['property_name']) ? $member['property_name'] : '';
+                                                    $isOwnMember = ($memberPropertyName === $model->property_name);
+                                                ?>
                                                     <tr>
-                                                        <th class="col-stt text-center">STT</th>
-                                                        <th>Họ tên</th>
-                                                        <th style="width:100px;" class="text-center">Giới tính</th>
-                                                        <th>Đơn vị</th>
+                                                        <td class="text-center"><?php echo $idx + 1; ?></td>
+                                                        <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
+                                                        <td class="text-center">
+                                                            <?php
+                                                            $gender = strtolower($member['gender']);
+                                                            if ($gender === 'male' || $gender === 'nam') {
+                                                                echo '<span class="badge bg-primary">Nam</span>';
+                                                            } elseif ($gender === 'female' || $gender === 'nữ' || $gender === 'nu') {
+                                                                echo '<span class="badge bg-danger">Nữ</span>';
+                                                            } else {
+                                                                echo '-';
+                                                            }
+                                                            ?>
+                                                        </td>
+                                                        <td><?php echo CHtml::encode($memberPropertyName ?: '-'); ?></td>
                                                         <?php if ($canEdit): ?>
-                                                            <th style="width:80px;" class="text-center">Thao tác</th>
-                                                        <?php endif; ?>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php foreach ($teamData['members'] as $idx => $member):
-                                                        $memberId = isset($member['id']) ? $member['id'] : null;
-                                                    ?>
-                                                        <tr>
-                                                            <td class="text-center"><?php echo $idx + 1; ?></td>
-                                                            <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
                                                             <td class="text-center">
-                                                                <?php
-                                                                $gender = strtolower($member['gender']);
-                                                                if ($gender === 'male' || $gender === 'nam') {
-                                                                    echo '<span class="badge bg-primary">Nam</span>';
-                                                                } elseif ($gender === 'female' || $gender === 'nữ' || $gender === 'nu') {
-                                                                    echo '<span class="badge bg-danger">Nữ</span>';
-                                                                } else {
-                                                                    echo '-';
-                                                                }
-                                                                ?>
-                                                            </td>
-                                                            <td><?php echo CHtml::encode($member['property_name'] ?: '-'); ?></td>
-                                                            <?php if ($canEdit && $memberId): ?>
-                                                                <td class="text-center">
+                                                                <?php if ($isOwnMember && $memberId): ?>
                                                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeamMember(<?php echo $memberId; ?>, <?php echo $teamData['team_id']; ?>)" title="Xóa khỏi đội">
                                                                         <i class="fa fa-trash"></i>
                                                                     </button>
-                                                                </td>
-                                                            <?php endif; ?>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    <?php endif; ?>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                        <?php endif; ?>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div><!-- end main col -->
