@@ -36,7 +36,7 @@ class Attendees extends BaseAttendees
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path', 'length', 'max' => 500);
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path, approval_status, rejection_reason, personal_email', 'safe');
         $rules[] = array('approval_status, transport_id', 'numerical', 'integerOnly' => true);
-        $rules[] = array('join_hotel_date, check_in_date, check_out_date, transport_id, transport_name', 'safe');
+        $rules[] = array('join_hotel_date, check_in_date, check_out_date, transport_id, transport_name, gender', 'safe');
         return $rules;
     }
 
