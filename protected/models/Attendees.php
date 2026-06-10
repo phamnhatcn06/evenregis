@@ -23,6 +23,7 @@ class Attendees extends BaseAttendees
     public $check_out_date;
     public $transport_id;
     public $transport_name;
+    public $gender;
 
     public static function model($className = __CLASS__)
     {

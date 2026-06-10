@@ -331,14 +331,14 @@ class SportTeamsController extends AdminController
         }
         uksort($groupedSports, 'strnatcasecmp');
         foreach ($groupedSports as $groupName => &$items) {
-            usort($items, function($a, $b) {
+            usort($items, function ($a, $b) {
                 return strnatcasecmp($a['name'], $b['name']);
             });
         }
         unset($items);
 
         // Sắp xếp theo mã cụm (region_code)
-        uasort($teamsByRegion, function($a, $b) {
+        uasort($teamsByRegion, function ($a, $b) {
             return strcmp($a['region_code'], $b['region_code']);
         });
 
@@ -533,14 +533,14 @@ class SportTeamsController extends AdminController
         }
         uksort($groupedSports, 'strnatcasecmp');
         foreach ($groupedSports as $groupName => &$items) {
-            usort($items, function($a, $b) {
+            usort($items, function ($a, $b) {
                 return strnatcasecmp($a['name'], $b['name']);
             });
         }
         unset($items);
 
         // Sắp xếp theo mã cụm (region_code)
-        uasort($teamsByRegion, function($a, $b) {
+        uasort($teamsByRegion, function ($a, $b) {
             return strcmp($a['region_code'], $b['region_code']);
         });
 
@@ -564,7 +564,7 @@ class SportTeamsController extends AdminController
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
-        $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 100)->getData();
+        $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $id), 10000)->getData();
 
         $this->render('view', array(
             'model' => $model,
