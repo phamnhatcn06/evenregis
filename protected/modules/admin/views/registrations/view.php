@@ -700,22 +700,30 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                 $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
                                 $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
                                 $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
+                                $teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
                                 $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
 
                                 $allianceProperties = array();
                                 $membersList = array();
+                                $hasOwnMembers = false;
                                 foreach ($members as $member) {
                                     $memberPropertyName = isset($member['property_name']) ? $member['property_name'] : '';
+                                    $memberId = isset($member['id']) ? $member['id'] : null;
                                     $membersList[] = array(
+                                        'id' => $memberId,
                                         'attendee_name' => isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : ''),
                                         'gender' => isset($member['gender']) ? $member['gender'] : '',
                                         'property_name' => $memberPropertyName,
                                     );
+                                    if ($memberPropertyName === $model->property_name) {
+                                        $hasOwnMembers = true;
+                                    }
                                     if (!empty($memberPropertyName) && $memberPropertyName !== $model->property_name && !in_array($memberPropertyName, $allianceProperties)) {
                                         $allianceProperties[] = $memberPropertyName;
                                     }
                                 }
 
+                                $isTeamOwner = ($teamPropertyId == $model->property_id);
                                 $teamsData[] = array(
                                     'team_id' => $teamId,
                                     'sport_name' => $sportName,
@@ -723,6 +731,8 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                     'members' => $membersList,
                                     'alliance_properties' => $allianceProperties,
                                     'is_alliance' => !empty($allianceProperties),
+                                    'is_team_owner' => $isTeamOwner,
+                                    'has_own_members' => $hasOwnMembers,
                                 );
                             }
                             // Sắp xếp theo tên môn
