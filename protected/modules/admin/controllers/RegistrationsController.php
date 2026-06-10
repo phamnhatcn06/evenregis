@@ -202,28 +202,54 @@ class RegistrationsController extends AdminController
 			}
 
 			foreach ($teamsData as $team) {
-				$teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+				// Hỗ trợ cả object và array
+				$isObject = is_object($team);
+				$teamId = $isObject ? (isset($team->id) ? $team->id : null) : (isset($team['id']) ? $team['id'] : null);
 				if ($teamId) {
+					$sportName = $isObject ? (isset($team->sport_name) ? $team->sport_name : '') : (isset($team['sport_name']) ? $team['sport_name'] : '');
+					$sportId = $isObject ? (isset($team->sport_id) ? $team->sport_id : null) : (isset($team['sport_id']) ? $team['sport_id'] : null);
+
 					// Fetch sport name if not available
-					if (empty($team->sport_name) && $team->sport_id) {
-						$sport = Sports::fetchFromApi($team->sport_id);
-						$team->sport_name = $sport ? $sport->name : '';
+					if (empty($sportName) && $sportId) {
+						$sport = Sports::fetchFromApi($sportId);
+						$sportName = $sport ? $sport->name : '';
+						if ($isObject) {
+							$team->sport_name = $sportName;
+						} else {
+							$team['sport_name'] = $sportName;
+						}
 					}
 
 					// Chỉ hiển thị danh sách tham gia của đối tác ở các nội dung có số người min >= 3
-					$teamPropertyId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
+					$teamPropertyId = $isObject ? (isset($team->property_id) ? $team->property_id : null) : (isset($team['property_id']) ? $team['property_id'] : null);
 					if ($teamPropertyId != $model->property_id) {
-						$minPlayers = self::getSportMinPlayers($team->sport_name);
+						$minPlayers = self::getSportMinPlayers($sportName);
 						if ($minPlayers < 3) {
 							continue; // Bỏ qua đội của đối tác nếu số lượng người tối thiểu của môn < 3
 						}
 					}
 
+					// Convert to object for consistency
+					if (!$isObject) {
+						$teamObj = new stdClass();
+						foreach ($team as $key => $value) {
+							$teamObj->$key = $value;
+						}
+						$team = $teamObj;
+					}
 					$sportTeams[] = $team;
-					$membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+
+					// Kiểm tra xem API đã trả về members chưa
+					$membersData = array();
+					if (isset($team->members) && is_array($team->members)) {
+						$membersData = $team->members;
+					} else {
+						// Fallback: gọi API riêng để lấy members
+						$membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+					}
 
 					// Lấy property_name của team để fallback
-					$teamPropertyName = isset($team->property_name) ? $team->property_name : (isset($team['property_name']) ? $team['property_name'] : '');
+					$teamPropertyName = isset($team->property_name) ? $team->property_name : '';
 					if (empty($teamPropertyName) && $teamPropertyId == $model->property_id) {
 						$teamPropertyName = $model->property_name;
 					} elseif (empty($teamPropertyName) && $teamPropertyId == $model->relation_property_id) {
@@ -233,10 +259,11 @@ class RegistrationsController extends AdminController
 					// Enrich member info from attendees map
 					$enrichedMembers = array();
 					foreach ($membersData as $member) {
-						$attId = isset($member->attendee_id) ? $member->attendee_id : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
+						$memberIsObj = is_object($member);
+						$attId = $memberIsObj ? (isset($member->attendee_id) ? $member->attendee_id : null) : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
 						$attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
 
-						$memberArr = is_object($member) ? array_merge($member->attributes, get_object_vars($member)) : $member;
+						$memberArr = $memberIsObj ? (method_exists($member, 'getAttributes') ? array_merge($member->getAttributes(), get_object_vars($member)) : get_object_vars($member)) : $member;
 						if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
 							$memberArr['attendee_name'] = $attInfo['full_name'];
 						}
