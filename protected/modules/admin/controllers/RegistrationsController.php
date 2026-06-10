@@ -1151,66 +1151,29 @@ class RegistrationsController extends AdminController
 	 */
 	protected function validateCompetitionRequirements($model)
 	{
-		if (!$model->period_id || !$model->event_id) {
-			return null;
-		}
-
-		// Lấy content_ids của period
-		$contentIds = RegistrationPeriodContents::getContentIdsByPeriod($model->period_id);
-
-		// Chỉ validate nếu period có content_id = 2 (thi nghiệp vụ)
-		if (!in_array(2, $contentIds)) {
-			return null;
-		}
-
-		// Lấy danh sách cuộc thi của event từ event_competitions
-		$eventCompetitions = EventCompetitions::getByEventId($model->event_id);
-		if (empty($eventCompetitions)) {
-			return null;
-		}
-
-		// Lấy số người đã đăng ký thi nghiệp vụ của registration này
-		$compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $model->id), 500)->getData();
-
-		// Đếm số người đăng ký theo từng competition_id
-		$regCountByComp = array();
-		foreach ($compRegsData as $reg) {
-			$compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
-			if ($compId) {
-				if (!isset($regCountByComp[$compId])) {
-					$regCountByComp[$compId] = 0;
-				}
-				$regCountByComp[$compId]++;
-			}
-		}
-
-		// Validate từng cuộc thi
-		$errors = array();
-		foreach ($eventCompetitions as $ec) {
-			$compId = isset($ec['competition_id']) ? $ec['competition_id'] : (isset($ec->competition_id) ? $ec->competition_id : null);
-			if (!$compId) continue;
-
-			// Lấy thông tin cuộc thi để biết max_per_org và tên
-			$competition = Competitions::fetchFromApi($compId);
-			if (!$competition) continue;
-
-			$maxPerOrg = $competition->max_per_org ? (int)$competition->max_per_org : 0;
-
-			// Nếu max_per_org = 0 hoặc null thì không giới hạn, bỏ qua
-			if ($maxPerOrg <= 0) continue;
-
-			$currentCount = isset($regCountByComp[$compId]) ? $regCountByComp[$compId] : 0;
-
-			if ($currentCount < $maxPerOrg) {
-				$errors[] = "Cuộc thi \"{$competition->name}\" yêu cầu đủ {$maxPerOrg} người, hiện có {$currentCount} người";
-			}
-		}
-
-		if (!empty($errors)) {
-			return 'Không thể nộp đăng ký. ' . implode('. ', $errors) . '.';
-		}
-
+		// Không kiểm tra validation, luôn cho phép submit
+		// Có nội dung nào thì gửi nội dung đó
 		return null;
+	}
+
+	/**
+	 * Tính số lượng người tham dự cho competition
+	 * Đối với đơn vị có has_golf = 1: nhân đôi số lượng cho competition id = 3 và id = 4
+	 * @param int $competitionId
+	 * @param int $count Số lượng gốc
+	 * @param object $property Thông tin property
+	 * @return int
+	 */
+	protected function getCompetitionAttendeeCount($competitionId, $count, $property)
+	{
+		$hasGolf = isset($property->has_golf) ? (int)$property->has_golf : 0;
+
+		// Nếu đơn vị có has_golf = 1 và competition_id là 3 hoặc 4 thì nhân đôi
+		if ($hasGolf == 1 && in_array($competitionId, array(3, 4))) {
+			return $count * 2;
+		}
+
+		return $count;
 	}
 
 	protected function deleteAllianceRequest($eventId, $requesterOrgId, $targetOrgId)
@@ -1406,7 +1369,6 @@ class RegistrationsController extends AdminController
 				}
 			}
 		}
-
 		// Add new ones
 		$errors = array();
 		if (!empty($targetOrgIds)) {
@@ -2848,7 +2810,6 @@ class RegistrationsController extends AdminController
 				$debugErrors[] = array('attendee_id' => $staffId, 'error' => $result);
 			}
 		}
-
 		$message = "Đã đăng ký thành công {$successCount} người tham dự thi nghiệp vụ.";
 		if ($errorCount > 0) {
 			$message .= " Có {$errorCount} người không đăng ký được.";
@@ -2862,7 +2823,7 @@ class RegistrationsController extends AdminController
 		$registrations = CompetitionRegistrations::getApiDataProvider(array(
 			'registration_id' => $registrationId,
 			'competition_id'  => $competitionId,
-		), 100)->getData();
+		), 10000)->getData();
 
 		// Load attendees map để lấy thông tin chi tiết
 		$attendeesMap = array();
@@ -4524,142 +4485,141 @@ class RegistrationsController extends AdminController
 			$model = $this->loadModelById($id);
 			$errors = array();
 
-		// 1. Kiểm tra yêu cầu liên quân gửi đi (nếu có relation_property_id)
-		if ($model->relation_property_id) {
-			$allianceRequest = AllianceRequests::findByRegistration(
-				$model->event_id,
-				$model->property_id,
-				$model->relation_property_id
-			);
-			if (!$allianceRequest) {
+			// 1. Kiểm tra yêu cầu liên quân gửi đi (nếu có relation_property_id)
+			if ($model->relation_property_id) {
 				$allianceRequest = AllianceRequests::findByRegistration(
 					$model->event_id,
-					$model->relation_property_id,
-					$model->property_id
+					$model->property_id,
+					$model->relation_property_id
 				);
+				if (!$allianceRequest) {
+					$allianceRequest = AllianceRequests::findByRegistration(
+						$model->event_id,
+						$model->relation_property_id,
+						$model->property_id
+					);
+				}
+
+				if (!$allianceRequest) {
+					$errors[] = 'Chưa gửi yêu cầu liên quân với đơn vị đối tác.';
+				} else if ($allianceRequest->status != AllianceRequests::STATUS_APPROVED) {
+					$statusLabel = 'chưa được duyệt';
+					if ($allianceRequest->status == AllianceRequests::STATUS_PENDING) {
+						$statusLabel = 'đang chờ xác nhận';
+					} else if ($allianceRequest->status == AllianceRequests::STATUS_REJECTED) {
+						$statusLabel = 'đã bị từ chối';
+					} else if ($allianceRequest->status == AllianceRequests::STATUS_CANCELLED) {
+						$statusLabel = 'đã bị hủy';
+					}
+					$errors[] = "Yêu cầu liên quân giữa đơn vị của bạn và đơn vị đối tác {$statusLabel}.";
+				}
 			}
 
-			if (!$allianceRequest) {
-				$errors[] = 'Chưa gửi yêu cầu liên quân với đơn vị đối tác.';
-			} else if ($allianceRequest->status != AllianceRequests::STATUS_APPROVED) {
-				$statusLabel = 'chưa được duyệt';
-				if ($allianceRequest->status == AllianceRequests::STATUS_PENDING) {
-					$statusLabel = 'đang chờ xác nhận';
-				} else if ($allianceRequest->status == AllianceRequests::STATUS_REJECTED) {
-					$statusLabel = 'đã bị từ chối';
-				} else if ($allianceRequest->status == AllianceRequests::STATUS_CANCELLED) {
-					$statusLabel = 'đã bị hủy';
-				}
-				$errors[] = "Yêu cầu liên quân giữa đơn vị của bạn và đơn vị đối tác {$statusLabel}.";
+			// 2. Kiểm tra các yêu cầu liên quân gửi đến đang chờ duyệt (STATUS_PENDING)
+			$incomingAllianceRequests = AllianceRequests::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'target_org_id' => $model->property_id,
+				'status' => AllianceRequests::STATUS_PENDING,
+			), 100)->getData();
+
+			if (!empty($incomingAllianceRequests)) {
+				$errors[] = 'Đơn vị của bạn đang có yêu cầu liên quân gửi đến chưa xử lý. Vui lòng duyệt hoặc từ chối yêu cầu liên quân trước khi gửi duyệt phiếu.';
 			}
-		}
 
-		// 2. Kiểm tra các yêu cầu liên quân gửi đến đang chờ duyệt (STATUS_PENDING)
-		$incomingAllianceRequests = AllianceRequests::getApiDataProvider(array(
-			'event_id' => $model->event_id,
-			'target_org_id' => $model->property_id,
-			'status' => AllianceRequests::STATUS_PENDING,
-		), 100)->getData();
+			// 3. Kiểm tra số lượng thành viên đội thi đấu thể thao
+			$sportTeams = SportTeams::getApiDataProvider(array('registration_id' => $id), 100)->getData();
+			foreach ($sportTeams as $team) {
+				$teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+				$teamName = isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : 'Không rõ tên');
+				$sportId = isset($team->sport_id) ? $team->sport_id : (isset($team['sport_id']) ? $team['sport_id'] : null);
+				$sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
 
-		if (!empty($incomingAllianceRequests)) {
-			$errors[] = 'Đơn vị của bạn đang có yêu cầu liên quân gửi đến chưa xử lý. Vui lòng duyệt hoặc từ chối yêu cầu liên quân trước khi gửi duyệt phiếu.';
-		}
+				if (!$teamId) continue;
 
-		// 3. Kiểm tra số lượng thành viên đội thi đấu thể thao
-		$sportTeams = SportTeams::getApiDataProvider(array('registration_id' => $id), 100)->getData();
-		foreach ($sportTeams as $team) {
-			$teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
-			$teamName = isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : 'Không rõ tên');
-			$sportId = isset($team->sport_id) ? $team->sport_id : (isset($team['sport_id']) ? $team['sport_id'] : null);
-			$sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
-
-			if (!$teamId) continue;
-
-			// Lấy thông tin môn thể thao để lấy max_per_team_member
-			$sport = $sportId ? Sports::fetchFromApi($sportId) : null;
-			$maxPerTeam = 0;
-			if ($sport && isset($sport->max_per_team_member) && $sport->max_per_team_member !== null && $sport->max_per_team_member !== '') {
-				$maxPerTeam = (int)$sport->max_per_team_member;
-				if (empty($sportName)) {
-					$sportName = $sport->name;
+				// Lấy thông tin môn thể thao để lấy max_per_team_member
+				$sport = $sportId ? Sports::fetchFromApi($sportId) : null;
+				$maxPerTeam = 0;
+				if ($sport && isset($sport->max_per_team_member) && $sport->max_per_team_member !== null && $sport->max_per_team_member !== '') {
+					$maxPerTeam = (int)$sport->max_per_team_member;
+					if (empty($sportName)) {
+						$sportName = $sport->name;
+					}
+				} else {
+					$maxPerTeam = self::getSportMaxPlayers($sportName);
 				}
+
+				// Đếm số thành viên trong đội
+				$membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+				$memberCount = count($membersData);
+
+				if ($maxPerTeam > 0 && $memberCount > $maxPerTeam) {
+					$errors[] = "Đội \"{$teamName}\" (môn {$sportName}) có {$memberCount} thành viên, vượt quá giới hạn {$maxPerTeam} người.";
+				}
+			}
+
+			// 4. Kiểm tra thông tin người tham dự (Attendees)
+			$attendees = Attendees::getByRegistrationId($id);
+			if (empty($attendees)) {
+				$errors[] = 'Phiếu đăng ký chưa có người tham dự nào.';
 			} else {
-				$maxPerTeam = self::getSportMaxPlayers($sportName);
-			}
+				// Lấy danh sách ID thí sinh thi Miss trong event này để kiểm tra email cá nhân
+				$missAttendeeEmails = array();
+				$contests = BeautyContests::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
+				foreach ($contests as $contest) {
+					$contestId = isset($contest->id) ? $contest->id : (isset($contest['id']) ? $contest['id'] : null);
+					if ($contestId) {
+						$contestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 500)->getData();
+						foreach ($contestants as $c) {
+							$attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
+							$cEmail = isset($c->personal_email) ? $c->personal_email : (isset($c['personal_email']) ? $c['personal_email'] : null);
+							if ($attId) {
+								$missAttendeeEmails[$attId] = $cEmail;
+							}
+						}
+					}
+				}
 
-			// Đếm số thành viên trong đội
-			$membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
-			$memberCount = count($membersData);
+				foreach ($attendees as $att) {
+					$name = isset($att['full_name']) ? $att['full_name'] : 'Không rõ tên';
+					$attId = isset($att['id']) ? $att['id'] : null;
 
-			if ($maxPerTeam > 0 && $memberCount > $maxPerTeam) {
-				$errors[] = "Đội \"{$teamName}\" (môn {$sportName}) có {$memberCount} thành viên, vượt quá giới hạn {$maxPerTeam} người.";
-			}
-		}
+					// Kiểm tra 4 tệp tài liệu bắt buộc
+					$missingDocs = array();
+					if (empty($att['cccd_front_path'])) {
+						$missingDocs[] = 'CCCD mặt trước';
+					}
+					if (empty($att['cccd_back_path'])) {
+						$missingDocs[] = 'CCCD mặt sau';
+					}
+					if (empty($att['portrait_path'])) {
+						$missingDocs[] = 'Ảnh chân dung';
+					}
+					if (empty($att['contract_path'])) {
+						$missingDocs[] = 'Hợp đồng lao động';
+					}
 
-		// 4. Kiểm tra thông tin người tham dự (Attendees)
-		$attendees = Attendees::getByRegistrationId($id);
-		if (empty($attendees)) {
-			$errors[] = 'Phiếu đăng ký chưa có người tham dự nào.';
-		} else {
-			// Lấy danh sách ID thí sinh thi Miss trong event này để kiểm tra email cá nhân
-			$missAttendeeEmails = array();
-			$contests = BeautyContests::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
-			foreach ($contests as $contest) {
-				$contestId = isset($contest->id) ? $contest->id : (isset($contest['id']) ? $contest['id'] : null);
-				if ($contestId) {
-					$contestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 500)->getData();
-					foreach ($contestants as $c) {
-						$attId = isset($c->attendee_id) ? $c->attendee_id : (isset($c['attendee_id']) ? $c['attendee_id'] : null);
-						$cEmail = isset($c->personal_email) ? $c->personal_email : (isset($c['personal_email']) ? $c['personal_email'] : null);
-						if ($attId) {
-							$missAttendeeEmails[$attId] = $cEmail;
+					if (!empty($missingDocs)) {
+						$errors[] = "Người tham dự \"{$name}\" chưa tải lên đủ tệp đính kèm bắt buộc: " . implode(', ', $missingDocs) . '.';
+					}
+
+					// Kiểm tra email cá nhân cho thí sinh thi Miss
+					if ($attId && array_key_exists($attId, $missAttendeeEmails)) {
+						$emailToCheck = !empty($att['personal_email']) ? $att['personal_email'] : $missAttendeeEmails[$attId];
+						if (empty($emailToCheck)) {
+							$errors[] = "Thí sinh thi Miss \"{$name}\" chưa điền email cá nhân.";
 						}
 					}
 				}
 			}
 
-			foreach ($attendees as $att) {
-				$name = isset($att['full_name']) ? $att['full_name'] : 'Không rõ tên';
-				$attId = isset($att['id']) ? $att['id'] : null;
-
-				// Kiểm tra 4 tệp tài liệu bắt buộc
-				$missingDocs = array();
-				if (empty($att['cccd_front_path'])) {
-					$missingDocs[] = 'CCCD mặt trước';
-				}
-				if (empty($att['cccd_back_path'])) {
-					$missingDocs[] = 'CCCD mặt sau';
-				}
-				if (empty($att['portrait_path'])) {
-					$missingDocs[] = 'Ảnh chân dung';
-				}
-				if (empty($att['contract_path'])) {
-					$missingDocs[] = 'Hợp đồng lao động';
-				}
-
-				if (!empty($missingDocs)) {
-					$errors[] = "Người tham dự \"{$name}\" chưa tải lên đủ tệp đính kèm bắt buộc: " . implode(', ', $missingDocs) . '.';
-				}
-
-				// Kiểm tra email cá nhân cho thí sinh thi Miss
-				if ($attId && array_key_exists($attId, $missAttendeeEmails)) {
-					$emailToCheck = !empty($att['personal_email']) ? $att['personal_email'] : $missAttendeeEmails[$attId];
-					if (empty($emailToCheck)) {
-						$errors[] = "Thí sinh thi Miss \"{$name}\" chưa điền email cá nhân.";
-					}
-				}
+			if (!empty($errors)) {
+				echo CJSON::encode(array(
+					'success' => false,
+					'errors' => $errors,
+				));
+			} else {
+				echo CJSON::encode(array('success' => true));
 			}
-		}
-
-		if (!empty($errors)) {
-			echo CJSON::encode(array(
-				'success' => false,
-				'errors' => $errors,
-			));
-		} else {
-			echo CJSON::encode(array('success' => true));
-		}
-
 		} catch (CHttpException $e) {
 			echo CJSON::encode(array(
 				'success' => false,
