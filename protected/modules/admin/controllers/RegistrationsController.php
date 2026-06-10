@@ -193,20 +193,22 @@ class RegistrationsController extends AdminController
 			$teamsData = SportTeams::getApiDataProvider(array('registration_id' => $model->id), 100)->getData();
 
 			// Tải thêm các đội liên quân mà đơn vị này tham gia (alliance_org_ids chứa property_id)
-			$allianceTeamsData = SportTeams::getApiDataProvider(array(
-				'event_id' => $model->event_id,
-				'alliance_org_id' => $model->property_id,
-			), 100)->getData();
-			if (!empty($allianceTeamsData)) {
-				$existingTeamIds = array();
-				foreach ($teamsData as $t) {
-					$tid = isset($t->id) ? $t->id : (isset($t['id']) ? $t['id'] : null);
-					if ($tid) $existingTeamIds[] = $tid;
-				}
-				foreach ($allianceTeamsData as $at) {
-					$atid = isset($at->id) ? $at->id : (isset($at['id']) ? $at['id'] : null);
-					if ($atid && !in_array($atid, $existingTeamIds)) {
-						$teamsData[] = $at;
+			$allEventTeams = SportTeams::getApiDataProvider(array('event_id' => $model->event_id), 200)->getData();
+			$existingTeamIds = array();
+			foreach ($teamsData as $t) {
+				$tid = isset($t->id) ? $t->id : (isset($t['id']) ? $t['id'] : null);
+				if ($tid) $existingTeamIds[] = $tid;
+			}
+			foreach ($allEventTeams as $et) {
+				$etid = isset($et->id) ? $et->id : (isset($et['id']) ? $et['id'] : null);
+				if ($etid && !in_array($etid, $existingTeamIds)) {
+					// Kiểm tra xem alliance_org_ids có chứa property_id của đơn vị hiện tại không
+					$allianceIds = isset($et->alliance_org_ids) ? $et->alliance_org_ids : (isset($et['alliance_org_ids']) ? $et['alliance_org_ids'] : '');
+					if (!empty($allianceIds)) {
+						$allianceIdArr = array_map('trim', explode(',', $allianceIds));
+						if (in_array((string)$model->property_id, $allianceIdArr)) {
+							$teamsData[] = $et;
+						}
 					}
 				}
 			}
