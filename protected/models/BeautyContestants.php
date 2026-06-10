@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 Yii::import('application.models._base.BaseBeautyContestants');
 
@@ -93,6 +93,7 @@ class BeautyContestants extends BaseBeautyContestants
         if ($this->note) {
             $data['note'] = $this->note;
         }
+        var_dump(json_encode($data));die;
         return ApiClient::post(ApiEndpoints::BEAUTY_CONTESTANT_STORE, $data);
     }
 

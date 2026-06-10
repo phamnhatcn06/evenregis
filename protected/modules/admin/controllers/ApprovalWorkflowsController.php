@@ -169,7 +169,6 @@ class ApprovalworkflowsController extends AdminController
                         $organization_id = Properties::fetchByCode($user['Employee']['Hotel']['Code']);
                         $approver->organization_id = isset($organization_id->id) ? $organization_id->id : null;
                         $approver->is_active = 1;
-
                         $result = $approver->storeViaApi();
                         if ($result['success']) {
                             $successCount++;

@@ -4038,12 +4038,12 @@ class RegistrationsController extends AdminController
 		$startNum = $contest->candidate_start ?: 1;
 
 		$existingContestants = BeautyContestants::getApiDataProvider(array('contest_id' => $contestId), 1000)->getData();
-		$nextNum = $startNum + count($existingContestants);
 
 		$successCount = 0;
 		$errors = array();
 		foreach ($attendeeIds as $attendeeId) {
-			$candidateNumber = $prefix . $attendeeId;
+			$suffix = chr(mt_rand(65, 90)); // A-Z để tránh trùng khi delete rồi add lại
+				$candidateNumber = $prefix . $attendeeId . $suffix;
 			$model = new BeautyContestants;
 			$model->contest_id = $contestId;
 			$model->attendee_id = $attendeeId;
@@ -4055,7 +4055,6 @@ class RegistrationsController extends AdminController
 			$result = $model->storeViaApi();
 			if ($result['success']) {
 				$successCount++;
-				$nextNum++;
 			} else {
 				$errors[] = isset($result['error']) ? $result['error'] : 'Lỗi không xác định';
 			}
