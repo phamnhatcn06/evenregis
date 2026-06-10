@@ -1220,10 +1220,12 @@ class RegistrationsController extends AdminController
 		}
 
 		// Nếu chưa có targetRegistrationId, tự động tìm registration của đơn vị nhận
+		// Điều kiện: cùng event_id, cùng period_id, deleted_at IS NULL
 		if (!$targetRegistrationId && $targetOrgId && $eventId) {
 			$params = array(
 				'event_id' => $eventId,
 				'property_id' => $targetOrgId,
+				'deleted_at' => 'null',
 			);
 			if ($periodId) {
 				$params['period_id'] = $periodId;
