@@ -505,6 +505,9 @@ var RegistrationView = (function() {
                     return;
                 }
 
+                // Reset modal state trước khi mở (tránh bị disable từ lần edit trước)
+                resetSportModalUI();
+
                 // Lấy tên môn đã chọn
                 var sportName = sportSelect.options[sportSelect.selectedIndex].text;
 
@@ -549,7 +552,7 @@ var RegistrationView = (function() {
 
                 // Load attendees
                 loadSportAttendees();
-                
+
                 updateSportTeamName(sportName);
             });
         }
