@@ -185,39 +185,20 @@ class RegistrationsController extends AdminController
 		}
 		unset($compData);
 
-		// Load Sport Teams cho đơn vị
+		// Load Sport Teams cho đơn vị (bao gồm cả đội liên quân)
 		$sportTeams = array();
 		$sportTeamMembers = array();
 		if ($model->event_id && $model->property_id) {
-			// Tải đội của đơn vị hiện tại theo registration_id
-			$teamsData = SportTeams::getApiDataProvider(array('registration_id' => $model->id), 100)->getData();
-
-			// Tải thêm các đội liên quân mà đơn vị này tham gia (alliance_org_ids chứa property_id)
-			$allEventTeams = SportTeams::getApiDataProvider(array('event_id' => $model->event_id), 200)->getData();
-			$existingTeamIds = array();
-			foreach ($teamsData as $t) {
-				$tid = isset($t->id) ? $t->id : (isset($t['id']) ? $t['id'] : null);
-				if ($tid) $existingTeamIds[] = $tid;
-			}
-			$currentPropertyId = (string)$model->property_id;
-			foreach ($allEventTeams as $et) {
-				$etid = isset($et->id) ? $et->id : (isset($et['id']) ? $et['id'] : null);
-				if ($etid && !in_array($etid, $existingTeamIds)) {
-					// Kiểm tra xem alliance_org_ids có chứa property_id của đơn vị hiện tại không
-					$allianceIds = '';
-					if (is_object($et)) {
-						$allianceIds = isset($et->alliance_org_ids) ? $et->alliance_org_ids : '';
-					} else {
-						$allianceIds = isset($et['alliance_org_ids']) ? $et['alliance_org_ids'] : '';
-					}
-					if (!empty($allianceIds)) {
-						$allianceIdArr = array_map('trim', explode(',', $allianceIds));
-						if (in_array($currentPropertyId, $allianceIdArr)) {
-							$teamsData[] = $et;
-							$existingTeamIds[] = $etid;
-						}
-					}
-				}
+			// Gọi API list-by-property để lấy tất cả đội của đơn vị (kể cả đội liên quân)
+			$apiResult = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST_BY_PROPERTY, array(
+				'property_id' => $model->property_id,
+				'event_id' => $model->event_id,
+			));
+			$teamsData = array();
+			if ($apiResult['success'] && isset($apiResult['data']['data'])) {
+				$teamsData = $apiResult['data']['data'];
+			} elseif ($apiResult['success'] && isset($apiResult['data']) && is_array($apiResult['data'])) {
+				$teamsData = $apiResult['data'];
 			}
 
 			foreach ($teamsData as $team) {
