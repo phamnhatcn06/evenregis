@@ -199,15 +199,22 @@ class RegistrationsController extends AdminController
 				$tid = isset($t->id) ? $t->id : (isset($t['id']) ? $t['id'] : null);
 				if ($tid) $existingTeamIds[] = $tid;
 			}
+			$currentPropertyId = (string)$model->property_id;
 			foreach ($allEventTeams as $et) {
 				$etid = isset($et->id) ? $et->id : (isset($et['id']) ? $et['id'] : null);
 				if ($etid && !in_array($etid, $existingTeamIds)) {
 					// Kiểm tra xem alliance_org_ids có chứa property_id của đơn vị hiện tại không
-					$allianceIds = isset($et->alliance_org_ids) ? $et->alliance_org_ids : (isset($et['alliance_org_ids']) ? $et['alliance_org_ids'] : '');
+					$allianceIds = '';
+					if (is_object($et)) {
+						$allianceIds = isset($et->alliance_org_ids) ? $et->alliance_org_ids : '';
+					} else {
+						$allianceIds = isset($et['alliance_org_ids']) ? $et['alliance_org_ids'] : '';
+					}
 					if (!empty($allianceIds)) {
 						$allianceIdArr = array_map('trim', explode(',', $allianceIds));
-						if (in_array((string)$model->property_id, $allianceIdArr)) {
+						if (in_array($currentPropertyId, $allianceIdArr)) {
 							$teamsData[] = $et;
+							$existingTeamIds[] = $etid;
 						}
 					}
 				}
