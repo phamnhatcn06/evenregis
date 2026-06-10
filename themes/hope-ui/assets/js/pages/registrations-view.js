@@ -56,6 +56,7 @@ var RegistrationView = (function() {
         propertyId = config.propertyId;
         propertyCode = config.propertyCode;
         isHotel = config.isHotel || false;
+        hasGolf = config.hasGolf || false;
         registeredSports = config.registeredSports || [];
         registeredCompetitions = config.registeredCompetitions || [];
         existingStaffIds = config.existingStaffIds || [];
