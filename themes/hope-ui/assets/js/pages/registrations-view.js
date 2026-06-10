@@ -3108,6 +3108,7 @@ var RegistrationView = (function() {
             var subInfo = [];
             if (staff.department_name) subInfo.push(staff.department_name);
             if (staff.position) subInfo.push(staff.position);
+            if (staff.gender) subInfo.push(staff.gender === 'male' || staff.gender === 'Nam' ? 'Nam' : (staff.gender === 'female' || staff.gender === 'Nữ' ? 'Nữ' : staff.gender));
             if (staff.join_hotel_date) subInfo.push('Vào: ' + formatDate(staff.join_hotel_date));
             item.innerHTML = '<small>' + escapeHtml(staff.display) + '</small>' +
                 (subInfo.length ? '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(subInfo.join(' - ')) + '</span>' : '');
