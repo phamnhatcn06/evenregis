@@ -2347,6 +2347,18 @@ class RegistrationsController extends AdminController
 		} elseif ($content_type === 'competition') {
 			$competitions = EventCompetitions::getByEventId($event_id);
 
+			// Lấy has_golf từ registration property
+			$hasGolf = 0;
+			if ($registrationId) {
+				$registration = Registrations::fetchFromApi($registrationId);
+				if ($registration && $registration->property_id) {
+					$property = Properties::fetchFromApi($registration->property_id);
+					if ($property && isset($property->has_golf)) {
+						$hasGolf = (int)$property->has_golf;
+					}
+				}
+			}
+
 			// Lấy số lượng đã đăng ký cho từng cuộc thi của registration này
 			$registeredCounts = array();
 			if ($registrationId) {
@@ -2375,6 +2387,11 @@ class RegistrationsController extends AdminController
 					if ($competition) {
 						$maxPerOrg = $competition->max_per_org ? (int)$competition->max_per_org : 0;
 					}
+				}
+
+				// Nếu đơn vị có has_golf = 1 và competition_id là 3 hoặc 4 thì nhân đôi max_per_org
+				if ($hasGolf == 1 && in_array($compId, array(3, 4))) {
+					$maxPerOrg = $maxPerOrg * 2;
 				}
 
 				// Bỏ qua nếu đã đăng ký đủ số lượng (max_per_org > 0 và đã đạt giới hạn)
