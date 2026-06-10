@@ -1333,12 +1333,22 @@ foreach ($attendees as $att) {
     }
 }
 
+// Lấy has_golf từ property
+$hasGolf = 0;
+if ($model->property_id) {
+    $property = Properties::fetchFromApi($model->property_id);
+    if ($property && isset($property->has_golf)) {
+        $hasGolf = (int)$property->has_golf;
+    }
+}
+
 $jsConfig = array(
     'eventId' => $model->event_id ? $model->event_id : null,
     'registrationId' => $model->id,
     'propertyId' => $model->property_id,
     'propertyCode' => isset($model->property_code) ? $model->property_code : '',
     'isHotel' => $isHotel,
+    'hasGolf' => $hasGolf,
     'registeredSports' => $sportIds,
     'registeredCompetitions' => $competitionIds,
     'existingStaffIds' => $existingStaffIds,
