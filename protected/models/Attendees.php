@@ -212,7 +212,8 @@ class Attendees extends BaseAttendees
             'check_in_date',
             'check_out_date',
             'transport_id',
-            'personal_email'
+            'personal_email',
+            'gender'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
