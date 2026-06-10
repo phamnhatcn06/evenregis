@@ -192,31 +192,21 @@ class RegistrationsController extends AdminController
 			// Tải đội của đơn vị hiện tại theo registration_id
 			$teamsData = SportTeams::getApiDataProvider(array('registration_id' => $model->id), 100)->getData();
 
-			// Nếu liên quân đã được duyệt, tải thêm các đội thi đấu thể thao của đối tác liên quân
-			if ($isAllianceApproved && $model->relation_property_id) {
-				$partnerRegs = Registrations::getApiDataProvider(array(
-					'event_id' => $model->event_id,
-					'property_id' => $model->relation_property_id,
-				), 1)->getData();
-				if (!empty($partnerRegs)) {
-					$partnerReg = $partnerRegs[0];
-					$partnerRegId = isset($partnerReg['id']) ? $partnerReg['id'] : (isset($partnerReg->id) ? $partnerReg->id : null);
-					if ($partnerRegId) {
-						$partnerTeamsData = SportTeams::getApiDataProvider(array('registration_id' => $partnerRegId), 100)->getData();
-						if (!empty($partnerTeamsData)) {
-							// Merge và đánh dấu các đội không trùng
-							$existingTeamIds = array();
-							foreach ($teamsData as $t) {
-								$tid = isset($t->id) ? $t->id : (isset($t['id']) ? $t['id'] : null);
-								if ($tid) $existingTeamIds[] = $tid;
-							}
-							foreach ($partnerTeamsData as $pt) {
-								$ptid = isset($pt->id) ? $pt->id : (isset($pt['id']) ? $pt['id'] : null);
-								if ($ptid && !in_array($ptid, $existingTeamIds)) {
-									$teamsData[] = $pt;
-								}
-							}
-						}
+			// Tải thêm các đội liên quân mà đơn vị này tham gia (alliance_org_ids chứa property_id)
+			$allianceTeamsData = SportTeams::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'alliance_org_id' => $model->property_id,
+			), 100)->getData();
+			if (!empty($allianceTeamsData)) {
+				$existingTeamIds = array();
+				foreach ($teamsData as $t) {
+					$tid = isset($t->id) ? $t->id : (isset($t['id']) ? $t['id'] : null);
+					if ($tid) $existingTeamIds[] = $tid;
+				}
+				foreach ($allianceTeamsData as $at) {
+					$atid = isset($at->id) ? $at->id : (isset($at['id']) ? $at['id'] : null);
+					if ($atid && !in_array($atid, $existingTeamIds)) {
+						$teamsData[] = $at;
 					}
 				}
 			}
