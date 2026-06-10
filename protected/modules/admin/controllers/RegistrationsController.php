@@ -4651,7 +4651,6 @@ class RegistrationsController extends AdminController
 			}
 		}
 
-		header('Content-Type: application/json');
 		if (!empty($errors)) {
 			echo CJSON::encode(array(
 				'success' => false,
@@ -4659,6 +4658,19 @@ class RegistrationsController extends AdminController
 			));
 		} else {
 			echo CJSON::encode(array('success' => true));
+		}
+
+		} catch (CHttpException $e) {
+			echo CJSON::encode(array(
+				'success' => false,
+				'errors' => array($e->getMessage()),
+			));
+		} catch (Exception $e) {
+			Yii::log('checkSubmitValid error: ' . $e->getMessage(), CLogger::LEVEL_ERROR);
+			echo CJSON::encode(array(
+				'success' => false,
+				'errors' => array('Lỗi hệ thống: ' . $e->getMessage()),
+			));
 		}
 		Yii::app()->end();
 	}
