@@ -747,9 +747,14 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                             <?php endif; ?>
                                         </div>
                                         <?php if ($canEdit): ?>
-                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="RegistrationView.editSportTeam(<?php echo $teamData['team_id']; ?>)" title="Sửa danh sách VĐV">
-                                                <i class="fa fa-pencil me-1"></i>Sửa
-                                            </button>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="RegistrationView.editSportTeam(<?php echo $teamData['team_id']; ?>)" title="Sửa danh sách VĐV">
+                                                    <i class="fa fa-pencil me-1"></i>Sửa
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeam(<?php echo $teamData['team_id']; ?>)" title="Xóa đội">
+                                                    <i class="fa fa-trash me-1"></i>Xóa
+                                                </button>
+                                            </div>
                                         <?php endif; ?>
                                     </div>
                                     <?php if ($teamData['is_alliance']): ?>
