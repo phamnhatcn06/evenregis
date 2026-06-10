@@ -773,15 +773,15 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                         <?php endif; ?>
                                     </div>
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped table-sm mb-3 content-table">
+                                        <table class="table table-bordered table-striped table-sm mb-3">
                                             <thead class="table-light">
                                                 <tr>
                                                     <th style="width:50px;" class="text-center">STT</th>
-                                                    <th>Họ tên</th>
-                                                    <th style="width:100px;" class="text-center">Giới tính</th>
-                                                    <th style="width:200px;">Đơn vị</th>
+                                                    <th style="width:180px;">Họ tên</th>
+                                                    <th style="width:80px;" class="text-center">Giới tính</th>
+                                                    <th>Đơn vị</th>
                                                     <?php if ($canEdit): ?>
-                                                        <th style="width:80px;" class="text-center">Thao tác</th>
+                                                        <th style="width:70px;" class="text-center">Thao tác</th>
                                                     <?php endif; ?>
                                                 </tr>
                                             </thead>
@@ -789,17 +789,17 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                 <?php foreach ($teamData['members'] as $idx => $member):
                                                     $memberId = isset($member['id']) ? $member['id'] : null;
                                                     $memberPropertyName = isset($member['property_name']) ? $member['property_name'] : '';
+                                                    $memberGender = isset($member['gender']) ? strtolower($member['gender']) : '';
                                                     $isOwnMember = ($memberPropertyName === $model->property_name);
                                                 ?>
                                                     <tr>
                                                         <td class="text-center"><?php echo $idx + 1; ?></td>
-                                                        <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
+                                                        <td><?php echo CHtml::encode(isset($member['attendee_name']) ? $member['attendee_name'] : ''); ?></td>
                                                         <td class="text-center">
                                                             <?php
-                                                            $gender = strtolower($member['gender']);
-                                                            if ($gender === 'male' || $gender === 'nam') {
+                                                            if ($memberGender === 'male' || $memberGender === 'nam') {
                                                                 echo '<span class="badge bg-primary">Nam</span>';
-                                                            } elseif ($gender === 'female' || $gender === 'nữ' || $gender === 'nu') {
+                                                            } elseif ($memberGender === 'female' || $memberGender === 'nữ' || $memberGender === 'nu') {
                                                                 echo '<span class="badge bg-danger">Nữ</span>';
                                                             } else {
                                                                 echo '-';
