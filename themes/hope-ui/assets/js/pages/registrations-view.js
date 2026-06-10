@@ -2388,6 +2388,52 @@ var RegistrationView = (function() {
         });
     }
 
+    function confirmDeleteTeamMember(memberId, teamId) {
+        Swal.fire({
+            title: 'Xóa VĐV khỏi đội?',
+            text: "VĐV này sẽ bị xóa khỏi đội thi đấu. Bạn có chắc chắn?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Có, xóa ngay!',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Đang xử lý...",
+                    text: "Vui lòng chờ trong giây lát.",
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
+                fetch(window.BASE_URL + '/admin/registrations/deleteTeamMember', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: 'member_id=' + memberId + '&team_id=' + teamId + '&registration_id=' + registrationId
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    Swal.close();
+                    if (data.success) {
+                        Toast.success(data.message || 'Đã xóa VĐV khỏi đội.');
+                        location.reload();
+                    } else {
+                        Toast.error(data.error || 'Không thể xóa VĐV.');
+                    }
+                })
+                .catch(function(err) {
+                    Swal.close();
+                    Toast.error('Lỗi kết nối. Vui lòng thử lại.');
+                });
+            }
+        });
+    }
+
     var editingTeamId = null;
     var editingTeamMaxMembers = null;
     var editingTeamAllianceMemberCount = 0;
