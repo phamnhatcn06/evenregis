@@ -230,6 +230,7 @@ class ApiEndpoints
     const SPORT_TEAM_DETAIL = '/api/sport-teams/detail/{id}';
     const SPORT_TEAM_UPDATE = '/api/sport-teams/update/{id}';
     const SPORT_TEAM_DESTROY = '/api/sport-teams/destroy/{id}';
+    const SPORT_TEAM_LIST_BY_PROPERTY = '/api/sport-teams/list-by-property';
 
     // Sport Team Member
     const SPORT_TEAM_MEMBER_LIST = '/api/sport-team-members';
