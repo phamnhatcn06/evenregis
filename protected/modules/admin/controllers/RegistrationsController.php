@@ -4516,10 +4516,13 @@ class RegistrationsController extends AdminController
 
 	public function actionCheckSubmitValid($id)
 	{
-		$this->checkRegistrationAccess($id);
+		header('Content-Type: application/json');
 
-		$model = $this->loadModelById($id);
-		$errors = array();
+		try {
+			$this->checkRegistrationAccess($id);
+
+			$model = $this->loadModelById($id);
+			$errors = array();
 
 		// 1. Kiểm tra yêu cầu liên quân gửi đi (nếu có relation_property_id)
 		if ($model->relation_property_id) {
