@@ -854,10 +854,15 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                         <th>Họ tên</th>
                                                         <th style="width:100px;" class="text-center">Giới tính</th>
                                                         <th>Đơn vị</th>
+                                                        <?php if ($canEdit): ?>
+                                                            <th style="width:80px;" class="text-center">Thao tác</th>
+                                                        <?php endif; ?>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <?php foreach ($teamData['members'] as $idx => $member): ?>
+                                                    <?php foreach ($teamData['members'] as $idx => $member):
+                                                        $memberId = isset($member['id']) ? $member['id'] : null;
+                                                    ?>
                                                         <tr>
                                                             <td class="text-center"><?php echo $idx + 1; ?></td>
                                                             <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
@@ -874,6 +879,13 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                                 ?>
                                                             </td>
                                                             <td><?php echo CHtml::encode($member['property_name'] ?: '-'); ?></td>
+                                                            <?php if ($canEdit && $memberId): ?>
+                                                                <td class="text-center">
+                                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeamMember(<?php echo $memberId; ?>, <?php echo $teamData['team_id']; ?>)" title="Xóa khỏi đội">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </button>
+                                                                </td>
+                                                            <?php endif; ?>
                                                         </tr>
                                                     <?php endforeach; ?>
                                                 </tbody>
