@@ -1657,14 +1657,9 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         };
 
         fetch((window.BASE_URL || "") + "/admin/registrations/checkSubmitValid?id=' . $model->id . '")
-            .then(function(response) {
-                console.log("Response status:", response.status);
-                return response.text();
-            })
+            .then(function(response) { return response.text(); })
             .then(function(text) {
-                console.log("Response text:", text);
-                var data = JSON.parse(text);
-                console.log("Parsed data:", data);
+                var data = JSON.parse(text.replace(/^﻿/, ""));
                 Swal.close();
 
                 if (!data.success) {
