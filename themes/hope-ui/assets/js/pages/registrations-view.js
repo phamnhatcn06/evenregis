@@ -4,6 +4,7 @@ var RegistrationView = (function() {
     var propertyId = null;
     var propertyCode = null;
     var isHotel = false;
+    var hasGolf = false;
     var contentsData = [];
     var registeredSports = [];
     var registeredCompetitions = [];
