@@ -718,6 +718,10 @@ var RegistrationView = (function() {
             .then(function(data) {
                 if (data.success && data.data) {
                     maxPerOrg = data.data.max_per_org || 0;
+                    // Nếu đơn vị có has_golf = 1 và competition_id là 3 hoặc 4 thì nhân đôi
+                    if (hasGolf && (competitionId == 3 || competitionId == 4)) {
+                        maxPerOrg = maxPerOrg * 2;
+                    }
                     document.getElementById('comp_max_per_org').value = maxPerOrg > 0 ? maxPerOrg : 'Không giới hạn';
                     document.getElementById('max_count').textContent = maxPerOrg > 0 ? maxPerOrg : '∞';
                 }
