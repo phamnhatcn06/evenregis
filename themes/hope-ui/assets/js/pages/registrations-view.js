@@ -2123,6 +2123,10 @@ var RegistrationView = (function() {
             .then(function(data) {
                 if (data.success && data.data) {
                     editCompMaxPerOrg = data.data.max_per_org || 0;
+                    // Nếu đơn vị có has_golf = 1 và competition_id là 3 hoặc 4 thì nhân đôi
+                    if (hasGolf && (competitionId == 3 || competitionId == 4)) {
+                        editCompMaxPerOrg = editCompMaxPerOrg * 2;
+                    }
                     document.getElementById('edit_comp_max_per_org').value = editCompMaxPerOrg > 0 ? editCompMaxPerOrg : 'Không giới hạn';
                     document.getElementById('edit_max_count').textContent = editCompMaxPerOrg > 0 ? editCompMaxPerOrg : '∞';
                 }
