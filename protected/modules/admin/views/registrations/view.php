@@ -797,9 +797,10 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                         <td><?php echo CHtml::encode(isset($member['attendee_name']) ? $member['attendee_name'] : ''); ?></td>
                                                         <td class="text-center">
                                                             <?php
-                                                            if ($memberGender === 'male' || $memberGender === 'nam') {
+                                                            $genderVal = isset($member['gender']) ? $member['gender'] : '';
+                                                            if ($genderVal === 1 || $genderVal === '1' || $genderVal === 'male' || $genderVal === 'nam') {
                                                                 echo '<span class="badge bg-primary">Nam</span>';
-                                                            } elseif ($memberGender === 'female' || $memberGender === 'nữ' || $memberGender === 'nu') {
+                                                            } elseif ($genderVal === 2 || $genderVal === '2' || $genderVal === 'female' || $genderVal === 'nữ' || $genderVal === 'nu') {
                                                                 echo '<span class="badge bg-danger">Nữ</span>';
                                                             } else {
                                                                 echo '-';
