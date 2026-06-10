@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 Yii::import('application.models._base.BaseAllianceRequests');
 
@@ -90,17 +90,15 @@ class AllianceRequests extends BaseAllianceRequests
 	public function updateViaApi()
 	{
 		// Only send specific fields that are allowed to be updated for an Alliance Request
-		$allowedFields = array('status', 'reviewed_by', 'reviewed_at', 'rejection_reason', 'note');
+		$allowedFields = array('status', 'reviewed_by', 'reviewed_at', 'rejection_reason', 'note', 'registration_id', 'target_registration_id');
 		$data = array();
 		foreach ($allowedFields as $field) {
 			if ($this->$field !== null && $this->$field !== '') {
 				$data[$field] = $this->$field;
 			}
 		}
-
 		$url = ApiEndpoints::url(ApiEndpoints::ALLIANCE_REQUEST_UPDATE, array('id' => $this->id));
 		$result = ApiClient::post($url, $data);
-
 		if ($result['success'] && isset($result['data']['code']) && $result['data']['code'] >= 400) {
 			$result['success'] = false;
 			$result['error'] = isset($result['data']['message']) ? $result['data']['message'] : 'API error';

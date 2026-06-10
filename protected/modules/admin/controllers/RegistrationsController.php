@@ -192,7 +192,7 @@ class RegistrationsController extends AdminController
 			// Tải đội của đơn vị hiện tại theo registration_id
 			$teamsData = SportTeams::getApiDataProvider(array('registration_id' => $model->id), 100)->getData();
 
-			// Nếu liên quân đã được duyệt, tải thêm các đội thi đấu thể thao của đối tác liên quân theo registration_id của đối tác
+			// Nếu liên quân đã được duyệt, tải thêm các đội thi đấu thể thao của đối tác liên quân
 			if ($isAllianceApproved && $model->relation_property_id) {
 				$partnerRegs = Registrations::getApiDataProvider(array(
 					'event_id' => $model->event_id,
@@ -204,7 +204,18 @@ class RegistrationsController extends AdminController
 					if ($partnerRegId) {
 						$partnerTeamsData = SportTeams::getApiDataProvider(array('registration_id' => $partnerRegId), 100)->getData();
 						if (!empty($partnerTeamsData)) {
-							$teamsData = array_merge($teamsData, $partnerTeamsData);
+							// Merge và đánh dấu các đội không trùng
+							$existingTeamIds = array();
+							foreach ($teamsData as $t) {
+								$tid = isset($t->id) ? $t->id : (isset($t['id']) ? $t['id'] : null);
+								if ($tid) $existingTeamIds[] = $tid;
+							}
+							foreach ($partnerTeamsData as $pt) {
+								$ptid = isset($pt->id) ? $pt->id : (isset($pt['id']) ? $pt['id'] : null);
+								if ($ptid && !in_array($ptid, $existingTeamIds)) {
+									$teamsData[] = $pt;
+								}
+							}
 						}
 					}
 				}
@@ -4043,7 +4054,7 @@ class RegistrationsController extends AdminController
 		$errors = array();
 		foreach ($attendeeIds as $attendeeId) {
 			$suffix = chr(mt_rand(65, 90)); // A-Z để tránh trùng khi delete rồi add lại
-				$candidateNumber = $prefix . $attendeeId . $suffix;
+			$candidateNumber = $prefix . $attendeeId . $suffix;
 			$model = new BeautyContestants;
 			$model->contest_id = $contestId;
 			$model->attendee_id = $attendeeId;
