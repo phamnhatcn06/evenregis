@@ -804,9 +804,9 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                 <small class="fw-bold text-secondary">
                                                     <i class="fa fa-building-o me-1"></i><?php echo CHtml::encode($propName); ?>
                                                     <?php if ($isOwnerProperty): ?>
-                                                        <span class="badge bg-success ms-1">Đơn vị chủ quản</span>
+                                                        <span class="badge bg-success ms-1">Đơn vị của bạn</span>
                                                     <?php else: ?>
-                                                        <span class="badge bg-warning text-dark ms-1">Liên quân</span>
+                                                        <span class="badge bg-secondary ms-1">Đơn vị liên quân</span>
                                                     <?php endif; ?>
                                                     (<?php echo count($propMembers); ?> VĐV)
                                                 </small>
