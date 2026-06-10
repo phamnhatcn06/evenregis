@@ -755,6 +755,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                     <i class="fa fa-trash me-1"></i>Xóa
                                                 </button>
                                             </div>
+                                            <form method="post" action="<?php echo $this->createUrl('deleteSportTeam', array('id' => $teamData['team_id'], 'registration_id' => $model->id)); ?>" id="delete-team-form-<?php echo $teamData['team_id']; ?>" style="display:none;"></form>
                                         <?php endif; ?>
                                     </div>
                                     <?php if ($teamData['is_alliance']): ?>
