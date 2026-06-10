@@ -785,11 +785,15 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                         }
                                         $overallIdx = 0;
                                         ?>
-                                        <?php foreach ($sortedProperties as $propName => $propMembers): ?>
+                                        <?php
+                                        $isOwnerProperty = ($propName === $model->property_name);
+                                        foreach ($sortedProperties as $propName => $propMembers):
+                                            $isOwnerProperty = ($propName === $model->property_name);
+                                        ?>
                                             <div class="ms-3 mb-2">
                                                 <small class="fw-bold text-secondary">
                                                     <i class="fa fa-building-o me-1"></i><?php echo CHtml::encode($propName); ?>
-                                                    <?php if ($propName === $model->property_name): ?>
+                                                    <?php if ($isOwnerProperty): ?>
                                                         <span class="badge bg-success ms-1">Đơn vị chủ quản</span>
                                                     <?php else: ?>
                                                         <span class="badge bg-warning text-dark ms-1">Liên quân</span>
@@ -804,10 +808,15 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                             <th class="col-stt text-center">STT</th>
                                                             <th>Họ tên</th>
                                                             <th style="width:100px;" class="text-center">Giới tính</th>
+                                                            <?php if ($canEdit && $isOwnerProperty): ?>
+                                                                <th style="width:80px;" class="text-center">Thao tác</th>
+                                                            <?php endif; ?>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <?php foreach ($propMembers as $idx => $member): $overallIdx++; ?>
+                                                        <?php foreach ($propMembers as $idx => $member): $overallIdx++;
+                                                            $memberId = isset($member['id']) ? $member['id'] : null;
+                                                        ?>
                                                             <tr>
                                                                 <td class="text-center"><?php echo $overallIdx; ?></td>
                                                                 <td><?php echo CHtml::encode($member['attendee_name']); ?></td>
@@ -823,6 +832,13 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                                                                     }
                                                                     ?>
                                                                 </td>
+                                                                <?php if ($canEdit && $isOwnerProperty && $memberId): ?>
+                                                                    <td class="text-center">
+                                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTeamMember(<?php echo $memberId; ?>, <?php echo $teamData['team_id']; ?>)" title="Xóa khỏi đội">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </button>
+                                                                    </td>
+                                                                <?php endif; ?>
                                                             </tr>
                                                         <?php endforeach; ?>
                                                     </tbody>
