@@ -61,7 +61,22 @@ class ApproveRegistrationsController extends AdminController
             $model->period_name = $period ? $period->name : '';
         }
 
-        // Load attendees
+        // Load period contents - danh sách nội dung được phép đăng ký trong đợt này
+        $periodContentCodes = array();
+        if ($model->period_id) {
+            $periodContents = RegistrationPeriodContents::getContentsByPeriod($model->period_id);
+            foreach ($periodContents as $pc) {
+                $contentId = is_array($pc) ? (isset($pc['content_id']) ? $pc['content_id'] : null) : (isset($pc->content_id) ? $pc->content_id : null);
+                if ($contentId) {
+                    $content = Contents::fetchFromApi($contentId);
+                    if ($content && $content->code) {
+                        $periodContentCodes[] = $content->code;
+                    }
+                }
+            }
+        }
+
+        // Load attendees - chỉ lấy của registration này
         $attendees = Attendees::getByRegistrationId($id);
         $attendeesMap = array();
         foreach ($attendees as $att) {
