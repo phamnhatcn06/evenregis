@@ -637,9 +637,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                     <tr class="table-warning">
                                                         <td colspan="3" class="text-end fw-bold">Tổng <?php echo CHtml::encode($regionName); ?>:</td>
                                                         <?php foreach ($activeSportsForReport as $spId => $spName): ?>
-                                                            <td class="text-center fw-bold"><?php echo $regionTotals[$spId]['team_count']; ?></td>
-                                                            <td class="text-center fw-bold"><?php echo $regionTotals[$spId]['member_count']; ?></td>
-                                                            <td></td>
+                                                            <td class="col-num fw-bold"><?php echo $regionTotals[$spId]['team_count']; ?></td>
+                                                            <td class="col-num fw-bold"><?php echo $regionTotals[$spId]['member_count']; ?></td>
+                                                            <td class="col-note"></td>
                                                         <?php endforeach; ?>
                                                     </tr>
                                                 <?php endforeach; ?>
