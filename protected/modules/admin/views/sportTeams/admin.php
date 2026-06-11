@@ -191,119 +191,157 @@ Yii::app()->clientScript->registerScriptFile(
         z-index: 99998 !important;
     }
 
-    /* Sticky/Frozen columns for sports summary tables */
-    #sports-summary-table, #tableSportsSummary {
+    /* Sports Summary Table */
+    #sports-summary-table {
         border-collapse: separate !important;
         border-spacing: 0 !important;
-        border-left: 1px solid #dee2e6 !important;
-        border-top: 1px solid #dee2e6 !important;
         width: max-content !important;
         min-width: 100% !important;
     }
 
-    #sports-summary-table th, #sports-summary-table td,
-    #tableSportsSummary th, #tableSportsSummary td {
-        border-right: 1px solid #dee2e6 !important;
-        border-bottom: 1px solid #dee2e6 !important;
+    #sports-summary-table th,
+    #sports-summary-table td {
+        border: 1px solid #dee2e6 !important;
+        vertical-align: middle !important;
     }
 
-    /* STT column */
-    #sports-summary-table thead tr:first-child th:nth-child(1),
-    #tableSportsSummary thead tr:first-child th:nth-child(1) {
+    /* Column widths - uniform for data columns */
+    #sports-summary-table .col-data {
+        width: 55px !important;
+        min-width: 55px !important;
+        max-width: 55px !important;
+        padding: 4px 2px !important;
+        font-size: 12px !important;
+    }
+
+    /* Frozen columns - STT */
+    #sports-summary-table thead tr:first-child th:nth-child(1) {
         position: sticky !important;
         left: 0 !important;
-        z-index: 10 !important;
-        background-color: #3a57e8 !important;
-        width: 60px !important;
-        min-width: 60px !important;
-        max-width: 60px !important;
+        z-index: 12 !important;
+        background: #3a57e8 !important;
+        color: #fff !important;
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
     }
-    #sports-summary-table tbody tr:not(.table-warning) td:nth-child(1),
-    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(1) {
-        position: sticky !important;
-        left: 0 !important;
-        z-index: 8 !important;
-        background-color: #ffffff !important;
-        width: 60px !important;
-        min-width: 60px !important;
-        max-width: 60px !important;
-    }
-
-    /* Cụm column */
-    #sports-summary-table thead tr:first-child th:nth-child(2),
-    #tableSportsSummary thead tr:first-child th:nth-child(2) {
-        position: sticky !important;
-        left: 60px !important;
-        z-index: 10 !important;
-        background-color: #3a57e8 !important;
-        width: 150px !important;
-        min-width: 150px !important;
-        max-width: 150px !important;
-    }
-    #sports-summary-table tbody tr:not(.table-warning) td:nth-child(2),
-    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(2) {
-        position: sticky !important;
-        left: 60px !important;
-        z-index: 8 !important;
-        background-color: #ffffff !important;
-        width: 150px !important;
-        min-width: 150px !important;
-        max-width: 150px !important;
-    }
-
-    /* Tên ĐV column */
-    #sports-summary-table thead tr:first-child th:nth-child(3),
-    #tableSportsSummary thead tr:first-child th:nth-child(3) {
-        position: sticky !important;
-        left: 210px !important;
-        z-index: 10 !important;
-        background-color: #3a57e8 !important;
-        width: 200px !important;
-        min-width: 200px !important;
-        max-width: 200px !important;
-    }
-    #sports-summary-table tbody tr:not(.table-warning) td:nth-child(3),
-    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(3) {
-        position: sticky !important;
-        left: 210px !important;
-        z-index: 8 !important;
-        background-color: #ffffff !important;
-        width: 200px !important;
-        min-width: 200px !important;
-        max-width: 200px !important;
-    }
-
-    /* Subtotal row (colspan="3") */
-    #sports-summary-table tbody tr.table-warning td:first-child,
-    #tableSportsSummary tbody tr.table-warning td:first-child {
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(1) {
         position: sticky !important;
         left: 0 !important;
         z-index: 8 !important;
-        background-color: #fff3cd !important;
-        width: 410px !important;
-        min-width: 410px !important;
-        max-width: 410px !important;
+        background: #fff !important;
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        box-shadow: 1px 0 0 #dee2e6;
     }
 
-    /* Grand Total row (colspan="3") */
-    #sports-summary-table tfoot tr td:first-child,
-    #tableSportsSummary tfoot tr td:first-child {
+    /* Frozen columns - Cụm */
+    #sports-summary-table thead tr:first-child th:nth-child(2) {
+        position: sticky !important;
+        left: 50px !important;
+        z-index: 12 !important;
+        background: #3a57e8 !important;
+        color: #fff !important;
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+    }
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(2) {
+        position: sticky !important;
+        left: 50px !important;
+        z-index: 8 !important;
+        background: #f8f9fa !important;
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+        box-shadow: 1px 0 0 #dee2e6;
+    }
+
+    /* Frozen columns - Tên ĐV */
+    #sports-summary-table thead tr:first-child th:nth-child(3) {
+        position: sticky !important;
+        left: 170px !important;
+        z-index: 12 !important;
+        background: #3a57e8 !important;
+        color: #fff !important;
+        width: 180px !important;
+        min-width: 180px !important;
+        max-width: 180px !important;
+        border-right: 2px solid #1e3a8a !important;
+    }
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(3) {
+        position: sticky !important;
+        left: 170px !important;
+        z-index: 8 !important;
+        background: #fff !important;
+        width: 180px !important;
+        min-width: 180px !important;
+        max-width: 180px !important;
+        border-right: 2px solid #dee2e6 !important;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+
+    /* Header row 2 (Đội, VĐV, G.Chú) */
+    #sports-summary-table thead tr:nth-child(2) th {
+        background: #e9ecef !important;
+        color: #495057 !important;
+        font-size: 11px !important;
+        padding: 4px 2px !important;
+    }
+
+    /* Sport group headers */
+    #sports-summary-table thead tr:first-child th.sport-header {
+        background: #0dcaf0 !important;
+        color: #000 !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        padding: 6px 4px !important;
+    }
+
+    /* Subtotal row */
+    #sports-summary-table tbody tr.table-warning td:first-child {
         position: sticky !important;
         left: 0 !important;
         z-index: 8 !important;
-        background-color: #d1e7dd !important;
-        width: 410px !important;
-        min-width: 410px !important;
-        max-width: 410px !important;
+        background: #fff3cd !important;
+        border-right: 2px solid #ffc107 !important;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+    #sports-summary-table tbody tr.table-warning td {
+        background: #fff3cd !important;
+        font-weight: 600 !important;
     }
 
-    /* Hover effect for row with sticky cells */
-    #sports-summary-table tbody tr:not(.table-warning):hover td:nth-child(1),
-    #sports-summary-table tbody tr:not(.table-warning):hover td:nth-child(2),
-    #sports-summary-table tbody tr:not(.table-warning):hover td:nth-child(3),
-    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(1),
-    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(2),
-    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(3) {
-        background-color: #f1f3f5 !important;
+    /* Grand Total row */
+    #sports-summary-table tbody tr.table-success td:first-child,
+    #sports-summary-table tfoot tr td:first-child {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 8 !important;
+        background: #198754 !important;
+        color: #fff !important;
+        border-right: 2px solid #146c43 !important;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+    #sports-summary-table tbody tr.table-success td,
+    #sports-summary-table tfoot tr td {
+        background: #198754 !important;
+        color: #fff !important;
+    }
+
+    /* Hover effect */
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td {
+        background: #e3f2fd !important;
+    }
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:nth-child(1),
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:nth-child(2),
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:nth-child(3) {
+        background: #bbdefb !important;
+    }
+
+    /* Alternating row colors */
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):nth-child(even) td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)) {
+        background: #f8f9fa;
     }
 </style>
