@@ -286,12 +286,24 @@ Yii::app()->clientScript->registerScriptFile(
         width: 50px !important;
         min-width: 50px !important;
     }
-    #sports-summary-table tbody td:nth-child(2) {
+    #sports-summary-table tbody td:nth-child(2),
+    #sports-summary-table tbody td[rowspan] {
         background: #f8f9fa !important;
         width: 120px !important;
         min-width: 120px !important;
+        font-weight: 600;
+        vertical-align: middle !important;
     }
-    #sports-summary-table tbody td:nth-child(3) {
+    #sports-summary-table tbody td:nth-child(3),
+    #sports-summary-table tbody tr td:nth-child(2):not([rowspan]) {
+        background: #fff !important;
+        width: 180px !important;
+        min-width: 180px !important;
+        border-right: 2px solid #dee2e6 !important;
+    }
+
+    /* For rows where region is merged, 3rd visible cell is property name */
+    #sports-summary-table tbody tr:not(:first-child) td:nth-child(2):not([rowspan]) {
         background: #fff !important;
         width: 180px !important;
         min-width: 180px !important;
