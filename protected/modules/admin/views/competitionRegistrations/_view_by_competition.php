@@ -1,0 +1,336 @@
+<?php
+/**
+ * Hiển thị tất cả thí sinh thi nghiệp vụ theo cuộc thi, phân chia theo cụm (khu vực)
+ * @var string $competitionName Tên cuộc thi
+ * @var string $eventName Tên sự kiện
+ * @var int $competitionId ID cuộc thi hiện tại
+ * @var int $eventId ID sự kiện hiện tại
+ * @var array $contestantsByRegion Thí sinh nhóm theo khu vực
+ * @var array $regionList Danh sách khu vực để filter
+ * @var array $competitionsList Danh sách cuộc thi
+ */
+?>
+<style>
+.table-fixed-cols { table-layout: fixed; width: 100%; }
+.table-fixed-cols td, .table-fixed-cols th { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">
+            <?php echo CHtml::encode($competitionName); ?> - <?php echo CHtml::encode($eventName); ?>
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
+                <label for="filter-change-competition" class="form-label mb-0 me-2 text-nowrap fw-semibold">
+                    Nghiệp vụ:
+                </label>
+                <select id="filter-change-competition" class="form-select form-select-sm">
+                    <?php foreach ($competitionsList as $item): ?>
+                        <option value="<?php echo CHtml::encode($item['id']); ?>" <?php echo $item['id'] == $competitionId ? 'selected="selected"' : ''; ?>>
+                            <?php echo CHtml::encode($item['name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php if (!empty($contestantsByRegion)): ?>
+                <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
+                    <label for="filter-region" class="form-label mb-0 me-2 text-nowrap fw-semibold">
+                        Lọc theo cụm:
+                    </label>
+                    <select id="filter-region" class="form-select form-select-sm">
+                        <option value="">-- Tất cả cụm --</option>
+                        <?php foreach ($regionList as $regionId => $regionName): ?>
+                            <option value="<?php echo CHtml::encode($regionId); ?>">
+                                <?php echo CHtml::encode($regionName); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
+                    <label for="filter-property" class="form-label mb-0 me-2 text-nowrap fw-semibold">
+                        Lọc theo đơn vị:
+                    </label>
+                    <select id="filter-property" class="form-select form-select-sm">
+                        <option value="">-- Tất cả đơn vị --</option>
+                        <?php foreach ($contestantsByRegion as $regionData): ?>
+                            <?php foreach ($regionData['properties'] as $propData): ?>
+                                <option value="<?php echo CHtml::encode($propData['property_name']); ?>">
+                                    <?php echo CHtml::encode($propData['property_name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <?php if (empty($contestantsByRegion)): ?>
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle me-2"></i>Chưa có thí sinh đăng ký thi nghiệp vụ này.
+            </div>
+        <?php else: ?>
+
+            <?php
+            $globalIndex = 1;
+            foreach ($contestantsByRegion as $regionData):
+                $regionContestantCount = 0;
+                $regionConfirmedCount = 0;
+                $regionPendingCount = 0;
+                foreach ($regionData['properties'] as $propData) {
+                    foreach ($propData['contestants'] as $contestant) {
+                        $regionContestantCount++;
+                        if ($contestant['status'] == CompetitionRegistrations::STATUS_CONFIRMED) {
+                            $regionConfirmedCount++;
+                        } elseif ($contestant['status'] == CompetitionRegistrations::STATUS_PENDING) {
+                            $regionPendingCount++;
+                        }
+                    }
+                }
+            ?>
+                <div class="region-block mb-4" data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
+                     data-total="<?php echo $regionContestantCount; ?>"
+                     data-confirmed="<?php echo $regionConfirmedCount; ?>"
+                     data-pending="<?php echo $regionPendingCount; ?>">
+                    <h5 class="bg-light p-2 rounded border-start border-4 border-primary mb-3">
+                        <i class="fa fa-map-marker me-2"></i>
+                        <?php echo CHtml::encode($regionData['region_name']); ?>
+                        <span class="badge bg-primary ms-2 region-contestant-count"><?php echo $regionContestantCount; ?> thí sinh</span>
+                        <span class="badge bg-success ms-1 region-confirmed-count"><?php echo $regionConfirmedCount; ?> đã xác nhận</span>
+                        <span class="badge bg-warning text-dark ms-1 region-pending-count"><?php echo $regionPendingCount; ?> chờ xác nhận</span>
+                    </h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-fixed-cols">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:5%">#</th>
+                                    <th style="width:10%">SBD</th>
+                                    <th style="width:25%">Họ tên</th>
+                                    <th style="width:20%">Đơn vị</th>
+                                    <th style="width:15%">Chức danh</th>
+                                    <th style="width:10%">Giới tính</th>
+                                    <th style="width:10%">Trạng thái</th>
+                                    <th style="width:5%">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($regionData['properties'] as $propData): ?>
+                                    <?php foreach ($propData['contestants'] as $contestant): ?>
+                                        <tr class="contestant-row"
+                                            data-property="<?php echo CHtml::encode($propData['property_name']); ?>"
+                                            data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
+                                            data-status="<?php echo $contestant['status']; ?>">
+                                            <td class="row-index"><?php echo $globalIndex++; ?></td>
+                                            <td><strong><?php echo CHtml::encode($contestant['candidate_number'] ?: '-'); ?></strong></td>
+                                            <td><?php echo CHtml::encode($contestant['attendee_name']); ?></td>
+                                            <td><?php echo CHtml::encode($propData['property_name']); ?></td>
+                                            <td><?php echo CHtml::encode($contestant['attendee_position']); ?></td>
+                                            <td>
+                                                <?php
+                                                $gender = $contestant['attendee_gender'];
+                                                echo $gender === 'male' ? 'Nam' : ($gender === 'female' ? 'Nữ' : '-');
+                                                ?>
+                                            </td>
+                                            <td><?php echo CompetitionRegistrations::getStatusLabel($contestant['status']); ?></td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-info btn-view-contestant" data-id="<?php echo $contestant['id']; ?>" title="Xem chi tiết" style="width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;">
+                                                    <?php echo IconHelper::render('view', 'icon-20', 20); ?>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="mt-3">
+                <strong>Tổng:</strong>
+                <?php
+                $total = 0;
+                $totalProperties = 0;
+                foreach ($contestantsByRegion as $regionData) {
+                    foreach ($regionData['properties'] as $propData) {
+                        $total += count($propData['contestants']);
+                        $totalProperties++;
+                    }
+                }
+                $originalText = $total . ' thí sinh từ ' . $totalProperties . ' đơn vị thuộc ' . count($contestantsByRegion) . ' cụm';
+                ?>
+                <span id="total-contestants-text" data-original="<?php echo CHtml::encode($originalText); ?>">
+                    <?php echo CHtml::encode($originalText); ?>
+                </span>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Modal xem chi tiết thí sinh -->
+<div class="modal fade" id="modalViewContestant" tabindex="-1" aria-labelledby="modalViewContestantLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalViewContestantLabel">Chi tiết thí sinh</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body" id="modalViewContestantBody">
+                <div class="text-center py-4">
+                    <i class="fa fa-spinner fa-spin fa-2x"></i>
+                    <p class="mt-2">Đang tải...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var ajaxViewUrl = '<?php echo Yii::app()->createUrl("/admin/competitionRegistrations/ajaxView"); ?>';
+
+    document.querySelectorAll('.btn-view-contestant').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            var modalBody = document.getElementById('modalViewContestantBody');
+            var modal = new bootstrap.Modal(document.getElementById('modalViewContestant'));
+
+            modalBody.innerHTML = '<div class="text-center py-4"><i class="fa fa-spinner fa-spin fa-2x"></i><p class="mt-2">Đang tải...</p></div>';
+            modal.show();
+
+            fetch(ajaxViewUrl + '?id=' + id, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        var d = data.data;
+                        var genderLabel = d.attendee_gender === 'male' ? 'Nam' : (d.attendee_gender === 'female' ? 'Nữ' : '-');
+                        var html = '<table class="table table-bordered">';
+                        html += '<tr><th style="width:35%;background:#f8f9fa;">Số báo danh</th><td><strong>' + (d.candidate_number || '-') + '</strong></td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Họ tên</th><td>' + (d.attendee_name || '-') + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Đơn vị</th><td>' + (d.property_name || '-') + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Chức danh</th><td>' + (d.attendee_position || '-') + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Giới tính</th><td>' + genderLabel + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Cuộc thi</th><td>' + (d.competition_name || '-') + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Trạng thái</th><td>' + d.status_label + '</td></tr>';
+                        html += '<tr><th style="background:#f8f9fa;">Ngày đăng ký</th><td>' + (d.registered_at || '-') + '</td></tr>';
+                        if (d.note) {
+                            html += '<tr><th style="background:#f8f9fa;">Ghi chú</th><td>' + d.note + '</td></tr>';
+                        }
+                        html += '</table>';
+                        modalBody.innerHTML = html;
+                    } else {
+                        modalBody.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Có lỗi xảy ra') + '</div>';
+                    }
+                })
+                .catch(function() {
+                    modalBody.innerHTML = '<div class="alert alert-danger">Lỗi kết nối server</div>';
+                });
+        });
+    });
+
+    var filterRegion = document.getElementById('filter-region');
+    var filterProperty = document.getElementById('filter-property');
+
+    function applyFilters() {
+        var selectedRegion = filterRegion ? filterRegion.value : '';
+        var selectedProperty = filterProperty ? filterProperty.value : '';
+        var rows = document.querySelectorAll('.contestant-row');
+        var regionBlocks = document.querySelectorAll('.region-block');
+        var idx = 1;
+
+        rows.forEach(function(row) {
+            var rowRegion = row.getAttribute('data-region-id');
+            var rowProperty = row.getAttribute('data-property');
+            var matchRegion = !selectedRegion || rowRegion === selectedRegion;
+            var matchProperty = !selectedProperty || rowProperty === selectedProperty;
+
+            if (matchRegion && matchProperty) {
+                row.style.display = '';
+                var idxCol = row.querySelector('.row-index');
+                if (idxCol) { idxCol.textContent = idx++; }
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        regionBlocks.forEach(function(block) {
+            var blockRegionId = block.getAttribute('data-region-id');
+            var visibleRows = block.querySelectorAll('.contestant-row:not([style*="display: none"])');
+
+            if (selectedRegion && blockRegionId !== selectedRegion) {
+                block.style.display = 'none';
+            } else if (visibleRows.length === 0) {
+                block.style.display = 'none';
+            } else {
+                block.style.display = '';
+                var totalCount = visibleRows.length;
+                var confirmedCount = 0;
+                var pendingCount = 0;
+                visibleRows.forEach(function(row) {
+                    var status = parseInt(row.getAttribute('data-status'));
+                    if (status === <?php echo CompetitionRegistrations::STATUS_CONFIRMED; ?>) {
+                        confirmedCount++;
+                    } else if (status === <?php echo CompetitionRegistrations::STATUS_PENDING; ?>) {
+                        pendingCount++;
+                    }
+                });
+
+                var countBadge = block.querySelector('.region-contestant-count');
+                var confirmedBadge = block.querySelector('.region-confirmed-count');
+                var pendingBadge = block.querySelector('.region-pending-count');
+                if (countBadge) countBadge.textContent = totalCount + ' thí sinh';
+                if (confirmedBadge) confirmedBadge.textContent = confirmedCount + ' đã xác nhận';
+                if (pendingBadge) pendingBadge.textContent = pendingCount + ' chờ xác nhận';
+            }
+        });
+
+        var totalCount = idx - 1;
+        var totalText = document.getElementById('total-contestants-text');
+        if (totalText) {
+            if (selectedRegion || selectedProperty) {
+                var filterDesc = [];
+                if (selectedRegion) {
+                    var regionOption = filterRegion.options[filterRegion.selectedIndex];
+                    filterDesc.push('cụm "' + regionOption.text + '"');
+                }
+                if (selectedProperty) {
+                    filterDesc.push('đơn vị "' + selectedProperty + '"');
+                }
+                totalText.textContent = totalCount + ' thí sinh thuộc ' + filterDesc.join(', ');
+            } else {
+                totalText.textContent = totalText.getAttribute('data-original');
+            }
+        }
+    }
+
+    if (filterRegion) {
+        filterRegion.addEventListener('change', function() {
+            if (filterProperty) { filterProperty.value = ''; }
+            applyFilters();
+        });
+    }
+
+    if (filterProperty) {
+        filterProperty.addEventListener('change', applyFilters);
+    }
+
+    var filterChangeCompetition = document.getElementById('filter-change-competition');
+    if (filterChangeCompetition) {
+        filterChangeCompetition.addEventListener('change', function() {
+            var selectedCompetitionId = this.value;
+            if (selectedCompetitionId) {
+                var currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('competition_id', selectedCompetitionId);
+                window.location.href = currentUrl.toString();
+            }
+        });
+    }
+})();
+</script>
