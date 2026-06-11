@@ -39,7 +39,16 @@ $this->Tabletitle = 'Danh sách đăng ký thi nghiệp vụ';
                     'type' => 'raw',
                     'filter' => $competitions,
                     'value' => function ($data) {
-                        return isset($data->competition) ? CHtml::encode($data->competition->name) : $data->competition_id;
+                        if (isset($data->competition_name)) {
+                            return CHtml::encode($data->competition_name);
+                        }
+                        if (isset($data->competition)) {
+                            if (is_array($data->competition)) {
+                                return CHtml::encode($data->competition['name']);
+                            }
+                            return CHtml::encode($data->competition->name);
+                        }
+                        return $data->competition_id;
                     }
                 ),
                 array(
@@ -47,7 +56,16 @@ $this->Tabletitle = 'Danh sách đăng ký thi nghiệp vụ';
                     'header' => 'Thí sinh',
                     'type' => 'raw',
                     'value' => function ($data) {
-                        return isset($data->attendee) ? CHtml::encode($data->attendee->full_name) : $data->attendee_id;
+                        if (isset($data->attendee_name)) {
+                            return CHtml::encode($data->attendee_name);
+                        }
+                        if (isset($data->attendee)) {
+                            if (is_array($data->attendee)) {
+                                return CHtml::encode($data->attendee['full_name']);
+                            }
+                            return CHtml::encode($data->attendee->full_name);
+                        }
+                        return $data->attendee_id;
                     }
                 ),
                 array(
