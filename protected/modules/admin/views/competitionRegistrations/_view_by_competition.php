@@ -231,6 +231,44 @@
     var filterRegion = document.getElementById('filter-region');
     var filterProperty = document.getElementById('filter-property');
 
+    // Dữ liệu đơn vị theo cụm
+    var propertiesByRegion = <?php
+        $propertiesByRegion = array();
+        foreach ($contestantsByRegion as $regionData) {
+            $regionId = $regionData['region_id'];
+            $propertiesByRegion[$regionId] = array();
+            foreach ($regionData['properties'] as $propData) {
+                $propertiesByRegion[$regionId][] = $propData['property_name'];
+            }
+        }
+        echo json_encode($propertiesByRegion);
+    ?>;
+
+    // Cập nhật dropdown đơn vị khi chọn cụm
+    function updatePropertyDropdown(regionId) {
+        if (!filterProperty) return;
+        filterProperty.innerHTML = '';
+
+        if (!regionId) {
+            filterProperty.innerHTML = '<option value="">-- Chọn cụm trước --</option>';
+            return;
+        }
+
+        var properties = propertiesByRegion[regionId] || [];
+        if (properties.length === 0) {
+            filterProperty.innerHTML = '<option value="">-- Không có đơn vị --</option>';
+            return;
+        }
+
+        filterProperty.innerHTML = '<option value="">-- Tất cả đơn vị --</option>';
+        properties.forEach(function(propName) {
+            var option = document.createElement('option');
+            option.value = propName;
+            option.textContent = propName;
+            filterProperty.appendChild(option);
+        });
+    }
+
     function applyFilters() {
         var selectedRegion = filterRegion ? filterRegion.value : '';
         var selectedProperty = filterProperty ? filterProperty.value : '';
