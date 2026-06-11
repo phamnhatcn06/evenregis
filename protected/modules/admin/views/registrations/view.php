@@ -1760,7 +1760,7 @@ Yii::app()->clientScript->registerScript('registrations-view-init', '
         if (typeof $.fn.DataTable === "undefined") return;
         var table = $("#attendees-table").DataTable({
             paging: true,
-            pageLength: 10,
+            pageLength: 200,
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Tất cả"]],
             ordering: true,
             searching: true,

@@ -229,7 +229,7 @@ class SportTeamsController extends AdminController
         $teams = SportTeams::getApiDataProvider(array(
             'event_id' => $eventId,
             'sport_id' => $sportId,
-        ), 500)->getData();
+        ), 5000)->getData();
 
         // Lấy danh sách khu vực và property để map
         $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
