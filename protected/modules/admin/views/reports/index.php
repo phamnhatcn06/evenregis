@@ -566,7 +566,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                         Chưa có môn thể thao nào được đăng ký cho sự kiện này.
                                     </div>
                                 <?php else: ?>
-                                    <div class="table-responsive">
+                                    <div class="sports-summary-wrapper">
                                         <table class="table table-bordered table-hover align-middle mb-0" id="tableSportsSummary">
                                             <thead>
                                                 <tr>
