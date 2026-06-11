@@ -670,8 +670,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 <style>
     /* Sports Summary Table Container */
     .sports-summary-wrapper {
-        overflow-x: auto;
-        max-width: 100%;
+        overflow: auto;
+        max-height: 70vh;
+        position: relative;
     }
 
     /* Sports Summary Table */
