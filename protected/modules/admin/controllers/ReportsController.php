@@ -1542,30 +1542,41 @@ class ReportsController extends AdminController
         $sheet->getRowDimension(2)->setRowHeight(20);
 
         // Build headers
-        $row = 3;
+        $row = 4;
         $col = 'A';
         $sheet->setCellValue($col++ . $row, 'STT');
         $sheet->setCellValue($col++ . $row, 'Cụm');
-        $sheet->setCellValue($col++ . $row, 'Tên ĐV');
+        $sheet->setCellValue($col++ . $row, 'Tên đơn vị');
 
         $sportColMap = array();
+        $sportStartCols = array();
         foreach ($activeSports as $spId => $spName) {
+            $sportStartCols[$spId] = $col;
             $sportColMap[$spId] = $col;
             $sheet->setCellValue($col . $row, $spName);
-            
+
             $nextCol1 = $col;
             $nextCol1++;
             $nextCol2 = $nextCol1;
             $nextCol2++;
-            
+
             $sheet->mergeCells($col . $row . ':' . $nextCol2 . $row);
+            // Apply sport header style
+            $sheet->getStyle($col . $row . ':' . $nextCol2 . $row)->applyFromArray($sportHeaderStyle);
             $col = $nextCol2;
             $col++;
         }
 
-        // Apply header style
-        $lastCol = chr(ord($col) - 1);
-        $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($headerStyle);
+        // Calculate last column
+        $lastCol = $col;
+        $lastCol--;
+        if (is_numeric($lastCol)) {
+            $lastCol = PHPExcel_Cell::stringFromColumnIndex($lastCol - 1);
+        }
+
+        // Apply header style for first 3 columns
+        $sheet->getStyle('A' . $row . ':C' . $row)->applyFromArray($headerStyle);
+        $sheet->getRowDimension($row)->setRowHeight(30);
 
         // Sub-header row
         $row++;
@@ -1574,16 +1585,17 @@ class ReportsController extends AdminController
         $sheet->setCellValue($col++ . $row, '');
         $sheet->setCellValue($col++ . $row, '');
         foreach ($activeSports as $spId => $spName) {
-            $sheet->setCellValue($col++ . $row, 'Số đội');
-            $sheet->setCellValue($col++ . $row, 'Số VĐV');
+            $sheet->setCellValue($col++ . $row, 'Đội');
+            $sheet->setCellValue($col++ . $row, 'VĐV');
             $sheet->setCellValue($col++ . $row, 'Ghi chú');
         }
         $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($subHeaderStyle);
+        $sheet->getRowDimension($row)->setRowHeight(22);
 
         // Merge STT, Cụm, Tên ĐV headers
-        $sheet->mergeCells('A3:A4');
-        $sheet->mergeCells('B3:B4');
-        $sheet->mergeCells('C3:C4');
+        $sheet->mergeCells('A4:A5');
+        $sheet->mergeCells('B4:B5');
+        $sheet->mergeCells('C4:C5');
 
         // Data rows
         $row++;
