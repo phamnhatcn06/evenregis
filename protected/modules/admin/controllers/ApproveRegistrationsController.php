@@ -219,10 +219,10 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
-        // Load Talent Entries
+        // Load Talent Entries - chỉ nếu period có content 'talent'
         $talentEntries = array();
         $talentEntryMembers = array();
-        if ($model->property_id) {
+        if ($model->property_id && (empty($periodContentCodes) || in_array('talent', $periodContentCodes))) {
             // Lấy talent shows của event
             $showIds = array();
             if ($model->event_id) {
