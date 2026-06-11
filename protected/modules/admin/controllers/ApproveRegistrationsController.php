@@ -312,6 +312,7 @@ class ApproveRegistrationsController extends AdminController
             'beautyContestants' => $beautyContestants,
             'talentEntries' => $talentEntries,
             'talentEntryMembers' => $talentEntryMembers,
+            'periodContentCodes' => $periodContentCodes,
         ));
     }
 
