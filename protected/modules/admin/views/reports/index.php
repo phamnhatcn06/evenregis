@@ -710,18 +710,33 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         word-wrap: break-word !important;
     }
 
+    /* Sticky header rows */
+    #tableSportsSummary thead tr:first-child th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+    }
+    #tableSportsSummary thead tr:nth-child(2) th {
+        position: sticky !important;
+        top: 38px !important;
+        z-index: 10 !important;
+        background: #e9ecef !important;
+        color: #495057 !important;
+        font-size: 11px !important;
+        padding: 4px 2px !important;
+    }
+
     /* Frozen columns - STT */
     #tableSportsSummary thead tr:first-child th:nth-child(1) {
-        position: sticky !important;
         left: 0 !important;
-        z-index: 12 !important;
+        z-index: 13 !important;
         background: #3a57e8 !important;
         color: #fff !important;
         width: 50px !important;
         min-width: 50px !important;
         max-width: 50px !important;
     }
-    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(1) {
+    #tableSportsSummary tbody td:nth-child(1) {
         position: sticky !important;
         left: 0 !important;
         z-index: 8 !important;
@@ -733,16 +748,15 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 
     /* Frozen columns - Cụm */
     #tableSportsSummary thead tr:first-child th:nth-child(2) {
-        position: sticky !important;
         left: 50px !important;
-        z-index: 12 !important;
+        z-index: 13 !important;
         background: #3a57e8 !important;
         color: #fff !important;
         width: 120px !important;
         min-width: 120px !important;
         max-width: 120px !important;
     }
-    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(2) {
+    #tableSportsSummary tbody td:nth-child(2) {
         position: sticky !important;
         left: 50px !important;
         z-index: 8 !important;
@@ -754,9 +768,8 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 
     /* Frozen columns - Tên ĐV */
     #tableSportsSummary thead tr:first-child th:nth-child(3) {
-        position: sticky !important;
         left: 170px !important;
-        z-index: 12 !important;
+        z-index: 13 !important;
         background: #3a57e8 !important;
         color: #fff !important;
         width: 180px !important;
@@ -764,7 +777,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         max-width: 180px !important;
         border-right: 2px solid #1e3a8a !important;
     }
-    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(3) {
+    #tableSportsSummary tbody td:nth-child(3) {
         position: sticky !important;
         left: 170px !important;
         z-index: 8 !important;
@@ -776,17 +789,6 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
 
-    /* Header row 2 */
-    #tableSportsSummary thead tr:nth-child(2) th {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 11 !important;
-        background: #e9ecef !important;
-        color: #495057 !important;
-        font-size: 11px !important;
-        padding: 4px 2px !important;
-    }
-
     /* Sport group headers */
     #tableSportsSummary thead tr:first-child th.bg-soft-info {
         background: #0dcaf0 !important;
@@ -796,33 +798,35 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         padding: 6px 4px !important;
     }
 
-    /* Subtotal row */
-    #tableSportsSummary tbody tr.table-warning td:first-child {
-        position: sticky !important;
-        left: 0 !important;
-        z-index: 8 !important;
-        background: #fff3cd !important;
-        border-right: 2px solid #ffc107 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
-    }
+    /* Subtotal row - override sticky bg */
     #tableSportsSummary tbody tr.table-warning td {
         background: #fff3cd !important;
         font-weight: 600 !important;
     }
-
-    /* Grand Total row */
-    #tableSportsSummary tfoot tr td:first-child {
-        position: sticky !important;
-        left: 0 !important;
-        z-index: 8 !important;
-        background: #198754 !important;
-        color: #fff !important;
-        border-right: 2px solid #146c43 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
+    #tableSportsSummary tbody tr.table-warning td:nth-child(1),
+    #tableSportsSummary tbody tr.table-warning td:nth-child(2),
+    #tableSportsSummary tbody tr.table-warning td:nth-child(3) {
+        background: #fff3cd !important;
     }
+
+    /* Grand Total row - override sticky bg */
     #tableSportsSummary tfoot tr td {
         background: #198754 !important;
         color: #fff !important;
+    }
+    #tableSportsSummary tfoot tr td:nth-child(1),
+    #tableSportsSummary tfoot tr td:nth-child(2),
+    #tableSportsSummary tfoot tr td:nth-child(3) {
+        position: sticky !important;
+        left: 0 !important;
+        background: #198754 !important;
+        color: #fff !important;
+    }
+    #tableSportsSummary tfoot tr td:nth-child(2) {
+        left: 50px !important;
+    }
+    #tableSportsSummary tfoot tr td:nth-child(3) {
+        left: 170px !important;
     }
 
     /* Hover effect */
@@ -836,7 +840,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
     }
 
     /* Alternating row colors */
-    #tableSportsSummary tbody tr:not(.table-warning):nth-child(even) td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)) {
+    #tableSportsSummary tbody tr:not(.table-warning):nth-child(even) td:nth-child(n+4) {
         background: #f8f9fa;
     }
 </style>
