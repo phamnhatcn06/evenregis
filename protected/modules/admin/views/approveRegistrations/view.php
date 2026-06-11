@@ -393,8 +393,10 @@ $attributes = array(
         <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
+<?php if (empty($periodContentCodes) || in_array('talent', $periodContentCodes)): ?>
 <div class="card mb-3">
     <div class="card-header bg-white">
         <h5 class="mb-0"><i class="fa fa-music me-2 text-primary"></i>Đăng ký văn nghệ</h5>
