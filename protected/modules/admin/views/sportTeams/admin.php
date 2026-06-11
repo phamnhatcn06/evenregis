@@ -331,19 +331,36 @@ document.addEventListener('DOMContentLoaded', function() {
         var table = document.getElementById('sports-summary-table');
         if (!table) return;
 
-        // Update frozen columns with transform
-        var rows = table.querySelectorAll('tr');
-        rows.forEach(function(row) {
+        // Header row 1 (has rowspan for first 3 cols)
+        var headerRow1 = table.querySelector('thead tr:first-child');
+        if (headerRow1) {
+            var ths = headerRow1.children;
+            if (ths.length >= 3) {
+                ths[0].style.transform = 'translateX(' + scrollLeft + 'px)';
+                ths[0].style.zIndex = '15';
+                ths[1].style.transform = 'translateX(' + scrollLeft + 'px)';
+                ths[1].style.zIndex = '15';
+                ths[2].style.transform = 'translateX(' + scrollLeft + 'px)';
+                ths[2].style.zIndex = '15';
+                if (scrollLeft > 0) {
+                    ths[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
+                } else {
+                    ths[2].style.boxShadow = 'none';
+                }
+            }
+        }
+
+        // Body rows only
+        var bodyRows = table.querySelectorAll('tbody tr');
+        bodyRows.forEach(function(row) {
             var cells = row.children;
-            if (cells.length >= 3) {
+            if (cells.length >= 3 && cells[0].tagName === 'TD') {
                 cells[0].style.transform = 'translateX(' + scrollLeft + 'px)';
                 cells[0].style.zIndex = '5';
                 cells[1].style.transform = 'translateX(' + scrollLeft + 'px)';
                 cells[1].style.zIndex = '5';
                 cells[2].style.transform = 'translateX(' + scrollLeft + 'px)';
                 cells[2].style.zIndex = '5';
-
-                // Add shadow when scrolled
                 if (scrollLeft > 0) {
                     cells[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
                 } else {
