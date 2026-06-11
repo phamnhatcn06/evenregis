@@ -53,14 +53,7 @@
                         Lọc theo đơn vị:
                     </label>
                     <select id="filter-property" class="form-select form-select-sm">
-                        <option value="">-- Tất cả đơn vị --</option>
-                        <?php foreach ($contestantsByRegion as $regionData): ?>
-                            <?php foreach ($regionData['properties'] as $propData): ?>
-                                <option value="<?php echo CHtml::encode($propData['property_name']); ?>">
-                                    <?php echo CHtml::encode($propData['property_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php endforeach; ?>
+                        <option value="">-- Chọn cụm trước --</option>
                     </select>
                 </div>
             <?php endif; ?>
