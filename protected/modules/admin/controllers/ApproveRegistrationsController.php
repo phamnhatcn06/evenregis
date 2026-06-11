@@ -104,41 +104,43 @@ class ApproveRegistrationsController extends AdminController
             if ($tId) $transports[$tId] = $tName;
         }
 
-        // Load competition registrations
+        // Load competition registrations - chỉ nếu period có content 'competition'
         $competitionRegistrations = array();
-        $compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $id), 200)->getData();
-        foreach ($compRegsData as $reg) {
-            $compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
-            if (!$compId) continue;
+        if (empty($periodContentCodes) || in_array('competition', $periodContentCodes)) {
+            $compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $id), 200)->getData();
+            foreach ($compRegsData as $reg) {
+                $compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
+                if (!$compId) continue;
 
-            if (!isset($competitionRegistrations[$compId])) {
-                $competitionRegistrations[$compId] = array(
-                    'competition_id' => $compId,
-                    'competition_name' => isset($reg->competition_name) ? $reg->competition_name : (isset($reg['competition_name']) ? $reg['competition_name'] : ''),
-                    'attendees' => array(),
+                if (!isset($competitionRegistrations[$compId])) {
+                    $competitionRegistrations[$compId] = array(
+                        'competition_id' => $compId,
+                        'competition_name' => isset($reg->competition_name) ? $reg->competition_name : (isset($reg['competition_name']) ? $reg['competition_name'] : ''),
+                        'attendees' => array(),
+                    );
+                }
+
+                $attendeeId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
+                $attendeeInfo = isset($attendeesMap[$attendeeId]) ? $attendeesMap[$attendeeId] : array();
+
+                $competitionRegistrations[$compId]['attendees'][] = array(
+                    'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
+                    'attendee_id' => $attendeeId,
+                    'attendee_name' => isset($attendeeInfo['full_name']) ? $attendeeInfo['full_name'] : '',
+                    'position_name' => isset($attendeeInfo['position_name']) ? $attendeeInfo['position_name'] : '',
+                    'division_name' => isset($attendeeInfo['division_name']) ? $attendeeInfo['division_name'] : '',
                 );
             }
 
-            $attendeeId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
-            $attendeeInfo = isset($attendeesMap[$attendeeId]) ? $attendeesMap[$attendeeId] : array();
-
-            $competitionRegistrations[$compId]['attendees'][] = array(
-                'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
-                'attendee_id' => $attendeeId,
-                'attendee_name' => isset($attendeeInfo['full_name']) ? $attendeeInfo['full_name'] : '',
-                'position_name' => isset($attendeeInfo['position_name']) ? $attendeeInfo['position_name'] : '',
-                'division_name' => isset($attendeeInfo['division_name']) ? $attendeeInfo['division_name'] : '',
-            );
-        }
-
-        // Load competition names if missing
-        foreach ($competitionRegistrations as $compId => &$compData) {
-            if (empty($compData['competition_name'])) {
-                $comp = Competitions::fetchFromApi($compId);
-                $compData['competition_name'] = $comp ? $comp->name : '';
+            // Load competition names if missing
+            foreach ($competitionRegistrations as $compId => &$compData) {
+                if (empty($compData['competition_name'])) {
+                    $comp = Competitions::fetchFromApi($compId);
+                    $compData['competition_name'] = $comp ? $comp->name : '';
+                }
             }
+            unset($compData);
         }
-        unset($compData);
 
         // Load Sport Teams
         $sportTeams = array();
