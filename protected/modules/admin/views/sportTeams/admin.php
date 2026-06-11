@@ -321,31 +321,25 @@ Yii::app()->clientScript->registerScriptFile(
         padding: 6px 4px !important;
     }
 
-    /* Subtotal row */
-    #sports-summary-table tbody tr.table-warning td:first-child {
-        position: sticky !important;
-        left: 0 !important;
-        z-index: 8 !important;
-        background: #fff3cd !important;
-        border-right: 2px solid #ffc107 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
-    }
+    /* Subtotal row - override sticky bg */
     #sports-summary-table tbody tr.table-warning td {
         background: #fff3cd !important;
         font-weight: 600 !important;
     }
+    #sports-summary-table tbody tr.table-warning td:nth-child(1),
+    #sports-summary-table tbody tr.table-warning td:nth-child(2),
+    #sports-summary-table tbody tr.table-warning td:nth-child(3) {
+        background: #fff3cd !important;
+    }
 
-    /* Grand Total row */
-    #sports-summary-table tbody tr.table-success td:first-child {
-        position: sticky !important;
-        left: 0 !important;
-        z-index: 8 !important;
+    /* Grand Total row - override sticky bg */
+    #sports-summary-table tbody tr.table-success td {
         background: #198754 !important;
         color: #fff !important;
-        border-right: 2px solid #146c43 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
-    #sports-summary-table tbody tr.table-success td {
+    #sports-summary-table tbody tr.table-success td:nth-child(1),
+    #sports-summary-table tbody tr.table-success td:nth-child(2),
+    #sports-summary-table tbody tr.table-success td:nth-child(3) {
         background: #198754 !important;
         color: #fff !important;
     }
@@ -361,7 +355,7 @@ Yii::app()->clientScript->registerScriptFile(
     }
 
     /* Alternating row colors */
-    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):nth-child(even) td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)) {
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):nth-child(even) td:nth-child(n+4) {
         background: #f8f9fa;
     }
 </style>
