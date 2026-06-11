@@ -342,8 +342,10 @@ $attributes = array(
         <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
+<?php if (empty($periodContentCodes) || in_array('miss', $periodContentCodes)): ?>
 <div class="card mb-3">
     <div class="card-header bg-white">
         <h5 class="mb-0"><i class="fa fa-star me-2 text-primary"></i>Đăng ký thi Miss Mường Thanh</h5>
