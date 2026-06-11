@@ -386,11 +386,30 @@ class CompetitionRegistrationsController extends AdminController
             Yii::app()->end();
         }
 
-        $attendeeName = isset($model->attendee) ? $model->attendee->full_name : (isset($model->attendee_name) ? $model->attendee_name : '-');
-        $attendeePosition = isset($model->attendee) ? $model->attendee->position : (isset($model->attendee_position) ? $model->attendee_position : '');
-        $attendeeGender = isset($model->attendee) ? $model->attendee->gender : (isset($model->attendee_gender) ? $model->attendee_gender : '');
-        $propertyName = isset($model->property_name) ? $model->property_name : (isset($model->attendee) && isset($model->attendee->property_name) ? $model->attendee->property_name : '');
-        $competitionName = isset($model->competition) ? $model->competition->name : (isset($model->competition_name) ? $model->competition_name : '');
+        $attendeeName = $model->attendee_name ?? '-';
+        $attendeePosition = $model->attendee_position ?? '';
+        $attendeeGender = $model->attendee_gender ?? '';
+        $propertyName = $model->property_name ?? '';
+        $competitionName = $model->competition_name ?? '';
+
+        if (isset($model->attendee)) {
+            $att = $model->attendee;
+            if (is_array($att)) {
+                $attendeeName = $att['full_name'] ?? $attendeeName;
+                $attendeePosition = $att['position'] ?? $attendeePosition;
+                $attendeeGender = $att['gender'] ?? $attendeeGender;
+                $propertyName = $att['property_name'] ?? $propertyName;
+            } else {
+                $attendeeName = $att->full_name ?? $attendeeName;
+                $attendeePosition = $att->position ?? $attendeePosition;
+                $attendeeGender = $att->gender ?? $attendeeGender;
+                $propertyName = $att->property_name ?? $propertyName;
+            }
+        }
+        if (isset($model->competition)) {
+            $comp = $model->competition;
+            $competitionName = is_array($comp) ? ($comp['name'] ?? $competitionName) : ($comp->name ?? $competitionName);
+        }
 
         echo json_encode(array(
             'success' => true,
