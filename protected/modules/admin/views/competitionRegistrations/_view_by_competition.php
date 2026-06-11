@@ -343,7 +343,7 @@
 
     if (filterRegion) {
         filterRegion.addEventListener('change', function() {
-            if (filterProperty) { filterProperty.value = ''; }
+            updatePropertyDropdown(this.value);
             applyFilters();
         });
     }
