@@ -11,6 +11,8 @@ class SportTeamMembers extends BaseSportTeamMembers
     public $sport_name;
     public $team_name;
     public $property_name;
+    public $property_id;
+    public $property_code;
 
     public static function model($className = __CLASS__)
     {
@@ -93,6 +95,12 @@ class SportTeamMembers extends BaseSportTeamMembers
             }
             if (isset($value['property_name'])) {
                 $this->property_name = $value['property_name'];
+            }
+            if (isset($value['property_id'])) {
+                $this->property_id = $value['property_id'];
+            }
+            if (isset($value['property_code'])) {
+                $this->property_code = $value['property_code'];
             }
         }
     }

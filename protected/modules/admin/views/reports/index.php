@@ -574,13 +574,14 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                     <th rowspan="2" class="text-center align-middle" width="150">Cụm</th>
                                                     <th rowspan="2" class="align-middle">Tên ĐV</th>
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
-                                                        <th colspan="2" class="text-center bg-soft-info"><?php echo CHtml::encode($spName); ?></th>
+                                                        <th colspan="3" class="text-center bg-soft-info"><?php echo CHtml::encode($spName); ?></th>
                                                     <?php endforeach; ?>
                                                 </tr>
                                                 <tr class="table-light">
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                         <th class="text-center small" width="70">Số đội</th>
                                                         <th class="text-center small" width="70">Số VĐV</th>
+                                                        <th class="text-center small" width="150">Ghi chú</th>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </thead>
@@ -620,6 +621,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                         <?php foreach ($activeSportsForReport as $spId => $spName):
                                                             $teamCount = isset($sportsData[$spId]) ? $sportsData[$spId]['team_count'] : 0;
                                                             $memberCount = isset($sportsData[$spId]) ? $sportsData[$spId]['member_count'] : 0;
+                                                            $note = isset($sportsData[$spId]['note']) ? $sportsData[$spId]['note'] : '';
                                                             $regionTotals[$spId]['team_count'] += $teamCount;
                                                             $regionTotals[$spId]['member_count'] += $memberCount;
                                                             $grandTotals[$spId]['team_count'] += $teamCount;
@@ -627,6 +629,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                         ?>
                                                             <td class="text-center <?php echo $teamCount ? 'text-primary fw-bold' : 'text-muted'; ?>"><?php echo $teamCount ?: '-'; ?></td>
                                                             <td class="text-center <?php echo $memberCount ? 'text-success fw-bold' : 'text-muted'; ?>"><?php echo $memberCount ?: '-'; ?></td>
+                                                            <td class="text-center small text-muted"><?php echo $note ? CHtml::encode($note) : '-'; ?></td>
                                                         <?php endforeach; ?>
                                                     </tr>
                                                 <?php endforeach; ?>
@@ -636,6 +639,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                         <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                             <td class="text-center fw-bold"><?php echo $regionTotals[$spId]['team_count']; ?></td>
                                                             <td class="text-center fw-bold"><?php echo $regionTotals[$spId]['member_count']; ?></td>
+                                                            <td></td>
                                                         <?php endforeach; ?>
                                                     </tr>
                                                 <?php endforeach; ?>
@@ -646,6 +650,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                         <td class="text-center fw-bold fs-5"><?php echo $grandTotals[$spId]['team_count']; ?></td>
                                                         <td class="text-center fw-bold fs-5"><?php echo $grandTotals[$spId]['member_count']; ?></td>
+                                                        <td></td>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </tfoot>

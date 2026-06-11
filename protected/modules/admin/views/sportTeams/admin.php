@@ -139,6 +139,22 @@ $this->Tabletitle = 'Tổng quan đội thể thao';
                     </tbody>
                 </table>
             </div>
+
+            <!-- New Sports Summary by Cluster Section -->
+            <hr class="my-4">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0 text-dark"><i class="fa fa-table text-primary me-2"></i>Tổng hợp đăng ký thể thao theo cụm và đơn vị</h5>
+                <a id="btn-export-excel" href="#" class="btn btn-success btn-sm">
+                    <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
+                </a>
+            </div>
+            
+            <div class="table-responsive" style="border-radius: 8px; border: 1px solid #e9ecef;">
+                <table class="table table-bordered table-hover align-middle mb-0" id="sports-summary-table">
+                    <!-- Dynamic header and body will be injected by JS -->
+                </table>
+            </div>
         </div>
     </div>
 </div>

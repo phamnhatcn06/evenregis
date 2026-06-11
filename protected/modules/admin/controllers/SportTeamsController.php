@@ -13,7 +13,7 @@ class SportTeamsController extends AdminController
         $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
         $properties = Properties::getListForDropdown();
 
-        $this->render('overview', array(
+        $this->render('admin', array(
             'events' => $events,
             'sports' => $sports,
             'properties' => $properties,
@@ -143,6 +143,191 @@ class SportTeamsController extends AdminController
             return strnatcasecmp($a['name'], $b['name']);
         });
 
+        // Fetch regionals
+        $regionals = Regionals::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        $regionalMap = array();
+        foreach ($regionals as $reg) {
+            $regId = isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null);
+            $regName = isset($reg->name) ? $reg->name : (isset($reg['name']) ? $reg['name'] : '');
+            if ($regId) {
+                $regionalMap[$regId] = $regName;
+            }
+        }
+
+        // Fetch properties
+        $user = AuthHandler::getUser();
+        $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+        $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
+        $userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+        $properties = array();
+        if ($isHO) {
+            $properties = Properties::getApiDataProvider(array('is_active' => 1), 1000)->getData();
+        } else if ($userPropertyId) {
+            $prop = Properties::fetchFromApi($userPropertyId);
+            if ($prop) {
+                $properties = array($prop);
+            }
+        }
+
+        $propertyRegionalMap = array();
+        foreach ($properties as $prop) {
+            $propId = isset($prop->id) ? $prop->id : (isset($prop['id']) ? $prop['id'] : null);
+            $propRegionId = isset($prop->region_id) ? $prop->region_id : null;
+            if ($propId) {
+                $propertyRegionalMap[$propId] = array(
+                    'region_id' => $propRegionId,
+                    'region_name' => isset($regionalMap[$propRegionId]) ? $regionalMap[$propRegionId] : 'Chưa phân cụm',
+                    'code' => isset($prop->code) ? $prop->code : '',
+                    'name' => isset($prop->name) ? $prop->name : '',
+                );
+            }
+        }
+
+        // Fetch all attendees for mapping attendee_id => property_id
+        $attParams = array('event_id' => $eventId, 'per_page' => 5000);
+        if (!$isHO && $userPropertyId) {
+            $attParams['property_id'] = $userPropertyId;
+        }
+        $rawAttendees = Attendees::getApiDataProvider($attParams, 5000)->getData();
+        $attendeePropertyMap = array();
+        foreach ($rawAttendees as $att) {
+            $attId = isset($att->id) ? $att->id : (isset($att['id']) ? $att['id'] : null);
+            $attPropId = isset($att->property_id) ? $att->property_id : (isset($att['property_id']) ? $att['property_id'] : null);
+            if ($attId && $attPropId) {
+                $attendeePropertyMap[$attId] = $attPropId;
+            }
+        }
+
+        // Build sports report data: sportsReportData[region_id][property_id][sport_id] = {team_count, member_count}
+        $sportsReportData = array();
+
+        // Fetch all active properties for name mapping (useful for the alliance notes)
+        $allPropertiesForMap = Properties::getApiDataProvider(array('is_active' => 1), 1000)->getData();
+        $propertyNamesMap = array();
+        foreach ($allPropertiesForMap as $prop) {
+            $pId = isset($prop->id) ? $prop->id : (isset($prop['id']) ? $prop['id'] : null);
+            if ($pId) {
+                $propertyNamesMap[$pId] = isset($prop->name) ? $prop->name : '';
+            }
+        }
+
+        // Initialize team counts for host properties
+        foreach ($activeTeamsMap as $team) {
+            $teamId = isset($team->id) ? $team->id : null;
+            $propId = isset($team->property_id) ? $team->property_id : null;
+            $spId = isset($team->sport_id) ? $team->sport_id : null;
+            if (!$propId || !$spId || !$teamId) continue;
+
+            $regionId = isset($propertyRegionalMap[$propId]) ? $propertyRegionalMap[$propId]['region_id'] : 0;
+            if (!$regionId) $regionId = 0;
+
+            if (!isset($sportsReportData[$regionId])) $sportsReportData[$regionId] = array();
+            if (!isset($sportsReportData[$regionId][$propId])) $sportsReportData[$regionId][$propId] = array();
+            if (!isset($sportsReportData[$regionId][$propId][$spId])) {
+                $sportsReportData[$regionId][$propId][$spId] = array('team_count' => 0, 'member_count' => 0, 'note' => '', 'notes' => array());
+            }
+
+            $sportsReportData[$regionId][$propId][$spId]['team_count']++;
+        }
+
+        // Distribute member counts based on athlete properties and credit alliance partners
+        if ($membersRes['success'] && is_array($membersData)) {
+            foreach ($activeTeamsMap as $team) {
+                $teamId = isset($team->id) ? $team->id : null;
+                $hostPropId = isset($team->property_id) ? $team->property_id : null;
+                $spId = isset($team->sport_id) ? $team->sport_id : null;
+                if (!$hostPropId || !$spId || !$teamId) continue;
+
+                $isAlliance = isset($team->is_alliance) && $team->is_alliance == 1;
+
+                $participatingProperties = array();
+                $participatingProperties[$hostPropId] = true;
+
+                foreach ($membersData as $member) {
+                    $mTeamId = isset($member['sport_team_id']) ? $member['sport_team_id'] : null;
+                    if ($mTeamId != $teamId) continue;
+
+                    $attendeeId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
+                    if (!$attendeeId) continue;
+
+                    $memberPropId = isset($attendeePropertyMap[$attendeeId]) ? $attendeePropertyMap[$attendeeId] : null;
+                    if (!$memberPropId) continue;
+
+                    $participatingProperties[$memberPropId] = true;
+
+                    // For alliance teams, show count at the registering unit (host)
+                    $targetPropId = $isAlliance ? $hostPropId : $memberPropId;
+
+                    $regionId = isset($propertyRegionalMap[$targetPropId]) ? $propertyRegionalMap[$targetPropId]['region_id'] : 0;
+                    if (!$regionId) $regionId = 0;
+
+                    if (!isset($sportsReportData[$regionId])) $sportsReportData[$regionId] = array();
+                    if (!isset($sportsReportData[$regionId][$targetPropId])) $sportsReportData[$regionId][$targetPropId] = array();
+                    if (!isset($sportsReportData[$regionId][$targetPropId][$spId])) {
+                        $sportsReportData[$regionId][$targetPropId][$spId] = array('team_count' => 0, 'member_count' => 0, 'note' => '', 'notes' => array());
+                    }
+
+                    $sportsReportData[$regionId][$targetPropId][$spId]['member_count']++;
+                }
+
+                if ($isAlliance) {
+                    // Build alliance note at registering unit
+                    $allianceNames = array();
+                    if (isset($propertyNamesMap[$hostPropId])) {
+                        $allianceNames[] = $propertyNamesMap[$hostPropId];
+                    }
+                    $allianceOrgIds = isset($team->alliance_org_ids) ? $team->alliance_org_ids : '';
+                    if (!empty($allianceOrgIds)) {
+                        $partnerIds = array_filter(array_map('trim', explode(',', $allianceOrgIds)));
+                        foreach ($partnerIds as $pId) {
+                            if (isset($propertyNamesMap[$pId])) {
+                                $allianceNames[] = $propertyNamesMap[$pId];
+                            }
+                        }
+                    }
+                    if (count($allianceNames) > 1) {
+                        $allianceNote = 'Liên quân: ' . implode(' - ', $allianceNames);
+                        $hostRegionId = isset($propertyRegionalMap[$hostPropId]) ? $propertyRegionalMap[$hostPropId]['region_id'] : 0;
+                        if (!$hostRegionId) $hostRegionId = 0;
+
+                        if (isset($sportsReportData[$hostRegionId][$hostPropId][$spId])) {
+                            $sportsReportData[$hostRegionId][$hostPropId][$spId]['notes'][] = $allianceNote;
+                        }
+                    }
+                } else {
+                    // For single teams, increment team_count for participating properties that are not the host (alliance partners)
+                    foreach ($participatingProperties as $pId => $dummy) {
+                        if ($pId == $hostPropId) {
+                            continue;
+                        }
+
+                        $regionId = isset($propertyRegionalMap[$pId]) ? $propertyRegionalMap[$pId]['region_id'] : 0;
+                        if (!$regionId) $regionId = 0;
+
+                        if (!isset($sportsReportData[$regionId])) $sportsReportData[$regionId] = array();
+                        if (!isset($sportsReportData[$regionId][$pId])) $sportsReportData[$regionId][$pId] = array();
+                        if (!isset($sportsReportData[$regionId][$pId][$spId])) {
+                            $sportsReportData[$regionId][$pId][$spId] = array('team_count' => 0, 'member_count' => 0, 'note' => '', 'notes' => array());
+                        }
+
+                        $sportsReportData[$regionId][$pId][$spId]['team_count']++;
+                    }
+                }
+            }
+        }
+
+        // Finalize note strings
+        foreach ($sportsReportData as $regionId => $propData) {
+            foreach ($propData as $propId => $sportsData) {
+                foreach ($sportsData as $spId => $spData) {
+                    if (!empty($spData['notes'])) {
+                        $sportsReportData[$regionId][$propId][$spId]['note'] = implode('; ', array_unique($spData['notes']));
+                    }
+                }
+            }
+        }
+
         header('Content-Type: application/json');
         echo json_encode(array(
             'success' => true,
@@ -151,6 +336,9 @@ class SportTeamsController extends AdminController
             'single_team_count' => $singleTeamCount,
             'alliance_team_count' => $allianceTeamCount,
             'sports' => $formattedSports,
+            'regional_map' => $regionalMap,
+            'property_regional_map' => $propertyRegionalMap,
+            'sports_report_data' => $sportsReportData,
         ));
         Yii::app()->end();
     }
