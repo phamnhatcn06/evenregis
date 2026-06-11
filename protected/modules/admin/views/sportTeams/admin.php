@@ -233,19 +233,33 @@ Yii::app()->clientScript->registerScriptFile(
         word-wrap: break-word !important;
     }
 
-    /* Frozen columns - STT */
-    #sports-summary-table thead tr:first-child th:nth-child(1),
-    #sports-summary-table thead tr:nth-child(2) th:first-child {
+    /* Sticky header rows */
+    #sports-summary-table thead tr:first-child th {
         position: sticky !important;
+        top: 0 !important;
+        z-index: 10 !important;
+    }
+    #sports-summary-table thead tr:nth-child(2) th {
+        position: sticky !important;
+        top: 38px !important;
+        z-index: 10 !important;
+        background: #e9ecef !important;
+        color: #495057 !important;
+        font-size: 11px !important;
+        padding: 4px 2px !important;
+    }
+
+    /* Frozen columns - STT */
+    #sports-summary-table thead tr:first-child th:nth-child(1) {
         left: 0 !important;
-        z-index: 12 !important;
+        z-index: 13 !important;
         background: #3a57e8 !important;
         color: #fff !important;
         width: 50px !important;
         min-width: 50px !important;
         max-width: 50px !important;
     }
-    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(1) {
+    #sports-summary-table tbody td:nth-child(1) {
         position: sticky !important;
         left: 0 !important;
         z-index: 8 !important;
@@ -257,16 +271,15 @@ Yii::app()->clientScript->registerScriptFile(
 
     /* Frozen columns - Cụm */
     #sports-summary-table thead tr:first-child th:nth-child(2) {
-        position: sticky !important;
         left: 50px !important;
-        z-index: 12 !important;
+        z-index: 13 !important;
         background: #3a57e8 !important;
         color: #fff !important;
         width: 120px !important;
         min-width: 120px !important;
         max-width: 120px !important;
     }
-    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(2) {
+    #sports-summary-table tbody td:nth-child(2) {
         position: sticky !important;
         left: 50px !important;
         z-index: 8 !important;
@@ -278,9 +291,8 @@ Yii::app()->clientScript->registerScriptFile(
 
     /* Frozen columns - Tên ĐV */
     #sports-summary-table thead tr:first-child th:nth-child(3) {
-        position: sticky !important;
         left: 170px !important;
-        z-index: 12 !important;
+        z-index: 13 !important;
         background: #3a57e8 !important;
         color: #fff !important;
         width: 180px !important;
@@ -288,7 +300,7 @@ Yii::app()->clientScript->registerScriptFile(
         max-width: 180px !important;
         border-right: 2px solid #1e3a8a !important;
     }
-    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(3) {
+    #sports-summary-table tbody td:nth-child(3) {
         position: sticky !important;
         left: 170px !important;
         z-index: 8 !important;
@@ -298,17 +310,6 @@ Yii::app()->clientScript->registerScriptFile(
         max-width: 180px !important;
         border-right: 2px solid #adb5bd !important;
         box-shadow: 2px 0 4px rgba(0,0,0,0.08);
-    }
-
-    /* Header row 2 (Đội, VĐV, G.Chú) */
-    #sports-summary-table thead tr:nth-child(2) th {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 11 !important;
-        background: #e9ecef !important;
-        color: #495057 !important;
-        font-size: 11px !important;
-        padding: 4px 2px !important;
     }
 
     /* Sport group headers */
