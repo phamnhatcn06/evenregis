@@ -133,7 +133,11 @@ class CompetitionRegistrationsController extends AdminController
     {
         $events = Events::getActiveList();
         $competitions = Competitions::getActiveList();
-        $organizations = Organizations::getActiveList();
+        $propertiesData = Properties::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $organizations = array();
+        foreach ($propertiesData as $p) {
+            $organizations[$p->id] = $p->name;
+        }
 
         $this->render('overview', array(
             'events' => $events,
