@@ -648,9 +648,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                 <tr>
                                                     <td colspan="3" class="text-end fw-bold fs-6">TỔNG CỘNG:</td>
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
-                                                        <td class="text-center fw-bold fs-5"><?php echo $grandTotals[$spId]['team_count']; ?></td>
-                                                        <td class="text-center fw-bold fs-5"><?php echo $grandTotals[$spId]['member_count']; ?></td>
-                                                        <td></td>
+                                                        <td class="col-num fw-bold fs-6"><?php echo $grandTotals[$spId]['team_count']; ?></td>
+                                                        <td class="col-num fw-bold fs-6"><?php echo $grandTotals[$spId]['member_count']; ?></td>
+                                                        <td class="col-note"></td>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </tfoot>
