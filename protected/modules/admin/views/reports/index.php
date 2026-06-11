@@ -579,9 +579,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                 </tr>
                                                 <tr>
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
-                                                        <th class="text-center">Đội</th>
-                                                        <th class="text-center">VĐV</th>
-                                                        <th class="text-center">G.Chú</th>
+                                                        <th class="text-center col-num">Đội</th>
+                                                        <th class="text-center col-num">VĐV</th>
+                                                        <th class="text-center col-note">Ghi chú</th>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </thead>
