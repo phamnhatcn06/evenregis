@@ -142,11 +142,11 @@ class ApproveRegistrationsController extends AdminController
             unset($compData);
         }
 
-        // Load Sport Teams
+        // Load Sport Teams - chỉ nếu period có content 'sports'
         $sportTeams = array();
         $sportTeamMembers = array();
-        if ($model->event_id && $model->property_id) {
-            $teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id), 100)->getData();
+        if ($model->event_id && $model->property_id && (empty($periodContentCodes) || in_array('sports', $periodContentCodes))) {
+            $teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id, 'registration_id' => $id), 100)->getData();
             foreach ($teamsData as $team) {
                 $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
                 if ($teamId) {
