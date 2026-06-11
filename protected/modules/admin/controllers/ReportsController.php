@@ -1781,6 +1781,16 @@ class ReportsController extends AdminController
         // Freeze panes - freeze first 3 columns and header rows
         $sheet->freezePane('D6');
 
+        // Apply outline border to entire table
+        $sheet->getStyle('A4:' . $lastCol . $row)->applyFromArray(array(
+            'borders' => array(
+                'outline' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_MEDIUM,
+                    'color' => array('rgb' => '000000')
+                )
+            )
+        ));
+
         // Send file
         $filename = "Bao_cao_the_thao_" . date('Ymd_His') . ".xlsx";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
