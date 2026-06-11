@@ -569,19 +569,19 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-hover align-middle mb-0" id="tableSportsSummary">
                                             <thead>
-                                                <tr class="table-primary">
-                                                    <th rowspan="2" class="text-center align-middle" width="60">STT</th>
-                                                    <th rowspan="2" class="text-center align-middle" width="150">Cụm</th>
-                                                    <th rowspan="2" class="align-middle" width="200">Tên ĐV</th>
+                                                <tr>
+                                                    <th rowspan="2" class="text-center align-middle">STT</th>
+                                                    <th rowspan="2" class="text-center align-middle">Cụm</th>
+                                                    <th rowspan="2" class="align-middle">Tên ĐV</th>
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                         <th colspan="3" class="text-center bg-soft-info"><?php echo CHtml::encode($spName); ?></th>
                                                     <?php endforeach; ?>
                                                 </tr>
-                                                <tr class="table-light">
+                                                <tr>
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
-                                                        <th class="text-center small" width="70">Số đội</th>
-                                                        <th class="text-center small" width="70">Số VĐV</th>
-                                                        <th class="text-center small" width="75">Ghi chú</th>
+                                                        <th class="text-center">Đội</th>
+                                                        <th class="text-center">VĐV</th>
+                                                        <th class="text-center">G.Chú</th>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </thead>
