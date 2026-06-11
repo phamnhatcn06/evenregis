@@ -1689,13 +1689,41 @@ class ReportsController extends AdminController
         ));
         $sheet->getRowDimension($row)->setRowHeight(25);
 
-        // Merge title row
+        // Merge title rows
         $sheet->mergeCells('A1:' . $lastCol . '1');
+        $sheet->mergeCells('A2:' . $lastCol . '2');
 
-        // Auto-size columns
-        foreach (range('A', $lastCol) as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        // Set column widths
+        $sheet->getColumnDimension('A')->setWidth(6);  // STT
+        $sheet->getColumnDimension('B')->setWidth(18); // Cụm
+        $sheet->getColumnDimension('C')->setWidth(28); // Tên ĐV
+
+        // Sport columns
+        $colIndex = 3; // Start from D
+        foreach ($activeSports as $spId => $spName) {
+            $colLetter = PHPExcel_Cell::stringFromColumnIndex($colIndex);
+            $sheet->getColumnDimension($colLetter)->setWidth(7); // Đội
+            $colIndex++;
+            $colLetter = PHPExcel_Cell::stringFromColumnIndex($colIndex);
+            $sheet->getColumnDimension($colLetter)->setWidth(7); // VĐV
+            $colIndex++;
+            $colLetter = PHPExcel_Cell::stringFromColumnIndex($colIndex);
+            $sheet->getColumnDimension($colLetter)->setWidth(25); // Ghi chú
+            $colIndex++;
         }
+
+        // Center align number columns
+        $colIndex = 3;
+        foreach ($activeSports as $spId => $spName) {
+            $colLetter1 = PHPExcel_Cell::stringFromColumnIndex($colIndex);
+            $colLetter2 = PHPExcel_Cell::stringFromColumnIndex($colIndex + 1);
+            $sheet->getStyle($colLetter1 . '6:' . $colLetter1 . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle($colLetter2 . '6:' . $colLetter2 . $row)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $colIndex += 3;
+        }
+
+        // Freeze panes - freeze first 3 columns and header rows
+        $sheet->freezePane('D6');
 
         // Send file
         $filename = "Bao_cao_the_thao_" . date('Ymd_His') . ".xlsx";
