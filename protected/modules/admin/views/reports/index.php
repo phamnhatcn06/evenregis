@@ -627,9 +627,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                             $grandTotals[$spId]['team_count'] += $teamCount;
                                                             $grandTotals[$spId]['member_count'] += $memberCount;
                                                         ?>
-                                                            <td class="text-center <?php echo $teamCount ? 'text-primary fw-bold' : 'text-muted'; ?>"><?php echo $teamCount ?: '-'; ?></td>
-                                                            <td class="text-center <?php echo $memberCount ? 'text-success fw-bold' : 'text-muted'; ?>"><?php echo $memberCount ?: '-'; ?></td>
-                                                            <td class="text-center small text-muted"><?php echo $note ? CHtml::encode($note) : '-'; ?></td>
+                                                            <td class="col-num <?php echo $teamCount ? 'text-primary fw-bold' : 'text-muted'; ?>"><?php echo $teamCount ?: '-'; ?></td>
+                                                            <td class="col-num <?php echo $memberCount ? 'text-success fw-bold' : 'text-muted'; ?>"><?php echo $memberCount ?: '-'; ?></td>
+                                                            <td class="col-note text-muted"><?php echo $note ? CHtml::encode($note) : '-'; ?></td>
                                                         <?php endforeach; ?>
                                                     </tr>
                                                 <?php endforeach; ?>
