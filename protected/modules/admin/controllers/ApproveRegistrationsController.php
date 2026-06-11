@@ -66,12 +66,19 @@ class ApproveRegistrationsController extends AdminController
         if ($model->period_id) {
             $periodContents = RegistrationPeriodContents::getContentsByPeriod($model->period_id);
             foreach ($periodContents as $pc) {
-                $contentId = is_array($pc) ? (isset($pc['content_id']) ? $pc['content_id'] : null) : (isset($pc->content_id) ? $pc->content_id : null);
-                if ($contentId) {
-                    $content = Contents::fetchFromApi($contentId);
-                    if ($content && $content->code) {
-                        $periodContentCodes[] = $content->code;
-                    }
+                $code = '';
+                if (is_array($pc)) {
+                    $code = isset($pc['content_code']) ? $pc['content_code'] : (isset($pc['content']['code']) ? $pc['content']['code'] : '');
+                } else {
+                    $code = isset($pc->content_code) ? $pc->content_code : (isset($pc->content) && isset($pc->content->code) ? $pc->content->code : '');
+                }
+                if ($code) {
+                    // Normalize code names
+                    if ($code === 'sport') $code = 'sports';
+                    if ($code === 'competitions') $code = 'competition';
+                    if ($code === 'talents') $code = 'talent';
+                    if ($code === 'beauty_contests') $code = 'miss';
+                    $periodContentCodes[] = $code;
                 }
             }
         }
