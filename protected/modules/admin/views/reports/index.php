@@ -152,6 +152,12 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                     <span>5. Đội thể thao theo môn</span>
                                 </button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link text-start text-md-center px-4 py-3 rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-md-center gap-2" id="sports-summary-tab" data-bs-toggle="tab" data-bs-target="#sports-summary-pane" type="button" role="tab" aria-controls="sports-summary-pane" aria-selected="false">
+                                    <i class="fa fa-table fa-lg"></i>
+                                    <span>6. Tổng hợp thể thao theo cụm</span>
+                                </button>
+                            </li>
                         </ul>
                     </div>
 
