@@ -263,6 +263,12 @@ class CompetitionRegistrationsController extends AdminController
             'confirmed_count' => $confirmedCount,
             'pending_count' => $pendingCount,
             'competitions' => $formattedCompetitions,
+            'registration_stats' => array(
+                'submitted' => $regSubmitted,
+                'not_submitted' => $regNotSubmitted,
+                'approved' => $regApproved,
+                'not_approved' => $regNotApproved,
+            ),
         ));
         Yii::app()->end();
     }
