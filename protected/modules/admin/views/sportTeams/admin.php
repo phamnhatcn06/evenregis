@@ -191,12 +191,17 @@ Yii::app()->clientScript->registerScriptFile(
         z-index: 99998 !important;
     }
 
+    /* Sports Summary Table Container */
+    .sports-summary-wrapper {
+        overflow-x: auto;
+        max-width: 100%;
+    }
+
     /* Sports Summary Table */
     #sports-summary-table {
         border-collapse: separate !important;
         border-spacing: 0 !important;
-        width: max-content !important;
-        min-width: 100% !important;
+        min-width: max-content;
     }
 
     #sports-summary-table th,
@@ -205,17 +210,31 @@ Yii::app()->clientScript->registerScriptFile(
         vertical-align: middle !important;
     }
 
-    /* Column widths - uniform for data columns */
-    #sports-summary-table .col-data {
-        width: 55px !important;
-        min-width: 55px !important;
-        max-width: 55px !important;
+    /* Column widths - Số đội, Số VĐV */
+    #sports-summary-table .col-num {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
         padding: 4px 2px !important;
         font-size: 12px !important;
+        text-align: center !important;
+    }
+
+    /* Column widths - Ghi chú (wider, wrap text) */
+    #sports-summary-table .col-note {
+        width: 80px !important;
+        min-width: 80px !important;
+        max-width: 80px !important;
+        padding: 4px 4px !important;
+        font-size: 11px !important;
+        text-align: left !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
     }
 
     /* Frozen columns - STT */
-    #sports-summary-table thead tr:first-child th:nth-child(1) {
+    #sports-summary-table thead tr:first-child th:nth-child(1),
+    #sports-summary-table thead tr:nth-child(2) th:first-child {
         position: sticky !important;
         left: 0 !important;
         z-index: 12 !important;
@@ -233,7 +252,6 @@ Yii::app()->clientScript->registerScriptFile(
         width: 50px !important;
         min-width: 50px !important;
         max-width: 50px !important;
-        box-shadow: 1px 0 0 #dee2e6;
     }
 
     /* Frozen columns - Cụm */
@@ -255,7 +273,6 @@ Yii::app()->clientScript->registerScriptFile(
         width: 120px !important;
         min-width: 120px !important;
         max-width: 120px !important;
-        box-shadow: 1px 0 0 #dee2e6;
     }
 
     /* Frozen columns - Tên ĐV */
@@ -278,12 +295,15 @@ Yii::app()->clientScript->registerScriptFile(
         width: 180px !important;
         min-width: 180px !important;
         max-width: 180px !important;
-        border-right: 2px solid #dee2e6 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        border-right: 2px solid #adb5bd !important;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
 
     /* Header row 2 (Đội, VĐV, G.Chú) */
     #sports-summary-table thead tr:nth-child(2) th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 11 !important;
         background: #e9ecef !important;
         color: #495057 !important;
         font-size: 11px !important;
@@ -306,7 +326,7 @@ Yii::app()->clientScript->registerScriptFile(
         z-index: 8 !important;
         background: #fff3cd !important;
         border-right: 2px solid #ffc107 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
     #sports-summary-table tbody tr.table-warning td {
         background: #fff3cd !important;
@@ -314,18 +334,16 @@ Yii::app()->clientScript->registerScriptFile(
     }
 
     /* Grand Total row */
-    #sports-summary-table tbody tr.table-success td:first-child,
-    #sports-summary-table tfoot tr td:first-child {
+    #sports-summary-table tbody tr.table-success td:first-child {
         position: sticky !important;
         left: 0 !important;
         z-index: 8 !important;
         background: #198754 !important;
         color: #fff !important;
         border-right: 2px solid #146c43 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
-    #sports-summary-table tbody tr.table-success td,
-    #sports-summary-table tfoot tr td {
+    #sports-summary-table tbody tr.table-success td {
         background: #198754 !important;
         color: #fff !important;
     }
