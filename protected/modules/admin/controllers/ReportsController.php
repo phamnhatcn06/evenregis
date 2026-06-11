@@ -1646,7 +1646,13 @@ class ReportsController extends AdminController
                     $grandTotals[$spId]['member_count'] += $memberCount;
                 }
 
-                $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($borderStyle);
+                // Apply alternating row style
+                if ($stt % 2 == 0) {
+                    $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($dataStyleAlt);
+                } else {
+                    $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($dataStyle);
+                }
+                $sheet->getRowDimension($row)->setRowHeight(20);
                 $row++;
             }
 
