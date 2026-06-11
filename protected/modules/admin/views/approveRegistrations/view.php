@@ -242,6 +242,7 @@ $attributes = array(
 </div>
 
 <!-- 1. ĐĂNG KÝ THI ĐẤU THỂ THAO -->
+<?php if (empty($periodContentCodes) || in_array('sports', $periodContentCodes)): ?>
 <div class="card mb-3">
     <div class="card-header bg-white">
         <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao</h5>
