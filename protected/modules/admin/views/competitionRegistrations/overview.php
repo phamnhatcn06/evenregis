@@ -35,6 +35,41 @@ $this->Tabletitle = 'Tổng quan thí sinh thi nghiệp vụ';
 
 <div class="row mb-4">
     <div class="col-md-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <h3 id="stat-reg-submitted" class="mb-0 text-primary">0</h3>
+                <small>Đăng ký đã gửi</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-secondary">
+            <div class="card-body text-center">
+                <h3 id="stat-reg-not-submitted" class="mb-0 text-secondary">0</h3>
+                <small>Đăng ký chưa gửi</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h3 id="stat-reg-approved" class="mb-0 text-success">0</h3>
+                <small>Đăng ký đã duyệt</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <h3 id="stat-reg-not-approved" class="mb-0 text-warning">0</h3>
+                <small>Đăng ký chưa duyệt</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
         <div class="card bg-info text-white">
             <div class="card-body text-center">
                 <h3 id="stat-total" class="mb-0">0</h3>
