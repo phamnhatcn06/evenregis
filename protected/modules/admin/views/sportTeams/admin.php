@@ -150,7 +150,7 @@ $this->Tabletitle = 'Tổng quan đội thể thao';
                 </a>
             </div>
             
-            <div class="table-responsive" style="border-radius: 8px; border: 1px solid #e9ecef;">
+            <div class="sports-summary-wrapper" style="border-radius: 8px; border: 1px solid #e9ecef;">
                 <table class="table table-bordered table-hover align-middle mb-0" id="sports-summary-table">
                     <!-- Dynamic header and body will be injected by JS -->
                 </table>
