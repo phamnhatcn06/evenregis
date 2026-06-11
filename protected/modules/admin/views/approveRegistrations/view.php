@@ -486,6 +486,7 @@ $attributes = array(
         <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- Modal View All Documents -->
 <div class="modal fade" id="allDocumentsModal" tabindex="-1">
