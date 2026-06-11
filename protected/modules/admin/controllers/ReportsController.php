@@ -506,6 +506,75 @@ class ReportsController extends AdminController
             'Tổng hợp'
         );
 
+        // 7. Build Sports Summary Report by Regional (Cụm) and Property
+        $regionals = Regionals::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        $regionalMap = array();
+        foreach ($regionals as $reg) {
+            $regId = isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null);
+            $regName = isset($reg->name) ? $reg->name : (isset($reg['name']) ? $reg['name'] : '');
+            if ($regId) {
+                $regionalMap[$regId] = $regName;
+            }
+        }
+
+        // Build property -> regional mapping and property info
+        $propertyRegionalMap = array();
+        foreach ($properties as $prop) {
+            $propId = isset($prop->id) ? $prop->id : (isset($prop['id']) ? $prop['id'] : null);
+            $propRegionId = isset($prop->region_id) ? $prop->region_id : null;
+            if ($propId) {
+                $propertyRegionalMap[$propId] = array(
+                    'region_id' => $propRegionId,
+                    'region_name' => isset($regionalMap[$propRegionId]) ? $regionalMap[$propRegionId] : 'Chưa phân cụm',
+                    'code' => isset($prop->code) ? $prop->code : '',
+                    'name' => isset($prop->name) ? $prop->name : '',
+                );
+            }
+        }
+
+        // Build sports report data: sportReportData[region_id][property_id][sport_id] = {team_count, member_count}
+        $sportsReportData = array();
+        $sportMemberCounts = array(); // team_id => member_count
+
+        // Fetch all team members to count
+        foreach ($sportTeams as $team) {
+            $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+            if ($teamId) {
+                $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+                $sportMemberCounts[$teamId] = count($membersData);
+            }
+        }
+
+        foreach ($sportTeams as $team) {
+            $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+            $propId = isset($team->property_id) ? $team->property_id : (isset($team['property_id']) ? $team['property_id'] : null);
+            $spId = isset($team->sport_id) ? $team->sport_id : (isset($team['sport_id']) ? $team['sport_id'] : null);
+
+            if (!$propId || !$spId) continue;
+
+            $regionId = isset($propertyRegionalMap[$propId]) ? $propertyRegionalMap[$propId]['region_id'] : 0;
+            if (!$regionId) $regionId = 0;
+
+            if (!isset($sportsReportData[$regionId])) {
+                $sportsReportData[$regionId] = array();
+            }
+            if (!isset($sportsReportData[$regionId][$propId])) {
+                $sportsReportData[$regionId][$propId] = array();
+            }
+            if (!isset($sportsReportData[$regionId][$propId][$spId])) {
+                $sportsReportData[$regionId][$propId][$spId] = array('team_count' => 0, 'member_count' => 0);
+            }
+
+            $sportsReportData[$regionId][$propId][$spId]['team_count']++;
+            $sportsReportData[$regionId][$propId][$spId]['member_count'] += isset($sportMemberCounts[$teamId]) ? $sportMemberCounts[$teamId] : 0;
+        }
+
+        // Get active sports list for report columns
+        $activeSportsForReport = array();
+        foreach ($statsBySport as $spId => $spStat) {
+            $activeSportsForReport[$spId] = $spStat['name'];
+        }
+
         $this->render('index', array(
             'isHO' => $isHO,
             'user' => $user,
@@ -522,6 +591,10 @@ class ReportsController extends AdminController
             'beautyContestantsList' => $beautyContestantsList,
             'sportTeams' => $sportTeams,
             'statsBySport' => $statsBySport,
+            'sportsReportData' => $sportsReportData,
+            'activeSportsForReport' => $activeSportsForReport,
+            'regionalMap' => $regionalMap,
+            'propertyRegionalMap' => $propertyRegionalMap,
             'kpis' => array(
                 'registered_units' => count($uniqueRegisteredOrgs),
                 'total_units' => count($properties),
