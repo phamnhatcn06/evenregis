@@ -294,8 +294,10 @@ $attributes = array(
         <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- 2. ĐĂNG KÝ THI NGHIỆP VỤ -->
+<?php if (empty($periodContentCodes) || in_array('competition', $periodContentCodes)): ?>
 <div class="card mb-3">
     <div class="card-header bg-white">
         <h5 class="mb-0"><i class="fa fa-trophy me-2 text-primary"></i>Đăng ký thi nghiệp vụ</h5>
