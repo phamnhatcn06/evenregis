@@ -1496,41 +1496,81 @@ class ReportsController extends AdminController
         $sheet = $objPHPExcel->setActiveSheetIndex(0);
         $sheet->setTitle('Bao_cao_the_thao');
 
+        // Border styles
+        $borderOutline = array(
+            'style' => PHPExcel_Style_Border::BORDER_MEDIUM,
+            'color' => array('rgb' => '000000')
+        );
+        $borderHeader = array(
+            'style' => PHPExcel_Style_Border::BORDER_MEDIUM,
+            'color' => array('rgb' => '1E40AF')
+        );
+        $borderColumn = array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN,
+            'color' => array('rgb' => 'CBD5E1')
+        );
+        $borderRowDotted = array(
+            'style' => PHPExcel_Style_Border::BORDER_DOTTED,
+            'color' => array('rgb' => 'CBD5E1')
+        );
+
         // Header styles
         $headerStyle = array(
             'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11, 'name' => 'Arial'),
             'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '2563EB')),
             'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER, 'wrapText' => true),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => '1E40AF')))
+            'borders' => array(
+                'outline' => $borderOutline,
+                'inside' => $borderHeader
+            )
         );
         $sportHeaderStyle = array(
             'font' => array('bold' => true, 'color' => array('rgb' => '000000'), 'size' => 10, 'name' => 'Arial'),
             'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '06B6D4')),
             'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER, 'wrapText' => true),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => '0891B2')))
+            'borders' => array(
+                'outline' => $borderOutline,
+                'inside' => $borderHeader
+            )
         );
         $subHeaderStyle = array(
             'font' => array('bold' => true, 'size' => 9, 'name' => 'Arial'),
             'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'F1F5F9')),
             'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'CBD5E1')))
+            'borders' => array(
+                'outline' => $borderHeader,
+                'inside' => $borderColumn
+            )
         );
         $dataStyle = array(
             'font' => array('size' => 10, 'name' => 'Arial'),
             'alignment' => array('vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'E2E8F0')))
+            'borders' => array(
+                'left' => $borderColumn,
+                'right' => $borderColumn,
+                'top' => $borderRowDotted,
+                'bottom' => $borderRowDotted
+            )
         );
         $dataStyleAlt = array(
             'font' => array('size' => 10, 'name' => 'Arial'),
             'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'F8FAFC')),
             'alignment' => array('vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'E2E8F0')))
+            'borders' => array(
+                'left' => $borderColumn,
+                'right' => $borderColumn,
+                'top' => $borderRowDotted,
+                'bottom' => $borderRowDotted
+            )
         );
         $totalRowStyle = array(
             'font' => array('bold' => true, 'size' => 10, 'name' => 'Arial'),
             'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'FEF3C7')),
             'alignment' => array('vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'F59E0B')))
+            'borders' => array(
+                'outline' => $borderOutline,
+                'inside' => $borderColumn
+            )
         );
 
         // Title row
