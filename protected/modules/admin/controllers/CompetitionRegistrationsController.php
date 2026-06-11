@@ -271,9 +271,11 @@ class CompetitionRegistrationsController extends AdminController
                 continue;
             }
 
-            $propId = isset($compReg->attendee) && isset($compReg->attendee->property_id)
-                ? $compReg->attendee->property_id
-                : (isset($compReg->property_id) ? $compReg->property_id : null);
+            $propId = isset($compReg->property_id) ? $compReg->property_id : null;
+            if (!$propId && isset($compReg->attendee)) {
+                $att = $compReg->attendee;
+                $propId = is_array($att) ? (isset($att['property_id']) ? $att['property_id'] : null) : (isset($att->property_id) ? $att->property_id : null);
+            }
             $propName = isset($propertyNameMap[$propId]) ? $propertyNameMap[$propId] : (isset($compReg->property_name) ? $compReg->property_name : 'Chưa xác định');
 
             $regionId = isset($propertyRegionMap[$propId]) ? $propertyRegionMap[$propId] : null;
@@ -296,9 +298,21 @@ class CompetitionRegistrationsController extends AdminController
                 );
             }
 
-            $attendeeName = isset($compReg->attendee) ? $compReg->attendee->full_name : (isset($compReg->attendee_name) ? $compReg->attendee_name : '-');
-            $attendeePosition = isset($compReg->attendee) ? $compReg->attendee->position : (isset($compReg->attendee_position) ? $compReg->attendee_position : '');
-            $attendeeGender = isset($compReg->attendee) ? $compReg->attendee->gender : (isset($compReg->attendee_gender) ? $compReg->attendee_gender : '');
+            $attendeeName = isset($compReg->attendee_name) ? $compReg->attendee_name : '-';
+            $attendeePosition = isset($compReg->attendee_position) ? $compReg->attendee_position : '';
+            $attendeeGender = isset($compReg->attendee_gender) ? $compReg->attendee_gender : '';
+            if (isset($compReg->attendee)) {
+                $att = $compReg->attendee;
+                if (is_array($att)) {
+                    $attendeeName = isset($att['full_name']) ? $att['full_name'] : $attendeeName;
+                    $attendeePosition = isset($att['position']) ? $att['position'] : $attendeePosition;
+                    $attendeeGender = isset($att['gender']) ? $att['gender'] : $attendeeGender;
+                } else {
+                    $attendeeName = isset($att->full_name) ? $att->full_name : $attendeeName;
+                    $attendeePosition = isset($att->position) ? $att->position : $attendeePosition;
+                    $attendeeGender = isset($att->gender) ? $att->gender : $attendeeGender;
+                }
+            }
 
             $contestantsByRegion[$regionId]['properties'][$propId]['contestants'][] = array(
                 'id' => $compReg->id,
