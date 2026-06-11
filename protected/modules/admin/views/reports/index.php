@@ -668,12 +668,17 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 </div>
 
 <style>
+    /* Sports Summary Table Container */
+    .sports-summary-wrapper {
+        overflow-x: auto;
+        max-width: 100%;
+    }
+
     /* Sports Summary Table */
     #tableSportsSummary {
         border-collapse: separate !important;
         border-spacing: 0 !important;
-        width: max-content !important;
-        min-width: 100% !important;
+        min-width: max-content;
     }
 
     #tableSportsSummary th,
@@ -682,24 +687,30 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         vertical-align: middle !important;
     }
 
-    /* Column widths - uniform for data columns */
-    #tableSportsSummary th[width="70"],
-    #tableSportsSummary td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)) {
-        width: 55px !important;
-        min-width: 55px !important;
-        max-width: 55px !important;
+    /* Column widths - Số đội, Số VĐV */
+    #tableSportsSummary .col-num {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
         padding: 4px 2px !important;
         font-size: 12px !important;
+        text-align: center !important;
     }
-    #tableSportsSummary th[width="75"] {
-        width: 55px !important;
-        min-width: 55px !important;
-        max-width: 55px !important;
+
+    /* Column widths - Ghi chú (wider, wrap text) */
+    #tableSportsSummary .col-note {
+        width: 80px !important;
+        min-width: 80px !important;
+        max-width: 80px !important;
+        padding: 4px 4px !important;
+        font-size: 11px !important;
+        text-align: left !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
     }
 
     /* Frozen columns - STT */
-    #tableSportsSummary thead tr:first-child th:nth-child(1),
-    #tableSportsSummary thead tr:nth-child(2) th:first-child {
+    #tableSportsSummary thead tr:first-child th:nth-child(1) {
         position: sticky !important;
         left: 0 !important;
         z-index: 12 !important;
@@ -717,7 +728,6 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         width: 50px !important;
         min-width: 50px !important;
         max-width: 50px !important;
-        box-shadow: 1px 0 0 #dee2e6;
     }
 
     /* Frozen columns - Cụm */
@@ -739,7 +749,6 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         width: 120px !important;
         min-width: 120px !important;
         max-width: 120px !important;
-        box-shadow: 1px 0 0 #dee2e6;
     }
 
     /* Frozen columns - Tên ĐV */
@@ -762,12 +771,15 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         width: 180px !important;
         min-width: 180px !important;
         max-width: 180px !important;
-        border-right: 2px solid #dee2e6 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        border-right: 2px solid #adb5bd !important;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
 
-    /* Header row 2 (Số đội, Số VĐV, Ghi chú) */
+    /* Header row 2 */
     #tableSportsSummary thead tr:nth-child(2) th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 11 !important;
         background: #e9ecef !important;
         color: #495057 !important;
         font-size: 11px !important;
@@ -790,7 +802,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         z-index: 8 !important;
         background: #fff3cd !important;
         border-right: 2px solid #ffc107 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
     #tableSportsSummary tbody tr.table-warning td {
         background: #fff3cd !important;
@@ -805,7 +817,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         background: #198754 !important;
         color: #fff !important;
         border-right: 2px solid #146c43 !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
     #tableSportsSummary tfoot tr td {
         background: #198754 !important;
