@@ -156,14 +156,43 @@ class CompetitionRegistrationsController extends AdminController
                 'success' => true,
                 'total_contestants' => 0,
                 'competitions' => array(),
+                'registration_stats' => array(
+                    'submitted' => 0,
+                    'not_submitted' => 0,
+                    'approved' => 0,
+                    'not_approved' => 0,
+                ),
             ));
             Yii::app()->end();
         }
 
         $registrationsRes = Registrations::getApiDataProvider(array(
             'event_id' => $eventId,
+            'period_id' => 2,
             'per_page' => 1000,
         ), 1000)->getData();
+
+        // Thống kê đăng ký theo trạng thái
+        $regSubmitted = 0;
+        $regNotSubmitted = 0;
+        $regApproved = 0;
+        $regNotApproved = 0;
+        foreach ($registrationsRes as $reg) {
+            if (isset($reg->deleted_at) && $reg->deleted_at !== null && $reg->deleted_at !== '') {
+                continue;
+            }
+            $status = isset($reg->status) ? (int)$reg->status : 0;
+            if ($status == Registrations::STATUS_SUBMITTED || $status == Registrations::STATUS_APPROVED || $status == Registrations::STATUS_REJECTED || $status == Registrations::STATUS_RETURNED) {
+                $regSubmitted++;
+            } else {
+                $regNotSubmitted++;
+            }
+            if ($status == Registrations::STATUS_APPROVED) {
+                $regApproved++;
+            } else {
+                $regNotApproved++;
+            }
+        }
 
         $activeRegsMap = array();
         foreach ($registrationsRes as $reg) {
