@@ -1663,13 +1663,21 @@ class ReportsController extends AdminController
                 return strnatcasecmp($codeA, $codeB);
             });
 
+            $regionRowCount = count($propData);
+            $propIndex = 0;
+
             foreach ($propData as $propId => $sportsData) {
                 $propInfo = isset($propertyRegionalMap[$propId]) ? $propertyRegionalMap[$propId] : null;
                 $propName = $propInfo ? $propInfo['name'] : 'Không xác định';
 
                 $col = 'A';
                 $sheet->setCellValue($col++ . $row, $stt++);
-                $sheet->setCellValue($col++ . $row, $regionName);
+
+                // Only set region name for first property row (will be merged later)
+                if ($propIndex === 0) {
+                    $sheet->setCellValue('B' . $row, $regionName);
+                }
+                $col = 'C';
                 $sheet->setCellValue($col++ . $row, $propName);
 
                 foreach ($activeSports as $spId => $spName) {
@@ -1694,6 +1702,14 @@ class ReportsController extends AdminController
                 }
                 $sheet->getRowDimension($row)->setRowHeight(20);
                 $row++;
+                $propIndex++;
+            }
+
+            // Merge region column (Cụm) for this region
+            if ($regionRowCount > 1) {
+                $regionEndRow = $regionStartRow + $regionRowCount - 1;
+                $sheet->mergeCells('B' . $regionStartRow . ':B' . $regionEndRow);
+                $sheet->getStyle('B' . $regionStartRow . ':B' . $regionEndRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             }
 
             // Region subtotal row
