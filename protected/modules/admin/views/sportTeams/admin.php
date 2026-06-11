@@ -196,32 +196,34 @@ Yii::app()->clientScript->registerScriptFile(
         overflow: auto;
         max-height: 70vh;
         position: relative;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
     }
 
     /* Sports Summary Table */
     #sports-summary-table {
         border-collapse: separate !important;
         border-spacing: 0 !important;
-        min-width: max-content;
+        margin: 0 !important;
     }
 
     #sports-summary-table th,
     #sports-summary-table td {
         border: 1px solid #dee2e6 !important;
         vertical-align: middle !important;
+        white-space: nowrap;
     }
 
     /* Column widths - Số đội, Số VĐV */
     #sports-summary-table .col-num {
         width: 50px !important;
         min-width: 50px !important;
-        max-width: 50px !important;
         padding: 4px 2px !important;
         font-size: 12px !important;
         text-align: center !important;
     }
 
-    /* Column widths - Ghi chú (wider, wrap text) */
+    /* Column widths - Ghi chú */
     #sports-summary-table .col-note {
         width: 80px !important;
         min-width: 80px !important;
@@ -233,83 +235,40 @@ Yii::app()->clientScript->registerScriptFile(
         word-wrap: break-word !important;
     }
 
-    /* Sticky header rows */
-    #sports-summary-table thead tr:first-child th {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 10 !important;
+    /* Frozen columns */
+    #sports-summary-table .frozen-col {
+        position: relative;
+        z-index: 2;
     }
+
+    /* Header first row */
+    #sports-summary-table thead tr:first-child th {
+        background: #3a57e8 !important;
+        color: #fff !important;
+        font-weight: 600;
+    }
+
+    /* Header - STT, Cụm, Tên ĐV */
+    #sports-summary-table thead tr:first-child th:nth-child(1) {
+        width: 50px !important;
+        min-width: 50px !important;
+    }
+    #sports-summary-table thead tr:first-child th:nth-child(2) {
+        width: 120px !important;
+        min-width: 120px !important;
+    }
+    #sports-summary-table thead tr:first-child th:nth-child(3) {
+        width: 180px !important;
+        min-width: 180px !important;
+        border-right: 2px solid #1e3a8a !important;
+    }
+
+    /* Header row 2 */
     #sports-summary-table thead tr:nth-child(2) th {
-        position: sticky !important;
-        top: 38px !important;
-        z-index: 10 !important;
         background: #e9ecef !important;
         color: #495057 !important;
         font-size: 11px !important;
         padding: 4px 2px !important;
-    }
-
-    /* Frozen columns - STT */
-    #sports-summary-table thead tr:first-child th:nth-child(1) {
-        left: 0 !important;
-        z-index: 13 !important;
-        background: #3a57e8 !important;
-        color: #fff !important;
-        width: 50px !important;
-        min-width: 50px !important;
-        max-width: 50px !important;
-    }
-    #sports-summary-table tbody td:nth-child(1) {
-        position: sticky !important;
-        left: 0 !important;
-        z-index: 8 !important;
-        background: #fff !important;
-        width: 50px !important;
-        min-width: 50px !important;
-        max-width: 50px !important;
-    }
-
-    /* Frozen columns - Cụm */
-    #sports-summary-table thead tr:first-child th:nth-child(2) {
-        left: 50px !important;
-        z-index: 13 !important;
-        background: #3a57e8 !important;
-        color: #fff !important;
-        width: 120px !important;
-        min-width: 120px !important;
-        max-width: 120px !important;
-    }
-    #sports-summary-table tbody td:nth-child(2) {
-        position: sticky !important;
-        left: 50px !important;
-        z-index: 8 !important;
-        background: #f8f9fa !important;
-        width: 120px !important;
-        min-width: 120px !important;
-        max-width: 120px !important;
-    }
-
-    /* Frozen columns - Tên ĐV */
-    #sports-summary-table thead tr:first-child th:nth-child(3) {
-        left: 170px !important;
-        z-index: 13 !important;
-        background: #3a57e8 !important;
-        color: #fff !important;
-        width: 180px !important;
-        min-width: 180px !important;
-        max-width: 180px !important;
-        border-right: 2px solid #1e3a8a !important;
-    }
-    #sports-summary-table tbody td:nth-child(3) {
-        position: sticky !important;
-        left: 170px !important;
-        z-index: 8 !important;
-        background: #fff !important;
-        width: 180px !important;
-        min-width: 180px !important;
-        max-width: 180px !important;
-        border-right: 2px solid #adb5bd !important;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.08);
     }
 
     /* Sport group headers */
@@ -321,25 +280,32 @@ Yii::app()->clientScript->registerScriptFile(
         padding: 6px 4px !important;
     }
 
-    /* Subtotal row - override sticky bg */
+    /* Body frozen columns */
+    #sports-summary-table tbody td:nth-child(1) {
+        background: #fff !important;
+        width: 50px !important;
+        min-width: 50px !important;
+    }
+    #sports-summary-table tbody td:nth-child(2) {
+        background: #f8f9fa !important;
+        width: 120px !important;
+        min-width: 120px !important;
+    }
+    #sports-summary-table tbody td:nth-child(3) {
+        background: #fff !important;
+        width: 180px !important;
+        min-width: 180px !important;
+        border-right: 2px solid #dee2e6 !important;
+    }
+
+    /* Subtotal row */
     #sports-summary-table tbody tr.table-warning td {
         background: #fff3cd !important;
         font-weight: 600 !important;
     }
-    #sports-summary-table tbody tr.table-warning td:nth-child(1),
-    #sports-summary-table tbody tr.table-warning td:nth-child(2),
-    #sports-summary-table tbody tr.table-warning td:nth-child(3) {
-        background: #fff3cd !important;
-    }
 
-    /* Grand Total row - override sticky bg */
+    /* Grand Total row */
     #sports-summary-table tbody tr.table-success td {
-        background: #198754 !important;
-        color: #fff !important;
-    }
-    #sports-summary-table tbody tr.table-success td:nth-child(1),
-    #sports-summary-table tbody tr.table-success td:nth-child(2),
-    #sports-summary-table tbody tr.table-success td:nth-child(3) {
         background: #198754 !important;
         color: #fff !important;
     }
@@ -348,14 +314,43 @@ Yii::app()->clientScript->registerScriptFile(
     #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td {
         background: #e3f2fd !important;
     }
-    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:nth-child(1),
-    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:nth-child(2),
-    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:nth-child(3) {
-        background: #bbdefb !important;
-    }
 
     /* Alternating row colors */
     #sports-summary-table tbody tr:not(.table-warning):not(.table-success):nth-child(even) td:nth-child(n+4) {
         background: #f8f9fa;
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var wrapper = document.querySelector('.sports-summary-wrapper');
+    if (!wrapper) return;
+
+    wrapper.addEventListener('scroll', function() {
+        var scrollLeft = this.scrollLeft;
+        var table = document.getElementById('sports-summary-table');
+        if (!table) return;
+
+        // Update frozen columns with transform
+        var rows = table.querySelectorAll('tr');
+        rows.forEach(function(row) {
+            var cells = row.children;
+            if (cells.length >= 3) {
+                cells[0].style.transform = 'translateX(' + scrollLeft + 'px)';
+                cells[0].style.zIndex = '5';
+                cells[1].style.transform = 'translateX(' + scrollLeft + 'px)';
+                cells[1].style.zIndex = '5';
+                cells[2].style.transform = 'translateX(' + scrollLeft + 'px)';
+                cells[2].style.zIndex = '5';
+
+                // Add shadow when scrolled
+                if (scrollLeft > 0) {
+                    cells[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
+                } else {
+                    cells[2].style.boxShadow = 'none';
+                }
+            }
+        });
+    });
+});
+</script>
