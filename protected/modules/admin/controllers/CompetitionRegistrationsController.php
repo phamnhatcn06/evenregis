@@ -169,8 +169,8 @@ class CompetitionRegistrationsController extends AdminController
         $registrationsRes = Registrations::getApiDataProvider(array(
             'event_id' => $eventId,
             'period_id' => 2,
-            'per_page' => 1000,
-        ), 1000)->getData();
+            'per_page' => 10000,
+        ), 10000)->getData();
 
         // Thống kê đăng ký theo trạng thái
         $regSubmitted = 0;
