@@ -179,9 +179,9 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
-        // Load Beauty Contestants
+        // Load Beauty Contestants - chỉ nếu period có content 'miss'
         $beautyContestants = array();
-        if ($model->event_id) {
+        if ($model->event_id && (empty($periodContentCodes) || in_array('miss', $periodContentCodes))) {
             $attendeeIds = array_keys($attendeesMap);
             if (!empty($attendeeIds)) {
                 $contests = BeautyContests::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
