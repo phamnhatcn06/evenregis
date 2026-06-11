@@ -546,6 +546,13 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 
                             <!-- TAB 6: TỔNG HỢP THỂ THAO THEO CỤM -->
                             <div class="tab-pane fade" id="sports-summary-pane" role="tabpanel" aria-labelledby="sports-summary-tab" tabindex="0">
+                                <?php
+                                // Ensure variables exist
+                                if (!isset($activeSportsForReport)) $activeSportsForReport = array();
+                                if (!isset($sportsReportData)) $sportsReportData = array();
+                                if (!isset($regionalMap)) $regionalMap = array();
+                                if (!isset($propertyRegionalMap)) $propertyRegionalMap = array();
+                                ?>
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
                                     <h5 class="fw-bold mb-0 text-dark"><i class="fa fa-table text-primary me-2"></i>Tổng hợp đăng ký thể thao theo cụm và đơn vị</h5>
                                     <a href="<?php echo Yii::app()->createUrl('/admin/reports/exportSports', array('event_id' => $selectedEventId)); ?>" class="btn btn-success">
