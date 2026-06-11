@@ -362,23 +362,52 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Body rows only
+        // Body rows - handle rowspan for merged region cells
         var bodyRows = table.querySelectorAll('tbody tr');
         bodyRows.forEach(function(row) {
             var cells = row.children;
-            if (cells.length >= 3 && cells[0].tagName === 'TD') {
-                cells[0].style.transform = 'translateX(' + scrollLeft + 'px)';
-                cells[0].style.zIndex = '5';
-                cells[1].style.transform = 'translateX(' + scrollLeft + 'px)';
-                cells[1].style.zIndex = '5';
-                cells[2].style.transform = 'translateX(' + scrollLeft + 'px)';
-                cells[2].style.zIndex = '5';
-                if (scrollLeft > 0) {
-                    cells[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
-                } else {
-                    cells[2].style.boxShadow = 'none';
+            if (cells.length < 2 || cells[0].tagName !== 'TD') return;
+
+            // First cell (STT) always frozen
+            cells[0].style.transform = 'translateX(' + scrollLeft + 'px)';
+            cells[0].style.zIndex = '5';
+
+            // Check if row has rowspan cell (region merged)
+            var hasRowspan = cells[1].hasAttribute('rowspan');
+
+            if (hasRowspan) {
+                // This row has region cell with rowspan - freeze cells 0, 1, 2
+                if (cells.length >= 3) {
+                    cells[1].style.transform = 'translateX(' + scrollLeft + 'px)';
+                    cells[1].style.zIndex = '6';
+                    cells[2].style.transform = 'translateX(' + scrollLeft + 'px)';
+                    cells[2].style.zIndex = '5';
+                    if (scrollLeft > 0) {
+                        cells[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
+                    } else {
+                        cells[2].style.boxShadow = 'none';
+                    }
+                }
+            } else {
+                // No rowspan - row only has STT and Property name (region cell is merged from above)
+                // Freeze cells 0 and 1 (STT and Property name)
+                if (cells.length >= 2) {
+                    cells[1].style.transform = 'translateX(' + scrollLeft + 'px)';
+                    cells[1].style.zIndex = '5';
+                    if (scrollLeft > 0) {
+                        cells[1].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
+                    } else {
+                        cells[1].style.boxShadow = 'none';
+                    }
                 }
             }
+        });
+
+        // Also handle rowspan cells that span multiple rows
+        var rowspanCells = table.querySelectorAll('tbody td[rowspan]');
+        rowspanCells.forEach(function(cell) {
+            cell.style.transform = 'translateX(' + scrollLeft + 'px)';
+            cell.style.zIndex = '6';
         });
     });
 });
