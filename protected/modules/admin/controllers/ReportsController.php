@@ -1534,8 +1534,12 @@ class ReportsController extends AdminController
         );
 
         // Title row
-        $sheet->setCellValue('A1', 'BÁO CÁO ĐĂNG KÝ THI ĐẤU THỂ THAO - ' . strtoupper($eventName));
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new PHPExcel_Style_Color('3A57E8'));
+        $sheet->setCellValue('A1', 'BÁO CÁO ĐĂNG KÝ THI ĐẤU THỂ THAO');
+        $sheet->setCellValue('A2', $eventName);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16)->setColor(new PHPExcel_Style_Color('1E40AF'));
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(12)->setColor(new PHPExcel_Style_Color('64748B'));
+        $sheet->getRowDimension(1)->setRowHeight(25);
+        $sheet->getRowDimension(2)->setRowHeight(20);
 
         // Build headers
         $row = 3;
