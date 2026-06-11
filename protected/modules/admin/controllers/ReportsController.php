@@ -536,12 +536,12 @@ class ReportsController extends AdminController
         $sportsReportData = array();
         $sportMemberCounts = array(); // team_id => member_count
 
-        // Fetch all team members to count
+        // Use member_count from team object if available, otherwise default to 0
         foreach ($sportTeams as $team) {
             $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
             if ($teamId) {
-                $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
-                $sportMemberCounts[$teamId] = count($membersData);
+                $mCount = isset($team->member_count) ? (int)$team->member_count : 0;
+                $sportMemberCounts[$teamId] = $mCount;
             }
         }
 
