@@ -133,10 +133,12 @@ class CompetitionRegistrationsController extends AdminController
     {
         $events = Events::getActiveList();
         $competitions = Competitions::getActiveList();
+        $organizations = Organizations::getActiveList();
 
         $this->render('overview', array(
             'events' => $events,
             'competitions' => $competitions,
+            'organizations' => $organizations,
         ));
     }
 
