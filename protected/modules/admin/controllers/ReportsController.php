@@ -1667,6 +1667,7 @@ class ReportsController extends AdminController
                 $sheet->setCellValue($col++ . $row, '');
             }
             $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($totalRowStyle);
+            $sheet->getRowDimension($row)->setRowHeight(22);
             $row++;
         }
 
@@ -1681,10 +1682,12 @@ class ReportsController extends AdminController
             $sheet->setCellValue($col++ . $row, '');
         }
         $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray(array(
-            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
-            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '28A745')),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'CCCCCC')))
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11, 'name' => 'Arial'),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '059669')),
+            'alignment' => array('vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => '047857')))
         ));
+        $sheet->getRowDimension($row)->setRowHeight(25);
 
         // Merge title row
         $sheet->mergeCells('A1:' . $lastCol . '1');
