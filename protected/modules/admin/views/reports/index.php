@@ -572,7 +572,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                 <tr class="table-primary">
                                                     <th rowspan="2" class="text-center align-middle" width="60">STT</th>
                                                     <th rowspan="2" class="text-center align-middle" width="150">Cụm</th>
-                                                    <th rowspan="2" class="align-middle">Tên ĐV</th>
+                                                    <th rowspan="2" class="align-middle" width="200">Tên ĐV</th>
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                         <th colspan="3" class="text-center bg-soft-info"><?php echo CHtml::encode($spName); ?></th>
                                                     <?php endforeach; ?>
@@ -581,7 +581,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                         <th class="text-center small" width="70">Số đội</th>
                                                         <th class="text-center small" width="70">Số VĐV</th>
-                                                        <th class="text-center small" width="150">Ghi chú</th>
+                                                        <th class="text-center small" width="75">Ghi chú</th>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </thead>
@@ -666,3 +666,164 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         </div>
     </div>
 </div>
+
+<style>
+    /* Sports Summary Table */
+    #tableSportsSummary {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+        width: max-content !important;
+        min-width: 100% !important;
+    }
+
+    #tableSportsSummary th,
+    #tableSportsSummary td {
+        border: 1px solid #dee2e6 !important;
+        vertical-align: middle !important;
+    }
+
+    /* Column widths - uniform for data columns */
+    #tableSportsSummary th[width="70"],
+    #tableSportsSummary td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)) {
+        width: 55px !important;
+        min-width: 55px !important;
+        max-width: 55px !important;
+        padding: 4px 2px !important;
+        font-size: 12px !important;
+    }
+    #tableSportsSummary th[width="75"] {
+        width: 55px !important;
+        min-width: 55px !important;
+        max-width: 55px !important;
+    }
+
+    /* Frozen columns - STT */
+    #tableSportsSummary thead tr:first-child th:nth-child(1),
+    #tableSportsSummary thead tr:nth-child(2) th:first-child {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 12 !important;
+        background: #3a57e8 !important;
+        color: #fff !important;
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+    }
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(1) {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 8 !important;
+        background: #fff !important;
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        box-shadow: 1px 0 0 #dee2e6;
+    }
+
+    /* Frozen columns - Cụm */
+    #tableSportsSummary thead tr:first-child th:nth-child(2) {
+        position: sticky !important;
+        left: 50px !important;
+        z-index: 12 !important;
+        background: #3a57e8 !important;
+        color: #fff !important;
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+    }
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(2) {
+        position: sticky !important;
+        left: 50px !important;
+        z-index: 8 !important;
+        background: #f8f9fa !important;
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+        box-shadow: 1px 0 0 #dee2e6;
+    }
+
+    /* Frozen columns - Tên ĐV */
+    #tableSportsSummary thead tr:first-child th:nth-child(3) {
+        position: sticky !important;
+        left: 170px !important;
+        z-index: 12 !important;
+        background: #3a57e8 !important;
+        color: #fff !important;
+        width: 180px !important;
+        min-width: 180px !important;
+        max-width: 180px !important;
+        border-right: 2px solid #1e3a8a !important;
+    }
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(3) {
+        position: sticky !important;
+        left: 170px !important;
+        z-index: 8 !important;
+        background: #fff !important;
+        width: 180px !important;
+        min-width: 180px !important;
+        max-width: 180px !important;
+        border-right: 2px solid #dee2e6 !important;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+
+    /* Header row 2 (Số đội, Số VĐV, Ghi chú) */
+    #tableSportsSummary thead tr:nth-child(2) th {
+        background: #e9ecef !important;
+        color: #495057 !important;
+        font-size: 11px !important;
+        padding: 4px 2px !important;
+    }
+
+    /* Sport group headers */
+    #tableSportsSummary thead tr:first-child th.bg-soft-info {
+        background: #0dcaf0 !important;
+        color: #000 !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        padding: 6px 4px !important;
+    }
+
+    /* Subtotal row */
+    #tableSportsSummary tbody tr.table-warning td:first-child {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 8 !important;
+        background: #fff3cd !important;
+        border-right: 2px solid #ffc107 !important;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+    #tableSportsSummary tbody tr.table-warning td {
+        background: #fff3cd !important;
+        font-weight: 600 !important;
+    }
+
+    /* Grand Total row */
+    #tableSportsSummary tfoot tr td:first-child {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 8 !important;
+        background: #198754 !important;
+        color: #fff !important;
+        border-right: 2px solid #146c43 !important;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+    #tableSportsSummary tfoot tr td {
+        background: #198754 !important;
+        color: #fff !important;
+    }
+
+    /* Hover effect */
+    #tableSportsSummary tbody tr:not(.table-warning):hover td {
+        background: #e3f2fd !important;
+    }
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(1),
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(2),
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(3) {
+        background: #bbdefb !important;
+    }
+
+    /* Alternating row colors */
+    #tableSportsSummary tbody tr:not(.table-warning):nth-child(even) td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(3)) {
+        background: #f8f9fa;
+    }
+</style>

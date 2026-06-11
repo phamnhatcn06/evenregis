@@ -190,4 +190,120 @@ Yii::app()->clientScript->registerScriptFile(
     .select2-drop-mask {
         z-index: 99998 !important;
     }
+
+    /* Sticky/Frozen columns for sports summary tables */
+    #sports-summary-table, #tableSportsSummary {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+        border-left: 1px solid #dee2e6 !important;
+        border-top: 1px solid #dee2e6 !important;
+        width: max-content !important;
+        min-width: 100% !important;
+    }
+
+    #sports-summary-table th, #sports-summary-table td,
+    #tableSportsSummary th, #tableSportsSummary td {
+        border-right: 1px solid #dee2e6 !important;
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+
+    /* STT column */
+    #sports-summary-table thead tr:first-child th:nth-child(1),
+    #tableSportsSummary thead tr:first-child th:nth-child(1) {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 10 !important;
+        background-color: #3a57e8 !important;
+        width: 60px !important;
+        min-width: 60px !important;
+        max-width: 60px !important;
+    }
+    #sports-summary-table tbody tr:not(.table-warning) td:nth-child(1),
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(1) {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 8 !important;
+        background-color: #ffffff !important;
+        width: 60px !important;
+        min-width: 60px !important;
+        max-width: 60px !important;
+    }
+
+    /* Cụm column */
+    #sports-summary-table thead tr:first-child th:nth-child(2),
+    #tableSportsSummary thead tr:first-child th:nth-child(2) {
+        position: sticky !important;
+        left: 60px !important;
+        z-index: 10 !important;
+        background-color: #3a57e8 !important;
+        width: 150px !important;
+        min-width: 150px !important;
+        max-width: 150px !important;
+    }
+    #sports-summary-table tbody tr:not(.table-warning) td:nth-child(2),
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(2) {
+        position: sticky !important;
+        left: 60px !important;
+        z-index: 8 !important;
+        background-color: #ffffff !important;
+        width: 150px !important;
+        min-width: 150px !important;
+        max-width: 150px !important;
+    }
+
+    /* Tên ĐV column */
+    #sports-summary-table thead tr:first-child th:nth-child(3),
+    #tableSportsSummary thead tr:first-child th:nth-child(3) {
+        position: sticky !important;
+        left: 210px !important;
+        z-index: 10 !important;
+        background-color: #3a57e8 !important;
+        width: 200px !important;
+        min-width: 200px !important;
+        max-width: 200px !important;
+    }
+    #sports-summary-table tbody tr:not(.table-warning) td:nth-child(3),
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(3) {
+        position: sticky !important;
+        left: 210px !important;
+        z-index: 8 !important;
+        background-color: #ffffff !important;
+        width: 200px !important;
+        min-width: 200px !important;
+        max-width: 200px !important;
+    }
+
+    /* Subtotal row (colspan="3") */
+    #sports-summary-table tbody tr.table-warning td:first-child,
+    #tableSportsSummary tbody tr.table-warning td:first-child {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 8 !important;
+        background-color: #fff3cd !important;
+        width: 410px !important;
+        min-width: 410px !important;
+        max-width: 410px !important;
+    }
+
+    /* Grand Total row (colspan="3") */
+    #sports-summary-table tfoot tr td:first-child,
+    #tableSportsSummary tfoot tr td:first-child {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 8 !important;
+        background-color: #d1e7dd !important;
+        width: 410px !important;
+        min-width: 410px !important;
+        max-width: 410px !important;
+    }
+
+    /* Hover effect for row with sticky cells */
+    #sports-summary-table tbody tr:not(.table-warning):hover td:nth-child(1),
+    #sports-summary-table tbody tr:not(.table-warning):hover td:nth-child(2),
+    #sports-summary-table tbody tr:not(.table-warning):hover td:nth-child(3),
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(1),
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(2),
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(3) {
+        background-color: #f1f3f5 !important;
+    }
 </style>
