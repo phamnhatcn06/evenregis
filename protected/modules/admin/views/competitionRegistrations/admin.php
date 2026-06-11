@@ -6,6 +6,12 @@ $this->breadcrumbs = array(
 
 $this->menu = array(
     array(
+        'label' => 'Tổng quan',
+        'url' => $this->createUrl('overview'),
+        'color' => 'info',
+        'icon' => 'fa-th-large',
+    ),
+    array(
         'label' => 'Thêm mới',
         'url' => $this->createUrl('create'),
         'color' => 'primary',
