@@ -275,6 +275,84 @@ class CompetitionRegistrationsController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionGetOrganizationStats()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        $organizationId = Yii::app()->request->getQuery('organization_id');
+
+        if (empty($eventId)) {
+            $activeEvents = Events::getActiveList();
+            if (!empty($activeEvents)) {
+                $eventId = key($activeEvents);
+            }
+        }
+
+        if (empty($eventId)) {
+            header('Content-Type: application/json');
+            echo json_encode(array('success' => true, 'organizations' => array()));
+            Yii::app()->end();
+        }
+
+        $params = array(
+            'event_id' => $eventId,
+            'per_page' => 5000,
+        );
+        if (!empty($organizationId)) {
+            $params['organization_id'] = $organizationId;
+        }
+
+        $compRegsRes = CompetitionRegistrations::getApiDataProvider($params, 5000)->getData();
+
+        $orgStats = array();
+
+        foreach ($compRegsRes as $compReg) {
+            if (isset($compReg->deleted_at) && $compReg->deleted_at !== null && $compReg->deleted_at !== '') {
+                continue;
+            }
+
+            $orgId = isset($compReg->organization_id) ? $compReg->organization_id : null;
+            if (empty($orgId)) continue;
+
+            $orgName = 'Chưa xác định';
+            if (isset($compReg->organization_name)) {
+                $orgName = $compReg->organization_name;
+            } elseif (isset($compReg->organization)) {
+                if (is_array($compReg->organization)) {
+                    $orgName = $compReg->organization['name'];
+                } else {
+                    $orgName = $compReg->organization->name;
+                }
+            }
+
+            if (!isset($orgStats[$orgId])) {
+                $orgStats[$orgId] = array(
+                    'id' => $orgId,
+                    'name' => $orgName,
+                    'contestant_count' => 0,
+                    'confirmed_count' => 0,
+                );
+            }
+
+            $orgStats[$orgId]['contestant_count']++;
+
+            if (isset($compReg->status) && $compReg->status == CompetitionRegistrations::STATUS_CONFIRMED) {
+                $orgStats[$orgId]['confirmed_count']++;
+            }
+        }
+
+        $formattedOrgs = array_values($orgStats);
+        usort($formattedOrgs, function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
+        header('Content-Type: application/json');
+        echo json_encode(array(
+            'success' => true,
+            'organizations' => $formattedOrgs,
+        ));
+        Yii::app()->end();
+    }
+
     public function actionViewByCompetition()
     {
         $eventId = Yii::app()->request->getQuery('event_id');
