@@ -1054,4 +1054,319 @@ class ReportsController extends AdminController
         $objWriter->save('php://output');
         Yii::app()->end();
     }
+
+    /**
+     * Xuất báo cáo thể thao theo cụm và đơn vị
+     */
+    public function actionExportSports($event_id = null)
+    {
+        $user = AuthHandler::getUser();
+        if (!$user) {
+            throw new CHttpException(403, 'Bạn cần đăng nhập để xuất báo cáo.');
+        }
+
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+        $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
+        $userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+        // Get event
+        $selectedEventId = $event_id;
+        $eventName = '';
+        if ($selectedEventId) {
+            $event = Events::fetchFromApi($selectedEventId);
+            $eventName = $event ? $event->name : '';
+        }
+
+        // Fetch regionals
+        $regionals = Regionals::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        $regionalMap = array();
+        foreach ($regionals as $reg) {
+            $regId = isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null);
+            $regName = isset($reg->name) ? $reg->name : (isset($reg['name']) ? $reg['name'] : '');
+            if ($regId) {
+                $regionalMap[$regId] = $regName;
+            }
+        }
+
+        // Fetch properties
+        $properties = array();
+        if ($isHO) {
+            $properties = Properties::getApiDataProvider(array('is_active' => 1), 1000)->getData();
+        } else if ($userPropertyId) {
+            $prop = Properties::fetchFromApi($userPropertyId);
+            if ($prop) $properties = array($prop);
+        }
+
+        $propertyRegionalMap = array();
+        foreach ($properties as $prop) {
+            $propId = isset($prop->id) ? $prop->id : (isset($prop['id']) ? $prop['id'] : null);
+            $propRegionId = isset($prop->region_id) ? $prop->region_id : null;
+            if ($propId) {
+                $propertyRegionalMap[$propId] = array(
+                    'region_id' => $propRegionId,
+                    'region_name' => isset($regionalMap[$propRegionId]) ? $regionalMap[$propRegionId] : 'Chưa phân cụm',
+                    'code' => isset($prop->code) ? $prop->code : '',
+                    'name' => isset($prop->name) ? $prop->name : '',
+                );
+            }
+        }
+
+        // Fetch active registrations
+        $regParams = array('event_id' => $selectedEventId, 'per_page' => 1000);
+        if (!$isHO && $userPropertyId) {
+            $regParams['property_id'] = $userPropertyId;
+        }
+        $registrationsRes = Registrations::getApiDataProvider($regParams, 1000)->getData();
+        $activeRegistrationIds = array();
+        foreach ($registrationsRes as $reg) {
+            $deletedAt = isset($reg->deleted_at) ? $reg->deleted_at : null;
+            if ($deletedAt) continue;
+            $status = isset($reg->status) ? (int)$reg->status : 0;
+            if ($status !== Registrations::STATUS_DRAFT) {
+                $regId = isset($reg->id) ? $reg->id : null;
+                if ($regId) $activeRegistrationIds[$regId] = true;
+            }
+        }
+
+        // Fetch sports
+        $sportsList = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $sportNameMap = array();
+        foreach ($sportsList as $sp) {
+            $spId = isset($sp->id) ? $sp->id : null;
+            $spName = isset($sp->name) ? $sp->name : '';
+            if ($spId) $sportNameMap[$spId] = $spName;
+        }
+
+        // Fetch sport teams
+        $teamParams = array('event_id' => $selectedEventId, 'per_page' => 1000);
+        if (!$isHO && $userPropertyId) {
+            $teamParams['property_id'] = $userPropertyId;
+        }
+        $rawTeams = SportTeams::getApiDataProvider($teamParams, 1000)->getData();
+
+        $sportTeams = array();
+        $activeSports = array();
+        foreach ($rawTeams as $team) {
+            $teamDeletedAt = isset($team->deleted_at) ? $team->deleted_at : null;
+            if ($teamDeletedAt) continue;
+            $regId = isset($team->registration_id) ? $team->registration_id : null;
+            if (!$regId || !isset($activeRegistrationIds[$regId])) continue;
+
+            $spId = isset($team->sport_id) ? $team->sport_id : null;
+            if ($spId && isset($sportNameMap[$spId])) {
+                $activeSports[$spId] = $sportNameMap[$spId];
+            }
+            $sportTeams[] = $team;
+        }
+
+        // Sort active sports by name
+        asort($activeSports);
+
+        // Count members per team
+        $sportMemberCounts = array();
+        foreach ($sportTeams as $team) {
+            $teamId = isset($team->id) ? $team->id : null;
+            if ($teamId) {
+                $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+                $sportMemberCounts[$teamId] = count($membersData);
+            }
+        }
+
+        // Build report data
+        $sportsReportData = array();
+        foreach ($sportTeams as $team) {
+            $teamId = isset($team->id) ? $team->id : null;
+            $propId = isset($team->property_id) ? $team->property_id : null;
+            $spId = isset($team->sport_id) ? $team->sport_id : null;
+            if (!$propId || !$spId) continue;
+
+            $regionId = isset($propertyRegionalMap[$propId]) ? $propertyRegionalMap[$propId]['region_id'] : 0;
+            if (!$regionId) $regionId = 0;
+
+            if (!isset($sportsReportData[$regionId])) $sportsReportData[$regionId] = array();
+            if (!isset($sportsReportData[$regionId][$propId])) $sportsReportData[$regionId][$propId] = array();
+            if (!isset($sportsReportData[$regionId][$propId][$spId])) {
+                $sportsReportData[$regionId][$propId][$spId] = array('team_count' => 0, 'member_count' => 0);
+            }
+
+            $sportsReportData[$regionId][$propId][$spId]['team_count']++;
+            $sportsReportData[$regionId][$propId][$spId]['member_count'] += isset($sportMemberCounts[$teamId]) ? $sportMemberCounts[$teamId] : 0;
+        }
+
+        // Initialize PHPExcel
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $objPHPExcel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        $objPHPExcel->getProperties()->setCreator("System")
+            ->setTitle("Bao cao the thao theo cum")
+            ->setSubject("Bao cao the thao theo cum");
+
+        $sheet = $objPHPExcel->setActiveSheetIndex(0);
+        $sheet->setTitle('Bao_cao_the_thao');
+
+        // Header styles
+        $headerStyle = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '3A57E8')),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'CCCCCC')))
+        );
+        $subHeaderStyle = array(
+            'font' => array('bold' => true, 'size' => 10),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'E9ECEF')),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'CCCCCC')))
+        );
+        $borderStyle = array(
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'E9ECEF')))
+        );
+        $totalRowStyle = array(
+            'font' => array('bold' => true),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'FFF3CD')),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'CCCCCC')))
+        );
+
+        // Title row
+        $sheet->setCellValue('A1', 'BÁO CÁO ĐĂNG KÝ THI ĐẤU THỂ THAO - ' . strtoupper($eventName));
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new PHPExcel_Style_Color('3A57E8'));
+
+        // Build headers
+        $row = 3;
+        $col = 'A';
+        $sheet->setCellValue($col++ . $row, 'STT');
+        $sheet->setCellValue($col++ . $row, 'Cụm');
+        $sheet->setCellValue($col++ . $row, 'Tên ĐV');
+
+        $sportColMap = array();
+        foreach ($activeSports as $spId => $spName) {
+            $sportColMap[$spId] = $col;
+            $sheet->setCellValue($col . $row, $spName);
+            $sheet->mergeCells($col . $row . ':' . chr(ord($col) + 1) . $row);
+            $col++;
+            $col++;
+        }
+
+        // Apply header style
+        $lastCol = chr(ord($col) - 1);
+        $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($headerStyle);
+
+        // Sub-header row
+        $row++;
+        $col = 'A';
+        $sheet->setCellValue($col++ . $row, '');
+        $sheet->setCellValue($col++ . $row, '');
+        $sheet->setCellValue($col++ . $row, '');
+        foreach ($activeSports as $spId => $spName) {
+            $sheet->setCellValue($col++ . $row, 'Số đội');
+            $sheet->setCellValue($col++ . $row, 'Số VĐV');
+        }
+        $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($subHeaderStyle);
+
+        // Merge STT, Cụm, Tên ĐV headers
+        $sheet->mergeCells('A3:A4');
+        $sheet->mergeCells('B3:B4');
+        $sheet->mergeCells('C3:C4');
+
+        // Data rows
+        $row++;
+        $stt = 1;
+        $grandTotals = array();
+        foreach ($activeSports as $spId => $spName) {
+            $grandTotals[$spId] = array('team_count' => 0, 'member_count' => 0);
+        }
+
+        // Sort regions
+        ksort($sportsReportData);
+
+        foreach ($sportsReportData as $regionId => $propData) {
+            $regionName = ($regionId && isset($regionalMap[$regionId])) ? $regionalMap[$regionId] : 'Chưa phân cụm';
+            $regionStartRow = $row;
+            $regionTotals = array();
+            foreach ($activeSports as $spId => $spName) {
+                $regionTotals[$spId] = array('team_count' => 0, 'member_count' => 0);
+            }
+
+            // Sort properties by code
+            uksort($propData, function($a, $b) use ($propertyRegionalMap) {
+                $codeA = isset($propertyRegionalMap[$a]) ? $propertyRegionalMap[$a]['code'] : '';
+                $codeB = isset($propertyRegionalMap[$b]) ? $propertyRegionalMap[$b]['code'] : '';
+                return strnatcasecmp($codeA, $codeB);
+            });
+
+            foreach ($propData as $propId => $sportsData) {
+                $propInfo = isset($propertyRegionalMap[$propId]) ? $propertyRegionalMap[$propId] : null;
+                $propName = $propInfo ? $propInfo['name'] : 'Không xác định';
+
+                $col = 'A';
+                $sheet->setCellValue($col++ . $row, $stt++);
+                $sheet->setCellValue($col++ . $row, $regionName);
+                $sheet->setCellValue($col++ . $row, $propName);
+
+                foreach ($activeSports as $spId => $spName) {
+                    $teamCount = isset($sportsData[$spId]) ? $sportsData[$spId]['team_count'] : 0;
+                    $memberCount = isset($sportsData[$spId]) ? $sportsData[$spId]['member_count'] : 0;
+                    $sheet->setCellValue($col++ . $row, $teamCount ?: '');
+                    $sheet->setCellValue($col++ . $row, $memberCount ?: '');
+
+                    $regionTotals[$spId]['team_count'] += $teamCount;
+                    $regionTotals[$spId]['member_count'] += $memberCount;
+                    $grandTotals[$spId]['team_count'] += $teamCount;
+                    $grandTotals[$spId]['member_count'] += $memberCount;
+                }
+
+                $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($borderStyle);
+                $row++;
+            }
+
+            // Region subtotal row
+            $col = 'A';
+            $sheet->setCellValue($col++ . $row, '');
+            $sheet->setCellValue($col++ . $row, '');
+            $sheet->setCellValue($col++ . $row, 'Tổng ' . $regionName);
+            foreach ($activeSports as $spId => $spName) {
+                $sheet->setCellValue($col++ . $row, $regionTotals[$spId]['team_count']);
+                $sheet->setCellValue($col++ . $row, $regionTotals[$spId]['member_count']);
+            }
+            $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($totalRowStyle);
+            $row++;
+        }
+
+        // Grand total row
+        $col = 'A';
+        $sheet->setCellValue($col++ . $row, '');
+        $sheet->setCellValue($col++ . $row, '');
+        $sheet->setCellValue($col++ . $row, 'TỔNG CỘNG');
+        foreach ($activeSports as $spId => $spName) {
+            $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['team_count']);
+            $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['member_count']);
+        }
+        $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray(array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '28A745')),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'CCCCCC')))
+        ));
+
+        // Merge title row
+        $sheet->mergeCells('A1:' . $lastCol . '1');
+
+        // Auto-size columns
+        foreach (range('A', $lastCol) as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Send file
+        $filename = "Bao_cao_the_thao_" . date('Ymd_His') . ".xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        Yii::app()->end();
+    }
 }
