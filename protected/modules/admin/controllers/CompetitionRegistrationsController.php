@@ -86,31 +86,31 @@ class CompetitionRegistrationsController extends AdminController
         }
     }
 
-    public function actionAdmin()
-    {
-        $model = new CompetitionRegistrations('search');
-        $model->unsetAttributes();
+    // public function actionAdmin()
+    // {
+    //     $model = new CompetitionRegistrations('search');
+    //     $model->unsetAttributes();
 
-        if (isset($_GET['CompetitionRegistrations'])) {
-            $model->setAttributes($_GET['CompetitionRegistrations']);
-        }
+    //     if (isset($_GET['CompetitionRegistrations'])) {
+    //         $model->setAttributes($_GET['CompetitionRegistrations']);
+    //     }
 
-        $params = array();
-        foreach ($model->attributes as $key => $value) {
-            if ($value !== null && $value !== '') {
-                $params[$key] = $value;
-            }
-        }
+    //     $params = array();
+    //     foreach ($model->attributes as $key => $value) {
+    //         if ($value !== null && $value !== '') {
+    //             $params[$key] = $value;
+    //         }
+    //     }
 
-        $dataProvider = CompetitionRegistrations::getApiDataProvider($params);
-        $competitions = Competitions::getActiveList();
+    //     $dataProvider = CompetitionRegistrations::getApiDataProvider($params);
+    //     $competitions = Competitions::getActiveList();
 
-        $this->render('admin', array(
-            'model' => $model,
-            'dataProvider' => $dataProvider,
-            'competitions' => $competitions,
-        ));
-    }
+    //     $this->render('admin', array(
+    //         'model' => $model,
+    //         'dataProvider' => $dataProvider,
+    //         'competitions' => $competitions,
+    //     ));
+    // }
 
     public function actionConfirm($id)
     {
@@ -129,7 +129,7 @@ class CompetitionRegistrationsController extends AdminController
         }
     }
 
-    public function actionOverview()
+    public function actionAdmin()
     {
         $events = Events::getActiveList();
         $competitions = Competitions::getActiveList();
@@ -189,7 +189,16 @@ class CompetitionRegistrationsController extends AdminController
             }
 
             $compId = $compReg->competition_id;
-            $compName = isset($compReg->competition) ? $compReg->competition->name : (isset($compReg->competition_name) ? $compReg->competition_name : 'Chưa xác định');
+            $compName = 'Chưa xác định';
+            if (isset($compReg->competition_name)) {
+                $compName = $compReg->competition_name;
+            } elseif (isset($compReg->competition)) {
+                if (is_array($compReg->competition)) {
+                    $compName = $compReg->competition['name'];
+                } else {
+                    $compName = $compReg->competition->name;
+                }
+            }
 
             if (!isset($competitionStats[$compId])) {
                 $competitionStats[$compId] = array(
