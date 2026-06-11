@@ -544,6 +544,109 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                 </div>
                             </div>
 
+                            <!-- TAB 6: TỔNG HỢP THỂ THAO THEO CỤM -->
+                            <div class="tab-pane fade" id="sports-summary-pane" role="tabpanel" aria-labelledby="sports-summary-tab" tabindex="0">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                                    <h5 class="fw-bold mb-0 text-dark"><i class="fa fa-table text-primary me-2"></i>Tổng hợp đăng ký thể thao theo cụm và đơn vị</h5>
+                                    <a href="<?php echo Yii::app()->createUrl('/admin/reports/exportSports', array('event_id' => $selectedEventId)); ?>" class="btn btn-success">
+                                        <i class="fa fa-file-excel-o me-1"></i> Xuất báo cáo Excel
+                                    </a>
+                                </div>
+
+                                <?php if (empty($activeSportsForReport)): ?>
+                                    <div class="text-center py-5 text-muted">
+                                        <i class="fa fa-trophy fa-3x mb-3 text-white-50 d-block"></i>
+                                        Chưa có môn thể thao nào được đăng ký cho sự kiện này.
+                                    </div>
+                                <?php else: ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover align-middle mb-0" id="tableSportsSummary">
+                                            <thead>
+                                                <tr class="table-primary">
+                                                    <th rowspan="2" class="text-center align-middle" width="60">STT</th>
+                                                    <th rowspan="2" class="text-center align-middle" width="150">Cụm</th>
+                                                    <th rowspan="2" class="align-middle">Tên ĐV</th>
+                                                    <?php foreach ($activeSportsForReport as $spId => $spName): ?>
+                                                        <th colspan="2" class="text-center bg-soft-info"><?php echo CHtml::encode($spName); ?></th>
+                                                    <?php endforeach; ?>
+                                                </tr>
+                                                <tr class="table-light">
+                                                    <?php foreach ($activeSportsForReport as $spId => $spName): ?>
+                                                        <th class="text-center small" width="70">Số đội</th>
+                                                        <th class="text-center small" width="70">Số VĐV</th>
+                                                    <?php endforeach; ?>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $stt = 1;
+                                                $grandTotals = array();
+                                                foreach ($activeSportsForReport as $spId => $spName) {
+                                                    $grandTotals[$spId] = array('team_count' => 0, 'member_count' => 0);
+                                                }
+
+                                                // Sort regions
+                                                ksort($sportsReportData);
+
+                                                foreach ($sportsReportData as $regionId => $propData):
+                                                    $regionName = ($regionId && isset($regionalMap[$regionId])) ? $regionalMap[$regionId] : 'Chưa phân cụm';
+                                                    $regionTotals = array();
+                                                    foreach ($activeSportsForReport as $spId => $spName) {
+                                                        $regionTotals[$spId] = array('team_count' => 0, 'member_count' => 0);
+                                                    }
+
+                                                    // Sort properties by code
+                                                    uksort($propData, function($a, $b) use ($propertyRegionalMap) {
+                                                        $codeA = isset($propertyRegionalMap[$a]) ? $propertyRegionalMap[$a]['code'] : '';
+                                                        $codeB = isset($propertyRegionalMap[$b]) ? $propertyRegionalMap[$b]['code'] : '';
+                                                        return strnatcasecmp($codeA, $codeB);
+                                                    });
+
+                                                    foreach ($propData as $propId => $sportsData):
+                                                        $propInfo = isset($propertyRegionalMap[$propId]) ? $propertyRegionalMap[$propId] : null;
+                                                        $propName = $propInfo ? $propInfo['name'] : 'Không xác định';
+                                                ?>
+                                                    <tr>
+                                                        <td class="text-center fw-bold text-muted"><?php echo $stt++; ?></td>
+                                                        <td class="small"><?php echo CHtml::encode($regionName); ?></td>
+                                                        <td class="fw-bold text-dark"><?php echo CHtml::encode($propName); ?></td>
+                                                        <?php foreach ($activeSportsForReport as $spId => $spName):
+                                                            $teamCount = isset($sportsData[$spId]) ? $sportsData[$spId]['team_count'] : 0;
+                                                            $memberCount = isset($sportsData[$spId]) ? $sportsData[$spId]['member_count'] : 0;
+                                                            $regionTotals[$spId]['team_count'] += $teamCount;
+                                                            $regionTotals[$spId]['member_count'] += $memberCount;
+                                                            $grandTotals[$spId]['team_count'] += $teamCount;
+                                                            $grandTotals[$spId]['member_count'] += $memberCount;
+                                                        ?>
+                                                            <td class="text-center <?php echo $teamCount ? 'text-primary fw-bold' : 'text-muted'; ?>"><?php echo $teamCount ?: '-'; ?></td>
+                                                            <td class="text-center <?php echo $memberCount ? 'text-success fw-bold' : 'text-muted'; ?>"><?php echo $memberCount ?: '-'; ?></td>
+                                                        <?php endforeach; ?>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                                    <!-- Region subtotal -->
+                                                    <tr class="table-warning">
+                                                        <td colspan="3" class="text-end fw-bold">Tổng <?php echo CHtml::encode($regionName); ?>:</td>
+                                                        <?php foreach ($activeSportsForReport as $spId => $spName): ?>
+                                                            <td class="text-center fw-bold"><?php echo $regionTotals[$spId]['team_count']; ?></td>
+                                                            <td class="text-center fw-bold"><?php echo $regionTotals[$spId]['member_count']; ?></td>
+                                                        <?php endforeach; ?>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                            <tfoot class="table-success">
+                                                <tr>
+                                                    <td colspan="3" class="text-end fw-bold fs-6">TỔNG CỘNG:</td>
+                                                    <?php foreach ($activeSportsForReport as $spId => $spName): ?>
+                                                        <td class="text-center fw-bold fs-5"><?php echo $grandTotals[$spId]['team_count']; ?></td>
+                                                        <td class="text-center fw-bold fs-5"><?php echo $grandTotals[$spId]['member_count']; ?></td>
+                                                    <?php endforeach; ?>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
                         </div>
                     </div>
                 </div>
