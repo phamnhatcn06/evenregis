@@ -103,15 +103,43 @@ $this->Tabletitle = 'Tổng quan thí sinh thi nghiệp vụ';
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header bg-success text-white">
-        <h5 class="mb-0"><i class="fa fa-trophy me-2"></i>Thống kê theo nghiệp vụ</h5>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fa fa-trophy me-2"></i>Thống kê theo nghiệp vụ</h5>
+            </div>
+            <div class="card-body">
+                <div id="competitions-stats-container">
+                    <div class="text-center py-4">
+                        <i class="fa fa-spinner fa-spin fa-2x"></i>
+                        <p class="mt-2">Đang tải dữ liệu...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <div id="competitions-stats-container">
-            <div class="text-center py-4">
-                <i class="fa fa-spinner fa-spin fa-2x"></i>
-                <p class="mt-2">Đang tải dữ liệu...</p>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fa fa-building me-2"></i>Thống kê theo đơn vị</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Chọn đơn vị</label>
+                    <select id="filter-organization" class="form-select">
+                        <option value="">-- Tất cả đơn vị --</option>
+                        <?php foreach ($organizations as $id => $name): ?>
+                            <option value="<?php echo $id; ?>"><?php echo CHtml::encode($name); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div id="organization-stats-container">
+                    <div class="text-center py-4">
+                        <i class="fa fa-spinner fa-spin fa-2x"></i>
+                        <p class="mt-2">Đang tải dữ liệu...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
