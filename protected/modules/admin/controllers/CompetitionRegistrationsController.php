@@ -850,6 +850,127 @@ class CompetitionRegistrationsController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionAjaxGetPropertyContestants()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        $propertyId = Yii::app()->request->getQuery('property_id');
+
+        header('Content-Type: application/json');
+
+        if (empty($eventId) || empty($propertyId)) {
+            echo json_encode(array('success' => false, 'message' => 'Thiếu thông tin sự kiện hoặc đơn vị.'));
+            Yii::app()->end();
+        }
+
+        // Fetch all registrations for the event by property
+        $apiData = CompetitionRegistrations::getListByProperty(array(
+            'event_id' => $eventId,
+            'property_id' => $propertyId,
+        ));
+
+        $rawData = isset($apiData['data']) && is_array($apiData['data']) ? $apiData['data'] : (is_array($apiData) ? $apiData : array());
+
+        // Map all registrations of the event to get the complete registered competitions list for each attendee.
+        $allCompRegs = CompetitionRegistrations::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'per_page' => 10000,
+        ), 10000)->getData();
+
+        // Map attendee_id -> array of registered competition names
+        $attendeeCompetitions = array();
+        foreach ($allCompRegs as $reg) {
+            if (isset($reg->deleted_at) && $reg->deleted_at !== null && $reg->deleted_at !== '') {
+                continue;
+            }
+            $attId = $reg->attendee_id;
+            if (!isset($attendeeCompetitions[$attId])) {
+                $attendeeCompetitions[$attId] = array();
+            }
+            $compName = isset($reg->competition_name) ? $reg->competition_name : '';
+            if (!$compName && isset($reg->competition)) {
+                $comp = $reg->competition;
+                $compName = is_array($comp) ? (isset($comp['name']) ? $comp['name'] : '') : (isset($comp->name) ? $comp->name : '');
+            }
+            if ($compName && !in_array($compName, $attendeeCompetitions[$attId])) {
+                $attendeeCompetitions[$attId][] = $compName;
+            }
+        }
+
+        // Map local properties map for fallback name
+        $properties = Properties::getApiDataProvider(array(), 500)->getData();
+        $propertyNameMap = array();
+        foreach ($properties as $p) {
+            $propertyNameMap[$p->id] = $p->name;
+        }
+
+        $contestants = array();
+        foreach ($rawData as $item) {
+            if (isset($item['deleted_at']) && $item['deleted_at'] !== null && $item['deleted_at'] !== '') {
+                continue;
+            }
+
+            // Verify property matches
+            $itemPropId = isset($item['property_id']) ? $item['property_id'] : null;
+            if (isset($item['attendee']) && is_array($item['attendee']) && !$itemPropId) {
+                $itemPropId = isset($item['attendee']['property_id']) ? $item['attendee']['property_id'] : null;
+            }
+            if ($itemPropId && $itemPropId != $propertyId) {
+                continue;
+            }
+
+            $attendeeName = isset($item['attendee_name']) ? $item['attendee_name'] : '-';
+            $attendeePosition = '';
+            
+            if (isset($item['position'])) {
+                $pos = $item['position'];
+                if (is_array($pos) && isset($pos['name'])) {
+                    $attendeePosition = $pos['name'];
+                } elseif (is_object($pos) && isset($pos->name)) {
+                    $attendeePosition = $pos->name;
+                }
+            }
+
+            if (isset($item['attendee'])) {
+                $att = $item['attendee'];
+                if (is_array($att)) {
+                    $attendeeName = isset($att['full_name']) ? $att['full_name'] : $attendeeName;
+                    if (empty($attendeePosition) && isset($att['position'])) {
+                        $pos = $att['position'];
+                        $attendeePosition = is_array($pos) ? (isset($pos['name']) ? $pos['name'] : '') : (isset($pos->name) ? $pos->name : '');
+                    }
+                }
+            }
+
+            $status = isset($item['status']) ? (int)$item['status'] : 0;
+            $statusLabel = CompetitionRegistrations::getStatusLabel($status);
+
+            $attId = isset($item['attendee_id']) ? $item['attendee_id'] : null;
+            $registeredComps = ($attId && isset($attendeeCompetitions[$attId])) ? $attendeeCompetitions[$attId] : array();
+
+            $contestants[] = array(
+                'id' => isset($item['id']) ? $item['id'] : null,
+                'name' => $attendeeName,
+                'position' => $attendeePosition,
+                'candidate_number' => isset($item['candidate_number']) ? $item['candidate_number'] : null,
+                'status_label' => $statusLabel,
+                'status' => $status,
+                'registered_competitions' => $registeredComps,
+            );
+        }
+
+        // Sort contestants alphabetically by name
+        usort($contestants, function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
+        echo json_encode(array(
+            'success' => true,
+            'propertyName' => isset($propertyNameMap[$propertyId]) ? $propertyNameMap[$propertyId] : 'Đơn vị',
+            'contestants' => $contestants,
+        ));
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = CompetitionRegistrations::fetchFromApi($id);

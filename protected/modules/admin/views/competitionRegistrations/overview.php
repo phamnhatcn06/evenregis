@@ -145,6 +145,40 @@ $this->Tabletitle = 'Tổng quan thí sinh thi nghiệp vụ';
     </div>
 </div>
 
+<!-- Modal xem danh sách thí sinh của đơn vị -->
+<div class="modal fade" id="modalViewOrgContestants" tabindex="-1" aria-labelledby="modalViewOrgContestantsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalViewOrgContestantsLabel">Danh sách thí sinh: <span id="modalViewOrgContestantsTitleName">-</span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 5%">STT</th>
+                                <th style="width: 15%">SBD</th>
+                                <th style="width: 25%">Họ tên</th>
+                                <th style="width: 25%">Chức danh</th>
+                                <th style="width: 20%">Nghiệp vụ đăng ký</th>
+                                <th style="width: 10%">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalViewOrgContestantsBody">
+                            <!-- Dữ liệu sẽ được render bằng JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/pages/competition-registrations-overview.js',

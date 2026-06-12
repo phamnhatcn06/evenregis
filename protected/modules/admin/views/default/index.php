@@ -205,13 +205,25 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
     $draft = isset($stats['properties_draft']) ? $stats['properties_draft'] : array();
     $submitted = isset($stats['properties_submitted']) ? $stats['properties_submitted'] : array();
     ?>
+    <script>
+        window.dashboardStatsData = {
+            notstarted: <?php echo json_encode($notStarted); ?>,
+            draft: <?php echo json_encode($draft); ?>,
+            submitted: <?php echo json_encode($submitted); ?>
+        };
+    </script>
     <div class="row">
         <!-- Chưa khởi tạo đăng ký -->
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0"><i class="fa fa-times-circle text-danger me-2"></i>Chưa khởi tạo</h6>
-                    <span class="badge bg-danger" id="stat-count-notstarted"><?php echo count($notStarted); ?></span>
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-success me-2 py-0 px-2 btn-export-excel" data-type="notstarted" title="Xuất Excel" style="font-size: 0.75rem;">
+                            <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                        </button>
+                        <span class="badge bg-danger" id="stat-count-notstarted"><?php echo count($notStarted); ?></span>
+                    </div>
                 </div>
                 <div class="card-body p-0" id="table-notstarted">
                     <?php if (empty($notStarted)): ?>
@@ -245,7 +257,12 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0"><i class="fa fa-edit text-secondary me-2"></i>Nháp (chưa gửi)</h6>
-                    <span class="badge bg-secondary" id="stat-count-draft"><?php echo count($draft); ?></span>
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-success me-2 py-0 px-2 btn-export-excel" data-type="draft" title="Xuất Excel" style="font-size: 0.75rem;">
+                            <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                        </button>
+                        <span class="badge bg-secondary" id="stat-count-draft"><?php echo count($draft); ?></span>
+                    </div>
                 </div>
                 <div class="card-body p-0" id="table-draft">
                     <?php if (empty($draft)): ?>
@@ -279,7 +296,12 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0"><i class="fa fa-paper-plane text-info me-2"></i>Đã gửi đăng ký</h6>
-                    <span class="badge bg-info" id="stat-count-submitted"><?php echo count($submitted); ?></span>
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-success me-2 py-0 px-2 btn-export-excel" data-type="submitted" title="Xuất Excel" style="font-size: 0.75rem;">
+                            <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                        </button>
+                        <span class="badge bg-info" id="stat-count-submitted"><?php echo count($submitted); ?></span>
+                    </div>
                 </div>
                 <div class="card-body p-0" id="table-submitted">
                     <?php if (empty($submitted)): ?>
