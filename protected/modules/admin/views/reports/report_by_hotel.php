@@ -1,7 +1,7 @@
 <?php
 /**
  * Report By Hotel View
- * @var ReportsController $this
+ * @var ReportByHotelController $this
  * @var bool $isHO
  * @var array $user
  * @var array $eventsList
@@ -12,7 +12,7 @@
  */
 
 $this->breadcrumbs = array(
-    'Báo cáo' => array('admin'),
+    'Báo cáo' => array('/admin/reports/admin'),
     'Theo khách sạn',
 );
 
@@ -47,7 +47,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <a href="<?php echo $this->createUrl('exportByHotel', array('event_id' => $selectedEventId, 'type' => 'all')); ?>" class="btn btn-success shadow-sm" title="Xuất tất cả">
+                    <a href="<?php echo $this->createUrl('export', array('event_id' => $selectedEventId, 'type' => 'all')); ?>" class="btn btn-success shadow-sm" title="Xuất tất cả">
                         <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
                     </a>
                 </form>
