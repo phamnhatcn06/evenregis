@@ -9,7 +9,7 @@
 ?>
 <div class="card">
     <div class="card-header bg-warning text-white">
-        <h5 class="mb-0">
+        <h5 class="mb-0 text-white">
             <i class="fa fa-building me-2"></i>
             <?php echo CHtml::encode($propertyName); ?> - <?php echo CHtml::encode($eventName); ?>
         </h5>
