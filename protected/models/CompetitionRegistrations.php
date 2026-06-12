@@ -107,4 +107,13 @@ class CompetitionRegistrations extends BaseCompetitionRegistrations
     {
         return self::getApiDataProvider(array('registration_id' => $registrationId), 500)->getData();
     }
+
+    public static function getListByProperty($params = array())
+    {
+        $result = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST_BY_PROPERTY, $params);
+        if ($result['success'] && isset($result['data'])) {
+            return $result['data'];
+        }
+        return array();
+    }
 }
