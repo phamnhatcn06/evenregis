@@ -2739,6 +2739,17 @@ class RegistrationsController extends AdminController
 		$competitionId = isset($_GET['competition_id']) ? $_GET['competition_id'] : null;
 
 		$attendees = Attendees::getByRegistrationId($registration_id);
+
+		// Lấy has_golf từ registration property
+		$hasGolf = 0;
+		$registration = Registrations::fetchFromApi($registration_id);
+		if ($registration && $registration->property_id) {
+			$property = Properties::fetchFromApi($registration->property_id);
+			if ($property && isset($property->has_golf)) {
+				$hasGolf = (int)$property->has_golf;
+			}
+		}
+
 		// Lọc theo phòng ban được phép thi nếu có competition_id
 		$allowedDepartments = array();
 		if ($competitionId) {
@@ -2757,9 +2768,20 @@ class RegistrationsController extends AdminController
 
 			if (!$id) continue;
 
-			// Lọc theo division_code nằm trong danh sách phòng ban được phép thi
-			if (!empty($allowedDepartments) && !in_array($divisionCode, $allowedDepartments)) {
-				continue;
+			// Nếu đơn vị có has_golf = 1: cho chọn cả người có phòng ban phù hợp và người không có phòng ban
+			// Ngược lại: lọc theo division_code nằm trong danh sách phòng ban được phép thi
+			if (!empty($allowedDepartments)) {
+				if ($hasGolf == 1) {
+					// Đơn vị có golf: cho chọn người có phòng ban phù hợp HOẶC người không có phòng ban
+					if (!empty($divisionCode) && !in_array($divisionCode, $allowedDepartments)) {
+						continue;
+					}
+				} else {
+					// Đơn vị thường: chỉ cho chọn người có phòng ban phù hợp
+					if (!in_array($divisionCode, $allowedDepartments)) {
+						continue;
+					}
+				}
 			}
 
 			$result[] = array(
