@@ -297,79 +297,36 @@ class CompetitionRegistrationsController extends AdminController
             Yii::app()->end();
         }
 
-        $params = array(
-            'per_page' => 5000,
-        );
+        $params = array('event_id' => $eventId);
+        if (!empty($filterPropertyId)) {
+            $params['property_id'] = $filterPropertyId;
+        }
 
-        $compRegsRes = CompetitionRegistrations::getApiDataProvider($params, 5000)->getData();
+        $apiData = CompetitionRegistrations::getListByProperty($params);
 
-        $orgStats = array();
-
-        foreach ($compRegsRes as $compReg) {
-            if (isset($compReg->deleted_at) && $compReg->deleted_at !== null && $compReg->deleted_at !== '') {
-                continue;
-            }
-
-            $propId = null;
-            $propName = 'Chưa xác định';
-            $regionName = '';
-
-            if (isset($compReg->attendee)) {
-                $att = $compReg->attendee;
-                if (is_array($att)) {
-                    if (isset($att['property'])) {
-                        $prop = $att['property'];
-                        $propId = isset($prop['id']) ? $prop['id'] : null;
-                        $propName = isset($prop['name']) ? $prop['name'] : $propName;
-                        if (isset($prop['region']) && isset($prop['region']['name'])) {
-                            $regionName = $prop['region']['name'];
-                        }
-                    }
-                } else {
-                    if (isset($att->property)) {
-                        $prop = $att->property;
-                        if (is_array($prop)) {
-                            $propId = isset($prop['id']) ? $prop['id'] : null;
-                            $propName = isset($prop['name']) ? $prop['name'] : $propName;
-                            if (isset($prop['region']) && isset($prop['region']['name'])) {
-                                $regionName = $prop['region']['name'];
-                            }
-                        } else {
-                            $propId = isset($prop->id) ? $prop->id : null;
-                            $propName = isset($prop->name) ? $prop->name : $propName;
-                            if (isset($prop->region) && isset($prop->region->name)) {
-                                $regionName = $prop->region->name;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (empty($propId)) continue;
-
-            // Filter theo đơn vị nếu có
-            if (!empty($filterPropertyId) && $propId != $filterPropertyId) {
-                continue;
-            }
-
-            if (!isset($orgStats[$propId])) {
-                $orgStats[$propId] = array(
-                    'id' => $propId,
-                    'name' => $propName,
-                    'region_name' => $regionName,
-                    'contestant_count' => 0,
-                    'confirmed_count' => 0,
+        $formattedOrgs = array();
+        if (isset($apiData['data']) && is_array($apiData['data'])) {
+            foreach ($apiData['data'] as $item) {
+                $formattedOrgs[] = array(
+                    'id' => isset($item['property_id']) ? $item['property_id'] : null,
+                    'name' => isset($item['property_name']) ? $item['property_name'] : 'Chưa xác định',
+                    'region_name' => isset($item['region_name']) ? $item['region_name'] : '',
+                    'contestant_count' => isset($item['contestant_count']) ? (int)$item['contestant_count'] : 0,
+                    'confirmed_count' => isset($item['confirmed_count']) ? (int)$item['confirmed_count'] : 0,
                 );
             }
-
-            $orgStats[$propId]['contestant_count']++;
-
-            if (isset($compReg->status) && $compReg->status == CompetitionRegistrations::STATUS_CONFIRMED) {
-                $orgStats[$propId]['confirmed_count']++;
+        } elseif (is_array($apiData)) {
+            foreach ($apiData as $item) {
+                $formattedOrgs[] = array(
+                    'id' => isset($item['property_id']) ? $item['property_id'] : null,
+                    'name' => isset($item['property_name']) ? $item['property_name'] : 'Chưa xác định',
+                    'region_name' => isset($item['region_name']) ? $item['region_name'] : '',
+                    'contestant_count' => isset($item['contestant_count']) ? (int)$item['contestant_count'] : 0,
+                    'confirmed_count' => isset($item['confirmed_count']) ? (int)$item['confirmed_count'] : 0,
+                );
             }
         }
 
-        $formattedOrgs = array_values($orgStats);
         usort($formattedOrgs, function ($a, $b) {
             return strnatcasecmp($a['name'], $b['name']);
         });
@@ -442,14 +399,95 @@ class CompetitionRegistrationsController extends AdminController
             }
 
             $propId = isset($compReg->property_id) ? $compReg->property_id : null;
-            if (!$propId && isset($compReg->attendee)) {
-                $att = $compReg->attendee;
-                $propId = is_array($att) ? (isset($att['property_id']) ? $att['property_id'] : null) : (isset($att->property_id) ? $att->property_id : null);
-            }
-            $propName = isset($propertyNameMap[$propId]) ? $propertyNameMap[$propId] : (isset($compReg->property_name) ? $compReg->property_name : 'Chưa xác định');
+            $propNameFromApi = null;
+            $regionIdFromApi = null;
+            $regionNameFromApi = null;
 
-            $regionId = isset($propertyRegionMap[$propId]) ? $propertyRegionMap[$propId] : null;
-            $regionName = ($regionId && isset($regionalMap[$regionId])) ? $regionalMap[$regionId] : 'Chưa phân cụm';
+            if (isset($compReg->attendee)) {
+                $att = $compReg->attendee;
+                if (is_array($att)) {
+                    if (!$propId) {
+                        $propId = isset($att['property_id']) ? $att['property_id'] : null;
+                    }
+                    if (isset($att['property'])) {
+                        $prop = $att['property'];
+                        if (is_array($prop)) {
+                            if (!$propId) {
+                                $propId = isset($prop['id']) ? $prop['id'] : null;
+                            }
+                            $propNameFromApi = isset($prop['name']) ? $prop['name'] : null;
+                            if (isset($prop['region'])) {
+                                $reg = $prop['region'];
+                                if (is_array($reg)) {
+                                    $regionIdFromApi = isset($reg['id']) ? $reg['id'] : null;
+                                    $regionNameFromApi = isset($reg['name']) ? $reg['name'] : null;
+                                } elseif (is_object($reg)) {
+                                    $regionIdFromApi = isset($reg->id) ? $reg->id : null;
+                                    $regionNameFromApi = isset($reg->name) ? $reg->name : null;
+                                }
+                            }
+                        } elseif (is_object($prop)) {
+                            if (!$propId) {
+                                $propId = isset($prop->id) ? $prop->id : null;
+                            }
+                            $propNameFromApi = isset($prop->name) ? $prop->name : null;
+                            if (isset($prop->region)) {
+                                $reg = $prop->region;
+                                if (is_array($reg)) {
+                                    $regionIdFromApi = isset($reg['id']) ? $reg['id'] : null;
+                                    $regionNameFromApi = isset($reg['name']) ? $reg['name'] : null;
+                                } elseif (is_object($reg)) {
+                                    $regionIdFromApi = isset($reg->id) ? $reg->id : null;
+                                    $regionNameFromApi = isset($reg->name) ? $reg->name : null;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if (!$propId) {
+                        $propId = isset($att->property_id) ? $att->property_id : null;
+                    }
+                    if (isset($att->property)) {
+                        $prop = $att->property;
+                        if (is_array($prop)) {
+                            if (!$propId) {
+                                $propId = isset($prop['id']) ? $prop['id'] : null;
+                            }
+                            $propNameFromApi = isset($prop['name']) ? $prop['name'] : null;
+                            if (isset($prop['region'])) {
+                                $reg = $prop['region'];
+                                if (is_array($reg)) {
+                                    $regionIdFromApi = isset($reg['id']) ? $reg['id'] : null;
+                                    $regionNameFromApi = isset($reg['name']) ? $reg['name'] : null;
+                                } elseif (is_object($reg)) {
+                                    $regionIdFromApi = isset($reg->id) ? $reg->id : null;
+                                    $regionNameFromApi = isset($reg->name) ? $reg->name : null;
+                                }
+                            }
+                        } else {
+                            if (!$propId) {
+                                $propId = isset($prop->id) ? $prop->id : null;
+                            }
+                            $propNameFromApi = isset($prop->name) ? $prop->name : null;
+                            if (isset($prop->region)) {
+                                $reg = $prop->region;
+                                if (is_array($reg)) {
+                                    $regionIdFromApi = isset($reg['id']) ? $reg['id'] : null;
+                                    $regionNameFromApi = isset($reg['name']) ? $reg['name'] : null;
+                                } else {
+                                    $regionIdFromApi = isset($reg->id) ? $reg->id : null;
+                                    $regionNameFromApi = isset($reg->name) ? $reg->name : null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            $propName = isset($propertyNameMap[$propId]) ? $propertyNameMap[$propId] : ($propNameFromApi ?: (isset($compReg->property_name) ? $compReg->property_name : 'Chưa xác định'));
+
+            $regionId = isset($propertyRegionMap[$propId]) ? $propertyRegionMap[$propId] : ($regionIdFromApi ?: null);
+            $regionName = ($regionId && isset($regionalMap[$regionId])) ? $regionalMap[$regionId] : ($regionNameFromApi ?: 'Chưa phân cụm');
             $regionCode = ($regionId && isset($regionalCodeMap[$regionId])) ? $regionalCodeMap[$regionId] : 'ZZZ';
 
             if (!isset($contestantsByRegion[$regionId])) {
@@ -602,15 +640,55 @@ class CompetitionRegistrationsController extends AdminController
         if (isset($model->attendee)) {
             $att = $model->attendee;
             if (is_array($att)) {
-                $attendeeName = $att['full_name'] ?? $attendeeName;
-                $attendeePosition = $att['position'] ?? $attendeePosition;
-                $attendeeGender = $att['gender'] ?? $attendeeGender;
-                $propertyName = $att['property_name'] ?? $propertyName;
+                $attendeeName = isset($att['full_name']) ? $att['full_name'] : $attendeeName;
+                $attendeeGender = isset($att['gender']) ? $att['gender'] : $attendeeGender;
+                if (isset($att['position'])) {
+                    $pos = $att['position'];
+                    if (is_array($pos) && isset($pos['name'])) {
+                        $attendeePosition = $pos['name'];
+                    } elseif (is_object($pos) && isset($pos->name)) {
+                        $attendeePosition = $pos->name;
+                    } elseif (is_string($pos)) {
+                        $attendeePosition = $pos;
+                    }
+                }
+                if (isset($att['property'])) {
+                    $prop = $att['property'];
+                    if (is_array($prop) && isset($prop['name'])) {
+                        $propertyName = $prop['name'];
+                    } elseif (is_object($prop) && isset($prop->name)) {
+                        $propertyName = $prop->name;
+                    } elseif (is_string($prop)) {
+                        $propertyName = $prop;
+                    }
+                } else {
+                    $propertyName = isset($att['property_name']) ? $att['property_name'] : $propertyName;
+                }
             } else {
-                $attendeeName = $att->full_name ?? $attendeeName;
-                $attendeePosition = $att->position ?? $attendeePosition;
-                $attendeeGender = $att->gender ?? $attendeeGender;
-                $propertyName = $att->property_name ?? $propertyName;
+                $attendeeName = isset($att->full_name) ? $att->full_name : $attendeeName;
+                $attendeeGender = isset($att->gender) ? $att->gender : $attendeeGender;
+                if (isset($att->position)) {
+                    $pos = $att->position;
+                    if (is_array($pos) && isset($pos['name'])) {
+                        $attendeePosition = $pos['name'];
+                    } elseif (is_object($pos) && isset($pos->name)) {
+                        $attendeePosition = $pos->name;
+                    } elseif (is_string($pos)) {
+                        $attendeePosition = $pos;
+                    }
+                }
+                if (isset($att->property)) {
+                    $prop = $att->property;
+                    if (is_array($prop) && isset($prop['name'])) {
+                        $propertyName = $prop['name'];
+                    } elseif (is_object($prop) && isset($prop->name)) {
+                        $propertyName = $prop->name;
+                    } elseif (is_string($prop)) {
+                        $propertyName = $prop;
+                    }
+                } else {
+                    $propertyName = isset($att->property_name) ? $att->property_name : $propertyName;
+                }
             }
         }
         if (isset($model->competition)) {
