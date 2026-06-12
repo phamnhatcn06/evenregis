@@ -34,6 +34,10 @@
                                 </select>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">Số CCCD/CMND <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="id_card" required placeholder="Nhập số CCCD/CMND" maxlength="20">
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Vai trò <span class="text-danger">*</span></label>
                                 <select class="form-select" name="role_id[]" multiple="multiple" style="height: 120px;" required>
                                     <?php foreach ($roles as $rId => $rName): ?>
