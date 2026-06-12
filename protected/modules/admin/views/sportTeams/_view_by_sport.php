@@ -187,7 +187,7 @@
     <div class="modal-dialog" style="max-width: 70%;">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalViewTeamLabel">Chi tiết đội thi đấu</h5>
+                <h5 class="modal-title text-white" id="modalViewTeamLabel">Chi tiết đội thi đấu</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <div class="modal-body" id="modalViewTeamBody">
