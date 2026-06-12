@@ -9,12 +9,12 @@ $pendingCount = count($pendingList);
 
 <div class="row mb-4">
     <div class="col-md-4">
-        <div class="card bg-warning text-dark">
+        <div class="card bg-warning text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-0 text-dark">Đang chờ duyệt</h6>
-                        <h2 class="mb-0 text-dark"><?php echo $pendingCount; ?></h2>
+                        <h6 class="mb-0 text-white">Đang chờ duyệt</h6>
+                        <h2 class="mb-0 text-white"><?php echo $pendingCount; ?></h2>
                     </div>
                     <div class="fs-1">
                         <i class="fa fa-clock-o"></i>
