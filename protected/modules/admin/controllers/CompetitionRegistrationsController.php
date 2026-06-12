@@ -469,15 +469,28 @@ class CompetitionRegistrationsController extends AdminController
             }
 
             $attendeeName = isset($compReg->attendee_name) ? $compReg->attendee_name : '-';
-            $attendeePosition = isset($compReg->attendee_position) ? $compReg->attendee_position : '';
+            $attendeePosition = '';
             $attendeeGender = isset($compReg->attendee_gender) ? $compReg->attendee_gender : '';
+
+            // Lấy position từ compReg->position (object {"id":..., "name":...})
+            if (isset($compReg->position)) {
+                $pos = $compReg->position;
+                if (is_array($pos) && isset($pos['name'])) {
+                    $attendeePosition = $pos['name'];
+                } elseif (is_object($pos) && isset($pos->name)) {
+                    $attendeePosition = $pos->name;
+                } elseif (is_string($pos)) {
+                    $attendeePosition = $pos;
+                }
+            }
+
             if (isset($compReg->attendee)) {
                 $att = $compReg->attendee;
                 if (is_array($att)) {
                     $attendeeName = isset($att['full_name']) ? $att['full_name'] : $attendeeName;
                     $attendeeGender = isset($att['gender']) ? $att['gender'] : $attendeeGender;
-                    // Position là object {"id": ..., "name": ...}
-                    if (isset($att['position'])) {
+                    // Fallback: position trong attendee
+                    if (empty($attendeePosition) && isset($att['position'])) {
                         $pos = $att['position'];
                         if (is_array($pos) && isset($pos['name'])) {
                             $attendeePosition = $pos['name'];
@@ -490,8 +503,8 @@ class CompetitionRegistrationsController extends AdminController
                 } else {
                     $attendeeName = isset($att->full_name) ? $att->full_name : $attendeeName;
                     $attendeeGender = isset($att->gender) ? $att->gender : $attendeeGender;
-                    // Position là object {"id": ..., "name": ...}
-                    if (isset($att->position)) {
+                    // Fallback: position trong attendee
+                    if (empty($attendeePosition) && isset($att->position)) {
                         $pos = $att->position;
                         if (is_array($pos) && isset($pos['name'])) {
                             $attendeePosition = $pos['name'];
