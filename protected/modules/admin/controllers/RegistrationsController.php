@@ -3145,7 +3145,7 @@ class RegistrationsController extends AdminController
 			$sheet = $objPHPExcel->setActiveSheetIndex(0);
 
 			// Header
-			$headers = array('Họ và tên (*)', 'Phòng ban', 'Chức danh (*)', 'Vai trò 1 (*)', 'Vai trò 2', 'Vai trò 3', 'Ngày vào làm (dd/mm/yyyy) (*)', 'Ghi chú');
+			$headers = array('Họ và tên (*)', 'Số CCCD/CMND (*)', 'Phòng ban', 'Chức danh (*)', 'Vai trò 1 (*)', 'Vai trò 2', 'Vai trò 3', 'Ngày vào làm (dd/mm/yyyy) (*)', 'Ghi chú');
 			$col = 'A';
 			foreach ($headers as $header) {
 				$sheet->setCellValue($col . '1', $header);
@@ -3153,15 +3153,15 @@ class RegistrationsController extends AdminController
 				$col++;
 			}
 
-			// Add Data Validation for column D, E, F
+			// Add Data Validation for column E, F, G (Vai trò)
 			if ($lastRoleRow >= 1) {
-				for ($c = 'D'; $c <= 'F'; $c++) {
+				for ($c = 'E'; $c <= 'G'; $c++) {
 					$objValidation = $sheet->getDataValidation($c . "2:" . $c . "1000");
 					$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
 					$objValidation->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION);
 					$objValidation->setAllowBlank(true);
 					$objValidation->setShowInputMessage(true);
-					$objValidation->setShowErrorMessage(true); // Since it's dropdown only now, we can show error
+					$objValidation->setShowErrorMessage(true);
 					$objValidation->setShowDropDown(true);
 					$objValidation->setPromptTitle('Chọn vai trò');
 					$objValidation->setPrompt('Vui lòng chọn từ danh sách thả xuống.');
@@ -3171,15 +3171,16 @@ class RegistrationsController extends AdminController
 
 			// Sample data
 			$sheet->setCellValue('A2', 'Nguyễn Văn A');
-			$sheet->setCellValue('B2', 'Kinh doanh');
-			$sheet->setCellValue('C2', 'Nhân viên');
-			$sheet->setCellValue('D2', 'Vận động viên');
-			$sheet->setCellValue('E2', 'Khách');
-			$sheet->setCellValue('F2', '');
-			$sheet->setCellValue('G2', '01/01/2023');
-			$sheet->setCellValue('H2', 'Ghi chú mẫu');
+			$sheet->setCellValue('B2', '012345678901');
+			$sheet->setCellValue('C2', 'Kinh doanh');
+			$sheet->setCellValue('D2', 'Nhân viên');
+			$sheet->setCellValue('E2', 'Vận động viên');
+			$sheet->setCellValue('F2', 'Khách');
+			$sheet->setCellValue('G2', '');
+			$sheet->setCellValue('H2', '01/01/2023');
+			$sheet->setCellValue('I2', 'Ghi chú mẫu');
 
-			foreach (range('A', 'H') as $columnID) {
+			foreach (range('A', 'I') as $columnID) {
 				$sheet->getColumnDimension($columnID)->setAutoSize(true);
 			}
 
