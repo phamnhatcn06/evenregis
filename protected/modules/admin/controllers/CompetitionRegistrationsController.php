@@ -282,7 +282,7 @@ class CompetitionRegistrationsController extends AdminController
     public function actionGetOrganizationStats()
     {
         $eventId = Yii::app()->request->getQuery('event_id');
-        $propertyId = Yii::app()->request->getQuery('organization_id');
+        $filterPropertyId = Yii::app()->request->getQuery('organization_id');
 
         if (empty($eventId)) {
             $activeEvents = Events::getActiveList();
@@ -298,12 +298,8 @@ class CompetitionRegistrationsController extends AdminController
         }
 
         $params = array(
-            'event_id' => $eventId,
             'per_page' => 5000,
         );
-        if (!empty($propertyId)) {
-            $params['property_id'] = $propertyId;
-        }
 
         $compRegsRes = CompetitionRegistrations::getApiDataProvider($params, 5000)->getData();
 
@@ -350,6 +346,11 @@ class CompetitionRegistrationsController extends AdminController
             }
 
             if (empty($propId)) continue;
+
+            // Filter theo đơn vị nếu có
+            if (!empty($filterPropertyId) && $propId != $filterPropertyId) {
+                continue;
+            }
 
             if (!isset($orgStats[$propId])) {
                 $orgStats[$propId] = array(
