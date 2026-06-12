@@ -88,7 +88,7 @@ $this->Tabletitle = 'Tổng quan thí sinh thi nghiệp vụ';
     <div class="col-md-3">
         <div class="card bg-warning text-dark">
             <div class="card-body text-center">
-                <h3 id="stat-pending" class="mb-0">0</h3>
+                <h3 id="stat-pending" class="mb-0 text-dark">0</h3>
                 <small>Chờ xác nhận</small>
             </div>
         </div>
