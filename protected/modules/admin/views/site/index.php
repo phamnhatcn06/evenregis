@@ -38,12 +38,12 @@ $this->pageTitle = 'Dashboard - Admin';
     </div>
 
     <div class="col-md-4 mb-4">
-        <div class="card bg-warning text-dark">
+        <div class="card bg-warning text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h6 class="text-uppercase text-dark">Đăng ký mới</h6>
-                        <h2 class="mb-0 text-dark">0</h2>
+                        <h6 class="text-uppercase text-white">Đăng ký mới</h6>
+                        <h2 class="mb-0 text-white">0</h2>
                     </div>
                     <div class="align-self-center">
                         <i class="bi bi-person-plus fs-1"></i>
