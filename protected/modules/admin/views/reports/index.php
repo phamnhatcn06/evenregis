@@ -670,7 +670,10 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 <style>
     /* Sports Summary Table Container */
     .sports-summary-wrapper {
-        overflow: auto;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        overflow: auto !important;
         max-height: 70vh;
         position: relative;
         border: 1px solid #dee2e6;
@@ -751,8 +754,10 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         padding: 6px 4px !important;
     }
 
-    /* Sticky Column Classes */
-    #tableSportsSummary .col-sticky-stt {
+    /* Sticky Column Classes & Fallback Selectors */
+    #tableSportsSummary .col-sticky-stt,
+    #tableSportsSummary thead tr:first-child th:nth-child(1),
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(1) {
         position: sticky !important;
         left: 0 !important;
         z-index: 10 !important;
@@ -760,21 +765,27 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         min-width: 50px !important;
         text-align: center;
     }
-    #tableSportsSummary .col-sticky-region {
+    #tableSportsSummary .col-sticky-region,
+    #tableSportsSummary thead tr:first-child th:nth-child(2),
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(2) {
         position: sticky !important;
         left: 50px !important;
         z-index: 10 !important;
         width: 120px !important;
         min-width: 120px !important;
     }
-    #tableSportsSummary .col-sticky-property {
+    #tableSportsSummary .col-sticky-property,
+    #tableSportsSummary thead tr:first-child th:nth-child(3),
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(3) {
         position: sticky !important;
         left: 170px !important;
         z-index: 10 !important;
         width: 180px !important;
         min-width: 180px !important;
     }
-    #tableSportsSummary .col-sticky-total {
+    #tableSportsSummary .col-sticky-total,
+    #tableSportsSummary tbody tr.table-warning td:first-child,
+    #tableSportsSummary tfoot tr td:first-child {
         position: sticky !important;
         left: 0 !important;
         z-index: 10 !important;
@@ -783,12 +794,16 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
     /* Header Sticky Cells Background */
     #tableSportsSummary thead tr:first-child th.col-sticky-stt,
     #tableSportsSummary thead tr:first-child th.col-sticky-region,
-    #tableSportsSummary thead tr:first-child th.col-sticky-property {
+    #tableSportsSummary thead tr:first-child th.col-sticky-property,
+    #tableSportsSummary thead tr:first-child th:nth-child(1),
+    #tableSportsSummary thead tr:first-child th:nth-child(2),
+    #tableSportsSummary thead tr:first-child th:nth-child(3) {
         background: #3a57e8 !important;
         color: #fff !important;
         z-index: 15 !important;
     }
-    #tableSportsSummary thead tr:first-child th.col-sticky-property {
+    #tableSportsSummary thead tr:first-child th.col-sticky-property,
+    #tableSportsSummary thead tr:first-child th:nth-child(3) {
         border-right: 2px solid #1e3a8a !important;
     }
 
@@ -800,25 +815,19 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         padding: 4px 2px !important;
     }
 
-    /* Sport group headers */
-    #tableSportsSummary thead tr:first-child th.sport-header {
-        background: #0dcaf0 !important;
-        color: #000 !important;
-        font-weight: 600 !important;
-        font-size: 12px !important;
-        padding: 6px 4px !important;
-    }
-
     /* Body Sticky Cells Background */
-    #tableSportsSummary tbody td.col-sticky-stt {
+    #tableSportsSummary tbody td.col-sticky-stt,
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(1) {
         background: #fff !important;
     }
-    #tableSportsSummary tbody td.col-sticky-region {
+    #tableSportsSummary tbody td.col-sticky-region,
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(2) {
         background: #f8f9fa !important;
         font-weight: 600;
         vertical-align: middle !important;
     }
-    #tableSportsSummary tbody td.col-sticky-property {
+    #tableSportsSummary tbody td.col-sticky-property,
+    #tableSportsSummary tbody tr:not(.table-warning) td:nth-child(3) {
         background: #fff !important;
         border-right: 2px solid #dee2e6 !important;
     }
@@ -828,7 +837,8 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         background: #fff3cd !important;
         font-weight: 600 !important;
     }
-    #tableSportsSummary tbody tr.table-warning td.col-sticky-total {
+    #tableSportsSummary tbody tr.table-warning td.col-sticky-total,
+    #tableSportsSummary tbody tr.table-warning td:first-child {
         z-index: 11 !important;
     }
 
@@ -836,7 +846,8 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         background: #198754 !important;
         color: #fff !important;
     }
-    #tableSportsSummary tfoot tr td.col-sticky-total {
+    #tableSportsSummary tfoot tr td.col-sticky-total,
+    #tableSportsSummary tfoot tr td:first-child {
         z-index: 11 !important;
     }
 
@@ -848,7 +859,10 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
     /* Hover effect for sticky cells to avoid transparent background revealing underlying content */
     #tableSportsSummary tbody tr:not(.table-warning):hover td.col-sticky-stt,
     #tableSportsSummary tbody tr:not(.table-warning):hover td.col-sticky-region,
-    #tableSportsSummary tbody tr:not(.table-warning):hover td.col-sticky-property {
+    #tableSportsSummary tbody tr:not(.table-warning):hover td.col-sticky-property,
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(1),
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(2),
+    #tableSportsSummary tbody tr:not(.table-warning):hover td:nth-child(3) {
         background: #e3f2fd !important;
     }
 

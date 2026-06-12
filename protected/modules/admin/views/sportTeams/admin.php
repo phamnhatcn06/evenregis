@@ -173,7 +173,7 @@ Yii::app()->clientScript->registerScript('sport-teams-init', '
     window.BASE_URL = "' . Yii::app()->createUrl('/') . '";
 ', CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js?v=1.0.2',
     CClientScript::POS_END
 );
 ?>
@@ -193,7 +193,10 @@ Yii::app()->clientScript->registerScriptFile(
 
     /* Sports Summary Table Container */
     .sports-summary-wrapper {
-        overflow: auto;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        overflow: auto !important;
         max-height: 70vh;
         position: relative;
         border: 1px solid #dee2e6;
@@ -235,8 +238,10 @@ Yii::app()->clientScript->registerScriptFile(
         word-wrap: break-word !important;
     }
 
-    /* Sticky Column Classes */
-    #sports-summary-table .col-sticky-stt {
+    /* Sticky Column Classes & Fallback Selectors */
+    #sports-summary-table .col-sticky-stt,
+    #sports-summary-table thead tr:first-child th:nth-child(1),
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:first-child {
         position: sticky !important;
         left: 0 !important;
         z-index: 10 !important;
@@ -244,21 +249,28 @@ Yii::app()->clientScript->registerScriptFile(
         min-width: 50px !important;
         text-align: center;
     }
-    #sports-summary-table .col-sticky-region {
+    #sports-summary-table .col-sticky-region,
+    #sports-summary-table thead tr:first-child th:nth-child(2),
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td[rowspan] {
         position: sticky !important;
         left: 50px !important;
         z-index: 10 !important;
         width: 120px !important;
         min-width: 120px !important;
     }
-    #sports-summary-table .col-sticky-property {
+    #sports-summary-table .col-sticky-property,
+    #sports-summary-table thead tr:first-child th:nth-child(3),
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(3),
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(2):not([rowspan]) {
         position: sticky !important;
         left: 170px !important;
         z-index: 10 !important;
         width: 180px !important;
         min-width: 180px !important;
     }
-    #sports-summary-table .col-sticky-total {
+    #sports-summary-table .col-sticky-total,
+    #sports-summary-table tbody tr.table-warning td:first-child,
+    #sports-summary-table tbody tr.table-success td:first-child {
         position: sticky !important;
         left: 0 !important;
         z-index: 10 !important;
@@ -267,12 +279,16 @@ Yii::app()->clientScript->registerScriptFile(
     /* Header Sticky Cells Background */
     #sports-summary-table thead tr:first-child th.col-sticky-stt,
     #sports-summary-table thead tr:first-child th.col-sticky-region,
-    #sports-summary-table thead tr:first-child th.col-sticky-property {
+    #sports-summary-table thead tr:first-child th.col-sticky-property,
+    #sports-summary-table thead tr:first-child th:nth-child(1),
+    #sports-summary-table thead tr:first-child th:nth-child(2),
+    #sports-summary-table thead tr:first-child th:nth-child(3) {
         background: #3a57e8 !important;
         color: #fff !important;
         z-index: 15 !important;
     }
-    #sports-summary-table thead tr:first-child th.col-sticky-property {
+    #sports-summary-table thead tr:first-child th.col-sticky-property,
+    #sports-summary-table thead tr:first-child th:nth-child(3) {
         border-right: 2px solid #1e3a8a !important;
     }
 
@@ -294,15 +310,19 @@ Yii::app()->clientScript->registerScriptFile(
     }
 
     /* Body Sticky Cells Background */
-    #sports-summary-table tbody td.col-sticky-stt {
+    #sports-summary-table tbody td.col-sticky-stt,
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:first-child {
         background: #fff !important;
     }
-    #sports-summary-table tbody td.col-sticky-region {
+    #sports-summary-table tbody td.col-sticky-region,
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td[rowspan] {
         background: #f8f9fa !important;
         font-weight: 600;
         vertical-align: middle !important;
     }
-    #sports-summary-table tbody td.col-sticky-property {
+    #sports-summary-table tbody td.col-sticky-property,
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(3),
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success) td:nth-child(2):not([rowspan]) {
         background: #fff !important;
         border-right: 2px solid #dee2e6 !important;
     }
@@ -312,7 +332,8 @@ Yii::app()->clientScript->registerScriptFile(
         background: #fff3cd !important;
         font-weight: 600 !important;
     }
-    #sports-summary-table tbody tr.table-warning td.col-sticky-total {
+    #sports-summary-table tbody tr.table-warning td.col-sticky-total,
+    #sports-summary-table tbody tr.table-warning td:first-child {
         z-index: 11 !important;
     }
 
@@ -320,7 +341,8 @@ Yii::app()->clientScript->registerScriptFile(
         background: #198754 !important;
         color: #fff !important;
     }
-    #sports-summary-table tbody tr.table-success td.col-sticky-total {
+    #sports-summary-table tbody tr.table-success td.col-sticky-total,
+    #sports-summary-table tbody tr.table-success td:first-child {
         z-index: 11 !important;
     }
 
@@ -332,7 +354,11 @@ Yii::app()->clientScript->registerScriptFile(
     /* Hover effect for sticky cells to avoid transparent background revealing underlying content */
     #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td.col-sticky-stt,
     #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td.col-sticky-region,
-    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td.col-sticky-property {
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td.col-sticky-property,
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:first-child,
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td[rowspan],
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:nth-child(3),
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td:nth-child(2):not([rowspan]) {
         background: #e3f2fd !important;
     }
 
