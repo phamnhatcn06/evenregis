@@ -1146,13 +1146,79 @@ class RegistrationsController extends AdminController
 	/**
 	 * Validate yêu cầu thi nghiệp vụ (content_id = 2)
 	 * Kiểm tra mỗi cuộc thi trong event_competitions phải đủ max_per_org người đăng ký
+	 * Ngoại trừ đơn vị có has_golf = 1
 	 * @param Registrations $model
 	 * @return string|null Lỗi nếu không hợp lệ, null nếu OK
 	 */
 	protected function validateCompetitionRequirements($model)
 	{
-		// Không kiểm tra validation, luôn cho phép submit
-		// Có nội dung nào thì gửi nội dung đó
+		if (!$model->period_id || !$model->event_id) {
+			return null;
+		}
+
+		// Kiểm tra đơn vị có has_golf = 1 thì không validate
+		if ($model->property_id) {
+			$property = Properties::fetchFromApi($model->property_id);
+			if ($property && isset($property->has_golf) && (int)$property->has_golf == 1) {
+				return null;
+			}
+		}
+
+		// Lấy content_ids của period
+		$contentIds = RegistrationPeriodContents::getContentIdsByPeriod($model->period_id);
+
+		// Chỉ validate nếu period có content_id = 2 (thi nghiệp vụ)
+		if (!in_array(2, $contentIds)) {
+			return null;
+		}
+
+		// Lấy danh sách cuộc thi của event từ event_competitions
+		$eventCompetitions = EventCompetitions::getByEventId($model->event_id);
+		if (empty($eventCompetitions)) {
+			return null;
+		}
+
+		// Lấy số người đã đăng ký thi nghiệp vụ của registration này
+		$compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $model->id), 500)->getData();
+
+		// Đếm số người đăng ký theo từng competition_id
+		$regCountByComp = array();
+		foreach ($compRegsData as $reg) {
+			$compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
+			if ($compId) {
+				if (!isset($regCountByComp[$compId])) {
+					$regCountByComp[$compId] = 0;
+				}
+				$regCountByComp[$compId]++;
+			}
+		}
+
+		// Validate từng cuộc thi
+		$errors = array();
+		foreach ($eventCompetitions as $ec) {
+			$compId = isset($ec['competition_id']) ? $ec['competition_id'] : (isset($ec->competition_id) ? $ec->competition_id : null);
+			if (!$compId) continue;
+
+			// Lấy thông tin cuộc thi để biết max_per_org và tên
+			$competition = Competitions::fetchFromApi($compId);
+			if (!$competition) continue;
+
+			$maxPerOrg = $competition->max_per_org ? (int)$competition->max_per_org : 0;
+
+			// Nếu max_per_org = 0 hoặc null thì không giới hạn, bỏ qua
+			if ($maxPerOrg <= 0) continue;
+
+			$currentCount = isset($regCountByComp[$compId]) ? $regCountByComp[$compId] : 0;
+
+			if ($currentCount < $maxPerOrg) {
+				$errors[] = "Cuộc thi \"{$competition->name}\" yêu cầu đủ {$maxPerOrg} người, hiện có {$currentCount} người";
+			}
+		}
+
+		if (!empty($errors)) {
+			return 'Không thể nộp đăng ký. ' . implode('. ', $errors) . '.';
+		}
+
 		return null;
 	}
 
