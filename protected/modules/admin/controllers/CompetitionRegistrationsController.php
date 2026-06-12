@@ -133,10 +133,39 @@ class CompetitionRegistrationsController extends AdminController
     {
         $events = Events::getActiveList();
         $competitions = Competitions::getActiveList();
+        
         $propertiesData = Properties::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
+        
+        $regionalMap = array();
+        foreach ($regionals as $r) {
+            $regionalMap[$r->id] = $r->name;
+        }
+
+        // Sắp xếp các đơn vị theo cụm trước, sau đó theo bảng chữ cái tên đơn vị
+        usort($propertiesData, function ($a, $b) use ($regionalMap) {
+            $regIdA = isset($a->region_id) ? $a->region_id : null;
+            $regIdB = isset($b->region_id) ? $b->region_id : null;
+
+            $rA = ($regIdA && isset($regionalMap[$regIdA])) ? $regionalMap[$regIdA] : '';
+            $rB = ($regIdB && isset($regionalMap[$regIdB])) ? $regionalMap[$regIdB] : '';
+
+            // Đẩy cụm rỗng xuống cuối
+            if ($rA === '' && $rB !== '') return 1;
+            if ($rB === '' && $rA !== '') return -1;
+
+            $cmp = strnatcasecmp($rA, $rB);
+            if ($cmp === 0) {
+                return strnatcasecmp($a->name, $b->name);
+            }
+            return $cmp;
+        });
+
         $organizations = array();
         foreach ($propertiesData as $p) {
-            $organizations[$p->id] = $p->name;
+            $regId = isset($p->region_id) ? $p->region_id : null;
+            $rName = ($regId && isset($regionalMap[$regId])) ? $regionalMap[$regId] : 'Chưa phân cụm';
+            $organizations[$p->id] = '[' . $rName . '] ' . $p->name;
         }
 
         $this->render('overview', array(
@@ -318,17 +347,75 @@ class CompetitionRegistrationsController extends AdminController
             $regionalMap[$r->id] = $r->name;
         }
 
-        $formattedOrgs = array();
         $rawData = isset($apiData['data']) && is_array($apiData['data']) ? $apiData['data'] : (is_array($apiData) ? $apiData : array());
 
+        $orgStats = array();
+
         foreach ($rawData as $item) {
+            if (isset($item['deleted_at']) && $item['deleted_at'] !== null && $item['deleted_at'] !== '') {
+                continue;
+            }
+
+            // Extract property details from registration item
             $propId = isset($item['property_id']) ? $item['property_id'] : null;
-            $propName = isset($item['property_name']) && $item['property_name'] !== '' && $item['property_name'] !== null ? $item['property_name'] : 'Chưa xác định';
+            $propName = 'Chưa xác định';
+            $regionName = '';
+
+            if (isset($item['attendee'])) {
+                $att = $item['attendee'];
+                if (is_array($att)) {
+                    if (!$propId) {
+                        $propId = isset($att['property_id']) ? $att['property_id'] : null;
+                    }
+                    if (isset($att['property']) && is_array($att['property'])) {
+                        if (!$propId) {
+                            $propId = isset($att['property']['id']) ? $att['property']['id'] : null;
+                        }
+                        $propName = isset($att['property']['name']) ? $att['property']['name'] : $propName;
+                        if (isset($att['property']['region']) && is_array($att['property']['region'])) {
+                            $regionName = isset($att['property']['region']['name']) ? $att['property']['region']['name'] : $regionName;
+                        }
+                    }
+                } else {
+                    if (!$propId) {
+                        $propId = isset($att->property_id) ? $att->property_id : null;
+                    }
+                    if (isset($att->property)) {
+                        $prop = $att->property;
+                        if (is_array($prop)) {
+                            if (!$propId) {
+                                $propId = isset($prop['id']) ? $prop['id'] : null;
+                            }
+                            $propName = isset($prop['name']) ? $prop['name'] : $propName;
+                            if (isset($prop['region']) && is_array($prop['region'])) {
+                                $regionName = isset($prop['region']['name']) ? $prop['region']['name'] : $regionName;
+                            }
+                        } else {
+                            if (!$propId) {
+                                $propId = isset($prop->id) ? $prop->id : null;
+                            }
+                            $propName = isset($prop->name) ? $prop->name : $propName;
+                            if (isset($prop->region)) {
+                                $reg = $prop->region;
+                                if (is_array($reg)) {
+                                    $regionName = isset($reg['name']) ? $reg['name'] : $regionName;
+                                } else {
+                                    $regionName = isset($reg->name) ? $reg->name : $regionName;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (empty($propId)) {
+                $propId = 0; // Fallback to 0 if not found
+            }
+
+            // Fallback for property name and region from local maps if API returned empty/Chưa xác định
             if ($propName === 'Chưa xác định' && $propId && isset($propertyNameMap[$propId])) {
                 $propName = $propertyNameMap[$propId];
             }
-
-            $regionName = isset($item['region_name']) && $item['region_name'] !== '' && $item['region_name'] !== null ? $item['region_name'] : '';
             if (empty($regionName) && $propId && isset($propertyRegionMap[$propId])) {
                 $regId = $propertyRegionMap[$propId];
                 if ($regId && isset($regionalMap[$regId])) {
@@ -336,17 +423,43 @@ class CompetitionRegistrationsController extends AdminController
                 }
             }
 
-            $formattedOrgs[] = array(
-                'id' => $propId,
-                'name' => $propName,
-                'region_name' => $regionName,
-                'contestant_count' => isset($item['contestant_count']) ? (int)$item['contestant_count'] : 0,
-                'confirmed_count' => isset($item['confirmed_count']) ? (int)$item['confirmed_count'] : 0,
-            );
+            // Filter by property if requested
+            if (!empty($filterPropertyId) && $propId != $filterPropertyId) {
+                continue;
+            }
+
+            if (!isset($orgStats[$propId])) {
+                $orgStats[$propId] = array(
+                    'id' => $propId,
+                    'name' => $propName,
+                    'region_name' => $regionName,
+                    'contestant_count' => 0,
+                    'confirmed_count' => 0,
+                );
+            }
+
+            $orgStats[$propId]['contestant_count']++;
+
+            $status = isset($item['status']) ? (int)$item['status'] : 0;
+            if ($status == CompetitionRegistrations::STATUS_CONFIRMED) {
+                $orgStats[$propId]['confirmed_count']++;
+            }
         }
 
+        $formattedOrgs = array_values($orgStats);
         usort($formattedOrgs, function ($a, $b) {
-            return strnatcasecmp($a['name'], $b['name']);
+            $rA = isset($a['region_name']) ? $a['region_name'] : '';
+            $rB = isset($b['region_name']) ? $b['region_name'] : '';
+
+            // Sắp xếp cụm rỗng xuống cuối
+            if ($rA === '' && $rB !== '') return 1;
+            if ($rB === '' && $rA !== '') return -1;
+
+            $cmp = strnatcasecmp($rA, $rB);
+            if ($cmp === 0) {
+                return strnatcasecmp($a['name'], $b['name']);
+            }
+            return $cmp;
         });
 
         header('Content-Type: application/json');
@@ -591,6 +704,10 @@ class CompetitionRegistrationsController extends AdminController
         }
 
         foreach ($contestantsByRegion as &$region) {
+            // Sắp xếp các đơn vị trong cụm theo bảng chữ cái
+            usort($region['properties'], function ($a, $b) {
+                return strnatcasecmp($a['property_name'], $b['property_name']);
+            });
             $region['properties'] = array_values($region['properties']);
         }
         unset($region);

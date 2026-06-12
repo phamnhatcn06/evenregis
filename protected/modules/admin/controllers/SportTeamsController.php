@@ -349,10 +349,7 @@ class SportTeamsController extends AdminController
         $eventId = Yii::app()->request->getQuery('event_id');
         $propertyId = Yii::app()->request->getQuery('property_id');
 
-        $teams = SportTeams::getApiDataProvider(array(
-            'event_id' => $eventId,
-            'property_id' => $propertyId,
-        ), 500)->getData();
+        $teams = $this->getTeamsForProperty($eventId, $propertyId);
 
         $teamsBySport = array();
         foreach ($teams as $team) {
@@ -386,6 +383,7 @@ class SportTeamsController extends AdminController
                 'status' => $team->status,
                 'member_count' => count($members),
                 'members' => $memberList,
+                'property_name' => isset($team->property_name) ? $team->property_name : '',
             );
         }
 
@@ -552,10 +550,7 @@ class SportTeamsController extends AdminController
         $eventId = Yii::app()->request->getQuery('event_id');
         $propertyId = Yii::app()->request->getQuery('property_id');
 
-        $teams = SportTeams::getApiDataProvider(array(
-            'event_id' => $eventId,
-            'property_id' => $propertyId,
-        ), 500)->getData();
+        $teams = $this->getTeamsForProperty($eventId, $propertyId);
 
         $teamsBySport = array();
         foreach ($teams as $team) {
@@ -589,6 +584,7 @@ class SportTeamsController extends AdminController
                 'status' => $team->status,
                 'member_count' => count($members),
                 'members' => $memberList,
+                'property_name' => isset($team->property_name) ? $team->property_name : '',
             );
         }
 
@@ -1047,5 +1043,67 @@ class SportTeamsController extends AdminController
             throw new CHttpException(404, 'Không tìm thấy đội thể thao.');
         }
         return $model;
+    }
+
+    /**
+     * Lấy danh sách đội thể thao của đơn vị dựa trên 2 điều kiện:
+     * 1. registration_id mà đơn vị đăng ký
+     * 2. các team bóng đá, kéo co mà đơn vị liên quân dựa theo cột alliance_org_ids
+     */
+    private function getTeamsForProperty($eventId, $propertyId)
+    {
+        // 1. Lấy danh sách registration_id của đơn vị này trong sự kiện
+        $registrations = Registrations::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'property_id' => $propertyId,
+        ), 100)->getData();
+
+        $regIds = array();
+        foreach ($registrations as $reg) {
+            if (isset($reg->deleted_at) && $reg->deleted_at !== null && $reg->deleted_at !== '') {
+                continue;
+            }
+            $regIds[] = $reg->id;
+        }
+
+        // 2. Lấy tất cả đội của sự kiện
+        $allTeams = SportTeams::getApiDataProvider(array(
+            'event_id' => $eventId,
+        ), 5000)->getData();
+
+        // 3. Lọc theo 2 điều kiện
+        $filteredTeams = array();
+        foreach ($allTeams as $team) {
+            if (isset($team->deleted_at) && $team->deleted_at !== null && $team->deleted_at !== '') {
+                continue;
+            }
+
+            // ĐK 1: registration_id thuộc danh sách registration của đơn vị
+            $cond1 = (!empty($team->registration_id) && in_array($team->registration_id, $regIds));
+
+            // ĐK 2: môn bóng đá hoặc kéo co và đơn vị nằm trong alliance_org_ids
+            $cond2 = false;
+            $sportName = $team->sport_name ?: '';
+            $isBongDaOrKeoCo = false;
+            if ($sportName) {
+                $sportNameLower = mb_strtolower($sportName, 'UTF-8');
+                if (mb_strpos($sportNameLower, 'bóng đá') !== false || mb_strpos($sportNameLower, 'kéo co') !== false) {
+                    $isBongDaOrKeoCo = true;
+                }
+            }
+
+            if ($isBongDaOrKeoCo && !empty($team->alliance_org_ids)) {
+                $allianceIds = array_filter(array_map('trim', explode(',', $team->alliance_org_ids)));
+                if (in_array($propertyId, $allianceIds)) {
+                    $cond2 = true;
+                }
+            }
+
+            if ($cond1 || $cond2) {
+                $filteredTeams[] = $team;
+            }
+        }
+
+        return $filteredTeams;
     }
 }

@@ -47,6 +47,9 @@
                                                     <a href="<?php echo Yii::app()->createUrl('/admin/sportTeams/view', array('id' => $team['id'])); ?>">
                                                         <?php echo CHtml::encode($team['team_name'] ?: $team['name']); ?>
                                                     </a>
+                                                    <?php if ($team['is_alliance'] && !empty($team['property_name']) && $team['property_name'] !== $propertyName): ?>
+                                                        <small class="text-muted d-block">Chủ trì: <?php echo CHtml::encode($team['property_name']); ?></small>
+                                                    <?php endif; ?>
                                                 </td>
                                                 <td>
                                                     <?php if ($team['is_alliance']): ?>
