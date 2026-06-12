@@ -282,7 +282,7 @@ class CompetitionRegistrationsController extends AdminController
     public function actionGetOrganizationStats()
     {
         $eventId = Yii::app()->request->getQuery('event_id');
-        $organizationId = Yii::app()->request->getQuery('organization_id');
+        $propertyId = Yii::app()->request->getQuery('organization_id');
 
         if (empty($eventId)) {
             $activeEvents = Events::getActiveList();
@@ -301,8 +301,8 @@ class CompetitionRegistrationsController extends AdminController
             'event_id' => $eventId,
             'per_page' => 5000,
         );
-        if (!empty($organizationId)) {
-            $params['organization_id'] = $organizationId;
+        if (!empty($propertyId)) {
+            $params['property_id'] = $propertyId;
         }
 
         $compRegsRes = CompetitionRegistrations::getApiDataProvider($params, 5000)->getData();
@@ -314,33 +314,57 @@ class CompetitionRegistrationsController extends AdminController
                 continue;
             }
 
-            $orgId = isset($compReg->organization_id) ? $compReg->organization_id : null;
-            if (empty($orgId)) continue;
+            $propId = null;
+            $propName = 'Chưa xác định';
+            $regionName = '';
 
-            $orgName = 'Chưa xác định';
-            if (isset($compReg->organization_name)) {
-                $orgName = $compReg->organization_name;
-            } elseif (isset($compReg->organization)) {
-                if (is_array($compReg->organization)) {
-                    $orgName = $compReg->organization['name'];
+            if (isset($compReg->attendee)) {
+                $att = $compReg->attendee;
+                if (is_array($att)) {
+                    if (isset($att['property'])) {
+                        $prop = $att['property'];
+                        $propId = isset($prop['id']) ? $prop['id'] : null;
+                        $propName = isset($prop['name']) ? $prop['name'] : $propName;
+                        if (isset($prop['region']) && isset($prop['region']['name'])) {
+                            $regionName = $prop['region']['name'];
+                        }
+                    }
                 } else {
-                    $orgName = $compReg->organization->name;
+                    if (isset($att->property)) {
+                        $prop = $att->property;
+                        if (is_array($prop)) {
+                            $propId = isset($prop['id']) ? $prop['id'] : null;
+                            $propName = isset($prop['name']) ? $prop['name'] : $propName;
+                            if (isset($prop['region']) && isset($prop['region']['name'])) {
+                                $regionName = $prop['region']['name'];
+                            }
+                        } else {
+                            $propId = isset($prop->id) ? $prop->id : null;
+                            $propName = isset($prop->name) ? $prop->name : $propName;
+                            if (isset($prop->region) && isset($prop->region->name)) {
+                                $regionName = $prop->region->name;
+                            }
+                        }
+                    }
                 }
             }
 
-            if (!isset($orgStats[$orgId])) {
-                $orgStats[$orgId] = array(
-                    'id' => $orgId,
-                    'name' => $orgName,
+            if (empty($propId)) continue;
+
+            if (!isset($orgStats[$propId])) {
+                $orgStats[$propId] = array(
+                    'id' => $propId,
+                    'name' => $propName,
+                    'region_name' => $regionName,
                     'contestant_count' => 0,
                     'confirmed_count' => 0,
                 );
             }
 
-            $orgStats[$orgId]['contestant_count']++;
+            $orgStats[$propId]['contestant_count']++;
 
             if (isset($compReg->status) && $compReg->status == CompetitionRegistrations::STATUS_CONFIRMED) {
-                $orgStats[$orgId]['confirmed_count']++;
+                $orgStats[$propId]['confirmed_count']++;
             }
         }
 
