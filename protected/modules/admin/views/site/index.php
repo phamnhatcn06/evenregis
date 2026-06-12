@@ -26,8 +26,8 @@ $this->pageTitle = 'Dashboard - Admin';
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h6 class="text-uppercase">Tổng Events</h6>
-                        <h2 class="mb-0">0</h2>
+                        <h6 class="text-uppercase text-white">Tổng Events</h6>
+                        <h2 class="mb-0 text-white">0</h2>
                     </div>
                     <div class="align-self-center">
                         <i class="bi bi-calendar-event fs-1"></i>
