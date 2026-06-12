@@ -199,6 +199,7 @@ class ApiEndpoints
     const COMPETITION_REGISTRATION_UPDATE = '/api/competition-registrations/update/{id}';
     const COMPETITION_REGISTRATION_DESTROY = '/api/competition-registrations/destroy/{id}';
     const COMPETITION_REGISTRATION_CONFIRM = '/api/competition-registrations/confirm/{id}';
+    const COMPETITION_REGISTRATION_LIST_BY_PROPERTY = '/api/competition-registrations/list-by-property';
 
     // Registration Detail Attendee
     const REGISTRATION_DETAIL_ATTENDEE_LIST = '/api/registration-detail-attendees';
