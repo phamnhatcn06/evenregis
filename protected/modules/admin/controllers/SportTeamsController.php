@@ -351,6 +351,23 @@ class SportTeamsController extends AdminController
 
         $teams = $this->getTeamsForProperty($eventId, $propertyId);
 
+        // Fetch and build attendee map for fast lookup of position and department
+        $attendeeMap = array();
+        $attRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array(
+            'event_id' => $eventId,
+            'per_page' => 5000,
+        ));
+        if ($attRes['success']) {
+            $attData = isset($attRes['data']['data']) ? $attRes['data']['data'] : $attRes['data'];
+            if (is_array($attData)) {
+                foreach ($attData as $att) {
+                    if (isset($att['id'])) {
+                        $attendeeMap[$att['id']] = $att;
+                    }
+                }
+            }
+        }
+
         $teamsBySport = array();
         foreach ($teams as $team) {
             $sportName = $team->sport_name ?: 'Chưa xác định';
@@ -364,13 +381,22 @@ class SportTeamsController extends AdminController
             $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $team->id), 100)->getData();
             $memberList = array();
             foreach ($members as $m) {
-                $pos = $m->attendee_position;
-                if (empty($pos) && $m->attendee) {
-                    $pos = $m->attendee->position;
+                $pos = '';
+                $dept = '';
+                if (!empty($m->attendee_id) && isset($attendeeMap[$m->attendee_id])) {
+                    $att = $attendeeMap[$m->attendee_id];
+                    $pos = !empty($att['position_name']) ? $att['position_name'] : (!empty($att['position']) ? $att['position'] : '');
+                    $dept = !empty($att['division_name']) ? $att['division_name'] : (!empty($att['unit_label']) ? $att['unit_label'] : '');
+                } else {
+                    $pos = $m->attendee_position;
+                    if (empty($pos) && $m->attendee) {
+                        $pos = $m->attendee->position;
+                    }
+                    $dept = isset($m->department_name) ? $m->department_name : '';
                 }
                 $memberList[] = array(
                     'name' => $m->attendee_name ?: $m->name,
-                    'department' => isset($m->department_name) ? $m->department_name : '',
+                    'department' => $dept,
                     'attendee_position' => $pos,
                 );
             }
@@ -552,6 +578,23 @@ class SportTeamsController extends AdminController
 
         $teams = $this->getTeamsForProperty($eventId, $propertyId);
 
+        // Fetch and build attendee map for fast lookup of position and department
+        $attendeeMap = array();
+        $attRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array(
+            'event_id' => $eventId,
+            'per_page' => 5000,
+        ));
+        if ($attRes['success']) {
+            $attData = isset($attRes['data']['data']) ? $attRes['data']['data'] : $attRes['data'];
+            if (is_array($attData)) {
+                foreach ($attData as $att) {
+                    if (isset($att['id'])) {
+                        $attendeeMap[$att['id']] = $att;
+                    }
+                }
+            }
+        }
+
         $teamsBySport = array();
         foreach ($teams as $team) {
             $sportName = $team->sport_name ?: 'Chưa xác định';
@@ -565,13 +608,22 @@ class SportTeamsController extends AdminController
             $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $team->id), 100)->getData();
             $memberList = array();
             foreach ($members as $m) {
-                $pos = $m->attendee_position;
-                if (empty($pos) && $m->attendee) {
-                    $pos = $m->attendee->position;
+                $pos = '';
+                $dept = '';
+                if (!empty($m->attendee_id) && isset($attendeeMap[$m->attendee_id])) {
+                    $att = $attendeeMap[$m->attendee_id];
+                    $pos = !empty($att['position_name']) ? $att['position_name'] : (!empty($att['position']) ? $att['position'] : '');
+                    $dept = !empty($att['division_name']) ? $att['division_name'] : (!empty($att['unit_label']) ? $att['unit_label'] : '');
+                } else {
+                    $pos = $m->attendee_position;
+                    if (empty($pos) && $m->attendee) {
+                        $pos = $m->attendee->position;
+                    }
+                    $dept = isset($m->department_name) ? $m->department_name : '';
                 }
                 $memberList[] = array(
                     'name' => $m->attendee_name ?: $m->name,
-                    'department' => isset($m->department_name) ? $m->department_name : '',
+                    'department' => $dept,
                     'attendee_position' => $pos,
                 );
             }
