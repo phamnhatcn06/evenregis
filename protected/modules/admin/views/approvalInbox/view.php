@@ -161,8 +161,8 @@ $this->Tabletitle = 'Duyệt đơn đăng ký #' . $model->registration_id;
 
             <!-- Yêu cầu chỉnh sửa -->
             <div class="card border-warning">
-                <div class="card-header bg-warning text-dark">
-                    <h6 class="mb-0"><i class="fa fa-undo"></i> Yêu cầu chỉnh sửa</h6>
+                <div class="card-header bg-warning text-white">
+                    <h6 class="mb-0 text-white"><i class="fa fa-undo"></i> Yêu cầu chỉnh sửa</h6>
                 </div>
                 <div class="card-body">
                     <form method="post" action="<?php echo $this->createUrl('revision', array('id' => $model->id)); ?>">
