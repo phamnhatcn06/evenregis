@@ -304,27 +304,45 @@ class CompetitionRegistrationsController extends AdminController
 
         $apiData = CompetitionRegistrations::getListByProperty($params);
 
+        $properties = Properties::getApiDataProvider(array(), 500)->getData();
+        $propertyNameMap = array();
+        $propertyRegionMap = array();
+        foreach ($properties as $p) {
+            $propertyNameMap[$p->id] = $p->name;
+            $propertyRegionMap[$p->id] = isset($p->region_id) ? $p->region_id : null;
+        }
+
+        $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
+        $regionalMap = array();
+        foreach ($regionals as $r) {
+            $regionalMap[$r->id] = $r->name;
+        }
+
         $formattedOrgs = array();
-        if (isset($apiData['data']) && is_array($apiData['data'])) {
-            foreach ($apiData['data'] as $item) {
-                $formattedOrgs[] = array(
-                    'id' => isset($item['property_id']) ? $item['property_id'] : null,
-                    'name' => isset($item['property_name']) ? $item['property_name'] : 'Chưa xác định',
-                    'region_name' => isset($item['region_name']) ? $item['region_name'] : '',
-                    'contestant_count' => isset($item['contestant_count']) ? (int)$item['contestant_count'] : 0,
-                    'confirmed_count' => isset($item['confirmed_count']) ? (int)$item['confirmed_count'] : 0,
-                );
+        $rawData = isset($apiData['data']) && is_array($apiData['data']) ? $apiData['data'] : (is_array($apiData) ? $apiData : array());
+
+        foreach ($rawData as $item) {
+            $propId = isset($item['property_id']) ? $item['property_id'] : null;
+            $propName = isset($item['property_name']) && $item['property_name'] !== '' && $item['property_name'] !== null ? $item['property_name'] : 'Chưa xác định';
+            if ($propName === 'Chưa xác định' && $propId && isset($propertyNameMap[$propId])) {
+                $propName = $propertyNameMap[$propId];
             }
-        } elseif (is_array($apiData)) {
-            foreach ($apiData as $item) {
-                $formattedOrgs[] = array(
-                    'id' => isset($item['property_id']) ? $item['property_id'] : null,
-                    'name' => isset($item['property_name']) ? $item['property_name'] : 'Chưa xác định',
-                    'region_name' => isset($item['region_name']) ? $item['region_name'] : '',
-                    'contestant_count' => isset($item['contestant_count']) ? (int)$item['contestant_count'] : 0,
-                    'confirmed_count' => isset($item['confirmed_count']) ? (int)$item['confirmed_count'] : 0,
-                );
+
+            $regionName = isset($item['region_name']) && $item['region_name'] !== '' && $item['region_name'] !== null ? $item['region_name'] : '';
+            if (empty($regionName) && $propId && isset($propertyRegionMap[$propId])) {
+                $regId = $propertyRegionMap[$propId];
+                if ($regId && isset($regionalMap[$regId])) {
+                    $regionName = $regionalMap[$regId];
+                }
             }
+
+            $formattedOrgs[] = array(
+                'id' => $propId,
+                'name' => $propName,
+                'region_name' => $regionName,
+                'contestant_count' => isset($item['contestant_count']) ? (int)$item['contestant_count'] : 0,
+                'confirmed_count' => isset($item['confirmed_count']) ? (int)$item['confirmed_count'] : 0,
+            );
         }
 
         usort($formattedOrgs, function ($a, $b) {
