@@ -1801,12 +1801,7 @@ class ReportsController extends AdminController
         $objWriter->save('php://output');
         Yii::app()->end();
     }
-
-    /**
-     * Báo cáo tổng hợp theo khách sạn (property)
-     * Hiển thị: VĐV thể thao, thí sinh thi nghiệp vụ, thí sinh thi Miss, tiết mục văn nghệ
-     */
-    public function actionReportByHotel()
+}
     {
         $user = AuthHandler::getUser();
         if (!$user) {
