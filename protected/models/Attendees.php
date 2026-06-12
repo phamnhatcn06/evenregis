@@ -57,6 +57,7 @@ class Attendees extends BaseAttendees
         $labels['transport_id'] = Yii::t('app', 'Phương tiện');
         $labels['transport_name'] = Yii::t('app', 'Tên phương tiện');
         $labels['gender'] = Yii::t('app', 'Giới tính');
+        $labels['id_card'] = Yii::t('app', 'Số CCCD/CMND');
         return $labels;
     }
 
