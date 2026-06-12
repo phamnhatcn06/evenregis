@@ -16,7 +16,7 @@
 </style>
 <div class="card">
     <div class="card-header bg-success text-white">
-        <h5 class="mb-0">
+        <h5 class="mb-0 text-white">
             <?php echo CHtml::encode($competitionName); ?> - <?php echo CHtml::encode($eventName); ?>
         </h5>
     </div>
