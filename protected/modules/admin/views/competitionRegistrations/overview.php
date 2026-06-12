@@ -107,7 +107,7 @@ $this->Tabletitle = 'Tổng quan thí sinh thi nghiệp vụ';
     <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fa fa-trophy me-2"></i>Thống kê theo nghiệp vụ</h5>
+                <h5 class="mb-0 text-white"><i class="fa fa-trophy me-2"></i>Thống kê theo nghiệp vụ</h5>
             </div>
             <div class="card-body">
                 <div id="competitions-stats-container">
