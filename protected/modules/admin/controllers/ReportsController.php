@@ -1802,8 +1802,6 @@ class ReportsController extends AdminController
         Yii::app()->end();
     }
 }
-    {
-        $user = AuthHandler::getUser();
         if (!$user) {
             throw new CHttpException(403, 'Bạn cần đăng nhập để xem báo cáo.');
         }
