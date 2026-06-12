@@ -475,12 +475,32 @@ class CompetitionRegistrationsController extends AdminController
                 $att = $compReg->attendee;
                 if (is_array($att)) {
                     $attendeeName = isset($att['full_name']) ? $att['full_name'] : $attendeeName;
-                    $attendeePosition = isset($att['position']) ? $att['position'] : $attendeePosition;
                     $attendeeGender = isset($att['gender']) ? $att['gender'] : $attendeeGender;
+                    // Position là object {"id": ..., "name": ...}
+                    if (isset($att['position'])) {
+                        $pos = $att['position'];
+                        if (is_array($pos) && isset($pos['name'])) {
+                            $attendeePosition = $pos['name'];
+                        } elseif (is_object($pos) && isset($pos->name)) {
+                            $attendeePosition = $pos->name;
+                        } elseif (is_string($pos)) {
+                            $attendeePosition = $pos;
+                        }
+                    }
                 } else {
                     $attendeeName = isset($att->full_name) ? $att->full_name : $attendeeName;
-                    $attendeePosition = isset($att->position) ? $att->position : $attendeePosition;
                     $attendeeGender = isset($att->gender) ? $att->gender : $attendeeGender;
+                    // Position là object {"id": ..., "name": ...}
+                    if (isset($att->position)) {
+                        $pos = $att->position;
+                        if (is_array($pos) && isset($pos['name'])) {
+                            $attendeePosition = $pos['name'];
+                        } elseif (is_object($pos) && isset($pos->name)) {
+                            $attendeePosition = $pos->name;
+                        } elseif (is_string($pos)) {
+                            $attendeePosition = $pos;
+                        }
+                    }
                 }
             }
 
