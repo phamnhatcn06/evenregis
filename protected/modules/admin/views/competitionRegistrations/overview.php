@@ -17,7 +17,7 @@ $this->Tabletitle = 'Tổng quan thí sinh thi nghiệp vụ';
 
 <div class="card mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fa fa-filter me-2"></i>Bộ lọc</h5>
+        <h5 class="mb-0 text-white"><i class="fa fa-filter me-2"></i>Bộ lọc</h5>
     </div>
     <div class="card-body">
         <div class="row">
