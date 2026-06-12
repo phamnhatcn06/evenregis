@@ -150,7 +150,7 @@ $this->Tabletitle = 'Tổng quan thí sinh thi nghiệp vụ';
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalViewOrgContestantsLabel">Danh sách thí sinh: <span id="modalViewOrgContestantsTitleName">-</span></h5>
+                <h5 class="modal-title text-white" id="modalViewOrgContestantsLabel">Danh sách thí sinh: <span id="modalViewOrgContestantsTitleName">-</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <div class="modal-body">
