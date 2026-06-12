@@ -3362,6 +3362,7 @@ class RegistrationsController extends AdminController
 		}
 		$attendee->role_id = $roleId;
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
+		$attendee->id_card = Yii::app()->getRequest()->getPost('id_card');
 		$attendee->approval_status = Attendees::APPROVAL_PENDING;
 		$attendee->join_hotel_date = $join_hotel_date;
 		$attendee->check_in_date = $checkInDate;
