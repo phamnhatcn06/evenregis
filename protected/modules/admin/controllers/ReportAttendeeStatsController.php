@@ -162,6 +162,9 @@ class ReportAttendeeStatsController extends AdminController
                 $propId = isset($regPropertyMap[$regId]) ? $regPropertyMap[$regId] : null;
                 // Chỉ lấy attendee có role_id chứa "2" (VĐV)
                 $roleId = isset($att->role_id) ? $att->role_id : '';
+                if (is_array($roleId)) {
+                    $roleId = implode(',', $roleId);
+                }
                 if ($attId && strpos((string)$roleId, '2') !== false) {
                     $attendees[$attId] = $att;
                     $attendeePropertyMap[$attId] = $propId;
