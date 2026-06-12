@@ -231,7 +231,7 @@ class Attendees extends BaseAttendees
         if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
             $data['start_date'] = $this->join_hotel_date;
         }
-        var_dump(json_encode($data));
+        // var_dump(json_encode($data));
         Yii::log("Attendees storeViaApi - JSON data: " . json_encode($data), 'info', 'application.registration');
         $result = ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
         // var_dump(json_encode($result));
