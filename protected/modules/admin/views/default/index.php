@@ -7,8 +7,11 @@ $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
 $eventList = isset($events) ? $events : array();
 $periodList = isset($periods) ? $periods : array();
 
+$dashboardJsPath = Yii::getPathOfAlias('webroot') . Yii::app()->theme->baseUrl . '/assets/js/pages/dashboard-index.js';
+$dashboardJsVer = file_exists($dashboardJsPath) ? filemtime($dashboardJsPath) : '1.0.0';
+
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/dashboard-index.js',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/dashboard-index.js?v=' . $dashboardJsVer,
     CClientScript::POS_END
 );
 

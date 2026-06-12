@@ -235,31 +235,44 @@ Yii::app()->clientScript->registerScriptFile(
         word-wrap: break-word !important;
     }
 
-    /* Frozen columns */
-    #sports-summary-table .frozen-col {
-        position: relative;
-        z-index: 2;
-    }
-
-    /* Header first row */
-    #sports-summary-table thead tr:first-child th {
-        background: #3a57e8 !important;
-        color: #fff !important;
-        font-weight: 600;
-    }
-
-    /* Header - STT, Cụm, Tên ĐV */
-    #sports-summary-table thead tr:first-child th:nth-child(1) {
+    /* Sticky Column Classes */
+    #sports-summary-table .col-sticky-stt {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 10 !important;
         width: 50px !important;
         min-width: 50px !important;
+        text-align: center;
     }
-    #sports-summary-table thead tr:first-child th:nth-child(2) {
+    #sports-summary-table .col-sticky-region {
+        position: sticky !important;
+        left: 50px !important;
+        z-index: 10 !important;
         width: 120px !important;
         min-width: 120px !important;
     }
-    #sports-summary-table thead tr:first-child th:nth-child(3) {
+    #sports-summary-table .col-sticky-property {
+        position: sticky !important;
+        left: 170px !important;
+        z-index: 10 !important;
         width: 180px !important;
         min-width: 180px !important;
+    }
+    #sports-summary-table .col-sticky-total {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 10 !important;
+    }
+
+    /* Header Sticky Cells Background */
+    #sports-summary-table thead tr:first-child th.col-sticky-stt,
+    #sports-summary-table thead tr:first-child th.col-sticky-region,
+    #sports-summary-table thead tr:first-child th.col-sticky-property {
+        background: #3a57e8 !important;
+        color: #fff !important;
+        z-index: 15 !important;
+    }
+    #sports-summary-table thead tr:first-child th.col-sticky-property {
         border-right: 2px solid #1e3a8a !important;
     }
 
@@ -280,50 +293,46 @@ Yii::app()->clientScript->registerScriptFile(
         padding: 6px 4px !important;
     }
 
-    /* Body frozen columns */
-    #sports-summary-table tbody td:nth-child(1) {
+    /* Body Sticky Cells Background */
+    #sports-summary-table tbody td.col-sticky-stt {
         background: #fff !important;
-        width: 50px !important;
-        min-width: 50px !important;
     }
-    #sports-summary-table tbody td:nth-child(2),
-    #sports-summary-table tbody td[rowspan] {
+    #sports-summary-table tbody td.col-sticky-region {
         background: #f8f9fa !important;
-        width: 120px !important;
-        min-width: 120px !important;
         font-weight: 600;
         vertical-align: middle !important;
     }
-    #sports-summary-table tbody td:nth-child(3),
-    #sports-summary-table tbody tr td:nth-child(2):not([rowspan]) {
+    #sports-summary-table tbody td.col-sticky-property {
         background: #fff !important;
-        width: 180px !important;
-        min-width: 180px !important;
         border-right: 2px solid #dee2e6 !important;
     }
 
-    /* For rows where region is merged, 3rd visible cell is property name */
-    #sports-summary-table tbody tr:not(:first-child) td:nth-child(2):not([rowspan]) {
-        background: #fff !important;
-        width: 180px !important;
-        min-width: 180px !important;
-        border-right: 2px solid #dee2e6 !important;
-    }
-
-    /* Subtotal row */
+    /* Subtotal & Grand Total Sticky Background */
     #sports-summary-table tbody tr.table-warning td {
         background: #fff3cd !important;
         font-weight: 600 !important;
     }
+    #sports-summary-table tbody tr.table-warning td.col-sticky-total {
+        z-index: 11 !important;
+    }
 
-    /* Grand Total row */
     #sports-summary-table tbody tr.table-success td {
         background: #198754 !important;
         color: #fff !important;
     }
+    #sports-summary-table tbody tr.table-success td.col-sticky-total {
+        z-index: 11 !important;
+    }
 
     /* Hover effect */
     #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td {
+        background: #e3f2fd !important;
+    }
+
+    /* Hover effect for sticky cells to avoid transparent background revealing underlying content */
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td.col-sticky-stt,
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td.col-sticky-region,
+    #sports-summary-table tbody tr:not(.table-warning):not(.table-success):hover td.col-sticky-property {
         background: #e3f2fd !important;
     }
 
@@ -332,83 +341,3 @@ Yii::app()->clientScript->registerScriptFile(
         background: #f8f9fa;
     }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var wrapper = document.querySelector('.sports-summary-wrapper');
-    if (!wrapper) return;
-
-    wrapper.addEventListener('scroll', function() {
-        var scrollLeft = this.scrollLeft;
-        var table = document.getElementById('sports-summary-table');
-        if (!table) return;
-
-        // Header row 1 (has rowspan for first 3 cols)
-        var headerRow1 = table.querySelector('thead tr:first-child');
-        if (headerRow1) {
-            var ths = headerRow1.children;
-            if (ths.length >= 3) {
-                ths[0].style.transform = 'translateX(' + scrollLeft + 'px)';
-                ths[0].style.zIndex = '15';
-                ths[1].style.transform = 'translateX(' + scrollLeft + 'px)';
-                ths[1].style.zIndex = '15';
-                ths[2].style.transform = 'translateX(' + scrollLeft + 'px)';
-                ths[2].style.zIndex = '15';
-                if (scrollLeft > 0) {
-                    ths[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
-                } else {
-                    ths[2].style.boxShadow = 'none';
-                }
-            }
-        }
-
-        // Body rows - handle rowspan for merged region cells
-        var bodyRows = table.querySelectorAll('tbody tr');
-        bodyRows.forEach(function(row) {
-            var cells = row.children;
-            if (cells.length < 2 || cells[0].tagName !== 'TD') return;
-
-            // First cell (STT) always frozen
-            cells[0].style.transform = 'translateX(' + scrollLeft + 'px)';
-            cells[0].style.zIndex = '5';
-
-            // Check if row has rowspan cell (region merged)
-            var hasRowspan = cells[1].hasAttribute('rowspan');
-
-            if (hasRowspan) {
-                // This row has region cell with rowspan - freeze cells 0, 1, 2
-                if (cells.length >= 3) {
-                    cells[1].style.transform = 'translateX(' + scrollLeft + 'px)';
-                    cells[1].style.zIndex = '6';
-                    cells[2].style.transform = 'translateX(' + scrollLeft + 'px)';
-                    cells[2].style.zIndex = '5';
-                    if (scrollLeft > 0) {
-                        cells[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
-                    } else {
-                        cells[2].style.boxShadow = 'none';
-                    }
-                }
-            } else {
-                // No rowspan - row only has STT and Property name (region cell is merged from above)
-                // Freeze cells 0 and 1 (STT and Property name)
-                if (cells.length >= 2) {
-                    cells[1].style.transform = 'translateX(' + scrollLeft + 'px)';
-                    cells[1].style.zIndex = '5';
-                    if (scrollLeft > 0) {
-                        cells[1].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
-                    } else {
-                        cells[1].style.boxShadow = 'none';
-                    }
-                }
-            }
-        });
-
-        // Also handle rowspan cells that span multiple rows
-        var rowspanCells = table.querySelectorAll('tbody td[rowspan]');
-        rowspanCells.forEach(function(cell) {
-            cell.style.transform = 'translateX(' + scrollLeft + 'px)';
-            cell.style.zIndex = '6';
-        });
-    });
-});
-</script>

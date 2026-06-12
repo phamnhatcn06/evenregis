@@ -570,9 +570,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                         <table class="table table-bordered table-hover align-middle mb-0" id="tableSportsSummary">
                                             <thead>
                                                 <tr>
-                                                    <th rowspan="2" class="text-center align-middle">STT</th>
-                                                    <th rowspan="2" class="text-center align-middle">Cụm</th>
-                                                    <th rowspan="2" class="align-middle">Tên ĐV</th>
+                                                    <th rowspan="2" class="text-center align-middle col-sticky-stt">STT</th>
+                                                    <th rowspan="2" class="text-center align-middle col-sticky-region">Cụm</th>
+                                                    <th rowspan="2" class="align-middle col-sticky-property">Tên ĐV</th>
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                         <th colspan="3" class="text-center bg-soft-info"><?php echo CHtml::encode($spName); ?></th>
                                                     <?php endforeach; ?>
@@ -615,9 +615,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                         $propName = $propInfo ? $propInfo['name'] : 'Không xác định';
                                                 ?>
                                                     <tr>
-                                                        <td class="text-center fw-bold text-muted"><?php echo $stt++; ?></td>
-                                                        <td class="small"><?php echo CHtml::encode($regionName); ?></td>
-                                                        <td class="fw-bold text-dark"><?php echo CHtml::encode($propName); ?></td>
+                                                        <td class="text-center fw-bold text-muted col-sticky-stt"><?php echo $stt++; ?></td>
+                                                        <td class="small col-sticky-region"><?php echo CHtml::encode($regionName); ?></td>
+                                                        <td class="fw-bold text-dark col-sticky-property"><?php echo CHtml::encode($propName); ?></td>
                                                         <?php foreach ($activeSportsForReport as $spId => $spName):
                                                             $teamCount = isset($sportsData[$spId]) ? $sportsData[$spId]['team_count'] : 0;
                                                             $memberCount = isset($sportsData[$spId]) ? $sportsData[$spId]['member_count'] : 0;
@@ -635,7 +635,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                 <?php endforeach; ?>
                                                     <!-- Region subtotal -->
                                                     <tr class="table-warning">
-                                                        <td colspan="3" class="text-end fw-bold">Tổng <?php echo CHtml::encode($regionName); ?>:</td>
+                                                        <td colspan="3" class="text-end fw-bold col-sticky-total">Tổng <?php echo CHtml::encode($regionName); ?>:</td>
                                                         <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                             <td class="col-num fw-bold"><?php echo $regionTotals[$spId]['team_count']; ?></td>
                                                             <td class="col-num fw-bold"><?php echo $regionTotals[$spId]['member_count']; ?></td>
@@ -646,7 +646,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                             </tbody>
                                             <tfoot class="table-success">
                                                 <tr>
-                                                    <td colspan="3" class="text-end fw-bold fs-6">TỔNG CỘNG:</td>
+                                                    <td colspan="3" class="text-end fw-bold fs-6 col-sticky-total">TỔNG CỘNG:</td>
                                                     <?php foreach ($activeSportsForReport as $spId => $spName): ?>
                                                         <td class="col-num fw-bold fs-6"><?php echo $grandTotals[$spId]['team_count']; ?></td>
                                                         <td class="col-num fw-bold fs-6"><?php echo $grandTotals[$spId]['member_count']; ?></td>
@@ -751,38 +751,104 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         padding: 6px 4px !important;
     }
 
-    /* Body frozen columns */
-    #tableSportsSummary tbody td:nth-child(1) {
-        background: #fff !important;
+    /* Sticky Column Classes */
+    #tableSportsSummary .col-sticky-stt {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 10 !important;
         width: 50px !important;
         min-width: 50px !important;
+        text-align: center;
     }
-    #tableSportsSummary tbody td:nth-child(2) {
-        background: #f8f9fa !important;
+    #tableSportsSummary .col-sticky-region {
+        position: sticky !important;
+        left: 50px !important;
+        z-index: 10 !important;
         width: 120px !important;
         min-width: 120px !important;
     }
-    #tableSportsSummary tbody td:nth-child(3) {
-        background: #fff !important;
+    #tableSportsSummary .col-sticky-property {
+        position: sticky !important;
+        left: 170px !important;
+        z-index: 10 !important;
         width: 180px !important;
         min-width: 180px !important;
+    }
+    #tableSportsSummary .col-sticky-total {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 10 !important;
+    }
+
+    /* Header Sticky Cells Background */
+    #tableSportsSummary thead tr:first-child th.col-sticky-stt,
+    #tableSportsSummary thead tr:first-child th.col-sticky-region,
+    #tableSportsSummary thead tr:first-child th.col-sticky-property {
+        background: #3a57e8 !important;
+        color: #fff !important;
+        z-index: 15 !important;
+    }
+    #tableSportsSummary thead tr:first-child th.col-sticky-property {
+        border-right: 2px solid #1e3a8a !important;
+    }
+
+    /* Header row 2 */
+    #tableSportsSummary thead tr:nth-child(2) th {
+        background: #e9ecef !important;
+        color: #495057 !important;
+        font-size: 11px !important;
+        padding: 4px 2px !important;
+    }
+
+    /* Sport group headers */
+    #tableSportsSummary thead tr:first-child th.sport-header {
+        background: #0dcaf0 !important;
+        color: #000 !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        padding: 6px 4px !important;
+    }
+
+    /* Body Sticky Cells Background */
+    #tableSportsSummary tbody td.col-sticky-stt {
+        background: #fff !important;
+    }
+    #tableSportsSummary tbody td.col-sticky-region {
+        background: #f8f9fa !important;
+        font-weight: 600;
+        vertical-align: middle !important;
+    }
+    #tableSportsSummary tbody td.col-sticky-property {
+        background: #fff !important;
         border-right: 2px solid #dee2e6 !important;
     }
 
-    /* Subtotal row */
+    /* Subtotal & Grand Total Sticky Background */
     #tableSportsSummary tbody tr.table-warning td {
         background: #fff3cd !important;
         font-weight: 600 !important;
     }
+    #tableSportsSummary tbody tr.table-warning td.col-sticky-total {
+        z-index: 11 !important;
+    }
 
-    /* Grand Total row */
     #tableSportsSummary tfoot tr td {
         background: #198754 !important;
         color: #fff !important;
     }
+    #tableSportsSummary tfoot tr td.col-sticky-total {
+        z-index: 11 !important;
+    }
 
     /* Hover effect */
     #tableSportsSummary tbody tr:not(.table-warning):hover td {
+        background: #e3f2fd !important;
+    }
+
+    /* Hover effect for sticky cells to avoid transparent background revealing underlying content */
+    #tableSportsSummary tbody tr:not(.table-warning):hover td.col-sticky-stt,
+    #tableSportsSummary tbody tr:not(.table-warning):hover td.col-sticky-region,
+    #tableSportsSummary tbody tr:not(.table-warning):hover td.col-sticky-property {
         background: #e3f2fd !important;
     }
 
@@ -791,54 +857,3 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
         background: #f8f9fa;
     }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var wrapper = document.querySelector('#sports-summary-pane .sports-summary-wrapper');
-    if (!wrapper) return;
-
-    wrapper.addEventListener('scroll', function() {
-        var scrollLeft = this.scrollLeft;
-        var table = document.getElementById('tableSportsSummary');
-        if (!table) return;
-
-        // Header row 1 (has rowspan for first 3 cols)
-        var headerRow1 = table.querySelector('thead tr:first-child');
-        if (headerRow1) {
-            var ths = headerRow1.children;
-            if (ths.length >= 3) {
-                ths[0].style.transform = 'translateX(' + scrollLeft + 'px)';
-                ths[0].style.zIndex = '15';
-                ths[1].style.transform = 'translateX(' + scrollLeft + 'px)';
-                ths[1].style.zIndex = '15';
-                ths[2].style.transform = 'translateX(' + scrollLeft + 'px)';
-                ths[2].style.zIndex = '15';
-                if (scrollLeft > 0) {
-                    ths[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
-                } else {
-                    ths[2].style.boxShadow = 'none';
-                }
-            }
-        }
-
-        // Body and tfoot rows only
-        var dataRows = table.querySelectorAll('tbody tr, tfoot tr');
-        dataRows.forEach(function(row) {
-            var cells = row.children;
-            if (cells.length >= 3 && cells[0].tagName === 'TD') {
-                cells[0].style.transform = 'translateX(' + scrollLeft + 'px)';
-                cells[0].style.zIndex = '5';
-                cells[1].style.transform = 'translateX(' + scrollLeft + 'px)';
-                cells[1].style.zIndex = '5';
-                cells[2].style.transform = 'translateX(' + scrollLeft + 'px)';
-                cells[2].style.zIndex = '5';
-                if (scrollLeft > 0) {
-                    cells[2].style.boxShadow = '4px 0 8px rgba(0,0,0,0.15)';
-                } else {
-                    cells[2].style.boxShadow = 'none';
-                }
-            }
-        });
-    });
-});
-</script>
