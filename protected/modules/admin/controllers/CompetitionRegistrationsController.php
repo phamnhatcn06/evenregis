@@ -393,6 +393,32 @@ class CompetitionRegistrationsController extends AdminController
             'per_page' => 5000,
         ), 5000)->getData();
 
+        // Lấy tất cả đăng ký của event để biết thí sinh đăng ký những nghiệp vụ nào
+        $allCompRegs = CompetitionRegistrations::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'per_page' => 10000,
+        ), 10000)->getData();
+
+        // Map attendee_id -> danh sách competition đã đăng ký
+        $attendeeCompetitions = array();
+        foreach ($allCompRegs as $reg) {
+            if (isset($reg->deleted_at) && $reg->deleted_at !== null && $reg->deleted_at !== '') {
+                continue;
+            }
+            $attId = $reg->attendee_id;
+            if (!isset($attendeeCompetitions[$attId])) {
+                $attendeeCompetitions[$attId] = array();
+            }
+            $compName = isset($reg->competition_name) ? $reg->competition_name : '';
+            if (!$compName && isset($reg->competition)) {
+                $comp = $reg->competition;
+                $compName = is_array($comp) ? (isset($comp['name']) ? $comp['name'] : '') : (isset($comp->name) ? $comp->name : '');
+            }
+            if ($compName && !in_array($compName, $attendeeCompetitions[$attId])) {
+                $attendeeCompetitions[$attId][] = $compName;
+            }
+        }
+
         $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
         $regionalMap = array();
         $regionalCodeMap = array();
