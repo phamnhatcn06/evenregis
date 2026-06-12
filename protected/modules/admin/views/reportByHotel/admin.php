@@ -197,7 +197,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h6 class="mb-0 text-primary"><i class="fa fa-futbol-o me-1"></i> Danh sách VĐV tham gia thể thao</h6>
                                             <?php if ($sportCount > 0): ?>
-                                                <a href="<?php echo $this->createUrl('exportByHotel', array('event_id' => $selectedEventId, 'property_id' => $propId, 'type' => 'sport')); ?>" class="btn btn-sm btn-outline-success">
+                                                <a href="<?php echo $this->createUrl('export', array('event_id' => $selectedEventId, 'property_id' => $propId, 'type' => 'sport')); ?>" class="btn btn-sm btn-outline-success">
                                                     <i class="fa fa-download"></i> Xuất Excel
                                                 </a>
                                             <?php endif; ?>
