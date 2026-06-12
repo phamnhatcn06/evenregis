@@ -3253,22 +3253,23 @@ class RegistrationsController extends AdminController
 
 			for ($row = 2; $row <= $highestRow; $row++) {
 				$fullName = trim($sheet->getCell('A' . $row)->getValue() ?? '');
-				$department = trim($sheet->getCell('B' . $row)->getValue() ?? '');
-				$position = trim($sheet->getCell('C' . $row)->getValue() ?? '');
-				$role1 = trim($sheet->getCell('D' . $row)->getValue() ?? '');
-				$role2 = trim($sheet->getCell('E' . $row)->getValue() ?? '');
-				$role3 = trim($sheet->getCell('F' . $row)->getValue() ?? '');
-				$startDateVal = $sheet->getCell('G' . $row)->getValue();
-				$note = trim($sheet->getCell('H' . $row)->getValue() ?? '');
+				$idCard = trim($sheet->getCell('B' . $row)->getValue() ?? '');
+				$department = trim($sheet->getCell('C' . $row)->getValue() ?? '');
+				$position = trim($sheet->getCell('D' . $row)->getValue() ?? '');
+				$role1 = trim($sheet->getCell('E' . $row)->getValue() ?? '');
+				$role2 = trim($sheet->getCell('F' . $row)->getValue() ?? '');
+				$role3 = trim($sheet->getCell('G' . $row)->getValue() ?? '');
+				$startDateVal = $sheet->getCell('H' . $row)->getValue();
+				$note = trim($sheet->getCell('I' . $row)->getValue() ?? '');
 
-				if (empty($fullName) || empty($position) || empty($startDateVal)) {
-					if (!empty($fullName)) $errorCount++; // Chỉ tính lỗi nếu có nhập tên nhưng thiếu trường required
+				if (empty($fullName) || empty($idCard) || empty($position) || empty($startDateVal)) {
+					if (!empty($fullName)) $errorCount++;
 					continue;
 				}
 
 				// Format start_date
 				$startDate = null;
-				if (PHPExcel_Shared_Date::isDateTime($sheet->getCell('G' . $row))) {
+				if (PHPExcel_Shared_Date::isDateTime($sheet->getCell('H' . $row))) {
 					$startDate = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($startDateVal));
 				} else {
 					// Cố gắng parse dạng text dd/mm/yyyy
@@ -3293,9 +3294,8 @@ class RegistrationsController extends AdminController
 				$attendee->registration_id = $registrationId;
 				$attendee->property_id = $propertyId;
 				$attendee->full_name = $fullName;
+				$attendee->id_card = $idCard;
 				$attendee->position = $position;
-				// Gộp phòng ban vào chức danh hoặc bỏ qua vì base attendee ko có unit_label ở form add manual?
-				// Nhưng DB model có unit_label. Ta sẽ lưu vào unit_label.
 				$attendee->unit_label = $department;
 				if (!empty($roleIds)) {
 					$attendee->role_id = implode(', ', $roleIds);
