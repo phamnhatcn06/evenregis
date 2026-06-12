@@ -6,7 +6,7 @@ class ReportAttendeeStatsController extends AdminController
      * Báo cáo thống kê người đăng ký vòng loại theo cụm và đơn vị
      * Phân tích theo NGƯỜI chứ không phải theo MÔN
      */
-    public function actionIndex()
+    public function actionAdmin()
     {
         $user = AuthHandler::getUser();
         if (!$user) {
@@ -365,14 +365,14 @@ class ReportAttendeeStatsController extends AdminController
 
         // Sort properties trong mỗi regional theo code
         foreach ($regionalData as &$rd) {
-            usort($rd['properties'], function($a, $b) {
+            usort($rd['properties'], function ($a, $b) {
                 return strnatcasecmp($a['property_code'], $b['property_code']);
             });
         }
         unset($rd);
 
         // Sort regionals theo tên
-        usort($regionalData, function($a, $b) {
+        usort($regionalData, function ($a, $b) {
             if ($a['regional_id'] == 0) return 1;
             if ($b['regional_id'] == 0) return -1;
             return strnatcasecmp($a['regional_name'], $b['regional_name']);
