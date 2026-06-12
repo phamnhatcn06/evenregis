@@ -234,8 +234,8 @@ class Attendees extends BaseAttendees
         var_dump(json_encode($data));
         Yii::log("Attendees storeViaApi - JSON data: " . json_encode($data), 'info', 'application.registration');
         $result = ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
-        var_dump(json_encode($result));
-        die();
+        // var_dump(json_encode($result));
+        // die();
         return $result;
     }
 
