@@ -484,6 +484,9 @@ class CompetitionRegistrationsController extends AdminController
                 }
             }
 
+            $attId = $compReg->attendee_id;
+            $registeredCompetitions = isset($attendeeCompetitions[$attId]) ? $attendeeCompetitions[$attId] : array();
+
             $contestantsByRegion[$regionId]['properties'][$propId]['contestants'][] = array(
                 'id' => $compReg->id,
                 'attendee_id' => $compReg->attendee_id,
@@ -494,6 +497,7 @@ class CompetitionRegistrationsController extends AdminController
                 'status' => $compReg->status,
                 'registered_at' => $compReg->registered_at,
                 'note' => $compReg->note,
+                'registered_competitions' => $registeredCompetitions,
             );
         }
 
