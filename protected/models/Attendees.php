@@ -24,6 +24,7 @@ class Attendees extends BaseAttendees
     public $transport_id;
     public $transport_name;
     public $gender;
+    public $id_card;
 
     public static function model($className = __CLASS__)
     {
@@ -79,7 +80,7 @@ class Attendees extends BaseAttendees
 
     public static function getByRegistrationId($registrationId)
     {
-        $result = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('registration_id' => $registrationId, 'per_page' => 500));
+        $result = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('registration_id' => $registrationId, 'per_page' => 5000));
         if ($result['success'] && isset($result['data']['data'])) {
             return $result['data']['data'];
         }
@@ -228,8 +229,12 @@ class Attendees extends BaseAttendees
         if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
             $data['start_date'] = $this->join_hotel_date;
         }
+        var_dump(json_encode($data));
         Yii::log("Attendees storeViaApi - JSON data: " . json_encode($data), 'info', 'application.registration');
-        return ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
+        $result = ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
+        var_dump(json_encode($result));
+        die();
+        return $result;
     }
 
     public function updateViaApi()
