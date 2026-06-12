@@ -6,7 +6,7 @@ $this->pageTitle = 'Đăng ký - ' . Yii::app()->name;
     <div class="col-md-6">
         <div class="card shadow">
             <div class="card-header bg-success text-white">
-                <h4 class="mb-0">Đăng ký tài khoản</h4>
+                <h4 class="mb-0 text-white">Đăng ký tài khoản</h4>
             </div>
             <div class="card-body">
                 <?php $form = $this->beginWidget('CActiveForm', array(
