@@ -95,17 +95,15 @@
                     </h5>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-fixed-cols">
+                        <table class="table table-bordered table-hover">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width:5%">#</th>
-                                    <th style="width:10%">SBD</th>
-                                    <th style="width:25%">Họ tên</th>
+                                    <th style="width:5%">STT</th>
+                                    <th style="width:20%">Họ tên</th>
                                     <th style="width:20%">Đơn vị</th>
                                     <th style="width:15%">Chức danh</th>
-                                    <th style="width:10%">Giới tính</th>
-                                    <th style="width:10%">Trạng thái</th>
-                                    <th style="width:5%">Thao tác</th>
+                                    <th style="width:30%">Nghiệp vụ đăng ký</th>
+                                    <th style="width:10%">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -116,17 +114,21 @@
                                             data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
                                             data-status="<?php echo $contestant['status']; ?>">
                                             <td class="row-index"><?php echo $globalIndex++; ?></td>
-                                            <td><strong><?php echo CHtml::encode($contestant['candidate_number'] ?: '-'); ?></strong></td>
                                             <td><?php echo CHtml::encode($contestant['attendee_name']); ?></td>
                                             <td><?php echo CHtml::encode($propData['property_name']); ?></td>
                                             <td><?php echo CHtml::encode($contestant['attendee_position']); ?></td>
                                             <td>
                                                 <?php
-                                                $gender = $contestant['attendee_gender'];
-                                                echo $gender === 'male' ? 'Nam' : ($gender === 'female' ? 'Nữ' : '-');
+                                                $competitions = isset($contestant['registered_competitions']) ? $contestant['registered_competitions'] : array();
+                                                if (!empty($competitions)) {
+                                                    foreach ($competitions as $compName) {
+                                                        echo '<span class="badge bg-info me-1 mb-1">' . CHtml::encode($compName) . '</span>';
+                                                    }
+                                                } else {
+                                                    echo '-';
+                                                }
                                                 ?>
                                             </td>
-                                            <td><?php echo CompetitionRegistrations::getStatusLabel($contestant['status']); ?></td>
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-info btn-view-contestant" data-id="<?php echo $contestant['id']; ?>" title="Xem chi tiết" style="width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;">
                                                     <?php echo IconHelper::render('view', 'icon-20', 20); ?>
