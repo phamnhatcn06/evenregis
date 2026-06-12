@@ -235,7 +235,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h6 class="mb-0 text-success"><i class="fa fa-graduation-cap me-1"></i> Danh sách thí sinh thi nghiệp vụ</h6>
                                             <?php if ($compCount > 0): ?>
-                                                <a href="<?php echo $this->createUrl('exportByHotel', array('event_id' => $selectedEventId, 'property_id' => $propId, 'type' => 'competition')); ?>" class="btn btn-sm btn-outline-success">
+                                                <a href="<?php echo $this->createUrl('export', array('event_id' => $selectedEventId, 'property_id' => $propId, 'type' => 'competition')); ?>" class="btn btn-sm btn-outline-success">
                                                     <i class="fa fa-download"></i> Xuất Excel
                                                 </a>
                                             <?php endif; ?>
@@ -273,7 +273,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h6 class="mb-0 text-danger"><i class="fa fa-female me-1"></i> Danh sách thí sinh thi Miss</h6>
                                             <?php if ($beautyCount > 0): ?>
-                                                <a href="<?php echo $this->createUrl('exportByHotel', array('event_id' => $selectedEventId, 'property_id' => $propId, 'type' => 'beauty')); ?>" class="btn btn-sm btn-outline-success">
+                                                <a href="<?php echo $this->createUrl('export', array('event_id' => $selectedEventId, 'property_id' => $propId, 'type' => 'beauty')); ?>" class="btn btn-sm btn-outline-success">
                                                     <i class="fa fa-download"></i> Xuất Excel
                                                 </a>
                                             <?php endif; ?>
@@ -311,7 +311,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h6 class="mb-0 text-warning"><i class="fa fa-music me-1"></i> Danh sách tiết mục văn nghệ</h6>
                                             <?php if ($talentCount > 0): ?>
-                                                <a href="<?php echo $this->createUrl('exportByHotel', array('event_id' => $selectedEventId, 'property_id' => $propId, 'type' => 'talent')); ?>" class="btn btn-sm btn-outline-success">
+                                                <a href="<?php echo $this->createUrl('export', array('event_id' => $selectedEventId, 'property_id' => $propId, 'type' => 'talent')); ?>" class="btn btn-sm btn-outline-success">
                                                     <i class="fa fa-download"></i> Xuất Excel
                                                 </a>
                                             <?php endif; ?>
