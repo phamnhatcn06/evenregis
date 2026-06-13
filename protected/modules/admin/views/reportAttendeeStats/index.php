@@ -237,8 +237,9 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                         <thead class="table-success">
                             <tr>
                                 <th class="text-center" style="width: 60px;">STT</th>
-                                <th style="min-width: 200px;">Môn thể thao</th>
-                                <th class="text-center" style="width: 150px;">Số lượng VĐV</th>
+                                <th style="min-width: 180px;">Môn thể thao</th>
+                                <th class="text-center" style="width: 100px;">Tổng VĐV</th>
+                                <th style="min-width: 300px;">Chi tiết theo nội dung con</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -248,14 +249,31 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                             foreach ($reportData['sportStats'] as $sport):
                                 if ($sport['total_athletes'] == 0) continue;
                                 $totalAthletes += $sport['total_athletes'];
+                                $children = isset($sport['children']) ? $sport['children'] : array();
                             ?>
                             <tr>
                                 <td class="text-center"><?php echo $sportStt++; ?></td>
                                 <td>
                                     <i class="fa fa-trophy text-warning me-1"></i>
-                                    <?php echo CHtml::encode($sport['sport_name']); ?>
+                                    <strong><?php echo CHtml::encode($sport['sport_name']); ?></strong>
                                 </td>
-                                <td class="text-center fw-bold"><?php echo number_format($sport['total_athletes']); ?></td>
+                                <td class="text-center fw-bold fs-5"><?php echo number_format($sport['total_athletes']); ?></td>
+                                <td>
+                                    <?php if (!empty($children)): ?>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <?php foreach ($children as $child):
+                                            if ($child['total_athletes'] == 0) continue;
+                                        ?>
+                                        <span class="badge bg-info text-dark">
+                                            <?php echo CHtml::encode($child['sport_name']); ?>:
+                                            <strong><?php echo number_format($child['total_athletes']); ?></strong>
+                                        </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <?php else: ?>
+                                    <span class="text-muted small">—</span>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -263,6 +281,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                             <tr class="fw-bold">
                                 <td colspan="2" class="text-end">TỔNG CỘNG (lượt đăng ký):</td>
                                 <td class="text-center"><?php echo number_format($totalAthletes); ?></td>
+                                <td></td>
                             </tr>
                         </tfoot>
                     </table>
