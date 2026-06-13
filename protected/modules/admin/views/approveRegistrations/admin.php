@@ -72,8 +72,23 @@ $actionColumnOther = array(
     }
 );
 
+// Cột lý do trả về
+$rejectionReasonColumn = array(
+    'name' => 'rejection_reason',
+    'header' => 'Lý do trả về',
+    'value' => function ($data) {
+        $reason = isset($data->rejection_reason) ? $data->rejection_reason : '';
+        if (empty($reason)) return '-';
+        if (mb_strlen($reason) > 50) {
+            return '<span title="' . CHtml::encode($reason) . '">' . CHtml::encode(mb_substr($reason, 0, 50)) . '...</span>';
+        }
+        return CHtml::encode($reason);
+    },
+    'type' => 'raw',
+);
+
 $columnsSubmitted = array_merge($baseColumns, array($actionColumnSubmitted));
-$columnsRejected = array_merge($baseColumns, array($actionColumnOther));
+$columnsRejected = array_merge($baseColumns, array($rejectionReasonColumn, $actionColumnOther));
 $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
 ?>
 
