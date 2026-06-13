@@ -77,31 +77,100 @@ $columnsRejected = array_merge($baseColumns, array($actionColumnOther));
 $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
 ?>
 
+<style>
+.approval-tabs {
+    display: flex;
+    gap: 12px;
+    padding: 0;
+    margin-bottom: 24px;
+    border: none;
+}
+.approval-tabs .nav-item {
+    flex: 1;
+    max-width: 280px;
+}
+.approval-tabs .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    background: #fff;
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+.approval-tabs .nav-link:hover {
+    border-color: #dee2e6;
+    background: #f8f9fa;
+}
+.approval-tabs .nav-link.active {
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.approval-tabs .nav-link .tab-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.approval-tabs .nav-link .tab-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+.approval-tabs .nav-link .tab-count {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+}
+/* Tab Chờ duyệt - Warning/Orange */
+.approval-tabs .tab-submitted .tab-icon { background: #fff3cd; color: #856404; }
+.approval-tabs .tab-submitted.active { background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%); color: #000; }
+.approval-tabs .tab-submitted.active .tab-icon { background: rgba(255,255,255,0.3); color: #000; }
+/* Tab Trả về - Danger/Red */
+.approval-tabs .tab-rejected .tab-icon { background: #f8d7da; color: #721c24; }
+.approval-tabs .tab-rejected.active { background: linear-gradient(135deg, #dc3545 0%, #e4606d 100%); color: #fff; }
+.approval-tabs .tab-rejected.active .tab-icon { background: rgba(255,255,255,0.2); color: #fff; }
+/* Tab Đã duyệt - Success/Green */
+.approval-tabs .tab-approved .tab-icon { background: #d4edda; color: #155724; }
+.approval-tabs .tab-approved.active { background: linear-gradient(135deg, #28a745 0%, #48c774 100%); color: #fff; }
+.approval-tabs .tab-approved.active .tab-icon { background: rgba(255,255,255,0.2); color: #fff; }
+</style>
+
 <div class="card">
     <div class="card-body">
-        <ul class="nav nav-tabs" id="approvalTabs" role="tablist">
+        <ul class="nav approval-tabs" id="approvalTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="submitted-tab" data-bs-toggle="tab" data-bs-target="#submitted" type="button" role="tab">
-                    <i class="fa fa-clock-o me-1"></i>Chờ duyệt
-                    <?php if ($countSubmitted > 0): ?>
-                        <span class="badge bg-warning text-dark ms-1"><?php echo $countSubmitted; ?></span>
-                    <?php endif; ?>
+                <button class="nav-link tab-submitted active" id="submitted-tab" data-bs-toggle="tab" data-bs-target="#submitted" type="button" role="tab">
+                    <div class="tab-info">
+                        <div class="tab-icon"><i class="fa fa-clock-o"></i></div>
+                        <span>Chờ duyệt</span>
+                    </div>
+                    <span class="tab-count"><?php echo $countSubmitted; ?></span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">
-                    <i class="fa fa-undo me-1"></i>Trả về
-                    <?php if ($countRejected > 0): ?>
-                        <span class="badge bg-danger ms-1"><?php echo $countRejected; ?></span>
-                    <?php endif; ?>
+                <button class="nav-link tab-rejected" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">
+                    <div class="tab-info">
+                        <div class="tab-icon"><i class="fa fa-undo"></i></div>
+                        <span>Trả về</span>
+                    </div>
+                    <span class="tab-count"><?php echo $countRejected; ?></span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">
-                    <i class="fa fa-check me-1"></i>Đã duyệt
-                    <?php if ($countApproved > 0): ?>
-                        <span class="badge bg-success ms-1"><?php echo $countApproved; ?></span>
-                    <?php endif; ?>
+                <button class="nav-link tab-approved" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">
+                    <div class="tab-info">
+                        <div class="tab-icon"><i class="fa fa-check"></i></div>
+                        <span>Đã duyệt</span>
+                    </div>
+                    <span class="tab-count"><?php echo $countApproved; ?></span>
                 </button>
             </li>
         </ul>
