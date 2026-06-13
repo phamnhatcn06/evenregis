@@ -128,7 +128,8 @@ class ReportAttendeeStatsController extends AdminController
         if (!$isHO && $userPropertyId) {
             $regParams['property_id'] = $userPropertyId;
         }
-        $registrationsRes = Registrations::getApiDataProvider($regParams, 1000)->getData();
+        $registrationsRes = Registrations::getApiDataProvider($regParams, 10000)->getData();
+        //133 regis => OK
         $activeRegistrationIds = array();
         $regPropertyMap = array();
         foreach ($registrationsRes as $reg) {
@@ -151,6 +152,7 @@ class ReportAttendeeStatsController extends AdminController
             $attParams['property_id'] = $userPropertyId;
         }
         $rawAttendees = Attendees::getApiDataProvider($attParams, 10000)->getData();
+
         $attendees = array();
         $attendeePropertyMap = array();
         foreach ($rawAttendees as $att) {
@@ -167,8 +169,32 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
+        // DEBUG: Check attendee 687
+        $checkId = 687;
+        $foundInRaw = false;
+        foreach ($rawAttendees as $att) {
+            if (isset($att->id) && $att->id == $checkId) {
+                $foundInRaw = true;
+                echo "1. Raw: found, deleted_at=" . (isset($att->deleted_at) ? $att->deleted_at : 'null') . ", reg_id=" . (isset($att->registration_id) ? $att->registration_id : 'null') . "<br>";
+                break;
+            }
+        }
+        if (!$foundInRaw) echo "1. Raw: NOT FOUND (API không trả về)<br>";
+
+        $attRegId = null;
+        foreach ($rawAttendees as $att) {
+            if (isset($att->id) && $att->id == $checkId) {
+                $attRegId = isset($att->registration_id) ? $att->registration_id : null;
+                break;
+            }
+        }
+        echo "2. Registration $attRegId in activeRegistrationIds: " . (isset($activeRegistrationIds[$attRegId]) ? 'YES' : 'NO') . "<br>";
+        echo "3. In \$attendees: " . (isset($attendees[$checkId]) ? 'YES' : 'NO') . "<br>";
+        // END DEBUG
+
         // Lấy sports để map parent_id
         $sportsList = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        //32 sport => OK
         $sportParentMap = array();
         foreach ($sportsList as $sp) {
             $spId = isset($sp->id) ? $sp->id : null;
@@ -193,7 +219,7 @@ class ReportAttendeeStatsController extends AdminController
 
         // Lấy sport_id từ team
         $teamSportMap = array();
-        $teamsRes = SportTeams::getApiDataProvider(array('event_id' => $eventId), 5000)->getData();
+        $teamsRes = SportTeams::getApiDataProvider(array('event_id' => $eventId), 50000)->getData();
         foreach ($teamsRes as $team) {
             $teamId = isset($team->id) ? $team->id : null;
             $spId = isset($team->sport_id) ? $team->sport_id : null;
@@ -377,7 +403,18 @@ class ReportAttendeeStatsController extends AdminController
             if ($b['regional_id'] == 0) return -1;
             return strnatcasecmp($a['regional_name'], $b['regional_name']);
         });
+        // Lấy list attendee_id những người tham gia thể thao (có ít nhất 1 môn)
+        $sportsAttendeeIds = array();
+        foreach ($attendeeStats as $attId => $stats) {
+            $sportsCount = count($stats['parent_sports']);
+            if ($sportsCount > 0) {
+                $sportsAttendeeIds[] = $attId;
+            }
+        }
 
+        // Debug
+        echo implode(',', $sportsAttendeeIds);
+        die;
         return array(
             'regionals' => $regionalData,
             'summary' => $summary,

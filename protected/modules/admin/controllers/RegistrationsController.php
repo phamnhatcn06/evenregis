@@ -2902,6 +2902,8 @@ class RegistrationsController extends AdminController
 				'note'            => $note,
 			);
 			$result = ApiClient::post(ApiEndpoints::COMPETITION_REGISTRATION_STORE, $regData);
+			var_dump($result);
+			die;
 			if ($result['success']) {
 				$successCount++;
 				if (isset($result['data']['data']['id'])) {
