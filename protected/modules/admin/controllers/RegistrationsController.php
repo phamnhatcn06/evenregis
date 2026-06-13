@@ -4743,4 +4743,40 @@ class RegistrationsController extends AdminController
 		}
 		Yii::app()->end();
 	}
+
+	public function actionGetSportTeamsHtml($registration_id)
+	{
+		if (!Yii::app()->request->isAjaxRequest) {
+			throw new CHttpException(400, 'Bad Request');
+		}
+
+		$registration = Registrations::fetchFromApi($registration_id);
+		if (!$registration) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy phiếu đăng ký.'));
+			Yii::app()->end();
+		}
+
+		$sportTeams = SportTeams::getByRegistration($registration->event_id, $registration->property_id);
+		$sportTeamMembers = array();
+
+		if (!empty($sportTeams)) {
+			foreach ($sportTeams as $team) {
+				$teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+				if ($teamId) {
+					$members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 50)->getData();
+					$sportTeamMembers[$teamId] = $members;
+				}
+			}
+		}
+
+		$html = $this->renderPartial('_sport_teams_content', array(
+			'sportTeams' => $sportTeams,
+			'sportTeamMembers' => $sportTeamMembers,
+			'model' => $registration,
+			'canEdit' => true,
+		), true);
+
+		echo CJSON::encode(array('success' => true, 'html' => $html));
+		Yii::app()->end();
+	}
 }
