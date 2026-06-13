@@ -68,6 +68,8 @@ $this->Tabletitle = Yii::t('app', 'List') . ' ' . $model->label();
             'options' => array(
                 'pageLength' => 25,
                 'order' => array(array(0, 'desc')),
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>
