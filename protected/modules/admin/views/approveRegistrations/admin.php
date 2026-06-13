@@ -157,28 +157,6 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
 .approval-tabs .tab-approved.active { background: linear-gradient(135deg, #28a745 0%, #48c774 100%); color: #fff; }
 .approval-tabs .tab-approved.active .tab-icon { background: rgba(255,255,255,0.2); color: #fff; }
 
-/* DataTable responsive */
-.dataTables_wrapper {
-    width: 100%;
-    overflow-x: auto;
-}
-.dataTable {
-    width: 100% !important;
-    table-layout: auto;
-}
-.dataTable th, .dataTable td {
-    white-space: nowrap;
-}
-@media (max-width: 992px) {
-    .dataTable th, .dataTable td {
-        font-size: 13px;
-        padding: 8px 6px !important;
-    }
-    .btn-sm {
-        padding: 4px 8px;
-        font-size: 12px;
-    }
-}
 @media (max-width: 768px) {
     .approval-tabs {
         flex-direction: column;
