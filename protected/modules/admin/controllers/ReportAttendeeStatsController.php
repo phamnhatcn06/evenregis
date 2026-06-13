@@ -217,6 +217,18 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
+        // DEBUG: Check attendee 687 trong sportMembers
+        $foundInSportMembers = false;
+        foreach ($sportMembers as $sm) {
+            if (isset($sm['attendee_id']) && $sm['attendee_id'] == 687) {
+                $foundInSportMembers = true;
+                echo "4. SportMembers: found, team_id=" . (isset($sm['sport_team_id']) ? $sm['sport_team_id'] : 'null') . "<br>";
+                break;
+            }
+        }
+        if (!$foundInSportMembers) echo "4. SportMembers: NOT FOUND (API không trả về)<br>";
+        // END DEBUG
+
         // Lấy sport_id từ team
         $teamSportMap = array();
         $teamsRes = SportTeams::getApiDataProvider(array('event_id' => $eventId), 50000)->getData();
