@@ -86,21 +86,21 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
     border: none;
 }
 .approval-tabs .nav-item {
-    flex: 0 0 auto;
+    flex: 1;
 }
 .approval-tabs .nav-link {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    border-radius: 10px;
-    min-width: 160px;
-    border: 2px solid #e9ecef;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
     background: #fff;
     color: #6c757d;
     font-weight: 500;
-    font-size: 15px;
+    font-size: 14px;
     transition: all 0.2s ease;
+    width: 100%;
 }
 .approval-tabs .nav-link:hover {
     border-color: #dee2e6;
