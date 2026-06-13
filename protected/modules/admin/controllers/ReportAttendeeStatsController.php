@@ -248,6 +248,9 @@ class ReportAttendeeStatsController extends AdminController
 
         // Đếm sports (theo parent sport để tính là 1 môn)
         foreach ($sportMembers as $sm) {
+            $smDeletedAt = isset($sm['deleted_at']) ? $sm['deleted_at'] : null;
+            if ($smDeletedAt) continue;
+
             $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
             $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
             if (!$attId || !isset($attendeeStats[$attId])) continue;
