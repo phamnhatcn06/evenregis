@@ -264,6 +264,9 @@ class ReportAttendeeStatsController extends AdminController
 
         // Đếm competition
         foreach ($competitionRegs as $cr) {
+            $crDeletedAt = isset($cr['deleted_at']) ? $cr['deleted_at'] : null;
+            if ($crDeletedAt) continue;
+
             $attId = isset($cr['attendee_id']) ? $cr['attendee_id'] : null;
             if ($attId && isset($attendeeStats[$attId])) {
                 $attendeeStats[$attId]['has_competition'] = true;
