@@ -380,21 +380,40 @@ class ReportAttendeeStatsController extends AdminController
             if ($b['regional_id'] == 0) return -1;
             return strnatcasecmp($a['regional_name'], $b['regional_name']);
         });
-        // Lấy list attendee_id những người tham gia thể thao (có ít nhất 1 môn)
-        $sportsAttendeeIds = array();
-        foreach ($attendeeStats as $attId => $stats) {
-            $sportsCount = count($stats['parent_sports']);
-            if ($sportsCount > 0) {
-                $sportsAttendeeIds[] = $attId;
+        // Thống kê số VĐV theo từng môn thể thao (parent sport)
+        $sportStats = array();
+        foreach ($sportsList as $sp) {
+            $spId = isset($sp->id) ? $sp->id : null;
+            $parentId = isset($sp->parent_id) ? $sp->parent_id : null;
+            // Chỉ lấy parent sports (không có parent_id hoặc parent_id = null)
+            if ($spId && !$parentId) {
+                $sportStats[$spId] = array(
+                    'sport_id' => $spId,
+                    'sport_name' => isset($sp->name) ? $sp->name : '',
+                    'sport_code' => isset($sp->code) ? $sp->code : '',
+                    'total_athletes' => 0,
+                );
             }
         }
 
-        // Debug
-        echo implode(',', $sportsAttendeeIds);
-        die;
+        // Đếm số VĐV cho từng môn (dựa trên parent sport)
+        foreach ($attendeeStats as $attId => $stats) {
+            foreach ($stats['parent_sports'] as $parentSportId => $val) {
+                if (isset($sportStats[$parentSportId])) {
+                    $sportStats[$parentSportId]['total_athletes']++;
+                }
+            }
+        }
+
+        // Sắp xếp theo số VĐV giảm dần
+        usort($sportStats, function ($a, $b) {
+            return $b['total_athletes'] - $a['total_athletes'];
+        });
+
         return array(
             'regionals' => $regionalData,
             'summary' => $summary,
+            'sportStats' => $sportStats,
         );
     }
 
