@@ -86,15 +86,15 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
     border: none;
 }
 .approval-tabs .nav-item {
-    flex: 1;
-    max-width: 280px;
+    flex: 0 0 auto;
 }
 .approval-tabs .nav-link {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
-    border-radius: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    min-width: 160px;
     border: 2px solid #e9ecef;
     background: #fff;
     color: #6c757d;
