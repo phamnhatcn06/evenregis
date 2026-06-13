@@ -238,6 +238,8 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
                     'options' => array(
                         'pageLength' => 25,
                         'order' => array(array(4, 'desc')),
+                        'responsive' => true,
+                        'scrollX' => true,
                     ),
                 ));
                 ?>
