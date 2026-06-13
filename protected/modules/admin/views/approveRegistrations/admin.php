@@ -116,16 +116,16 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
     gap: 10px;
 }
 .approval-tabs .nav-link .tab-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 14px;
 }
 .approval-tabs .nav-link .tab-count {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
     line-height: 1;
 }
