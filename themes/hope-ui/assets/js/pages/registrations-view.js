@@ -1572,6 +1572,66 @@ var RegistrationView = (function() {
         sportSelectedAttendees = [];
         editingSportIndex = -1;
 
+        // Reset modal form fields
+        var modalSportSelect = document.getElementById('sport_item_id');
+        if (modalSportSelect) {
+            modalSportSelect.value = '';
+            modalSportSelect.classList.remove('d-none');
+        }
+
+        var sportNameDiv = document.getElementById('sport_selected_name');
+        if (sportNameDiv) {
+            sportNameDiv.textContent = '';
+            sportNameDiv.classList.add('d-none');
+        }
+
+        var isAllianceCheckbox = document.getElementById('sport_is_alliance');
+        if (isAllianceCheckbox) {
+            isAllianceCheckbox.checked = false;
+            isAllianceCheckbox.disabled = false;
+        }
+
+        var sportAllianceWrapper = document.getElementById('sport_alliance_wrapper');
+        if (sportAllianceWrapper) {
+            sportAllianceWrapper.classList.add('d-none');
+        }
+
+        var allianceCheckboxes = document.querySelectorAll('.sport-alliance-cb');
+        allianceCheckboxes.forEach(function(cb) {
+            cb.checked = false;
+        });
+
+        var teamNameInput = document.getElementById('sport_team_name');
+        if (teamNameInput) {
+            teamNameInput.value = '';
+            teamNameInput.readOnly = true;
+        }
+
+        var noteInput = document.getElementById('sport_note');
+        if (noteInput) {
+            noteInput.value = '';
+        }
+
+        var availableList = document.getElementById('sport_available_attendee_list');
+        if (availableList) {
+            availableList.innerHTML = '<div class="text-center text-muted p-3">Đang tải...</div>';
+        }
+
+        var selectedList = document.getElementById('sport_selected_attendee_list');
+        if (selectedList) {
+            selectedList.innerHTML = '';
+        }
+
+        var countSpan = document.getElementById('sport_selected_count');
+        if (countSpan) {
+            countSpan.textContent = '0';
+        }
+
+        var btnAdd = document.getElementById('btn_add_to_preview');
+        if (btnAdd) {
+            btnAdd.innerHTML = '<i class="fa fa-plus me-1"></i>Thêm vào danh sách';
+        }
+
         loadMainSportsList();
     }
 
