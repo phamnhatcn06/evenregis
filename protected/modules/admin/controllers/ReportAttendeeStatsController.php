@@ -169,29 +169,6 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
-        // DEBUG: Check attendee 687
-        $checkId = 687;
-        $foundInRaw = false;
-        foreach ($rawAttendees as $att) {
-            if (isset($att->id) && $att->id == $checkId) {
-                $foundInRaw = true;
-                echo "1. Raw: found, deleted_at=" . (isset($att->deleted_at) ? $att->deleted_at : 'null') . ", reg_id=" . (isset($att->registration_id) ? $att->registration_id : 'null') . "<br>";
-                break;
-            }
-        }
-        if (!$foundInRaw) echo "1. Raw: NOT FOUND (API không trả về)<br>";
-
-        $attRegId = null;
-        foreach ($rawAttendees as $att) {
-            if (isset($att->id) && $att->id == $checkId) {
-                $attRegId = isset($att->registration_id) ? $att->registration_id : null;
-                break;
-            }
-        }
-        echo "2. Registration $attRegId in activeRegistrationIds: " . (isset($activeRegistrationIds[$attRegId]) ? 'YES' : 'NO') . "<br>";
-        echo "3. In \$attendees: " . (isset($attendees[$checkId]) ? 'YES' : 'NO') . "<br>";
-        // END DEBUG
-
         // Lấy sports để map parent_id
         $sportsList = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
         //32 sport => OK
