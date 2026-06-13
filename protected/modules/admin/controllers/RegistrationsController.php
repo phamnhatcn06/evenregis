@@ -4756,13 +4756,44 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
-		$sportTeams = SportTeams::getByRegistration($registration->event_id, $registration->property_id);
+		// Load Sport Teams cho đơn vị (bao gồm cả đội liên quân)
+		$sportTeams = array();
 		$sportTeamMembers = array();
+		if ($registration->event_id && $registration->property_id) {
+			$apiResult = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST_BY_PROPERTY, array(
+				'property_id' => $registration->property_id,
+				'event_id' => $registration->event_id,
+			));
+			$teamsData = array();
+			if ($apiResult['success'] && isset($apiResult['data']['data'])) {
+				$teamsData = $apiResult['data']['data'];
+			} elseif ($apiResult['success'] && isset($apiResult['data']) && is_array($apiResult['data'])) {
+				$teamsData = $apiResult['data'];
+			}
 
-		if (!empty($sportTeams)) {
-			foreach ($sportTeams as $team) {
-				$teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+			foreach ($teamsData as $team) {
+				$isObject = is_object($team);
+				$teamId = $isObject ? (isset($team->id) ? $team->id : null) : (isset($team['id']) ? $team['id'] : null);
 				if ($teamId) {
+					$sportName = $isObject ? (isset($team->sport_name) ? $team->sport_name : '') : (isset($team['sport_name']) ? $team['sport_name'] : '');
+					$sportId = $isObject ? (isset($team->sport_id) ? $team->sport_id : null) : (isset($team['sport_id']) ? $team['sport_id'] : null);
+
+					if (empty($sportName) && $sportId) {
+						$sport = Sports::fetchFromApi($sportId);
+						$sportName = $sport ? $sport->name : '';
+					}
+
+					$teamObj = new stdClass();
+					$teamObj->id = $teamId;
+					$teamObj->sport_id = $sportId;
+					$teamObj->sport_name = $sportName;
+					$teamObj->team_name = $isObject ? (isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : '')) : (isset($team['team_name']) ? $team['team_name'] : (isset($team['name']) ? $team['name'] : ''));
+					$teamObj->property_id = $isObject ? (isset($team->property_id) ? $team->property_id : null) : (isset($team['property_id']) ? $team['property_id'] : null);
+					$teamObj->is_alliance = $isObject ? (isset($team->is_alliance) ? $team->is_alliance : 0) : (isset($team['is_alliance']) ? $team['is_alliance'] : 0);
+					$teamObj->alliance_org_ids = $isObject ? (isset($team->alliance_org_ids) ? $team->alliance_org_ids : '') : (isset($team['alliance_org_ids']) ? $team['alliance_org_ids'] : '');
+
+					$sportTeams[] = $teamObj;
+
 					$members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 50)->getData();
 					$sportTeamMembers[$teamId] = $members;
 				}
