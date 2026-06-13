@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Report Attendee Stats - Index View
  * Báo cáo thống kê người đăng ký vòng loại theo cụm và đơn vị
@@ -93,7 +94,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                         <div>
                             <span class="small fw-bold text-uppercase" style="opacity: 0.8;">Đăng ký 3 môn thể thao</span>
                             <h2 class="mb-0 mt-1 fw-bold"><?php echo number_format($summary['attendees_3_sports']); ?></h2>
-                            <small style="opacity: 0.7;">Người tham gia ≥3 môn</small>
+                            <small style="opacity: 0.7;">Người tham gia 3 môn</small>
                         </div>
                         <div class="rounded-3 p-3" style="background: rgba(255,255,255,0.2);">
                             <i class="fa fa-futbol-o fa-2x"></i>
@@ -158,11 +159,11 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
 
                             if (empty($regionals)):
                             ?>
-                            <tr>
-                                <td colspan="10" class="text-center text-muted py-4">
-                                    <i class="fa fa-info-circle me-1"></i> Chưa có dữ liệu đăng ký
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted py-4">
+                                        <i class="fa fa-info-circle me-1"></i> Chưa có dữ liệu đăng ký
+                                    </td>
+                                </tr>
                             <?php else: ?>
                                 <?php foreach ($regionals as $regional): ?>
                                     <?php
@@ -171,25 +172,26 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                     $isFirstProp = true;
                                     ?>
                                     <?php foreach ($properties as $prop): ?>
-                                    <tr>
-                                        <td class="text-center"><?php echo $stt++; ?></td>
-                                        <?php if ($isFirstProp): ?>
-                                        <td rowspan="<?php echo $propCount; ?>" class="align-middle fw-bold bg-light">
-                                            <?php echo CHtml::encode($regional['regional_name']); ?>
-                                        </td>
-                                        <?php $isFirstProp = false; endif; ?>
-                                        <td>
-                                            <span class="badge bg-secondary me-1"><?php echo CHtml::encode($prop['property_code']); ?></span>
-                                            <?php echo CHtml::encode($prop['property_name']); ?>
-                                        </td>
-                                        <td class="text-center fw-bold"><?php echo number_format($prop['unique_attendees']); ?></td>
-                                        <td class="text-center"><?php echo $prop['sports_attendees'] ?: '-'; ?></td>
-                                        <td class="text-center"><?php echo $prop['competition_attendees'] ?: '-'; ?></td>
-                                        <td class="text-center"><?php echo $prop['miss_attendees'] ?: '-'; ?></td>
-                                        <td class="text-center"><?php echo $prop['attendees_3_sports'] ?: '-'; ?></td>
-                                        <td class="text-center"><?php echo $prop['attendees_3_categories'] ?: '-'; ?></td>
-                                        <td class="text-center"><?php echo $prop['attendees_2_categories'] ?: '-'; ?></td>
-                                    </tr>
+                                        <tr>
+                                            <td class="text-center"><?php echo $stt++; ?></td>
+                                            <?php if ($isFirstProp): ?>
+                                                <td rowspan="<?php echo $propCount; ?>" class="align-middle fw-bold bg-light">
+                                                    <?php echo CHtml::encode($regional['regional_name']); ?>
+                                                </td>
+                                            <?php $isFirstProp = false;
+                                            endif; ?>
+                                            <td>
+                                                <span class="badge bg-secondary me-1"><?php echo CHtml::encode($prop['property_code']); ?></span>
+                                                <?php echo CHtml::encode($prop['property_name']); ?>
+                                            </td>
+                                            <td class="text-center fw-bold"><?php echo number_format($prop['unique_attendees']); ?></td>
+                                            <td class="text-center"><?php echo $prop['sports_attendees'] ?: '-'; ?></td>
+                                            <td class="text-center"><?php echo $prop['competition_attendees'] ?: '-'; ?></td>
+                                            <td class="text-center"><?php echo $prop['miss_attendees'] ?: '-'; ?></td>
+                                            <td class="text-center"><?php echo $prop['attendees_3_sports'] ?: '-'; ?></td>
+                                            <td class="text-center"><?php echo $prop['attendees_3_categories'] ?: '-'; ?></td>
+                                            <td class="text-center"><?php echo $prop['attendees_2_categories'] ?: '-'; ?></td>
+                                        </tr>
                                     <?php endforeach; ?>
 
                                     <!-- Regional Subtotal -->
@@ -207,18 +209,18 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                             <?php endif; ?>
                         </tbody>
                         <?php if (!empty($regionals)): ?>
-                        <tfoot class="table-success">
-                            <tr class="fw-bold">
-                                <td colspan="3" class="text-end">TỔNG CỘNG:</td>
-                                <td class="text-center"><?php echo number_format($summary['total_unique_attendees']); ?></td>
-                                <td class="text-center"><?php echo number_format($summary['total_sports_attendees']); ?></td>
-                                <td class="text-center"><?php echo number_format($summary['total_competition_attendees']); ?></td>
-                                <td class="text-center"><?php echo number_format($summary['total_miss_attendees']); ?></td>
-                                <td class="text-center"><?php echo number_format($summary['attendees_3_sports']); ?></td>
-                                <td class="text-center"><?php echo number_format($summary['attendees_3_categories']); ?></td>
-                                <td class="text-center"><?php echo number_format($summary['attendees_2_categories']); ?></td>
-                            </tr>
-                        </tfoot>
+                            <tfoot class="table-success">
+                                <tr class="fw-bold">
+                                    <td colspan="3" class="text-end">TỔNG CỘNG:</td>
+                                    <td class="text-center"><?php echo number_format($summary['total_unique_attendees']); ?></td>
+                                    <td class="text-center"><?php echo number_format($summary['total_sports_attendees']); ?></td>
+                                    <td class="text-center"><?php echo number_format($summary['total_competition_attendees']); ?></td>
+                                    <td class="text-center"><?php echo number_format($summary['total_miss_attendees']); ?></td>
+                                    <td class="text-center"><?php echo number_format($summary['attendees_3_sports']); ?></td>
+                                    <td class="text-center"><?php echo number_format($summary['attendees_3_categories']); ?></td>
+                                    <td class="text-center"><?php echo number_format($summary['attendees_2_categories']); ?></td>
+                                </tr>
+                            </tfoot>
                         <?php endif; ?>
                     </table>
                 </div>
@@ -227,62 +229,64 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
 
         <!-- Sport Athletes Stats Table -->
         <?php if (!empty($reportData['sportStats'])): ?>
-        <div class="card border shadow-sm mt-4">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-success"></i>Số lượng VĐV theo môn thể thao</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover mb-0">
-                        <thead class="table-success">
-                            <tr>
-                                <th class="text-center" style="width: 60px;">STT</th>
-                                <th style="min-width: 250px;">Môn thể thao</th>
-                                <th class="text-center" style="width: 120px;">Số lượng VĐV</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $sportStt = 1;
-                            $totalAthletes = 0;
-                            foreach ($reportData['sportStats'] as $sport):
-                                if ($sport['total_athletes'] == 0) continue;
-                                $totalAthletes += $sport['total_athletes'];
-                                $children = isset($sport['children']) ? $sport['children'] : array();
-                                $activeChildren = array_filter($children, function($c) { return $c['total_athletes'] > 0; });
-                            ?>
-                            <!-- Parent row -->
-                            <tr class="table-light">
-                                <td class="text-center fw-bold"><?php echo $sportStt++; ?></td>
-                                <td>
-                                    <i class="fa fa-trophy text-warning me-1"></i>
-                                    <strong><?php echo CHtml::encode($sport['sport_name']); ?></strong>
-                                </td>
-                                <td class="text-center fw-bold fs-5"><?php echo number_format($sport['total_athletes']); ?></td>
-                            </tr>
-                            <!-- Children rows -->
-                            <?php foreach ($activeChildren as $child): ?>
-                            <tr>
-                                <td></td>
-                                <td class="ps-4">
-                                    <i class="fa fa-angle-right text-muted me-2"></i>
-                                    <?php echo CHtml::encode($child['sport_name']); ?>
-                                </td>
-                                <td class="text-center"><?php echo number_format($child['total_athletes']); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                            <?php endforeach; ?>
-                        </tbody>
-                        <tfoot class="table-warning">
-                            <tr class="fw-bold">
-                                <td colspan="2" class="text-end">TỔNG CỘNG (lượt đăng ký):</td>
-                                <td class="text-center"><?php echo number_format($totalAthletes); ?></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+            <div class="card border shadow-sm mt-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-success"></i>Số lượng VĐV theo môn thể thao</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0">
+                            <thead class="table-success">
+                                <tr>
+                                    <th class="text-center" style="width: 60px;">STT</th>
+                                    <th style="min-width: 250px;">Môn thể thao</th>
+                                    <th class="text-center" style="width: 120px;">Số lượng VĐV</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $sportStt = 1;
+                                $totalAthletes = 0;
+                                foreach ($reportData['sportStats'] as $sport):
+                                    if ($sport['total_athletes'] == 0) continue;
+                                    $totalAthletes += $sport['total_athletes'];
+                                    $children = isset($sport['children']) ? $sport['children'] : array();
+                                    $activeChildren = array_filter($children, function ($c) {
+                                        return $c['total_athletes'] > 0;
+                                    });
+                                ?>
+                                    <!-- Parent row -->
+                                    <tr class="table-light">
+                                        <td class="text-center fw-bold"><?php echo $sportStt++; ?></td>
+                                        <td>
+                                            <i class="fa fa-trophy text-warning me-1"></i>
+                                            <strong><?php echo CHtml::encode($sport['sport_name']); ?></strong>
+                                        </td>
+                                        <td class="text-center fw-bold fs-5"><?php echo number_format($sport['total_athletes']); ?></td>
+                                    </tr>
+                                    <!-- Children rows -->
+                                    <?php foreach ($activeChildren as $child): ?>
+                                        <tr>
+                                            <td></td>
+                                            <td class="ps-4">
+                                                <i class="fa fa-angle-right text-muted me-2"></i>
+                                                <?php echo CHtml::encode($child['sport_name']); ?>
+                                            </td>
+                                            <td class="text-center"><?php echo number_format($child['total_athletes']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            </tbody>
+                            <tfoot class="table-warning">
+                                <tr class="fw-bold">
+                                    <td colspan="2" class="text-end">TỔNG CỘNG (lượt đăng ký):</td>
+                                    <td class="text-center"><?php echo number_format($totalAthletes); ?></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
         <?php endif; ?>
 
         <!-- Notes -->
