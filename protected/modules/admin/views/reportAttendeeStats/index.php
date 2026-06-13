@@ -237,9 +237,8 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                         <thead class="table-success">
                             <tr>
                                 <th class="text-center" style="width: 60px;">STT</th>
-                                <th style="min-width: 180px;">Môn thể thao</th>
-                                <th class="text-center" style="width: 100px;">Tổng VĐV</th>
-                                <th style="min-width: 300px;">Chi tiết theo nội dung con</th>
+                                <th style="min-width: 250px;">Môn thể thao</th>
+                                <th class="text-center" style="width: 120px;">Số lượng VĐV</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -250,38 +249,34 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                 if ($sport['total_athletes'] == 0) continue;
                                 $totalAthletes += $sport['total_athletes'];
                                 $children = isset($sport['children']) ? $sport['children'] : array();
+                                $activeChildren = array_filter($children, function($c) { return $c['total_athletes'] > 0; });
                             ?>
-                            <tr>
-                                <td class="text-center"><?php echo $sportStt++; ?></td>
+                            <!-- Parent row -->
+                            <tr class="table-light">
+                                <td class="text-center fw-bold"><?php echo $sportStt++; ?></td>
                                 <td>
                                     <i class="fa fa-trophy text-warning me-1"></i>
                                     <strong><?php echo CHtml::encode($sport['sport_name']); ?></strong>
                                 </td>
                                 <td class="text-center fw-bold fs-5"><?php echo number_format($sport['total_athletes']); ?></td>
-                                <td>
-                                    <?php if (!empty($children)): ?>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <?php foreach ($children as $child):
-                                            if ($child['total_athletes'] == 0) continue;
-                                        ?>
-                                        <span class="badge bg-info text-dark">
-                                            <?php echo CHtml::encode($child['sport_name']); ?>:
-                                            <strong><?php echo number_format($child['total_athletes']); ?></strong>
-                                        </span>
-                                        <?php endforeach; ?>
-                                    </div>
-                                    <?php else: ?>
-                                    <span class="text-muted small">—</span>
-                                    <?php endif; ?>
-                                </td>
                             </tr>
+                            <!-- Children rows -->
+                            <?php foreach ($activeChildren as $child): ?>
+                            <tr>
+                                <td></td>
+                                <td class="ps-4">
+                                    <i class="fa fa-angle-right text-muted me-2"></i>
+                                    <?php echo CHtml::encode($child['sport_name']); ?>
+                                </td>
+                                <td class="text-center"><?php echo number_format($child['total_athletes']); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
                             <?php endforeach; ?>
                         </tbody>
                         <tfoot class="table-warning">
                             <tr class="fw-bold">
                                 <td colspan="2" class="text-end">TỔNG CỘNG (lượt đăng ký):</td>
                                 <td class="text-center"><?php echo number_format($totalAthletes); ?></td>
-                                <td></td>
                             </tr>
                         </tfoot>
                     </table>
