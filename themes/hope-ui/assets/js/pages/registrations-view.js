@@ -1541,12 +1541,17 @@ var RegistrationView = (function() {
                 if (successCount === pendingSportRegistrations.length) {
                     Toast.success('Đã lưu thành công ' + successCount + ' môn thể thao.');
                     pendingSportRegistrations = [];
-                    setTimeout(function() { location.reload(); }, 1000);
+                    renderSportPreview();
+                    resetSportForm();
+                    refreshSportTeamsTable();
                 } else if (errors.length > 0) {
                     Toast.error(errors.join('; '));
                 } else {
                     Toast.warning('Lưu được ' + successCount + '/' + pendingSportRegistrations.length + ' môn.');
-                    setTimeout(function() { location.reload(); }, 2000);
+                    pendingSportRegistrations = [];
+                    renderSportPreview();
+                    resetSportForm();
+                    refreshSportTeamsTable();
                 }
             })
             .catch(function() {
@@ -1554,6 +1559,56 @@ var RegistrationView = (function() {
                 btn.innerHTML = '<i class="fa fa-save me-1"></i>Lưu tất cả đăng ký';
                 Toast.error('Có lỗi xảy ra khi lưu.');
             });
+    }
+
+    function resetSportForm() {
+        var sportSelect = document.getElementById('sport_select_main');
+        if (sportSelect) sportSelect.value = '';
+
+        var btnOpen = document.getElementById('btn_open_sport_modal');
+        if (btnOpen) btnOpen.disabled = true;
+
+        sportAllAttendees = [];
+        sportSelectedAttendees = [];
+        editingSportIndex = -1;
+
+        loadMainSportsList();
+    }
+
+    function refreshSportTeamsTable() {
+        var sportsCard = document.getElementById('sports-registration-card');
+        if (!sportsCard) return;
+
+        var cardBody = sportsCard.querySelector('.card-body');
+        if (!cardBody) return;
+
+        fetch(window.BASE_URL + '/admin/registrations/getSportTeamsHtml?registration_id=' + registrationId, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.success && data.html) {
+                var mainRow = cardBody.querySelector('.row');
+                if (mainRow) {
+                    var mainCol = mainRow.querySelector('.col-md-9, .col-12:last-child');
+                    if (mainCol) {
+                        var sportContent = mainCol.querySelector('.sport-teams-content');
+                        if (sportContent) {
+                            sportContent.innerHTML = data.html;
+                        } else {
+                            var noMsg = mainCol.querySelector('.no-sport-message, p.text-muted');
+                            if (noMsg) {
+                                noMsg.outerHTML = '<div class="sport-teams-content">' + data.html + '</div>';
+                            }
+                        }
+                    }
+                }
+                loadMainSportsList();
+            }
+        })
+        .catch(function() {
+            console.log('Could not refresh sports table');
+        });
     }
 
     function loadAllianceProperties() {
