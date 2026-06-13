@@ -709,3 +709,93 @@ select:focus {
 a.label.btn {
   text-transform: none !important;
 }
+
+/* ========================================
+   DataTable Responsive - Global Styles
+   ======================================== */
+.dataTables_wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.dataTable {
+  width: 100% !important;
+  table-layout: auto;
+}
+
+.dataTable th,
+.dataTable td {
+  white-space: nowrap;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1200px) {
+  .dataTable th,
+  .dataTable td {
+    font-size: 13px;
+    padding: 10px 8px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .dataTable th,
+  .dataTable td {
+    font-size: 12px;
+    padding: 8px 6px !important;
+  }
+
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter {
+    text-align: left !important;
+    margin-bottom: 10px;
+  }
+
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_paginate {
+    text-align: center !important;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dataTable th,
+  .dataTable td {
+    font-size: 11px;
+    padding: 6px 4px !important;
+  }
+
+  .dataTable .btn-sm {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .dataTables_wrapper .dataTables_length select {
+    width: auto;
+    display: inline-block;
+  }
+
+  .dataTables_wrapper .dataTables_filter input {
+    width: 150px;
+  }
+
+  .dataTables_paginate .paginate_button {
+    padding: 4px 8px !important;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .dataTables_wrapper .row:first-child,
+  .dataTables_wrapper .row:last-child {
+    flex-direction: column;
+  }
+
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_paginate {
+    width: 100%;
+    text-align: center !important;
+    margin-bottom: 8px;
+  }
+}
