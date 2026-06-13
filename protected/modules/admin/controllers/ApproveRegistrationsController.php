@@ -7,31 +7,23 @@ class ApproveRegistrationsController extends AdminController
      */
     public function actionAdmin()
     {
-        $model = new Registrations('search');
-        $model->unsetAttributes();
+        // DataProvider cho từng tab
+        $dpSubmitted = Registrations::getApiDataProvider(array('status' => Registrations::STATUS_SUBMITTED));
+        $dpRejected = Registrations::getApiDataProvider(array('status' => Registrations::STATUS_REJECTED));
+        $dpApproved = Registrations::getApiDataProvider(array('status' => Registrations::STATUS_APPROVED));
 
-        if (isset($_GET['Registrations'])) {
-            $model->setAttributes($_GET['Registrations']);
-        }
-
-        // Mặc định chỉ hiện SUBMITTED nếu không có filter
-        $params = array();
-        if (!isset($_GET['Registrations']['status']) || $_GET['Registrations']['status'] === '') {
-            $params['status'] = Registrations::STATUS_SUBMITTED;
-        }
-        foreach ($model->attributes as $key => $value) {
-            if ($value !== null && $value !== '') {
-                $params[$key] = $value;
-            }
-        }
-
-        $dataProvider = Registrations::getApiDataProvider($params);
-        $statusList = array('' => 'Tất cả') + Registrations::getStatusList();
+        // Đếm số lượng
+        $countSubmitted = $dpSubmitted->getTotalItemCount();
+        $countRejected = $dpRejected->getTotalItemCount();
+        $countApproved = $dpApproved->getTotalItemCount();
 
         $this->render('admin', array(
-            'model' => $model,
-            'dataProvider' => $dataProvider,
-            'statusList' => $statusList,
+            'dpSubmitted' => $dpSubmitted,
+            'dpRejected' => $dpRejected,
+            'dpApproved' => $dpApproved,
+            'countSubmitted' => $countSubmitted,
+            'countRejected' => $countRejected,
+            'countApproved' => $countApproved,
         ));
     }
 
