@@ -89,11 +89,16 @@ class SportTeams extends BaseSportTeams
     {
         $data = $this->attributes;
         $data['team_name'] = $this->team_name;
-        $data['is_alliance'] = $this->is_alliance;
-        // Gửi alliance_org_ids dưới dạng chuỗi id1,id2,id3
-        $data['alliance_org_ids'] = $this->alliance_property_ids;
         $data['status'] = $this->status;
         $data['registration_id'] = $this->registration_id;
+
+        // Chỉ gửi alliance fields khi có giá trị để tránh mất dữ liệu
+        if ($this->is_alliance !== null && $this->is_alliance !== '') {
+            $data['is_alliance'] = $this->is_alliance;
+        }
+        if ($this->alliance_property_ids !== null && $this->alliance_property_ids !== '') {
+            $data['alliance_org_ids'] = $this->alliance_property_ids;
+        }
 
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_TEAM_UPDATE, array('id' => $this->id));
         return ApiClient::post($url, $data);
