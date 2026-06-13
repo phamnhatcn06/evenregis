@@ -380,23 +380,63 @@ class ReportAttendeeStatsController extends AdminController
             if ($b['regional_id'] == 0) return -1;
             return strnatcasecmp($a['regional_name'], $b['regional_name']);
         });
-        // Thống kê số VĐV theo từng môn thể thao (parent sport)
+        // Thống kê số VĐV theo từng môn thể thao (parent sport + children)
         $sportStats = array();
+        $childSportsMap = array(); // parent_id => array of children
+
+        // Build map parent -> children và init sportStats
         foreach ($sportsList as $sp) {
             $spId = isset($sp->id) ? $sp->id : null;
             $parentId = isset($sp->parent_id) ? $sp->parent_id : null;
-            // Chỉ lấy parent sports (không có parent_id hoặc parent_id = null)
+            $spName = isset($sp->name) ? $sp->name : '';
+
             if ($spId && !$parentId) {
+                // Parent sport
                 $sportStats[$spId] = array(
                     'sport_id' => $spId,
-                    'sport_name' => isset($sp->name) ? $sp->name : '',
+                    'sport_name' => $spName,
                     'sport_code' => isset($sp->code) ? $sp->code : '',
+                    'total_athletes' => 0,
+                    'children' => array(),
+                );
+            } else if ($spId && $parentId) {
+                // Child sport
+                if (!isset($childSportsMap[$parentId])) {
+                    $childSportsMap[$parentId] = array();
+                }
+                $childSportsMap[$parentId][$spId] = array(
+                    'sport_id' => $spId,
+                    'sport_name' => $spName,
                     'total_athletes' => 0,
                 );
             }
         }
 
-        // Đếm số VĐV cho từng môn (dựa trên parent sport)
+        // Attach children to parents
+        foreach ($childSportsMap as $parentId => $children) {
+            if (isset($sportStats[$parentId])) {
+                $sportStats[$parentId]['children'] = $children;
+            }
+        }
+
+        // Đếm số VĐV cho từng môn con (child sport)
+        foreach ($sportMembers as $sm) {
+            $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
+            $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
+            if (!$attId || !isset($attendeeStats[$attId])) continue;
+
+            $sportId = isset($teamSportMap[$teamId]) ? $teamSportMap[$teamId] : null;
+            if (!$sportId) continue;
+
+            $parentSportId = isset($sportParentMap[$sportId]) ? $sportParentMap[$sportId] : $sportId;
+
+            // Đếm cho child sport
+            if ($sportId != $parentSportId && isset($sportStats[$parentSportId]['children'][$sportId])) {
+                $sportStats[$parentSportId]['children'][$sportId]['total_athletes']++;
+            }
+        }
+
+        // Đếm số VĐV cho parent (unique theo người, đã tính ở attendeeStats)
         foreach ($attendeeStats as $attId => $stats) {
             foreach ($stats['parent_sports'] as $parentSportId => $val) {
                 if (isset($sportStats[$parentSportId])) {
@@ -404,6 +444,16 @@ class ReportAttendeeStatsController extends AdminController
                 }
             }
         }
+
+        // Sắp xếp children theo số VĐV giảm dần
+        foreach ($sportStats as &$ps) {
+            if (!empty($ps['children'])) {
+                uasort($ps['children'], function ($a, $b) {
+                    return $b['total_athletes'] - $a['total_athletes'];
+                });
+            }
+        }
+        unset($ps);
 
         // Sắp xếp theo số VĐV giảm dần
         usort($sportStats, function ($a, $b) {
