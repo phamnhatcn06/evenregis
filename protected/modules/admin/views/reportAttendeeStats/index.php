@@ -225,6 +225,52 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
             </div>
         </div>
 
+        <!-- Sport Athletes Stats Table -->
+        <?php if (!empty($reportData['sportStats'])): ?>
+        <div class="card border shadow-sm mt-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-success"></i>Số lượng VĐV theo môn thể thao</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover mb-0">
+                        <thead class="table-success">
+                            <tr>
+                                <th class="text-center" style="width: 60px;">STT</th>
+                                <th style="min-width: 200px;">Môn thể thao</th>
+                                <th class="text-center" style="width: 150px;">Số lượng VĐV</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $sportStt = 1;
+                            $totalAthletes = 0;
+                            foreach ($reportData['sportStats'] as $sport):
+                                if ($sport['total_athletes'] == 0) continue;
+                                $totalAthletes += $sport['total_athletes'];
+                            ?>
+                            <tr>
+                                <td class="text-center"><?php echo $sportStt++; ?></td>
+                                <td>
+                                    <i class="fa fa-trophy text-warning me-1"></i>
+                                    <?php echo CHtml::encode($sport['sport_name']); ?>
+                                </td>
+                                <td class="text-center fw-bold"><?php echo number_format($sport['total_athletes']); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <tfoot class="table-warning">
+                            <tr class="fw-bold">
+                                <td colspan="2" class="text-end">TỔNG CỘNG (lượt đăng ký):</td>
+                                <td class="text-center"><?php echo number_format($totalAthletes); ?></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Notes -->
         <div class="alert alert-info mt-4">
             <h6 class="alert-heading"><i class="fa fa-info-circle me-1"></i> Ghi chú:</h6>
