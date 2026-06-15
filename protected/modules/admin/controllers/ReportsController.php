@@ -1749,11 +1749,9 @@ class ReportsController extends AdminController
         $sheet->setCellValue($col++ . $row, '');
         $sheet->setCellValue($col++ . $row, 'TỔNG CỘNG');
         foreach ($activeSports as $spId => $spName) {
-            if ($teamsOnly) {
-                $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['team_count']);
-            } else {
-                $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['team_count']);
-                $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['member_count']);
+            $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['team_count']);
+            $sheet->setCellValue($col++ . $row, $teamsOnly ? 0 : $grandTotals[$spId]['member_count']);
+            if (!$teamsOnly) {
                 $sheet->setCellValue($col++ . $row, '');
             }
         }
