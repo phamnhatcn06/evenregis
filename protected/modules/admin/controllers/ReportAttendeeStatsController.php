@@ -469,10 +469,84 @@ class ReportAttendeeStatsController extends AdminController
             return $b['total_athletes'] - $a['total_athletes'];
         });
 
+        // Tính toán số môn thể thao đăng ký theo đơn vị
+        $propertySportCount = array();
+        foreach ($propertyStats as $propId => $pStats) {
+            $propertySportCount[$propId] = array(
+                'property_id' => $propId,
+                'property_name' => $pStats['property_name'],
+                'property_code' => $pStats['property_code'],
+                'sport_count' => 0,
+                'sport_names' => array(),
+            );
+        }
+
+        // Đếm số môn thể thao mà đơn vị có VĐV đăng ký
+        foreach ($sportMembers as $sm) {
+            $smDeletedAt = isset($sm['deleted_at']) ? $sm['deleted_at'] : null;
+            if ($smDeletedAt) continue;
+
+            $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
+            $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
+            if (!$attId || !isset($attendeePropertyMap[$attId])) continue;
+
+            $propId = $attendeePropertyMap[$attId];
+            if (!isset($propertySportCount[$propId])) continue;
+
+            $sportId = isset($teamSportMap[$teamId]) ? $teamSportMap[$teamId] : null;
+            if (!$sportId) continue;
+
+            $parentSportId = isset($sportParentMap[$sportId]) ? $sportParentMap[$sportId] : $sportId;
+            $propertySportCount[$propId]['sport_names'][$parentSportId] = true;
+        }
+
+        // Đếm số môn và lấy tên
+        $sportNameMap = array();
+        foreach ($sportsList as $sp) {
+            $spId = isset($sp->id) ? $sp->id : null;
+            $parentId = isset($sp->parent_id) ? $sp->parent_id : null;
+            if ($spId && !$parentId) {
+                $sportNameMap[$spId] = isset($sp->name) ? $sp->name : '';
+            }
+        }
+
+        foreach ($propertySportCount as $propId => &$psc) {
+            $psc['sport_count'] = count($psc['sport_names']);
+            $names = array();
+            foreach (array_keys($psc['sport_names']) as $spId) {
+                if (isset($sportNameMap[$spId])) {
+                    $names[] = $sportNameMap[$spId];
+                }
+            }
+            $psc['sport_names'] = implode(', ', $names);
+        }
+        unset($psc);
+
+        // Lọc chỉ đơn vị có đăng ký thể thao
+        $propertySportCount = array_filter($propertySportCount, function ($p) {
+            return $p['sport_count'] > 0;
+        });
+
+        // Top 50 ít nhất
+        $top50Least = $propertySportCount;
+        usort($top50Least, function ($a, $b) {
+            return $a['sport_count'] - $b['sport_count'];
+        });
+        $top50Least = array_slice($top50Least, 0, 50);
+
+        // Top 50 nhiều nhất
+        $top50Most = $propertySportCount;
+        usort($top50Most, function ($a, $b) {
+            return $b['sport_count'] - $a['sport_count'];
+        });
+        $top50Most = array_slice($top50Most, 0, 50);
+
         return array(
             'regionals' => $regionalData,
             'summary' => $summary,
             'sportStats' => $sportStats,
+            'top50LeastSports' => $top50Least,
+            'top50MostSports' => $top50Most,
         );
     }
 
