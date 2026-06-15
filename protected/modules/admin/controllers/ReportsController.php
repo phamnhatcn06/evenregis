@@ -1720,6 +1720,8 @@ class ReportsController extends AdminController
                 $col = 'C';
                 $sheet->setCellValue($col++ . $row, $propName);
 
+                $rowTotalTeams = 0;
+                $rowTotalMembers = 0;
                 foreach ($activeSports as $spId => $spName) {
                     $teamCount = isset($sportsData[$spId]) ? $sportsData[$spId]['team_count'] : 0;
                     $memberCount = isset($sportsData[$spId]) ? $sportsData[$spId]['member_count'] : 0;
@@ -1735,7 +1737,13 @@ class ReportsController extends AdminController
                     $regionTotals[$spId]['member_count'] += $memberCount;
                     $grandTotals[$spId]['team_count'] += $teamCount;
                     $grandTotals[$spId]['member_count'] += $memberCount;
+
+                    $rowTotalTeams += $teamCount;
+                    $rowTotalMembers += $memberCount;
                 }
+                // Add row total
+                $sheet->setCellValue($col++ . $row, $rowTotalTeams ?: '');
+                $sheet->setCellValue($col++ . $row, $teamsOnly ? 0 : ($rowTotalMembers ?: ''));
 
                 // Apply alternating row style
                 if ($stt % 2 == 0) {
