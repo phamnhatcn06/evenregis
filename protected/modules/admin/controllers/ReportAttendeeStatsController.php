@@ -562,4 +562,78 @@ class ReportAttendeeStatsController extends AdminController
             'attendees_2_categories' => 0,
         );
     }
+
+    /**
+     * Xuất Excel báo cáo đơn vị theo số môn thể thao
+     */
+    public function actionExportSportsByProperty()
+    {
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $eventId = Yii::app()->request->getParam('event_id');
+        $type = Yii::app()->request->getParam('type', 'least'); // least or most
+
+        $user = AuthHandler::getUser();
+        $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+        $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
+        $userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+        $reportData = $this->buildReport($eventId, $isHO, $userPropertyId);
+
+        $data = $type === 'most' ? $reportData['top50MostSports'] : $reportData['top50LeastSports'];
+        $title = $type === 'most' ? 'Top 50 đơn vị đăng ký nhiều môn thể thao nhất' : 'Top 50 đơn vị đăng ký ít môn thể thao nhất';
+
+        Yii::import('application.extensions.phpexcel.PHPExcel');
+
+        $excel = new PHPExcel();
+        $sheet = $excel->getActiveSheet();
+        $sheet->setTitle('Báo cáo');
+
+        // Header
+        $sheet->setCellValue('A1', $title);
+        $sheet->mergeCells('A1:D1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+        // Column headers
+        $sheet->setCellValue('A3', 'STT');
+        $sheet->setCellValue('B3', 'Mã đơn vị');
+        $sheet->setCellValue('C3', 'Tên đơn vị');
+        $sheet->setCellValue('D3', 'Số môn thể thao');
+        $sheet->setCellValue('E3', 'Danh sách môn');
+
+        $headerStyle = array(
+            'font' => array('bold' => true),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'E2E8F0')),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+        );
+        $sheet->getStyle('A3:E3')->applyFromArray($headerStyle);
+
+        // Data
+        $row = 4;
+        $stt = 1;
+        foreach ($data as $item) {
+            $sheet->setCellValue('A' . $row, $stt++);
+            $sheet->setCellValue('B' . $row, $item['property_code']);
+            $sheet->setCellValue('C' . $row, $item['property_name']);
+            $sheet->setCellValue('D' . $row, $item['sport_count']);
+            $sheet->setCellValue('E' . $row, $item['sport_names']);
+            $row++;
+        }
+
+        // Auto width
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Output
+        $filename = $type === 'most' ? 'top50_nhieu_mon_the_thao.xlsx' : 'top50_it_mon_the_thao.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save('php://output');
+        Yii::app()->end();
+    }
 }
