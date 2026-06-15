@@ -156,7 +156,7 @@ $sportTeamsBySport = isset($stats['sport_teams_by_sport']) ? $stats['sport_teams
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="text-muted small">Tổng người tham dự</span>
+                            <span class="text-muted small">Tổng người đăng ký</span>
                             <h3 class="mb-0" id="stat-total-attendees"><?php echo isset($stats['total_attendees']) ? $stats['total_attendees'] : 0; ?></h3>
                         </div>
                         <div class="bg-soft-info rounded-3 p-3">
