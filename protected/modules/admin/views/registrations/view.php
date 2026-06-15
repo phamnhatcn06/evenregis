@@ -810,7 +810,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 
 <div class="row mt-3">
 
-    <div class="col-md-6">
+    <div class="col-md-12">
 
         <!-- 4. ĐĂNG KÝ VĂN NGHỆ -->
         <?php if ($canShowTalent): ?>
