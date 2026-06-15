@@ -654,8 +654,23 @@ class ReportAttendeeStatsController extends AdminController
 
         $reportData = $this->buildReport($eventId, $isHO, $userPropertyId);
 
-        $data = $type === 'most' ? $reportData['top50MostSports'] : $reportData['top50LeastSports'];
-        $title = $type === 'most' ? 'Top 50 đơn vị đăng ký nhiều môn thể thao nhất' : 'Top 50 đơn vị đăng ký ít môn thể thao nhất';
+        $category = Yii::app()->request->getParam('category', 'sport'); // sport or content
+
+        if ($category === 'content') {
+            $data = $type === 'most' ? $reportData['top50MostContent'] : $reportData['top50LeastContent'];
+            $title = $type === 'most' ? 'Top 50 đơn vị đăng ký nhiều nội dung thể thao nhất' : 'Top 50 đơn vị đăng ký ít nội dung thể thao nhất';
+            $colHeader = 'Số nội dung TT';
+            $filename = $type === 'most' ? 'top50_nhieu_noi_dung_the_thao.xlsx' : 'top50_it_noi_dung_the_thao.xlsx';
+            $countField = 'content_count';
+            $namesField = 'content_names';
+        } else {
+            $data = $type === 'most' ? $reportData['top50MostSports'] : $reportData['top50LeastSports'];
+            $title = $type === 'most' ? 'Top 50 đơn vị đăng ký nhiều môn thể thao nhất' : 'Top 50 đơn vị đăng ký ít môn thể thao nhất';
+            $colHeader = 'Số môn TT';
+            $filename = $type === 'most' ? 'top50_nhieu_mon_the_thao.xlsx' : 'top50_it_mon_the_thao.xlsx';
+            $countField = 'sport_count';
+            $namesField = 'sport_names';
+        }
 
         Yii::import('application.extensions.phpexcel.PHPExcel');
 
