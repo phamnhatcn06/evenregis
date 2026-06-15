@@ -1694,9 +1694,14 @@ class ReportsController extends AdminController
                     $teamCount = isset($sportsData[$spId]) ? $sportsData[$spId]['team_count'] : 0;
                     $memberCount = isset($sportsData[$spId]) ? $sportsData[$spId]['member_count'] : 0;
                     $note = isset($sportsData[$spId]['note']) ? $sportsData[$spId]['note'] : '';
-                    $sheet->setCellValue($col++ . $row, $teamCount ?: '');
-                    $sheet->setCellValue($col++ . $row, $memberCount ?: '');
-                    $sheet->setCellValue($col++ . $row, $note ?: '');
+
+                    if ($teamsOnly) {
+                        $sheet->setCellValue($col++ . $row, $teamCount ?: '');
+                    } else {
+                        $sheet->setCellValue($col++ . $row, $teamCount ?: '');
+                        $sheet->setCellValue($col++ . $row, $memberCount ?: '');
+                        $sheet->setCellValue($col++ . $row, $note ?: '');
+                    }
 
                     $regionTotals[$spId]['team_count'] += $teamCount;
                     $regionTotals[$spId]['member_count'] += $memberCount;
