@@ -249,11 +249,18 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                 $totalAthletes = 0;
                                 foreach ($reportData['sportStats'] as $sport):
                                     if ($sport['total_athletes'] == 0) continue;
-                                    $totalAthletes += $sport['total_athletes'];
                                     $children = isset($sport['children']) ? $sport['children'] : array();
                                     $activeChildren = array_filter($children, function ($c) {
                                         return $c['total_athletes'] > 0;
                                     });
+                                    // Chỉ cộng children nếu có, không cộng cả parent (tránh đếm trùng)
+                                    if (!empty($activeChildren)) {
+                                        foreach ($activeChildren as $c) {
+                                            $totalAthletes += $c['total_athletes'];
+                                        }
+                                    } else {
+                                        $totalAthletes += $sport['total_athletes'];
+                                    }
                                 ?>
                                     <!-- Parent row -->
                                     <tr class="table-light">
