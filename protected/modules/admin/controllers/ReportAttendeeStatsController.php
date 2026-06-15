@@ -715,8 +715,6 @@ class ReportAttendeeStatsController extends AdminController
         }
 
         // Output
-        $filename = $type === 'most' ? 'top50_nhieu_mon_the_thao.xlsx' : 'top50_it_mon_the_thao.xlsx';
-
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
