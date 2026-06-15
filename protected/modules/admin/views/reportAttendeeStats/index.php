@@ -296,6 +296,82 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
             </div>
         <?php endif; ?>
 
+        <!-- Top 50 đơn vị đăng ký ít môn thể thao nhất -->
+        <?php if (!empty($reportData['top50LeastSports'])): ?>
+            <div class="card border shadow-sm mt-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fa fa-arrow-down me-2 text-danger"></i>Top 50 đơn vị đăng ký ÍT môn thể thao nhất</h5>
+                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'least')); ?>" class="btn btn-success btn-sm">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0">
+                            <thead class="table-danger">
+                                <tr>
+                                    <th class="text-center" style="width: 60px;">STT</th>
+                                    <th style="width: 100px;">Mã ĐV</th>
+                                    <th style="min-width: 200px;">Tên đơn vị</th>
+                                    <th class="text-center" style="width: 120px;">Số môn TT</th>
+                                    <th style="min-width: 300px;">Danh sách môn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $sttLeast = 1; foreach ($reportData['top50LeastSports'] as $item): ?>
+                                    <tr>
+                                        <td class="text-center"><?php echo $sttLeast++; ?></td>
+                                        <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
+                                        <td><?php echo CHtml::encode($item['property_name']); ?></td>
+                                        <td class="text-center fw-bold text-danger"><?php echo $item['sport_count']; ?></td>
+                                        <td><small><?php echo CHtml::encode($item['sport_names']); ?></small></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- Top 50 đơn vị đăng ký nhiều môn thể thao nhất -->
+        <?php if (!empty($reportData['top50MostSports'])): ?>
+            <div class="card border shadow-sm mt-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fa fa-arrow-up me-2 text-success"></i>Top 50 đơn vị đăng ký NHIỀU môn thể thao nhất</h5>
+                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'most')); ?>" class="btn btn-success btn-sm">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0">
+                            <thead class="table-success">
+                                <tr>
+                                    <th class="text-center" style="width: 60px;">STT</th>
+                                    <th style="width: 100px;">Mã ĐV</th>
+                                    <th style="min-width: 200px;">Tên đơn vị</th>
+                                    <th class="text-center" style="width: 120px;">Số môn TT</th>
+                                    <th style="min-width: 300px;">Danh sách môn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $sttMost = 1; foreach ($reportData['top50MostSports'] as $item): ?>
+                                    <tr>
+                                        <td class="text-center"><?php echo $sttMost++; ?></td>
+                                        <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
+                                        <td><?php echo CHtml::encode($item['property_name']); ?></td>
+                                        <td class="text-center fw-bold text-success"><?php echo $item['sport_count']; ?></td>
+                                        <td><small><?php echo CHtml::encode($item['sport_names']); ?></small></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Notes -->
         <div class="alert alert-info mt-4">
             <h6 class="alert-heading"><i class="fa fa-info-circle me-1"></i> Ghi chú:</h6>
@@ -307,6 +383,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                 <li><strong>≥3 môn TT</strong>: Số người đăng ký từ 3 bộ môn thể thao trở lên (ví dụ: Bóng đá, Cầu lông, Bóng bàn)</li>
                 <li><strong>3 hạng mục</strong>: Số người tham gia cả 3 hạng mục (Thể thao + Nghiệp vụ + Miss)</li>
                 <li><strong>2 hạng mục</strong>: Số người tham gia đúng 2 hạng mục</li>
+                <li><strong>Top 50 ít/nhiều môn TT</strong>: Đếm số môn thể thao (parent sport) mà đơn vị có VĐV đăng ký</li>
             </ul>
         </div>
     </div>
