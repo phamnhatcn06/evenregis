@@ -541,52 +541,74 @@ class ReportAttendeeStatsController extends AdminController
         });
         $top50Most = array_slice($top50Most, 0, 50);
 
-        // Tính toán số nội dung (thể thao + nghiệp vụ + miss) theo đơn vị
-        $propertyContentCount = array();
+        // Tính toán số nội dung thể thao (child sports) theo đơn vị
+        $propertySportContentCount = array();
         foreach ($propertyStats as $propId => $pStats) {
-            $contentCount = 0;
-            $contentNames = array();
-            if ($pStats['sports_attendees'] > 0) {
-                $contentCount++;
-                $contentNames[] = 'Thể thao';
-            }
-            if ($pStats['competition_attendees'] > 0) {
-                $contentCount++;
-                $contentNames[] = 'Nghiệp vụ';
-            }
-            if ($pStats['miss_attendees'] > 0) {
-                $contentCount++;
-                $contentNames[] = 'Miss';
-            }
+            $propertySportContentCount[$propId] = array(
+                'property_id' => $propId,
+                'property_name' => $pStats['property_name'],
+                'property_code' => $pStats['property_code'],
+                'content_count' => 0,
+                'content_names' => array(),
+            );
+        }
 
-            if ($contentCount > 0) {
-                $propertyContentCount[$propId] = array(
-                    'property_id' => $propId,
-                    'property_name' => $pStats['property_name'],
-                    'property_code' => $pStats['property_code'],
-                    'content_count' => $contentCount,
-                    'content_names' => implode(', ', $contentNames),
-                    'sports_count' => isset($propertySportCount[$propId]) ? $propertySportCount[$propId]['sport_count'] : 0,
-                );
+        // Map tên sport (cả parent và child)
+        $allSportNameMap = array();
+        foreach ($sportsList as $sp) {
+            $spId = isset($sp->id) ? $sp->id : null;
+            if ($spId) {
+                $allSportNameMap[$spId] = isset($sp->name) ? $sp->name : '';
             }
         }
 
-        // Top 50 ít nội dung nhất
-        $top50LeastContent = $propertyContentCount;
-        usort($top50LeastContent, function ($a, $b) {
-            if ($a['content_count'] == $b['content_count']) {
-                return $a['sports_count'] - $b['sports_count'];
+        // Đếm số nội dung thể thao con (child sport) mà đơn vị có VĐV đăng ký
+        foreach ($sportMembers as $sm) {
+            $smDeletedAt = isset($sm['deleted_at']) ? $sm['deleted_at'] : null;
+            if ($smDeletedAt) continue;
+
+            $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
+            $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
+            if (!$attId || !isset($attendeePropertyMap[$attId])) continue;
+
+            $propId = $attendeePropertyMap[$attId];
+            if (!isset($propertySportContentCount[$propId])) continue;
+
+            $sportId = isset($teamSportMap[$teamId]) ? $teamSportMap[$teamId] : null;
+            if (!$sportId) continue;
+
+            // Đếm theo sport_id thực tế (child sport)
+            $propertySportContentCount[$propId]['content_names'][$sportId] = true;
+        }
+
+        // Đếm số nội dung và lấy tên
+        foreach ($propertySportContentCount as $propId => &$pcc) {
+            $pcc['content_count'] = count($pcc['content_names']);
+            $names = array();
+            foreach (array_keys($pcc['content_names']) as $spId) {
+                if (isset($allSportNameMap[$spId])) {
+                    $names[] = $allSportNameMap[$spId];
+                }
             }
+            $pcc['content_names'] = implode(', ', $names);
+        }
+        unset($pcc);
+
+        // Lọc chỉ đơn vị có đăng ký thể thao
+        $propertySportContentCount = array_filter($propertySportContentCount, function ($p) {
+            return $p['content_count'] > 0;
+        });
+
+        // Top 50 ít nội dung nhất
+        $top50LeastContent = $propertySportContentCount;
+        usort($top50LeastContent, function ($a, $b) {
             return $a['content_count'] - $b['content_count'];
         });
         $top50LeastContent = array_slice($top50LeastContent, 0, 50);
 
         // Top 50 nhiều nội dung nhất
-        $top50MostContent = $propertyContentCount;
+        $top50MostContent = $propertySportContentCount;
         usort($top50MostContent, function ($a, $b) {
-            if ($a['content_count'] == $b['content_count']) {
-                return $b['sports_count'] - $a['sports_count'];
-            }
             return $b['content_count'] - $a['content_count'];
         });
         $top50MostContent = array_slice($top50MostContent, 0, 50);
