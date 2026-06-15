@@ -296,81 +296,163 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
             </div>
         <?php endif; ?>
 
-        <!-- Top 50 đơn vị đăng ký ít môn thể thao nhất -->
-        <?php if (!empty($reportData['top50LeastSports'])): ?>
-            <div class="card border shadow-sm mt-4">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fa fa-arrow-down me-2 text-danger"></i>Top 50 đơn vị đăng ký ÍT môn thể thao nhất</h5>
-                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'least')); ?>" class="btn btn-success btn-sm">
-                        <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
-                    </a>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover mb-0">
-                            <thead class="table-danger">
-                                <tr>
-                                    <th class="text-center" style="width: 60px;">STT</th>
-                                    <th style="width: 100px;">Mã ĐV</th>
-                                    <th style="min-width: 200px;">Tên đơn vị</th>
-                                    <th class="text-center" style="width: 120px;">Số môn TT</th>
-                                    <th style="min-width: 300px;">Danh sách môn</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php $sttLeast = 1; foreach ($reportData['top50LeastSports'] as $item): ?>
+        <!-- Row 2 bảng: Môn thể thao -->
+        <div class="row mt-4">
+            <!-- Top 50 đơn vị đăng ký ít MÔN thể thao nhất -->
+            <?php if (!empty($reportData['top50LeastSports'])): ?>
+            <div class="col-lg-6">
+                <div class="card border shadow-sm h-100">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="fa fa-arrow-down me-2 text-danger"></i>Top 50 ĐV ít MÔN thể thao</h6>
+                        <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'least', 'category' => 'sport')); ?>" class="btn btn-success btn-sm">
+                            <i class="fa fa-file-excel-o"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive" style="max-height: 400px;">
+                            <table class="table table-bordered table-hover table-sm mb-0">
+                                <thead class="table-danger sticky-top">
                                     <tr>
-                                        <td class="text-center"><?php echo $sttLeast++; ?></td>
-                                        <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
-                                        <td><?php echo CHtml::encode($item['property_name']); ?></td>
-                                        <td class="text-center fw-bold text-danger"><?php echo $item['sport_count']; ?></td>
-                                        <td><small><?php echo CHtml::encode($item['sport_names']); ?></small></td>
+                                        <th class="text-center" style="width: 40px;">STT</th>
+                                        <th style="width: 80px;">Mã ĐV</th>
+                                        <th>Tên đơn vị</th>
+                                        <th class="text-center" style="width: 70px;">Số môn</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php $stt = 1; foreach ($reportData['top50LeastSports'] as $item): ?>
+                                        <tr title="<?php echo CHtml::encode($item['sport_names']); ?>">
+                                            <td class="text-center"><?php echo $stt++; ?></td>
+                                            <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
+                                            <td><?php echo CHtml::encode($item['property_name']); ?></td>
+                                            <td class="text-center fw-bold text-danger"><?php echo $item['sport_count']; ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        <?php endif; ?>
+            <?php endif; ?>
 
-        <!-- Top 50 đơn vị đăng ký nhiều môn thể thao nhất -->
-        <?php if (!empty($reportData['top50MostSports'])): ?>
-            <div class="card border shadow-sm mt-4">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fa fa-arrow-up me-2 text-success"></i>Top 50 đơn vị đăng ký NHIỀU môn thể thao nhất</h5>
-                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'most')); ?>" class="btn btn-success btn-sm">
-                        <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
-                    </a>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover mb-0">
-                            <thead class="table-success">
-                                <tr>
-                                    <th class="text-center" style="width: 60px;">STT</th>
-                                    <th style="width: 100px;">Mã ĐV</th>
-                                    <th style="min-width: 200px;">Tên đơn vị</th>
-                                    <th class="text-center" style="width: 120px;">Số môn TT</th>
-                                    <th style="min-width: 300px;">Danh sách môn</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php $sttMost = 1; foreach ($reportData['top50MostSports'] as $item): ?>
+            <!-- Top 50 đơn vị đăng ký nhiều MÔN thể thao nhất -->
+            <?php if (!empty($reportData['top50MostSports'])): ?>
+            <div class="col-lg-6">
+                <div class="card border shadow-sm h-100">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="fa fa-arrow-up me-2 text-success"></i>Top 50 ĐV nhiều MÔN thể thao</h6>
+                        <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'most', 'category' => 'sport')); ?>" class="btn btn-success btn-sm">
+                            <i class="fa fa-file-excel-o"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive" style="max-height: 400px;">
+                            <table class="table table-bordered table-hover table-sm mb-0">
+                                <thead class="table-success sticky-top">
                                     <tr>
-                                        <td class="text-center"><?php echo $sttMost++; ?></td>
-                                        <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
-                                        <td><?php echo CHtml::encode($item['property_name']); ?></td>
-                                        <td class="text-center fw-bold text-success"><?php echo $item['sport_count']; ?></td>
-                                        <td><small><?php echo CHtml::encode($item['sport_names']); ?></small></td>
+                                        <th class="text-center" style="width: 40px;">STT</th>
+                                        <th style="width: 80px;">Mã ĐV</th>
+                                        <th>Tên đơn vị</th>
+                                        <th class="text-center" style="width: 70px;">Số môn</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php $stt = 1; foreach ($reportData['top50MostSports'] as $item): ?>
+                                        <tr title="<?php echo CHtml::encode($item['sport_names']); ?>">
+                                            <td class="text-center"><?php echo $stt++; ?></td>
+                                            <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
+                                            <td><?php echo CHtml::encode($item['property_name']); ?></td>
+                                            <td class="text-center fw-bold text-success"><?php echo $item['sport_count']; ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        <?php endif; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Row 2 bảng: Nội dung thể thao -->
+        <div class="row mt-4">
+            <!-- Top 50 đơn vị đăng ký ít NỘI DUNG thể thao nhất -->
+            <?php if (!empty($reportData['top50LeastContent'])): ?>
+            <div class="col-lg-6">
+                <div class="card border shadow-sm h-100">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="fa fa-arrow-down me-2 text-warning"></i>Top 50 ĐV ít NỘI DUNG thể thao</h6>
+                        <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'least', 'category' => 'content')); ?>" class="btn btn-success btn-sm">
+                            <i class="fa fa-file-excel-o"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive" style="max-height: 400px;">
+                            <table class="table table-bordered table-hover table-sm mb-0">
+                                <thead class="table-warning sticky-top">
+                                    <tr>
+                                        <th class="text-center" style="width: 40px;">STT</th>
+                                        <th style="width: 80px;">Mã ĐV</th>
+                                        <th>Tên đơn vị</th>
+                                        <th class="text-center" style="width: 70px;">Số ND</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $stt = 1; foreach ($reportData['top50LeastContent'] as $item): ?>
+                                        <tr title="<?php echo CHtml::encode($item['content_names']); ?>">
+                                            <td class="text-center"><?php echo $stt++; ?></td>
+                                            <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
+                                            <td><?php echo CHtml::encode($item['property_name']); ?></td>
+                                            <td class="text-center fw-bold text-warning"><?php echo $item['content_count']; ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Top 50 đơn vị đăng ký nhiều NỘI DUNG thể thao nhất -->
+            <?php if (!empty($reportData['top50MostContent'])): ?>
+            <div class="col-lg-6">
+                <div class="card border shadow-sm h-100">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="fa fa-arrow-up me-2 text-primary"></i>Top 50 ĐV nhiều NỘI DUNG thể thao</h6>
+                        <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'most', 'category' => 'content')); ?>" class="btn btn-success btn-sm">
+                            <i class="fa fa-file-excel-o"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive" style="max-height: 400px;">
+                            <table class="table table-bordered table-hover table-sm mb-0">
+                                <thead class="table-primary sticky-top">
+                                    <tr>
+                                        <th class="text-center" style="width: 40px;">STT</th>
+                                        <th style="width: 80px;">Mã ĐV</th>
+                                        <th>Tên đơn vị</th>
+                                        <th class="text-center" style="width: 70px;">Số ND</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $stt = 1; foreach ($reportData['top50MostContent'] as $item): ?>
+                                        <tr title="<?php echo CHtml::encode($item['content_names']); ?>">
+                                            <td class="text-center"><?php echo $stt++; ?></td>
+                                            <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
+                                            <td><?php echo CHtml::encode($item['property_name']); ?></td>
+                                            <td class="text-center fw-bold text-primary"><?php echo $item['content_count']; ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
 
         <!-- Notes -->
         <div class="alert alert-info mt-4">
