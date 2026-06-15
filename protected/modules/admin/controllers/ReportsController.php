@@ -1733,9 +1733,13 @@ class ReportsController extends AdminController
             $sheet->setCellValue($col++ . $row, '');
             $sheet->setCellValue($col++ . $row, 'Tổng ' . $regionName);
             foreach ($activeSports as $spId => $spName) {
-                $sheet->setCellValue($col++ . $row, $regionTotals[$spId]['team_count']);
-                $sheet->setCellValue($col++ . $row, $regionTotals[$spId]['member_count']);
-                $sheet->setCellValue($col++ . $row, '');
+                if ($teamsOnly) {
+                    $sheet->setCellValue($col++ . $row, $regionTotals[$spId]['team_count']);
+                } else {
+                    $sheet->setCellValue($col++ . $row, $regionTotals[$spId]['team_count']);
+                    $sheet->setCellValue($col++ . $row, $regionTotals[$spId]['member_count']);
+                    $sheet->setCellValue($col++ . $row, '');
+                }
             }
             $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($totalRowStyle);
             $sheet->getRowDimension($row)->setRowHeight(22);
@@ -1748,9 +1752,13 @@ class ReportsController extends AdminController
         $sheet->setCellValue($col++ . $row, '');
         $sheet->setCellValue($col++ . $row, 'TỔNG CỘNG');
         foreach ($activeSports as $spId => $spName) {
-            $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['team_count']);
-            $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['member_count']);
-            $sheet->setCellValue($col++ . $row, '');
+            if ($teamsOnly) {
+                $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['team_count']);
+            } else {
+                $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['team_count']);
+                $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['member_count']);
+                $sheet->setCellValue($col++ . $row, '');
+            }
         }
         $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray(array(
             'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11, 'name' => 'Arial'),
