@@ -541,12 +541,64 @@ class ReportAttendeeStatsController extends AdminController
         });
         $top50Most = array_slice($top50Most, 0, 50);
 
+        // Tính toán số nội dung (thể thao + nghiệp vụ + miss) theo đơn vị
+        $propertyContentCount = array();
+        foreach ($propertyStats as $propId => $pStats) {
+            $contentCount = 0;
+            $contentNames = array();
+            if ($pStats['sports_attendees'] > 0) {
+                $contentCount++;
+                $contentNames[] = 'Thể thao';
+            }
+            if ($pStats['competition_attendees'] > 0) {
+                $contentCount++;
+                $contentNames[] = 'Nghiệp vụ';
+            }
+            if ($pStats['miss_attendees'] > 0) {
+                $contentCount++;
+                $contentNames[] = 'Miss';
+            }
+
+            if ($contentCount > 0) {
+                $propertyContentCount[$propId] = array(
+                    'property_id' => $propId,
+                    'property_name' => $pStats['property_name'],
+                    'property_code' => $pStats['property_code'],
+                    'content_count' => $contentCount,
+                    'content_names' => implode(', ', $contentNames),
+                    'sports_count' => isset($propertySportCount[$propId]) ? $propertySportCount[$propId]['sport_count'] : 0,
+                );
+            }
+        }
+
+        // Top 50 ít nội dung nhất
+        $top50LeastContent = $propertyContentCount;
+        usort($top50LeastContent, function ($a, $b) {
+            if ($a['content_count'] == $b['content_count']) {
+                return $a['sports_count'] - $b['sports_count'];
+            }
+            return $a['content_count'] - $b['content_count'];
+        });
+        $top50LeastContent = array_slice($top50LeastContent, 0, 50);
+
+        // Top 50 nhiều nội dung nhất
+        $top50MostContent = $propertyContentCount;
+        usort($top50MostContent, function ($a, $b) {
+            if ($a['content_count'] == $b['content_count']) {
+                return $b['sports_count'] - $a['sports_count'];
+            }
+            return $b['content_count'] - $a['content_count'];
+        });
+        $top50MostContent = array_slice($top50MostContent, 0, 50);
+
         return array(
             'regionals' => $regionalData,
             'summary' => $summary,
             'sportStats' => $sportStats,
             'top50LeastSports' => $top50Least,
             'top50MostSports' => $top50Most,
+            'top50LeastContent' => $top50LeastContent,
+            'top50MostContent' => $top50MostContent,
         );
     }
 
