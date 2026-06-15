@@ -1616,6 +1616,24 @@ class ReportsController extends AdminController
             }
         }
 
+        // Add TỔNG CỘNG header
+        $totalHeaderStartCol = $col;
+        $sheet->setCellValue($col . $row, 'TỔNG CỘNG');
+        $nextCol1 = $col;
+        $nextCol1++;
+        $sheet->mergeCells($col . $row . ':' . $nextCol1 . $row);
+        $sheet->getStyle($col . $row . ':' . $nextCol1 . $row)->applyFromArray(array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 10, 'name' => 'Arial'),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '059669')),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER, 'wrapText' => true),
+            'borders' => array(
+                'outline' => $borderOutline,
+                'inside' => $borderHeader
+            )
+        ));
+        $col = $nextCol1;
+        $col++;
+
         // Calculate last column
         $lastCol = $col;
         $lastCol--;
