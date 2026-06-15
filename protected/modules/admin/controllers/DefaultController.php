@@ -222,7 +222,8 @@ class DefaultController extends AdminController
         }
 
         // Attendees need to be filtered by registration -> period
-        $attendeeFilterParams = array('per_page' => 1);
+        // Chỉ đếm attendees từ registration đã submitted hoặc approved
+        $attendeeFilterParams = array('per_page' => 1, 'registration_status' => 'submitted,approved');
         if ($periodId) {
             $attendeeFilterParams['period_id'] = $periodId;
         } elseif ($eventId) {
