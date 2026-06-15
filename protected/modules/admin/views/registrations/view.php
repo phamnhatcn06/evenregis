@@ -935,7 +935,7 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
             </div>
         <?php endif; ?>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-12">
         <!-- 3. ĐĂNG KÝ THI SẮC ĐẸP (MISS) -->
         <?php if ($canShowMiss): ?>
             <?php
