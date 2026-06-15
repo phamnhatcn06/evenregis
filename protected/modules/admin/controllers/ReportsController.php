@@ -1631,9 +1631,13 @@ class ReportsController extends AdminController
         $sheet->setCellValue($col++ . $row, '');
         $sheet->setCellValue($col++ . $row, '');
         foreach ($activeSports as $spId => $spName) {
-            $sheet->setCellValue($col++ . $row, 'Đội');
-            $sheet->setCellValue($col++ . $row, 'VĐV');
-            $sheet->setCellValue($col++ . $row, 'Ghi chú');
+            if ($teamsOnly) {
+                $sheet->setCellValue($col++ . $row, 'Đội');
+            } else {
+                $sheet->setCellValue($col++ . $row, 'Đội');
+                $sheet->setCellValue($col++ . $row, 'VĐV');
+                $sheet->setCellValue($col++ . $row, 'Ghi chú');
+            }
         }
         $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($subHeaderStyle);
         $sheet->getRowDimension($row)->setRowHeight(22);
