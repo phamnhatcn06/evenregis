@@ -1821,7 +1821,7 @@ class ReportsController extends AdminController
         ));
 
         // Send file
-        $filename = "Bao_cao_the_thao_" . date('Ymd_His') . ".xlsx";
+        $filename = ($teamsOnly ? "Bao_cao_so_doi_" : "Bao_cao_the_thao_") . date('Ymd_His') . ".xlsx";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
