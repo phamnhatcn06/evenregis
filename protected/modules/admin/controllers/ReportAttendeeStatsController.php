@@ -699,35 +699,67 @@ class ReportAttendeeStatsController extends AdminController
         $sheet->mergeCells('A1:D1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 
-        // Column headers
-        $sheet->setCellValue('A3', 'STT');
-        $sheet->setCellValue('B3', 'Mã đơn vị');
-        $sheet->setCellValue('C3', 'Tên đơn vị');
-        $sheet->setCellValue('D3', $colHeader);
-        $sheet->setCellValue('E3', 'Danh sách');
+        // Column headers và data tùy theo category
+        if ($category === 'attendees') {
+            $sheet->setCellValue('A3', 'STT');
+            $sheet->setCellValue('B3', 'Mã đơn vị');
+            $sheet->setCellValue('C3', 'Tên đơn vị');
+            $sheet->setCellValue('D3', 'Số người ĐK TT');
+            $sheet->setCellValue('E3', 'Tổng người ĐK');
 
-        $headerStyle = array(
-            'font' => array('bold' => true),
-            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'E2E8F0')),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
-        );
-        $sheet->getStyle('A3:E3')->applyFromArray($headerStyle);
+            $headerStyle = array(
+                'font' => array('bold' => true),
+                'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'E2E8F0')),
+                'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+            );
+            $sheet->getStyle('A3:E3')->applyFromArray($headerStyle);
 
-        // Data
-        $row = 4;
-        $stt = 1;
-        foreach ($data as $item) {
-            $sheet->setCellValue('A' . $row, $stt++);
-            $sheet->setCellValue('B' . $row, $item['property_code']);
-            $sheet->setCellValue('C' . $row, $item['property_name']);
-            $sheet->setCellValue('D' . $row, $item[$countField]);
-            $sheet->setCellValue('E' . $row, $item[$namesField]);
-            $row++;
-        }
+            $row = 4;
+            $stt = 1;
+            foreach ($data as $item) {
+                $sheet->setCellValue('A' . $row, $stt++);
+                $sheet->setCellValue('B' . $row, $item['property_code']);
+                $sheet->setCellValue('C' . $row, $item['property_name']);
+                $sheet->setCellValue('D' . $row, $item['sports_attendees']);
+                $sheet->setCellValue('E' . $row, $item['unique_attendees']);
+                $row++;
+            }
 
-        // Auto width
-        foreach (range('A', 'E') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
+            foreach (range('A', 'E') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+        } else {
+            $colHeader = $category === 'content' ? 'Số nội dung TT' : 'Số môn TT';
+            $countField = $category === 'content' ? 'content_count' : 'sport_count';
+            $namesField = $category === 'content' ? 'content_names' : 'sport_names';
+
+            $sheet->setCellValue('A3', 'STT');
+            $sheet->setCellValue('B3', 'Mã đơn vị');
+            $sheet->setCellValue('C3', 'Tên đơn vị');
+            $sheet->setCellValue('D3', $colHeader);
+            $sheet->setCellValue('E3', 'Danh sách');
+
+            $headerStyle = array(
+                'font' => array('bold' => true),
+                'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'E2E8F0')),
+                'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+            );
+            $sheet->getStyle('A3:E3')->applyFromArray($headerStyle);
+
+            $row = 4;
+            $stt = 1;
+            foreach ($data as $item) {
+                $sheet->setCellValue('A' . $row, $stt++);
+                $sheet->setCellValue('B' . $row, $item['property_code']);
+                $sheet->setCellValue('C' . $row, $item['property_name']);
+                $sheet->setCellValue('D' . $row, $item[$countField]);
+                $sheet->setCellValue('E' . $row, $item[$namesField]);
+                $row++;
+            }
+
+            foreach (range('A', 'E') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
         }
 
         // Output
