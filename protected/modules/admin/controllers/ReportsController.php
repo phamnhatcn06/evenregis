@@ -1658,6 +1658,17 @@ class ReportsController extends AdminController
                 $sheet->setCellValue($col++ . $row, 'Ghi chú');
             }
         }
+        // Add TỔNG CỘNG sub-header
+        $sheet->setCellValue($col++ . $row, 'Đội');
+        $sheet->setCellValue($col++ . $row, 'VĐV');
+
+        // Recalculate lastCol to include TỔNG CỘNG columns
+        $lastCol = $col;
+        $lastCol--;
+        if (is_numeric($lastCol)) {
+            $lastCol = PHPExcel_Cell::stringFromColumnIndex($lastCol - 1);
+        }
+
         $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($subHeaderStyle);
         $sheet->getRowDimension($row)->setRowHeight(22);
 
