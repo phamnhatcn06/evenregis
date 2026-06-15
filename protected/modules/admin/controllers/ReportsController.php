@@ -1208,8 +1208,9 @@ class ReportsController extends AdminController
     /**
      * Xuất báo cáo thể thao theo cụm và đơn vị
      */
-    public function actionExportSports($event_id = null)
+    public function actionExportSports($event_id = null, $teams_only = 0)
     {
+        $teamsOnly = (int)$teams_only === 1;
         $user = AuthHandler::getUser();
         if (!$user) {
             throw new CHttpException(403, 'Bạn cần đăng nhập để xuất báo cáo.');
