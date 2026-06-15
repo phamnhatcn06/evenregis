@@ -974,65 +974,134 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                             <?php if (empty($beautyContestants)): ?>
                                 <p class="text-muted mb-0">Chưa có đăng ký</p>
                             <?php else: ?>
-                                <?php foreach ($beautyContestants as $contestData): ?>
-                                    <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo count($contestData['contestants']); ?> thí sinh)</h6>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-striped table-sm mb-3 content-table">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="col-stt text-center">STT</th>
-                                                    <th class="col-name">Họ tên</th>
-                                                    <th class="col-list">Email cá nhân</th>
-                                                    <?php if ($canEdit): ?>
-                                                        <th class="col-action text-center">Thao tác</th>
-                                                    <?php endif; ?>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($contestData['contestants'] as $idx => $c): ?>
-                                                    <tr>
-                                                        <td class="text-center"><?php echo $idx + 1; ?></td>
-                                                        <td>
-                                                            <?php
-                                                            $nameInfo = CHtml::encode($c['attendee_name']);
-                                                            $details = array();
-                                                            if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
-                                                            if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
-                                                            if (!empty($details)) {
-                                                                $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
-                                                            }
-                                                            echo $nameInfo;
-                                                            ?>
-                                                        </td>
-                                                        <td>
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <input type="email" class="form-control form-control-sm contestant-personal-email"
-                                                                    id="contestant-email-<?php echo $c['id']; ?>"
-                                                                    data-contestant-id="<?php echo $c['id']; ?>"
-                                                                    value="<?php echo CHtml::encode(isset($c['personal_email']) ? $c['personal_email'] : ''); ?>"
-                                                                    placeholder="Nhập email cá nhân..."
-                                                                    style="max-width: 250px;"
-                                                                    <?php echo !$canEdit ? 'disabled' : ''; ?>>
+                                <?php foreach ($beautyContestants as $contestData):
+                                    $contestants = $contestData['contestants'];
+                                    $total = count($contestants);
+                                    $half = ceil($total / 2);
+                                    $leftCol = array_slice($contestants, 0, $half);
+                                    $rightCol = array_slice($contestants, $half);
+                                ?>
+                                    <h6 class="mb-2"><i class="fa fa-trophy text-warning me-1"></i><?php echo CHtml::encode($contestData['contest_name']); ?> (<?php echo $total; ?> thí sinh)</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-striped table-sm mb-3">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width:45px;" class="text-center">STT</th>
+                                                            <th>Họ tên</th>
+                                                            <th>Email cá nhân</th>
+                                                            <?php if ($canEdit): ?>
+                                                                <th style="width:50px;" class="text-center"></th>
+                                                            <?php endif; ?>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($leftCol as $idx => $c): ?>
+                                                            <tr>
+                                                                <td class="text-center"><?php echo $idx + 1; ?></td>
+                                                                <td>
+                                                                    <?php
+                                                                    $nameInfo = CHtml::encode($c['attendee_name']);
+                                                                    $details = array();
+                                                                    if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
+                                                                    if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
+                                                                    if (!empty($details)) {
+                                                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                                                    }
+                                                                    echo $nameInfo;
+                                                                    ?>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <input type="email" class="form-control form-control-sm contestant-personal-email"
+                                                                            id="contestant-email-<?php echo $c['id']; ?>"
+                                                                            data-contestant-id="<?php echo $c['id']; ?>"
+                                                                            value="<?php echo CHtml::encode(isset($c['personal_email']) ? $c['personal_email'] : ''); ?>"
+                                                                            placeholder="Nhập email..."
+                                                                            <?php echo !$canEdit ? 'disabled' : ''; ?>>
+                                                                        <?php if ($canEdit): ?>
+                                                                            <button type="button" class="btn btn-sm btn-outline-success btn-save-contestant-email"
+                                                                                data-contestant-id="<?php echo $c['id']; ?>" title="Lưu email">
+                                                                                <i class="fa fa-save"></i>
+                                                                            </button>
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                </td>
                                                                 <?php if ($canEdit): ?>
-                                                                    <button type="button" class="btn btn-sm btn-outline-success btn-save-contestant-email"
-                                                                        data-contestant-id="<?php echo $c['id']; ?>" title="Lưu email">
-                                                                        <i class="fa fa-save"></i>
-                                                                    </button>
+                                                                    <td class="text-center">
+                                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </button>
+                                                                    </td>
                                                                 <?php endif; ?>
-                                                            </div>
-                                                        </td>
-                                                        <?php if ($canEdit): ?>
-                                                            <td class="text-center">
-                                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        <?php endif; ?>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div><!-- end table-responsive -->
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <?php if (!empty($rightCol)): ?>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-striped table-sm mb-3">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width:45px;" class="text-center">STT</th>
+                                                            <th>Họ tên</th>
+                                                            <th>Email cá nhân</th>
+                                                            <?php if ($canEdit): ?>
+                                                                <th style="width:50px;" class="text-center"></th>
+                                                            <?php endif; ?>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($rightCol as $idx => $c): ?>
+                                                            <tr>
+                                                                <td class="text-center"><?php echo $half + $idx + 1; ?></td>
+                                                                <td>
+                                                                    <?php
+                                                                    $nameInfo = CHtml::encode($c['attendee_name']);
+                                                                    $details = array();
+                                                                    if (!empty($c['position_name'])) $details[] = CHtml::encode($c['position_name']);
+                                                                    if (!empty($c['division_name'])) $details[] = 'Bộ phận: ' . CHtml::encode($c['division_name']);
+                                                                    if (!empty($details)) {
+                                                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                                                    }
+                                                                    echo $nameInfo;
+                                                                    ?>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <input type="email" class="form-control form-control-sm contestant-personal-email"
+                                                                            id="contestant-email-<?php echo $c['id']; ?>"
+                                                                            data-contestant-id="<?php echo $c['id']; ?>"
+                                                                            value="<?php echo CHtml::encode(isset($c['personal_email']) ? $c['personal_email'] : ''); ?>"
+                                                                            placeholder="Nhập email..."
+                                                                            <?php echo !$canEdit ? 'disabled' : ''; ?>>
+                                                                        <?php if ($canEdit): ?>
+                                                                            <button type="button" class="btn btn-sm btn-outline-success btn-save-contestant-email"
+                                                                                data-contestant-id="<?php echo $c['id']; ?>" title="Lưu email">
+                                                                                <i class="fa fa-save"></i>
+                                                                            </button>
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                </td>
+                                                                <?php if ($canEdit): ?>
+                                                                    <td class="text-center">
+                                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </button>
+                                                                    </td>
+                                                                <?php endif; ?>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div><!-- end main col -->
