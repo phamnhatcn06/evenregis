@@ -1591,21 +1591,26 @@ class ReportsController extends AdminController
 
         $sportColMap = array();
         $sportStartCols = array();
+        $colsPerSport = $teamsOnly ? 1 : 3;
         foreach ($activeSports as $spId => $spName) {
             $sportStartCols[$spId] = $col;
             $sportColMap[$spId] = $col;
             $sheet->setCellValue($col . $row, $spName);
 
-            $nextCol1 = $col;
-            $nextCol1++;
-            $nextCol2 = $nextCol1;
-            $nextCol2++;
+            if ($teamsOnly) {
+                $sheet->getStyle($col . $row)->applyFromArray($sportHeaderStyle);
+                $col++;
+            } else {
+                $nextCol1 = $col;
+                $nextCol1++;
+                $nextCol2 = $nextCol1;
+                $nextCol2++;
 
-            $sheet->mergeCells($col . $row . ':' . $nextCol2 . $row);
-            // Apply sport header style
-            $sheet->getStyle($col . $row . ':' . $nextCol2 . $row)->applyFromArray($sportHeaderStyle);
-            $col = $nextCol2;
-            $col++;
+                $sheet->mergeCells($col . $row . ':' . $nextCol2 . $row);
+                $sheet->getStyle($col . $row . ':' . $nextCol2 . $row)->applyFromArray($sportHeaderStyle);
+                $col = $nextCol2;
+                $col++;
+            }
         }
 
         // Calculate last column
