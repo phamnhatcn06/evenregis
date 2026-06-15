@@ -704,8 +704,8 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setCellValue('A' . $row, $stt++);
             $sheet->setCellValue('B' . $row, $item['property_code']);
             $sheet->setCellValue('C' . $row, $item['property_name']);
-            $sheet->setCellValue('D' . $row, $item['sport_count']);
-            $sheet->setCellValue('E' . $row, $item['sport_names']);
+            $sheet->setCellValue('D' . $row, $item[$countField]);
+            $sheet->setCellValue('E' . $row, $item[$namesField]);
             $row++;
         }
 
