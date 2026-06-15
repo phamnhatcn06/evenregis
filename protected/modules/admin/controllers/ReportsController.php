@@ -1801,7 +1801,8 @@ class ReportsController extends AdminController
         $objWriter->save('php://output');
         Yii::app()->end();
     }
-}
+
+    protected function buildSportStatsByRegional($eventId)
     {
         if (!$eventId) {
             return array(
