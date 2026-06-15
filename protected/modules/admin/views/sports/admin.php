@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     Sports::label(2),
     Yii::t('app', 'Admin'),
@@ -84,6 +84,8 @@ $this->Tabletitle = Yii::t('app', 'List') . ' ' . $model->label();
             ),
             'options' => array(
                 'pageLength' => 50,
+                'responsive' => true,
+                'scrollX' => true,
                 'ordering' => false,
                 'createdRow' => 'js:function(row, data, dataIndex) {
                     var span = $(row).find("span[data-parent]");

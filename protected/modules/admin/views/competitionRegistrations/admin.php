@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     'Đăng ký thi nghiệp vụ',
     'Quản lý',
@@ -101,6 +101,8 @@ $this->Tabletitle = 'Danh sách đăng ký thi nghiệp vụ';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>

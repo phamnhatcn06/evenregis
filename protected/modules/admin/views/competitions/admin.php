@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     'Cuộc thi nghiệp vụ',
     'Quản lý',
@@ -70,6 +70,8 @@ $this->Tabletitle = 'Danh sách cuộc thi nghiệp vụ';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>

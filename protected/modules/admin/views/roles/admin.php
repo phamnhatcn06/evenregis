@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     Roles::label(2),
     Yii::t('app', 'Admin'),
@@ -46,6 +46,8 @@ $this->Tabletitle = Yii::t('app', 'List') . ' ' . $model->label();
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
                 'order' => array(array(0, 'desc')),
             ),
         ));

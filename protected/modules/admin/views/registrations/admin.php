@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     Registrations::label(2),
     Yii::t('app', 'Admin'),
@@ -91,6 +91,8 @@ $this->Tabletitle = 'Quản lý phiếu đăng ký';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
                 'order' => array(array(0, 'desc')),
             ),
         ));

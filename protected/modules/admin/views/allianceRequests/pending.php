@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     'Yêu cầu liên quân' => array('admin'),
     'Chờ xác nhận',
@@ -57,6 +57,8 @@ $this->Tabletitle = 'Yêu cầu liên quân chờ xác nhận';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>

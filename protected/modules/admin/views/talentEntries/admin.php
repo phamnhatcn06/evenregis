@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     'Tiết mục văn nghệ',
     'Quản lý',
@@ -75,6 +75,8 @@ $this->Tabletitle = 'Danh sách tiết mục văn nghệ';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>

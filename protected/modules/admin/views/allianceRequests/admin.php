@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     'Yêu cầu liên quân',
     'Quản lý',
@@ -87,6 +87,8 @@ $this->Tabletitle = 'Danh sách yêu cầu liên quân';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>

@@ -1,4 +1,4 @@
-
+﻿
 <?php
 $this->breadcrumbs = array(
     Properties::label(2),
@@ -44,6 +44,8 @@ $this->widget('ext.edatatables.EDataTables', array(
     ),
     'options' => array(
         'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
         'order' => array(array(0, 'desc')),
     ),
 ));

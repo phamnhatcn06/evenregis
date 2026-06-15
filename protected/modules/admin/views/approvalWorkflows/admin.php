@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     'Quy trình duyệt',
     'Quản lý',
@@ -73,6 +73,8 @@ $this->Tabletitle = 'Danh sách quy trình duyệt';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>

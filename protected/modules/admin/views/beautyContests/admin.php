@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     'Cuộc thi sắc đẹp',
     'Quản lý',
@@ -80,6 +80,8 @@ $this->Tabletitle = 'Danh sách cuộc thi sắc đẹp';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>

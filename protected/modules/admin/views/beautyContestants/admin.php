@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $this->breadcrumbs = array(
     'Thí sinh Miss',
     'Quản lý',
@@ -105,6 +105,8 @@ $this->Tabletitle = 'Danh sách thí sinh thi Miss';
             ),
             'options' => array(
                 'pageLength' => 25,
+                'responsive' => true,
+                'scrollX' => true,
             ),
         ));
         ?>
