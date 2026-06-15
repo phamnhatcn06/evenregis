@@ -145,9 +145,14 @@ $this->Tabletitle = 'Tổng quan đội thể thao';
             
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0 text-dark"><i class="fa fa-table text-primary me-2"></i>Tổng hợp đăng ký thể thao theo cụm và đơn vị</h5>
-                <a id="btn-export-excel" href="#" class="btn btn-success btn-sm">
-                    <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
-                </a>
+                <div>
+                    <a id="btn-export-teams" href="#" class="btn btn-primary btn-sm me-2">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất số đội
+                    </a>
+                    <a id="btn-export-excel" href="#" class="btn btn-success btn-sm">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
+                    </a>
+                </div>
             </div>
             
             <div class="sports-summary-wrapper" style="border-radius: 8px; border: 1px solid #e9ecef;">
