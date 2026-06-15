@@ -1792,13 +1792,20 @@ class ReportsController extends AdminController
         $sheet->setCellValue($col++ . $row, '');
         $sheet->setCellValue($col++ . $row, '');
         $sheet->setCellValue($col++ . $row, 'TỔNG CỘNG');
+        $grandRowTotalTeams = 0;
+        $grandRowTotalMembers = 0;
         foreach ($activeSports as $spId => $spName) {
             $sheet->setCellValue($col++ . $row, $grandTotals[$spId]['team_count']);
             $sheet->setCellValue($col++ . $row, $teamsOnly ? 0 : $grandTotals[$spId]['member_count']);
             if (!$teamsOnly) {
                 $sheet->setCellValue($col++ . $row, '');
             }
+            $grandRowTotalTeams += $grandTotals[$spId]['team_count'];
+            $grandRowTotalMembers += $grandTotals[$spId]['member_count'];
         }
+        // Add grand row total
+        $sheet->setCellValue($col++ . $row, $grandRowTotalTeams);
+        $sheet->setCellValue($col++ . $row, $teamsOnly ? 0 : $grandRowTotalMembers);
         $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray(array(
             'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11, 'name' => 'Arial'),
             'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '059669')),
