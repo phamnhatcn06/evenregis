@@ -454,6 +454,44 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
             <?php endif; ?>
         </div>
 
+        <!-- Bảng đơn vị theo số người đăng ký thể thao -->
+        <?php if (!empty($reportData['propertiesBySportsAttendees'])): ?>
+            <div class="card border shadow-sm mt-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fa fa-sort-amount-desc me-2 text-info"></i>Đơn vị theo số người đăng ký thể thao (nhiều → ít)</h5>
+                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportsByProperty', array('event_id' => $selectedEventId, 'type' => 'attendees', 'category' => 'attendees')); ?>" class="btn btn-success btn-sm">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 500px;">
+                        <table class="table table-bordered table-hover table-sm mb-0">
+                            <thead class="table-info sticky-top">
+                                <tr>
+                                    <th class="text-center" style="width: 50px;">STT</th>
+                                    <th style="width: 100px;">Mã ĐV</th>
+                                    <th style="min-width: 250px;">Tên đơn vị</th>
+                                    <th class="text-center" style="width: 120px;">Số người ĐK TT</th>
+                                    <th class="text-center" style="width: 120px;">Tổng người ĐK</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $stt = 1; foreach ($reportData['propertiesBySportsAttendees'] as $item): ?>
+                                    <tr>
+                                        <td class="text-center"><?php echo $stt++; ?></td>
+                                        <td><span class="badge bg-secondary"><?php echo CHtml::encode($item['property_code']); ?></span></td>
+                                        <td><?php echo CHtml::encode($item['property_name']); ?></td>
+                                        <td class="text-center fw-bold text-info"><?php echo number_format($item['sports_attendees']); ?></td>
+                                        <td class="text-center"><?php echo number_format($item['unique_attendees']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Notes -->
         <div class="alert alert-info mt-4">
             <h6 class="alert-heading"><i class="fa fa-info-circle me-1"></i> Ghi chú:</h6>
