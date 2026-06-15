@@ -613,6 +613,23 @@ class ReportAttendeeStatsController extends AdminController
         });
         $top50MostContent = array_slice($top50MostContent, 0, 50);
 
+        // Sắp xếp đơn vị theo số người đăng ký thể thao (nhiều -> ít)
+        $propertiesBySportsAttendees = array();
+        foreach ($propertyStats as $propId => $pStats) {
+            if ($pStats['sports_attendees'] > 0) {
+                $propertiesBySportsAttendees[] = array(
+                    'property_id' => $propId,
+                    'property_name' => $pStats['property_name'],
+                    'property_code' => $pStats['property_code'],
+                    'sports_attendees' => $pStats['sports_attendees'],
+                    'unique_attendees' => $pStats['unique_attendees'],
+                );
+            }
+        }
+        usort($propertiesBySportsAttendees, function ($a, $b) {
+            return $b['sports_attendees'] - $a['sports_attendees'];
+        });
+
         return array(
             'regionals' => $regionalData,
             'summary' => $summary,
@@ -621,6 +638,7 @@ class ReportAttendeeStatsController extends AdminController
             'top50MostSports' => $top50Most,
             'top50LeastContent' => $top50LeastContent,
             'top50MostContent' => $top50MostContent,
+            'propertiesBySportsAttendees' => $propertiesBySportsAttendees,
         );
     }
 
