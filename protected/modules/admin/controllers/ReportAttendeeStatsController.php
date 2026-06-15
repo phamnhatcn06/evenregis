@@ -687,8 +687,8 @@ class ReportAttendeeStatsController extends AdminController
         $sheet->setCellValue('A3', 'STT');
         $sheet->setCellValue('B3', 'Mã đơn vị');
         $sheet->setCellValue('C3', 'Tên đơn vị');
-        $sheet->setCellValue('D3', 'Số môn thể thao');
-        $sheet->setCellValue('E3', 'Danh sách môn');
+        $sheet->setCellValue('D3', $colHeader);
+        $sheet->setCellValue('E3', 'Danh sách');
 
         $headerStyle = array(
             'font' => array('bold' => true),
