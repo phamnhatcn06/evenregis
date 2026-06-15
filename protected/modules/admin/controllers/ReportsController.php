@@ -1768,13 +1768,20 @@ class ReportsController extends AdminController
             $sheet->setCellValue($col++ . $row, '');
             $sheet->setCellValue($col++ . $row, '');
             $sheet->setCellValue($col++ . $row, 'Tổng ' . $regionName);
+            $regionRowTotalTeams = 0;
+            $regionRowTotalMembers = 0;
             foreach ($activeSports as $spId => $spName) {
                 $sheet->setCellValue($col++ . $row, $regionTotals[$spId]['team_count']);
                 $sheet->setCellValue($col++ . $row, $teamsOnly ? 0 : $regionTotals[$spId]['member_count']);
                 if (!$teamsOnly) {
                     $sheet->setCellValue($col++ . $row, '');
                 }
+                $regionRowTotalTeams += $regionTotals[$spId]['team_count'];
+                $regionRowTotalMembers += $regionTotals[$spId]['member_count'];
             }
+            // Add region row total
+            $sheet->setCellValue($col++ . $row, $regionRowTotalTeams);
+            $sheet->setCellValue($col++ . $row, $teamsOnly ? 0 : $regionRowTotalMembers);
             $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($totalRowStyle);
             $sheet->getRowDimension($row)->setRowHeight(22);
             $row++;
