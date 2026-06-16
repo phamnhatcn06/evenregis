@@ -585,14 +585,23 @@ class CompetitionRegistrationsController extends AdminController
         // Tính team_name cho từng registration_id
         $regIdToTeamName = array();
         foreach ($regIdToPropertyIds as $regId => $propIds) {
-            $prefixes = array();
+            $names = array();
             foreach ($propIds as $propId) {
+                // Ưu tiên prefix, fallback property name
                 if (isset($propertyPrefixMap[$propId]) && $propertyPrefixMap[$propId]) {
-                    $prefixes[] = $propertyPrefixMap[$propId];
+                    $names[] = $propertyPrefixMap[$propId];
+                } elseif (isset($propertyNameMap[$propId]) && $propertyNameMap[$propId]) {
+                    // Rút gọn tên đơn vị: "Mường Thanh Holiday Đà Lạt" → "MT H. Đà Lạt"
+                    $fullName = $propertyNameMap[$propId];
+                    $shortName = preg_replace('/Mường Thanh\s*/i', 'MT ', $fullName);
+                    $shortName = preg_replace('/Holiday\s*/i', 'H. ', $shortName);
+                    $shortName = preg_replace('/Grand\s*/i', 'G. ', $shortName);
+                    $shortName = preg_replace('/Luxury\s*/i', 'L. ', $shortName);
+                    $names[] = trim($shortName);
                 }
             }
-            sort($prefixes);
-            $regIdToTeamName[$regId] = implode(' - ', $prefixes);
+            sort($names);
+            $regIdToTeamName[$regId] = implode(' - ', $names);
         }
 
         // Đếm số thành viên mỗi đội (theo registration_id)
