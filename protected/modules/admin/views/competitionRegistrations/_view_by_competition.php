@@ -60,6 +60,11 @@
                 </select>
             </div>
             <?php endif; ?>
+            <div class="col-auto d-flex align-items-center">
+                <button type="button" id="btn-export-excel" class="btn btn-success btn-sm">
+                    <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                </button>
+            </div>
         </div>
 
         <?php if (empty($contestantsByRegion)): ?>
