@@ -332,9 +332,12 @@
         });
     }
 
+    var filterDepartment = document.getElementById('filter-department');
+
     function applyFilters() {
         var selectedRegion = filterRegion ? filterRegion.value : '';
         var selectedProperty = filterProperty ? filterProperty.value : '';
+        var selectedDepartment = filterDepartment ? filterDepartment.value : '';
         var rows = document.querySelectorAll('.contestant-row');
         var regionBlocks = document.querySelectorAll('.region-block');
         var idx = 1;
@@ -342,10 +345,12 @@
         rows.forEach(function(row) {
             var rowRegion = row.getAttribute('data-region-id');
             var rowProperty = row.getAttribute('data-property');
+            var rowDepartment = row.getAttribute('data-department') || '';
             var matchRegion = !selectedRegion || rowRegion === selectedRegion;
             var matchProperty = !selectedProperty || rowProperty === selectedProperty;
+            var matchDepartment = !selectedDepartment || rowDepartment === selectedDepartment;
 
-            if (matchRegion && matchProperty) {
+            if (matchRegion && matchProperty && matchDepartment) {
                 row.style.display = '';
                 var idxCol = row.querySelector('.row-index');
                 if (idxCol) { idxCol.textContent = idx++; }
@@ -370,7 +375,7 @@
         var totalCount = idx - 1;
         var totalText = document.getElementById('total-contestants-text');
         if (totalText) {
-            if (selectedRegion || selectedProperty) {
+            if (selectedRegion || selectedProperty || selectedDepartment) {
                 var filterDesc = [];
                 if (selectedRegion) {
                     var regionOption = filterRegion.options[filterRegion.selectedIndex];
@@ -379,7 +384,10 @@
                 if (selectedProperty) {
                     filterDesc.push('đơn vị "' + selectedProperty + '"');
                 }
-                totalText.textContent = totalCount + ' đội thuộc ' + filterDesc.join(', ');
+                if (selectedDepartment) {
+                    filterDesc.push('phòng ban "' + selectedDepartment + '"');
+                }
+                totalText.textContent = totalCount + ' người thuộc ' + filterDesc.join(', ');
             } else {
                 totalText.textContent = totalText.getAttribute('data-original');
             }
