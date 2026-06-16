@@ -518,9 +518,66 @@ class CompetitionRegistrationsController extends AdminController
         $properties = Properties::getApiDataProvider(array(), 500)->getData();
         $propertyRegionMap = array();
         $propertyNameMap = array();
+        $propertyPrefixMap = array();
         foreach ($properties as $p) {
             $propertyRegionMap[$p->id] = isset($p->region_id) ? $p->region_id : null;
             $propertyNameMap[$p->id] = $p->name;
+            $propertyPrefixMap[$p->id] = isset($p->prefix) ? $p->prefix : (isset($p->code) ? $p->code : '');
+        }
+
+        // Nhóm thí sinh theo registration_id để tính team_name (cho thi đội)
+        $regIdToPropertyIds = array();
+        foreach ($compRegs as $compReg) {
+            if (isset($compReg->deleted_at) && $compReg->deleted_at !== null && $compReg->deleted_at !== '') {
+                continue;
+            }
+            $regId = isset($compReg->registration_id) ? $compReg->registration_id : null;
+            if (!$regId) continue;
+
+            $propId = isset($compReg->property_id) ? $compReg->property_id : null;
+            if (!$propId && isset($compReg->attendee)) {
+                $att = $compReg->attendee;
+                if (is_array($att)) {
+                    $propId = isset($att['property_id']) ? $att['property_id'] : null;
+                } else {
+                    $propId = isset($att->property_id) ? $att->property_id : null;
+                }
+            }
+            if ($propId) {
+                if (!isset($regIdToPropertyIds[$regId])) {
+                    $regIdToPropertyIds[$regId] = array();
+                }
+                if (!in_array($propId, $regIdToPropertyIds[$regId])) {
+                    $regIdToPropertyIds[$regId][] = $propId;
+                }
+            }
+        }
+
+        // Tính team_name cho từng registration_id
+        $regIdToTeamName = array();
+        foreach ($regIdToPropertyIds as $regId => $propIds) {
+            $prefixes = array();
+            foreach ($propIds as $propId) {
+                if (isset($propertyPrefixMap[$propId]) && $propertyPrefixMap[$propId]) {
+                    $prefixes[] = $propertyPrefixMap[$propId];
+                }
+            }
+            sort($prefixes);
+            $regIdToTeamName[$regId] = implode(' - ', $prefixes);
+        }
+
+        // Đếm số thành viên mỗi đội (theo registration_id)
+        $regIdToMemberCount = array();
+        foreach ($compRegs as $compReg) {
+            if (isset($compReg->deleted_at) && $compReg->deleted_at !== null && $compReg->deleted_at !== '') {
+                continue;
+            }
+            $regId = isset($compReg->registration_id) ? $compReg->registration_id : null;
+            if (!$regId) continue;
+            if (!isset($regIdToMemberCount[$regId])) {
+                $regIdToMemberCount[$regId] = 0;
+            }
+            $regIdToMemberCount[$regId]++;
         }
 
         $contestantsByRegion = array();
