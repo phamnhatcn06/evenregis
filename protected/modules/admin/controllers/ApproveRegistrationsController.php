@@ -141,27 +141,68 @@ class ApproveRegistrationsController extends AdminController
             unset($compData);
         }
 
-        // Load Sport Teams - chỉ nếu period có content 'sports'
+        // Load Sport Teams - bao gồm cả đội liên quân
         $sportTeams = array();
         $sportTeamMembers = array();
         if ($model->event_id && $model->property_id && (empty($periodContentCodes) || in_array('sports', $periodContentCodes))) {
-            $teamsData = SportTeams::getApiDataProvider(array('event_id' => $model->event_id, 'property_id' => $model->property_id, 'registration_id' => $id), 100)->getData();
+            $apiResult = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST_BY_PROPERTY, array(
+                'property_id' => $model->property_id,
+                'event_id' => $model->event_id,
+            ));
+            $teamsData = array();
+            if ($apiResult['success'] && isset($apiResult['data']['data'])) {
+                $teamsData = $apiResult['data']['data'];
+            } elseif ($apiResult['success'] && isset($apiResult['data']) && is_array($apiResult['data'])) {
+                $teamsData = $apiResult['data'];
+            }
+
             foreach ($teamsData as $team) {
-                $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
+                $isObject = is_object($team);
+                $teamId = $isObject ? (isset($team->id) ? $team->id : null) : (isset($team['id']) ? $team['id'] : null);
                 if ($teamId) {
-                    if (empty($team->sport_name) && $team->sport_id) {
-                        $sport = Sports::fetchFromApi($team->sport_id);
-                        $team->sport_name = $sport ? $sport->name : '';
+                    $sportName = $isObject ? (isset($team->sport_name) ? $team->sport_name : '') : (isset($team['sport_name']) ? $team['sport_name'] : '');
+                    $sportId = $isObject ? (isset($team->sport_id) ? $team->sport_id : null) : (isset($team['sport_id']) ? $team['sport_id'] : null);
+
+                    if (empty($sportName) && $sportId) {
+                        $sport = Sports::fetchFromApi($sportId);
+                        $sportName = $sport ? $sport->name : '';
+                        if ($isObject) {
+                            $team->sport_name = $sportName;
+                        } else {
+                            $team['sport_name'] = $sportName;
+                        }
+                    }
+
+                    $teamPropertyId = $isObject ? (isset($team->property_id) ? $team->property_id : null) : (isset($team['property_id']) ? $team['property_id'] : null);
+
+                    if (!$isObject) {
+                        $teamObj = new stdClass();
+                        foreach ($team as $key => $value) {
+                            $teamObj->$key = $value;
+                        }
+                        $team = $teamObj;
                     }
                     $sportTeams[] = $team;
-                    $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+
+                    $membersData = array();
+                    if (isset($team->members) && is_array($team->members)) {
+                        $membersData = $team->members;
+                    } else {
+                        $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+                    }
+
+                    $teamPropertyName = isset($team->property_name) ? $team->property_name : '';
+                    if (empty($teamPropertyName) && $teamPropertyId == $model->property_id) {
+                        $teamPropertyName = $model->property_name;
+                    }
 
                     $enrichedMembers = array();
                     foreach ($membersData as $member) {
-                        $attId = isset($member->attendee_id) ? $member->attendee_id : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
+                        $memberIsObj = is_object($member);
+                        $attId = $memberIsObj ? (isset($member->attendee_id) ? $member->attendee_id : null) : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
                         $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
 
-                        $memberArr = is_object($member) ? array_merge($member->attributes, get_object_vars($member)) : $member;
+                        $memberArr = $memberIsObj ? (method_exists($member, 'getAttributes') ? array_merge($member->getAttributes(), get_object_vars($member)) : get_object_vars($member)) : $member;
                         if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
                             $memberArr['attendee_name'] = $attInfo['full_name'];
                         }
@@ -170,6 +211,15 @@ class ApproveRegistrationsController extends AdminController
                         }
                         if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
                             $memberArr['division_name'] = $attInfo['division_name'];
+                        }
+                        if (empty($memberArr['gender']) && isset($attInfo['gender'])) {
+                            $memberArr['gender'] = $attInfo['gender'];
+                        }
+                        if (empty($memberArr['property_name']) && !empty($attInfo['property_name'])) {
+                            $memberArr['property_name'] = $attInfo['property_name'];
+                        }
+                        if (empty($memberArr['property_name']) && !empty($teamPropertyName)) {
+                            $memberArr['property_name'] = $teamPropertyName;
                         }
                         $enrichedMembers[] = $memberArr;
                     }
