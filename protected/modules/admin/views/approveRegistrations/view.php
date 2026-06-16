@@ -248,50 +248,11 @@ $attributes = array(
             <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-primary"></i>Đăng ký thi đấu thể thao</h5>
         </div>
         <div class="card-body">
-            <?php if (empty($sportTeams)): ?>
-                <p class="text-muted mb-0">Chưa đăng ký môn thể thao nào.</p>
-            <?php else: ?>
-                <table class="table table-bordered table-striped table-sm mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Môn thi đấu</th>
-                            <th>Tên đội</th>
-                            <th style="width:100px;">Số VĐV</th>
-                            <th>Danh sách VĐV</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($sportTeams as $team):
-                            $teamId = isset($team->id) ? $team->id : (isset($team['id']) ? $team['id'] : null);
-                            $sportName = isset($team->sport_name) ? $team->sport_name : (isset($team['sport_name']) ? $team['sport_name'] : '');
-                            $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
-                            $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
-                        ?>
-                            <tr>
-                                <td><?php echo CHtml::encode($sportName); ?></td>
-                                <td><span class="badge bg-primary"><?php echo CHtml::encode($teamName); ?></span></td>
-                                <td class="text-center"><?php echo count($members); ?></td>
-                                <td>
-                                    <?php foreach ($members as $idx => $member):
-                                        $memberName = isset($member['attendee_name']) ? $member['attendee_name'] : (isset($member['name']) ? $member['name'] : '');
-                                        $memberPosition = isset($member['position_name']) ? $member['position_name'] : '';
-                                        $memberDivision = isset($member['division_name']) ? $member['division_name'] : '';
-                                        $nameInfo = CHtml::encode($memberName);
-                                        $details = array();
-                                        if ($memberPosition) $details[] = CHtml::encode($memberPosition);
-                                        if ($memberDivision) $details[] = 'Bộ phận: ' . CHtml::encode($memberDivision);
-                                        if (!empty($details)) {
-                                            $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
-                                        }
-                                    ?>
-                                        <div class="mb-1"><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
-                                    <?php endforeach; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
+            <?php $this->renderPartial('_sport_teams_content', array(
+                'sportTeams' => $sportTeams,
+                'sportTeamMembers' => $sportTeamMembers,
+                'model' => $model,
+            )); ?>
         </div>
     </div>
 <?php endif; ?>
