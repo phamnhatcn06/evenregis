@@ -883,18 +883,23 @@ class CompetitionRegistrationsController extends AdminController
 
         $regionList = array();
         $departmentList = array();
+        $positionList = array();
         foreach ($contestantsByRegion as $regionData) {
             $regionList[$regionData['region_id']] = $regionData['region_name'];
-            // Thu thập danh sách phòng ban
+            // Thu thập danh sách phòng ban và chức danh
             foreach ($regionData['properties'] as $propData) {
                 foreach ($propData['contestants'] as $c) {
                     if (!empty($c['attendee_department'])) {
                         $departmentList[$c['attendee_department']] = $c['attendee_department'];
                     }
+                    if (!empty($c['attendee_position'])) {
+                        $positionList[$c['attendee_position']] = $c['attendee_position'];
+                    }
                 }
             }
         }
         ksort($departmentList);
+        ksort($positionList);
 
         $this->render('view_by_competition', array(
             'competitionName' => $competitionName,
