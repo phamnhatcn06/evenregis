@@ -1,5 +1,4 @@
 <?php
-
 class CompetitionRegistrationsController extends AdminController
 {
     public function actionView($id)
@@ -133,10 +132,10 @@ class CompetitionRegistrationsController extends AdminController
     {
         $events = Events::getActiveList();
         $competitions = Competitions::getActiveList();
-        
+
         $propertiesData = Properties::getApiDataProvider(array('is_active' => 1), 500)->getData();
         $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
-        
+
         $regionalMap = array();
         foreach ($regionals as $r) {
             $regionalMap[$r->id] = $r->name;
@@ -1056,7 +1055,7 @@ class CompetitionRegistrationsController extends AdminController
 
             $attendeeName = isset($item['attendee_name']) ? $item['attendee_name'] : '-';
             $attendeePosition = '';
-            
+
             if (isset($item['position'])) {
                 $pos = $item['position'];
                 if (is_array($pos) && isset($pos['name'])) {
