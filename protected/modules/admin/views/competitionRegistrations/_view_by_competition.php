@@ -111,13 +111,32 @@
                             <tbody>
                                 <?php foreach ($regionData['properties'] as $propData): ?>
                                     <?php foreach ($propData['contestants'] as $contestant): ?>
+                                        <?php
+                                        $members = isset($contestant['members']) ? $contestant['members'] : array();
+                                        $memberNames = array();
+                                        $memberPositions = array();
+                                        foreach ($members as $m) {
+                                            $memberNames[] = $m['attendee_name'];
+                                            if (!empty($m['attendee_position'])) {
+                                                $memberPositions[] = $m['attendee_position'];
+                                            }
+                                        }
+                                        ?>
                                         <tr class="contestant-row"
                                             data-property="<?php echo CHtml::encode($propData['property_name']); ?>"
                                             data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
                                             data-status="<?php echo $contestant['status']; ?>"
                                             data-team-name="<?php echo CHtml::encode($contestant['team_name']); ?>">
                                             <td class="row-index"><?php echo $globalIndex++; ?></td>
-                                            <td><?php echo CHtml::encode($contestant['attendee_name']); ?></td>
+                                            <td>
+                                                <?php if (count($memberNames) > 1): ?>
+                                                    <?php foreach ($memberNames as $idx => $name): ?>
+                                                        <div><?php echo ($idx + 1) . '. ' . CHtml::encode($name); ?></div>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <?php echo CHtml::encode(isset($memberNames[0]) ? $memberNames[0] : '-'); ?>
+                                                <?php endif; ?>
+                                            </td>
                                             <td><?php echo CHtml::encode($propData['property_name']); ?></td>
                                             <td>
                                                 <?php if (!empty($contestant['team_name'])): ?>
@@ -126,7 +145,15 @@
                                                     <span class="text-muted">-</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td><?php echo CHtml::encode($contestant['attendee_position']); ?></td>
+                                            <td>
+                                                <?php if (count($memberPositions) > 1): ?>
+                                                    <?php foreach ($memberPositions as $idx => $pos): ?>
+                                                        <div><small><?php echo CHtml::encode($pos); ?></small></div>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <?php echo CHtml::encode(isset($memberPositions[0]) ? $memberPositions[0] : '-'); ?>
+                                                <?php endif; ?>
+                                            </td>
                                             <td>
                                                 <?php
                                                 $competitions = isset($contestant['registered_competitions']) ? $contestant['registered_competitions'] : array();
@@ -139,9 +166,9 @@
                                                 }
                                                 ?>
                                             </td>
-                                            <td>
-                                                <?php if (isset($contestant['member_count']) && $contestant['member_count'] > 1): ?>
-                                                    <span class="badge bg-success"><?php echo $contestant['member_count']; ?></span>
+                                            <td class="text-center">
+                                                <?php if (count($members) > 1): ?>
+                                                    <span class="badge bg-success"><?php echo count($members); ?></span>
                                                 <?php else: ?>
                                                     <span class="text-muted">1</span>
                                                 <?php endif; ?>
