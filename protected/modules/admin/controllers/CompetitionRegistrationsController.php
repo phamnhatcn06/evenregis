@@ -909,6 +909,7 @@ class CompetitionRegistrationsController extends AdminController
             'contestantsByRegion' => array_values($contestantsByRegion),
             'regionList' => $regionList,
             'departmentList' => $departmentList,
+            'positionList' => $positionList,
             'competitionsList' => $competitionsList,
         ));
     }
