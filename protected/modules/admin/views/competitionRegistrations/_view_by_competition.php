@@ -82,14 +82,12 @@
                 }
                 $regionTeamCount = count($regionTeamIds);
             ?>
-                <div class="region-block mb-4" data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
-                     data-total="<?php echo $regionTeamCount; ?>"
-                     data-members="<?php echo $regionMemberCount; ?>">
+                <div class="region-block mb-4" data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>">
                     <h5 class="bg-light p-2 rounded border-start border-4 border-primary mb-3">
                         <i class="fa fa-map-marker me-2"></i>
                         <?php echo CHtml::encode($regionData['region_name']); ?>
                         <span class="badge bg-primary ms-2"><?php echo $regionTeamCount; ?> đội</span>
-                        <span class="badge bg-info ms-1"><?php echo $regionMemberCount; ?> thí sinh</span>
+                        <span class="badge bg-success ms-1"><?php echo $regionMemberCount; ?> người</span>
                     </h5>
 
                     <div class="table-responsive">
