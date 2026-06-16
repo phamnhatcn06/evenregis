@@ -98,12 +98,14 @@
                         <table class="table table-bordered table-hover">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width:5%">STT</th>
-                                    <th style="width:20%">Họ tên</th>
-                                    <th style="width:20%">Đơn vị</th>
-                                    <th style="width:15%">Chức danh</th>
-                                    <th style="width:30%">Nghiệp vụ đăng ký</th>
-                                    <th style="width:10%">Thao tác</th>
+                                    <th style="width:4%">STT</th>
+                                    <th style="width:18%">Họ tên</th>
+                                    <th style="width:15%">Đơn vị</th>
+                                    <th style="width:10%">Tên đội</th>
+                                    <th style="width:12%">Chức danh</th>
+                                    <th style="width:28%">Nghiệp vụ đăng ký</th>
+                                    <th style="width:8%">SL</th>
+                                    <th style="width:5%"></th>
                                 </tr>
                             </thead>
                             <tbody>
