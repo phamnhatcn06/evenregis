@@ -434,6 +434,10 @@
         filterDepartment.addEventListener('change', applyFilters);
     }
 
+    if (filterPosition) {
+        filterPosition.addEventListener('change', applyFilters);
+    }
+
     var filterChangeCompetition = document.getElementById('filter-change-competition');
     if (filterChangeCompetition) {
         filterChangeCompetition.addEventListener('change', function() {
