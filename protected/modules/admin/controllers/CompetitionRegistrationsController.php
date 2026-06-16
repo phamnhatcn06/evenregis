@@ -873,9 +873,19 @@ class CompetitionRegistrationsController extends AdminController
         });
 
         $regionList = array();
+        $departmentList = array();
         foreach ($contestantsByRegion as $regionData) {
             $regionList[$regionData['region_id']] = $regionData['region_name'];
+            // Thu thập danh sách phòng ban
+            foreach ($regionData['properties'] as $propData) {
+                foreach ($propData['contestants'] as $c) {
+                    if (!empty($c['attendee_department'])) {
+                        $departmentList[$c['attendee_department']] = $c['attendee_department'];
+                    }
+                }
+            }
         }
+        ksort($departmentList);
 
         $this->render('view_by_competition', array(
             'competitionName' => $competitionName,
@@ -884,6 +894,7 @@ class CompetitionRegistrationsController extends AdminController
             'competitionId' => $competitionId,
             'contestantsByRegion' => array_values($contestantsByRegion),
             'regionList' => $regionList,
+            'departmentList' => $departmentList,
             'competitionsList' => $competitionsList,
         ));
     }
