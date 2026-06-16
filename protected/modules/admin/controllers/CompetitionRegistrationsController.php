@@ -515,14 +515,21 @@ class CompetitionRegistrationsController extends AdminController
             $regionalCodeMap[$r->id] = isset($r->code) ? $r->code : '';
         }
 
-        $properties = Properties::getApiDataProvider(array(), 500)->getData();
+        $properties = Properties::getApiDataProvider(array('is_active' => 1), 500)->getData();
         $propertyRegionMap = array();
         $propertyNameMap = array();
         $propertyPrefixMap = array();
         foreach ($properties as $p) {
             $propertyRegionMap[$p->id] = isset($p->region_id) ? $p->region_id : null;
             $propertyNameMap[$p->id] = $p->name;
-            $propertyPrefixMap[$p->id] = isset($p->prefix) ? $p->prefix : (isset($p->code) ? $p->code : '');
+            // Ưu tiên prefix, fallback sang code
+            $prefix = '';
+            if (isset($p->prefix) && $p->prefix) {
+                $prefix = $p->prefix;
+            } elseif (isset($p->code) && $p->code) {
+                $prefix = $p->code;
+            }
+            $propertyPrefixMap[$p->id] = $prefix;
         }
 
         // Nhóm thí sinh theo registration_id để tính team_name (cho thi đội)
