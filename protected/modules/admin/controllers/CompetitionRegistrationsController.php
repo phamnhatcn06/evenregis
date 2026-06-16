@@ -826,7 +826,11 @@ class CompetitionRegistrationsController extends AdminController
                         $departmentList[$c['attendee_department']] = $c['attendee_department'];
                     }
                     if (!empty($c['attendee_position'])) {
-                        $positionList[$c['attendee_position']] = $c['attendee_position'];
+                        // Gộp các chức danh giống nhau (khác hoa/thường)
+                        $posKey = mb_strtolower($c['attendee_position'], 'UTF-8');
+                        if (!isset($positionList[$posKey])) {
+                            $positionList[$posKey] = $c['attendee_position'];
+                        }
                     }
                 }
             }
