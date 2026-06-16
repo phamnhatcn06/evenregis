@@ -825,6 +825,7 @@ class CompetitionRegistrationsController extends AdminController
                 'candidate_number' => $compReg->candidate_number,
                 'attendee_name' => $attendeeName,
                 'attendee_position' => $attendeePosition,
+                'attendee_department' => $attendeeDepartment,
                 'attendee_gender' => $attendeeGender,
                 'status' => $compReg->status,
                 'registered_at' => $compReg->registered_at,
