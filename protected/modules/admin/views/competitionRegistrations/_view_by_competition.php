@@ -48,6 +48,7 @@
                     <option value="">-- Chọn cụm trước --</option>
                 </select>
             </div>
+            <?php endif; ?>
             <?php if (!empty($positionList)): ?>
             <div class="col-auto d-flex align-items-center">
                 <label for="filter-position" class="form-label mb-0 me-2 text-nowrap fw-semibold">Chức danh:</label>
@@ -58,7 +59,6 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <?php endif; ?>
             <?php endif; ?>
         </div>
 
