@@ -22,5 +22,6 @@ $this->Tabletitle = 'Thí sinh thi nghiệp vụ: ' . CHtml::encode($competition
     'competitionId' => $competitionId,
     'contestantsByRegion' => $contestantsByRegion,
     'regionList' => $regionList,
+    'positionList' => $positionList,
     'competitionsList' => $competitionsList,
 )); ?>
