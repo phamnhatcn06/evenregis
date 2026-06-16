@@ -746,9 +746,14 @@ class CompetitionRegistrationsController extends AdminController
             $attId = $compReg->attendee_id;
             $registeredCompetitions = isset($attendeeCompetitions[$attId]) ? $attendeeCompetitions[$attId] : array();
 
+            $regId = isset($compReg->registration_id) ? $compReg->registration_id : null;
+            $teamName = ($regId && isset($regIdToTeamName[$regId])) ? $regIdToTeamName[$regId] : '';
+            $memberCount = ($regId && isset($regIdToMemberCount[$regId])) ? $regIdToMemberCount[$regId] : 1;
+
             $contestantsByRegion[$regionId]['properties'][$propId]['contestants'][] = array(
                 'id' => $compReg->id,
                 'attendee_id' => $compReg->attendee_id,
+                'registration_id' => $regId,
                 'candidate_number' => $compReg->candidate_number,
                 'attendee_name' => $attendeeName,
                 'attendee_position' => $attendeePosition,
@@ -757,6 +762,8 @@ class CompetitionRegistrationsController extends AdminController
                 'registered_at' => $compReg->registered_at,
                 'note' => $compReg->note,
                 'registered_competitions' => $registeredCompetitions,
+                'team_name' => $teamName,
+                'member_count' => $memberCount,
             );
         }
 
