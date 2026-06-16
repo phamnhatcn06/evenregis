@@ -59,6 +59,24 @@
             <?php endif; ?>
         </div>
 
+        <?php if (!empty($departmentList)): ?>
+        <div class="row mb-3">
+            <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
+                <label for="filter-department" class="form-label mb-0 me-2 text-nowrap fw-semibold">
+                    Phòng ban:
+                </label>
+                <select id="filter-department" class="form-select form-select-sm">
+                    <option value="">-- Tất cả phòng ban --</option>
+                    <?php foreach ($departmentList as $deptName): ?>
+                        <option value="<?php echo CHtml::encode($deptName); ?>">
+                            <?php echo CHtml::encode($deptName); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <?php if (empty($contestantsByRegion)): ?>
             <div class="alert alert-info">
                 <i class="fa fa-info-circle me-2"></i>Chưa có thí sinh đăng ký thi nghiệp vụ này.
