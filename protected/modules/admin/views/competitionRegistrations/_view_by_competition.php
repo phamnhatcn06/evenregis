@@ -146,7 +146,8 @@
                                             data-property="<?php echo CHtml::encode($propData['property_name']); ?>"
                                             data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
                                             data-status="<?php echo $contestant['status']; ?>"
-                                            data-team-name="<?php echo CHtml::encode($contestant['team_name']); ?>">
+                                            data-team-name="<?php echo CHtml::encode($contestant['team_name']); ?>"
+                                            data-department="<?php echo CHtml::encode(isset($contestant['attendee_department']) ? $contestant['attendee_department'] : ''); ?>">
                                             <td class="row-index"><?php echo $globalIndex++; ?></td>
                                             <?php if ($isFirstOfTeam && $memberCount > 1): ?>
                                                 <td rowspan="<?php echo $memberCount; ?>" class="align-middle text-center" style="background:#f8f9fa;">
