@@ -68,17 +68,13 @@
             <?php
             $globalIndex = 1;
             foreach ($contestantsByRegion as $regionData):
-                $regionContestantCount = 0;
-                $regionConfirmedCount = 0;
-                $regionPendingCount = 0;
+                $regionTeamCount = 0;
+                $regionMemberCount = 0;
                 foreach ($regionData['properties'] as $propData) {
                     foreach ($propData['contestants'] as $contestant) {
-                        $regionContestantCount++;
-                        if ($contestant['status'] == CompetitionRegistrations::STATUS_CONFIRMED) {
-                            $regionConfirmedCount++;
-                        } elseif ($contestant['status'] == CompetitionRegistrations::STATUS_PENDING) {
-                            $regionPendingCount++;
-                        }
+                        $regionTeamCount++;
+                        $members = isset($contestant['members']) ? $contestant['members'] : array();
+                        $regionMemberCount += count($members) > 0 ? count($members) : 1;
                     }
                 }
             ?>
