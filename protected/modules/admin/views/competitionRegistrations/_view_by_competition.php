@@ -79,15 +79,13 @@
                 }
             ?>
                 <div class="region-block mb-4" data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
-                     data-total="<?php echo $regionContestantCount; ?>"
-                     data-confirmed="<?php echo $regionConfirmedCount; ?>"
-                     data-pending="<?php echo $regionPendingCount; ?>">
+                     data-total="<?php echo $regionTeamCount; ?>"
+                     data-members="<?php echo $regionMemberCount; ?>">
                     <h5 class="bg-light p-2 rounded border-start border-4 border-primary mb-3">
                         <i class="fa fa-map-marker me-2"></i>
                         <?php echo CHtml::encode($regionData['region_name']); ?>
-                        <span class="badge bg-primary ms-2 region-contestant-count"><?php echo $regionContestantCount; ?> thí sinh</span>
-                        <span class="badge bg-success ms-1 region-confirmed-count"><?php echo $regionConfirmedCount; ?> đã xác nhận</span>
-                        <span class="badge bg-warning text-dark ms-1 region-pending-count"><?php echo $regionPendingCount; ?> chờ xác nhận</span>
+                        <span class="badge bg-primary ms-2"><?php echo $regionTeamCount; ?> đội</span>
+                        <span class="badge bg-info ms-1"><?php echo $regionMemberCount; ?> thí sinh</span>
                     </h5>
 
                     <div class="table-responsive">
