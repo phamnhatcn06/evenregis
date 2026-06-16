@@ -105,21 +105,50 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($regionData['properties'] as $propData): ?>
-                                    <?php foreach ($propData['contestants'] as $contestant): ?>
+                                <?php foreach ($regionData['properties'] as $propData):
+                                    // Sắp xếp contestants theo registration_id để cùng đội nằm liền nhau
+                                    $sortedContestants = $propData['contestants'];
+                                    usort($sortedContestants, function($a, $b) {
+                                        $regA = isset($a['registration_id']) ? $a['registration_id'] : 0;
+                                        $regB = isset($b['registration_id']) ? $b['registration_id'] : 0;
+                                        return $regA - $regB;
+                                    });
+
+                                    // Track registration_id đã render để dùng rowspan
+                                    $renderedRegIds = array();
+                                ?>
+                                    <?php foreach ($sortedContestants as $idx => $contestant):
+                                        $regId = isset($contestant['registration_id']) ? $contestant['registration_id'] : null;
+                                        $memberCount = isset($contestant['member_count']) ? $contestant['member_count'] : 1;
+                                        $isFirstOfTeam = $regId && !isset($renderedRegIds[$regId]);
+                                        if ($regId) {
+                                            $renderedRegIds[$regId] = true;
+                                        }
+                                    ?>
                                         <tr class="contestant-row"
                                             data-property="<?php echo CHtml::encode($propData['property_name']); ?>"
                                             data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
                                             data-status="<?php echo $contestant['status']; ?>"
                                             data-team-name="<?php echo CHtml::encode($contestant['team_name']); ?>">
                                             <td class="row-index"><?php echo $globalIndex++; ?></td>
-                                            <td>
-                                                <?php if (!empty($contestant['team_name'])): ?>
-                                                    <span class="badge bg-primary"><?php echo CHtml::encode($contestant['team_name']); ?></span>
-                                                <?php else: ?>
-                                                    <span class="text-muted">-</span>
-                                                <?php endif; ?>
-                                            </td>
+                                            <?php if ($isFirstOfTeam && $memberCount > 1): ?>
+                                                <td rowspan="<?php echo $memberCount; ?>" class="align-middle text-center" style="background:#f8f9fa;">
+                                                    <?php if (!empty($contestant['team_name'])): ?>
+                                                        <span class="badge bg-primary"><?php echo CHtml::encode($contestant['team_name']); ?></span>
+                                                        <div class="small text-muted mt-1"><?php echo $memberCount; ?> người</div>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">-</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            <?php elseif (!$regId || $memberCount <= 1): ?>
+                                                <td class="align-middle text-center">
+                                                    <?php if (!empty($contestant['team_name'])): ?>
+                                                        <span class="badge bg-secondary"><?php echo CHtml::encode($contestant['team_name']); ?></span>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">-</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            <?php endif; ?>
                                             <td><?php echo CHtml::encode($contestant['attendee_name']); ?></td>
                                             <td><?php echo CHtml::encode($propData['property_name']); ?></td>
                                             <td><?php echo CHtml::encode($contestant['attendee_position']); ?></td>
@@ -134,13 +163,6 @@
                                                     echo '-';
                                                 }
                                                 ?>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if (isset($contestant['member_count']) && $contestant['member_count'] > 1): ?>
-                                                    <span class="badge bg-success"><?php echo $contestant['member_count']; ?></span>
-                                                <?php else: ?>
-                                                    <span class="text-muted">1</span>
-                                                <?php endif; ?>
                                             </td>
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-info btn-view-contestant" data-id="<?php echo $contestant['id']; ?>" title="Xem chi tiết" style="width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;">
