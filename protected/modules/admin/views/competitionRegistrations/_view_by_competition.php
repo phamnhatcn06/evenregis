@@ -59,8 +59,9 @@
             <?php endif; ?>
         </div>
 
-        <?php if (!empty($departmentList)): ?>
+        <?php if (!empty($departmentList) || !empty($positionList)): ?>
         <div class="row mb-3">
+            <?php if (!empty($departmentList)): ?>
             <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
                 <label for="filter-department" class="form-label mb-0 me-2 text-nowrap fw-semibold">
                     Phòng ban:
@@ -74,6 +75,22 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+            <?php endif; ?>
+            <?php if (!empty($positionList)): ?>
+            <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
+                <label for="filter-position" class="form-label mb-0 me-2 text-nowrap fw-semibold">
+                    Chức danh:
+                </label>
+                <select id="filter-position" class="form-select form-select-sm">
+                    <option value="">-- Tất cả chức danh --</option>
+                    <?php foreach ($positionList as $posName): ?>
+                        <option value="<?php echo CHtml::encode($posName); ?>">
+                            <?php echo CHtml::encode($posName); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
 
