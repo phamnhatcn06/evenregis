@@ -411,5 +411,25 @@
             }
         });
     }
+
+    // Export Excel
+    var btnExport = document.getElementById('btn-export-excel');
+    if (btnExport) {
+        btnExport.addEventListener('click', function() {
+            var params = new URLSearchParams();
+            params.set('event_id', '<?php echo $eventId; ?>');
+            params.set('competition_id', '<?php echo $competitionId; ?>');
+            if (filterRegion && filterRegion.value) {
+                params.set('region_id', filterRegion.value);
+            }
+            if (filterProperty && filterProperty.value) {
+                params.set('property', filterProperty.value);
+            }
+            if (filterPosition && filterPosition.value) {
+                params.set('position', filterPosition.value);
+            }
+            window.location.href = '<?php echo $this->createUrl("exportExcel"); ?>?' + params.toString();
+        });
+    }
 })();
 </script>
