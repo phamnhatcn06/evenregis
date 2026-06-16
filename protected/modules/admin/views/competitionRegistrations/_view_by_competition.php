@@ -184,15 +184,20 @@
             <div class="mt-3">
                 <strong>Tổng:</strong>
                 <?php
-                $total = 0;
+                $totalTeams = 0;
+                $totalMembers = 0;
                 $totalProperties = 0;
                 foreach ($contestantsByRegion as $regionData) {
                     foreach ($regionData['properties'] as $propData) {
-                        $total += count($propData['contestants']);
                         $totalProperties++;
+                        foreach ($propData['contestants'] as $c) {
+                            $totalTeams++;
+                            $members = isset($c['members']) ? $c['members'] : array();
+                            $totalMembers += count($members) > 0 ? count($members) : 1;
+                        }
                     }
                 }
-                $originalText = $total . ' thí sinh từ ' . $totalProperties . ' đơn vị thuộc ' . count($contestantsByRegion) . ' cụm';
+                $originalText = $totalTeams . ' đội (' . $totalMembers . ' thí sinh) từ ' . $totalProperties . ' đơn vị thuộc ' . count($contestantsByRegion) . ' cụm';
                 ?>
                 <span id="total-contestants-text" data-original="<?php echo CHtml::encode($originalText); ?>">
                     <?php echo CHtml::encode($originalText); ?>
