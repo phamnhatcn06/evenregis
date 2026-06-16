@@ -351,11 +351,13 @@
     }
 
     var filterDepartment = document.getElementById('filter-department');
+    var filterPosition = document.getElementById('filter-position');
 
     function applyFilters() {
         var selectedRegion = filterRegion ? filterRegion.value : '';
         var selectedProperty = filterProperty ? filterProperty.value : '';
         var selectedDepartment = filterDepartment ? filterDepartment.value : '';
+        var selectedPosition = filterPosition ? filterPosition.value : '';
         var rows = document.querySelectorAll('.contestant-row');
         var regionBlocks = document.querySelectorAll('.region-block');
         var idx = 1;
@@ -364,11 +366,13 @@
             var rowRegion = row.getAttribute('data-region-id');
             var rowProperty = row.getAttribute('data-property');
             var rowDepartment = row.getAttribute('data-department') || '';
+            var rowPosition = row.getAttribute('data-position') || '';
             var matchRegion = !selectedRegion || rowRegion === selectedRegion;
             var matchProperty = !selectedProperty || rowProperty === selectedProperty;
             var matchDepartment = !selectedDepartment || rowDepartment === selectedDepartment;
+            var matchPosition = !selectedPosition || rowPosition === selectedPosition;
 
-            if (matchRegion && matchProperty && matchDepartment) {
+            if (matchRegion && matchProperty && matchDepartment && matchPosition) {
                 row.style.display = '';
                 var idxCol = row.querySelector('.row-index');
                 if (idxCol) { idxCol.textContent = idx++; }
