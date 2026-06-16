@@ -114,10 +114,18 @@
                                         <tr class="contestant-row"
                                             data-property="<?php echo CHtml::encode($propData['property_name']); ?>"
                                             data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
-                                            data-status="<?php echo $contestant['status']; ?>">
+                                            data-status="<?php echo $contestant['status']; ?>"
+                                            data-team-name="<?php echo CHtml::encode($contestant['team_name']); ?>">
                                             <td class="row-index"><?php echo $globalIndex++; ?></td>
                                             <td><?php echo CHtml::encode($contestant['attendee_name']); ?></td>
                                             <td><?php echo CHtml::encode($propData['property_name']); ?></td>
+                                            <td>
+                                                <?php if (!empty($contestant['team_name'])): ?>
+                                                    <span class="badge bg-primary"><?php echo CHtml::encode($contestant['team_name']); ?></span>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td><?php echo CHtml::encode($contestant['attendee_position']); ?></td>
                                             <td>
                                                 <?php
@@ -130,6 +138,13 @@
                                                     echo '-';
                                                 }
                                                 ?>
+                                            </td>
+                                            <td>
+                                                <?php if (isset($contestant['member_count']) && $contestant['member_count'] > 1): ?>
+                                                    <span class="badge bg-success"><?php echo $contestant['member_count']; ?></span>
+                                                <?php else: ?>
+                                                    <span class="text-muted">1</span>
+                                                <?php endif; ?>
                                             </td>
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-info btn-view-contestant" data-id="<?php echo $contestant['id']; ?>" title="Xem chi tiết" style="width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;">
