@@ -68,15 +68,19 @@
             <?php
             $globalIndex = 1;
             foreach ($contestantsByRegion as $regionData):
-                $regionTeamCount = 0;
+                // Đếm số đội (unique registration_id) và số người
+                $regionTeamIds = array();
                 $regionMemberCount = 0;
                 foreach ($regionData['properties'] as $propData) {
                     foreach ($propData['contestants'] as $contestant) {
-                        $regionTeamCount++;
-                        $members = isset($contestant['members']) ? $contestant['members'] : array();
-                        $regionMemberCount += count($members) > 0 ? count($members) : 1;
+                        $regionMemberCount++;
+                        $regId = isset($contestant['registration_id']) ? $contestant['registration_id'] : null;
+                        if ($regId) {
+                            $regionTeamIds[$regId] = true;
+                        }
                     }
                 }
+                $regionTeamCount = count($regionTeamIds);
             ?>
                 <div class="region-block mb-4" data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
                      data-total="<?php echo $regionTeamCount; ?>"
