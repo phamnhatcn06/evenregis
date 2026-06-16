@@ -49,6 +49,7 @@
                 </select>
             </div>
             <?php endif; ?>
+            <!-- DEBUG: positionList count = <?php echo count($positionList); ?> -->
             <?php if (!empty($positionList)): ?>
             <div class="col-auto d-flex align-items-center">
                 <label for="filter-position" class="form-label mb-0 me-2 text-nowrap fw-semibold">Chức danh:</label>
