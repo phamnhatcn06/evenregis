@@ -920,16 +920,40 @@ class CompetitionRegistrationsController extends AdminController
         $eventId = Yii::app()->request->getQuery('event_id', 3);
         $competitionId = Yii::app()->request->getQuery('competition_id', 3);
 
-        // Gọi API trực tiếp
-        $url = ApiEndpoints::COMPETITION_REGISTRATION_LIST;
-        $result = ApiClient::get($url, array(
+        // Lấy qua ApiDataProvider để xem structure
+        $compRegs = CompetitionRegistrations::getApiDataProvider(array(
             'event_id' => $eventId,
             'competition_id' => $competitionId,
             'per_page' => 2,
-        ));
+        ), 2)->getData();
+
+        $debug = array();
+        foreach ($compRegs as $reg) {
+            $item = array(
+                'id' => $reg->id,
+                'attendee_id' => $reg->attendee_id,
+                'registration_id' => isset($reg->registration_id) ? $reg->registration_id : null,
+            );
+
+            // Check attendee
+            if (isset($reg->attendee)) {
+                $att = $reg->attendee;
+                $item['attendee_type'] = gettype($att);
+                if (is_array($att)) {
+                    $item['attendee_full_name'] = isset($att['full_name']) ? $att['full_name'] : null;
+                    $item['attendee_department'] = isset($att['department']) ? $att['department'] : null;
+                    $item['attendee_position'] = isset($att['position']) ? $att['position'] : null;
+                } else {
+                    $item['attendee_full_name'] = isset($att->full_name) ? $att->full_name : null;
+                    $item['attendee_department'] = isset($att->department) ? $att->department : null;
+                    $item['attendee_position'] = isset($att->position) ? $att->position : null;
+                }
+            }
+            $debug[] = $item;
+        }
 
         header('Content-Type: application/json');
-        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        echo json_encode($debug, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         Yii::app()->end();
     }
 
