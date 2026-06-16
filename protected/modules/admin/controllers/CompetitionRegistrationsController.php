@@ -908,13 +908,18 @@ class CompetitionRegistrationsController extends AdminController
         $compRegs = CompetitionRegistrations::getApiDataProvider(array(
             'event_id' => $eventId,
             'competition_id' => $competitionId,
-            'per_page' => 5,
-        ), 5)->getData();
+            'per_page' => 2,
+        ), 2)->getData();
+
+        $items = array();
+        foreach ($compRegs as $reg) {
+            $items[] = get_object_vars($reg);
+        }
 
         header('Content-Type: application/json');
         echo json_encode(array(
             'count' => count($compRegs),
-            'first_item' => count($compRegs) > 0 ? $compRegs[0] : null,
+            'items' => $items,
         ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         Yii::app()->end();
     }
