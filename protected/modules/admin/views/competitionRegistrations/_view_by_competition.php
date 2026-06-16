@@ -21,12 +21,10 @@
         </h5>
     </div>
     <div class="card-body">
-        <div class="row mb-3">
-            <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
-                <label for="filter-change-competition" class="form-label mb-0 me-2 text-nowrap fw-semibold">
-                    Nghiệp vụ:
-                </label>
-                <select id="filter-change-competition" class="form-select form-select-sm">
+        <div class="row mb-3 g-2">
+            <div class="col-auto d-flex align-items-center">
+                <label for="filter-change-competition" class="form-label mb-0 me-2 text-nowrap fw-semibold">Nghiệp vụ:</label>
+                <select id="filter-change-competition" class="form-select form-select-sm" style="min-width:200px;">
                     <?php foreach ($competitionsList as $item): ?>
                         <option value="<?php echo CHtml::encode($item['id']); ?>" <?php echo $item['id'] == $competitionId ? 'selected="selected"' : ''; ?>>
                             <?php echo CHtml::encode($item['name']); ?>
@@ -35,64 +33,45 @@
                 </select>
             </div>
             <?php if (!empty($contestantsByRegion)): ?>
-                <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
-                    <label for="filter-region" class="form-label mb-0 me-2 text-nowrap fw-semibold">
-                        Lọc theo cụm:
-                    </label>
-                    <select id="filter-region" class="form-select form-select-sm">
-                        <option value="">-- Tất cả cụm --</option>
-                        <?php foreach ($regionList as $regionId => $regionName): ?>
-                            <option value="<?php echo CHtml::encode($regionId); ?>">
-                                <?php echo CHtml::encode($regionName); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
-                    <label for="filter-property" class="form-label mb-0 me-2 text-nowrap fw-semibold">
-                        Lọc theo đơn vị:
-                    </label>
-                    <select id="filter-property" class="form-select form-select-sm">
-                        <option value="">-- Chọn cụm trước --</option>
-                    </select>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <?php if (!empty($departmentList) || !empty($positionList)): ?>
-        <div class="row mb-3">
+            <div class="col-auto d-flex align-items-center">
+                <label for="filter-region" class="form-label mb-0 me-2 text-nowrap fw-semibold">Cụm:</label>
+                <select id="filter-region" class="form-select form-select-sm" style="min-width:140px;">
+                    <option value="">-- Tất cả cụm --</option>
+                    <?php foreach ($regionList as $regionId => $regionName): ?>
+                        <option value="<?php echo CHtml::encode($regionId); ?>"><?php echo CHtml::encode($regionName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <label for="filter-property" class="form-label mb-0 me-2 text-nowrap fw-semibold">Đơn vị:</label>
+                <select id="filter-property" class="form-select form-select-sm" style="min-width:180px;">
+                    <option value="">-- Chọn cụm trước --</option>
+                </select>
+            </div>
             <?php if (!empty($departmentList)): ?>
-            <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
-                <label for="filter-department" class="form-label mb-0 me-2 text-nowrap fw-semibold">
-                    Phòng ban:
-                </label>
-                <select id="filter-department" class="form-select form-select-sm">
-                    <option value="">-- Tất cả phòng ban --</option>
+            <div class="col-auto d-flex align-items-center">
+                <label for="filter-department" class="form-label mb-0 me-2 text-nowrap fw-semibold">Phòng ban:</label>
+                <select id="filter-department" class="form-select form-select-sm" style="min-width:160px;">
+                    <option value="">-- Tất cả --</option>
                     <?php foreach ($departmentList as $deptName): ?>
-                        <option value="<?php echo CHtml::encode($deptName); ?>">
-                            <?php echo CHtml::encode($deptName); ?>
-                        </option>
+                        <option value="<?php echo CHtml::encode($deptName); ?>"><?php echo CHtml::encode($deptName); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <?php endif; ?>
             <?php if (!empty($positionList)): ?>
-            <div class="col-md-4 d-flex align-items-center mb-2 mb-md-0">
-                <label for="filter-position" class="form-label mb-0 me-2 text-nowrap fw-semibold">
-                    Chức danh:
-                </label>
-                <select id="filter-position" class="form-select form-select-sm">
-                    <option value="">-- Tất cả chức danh --</option>
+            <div class="col-auto d-flex align-items-center">
+                <label for="filter-position" class="form-label mb-0 me-2 text-nowrap fw-semibold">Chức danh:</label>
+                <select id="filter-position" class="form-select form-select-sm" style="min-width:160px;">
+                    <option value="">-- Tất cả --</option>
                     <?php foreach ($positionList as $posName): ?>
-                        <option value="<?php echo CHtml::encode($posName); ?>">
-                            <?php echo CHtml::encode($posName); ?>
-                        </option>
+                        <option value="<?php echo CHtml::encode($posName); ?>"><?php echo CHtml::encode($posName); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <?php endif; ?>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
 
         <?php if (empty($contestantsByRegion)): ?>
             <div class="alert alert-info">
