@@ -732,91 +732,25 @@ class CompetitionRegistrationsController extends AdminController
                 );
             }
 
-            $attendeeName = isset($compReg->attendee_name) ? $compReg->attendee_name : '-';
+            $attendeeName = '-';
             $attendeePosition = '';
             $attendeeDepartment = '';
-            $attendeeGender = isset($compReg->attendee_gender) ? $compReg->attendee_gender : '';
+            $attendeeGender = '';
 
-            // Lấy position và department từ compReg->position
-            if (isset($compReg->position)) {
-                $pos = $compReg->position;
-                if (is_array($pos)) {
-                    $attendeePosition = isset($pos['name']) ? $pos['name'] : '';
-                    if (isset($pos['department']['name'])) {
-                        $attendeeDepartment = $pos['department']['name'];
-                    } elseif (isset($pos['department_name'])) {
-                        $attendeeDepartment = $pos['department_name'];
-                    }
-                } elseif (is_object($pos)) {
-                    $attendeePosition = isset($pos->name) ? $pos->name : '';
-                    if (isset($pos->department->name)) {
-                        $attendeeDepartment = $pos->department->name;
-                    } elseif (isset($pos->department_name)) {
-                        $attendeeDepartment = $pos->department_name;
-                    }
-                } elseif (is_string($pos)) {
-                    $attendeePosition = $pos;
-                }
-            }
-
-            // Lấy department từ compReg trực tiếp
-            if (empty($attendeeDepartment)) {
-                if (isset($compReg->department)) {
-                    $dept = $compReg->department;
-                    if (is_array($dept) && isset($dept['name'])) {
-                        $attendeeDepartment = $dept['name'];
-                    } elseif (is_object($dept) && isset($dept->name)) {
-                        $attendeeDepartment = $dept->name;
-                    }
-                } elseif (isset($compReg->department_name)) {
-                    $attendeeDepartment = $compReg->department_name;
-                }
-            }
-
-            if (isset($compReg->attendee)) {
+            // Lấy từ attendee (array) - đây là nguồn chính
+            if (isset($compReg->attendee) && is_array($compReg->attendee)) {
                 $att = $compReg->attendee;
-                if (is_array($att)) {
-                    $attendeeName = isset($att['full_name']) ? $att['full_name'] : $attendeeName;
-                    $attendeeGender = isset($att['gender']) ? $att['gender'] : $attendeeGender;
-                    // Fallback: position và department trong attendee
-                    if (empty($attendeePosition) && isset($att['position'])) {
-                        $pos = $att['position'];
-                        if (is_array($pos)) {
-                            $attendeePosition = isset($pos['name']) ? $pos['name'] : '';
-                            if (empty($attendeeDepartment) && isset($pos['department']['name'])) {
-                                $attendeeDepartment = $pos['department']['name'];
-                            }
-                        } elseif (is_object($pos)) {
-                            $attendeePosition = isset($pos->name) ? $pos->name : '';
-                            if (empty($attendeeDepartment) && isset($pos->department->name)) {
-                                $attendeeDepartment = $pos->department->name;
-                            }
-                        }
-                    }
-                    if (empty($attendeeDepartment) && isset($att['department']['name'])) {
-                        $attendeeDepartment = $att['department']['name'];
-                    }
-                } else {
-                    $attendeeName = isset($att->full_name) ? $att->full_name : $attendeeName;
-                    $attendeeGender = isset($att->gender) ? $att->gender : $attendeeGender;
-                    // Fallback: position và department trong attendee
-                    if (empty($attendeePosition) && isset($att->position)) {
-                        $pos = $att->position;
-                        if (is_array($pos)) {
-                            $attendeePosition = isset($pos['name']) ? $pos['name'] : '';
-                            if (empty($attendeeDepartment) && isset($pos['department']['name'])) {
-                                $attendeeDepartment = $pos['department']['name'];
-                            }
-                        } elseif (is_object($pos)) {
-                            $attendeePosition = isset($pos->name) ? $pos->name : '';
-                            if (empty($attendeeDepartment) && isset($pos->department->name)) {
-                                $attendeeDepartment = $pos->department->name;
-                            }
-                        }
-                    }
-                    if (empty($attendeeDepartment) && isset($att->department->name)) {
-                        $attendeeDepartment = $att->department->name;
-                    }
+                $attendeeName = isset($att['full_name']) ? $att['full_name'] : '-';
+                $attendeeGender = isset($att['gender']) ? $att['gender'] : '';
+
+                // Position
+                if (isset($att['position']) && is_array($att['position'])) {
+                    $attendeePosition = isset($att['position']['name']) ? $att['position']['name'] : '';
+                }
+
+                // Department
+                if (isset($att['department']) && is_array($att['department'])) {
+                    $attendeeDepartment = isset($att['department']['name']) ? $att['department']['name'] : '';
                 }
             }
 
