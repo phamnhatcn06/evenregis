@@ -779,31 +779,20 @@ class CompetitionRegistrationsController extends AdminController
             $teamName = ($regId && isset($regIdToTeamName[$regId])) ? $regIdToTeamName[$regId] : '';
             $memberCount = ($regId && isset($regIdToMemberCount[$regId])) ? $regIdToMemberCount[$regId] : 1;
 
-            // Gộp theo team (registration_id) nếu có > 1 thành viên
-            $teamKey = $regId ? 'team_' . $regId : 'solo_' . $compReg->id;
-
-            if (!isset($contestantsByRegion[$regionId]['properties'][$propId]['contestants'][$teamKey])) {
-                // Tạo mới team/solo entry
-                $contestantsByRegion[$regionId]['properties'][$propId]['contestants'][$teamKey] = array(
-                    'id' => $compReg->id,
-                    'registration_id' => $regId,
-                    'candidate_number' => $compReg->candidate_number,
-                    'status' => $compReg->status,
-                    'registered_at' => $compReg->registered_at,
-                    'note' => $compReg->note,
-                    'registered_competitions' => $registeredCompetitions,
-                    'team_name' => $teamName,
-                    'member_count' => $memberCount,
-                    'members' => array(),
-                );
-            }
-
-            // Thêm thành viên vào team
-            $contestantsByRegion[$regionId]['properties'][$propId]['contestants'][$teamKey]['members'][] = array(
+            $contestantsByRegion[$regionId]['properties'][$propId]['contestants'][] = array(
+                'id' => $compReg->id,
                 'attendee_id' => $compReg->attendee_id,
+                'registration_id' => $regId,
+                'candidate_number' => $compReg->candidate_number,
                 'attendee_name' => $attendeeName,
                 'attendee_position' => $attendeePosition,
                 'attendee_gender' => $attendeeGender,
+                'status' => $compReg->status,
+                'registered_at' => $compReg->registered_at,
+                'note' => $compReg->note,
+                'registered_competitions' => $registeredCompetitions,
+                'team_name' => $teamName,
+                'member_count' => $memberCount,
             );
         }
 
