@@ -346,24 +346,6 @@
                 block.style.display = 'none';
             } else {
                 block.style.display = '';
-                var totalCount = visibleRows.length;
-                var confirmedCount = 0;
-                var pendingCount = 0;
-                visibleRows.forEach(function(row) {
-                    var status = parseInt(row.getAttribute('data-status'));
-                    if (status === <?php echo CompetitionRegistrations::STATUS_CONFIRMED; ?>) {
-                        confirmedCount++;
-                    } else if (status === <?php echo CompetitionRegistrations::STATUS_PENDING; ?>) {
-                        pendingCount++;
-                    }
-                });
-
-                var countBadge = block.querySelector('.region-contestant-count');
-                var confirmedBadge = block.querySelector('.region-confirmed-count');
-                var pendingBadge = block.querySelector('.region-pending-count');
-                if (countBadge) countBadge.textContent = totalCount + ' thí sinh';
-                if (confirmedBadge) confirmedBadge.textContent = confirmedCount + ' đã xác nhận';
-                if (pendingBadge) pendingBadge.textContent = pendingCount + ' chờ xác nhận';
             }
         });
 
