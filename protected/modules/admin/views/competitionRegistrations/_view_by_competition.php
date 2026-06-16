@@ -405,6 +405,10 @@
         filterProperty.addEventListener('change', applyFilters);
     }
 
+    if (filterDepartment) {
+        filterDepartment.addEventListener('change', applyFilters);
+    }
+
     var filterChangeCompetition = document.getElementById('filter-change-competition');
     if (filterChangeCompetition) {
         filterChangeCompetition.addEventListener('change', function() {
