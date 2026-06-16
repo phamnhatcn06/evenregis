@@ -899,6 +899,26 @@ class CompetitionRegistrationsController extends AdminController
         ));
     }
 
+    // Debug action - xem structure data từ API
+    public function actionDebugData()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id', 3);
+        $competitionId = Yii::app()->request->getQuery('competition_id', 3);
+
+        $compRegs = CompetitionRegistrations::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'competition_id' => $competitionId,
+            'per_page' => 5,
+        ), 5)->getData();
+
+        header('Content-Type: application/json');
+        echo json_encode(array(
+            'count' => count($compRegs),
+            'first_item' => count($compRegs) > 0 ? $compRegs[0] : null,
+        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        Yii::app()->end();
+    }
+
     public function actionAjaxView()
     {
         $id = Yii::app()->request->getQuery('id');
