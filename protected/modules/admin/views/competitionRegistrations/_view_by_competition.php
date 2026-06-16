@@ -397,7 +397,7 @@
         var totalCount = idx - 1;
         var totalText = document.getElementById('total-contestants-text');
         if (totalText) {
-            if (selectedRegion || selectedProperty || selectedDepartment) {
+            if (selectedRegion || selectedProperty || selectedDepartment || selectedPosition) {
                 var filterDesc = [];
                 if (selectedRegion) {
                     var regionOption = filterRegion.options[filterRegion.selectedIndex];
@@ -408,6 +408,9 @@
                 }
                 if (selectedDepartment) {
                     filterDesc.push('phòng ban "' + selectedDepartment + '"');
+                }
+                if (selectedPosition) {
+                    filterDesc.push('chức danh "' + selectedPosition + '"');
                 }
                 totalText.textContent = totalCount + ' người thuộc ' + filterDesc.join(', ');
             } else {
