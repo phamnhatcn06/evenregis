@@ -847,6 +847,139 @@ class CompetitionRegistrationsController extends AdminController
         ));
     }
 
+    public function actionExportExcel()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        $competitionId = Yii::app()->request->getQuery('competition_id');
+        $filterRegionId = Yii::app()->request->getQuery('region_id');
+        $filterProperty = Yii::app()->request->getQuery('property');
+        $filterPosition = Yii::app()->request->getQuery('position');
+
+        $compRegs = CompetitionRegistrations::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'competition_id' => $competitionId,
+            'per_page' => 5000,
+        ), 5000)->getData();
+
+        $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
+        $regionalMap = array();
+        foreach ($regionals as $r) {
+            $regionalMap[$r->id] = $r->name;
+        }
+
+        $properties = Properties::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $propertyRegionMap = array();
+        $propertyNameMap = array();
+        foreach ($properties as $p) {
+            $propertyRegionMap[$p->id] = isset($p->region_id) ? $p->region_id : null;
+            $propertyNameMap[$p->id] = $p->name;
+        }
+
+        // Lấy tên cuộc thi
+        $competitionName = '';
+        $competition = Competitions::fetchFromApi($competitionId);
+        if ($competition) {
+            $competitionName = $competition->name;
+        }
+
+        // Chuẩn bị data
+        $rows = array();
+        foreach ($compRegs as $compReg) {
+            if (isset($compReg->deleted_at) && $compReg->deleted_at) continue;
+
+            $propId = null;
+            $propName = '';
+            $regionId = null;
+            $regionName = '';
+            $attendeeName = '-';
+            $attendeePosition = '';
+
+            if (isset($compReg->attendee) && is_array($compReg->attendee)) {
+                $att = $compReg->attendee;
+                $attendeeName = isset($att['full_name']) ? $att['full_name'] : '-';
+                if (isset($att['position']) && is_array($att['position'])) {
+                    $attendeePosition = isset($att['position']['name']) ? $att['position']['name'] : '';
+                }
+                if (isset($att['property']) && is_array($att['property'])) {
+                    $propId = isset($att['property']['id']) ? $att['property']['id'] : null;
+                    $propName = isset($att['property']['name']) ? $att['property']['name'] : '';
+                    if (isset($att['property']['region']) && is_array($att['property']['region'])) {
+                        $regionId = isset($att['property']['region']['id']) ? $att['property']['region']['id'] : null;
+                        $regionName = isset($att['property']['region']['name']) ? $att['property']['region']['name'] : '';
+                    }
+                }
+            }
+
+            // Fallback
+            if (!$regionName && $propId && isset($propertyRegionMap[$propId])) {
+                $regId = $propertyRegionMap[$propId];
+                if ($regId && isset($regionalMap[$regId])) {
+                    $regionId = $regId;
+                    $regionName = $regionalMap[$regId];
+                }
+            }
+
+            // Apply filters
+            if ($filterRegionId && $regionId != $filterRegionId) continue;
+            if ($filterProperty && $propName != $filterProperty) continue;
+            if ($filterPosition && $attendeePosition != $filterPosition) continue;
+
+            $rows[] = array(
+                'region_name' => $regionName,
+                'property_name' => $propName,
+                'attendee_name' => $attendeeName,
+                'attendee_position' => $attendeePosition,
+            );
+        }
+
+        // Export Excel
+        Yii::import('application.extensions.phpexcel.PHPExcel');
+        $excel = new PHPExcel();
+        $sheet = $excel->getActiveSheet();
+        $sheet->setTitle('Danh sách thí sinh');
+
+        // Header
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'Cụm');
+        $sheet->setCellValue('C1', 'Đơn vị');
+        $sheet->setCellValue('D1', 'Họ tên');
+        $sheet->setCellValue('E1', 'Chức danh');
+
+        $headerStyle = array(
+            'font' => array('bold' => true),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'CCCCCC')),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+        );
+        $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+
+        // Data
+        $rowNum = 2;
+        $idx = 1;
+        foreach ($rows as $row) {
+            $sheet->setCellValue('A' . $rowNum, $idx++);
+            $sheet->setCellValue('B' . $rowNum, $row['region_name']);
+            $sheet->setCellValue('C' . $rowNum, $row['property_name']);
+            $sheet->setCellValue('D' . $rowNum, $row['attendee_name']);
+            $sheet->setCellValue('E' . $rowNum, $row['attendee_position']);
+            $rowNum++;
+        }
+
+        // Auto width
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Output
+        $filename = 'ThiSinh_' . preg_replace('/[^a-zA-Z0-9]/', '', $competitionName) . '_' . date('Ymd_His') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save('php://output');
+        Yii::app()->end();
+    }
+
     // Debug action - xem structure data từ API
     public function actionDebugData()
     {
