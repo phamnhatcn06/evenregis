@@ -926,7 +926,7 @@ class CompetitionRegistrationsController extends AdminController
             // Apply filters
             if ($filterRegionId && $regionId != $filterRegionId) continue;
             if ($filterProperty && $propName != $filterProperty) continue;
-            if ($filterPosition && $attendeePosition != $filterPosition) continue;
+            if ($filterPosition && mb_strtolower($attendeePosition, 'UTF-8') != mb_strtolower($filterPosition, 'UTF-8')) continue;
 
             $rows[] = array(
                 'region_name' => $regionName,
