@@ -48,6 +48,17 @@
                     <option value="">-- Chọn cụm trước --</option>
                 </select>
             </div>
+            <?php if (!empty($positionList)): ?>
+            <div class="col-auto d-flex align-items-center">
+                <label for="filter-position" class="form-label mb-0 me-2 text-nowrap fw-semibold">Chức danh:</label>
+                <select id="filter-position" class="form-select form-select-sm" style="min-width:180px;">
+                    <option value="">-- Tất cả --</option>
+                    <?php foreach ($positionList as $posName): ?>
+                        <option value="<?php echo CHtml::encode($posName); ?>"><?php echo CHtml::encode($posName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php endif; ?>
             <?php endif; ?>
         </div>
 
