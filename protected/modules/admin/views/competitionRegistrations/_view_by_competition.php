@@ -318,9 +318,12 @@
         });
     }
 
+    var filterPosition = document.getElementById('filter-position');
+
     function applyFilters() {
         var selectedRegion = filterRegion ? filterRegion.value : '';
         var selectedProperty = filterProperty ? filterProperty.value : '';
+        var selectedPosition = filterPosition ? filterPosition.value : '';
         var rows = document.querySelectorAll('.contestant-row');
         var regionBlocks = document.querySelectorAll('.region-block');
         var idx = 1;
@@ -328,10 +331,12 @@
         rows.forEach(function(row) {
             var rowRegion = row.getAttribute('data-region-id');
             var rowProperty = row.getAttribute('data-property');
+            var rowPosition = row.getAttribute('data-position') || '';
             var matchRegion = !selectedRegion || rowRegion === selectedRegion;
             var matchProperty = !selectedProperty || rowProperty === selectedProperty;
+            var matchPosition = !selectedPosition || rowPosition === selectedPosition;
 
-            if (matchRegion && matchProperty) {
+            if (matchRegion && matchProperty && matchPosition) {
                 row.style.display = '';
                 var idxCol = row.querySelector('.row-index');
                 if (idxCol) { idxCol.textContent = idx++; }
@@ -356,7 +361,7 @@
         var totalCount = idx - 1;
         var totalText = document.getElementById('total-contestants-text');
         if (totalText) {
-            if (selectedRegion || selectedProperty) {
+            if (selectedRegion || selectedProperty || selectedPosition) {
                 var filterDesc = [];
                 if (selectedRegion) {
                     var regionOption = filterRegion.options[filterRegion.selectedIndex];
@@ -364,6 +369,9 @@
                 }
                 if (selectedProperty) {
                     filterDesc.push('đơn vị "' + selectedProperty + '"');
+                }
+                if (selectedPosition) {
+                    filterDesc.push('chức danh "' + selectedPosition + '"');
                 }
                 totalText.textContent = totalCount + ' người thuộc ' + filterDesc.join(', ');
             } else {
@@ -381,6 +389,10 @@
 
     if (filterProperty) {
         filterProperty.addEventListener('change', applyFilters);
+    }
+
+    if (filterPosition) {
+        filterPosition.addEventListener('change', applyFilters);
     }
 
     var filterChangeCompetition = document.getElementById('filter-change-competition');
