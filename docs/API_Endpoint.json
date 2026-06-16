@@ -77,7 +77,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Property Name\",\n    \"smile_code\": \"S01\",\n    \"active_date\": \"2026-01-01\",\n    \"status\": 1,\n    \"prefix\": \"PR\",\n    \"region_id\": 1,\n    \"code\": \"PROP01\",\n    \"auth_email\": \"admin@example.com\"\n}",
+                            "raw": "{\n    \"name\": \"Property Name\",\n    \"smile_code\": \"S01\",\n    \"active_date\": \"2026-01-01\",\n    \"status\": 1,\n    \"has_golf\": 0,\n    \"prefix\": \"PR\",\n    \"region_id\": 1,\n    \"code\": \"PROP01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -142,7 +142,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Property Name\",\n    \"smile_code\": \"S01\",\n    \"active_date\": \"2026-01-01\",\n    \"status\": 1,\n    \"prefix\": \"PR\",\n    \"region_id\": 1,\n    \"code\": \"PROP01\",\n    \"auth_email\": \"admin@example.com\"\n}",
+                            "raw": "{\n    \"name\": \"Property Name\",\n    \"smile_code\": \"S01\",\n    \"active_date\": \"2026-01-01\",\n    \"status\": 1,\n    \"has_golf\": 0,\n    \"prefix\": \"PR\",\n    \"region_id\": 1,\n    \"code\": \"PROP01\",\n    \"auth_email\": \"admin@example.com\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1993,7 +1993,7 @@
                                             "value": "1"
                                         },
                                         {
-                                            "key": "competition_id",
+                                            "key": "contest_id",
                                             "value": "",
                                             "disabled": true
                                         }
@@ -3671,6 +3671,49 @@
                             "response": []
                         },
                         {
+                            "name": "Get List By Property",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/competition-registrations/list-by-property?property_id=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "competition-registrations",
+                                        "list-by-property"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "property_id",
+                                            "value": "1",
+                                            "description": "ID của khách sạn/đơn vị cần lọc dữ liệu"
+                                        },
+                                        {
+                                            "key": "event_id",
+                                            "value": "1",
+                                            "description": "(Tuỳ chọn) ID của sự kiện (ví dụ 1 là Đại hội)"
+                                        },
+                                        {
+                                            "key": "competition_id",
+                                            "value": "1",
+                                            "description": "(Tuỳ chọn) ID của chuyên môn thi"
+                                        }
+                                    ]
+                                },
+                                "description": "Lấy danh sách các đăng ký thi nghiệp vụ (competition) của một đơn vị cụ thể"
+                            },
+                            "response": []
+                        },
+                        {
                             "name": "Create",
                             "request": {
                                 "method": "POST",
@@ -4200,6 +4243,468 @@
                                         "1",
                                         "1"
                                     ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Competition Team",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [
+                                        {
+                                            "key": "cache-control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "content-type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-limit",
+                                            "value": "2000"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-remaining",
+                                            "value": "1967"
+                                        },
+                                        {
+                                            "key": "access-control-allow-origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "code": 401,
+                                    "body": "{\"code\":401,\"message\":\"Token kh\\u00f4ng t\\u1ed3n t\\u1ea1i, vui l\\u00f2ng nh\\u1eadp token!\",\"data\":null}",
+                                    "name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams/store",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams/store"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"competition_id\":5,\"registration_id\":16,\"candidate_number\":\"aqeticikt\",\"team_name\":\"ph\",\"captain_id\":7,\"status\":\"1\",\"registered_at\":\"2026-06-16T10:47:06\",\"confirmed_by\":11,\"confirmed_at\":\"2026-06-16T10:47:06\",\"note\":\"explicabo\"}"
+                                },
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams/detail/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams/detail/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "laboriosam",
+                                            "description": "The ID of the detail."
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [
+                                        {
+                                            "key": "cache-control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "content-type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-limit",
+                                            "value": "2000"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-remaining",
+                                            "value": "1966"
+                                        },
+                                        {
+                                            "key": "access-control-allow-origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "code": 401,
+                                    "body": "{\"code\":401,\"message\":\"Token kh\\u00f4ng t\\u1ed3n t\\u1ea1i, vui l\\u00f2ng nh\\u1eadp token!\",\"data\":null}",
+                                    "name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams/update/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams/update/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "repellat",
+                                            "description": "The ID of the update."
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"competition_id\":17,\"registration_id\":3,\"candidate_number\":\"tackcjgrrkjxlkmiihwu\",\"team_name\":\"ucdjrmbjvrvprjzfyckqslwc\",\"captain_id\":1,\"status\":\"2\",\"registered_at\":\"2026-06-16T10:47:06\",\"confirmed_by\":4,\"confirmed_at\":\"2026-06-16T10:47:06\",\"note\":\"consequatur\"}"
+                                },
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams/destroy/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams/destroy/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "dolores",
+                                            "description": "The ID of the destroy."
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Competition Team Member",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [
+                                        {
+                                            "key": "cache-control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "content-type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-limit",
+                                            "value": "2000"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-remaining",
+                                            "value": "1965"
+                                        },
+                                        {
+                                            "key": "access-control-allow-origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "code": 401,
+                                    "body": "{\"code\":401,\"message\":\"Token kh\\u00f4ng t\\u1ed3n t\\u1ea1i, vui l\\u00f2ng nh\\u1eadp token!\",\"data\":null}",
+                                    "name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members/store",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members/store"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"team_id\":1,\"attendee_id\":6,\"role\":\"cqtimsc\",\"is_captain\":\"1\",\"sort_order\":18}"
+                                },
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members/detail/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members/detail/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "esse",
+                                            "description": "The ID of the detail."
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [
+                                        {
+                                            "key": "cache-control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "content-type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-limit",
+                                            "value": "2000"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-remaining",
+                                            "value": "1964"
+                                        },
+                                        {
+                                            "key": "access-control-allow-origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "code": 401,
+                                    "body": "{\"code\":401,\"message\":\"Token kh\\u00f4ng t\\u1ed3n t\\u1ea1i, vui l\\u00f2ng nh\\u1eadp token!\",\"data\":null}",
+                                    "name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members/update/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members/update/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "doloribus",
+                                            "description": "The ID of the update."
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"team_id\":20,\"attendee_id\":17,\"role\":\"do\",\"is_captain\":\"0\",\"sort_order\":10}"
+                                },
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members/destroy/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members/destroy/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "aperiam",
+                                            "description": "The ID of the destroy."
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
                                 }
                             },
                             "response": []
@@ -7307,7 +7812,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"registration_id\": 1,\n    \"event_id\": 1,\n    \"requester_org_id\": 1,\n    \"target_org_id\": 2,\n    \"event_content_id\": 1,\n    \"requested_by\": 1,\n    \"note\": \"Alliance request note\",\n    \"auth_email\": \"admin@example.com\"\n}"
+                                    "raw": "{\n    \"registration_id\": 1,\n    \"event_id\": 1,\n    \"requester_org_id\": 1,\n    \"target_org_id\": 2,\n    \"target_registration_id\": \"\",\n    \"event_content_id\": 1,\n    \"requested_by\": \"user_name\",\n    \"note\": \"Alliance request note\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/alliance-requests/store",
@@ -7356,7 +7861,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"registration_id\": 1,\n    \"status\": 2,\n    \"reviewed_by\": 1,\n    \"rejection_reason\": \"\",\n    \"note\": \"Approved alliance\",\n    \"auth_email\": \"admin@example.com\"\n}"
+                                    "raw": "{\n    \"registration_id\": 1,\n    \"status\": 2,\n    \"reviewed_by\": \"admin_name\",\n    \"rejection_reason\": \"\",\n    \"target_registration_id\": \"\",\n    \"note\": \"Approved alliance\",\n    \"auth_email\": \"admin@example.com\"\n}"
                                 },
                                 "url": {
                                     "raw": "{{base_url}}/api/alliance-requests/update/1",
@@ -7608,6 +8113,54 @@
                                             "value": "2026-01-01 17:00:00",
                                             "type": "text",
                                             "description": "Ngày hết hạn hợp đồng"
+                                        },
+                                        {
+                                            "key": "gender",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "0: Nam, 1: Nữ, 2: Khác"
+                                        },
+                                        {
+                                            "key": "id_card",
+                                            "value": "012345678912",
+                                            "description": "CMND/CCCD/Passport",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "staff_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã nhân viên (đồng bộ từ staffs nếu không có, hoặc thêm mới nếu nhập tay)"
+                                        },
+                                        {
+                                            "key": "position_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã chức vụ"
+                                        },
+                                        {
+                                            "key": "position_name",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Tên chức vụ"
+                                        },
+                                        {
+                                            "key": "department_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã phòng ban"
+                                        },
+                                        {
+                                            "key": "department_name",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Tên phòng ban"
+                                        },
+                                        {
+                                            "key": "end_starting_date",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Ngày kết thúc thử việc"
                                         }
                                     ]
                                 },
@@ -7793,6 +8346,54 @@
                                             "value": "2026-01-01 17:00:00",
                                             "type": "text",
                                             "description": "Ngày hết hạn hợp đồng"
+                                        },
+                                        {
+                                            "key": "gender",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "0: Nam, 1: Nữ, 2: Khác"
+                                        },
+                                        {
+                                            "key": "id_card",
+                                            "value": "012345678912",
+                                            "description": "CMND/CCCD/Passport",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "staff_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã nhân viên (đồng bộ từ staffs nếu không có, hoặc thêm mới nếu nhập tay)"
+                                        },
+                                        {
+                                            "key": "position_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã chức vụ"
+                                        },
+                                        {
+                                            "key": "position_name",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Tên chức vụ"
+                                        },
+                                        {
+                                            "key": "department_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã phòng ban"
+                                        },
+                                        {
+                                            "key": "department_name",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Tên phòng ban"
+                                        },
+                                        {
+                                            "key": "end_starting_date",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Ngày kết thúc thử việc"
                                         }
                                     ]
                                 },
@@ -10305,6 +10906,38 @@
                     "name": "Sport Team",
                     "item": [
                         {
+                            "name": "Get List By Property",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/sport-teams/list-by-property?property_id=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "sport-teams",
+                                        "list-by-property"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "property_id",
+                                            "value": "1",
+                                            "description": "ID of the property"
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
                             "name": "Get List",
                             "request": {
                                 "method": "GET",
@@ -10371,7 +11004,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"registration_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"registration_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"alliance_org_ids\": \"\",\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"
@@ -10436,7 +11069,7 @@
                                 ],
                                 "body": {
                                     "mode": "raw",
-                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"registration_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "raw": "{\n    \"name\": \"Team Mường Thanh Luxury\",\n    \"short_name\": \"MTL\",\n    \"event_id\": 1,\n    \"registration_id\": 1,\n    \"property_id\": 1,\n    \"sport_id\": 1,\n    \"is_alliance\": 0,\n    \"alliance_org_ids\": \"\",\n    \"is_alliance_team\": 0,\n    \"color\": \"#FF0000\",\n    \"is_active\": 1,\n    \"auth_email\": \"admin@example.com\"\n}",
                                     "options": {
                                         "raw": {
                                             "language": "json"

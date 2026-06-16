@@ -541,15 +541,37 @@ class CompetitionRegistrationsController extends AdminController
             $regId = isset($compReg->registration_id) ? $compReg->registration_id : null;
             if (!$regId) continue;
 
-            $propId = isset($compReg->property_id) ? $compReg->property_id : null;
-            if (!$propId && isset($compReg->attendee)) {
+            // Lấy property_id từ nhiều nguồn
+            $propId = null;
+
+            // 1. Từ attendee.property_id hoặc attendee.property.id
+            if (isset($compReg->attendee)) {
                 $att = $compReg->attendee;
                 if (is_array($att)) {
-                    $propId = isset($att['property_id']) ? $att['property_id'] : null;
+                    if (isset($att['property_id'])) {
+                        $propId = $att['property_id'];
+                    } elseif (isset($att['property']['id'])) {
+                        $propId = $att['property']['id'];
+                    }
                 } else {
-                    $propId = isset($att->property_id) ? $att->property_id : null;
+                    if (isset($att->property_id)) {
+                        $propId = $att->property_id;
+                    } elseif (isset($att->property->id)) {
+                        $propId = $att->property->id;
+                    }
                 }
             }
+
+            // 2. Từ registration.property_id
+            if (!$propId && isset($compReg->registration)) {
+                $reg = $compReg->registration;
+                if (is_array($reg)) {
+                    $propId = isset($reg['property_id']) ? $reg['property_id'] : null;
+                } else {
+                    $propId = isset($reg->property_id) ? $reg->property_id : null;
+                }
+            }
+
             if ($propId) {
                 if (!isset($regIdToPropertyIds[$regId])) {
                     $regIdToPropertyIds[$regId] = array();
