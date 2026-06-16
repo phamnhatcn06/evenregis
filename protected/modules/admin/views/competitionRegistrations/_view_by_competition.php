@@ -361,7 +361,7 @@
                 if (selectedProperty) {
                     filterDesc.push('đơn vị "' + selectedProperty + '"');
                 }
-                totalText.textContent = totalCount + ' thí sinh thuộc ' + filterDesc.join(', ');
+                totalText.textContent = totalCount + ' đội thuộc ' + filterDesc.join(', ');
             } else {
                 totalText.textContent = totalText.getAttribute('data-original');
             }
