@@ -808,6 +808,11 @@ class CompetitionRegistrationsController extends AdminController
         }
 
         foreach ($contestantsByRegion as &$region) {
+            foreach ($region['properties'] as &$prop) {
+                // Convert contestants từ associative sang indexed array
+                $prop['contestants'] = array_values($prop['contestants']);
+            }
+            unset($prop);
             // Sắp xếp các đơn vị trong cụm theo bảng chữ cái
             usort($region['properties'], function ($a, $b) {
                 return strnatcasecmp($a['property_name'], $b['property_name']);
