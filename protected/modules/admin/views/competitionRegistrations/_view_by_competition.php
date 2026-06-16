@@ -339,7 +339,7 @@
             var rowPosition = row.getAttribute('data-position') || '';
             var matchRegion = !selectedRegion || rowRegion === selectedRegion;
             var matchProperty = !selectedProperty || rowProperty === selectedProperty;
-            var matchPosition = !selectedPosition || rowPosition === selectedPosition;
+            var matchPosition = !selectedPosition || rowPosition.toLowerCase() === selectedPosition.toLowerCase();
 
             if (matchRegion && matchProperty && matchPosition) {
                 row.style.display = '';
