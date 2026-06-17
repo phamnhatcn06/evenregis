@@ -232,6 +232,9 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
             <div class="card border shadow-sm mt-4">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fa fa-futbol-o me-2 text-success"></i>Số lượng VĐV theo môn thể thao</h5>
+                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportStats', array('event_id' => $selectedEventId)); ?>" class="btn btn-success btn-sm">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất Excel
+                    </a>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
