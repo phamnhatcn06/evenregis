@@ -846,7 +846,7 @@ class SportTeamsController extends AdminController
             $memberList[] = array(
                 'name' => isset($m['attendee_name']) ? $m['attendee_name'] : (isset($m['name']) ? $m['name'] : ''),
                 'gender' => $genderRaw,
-                'photo_path' => isset($m['attendee_photo']) ? $m['attendee_photo'] : '',
+                'photo_path' => isset($m['photo_path']) ? $m['photo_path'] : '',
                 'position' => isset($m['attendee_position']) ? $m['attendee_position'] : '',
                 'property_name' => isset($m['property_name']) ? $m['property_name'] : '',
             );
