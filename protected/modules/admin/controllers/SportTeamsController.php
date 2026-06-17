@@ -690,7 +690,7 @@ class SportTeamsController extends AdminController
         $teams = SportTeams::getApiDataProvider(array(
             'event_id' => $eventId,
             'sport_id' => $sportId,
-        ), 500)->getData();
+        ), 5000)->getData();
 
         // Lấy danh sách khu vực và property để map
         $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
@@ -842,11 +842,11 @@ class SportTeamsController extends AdminController
 
         $memberList = array();
         foreach ($model->members as $m) {
-            $gender = isset($m['attendee_gender']) ? $m['attendee_gender'] : (isset($m['gender']) ? $m['gender'] : '');
+            $genderRaw = isset($m['gender']) ? $m['gender'] : null;
             $memberList[] = array(
                 'name' => isset($m['attendee_name']) ? $m['attendee_name'] : (isset($m['name']) ? $m['name'] : ''),
-                'gender' => $gender,
-                'photo_path' => isset($m['photo_path']) ? $m['photo_path'] : '',
+                'gender' => $genderRaw,
+                'photo_path' => isset($m['attendee_photo']) ? $m['attendee_photo'] : '',
                 'position' => isset($m['attendee_position']) ? $m['attendee_position'] : '',
                 'property_name' => isset($m['property_name']) ? $m['property_name'] : '',
             );
