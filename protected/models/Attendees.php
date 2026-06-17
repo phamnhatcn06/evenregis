@@ -272,7 +272,6 @@ class Attendees extends BaseAttendees
         if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
             $data['start_date'] = $this->join_hotel_date;
         }
-
         $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
         return ApiClient::post($url, $data);
     }

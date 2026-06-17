@@ -771,4 +771,109 @@ class ReportAttendeeStatsController extends AdminController
         $writer->save('php://output');
         Yii::app()->end();
     }
+
+    /**
+     * Xuất Excel số lượng VĐV theo môn thể thao
+     */
+    public function actionExportSportStats()
+    {
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $eventId = Yii::app()->request->getParam('event_id');
+
+        $user = AuthHandler::getUser();
+        $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+        $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
+        $userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+        $reportData = $this->buildReport($eventId, $isHO, $userPropertyId);
+        $sportStats = isset($reportData['sportStats']) ? $reportData['sportStats'] : array();
+
+        Yii::import('application.extensions.phpexcel.PHPExcel');
+
+        $excel = new PHPExcel();
+        $sheet = $excel->getActiveSheet();
+        $sheet->setTitle('VĐV theo môn TT');
+
+        // Header
+        $sheet->setCellValue('A1', 'Số lượng VĐV theo môn thể thao');
+        $sheet->mergeCells('A1:C1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+        // Column headers
+        $sheet->setCellValue('A3', 'STT');
+        $sheet->setCellValue('B3', 'Môn thể thao');
+        $sheet->setCellValue('C3', 'Số lượng VĐV');
+
+        $headerStyle = array(
+            'font' => array('bold' => true),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '10B981')),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+        );
+        $sheet->getStyle('A3:C3')->applyFromArray($headerStyle);
+
+        $row = 4;
+        $stt = 1;
+        $totalAthletes = 0;
+
+        foreach ($sportStats as $sport) {
+            if ($sport['total_athletes'] == 0) continue;
+
+            $children = isset($sport['children']) ? $sport['children'] : array();
+            $activeChildren = array_filter($children, function ($c) {
+                return $c['total_athletes'] > 0;
+            });
+
+            // Parent row
+            $sheet->setCellValue('A' . $row, $stt++);
+            $sheet->setCellValue('B' . $row, $sport['sport_name']);
+            $sheet->setCellValue('C' . $row, $sport['total_athletes']);
+            $sheet->getStyle('A' . $row . ':C' . $row)->getFont()->setBold(true);
+            $sheet->getStyle('A' . $row . ':C' . $row)->getFill()
+                ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('F3F4F6');
+            $row++;
+
+            // Children rows
+            foreach ($activeChildren as $child) {
+                $sheet->setCellValue('A' . $row, '');
+                $sheet->setCellValue('B' . $row, '    └ ' . $child['sport_name']);
+                $sheet->setCellValue('C' . $row, $child['total_athletes']);
+                $row++;
+            }
+
+            // Tính tổng
+            if (!empty($activeChildren)) {
+                foreach ($activeChildren as $c) {
+                    $totalAthletes += $c['total_athletes'];
+                }
+            } else {
+                $totalAthletes += $sport['total_athletes'];
+            }
+        }
+
+        // Total row
+        $sheet->setCellValue('A' . $row, '');
+        $sheet->setCellValue('B' . $row, 'TỔNG CỘNG (lượt đăng ký)');
+        $sheet->setCellValue('C' . $row, $totalAthletes);
+        $sheet->getStyle('A' . $row . ':C' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $row . ':C' . $row)->getFill()
+            ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+            ->getStartColor()->setRGB('FEF3C7');
+
+        // Auto size columns
+        foreach (range('A', 'C') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Output
+        $filename = 'so_luong_vdv_theo_mon_the_thao.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save('php://output');
+        Yii::app()->end();
+    }
 }
