@@ -53,7 +53,7 @@ class SportTeamsController extends AdminController
             );
         }
 
-        // 2. Fetch registrations for checking deleted status
+        // 2. Fetch registrations for checking deleted status and not draft
         $registrationsRes = Registrations::getApiDataProvider(array(
             'event_id' => $eventId,
             'per_page' => 1000,
@@ -62,6 +62,10 @@ class SportTeamsController extends AdminController
         $activeRegsMap = array();
         foreach ($registrationsRes as $reg) {
             if (isset($reg->deleted_at) && $reg->deleted_at !== null && $reg->deleted_at !== '') {
+                continue;
+            }
+            $status = isset($reg->status) ? (int)$reg->status : 0;
+            if ($status === Registrations::STATUS_DRAFT) {
                 continue;
             }
             $activeRegsMap[$reg->id] = true;
