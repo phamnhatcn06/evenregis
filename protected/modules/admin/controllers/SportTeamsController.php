@@ -842,9 +842,10 @@ class SportTeamsController extends AdminController
 
         $memberList = array();
         foreach ($model->members as $m) {
+            $gender = isset($m['attendee_gender']) ? $m['attendee_gender'] : (isset($m['gender']) ? $m['gender'] : '');
             $memberList[] = array(
                 'name' => isset($m['attendee_name']) ? $m['attendee_name'] : (isset($m['name']) ? $m['name'] : ''),
-                'gender' => isset($m['gender']) ? $m['gender'] : '',
+                'gender' => $gender,
                 'position' => isset($m['attendee_position']) ? $m['attendee_position'] : '',
                 'property_name' => isset($m['property_name']) ? $m['property_name'] : '',
             );
