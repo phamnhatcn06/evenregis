@@ -99,7 +99,23 @@ class SportTeamsController extends AdminController
             }
         }
 
-        // 4. Fetch sport team members
+        // 4. Fetch valid attendees (not deleted, belongs to active registration)
+        $validAttendeeIds = array();
+        $attParams = array('event_id' => $eventId, 'per_page' => 5000);
+        $rawAttendees = Attendees::getApiDataProvider($attParams, 5000)->getData();
+        foreach ($rawAttendees as $att) {
+            $attDeletedAt = isset($att->deleted_at) ? $att->deleted_at : null;
+            if ($attDeletedAt) continue;
+            $regId = isset($att->registration_id) ? $att->registration_id : null;
+            if ($regId && isset($activeRegsMap[$regId])) {
+                $attId = isset($att->id) ? $att->id : null;
+                if ($attId) {
+                    $validAttendeeIds[$attId] = true;
+                }
+            }
+        }
+
+        // 5. Fetch sport team members
         $membersRes = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'event_id' => $eventId,
             'per_page' => 5000,
@@ -113,6 +129,10 @@ class SportTeamsController extends AdminController
                     $teamId = isset($member['sport_team_id']) ? $member['sport_team_id'] : null;
                     $attendeeId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
                     if (!$teamId || !$attendeeId || !isset($activeTeamsMap[$teamId])) {
+                        continue;
+                    }
+                    // Chỉ đếm attendee hợp lệ (không bị xóa, thuộc registration active)
+                    if (!isset($validAttendeeIds[$attendeeId])) {
                         continue;
                     }
 
