@@ -8,7 +8,7 @@ $this->Tabletitle = 'Phê duyệt đăng ký';
 
 // Column config chung cho cả 3 bảng
 $baseColumns = array(
-    array('name' => 'id', 'header' => 'ID', 'width' => '60px', 'filter' => false),
+    array('name' => 'id', 'header' => 'ID', 'width' => '60px'),
     array(
         'name' => 'event_id',
         'header' => 'Sự kiện',
@@ -41,7 +41,6 @@ $baseColumns = array(
         'name' => 'status',
         'header' => 'Trạng thái',
         'type' => 'raw',
-        'filter' => false,
         'value' => function ($data) {
             return Registrations::getStatusLabel($data->status);
         }
