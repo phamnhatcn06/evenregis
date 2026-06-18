@@ -294,7 +294,12 @@ Yii::app()->clientScript->registerScript('filter-select2-init', "
 $('#filter-property').select2({
     placeholder: '-- Tất cả --',
     allowClear: true,
-    width: '100%'
+    width: '100%',
+    minimumResultsForSearch: 0,
+    language: {
+        noResults: function() { return 'Không tìm thấy'; },
+        searching: function() { return 'Đang tìm...'; }
+    }
 });
 ", CClientScript::POS_END);
 
