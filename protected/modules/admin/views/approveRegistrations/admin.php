@@ -287,8 +287,8 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
 </div>
 
 <?php
-Yii::app()->clientScript->registerCssFile('https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css');
-Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', CClientScript::POS_END);
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
 
 Yii::app()->clientScript->registerScript('filter-select2-init', "
 $('#filter-property').select2({
