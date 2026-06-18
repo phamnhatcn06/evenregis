@@ -65,6 +65,11 @@ class Attendees extends BaseAttendees
         $labels['transport_name'] = Yii::t('app', 'Tên phương tiện');
         $labels['gender'] = Yii::t('app', 'Giới tính');
         $labels['id_card'] = Yii::t('app', 'Số CCCD/CMND');
+        $labels['position_code'] = Yii::t('app', 'Mã chức danh');
+        $labels['position_name'] = Yii::t('app', 'Tên chức danh');
+        $labels['department_code'] = Yii::t('app', 'Mã phòng ban');
+        $labels['department_name'] = Yii::t('app', 'Tên phòng ban');
+        $labels['end_starting_date'] = Yii::t('app', 'Ngày kết thúc thử việc');
         return $labels;
     }
 
