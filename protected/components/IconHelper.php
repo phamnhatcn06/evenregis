@@ -107,6 +107,8 @@ class IconHelper
         $svg = self::$_icons[$name];
         $svg = str_replace('{class}', $class, $svg);
         $svg = str_replace('{size}', $size, $svg);
+        // Add inline style for visibility
+        $svg = str_replace('<svg ', '<svg style="pointer-events:none;" ', $svg);
         return $svg;
     }
 

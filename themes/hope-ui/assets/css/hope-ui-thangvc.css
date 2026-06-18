@@ -27435,3 +27435,80 @@ panel-title {
     border-radius: 3px;
   }
 }
+
+.icon-10 {
+  height: 0.625rem;
+  width: 0.625rem;
+}
+
+.icon-14 {
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+.icon-16 {
+  height: 1rem;
+  width: 1rem;
+}
+
+.icon-18 {
+  height: 1.125rem;
+  width: 1.125rem;
+}
+
+.icon-20 {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+.icon-22 {
+  height: 1.375rem;
+  width: 1.375rem;
+}
+
+.icon-24 {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.icon-30 {
+  height: 1.875rem;
+  width: 1.875rem;
+}
+
+.icon-32 {
+  height: 2rem;
+  width: 2rem;
+}
+
+.icon-35 {
+  height: 2.1875rem;
+  width: 2.1875rem;
+}
+
+.icon-40 {
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.icon-44 {
+  height: 2.75rem;
+  width: 2.75rem;
+}
+
+/* SVG Icon Action Buttons - Fix color */
+.btn svg {
+  color: inherit;
+}
+
+.btn-info svg,
+.btn-danger svg,
+.btn-primary svg,
+.btn-success svg,
+.btn-secondary svg {
+  color: #fff;
+}
+
+.btn-warning svg {
+  color: #212529;
+}
