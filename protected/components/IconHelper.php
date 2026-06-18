@@ -99,7 +99,7 @@ class IconHelper
      * @param int $size Icon size (default: 20)
      * @return string
      */
-    public static function render($name, $class = 'icon-20', $size = 20)
+    public static function render($name, $class = 'icon-20', $size = 20, $color = '#fff')
     {
         if (!isset(self::$_icons[$name])) {
             return '';
@@ -107,8 +107,7 @@ class IconHelper
         $svg = self::$_icons[$name];
         $svg = str_replace('{class}', $class, $svg);
         $svg = str_replace('{size}', $size, $svg);
-        // Add inline style for visibility
-        $svg = str_replace('<svg ', '<svg style="pointer-events:none;" ', $svg);
+        $svg = str_replace('currentColor', $color, $svg);
         return $svg;
     }
 
