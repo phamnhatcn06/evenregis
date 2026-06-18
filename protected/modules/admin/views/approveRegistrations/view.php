@@ -182,7 +182,14 @@ $attributes = array(
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo CHtml::encode($fullName); ?></td>
-                                <td><?php echo CHtml::encode($position); ?></td>
+                                <td>
+                                    <?php
+                                    $posDetails = array();
+                                    if ($divisionName) $posDetails[] = CHtml::encode($divisionName);
+                                    if ($positionName) $posDetails[] = CHtml::encode($positionName);
+                                    echo $posDetails ? implode(' - ', $posDetails) : '-';
+                                    ?>
+                                </td>
                                 <td>
                                     <?php if (!empty($roleName)): ?>
                                         <?php foreach (array_map('trim', explode(',', $roleName)) as $role): ?>
