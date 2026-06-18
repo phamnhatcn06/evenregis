@@ -18,6 +18,11 @@ class Attendees extends BaseAttendees
     public $property_code;
     public $role_name;
     public $staff_code;
+    public $position_code;
+    public $position_name;
+    public $department_code;
+    public $department_name;
+    public $end_starting_date;
     public $join_hotel_date;
     public $check_in_date;
     public $check_out_date;
