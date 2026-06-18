@@ -799,3 +799,23 @@ a.label.btn {
     margin-bottom: 8px;
   }
 }
+
+/* ========================================
+   SVG Icon Action Buttons - Fix color
+   ======================================== */
+.btn svg {
+  color: inherit;
+}
+
+.btn-info svg,
+.btn-warning svg,
+.btn-danger svg,
+.btn-primary svg,
+.btn-success svg,
+.btn-secondary svg {
+  color: #fff;
+}
+
+.btn-warning svg {
+  color: #212529;
+}
