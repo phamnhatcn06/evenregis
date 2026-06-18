@@ -170,6 +170,29 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
 }
 </style>
 
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" action="<?php echo Yii::app()->createUrl('/admin/approveRegistrations/admin'); ?>" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Sự kiện</label>
+                <?php echo CHtml::dropDownList('event_id', $filterEventId, $eventList, array('class' => 'form-select', 'id' => 'filter-event')); ?>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Đơn vị</label>
+                <?php echo CHtml::dropDownList('property_id', $filterPropertyId, $propertyList, array('class' => 'form-select')); ?>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Đợt đăng ký</label>
+                <?php echo CHtml::dropDownList('period_id', $filterPeriodId, $periodList, array('class' => 'form-select', 'id' => 'filter-period')); ?>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-filter me-1"></i>Lọc</button>
+                <a href="<?php echo Yii::app()->createUrl('/admin/approveRegistrations/admin'); ?>" class="btn btn-outline-secondary"><i class="fa fa-refresh me-1"></i>Xóa lọc</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         <ul class="nav approval-tabs" id="approvalTabs" role="tablist">
