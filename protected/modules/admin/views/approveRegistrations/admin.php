@@ -233,7 +233,7 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
                     'id' => 'submitted-grid',
                     'dataProvider' => $dpSubmitted,
                     'language' => 'vi',
-                    'filter' => true,
+                    'filter' => false,
                     'columns' => $columnsSubmitted,
                     'options' => array(
                         'pageLength' => 25,
@@ -252,7 +252,7 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
                     'id' => 'rejected-grid',
                     'dataProvider' => $dpRejected,
                     'language' => 'vi',
-                    'filter' => true,
+                    'filter' => false,
                     'columns' => $columnsRejected,
                     'options' => array(
                         'pageLength' => 25,
@@ -271,7 +271,7 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
                     'id' => 'approved-grid',
                     'dataProvider' => $dpApproved,
                     'language' => 'vi',
-                    'filter' => true,
+                    'filter' => false,
                     'columns' => $columnsApproved,
                     'options' => array(
                         'pageLength' => 25,
@@ -285,3 +285,36 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
         </div>
     </div>
 </div>
+
+<?php
+Yii::app()->clientScript->registerScript('filter-period-load', "
+document.getElementById('filter-event').addEventListener('change', function() {
+    var eventId = this.value;
+    var periodSelect = document.getElementById('filter-period');
+    periodSelect.innerHTML = '<option value=\"\">-- Đang tải... --</option>';
+    if (!eventId) {
+        periodSelect.innerHTML = '<option value=\"\">-- Tất cả --</option>';
+        return;
+    }
+    fetch('" . Yii::app()->params['externalApiUrl'] . "/api/registration-periods?event_id=' + eventId, {
+        headers: { 'Authorization': 'Bearer " . Yii::app()->params['externalApiKey'] . "' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        periodSelect.innerHTML = '<option value=\"\">-- Tất cả --</option>';
+        var items = data.data || data;
+        if (Array.isArray(items)) {
+            items.forEach(function(p) {
+                var opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name;
+                periodSelect.appendChild(opt);
+            });
+        }
+    })
+    .catch(function() {
+        periodSelect.innerHTML = '<option value=\"\">-- Tất cả --</option>';
+    });
+});
+", CClientScript::POS_END);
+?>
