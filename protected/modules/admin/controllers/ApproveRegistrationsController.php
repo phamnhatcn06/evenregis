@@ -7,15 +7,53 @@ class ApproveRegistrationsController extends AdminController
      */
     public function actionAdmin()
     {
+        // Filter params từ GET
+        $filterEventId = Yii::app()->request->getQuery('event_id', '');
+        $filterPropertyId = Yii::app()->request->getQuery('property_id', '');
+        $filterPeriodId = Yii::app()->request->getQuery('period_id', '');
+
+        // Base params cho tất cả tabs
+        $baseParams = array();
+        if ($filterEventId) $baseParams['event_id'] = $filterEventId;
+        if ($filterPropertyId) $baseParams['property_id'] = $filterPropertyId;
+        if ($filterPeriodId) $baseParams['period_id'] = $filterPeriodId;
+
         // DataProvider cho từng tab
-        $dpSubmitted = Registrations::getApiDataProvider(array('status' => Registrations::STATUS_SUBMITTED));
-        $dpRejected = Registrations::getApiDataProvider(array('status' => Registrations::STATUS_REJECTED));
-        $dpApproved = Registrations::getApiDataProvider(array('status' => Registrations::STATUS_APPROVED));
+        $dpSubmitted = Registrations::getApiDataProvider(array_merge($baseParams, array('status' => Registrations::STATUS_SUBMITTED)));
+        $dpRejected = Registrations::getApiDataProvider(array_merge($baseParams, array('status' => Registrations::STATUS_REJECTED)));
+        $dpApproved = Registrations::getApiDataProvider(array_merge($baseParams, array('status' => Registrations::STATUS_APPROVED)));
 
         // Đếm số lượng
         $countSubmitted = $dpSubmitted->getTotalItemCount();
         $countRejected = $dpRejected->getTotalItemCount();
         $countApproved = $dpApproved->getTotalItemCount();
+
+        // Load dropdown data
+        $eventsData = Events::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        $eventList = array('' => '-- Tất cả --');
+        foreach ($eventsData as $e) {
+            $id = isset($e->id) ? $e->id : (isset($e['id']) ? $e['id'] : null);
+            $name = isset($e->name) ? $e->name : (isset($e['name']) ? $e['name'] : '');
+            if ($id) $eventList[$id] = $name;
+        }
+
+        $propertiesData = Properties::getApiDataProvider(array(), 500)->getData();
+        $propertyList = array('' => '-- Tất cả --');
+        foreach ($propertiesData as $p) {
+            $id = isset($p->id) ? $p->id : (isset($p['id']) ? $p['id'] : null);
+            $name = isset($p->name) ? $p->name : (isset($p['name']) ? $p['name'] : '');
+            if ($id) $propertyList[$id] = $name;
+        }
+
+        $periodList = array('' => '-- Tất cả --');
+        if ($filterEventId) {
+            $periodsData = RegistrationPeriods::getApiDataProvider(array('event_id' => $filterEventId), 100)->getData();
+            foreach ($periodsData as $p) {
+                $id = isset($p->id) ? $p->id : (isset($p['id']) ? $p['id'] : null);
+                $name = isset($p->name) ? $p->name : (isset($p['name']) ? $p['name'] : '');
+                if ($id) $periodList[$id] = $name;
+            }
+        }
 
         $this->render('admin', array(
             'dpSubmitted' => $dpSubmitted,
@@ -24,6 +62,12 @@ class ApproveRegistrationsController extends AdminController
             'countSubmitted' => $countSubmitted,
             'countRejected' => $countRejected,
             'countApproved' => $countApproved,
+            'eventList' => $eventList,
+            'propertyList' => $propertyList,
+            'periodList' => $periodList,
+            'filterEventId' => $filterEventId,
+            'filterPropertyId' => $filterPropertyId,
+            'filterPeriodId' => $filterPeriodId,
         ));
     }
 
