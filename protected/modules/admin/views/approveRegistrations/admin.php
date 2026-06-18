@@ -287,6 +287,17 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
 </div>
 
 <?php
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
+
+Yii::app()->clientScript->registerScript('filter-select2-init', "
+$('#filter-property').select2({
+    placeholder: '-- Tất cả --',
+    allowClear: true,
+    width: '100%'
+});
+", CClientScript::POS_END);
+
 Yii::app()->clientScript->registerScript('filter-period-load', "
 document.getElementById('filter-event').addEventListener('change', function() {
     var eventId = this.value;
