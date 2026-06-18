@@ -272,7 +272,13 @@ class Attendees extends BaseAttendees
             'transport_id',
             'personal_email',
             'gender',
-            'id_card'
+            'id_card',
+            'staff_code',
+            'position_code',
+            'position_name',
+            'department_code',
+            'department_name',
+            'end_starting_date'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
