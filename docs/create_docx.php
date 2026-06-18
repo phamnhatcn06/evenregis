@@ -11,7 +11,7 @@ $content = <<<'XML'
 <w:p><w:r><w:t>• Số bàn thi đấu: 2 bàn</w:t></w:r></w:p>
 <w:p><w:r><w:t>• Thời lượng mỗi trận: 30 phút</w:t></w:r></w:p>
 <w:p><w:r><w:t>• Ngày 1: Chiều 13:30 - 17:30</w:t></w:r></w:p>
-<w:p><w:r><w:t>• Ngày 2: Sáng 7:30 - 11:30, Chiều 14:00 - 16:30</w:t></w:r></w:p>
+<w:p><w:r><w:t>• Ngày 2: Sáng 7:30 - 11:30, Chiều 14:00 - 17:30</w:t></w:r></w:p>
 
 <w:p><w:r><w:t></w:t></w:r></w:p>
 <w:p><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>NGÀY 1 - CHIỀU (13:30 - 17:30)</w:t></w:r></w:p>
@@ -32,7 +32,7 @@ $content = <<<'XML'
 </w:tbl>
 
 <w:p><w:r><w:t></w:t></w:r></w:p>
-<w:p><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>NGÀY 2 - SÁNG (7:30 - 11:00)</w:t></w:r></w:p>
+<w:p><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>NGÀY 2 - SÁNG (7:30 - 11:30)</w:t></w:r></w:p>
 
 <w:tbl>
 <w:tblPr><w:tblW w:w="9500" w:type="dxa"/><w:tblBorders>
@@ -49,16 +49,19 @@ $content = <<<'XML'
 </w:tbl>
 
 <w:p><w:r><w:t></w:t></w:r></w:p>
-<w:p><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>NGÀY 2 - CHIỀU - CHUNG KẾT (14:00 - 16:30)</w:t></w:r></w:p>
+<w:p><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>NGÀY 2 - CHIỀU - TRANH 3-4 &amp; CHUNG KẾT (14:00 - 17:30)</w:t></w:r></w:p>
 
 <w:tbl>
 <w:tblPr><w:tblW w:w="9500" w:type="dxa"/><w:tblBorders>
 <w:top w:val="single" w:sz="4"/><w:left w:val="single" w:sz="4"/><w:bottom w:val="single" w:sz="4"/><w:right w:val="single" w:sz="4"/><w:insideH w:val="single" w:sz="4"/><w:insideV w:val="single" w:sz="4"/>
 </w:tblBorders></w:tblPr>
-<w:tr><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Giờ</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Nội dung</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Trận</w:t></w:r></w:p></w:tc></w:tr>
-<w:tr><w:tc><w:p><w:r><w:t>14:00-14:30</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Đôi Nam CHUNG KẾT</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Thắng BK1 vs Thắng BK2</w:t></w:r></w:p></w:tc></w:tr>
-<w:tr><w:tc><w:p><w:r><w:t>15:00-15:30</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Đơn Nữ CHUNG KẾT</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Thắng BK1 vs Thắng BK2</w:t></w:r></w:p></w:tc></w:tr>
-<w:tr><w:tc><w:p><w:r><w:t>16:00-16:30</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Đơn Nam CHUNG KẾT</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Thắng BK1 vs Thắng BK2</w:t></w:r></w:p></w:tc></w:tr>
+<w:tr><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Giờ</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Bàn 1</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Bàn 2</w:t></w:r></w:p></w:tc></w:tr>
+<w:tr><w:tc><w:p><w:r><w:t>14:00-14:30</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Đơn Nam TRANH 3-4: Thua BK1 vs Thua BK2</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Đơn Nữ TRANH 3-4: Thua BK1 vs Thua BK2</w:t></w:r></w:p></w:tc></w:tr>
+<w:tr><w:tc><w:p><w:r><w:t>14:30-15:00</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Đôi Nam TRANH 3-4: Thua BK1 vs Thua BK2</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:i/></w:rPr><w:t>---</w:t></w:r></w:p></w:tc></w:tr>
+<w:tr><w:tc><w:p><w:r><w:rPr><w:i/></w:rPr><w:t>15:00-15:30</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:i/></w:rPr><w:t>--- Nghỉ giải lao ---</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:i/></w:rPr><w:t>--- Nghỉ giải lao ---</w:t></w:r></w:p></w:tc></w:tr>
+<w:tr><w:tc><w:p><w:r><w:t>15:30-16:00</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Đôi Nam CHUNG KẾT</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:i/></w:rPr><w:t>---</w:t></w:r></w:p></w:tc></w:tr>
+<w:tr><w:tc><w:p><w:r><w:t>16:00-16:30</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Đơn Nữ CHUNG KẾT</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:i/></w:rPr><w:t>---</w:t></w:r></w:p></w:tc></w:tr>
+<w:tr><w:tc><w:p><w:r><w:t>16:30-17:00</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Đơn Nam CHUNG KẾT</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr><w:i/></w:rPr><w:t>---</w:t></w:r></w:p></w:tc></w:tr>
 </w:tbl>
 
 <w:p><w:r><w:t></w:t></w:r></w:p>
@@ -68,8 +71,8 @@ $content = <<<'XML'
 
 <w:p><w:r><w:t></w:t></w:r></w:p>
 <w:p><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>GHI CHÚ</w:t></w:r></w:p>
-<w:p><w:r><w:t>1. Thi đấu song song 2 bàn, Đơn Nam và Đơn Nữ cùng khung giờ (không trùng VĐV).</w:t></w:r></w:p>
-<w:p><w:r><w:t>2. Nghỉ 30 phút giữa Tứ kết và Vòng bảng để VĐV tham gia nhiều nội dung có thời gian nghỉ.</w:t></w:r></w:p>
+<w:p><w:r><w:t>1. Thi đấu song song 2 bàn.</w:t></w:r></w:p>
+<w:p><w:r><w:t>2. Tranh 3-4 đánh trước Chung kết.</w:t></w:r></w:p>
 <w:p><w:r><w:t>3. Chung kết đánh riêng từng trận để khán giả theo dõi.</w:t></w:r></w:p>
 <w:p><w:r><w:t>4. Bán kết Đôi Nam: Nhất A vs Nhì B; Nhất B vs Nhì A.</w:t></w:r></w:p>
 
