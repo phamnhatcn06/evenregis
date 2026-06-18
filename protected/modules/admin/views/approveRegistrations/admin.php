@@ -168,6 +168,39 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
         font-size: 16px;
     }
 }
+
+/* Select2 Bootstrap 5 style */
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    padding: 6px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    background-color: #fff;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 24px;
+    padding-left: 0;
+    color: #212529;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+    right: 8px;
+}
+.select2-container--default .select2-selection--single .select2-selection__clear {
+    margin-right: 20px;
+}
+.select2-dropdown {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+}
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 6px 12px;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #0d6efd;
+}
 </style>
 
 <div class="card mb-3">
