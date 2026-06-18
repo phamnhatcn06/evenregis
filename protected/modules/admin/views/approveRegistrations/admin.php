@@ -179,7 +179,7 @@ $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
             </div>
             <div class="col-md-3">
                 <label class="form-label">Đơn vị</label>
-                <?php echo CHtml::dropDownList('property_id', $filterPropertyId, $propertyList, array('class' => 'form-select')); ?>
+                <?php echo CHtml::dropDownList('property_id', $filterPropertyId, $propertyList, array('class' => 'form-select', 'id' => 'filter-property')); ?>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Đợt đăng ký</label>
