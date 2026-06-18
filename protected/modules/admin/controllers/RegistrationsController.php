@@ -3146,6 +3146,12 @@ class RegistrationsController extends AdminController
 			$attendee->check_in_date = $checkInDate;
 			$attendee->check_out_date = $checkOutDate;
 			$attendee->transport_id = $transportId;
+			$attendee->staff_code = isset($staff->code) ? $staff->code : null;
+			$attendee->position_code = isset($staff->position_code) ? $staff->position_code : null;
+			$attendee->position_name = isset($staff->position_name) ? $staff->position_name : null;
+			$attendee->department_code = isset($staff->department_code) ? $staff->department_code : null;
+			$attendee->department_name = isset($staff->department_name) ? $staff->department_name : null;
+			$attendee->end_starting_date = isset($staff->end_testing_date) ? $staff->end_testing_date : null;
 
 			$uploadedFiles = $this->handleAttendeeDocumentUpload();
 
