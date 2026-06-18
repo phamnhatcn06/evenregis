@@ -229,7 +229,13 @@ class Attendees extends BaseAttendees
             'transport_id',
             'personal_email',
             'gender',
-            'id_card'
+            'id_card',
+            'staff_code',
+            'position_code',
+            'position_name',
+            'department_code',
+            'department_name',
+            'end_starting_date'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
@@ -244,9 +250,6 @@ class Attendees extends BaseAttendees
         if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
             $data['start_date'] = $this->join_hotel_date;
         }
-        // Yii::log("Attendees storeViaApi - JSON data: " . json_encode($data), 'info', 'application.registration');
-        // var_dump(json_encode($data));
-        // die();
         $result = ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
         return $result;
     }
