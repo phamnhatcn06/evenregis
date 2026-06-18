@@ -14,7 +14,7 @@
 /framework/*
 !/framework/.gitkeep
 protected/runtime/
-assets/
+/assets/
 
 # Dependencies
 node_modules/

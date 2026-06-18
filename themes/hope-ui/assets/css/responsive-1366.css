@@ -1,0 +1,252 @@
+/**
+ * Responsive CSS cho man hinh 1366x768
+ * Giam font size de hien thi nhieu noi dung hon
+ */
+
+@media screen and (max-width: 1440px) {
+    body,
+    .table,
+    .table th,
+    .table td,
+    .form-control,
+    .form-select,
+    .form-label,
+    .btn,
+    .nav-link,
+    .dropdown-item,
+    .breadcrumb,
+    .alert,
+    .toast,
+    .modal-body,
+    .card-body,
+    pre,
+    code,
+    .form-check-label,
+    .form-text,
+    .input-group-text,
+    .list-group-item,
+    .select2-selection__choice,
+    .select2-results__option,
+    .select2-container--bootstrap-5 .select2-selection,
+    .select2-container--bootstrap-5 .select2-search__field,
+    .datepicker td,
+    .file-card .dropdown-item {
+        font-size: 12px !important;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem 0.6rem !important;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 0.35rem 0.6rem !important;
+    }
+
+    .form-label {
+        margin-bottom: 0.3rem !important;
+    }
+
+    .btn {
+        padding: 0.35rem 0.75rem !important;
+    }
+
+    .btn-sm {
+        font-size: 11px !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+
+    .card-header {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .card-body {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .card-title {
+        font-size: 14px !important;
+    }
+
+    h1, .h1 { font-size: 1.75rem !important; }
+    h2, .h2 { font-size: 1.5rem !important; }
+    h3, .h3 { font-size: 1.25rem !important; }
+    h4, .h4 { font-size: 1.1rem !important; }
+    h5, .h5 { font-size: 1rem !important; }
+    h6, .h6 { font-size: 0.9rem !important; }
+
+    .badge {
+        font-size: 11px !important;
+        padding: 0.3em 0.5em !important;
+    }
+
+    .nav-link {
+        padding: 0.4rem 0.8rem !important;
+    }
+
+    .dropdown-item {
+        padding: 0.4rem 1rem !important;
+    }
+
+    .modal-title {
+        font-size: 14px !important;
+    }
+
+    .modal-body {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .pagination .page-link {
+        font-size: 12px !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+
+    .sidebar .nav-item .nav-link span {
+        font-size: 12px !important;
+    }
+
+    .alert {
+        padding: 0.6rem 1rem !important;
+    }
+}
+
+@media screen and (max-width: 1366px) {
+    body,
+    .table,
+    .table th,
+    .table td,
+    .form-control,
+    .form-select,
+    .form-label,
+    .btn,
+    .nav-link,
+    .dropdown-item,
+    .breadcrumb,
+    .alert,
+    .toast,
+    .modal-body,
+    .card-body,
+    pre,
+    code,
+    .form-check-label,
+    .form-text,
+    .input-group-text,
+    .list-group-item,
+    .select2-selection__choice,
+    .select2-results__option,
+    .select2-container--bootstrap-5 .select2-selection,
+    .select2-container--bootstrap-5 .select2-search__field,
+    .datepicker td,
+    .file-card .dropdown-item {
+        font-size: 11px !important;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.3rem 0.4rem !important;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 0.3rem 0.5rem !important;
+    }
+
+    .form-label {
+        margin-bottom: 0.25rem !important;
+    }
+
+    .btn {
+        padding: 0.3rem 0.65rem !important;
+    }
+
+    .btn-sm {
+        font-size: 10px !important;
+        padding: 0.2rem 0.4rem !important;
+    }
+
+    .card-header {
+        padding: 0.6rem 0.85rem !important;
+    }
+
+    .card-body {
+        padding: 0.6rem 0.85rem !important;
+    }
+
+    .card-title {
+        font-size: 13px !important;
+    }
+
+    h1, .h1 { font-size: 1.5rem !important; }
+    h2, .h2 { font-size: 1.3rem !important; }
+    h3, .h3 { font-size: 1.15rem !important; }
+    h4, .h4 { font-size: 1rem !important; }
+    h5, .h5 { font-size: 0.9rem !important; }
+    h6, .h6 { font-size: 0.85rem !important; }
+
+    .badge {
+        font-size: 10px !important;
+        padding: 0.25em 0.45em !important;
+    }
+
+    .nav-link {
+        padding: 0.35rem 0.7rem !important;
+    }
+
+    .dropdown-item {
+        padding: 0.35rem 0.85rem !important;
+    }
+
+    .modal-title {
+        font-size: 13px !important;
+    }
+
+    .modal-body {
+        padding: 0.6rem 0.85rem !important;
+    }
+
+    .pagination .page-link {
+        font-size: 11px !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+
+    .sidebar .nav-item .nav-link span {
+        font-size: 11px !important;
+    }
+
+    .alert {
+        padding: 0.5rem 0.85rem !important;
+    }
+
+    /* Attendees table - thu nho anh va cot */
+    #attendees-table img,
+    #attendees-table .bg-light {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    #attendees-table .fa-3x {
+        font-size: 1.5em !important;
+    }
+
+    #attendees-table th,
+    #attendees-table td {
+        padding: 0.25rem 0.35rem !important;
+        font-size: 11px !important;
+        vertical-align: middle !important;
+    }
+
+    /* DataTables */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        font-size: 11px !important;
+    }
+
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        font-size: 11px !important;
+        padding: 0.2rem 0.4rem !important;
+    }
+}
