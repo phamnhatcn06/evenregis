@@ -1196,9 +1196,15 @@ class ReportsController extends AdminController
         $safeName = preg_replace('/[^A-Za-z0-9]/', '_', UrlTransliterate::cleanString($propName, '_'));
         $filename = "Bao_cao_chi_tiet_" . $safeName . ".xlsx";
 
+        // Clear any output buffers to prevent corruption
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
+        header('Pragma: public');
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
