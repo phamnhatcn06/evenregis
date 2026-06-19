@@ -266,6 +266,7 @@ class ReportAttendeeStatsController extends AdminController
         }
 
         // Đếm sports (theo parent sport để tính là 1 môn)
+        // Chỉ đếm những môn được cấu hình trong event_sports
         foreach ($sportMembers as $sm) {
             $smDeletedAt = isset($sm['deleted_at']) ? $sm['deleted_at'] : null;
             if ($smDeletedAt) continue;
@@ -276,6 +277,9 @@ class ReportAttendeeStatsController extends AdminController
 
             $sportId = isset($teamSportMap[$teamId]) ? $teamSportMap[$teamId] : null;
             if (!$sportId) continue;
+
+            // Filter theo event_sports nếu có cấu hình
+            if (!empty($activeSportIds) && !isset($activeSportIds[$sportId])) continue;
 
             $parentSportId = isset($sportParentMap[$sportId]) ? $sportParentMap[$sportId] : $sportId;
             $attendeeStats[$attId]['parent_sports'][$parentSportId] = true;
