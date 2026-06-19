@@ -414,10 +414,14 @@ class ReportAttendeeStatsController extends AdminController
         $childSportsMap = array(); // parent_id => array of children
 
         // Build map parent -> children và init sportStats
+        // Chỉ include những môn được cấu hình trong event_sports
         foreach ($sportsList as $sp) {
             $spId = isset($sp->id) ? $sp->id : null;
             $parentId = isset($sp->parent_id) ? $sp->parent_id : null;
             $spName = isset($sp->name) ? $sp->name : '';
+
+            // Filter theo event_sports nếu có cấu hình
+            if (!empty($activeSportIds) && !isset($activeSportIds[$spId])) continue;
 
             if ($spId && !$parentId) {
                 // Parent sport
