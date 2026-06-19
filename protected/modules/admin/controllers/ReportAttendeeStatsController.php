@@ -169,15 +169,34 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
+        // Lấy event_sports để filter chỉ các môn active với event này
+        $eventSportsList = EventSports::getByEventId($eventId);
+        $activeSportIds = array();
+        foreach ($eventSportsList as $es) {
+            $sportId = isset($es['sport_id']) ? $es['sport_id'] : null;
+            if ($sportId) {
+                $activeSportIds[$sportId] = true;
+            }
+        }
+
         // Lấy sports để map parent_id
         $sportsList = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
-        //32 sport => OK
         $sportParentMap = array();
         foreach ($sportsList as $sp) {
             $spId = isset($sp->id) ? $sp->id : null;
             $parentId = isset($sp->parent_id) ? $sp->parent_id : null;
             if ($spId) {
                 $sportParentMap[$spId] = $parentId ? $parentId : $spId;
+            }
+        }
+
+        // Nếu có event_sports config, thêm parent sports vào activeSportIds
+        if (!empty($activeSportIds)) {
+            foreach ($activeSportIds as $spId => $val) {
+                $parentId = isset($sportParentMap[$spId]) ? $sportParentMap[$spId] : $spId;
+                if ($parentId && $parentId != $spId) {
+                    $activeSportIds[$parentId] = true;
+                }
             }
         }
 
