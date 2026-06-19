@@ -598,6 +598,7 @@ class ReportAttendeeStatsController extends AdminController
         }
 
         // Đếm số nội dung thể thao con (child sport) mà đơn vị có VĐV đăng ký
+        // Chỉ đếm những môn được cấu hình trong event_sports
         foreach ($sportMembers as $sm) {
             $smDeletedAt = isset($sm['deleted_at']) ? $sm['deleted_at'] : null;
             if ($smDeletedAt) continue;
@@ -611,6 +612,9 @@ class ReportAttendeeStatsController extends AdminController
 
             $sportId = isset($teamSportMap[$teamId]) ? $teamSportMap[$teamId] : null;
             if (!$sportId) continue;
+
+            // Filter theo event_sports nếu có cấu hình
+            if (!empty($activeSportIds) && !isset($activeSportIds[$sportId])) continue;
 
             // Đếm theo sport_id thực tế (child sport)
             $propertySportContentCount[$propId]['content_names'][$sportId] = true;
