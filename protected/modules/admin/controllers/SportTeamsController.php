@@ -103,6 +103,10 @@ class SportTeamsController extends AdminController
             if (!isset($activeRegsMap[$team->registration_id])) {
                 continue;
             }
+            // Filter theo event_sports nếu có cấu hình
+            if (!empty($activeSportIds) && !isset($activeSportIds[$team->sport_id])) {
+                continue;
+            }
             $activeTeamsMap[$team->id] = $team;
 
             if (isset($sportStats[$team->sport_id])) {
