@@ -41,10 +41,23 @@ class SportTeamsController extends AdminController
             Yii::app()->end();
         }
 
-        // 1. Fetch active sports
+        // 1. Fetch active sports - filter theo event_sports của event
+        $eventSportsList = EventSports::getByEventId($eventId);
+        $activeSportIds = array();
+        foreach ($eventSportsList as $es) {
+            $sportId = isset($es['sport_id']) ? $es['sport_id'] : null;
+            if ($sportId) {
+                $activeSportIds[$sportId] = true;
+            }
+        }
+
         $sportsRes = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
         $sportStats = array();
         foreach ($sportsRes as $sport) {
+            // Chỉ include môn được cấu hình trong event_sports (nếu có cấu hình)
+            if (!empty($activeSportIds) && !isset($activeSportIds[$sport->id])) {
+                continue;
+            }
             $sportStats[$sport->id] = array(
                 'id' => $sport->id,
                 'name' => $sport->name,
