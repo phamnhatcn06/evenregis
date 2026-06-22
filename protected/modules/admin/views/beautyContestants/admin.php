@@ -13,6 +13,13 @@ $this->menu = array(
         'id' => 'btn_create',
     ),
     array(
+        'label' => 'Gửi email hàng loạt',
+        'url' => '#',
+        'color' => 'warning',
+        'icon' => 'fa-envelope',
+        'id' => 'btn_send_bulk_email',
+    ),
+    array(
         'label' => 'Xuất Excel',
         'url' => '#',
         'color' => 'success',
