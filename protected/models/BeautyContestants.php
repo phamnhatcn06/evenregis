@@ -88,10 +88,47 @@ class BeautyContestants extends BaseBeautyContestants
             $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
             $model->contest_name = isset($data['contest_name']) ? $data['contest_name'] : '';
             $model->event_name = isset($data['event_name']) ? $data['event_name'] : '';
+            $model->personal_email = isset($data['personal_email']) ? $data['personal_email'] : '';
+            $model->photo_portrait_2 = isset($data['photo_portrait_2']) ? $data['photo_portrait_2'] : '';
+            $model->photo_full_body_2 = isset($data['photo_full_body_2']) ? $data['photo_full_body_2'] : '';
+            $model->video_path = isset($data['video_path']) ? $data['video_path'] : '';
+            $model->submission_token = isset($data['submission_token']) ? $data['submission_token'] : '';
+            $model->submission_token_expires_at = isset($data['submission_token_expires_at']) ? $data['submission_token_expires_at'] : '';
+            $model->submitted_at = isset($data['submitted_at']) ? $data['submitted_at'] : '';
             $model->id = $id;
             return $model;
         }
         return null;
+    }
+
+    public static function generateSubmissionToken($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_GENERATE_TOKEN, array('id' => $id));
+        return ApiClient::post($url, array());
+    }
+
+    public static function fetchByToken($token)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_BY_TOKEN, array('token' => $token));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            $model = new self;
+            $model->setAttributes($data, false);
+            $model->attendee_name = isset($data['attendee_name']) ? $data['attendee_name'] : '';
+            $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
+            $model->contest_name = isset($data['contest_name']) ? $data['contest_name'] : '';
+            $model->event_name = isset($data['event_name']) ? $data['event_name'] : '';
+            $model->personal_email = isset($data['personal_email']) ? $data['personal_email'] : '';
+            return $model;
+        }
+        return null;
+    }
+
+    public static function submitByToken($token, $data, $files = array())
+    {
+        $postData = array_merge(array('token' => $token), $data);
+        return ApiClient::postMultipart(ApiEndpoints::BEAUTY_CONTESTANT_SUBMIT_BY_TOKEN, $postData, $files);
     }
 
     public function storeViaApi()
