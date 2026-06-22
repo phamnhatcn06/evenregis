@@ -109,6 +109,32 @@ $this->Tabletitle = 'Danh sách thí sinh thi Miss';
                         return BeautyContestants::getStatusLabel($data->status);
                     }
                 ),
+                array(
+                    'header' => 'Hồ sơ',
+                    'type' => 'raw',
+                    'width' => '100px',
+                    'filter' => false,
+                    'value' => function ($data) {
+                        if (!empty($data->submitted_at)) {
+                            return '<span class="badge bg-success">Đã gửi</span>';
+                        }
+                        return '<span class="badge bg-secondary">Chưa gửi</span>';
+                    }
+                ),
+                array(
+                    'header' => 'Thao tác',
+                    'type' => 'raw',
+                    'width' => '150px',
+                    'filter' => false,
+                    'value' => function ($data) {
+                        $buttons = '';
+                        $buttons .= CHtml::link('<i class="fa fa-eye"></i>', array('view', 'id' => $data->id), array('class' => 'btn btn-sm btn-info me-1', 'title' => 'Xem'));
+                        if (empty($data->submitted_at)) {
+                            $buttons .= '<button type="button" class="btn btn-sm btn-warning btn-send-email" data-id="' . $data->id . '" data-name="' . CHtml::encode($data->attendee_name) . '" title="Gửi email"><i class="fa fa-envelope"></i></button>';
+                        }
+                        return $buttons;
+                    }
+                ),
             ),
             'options' => array(
                 'pageLength' => 25,
