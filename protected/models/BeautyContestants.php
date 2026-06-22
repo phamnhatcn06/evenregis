@@ -16,6 +16,13 @@ class BeautyContestants extends BaseBeautyContestants
     public $registration_id;
     public $note;
     public $members;
+    public $photo_portrait_2;
+    public $photo_full_body_2;
+    public $video_path;
+    public $submission_token;
+    public $submission_token_expires_at;
+    public $submitted_at;
+    public $personal_email;
 
     public static function model($className = __CLASS__)
     {
