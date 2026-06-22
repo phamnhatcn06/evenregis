@@ -323,6 +323,64 @@ class BeautyContestantsController extends AdminController
         return $list;
     }
 
+    public function actionSendInviteEmail()
+    {
+        if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ');
+        }
+
+        $id = Yii::app()->request->getPost('id');
+        if (empty($id)) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Thiếu ID thí sinh'));
+            Yii::app()->end();
+        }
+
+        $result = BeautyContestants::generateSubmissionToken($id);
+
+        if ($result['success']) {
+            echo CJSON::encode(array('success' => true, 'message' => 'Đã gửi email thành công'));
+        } else {
+            $msg = isset($result['error']) ? $result['error'] : 'Không thể gửi email';
+            echo CJSON::encode(array('success' => false, 'message' => $msg));
+        }
+        Yii::app()->end();
+    }
+
+    public function actionSendBulkInviteEmail()
+    {
+        if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ');
+        }
+
+        $dataProvider = BeautyContestants::getApiDataProvider(array(
+            'submitted_at' => 'null',
+        ), 1000);
+        $contestants = $dataProvider->getData();
+
+        $sent = 0;
+        $failed = 0;
+
+        foreach ($contestants as $contestant) {
+            if (!empty($contestant->submitted_at)) {
+                continue;
+            }
+
+            $result = BeautyContestants::generateSubmissionToken($contestant->id);
+            if ($result['success']) {
+                $sent++;
+            } else {
+                $failed++;
+            }
+        }
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'sent' => $sent,
+            'failed' => $failed,
+        ));
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = BeautyContestants::fetchFromApi($id);
