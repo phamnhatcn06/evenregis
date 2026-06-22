@@ -147,7 +147,7 @@ $this->Tabletitle = 'Danh sách thí sinh thi Miss';
 </div>
 
 <?php
-Yii::app()->clientScript->registerScript('beauty-contestants-export', "
+Yii::app()->clientScript->registerScript('beauty-contestants-scripts', "
     // Prevent filter clicks from triggering column sorting
     $('#beauty-contestants-grid thead').on('click', 'input, select', function(e) {
         e.stopPropagation();
@@ -156,7 +156,7 @@ Yii::app()->clientScript->registerScript('beauty-contestants-export', "
     $('#btn_export_excel').click(function(e) {
         e.preventDefault();
         var baseUrl = '" . $this->createUrl('export') . "';
-        
+
         var filters = {};
         $('#beauty-contestants-grid thead input, #beauty-contestants-grid thead select').each(function() {
             var name = $(this).attr('name');
@@ -165,14 +165,107 @@ Yii::app()->clientScript->registerScript('beauty-contestants-export', "
                 filters[name] = val;
             }
         });
-        
+
         var queryString = $.param(filters);
         var exportUrl = baseUrl;
         if (queryString) {
             exportUrl += (baseUrl.indexOf('?') >= 0 ? '&' : '?') + queryString;
         }
-        
+
         window.location.href = exportUrl;
+    });
+
+    // Gửi email cho từng thí sinh
+    $(document).on('click', '.btn-send-email', function() {
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+        var btn = $(this);
+
+        Swal.fire({
+            title: 'Gửi email mời',
+            text: 'Gửi email mời nộp hồ sơ đến thí sinh \"' + name + '\"?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Gửi email',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                btn.prop('disabled', true).html('<i class=\"fa fa-spinner fa-spin\"></i>');
+
+                $.ajax({
+                    url: '" . $this->createUrl('sendInviteEmail') . "',
+                    type: 'POST',
+                    data: { id: id },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Toast.success('Đã gửi email thành công');
+                            btn.removeClass('btn-warning').addClass('btn-secondary').html('<i class=\"fa fa-check\"></i>');
+                        } else {
+                            Toast.error(response.message || 'Có lỗi xảy ra');
+                            btn.prop('disabled', false).html('<i class=\"fa fa-envelope\"></i>');
+                        }
+                    },
+                    error: function() {
+                        Toast.error('Lỗi kết nối server');
+                        btn.prop('disabled', false).html('<i class=\"fa fa-envelope\"></i>');
+                    }
+                });
+            }
+        });
+    });
+
+    // Gửi email hàng loạt
+    $('#btn_send_bulk_email').click(function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'Gửi email hàng loạt',
+            text: 'Gửi email mời nộp hồ sơ đến TẤT CẢ thí sinh chưa gửi hồ sơ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f0ad4e',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Gửi tất cả',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Đang gửi email...',
+                    text: 'Vui lòng đợi...',
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: '" . $this->createUrl('sendBulkInviteEmail') . "',
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(response) {
+                        Swal.close();
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Hoàn tất',
+                                html: 'Đã gửi: <strong>' + response.sent + '</strong> email<br>Lỗi: <strong>' + response.failed + '</strong>',
+                            }).then(function() {
+                                location.reload();
+                            });
+                        } else {
+                            Toast.error(response.message || 'Có lỗi xảy ra');
+                        }
+                    },
+                    error: function() {
+                        Swal.close();
+                        Toast.error('Lỗi kết nối server');
+                    }
+                });
+            }
+        });
     });
 ", CClientScript::POS_READY);
 ?>
