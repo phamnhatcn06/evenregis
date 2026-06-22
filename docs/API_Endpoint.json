@@ -2106,6 +2106,27 @@
                                             "key": "personal_email",
                                             "value": "beauty@gmail.com",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "photo_portrait_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_full_body_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "video_path",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "submitted_at",
+                                            "value": "",
+                                            "type": "text",
+                                            "disabled": true
                                         }
                                     ]
                                 },
@@ -2253,6 +2274,27 @@
                                             "key": "personal_email",
                                             "value": "beauty@gmail.com",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "photo_portrait_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_full_body_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "video_path",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "submitted_at",
+                                            "value": "",
+                                            "type": "text",
+                                            "disabled": true
                                         }
                                     ]
                                 },
@@ -2302,6 +2344,131 @@
                                             "language": "json"
                                         }
                                     }
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Generate Submission Token",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/beauty-contestants/1/generate-token",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "beauty-contestants",
+                                        "1",
+                                        "generate-token"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail By Token",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/beauty-contestants/by-token/YOUR_TOKEN_HERE",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "beauty-contestants",
+                                        "by-token",
+                                        "YOUR_TOKEN_HERE"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Submit By Token",
+                            "request": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "token",
+                                            "value": "YOUR_TOKEN_HERE",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "height_cm",
+                                            "value": "170.5",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "weight_kg",
+                                            "value": "50.0",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "measurements",
+                                            "value": "90-60-90",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "talent",
+                                            "value": "Múa dân gian",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "bio",
+                                            "value": "Tiểu sử cập nhật qua token",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "photo_portrait",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_portrait_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_full_body",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_full_body_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "video_path",
+                                            "value": "",
+                                            "type": "file"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/beauty-contestants/submit-by-token",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "beauty-contestants",
+                                        "submit-by-token"
+                                    ]
                                 }
                             },
                             "response": []
