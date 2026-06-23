@@ -143,16 +143,10 @@ return array(
         'db' => require(dirname(__FILE__) . '/database.php'),
 
         // Email component (yii-mail with SwiftMailer)
+        // Cấu hình trong protected/config/params.php -> mail
         'mail' => array(
             'class' => 'ext.yii-mail.YiiMail',
             'transportType' => 'smtp',
-            'transportOptions' => array(
-                'host' => getenv('SMTP_HOST') ?: 'smtp.gmail.com',
-                'username' => getenv('SMTP_USERNAME') ?: '',
-                'password' => getenv('SMTP_PASSWORD') ?: '',
-                'port' => getenv('SMTP_PORT') ?: 587,
-                'encryption' => getenv('SMTP_ENCRYPTION') ?: 'tls',
-            ),
             'viewPath' => 'application.views.mail',
             'logging' => true,
             'dryRun' => false,
