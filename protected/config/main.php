@@ -141,6 +141,22 @@ return array(
         ),
         // database settings are configured in database.php
         'db' => require(dirname(__FILE__) . '/database.php'),
+
+        // Email component (yii-mail with SwiftMailer)
+        'mail' => array(
+            'class' => 'ext.yii-mail.YiiMail',
+            'transportType' => 'smtp',
+            'transportOptions' => array(
+                'host' => Yii::app()->params['mail']['host'],
+                'username' => Yii::app()->params['mail']['username'],
+                'password' => Yii::app()->params['mail']['password'],
+                'port' => Yii::app()->params['mail']['port'],
+                'encryption' => Yii::app()->params['mail']['encryption'],
+            ),
+            'viewPath' => 'application.views.mail',
+            'logging' => true,
+            'dryRun' => false,
+        ),
         //
         //        'dbadvert' => array(
         //            'connectionString' => 'sqlsrv:Server=SWS3-NHAT; Database=MuongThanh_Dashboard',
