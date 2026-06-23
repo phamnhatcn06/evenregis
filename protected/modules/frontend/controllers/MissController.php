@@ -48,6 +48,11 @@ class MissController extends CController
             $result = BeautyContestants::submitByToken($token, $postData, $files);
 
             if ($result['success']) {
+                // Gửi email xác nhận
+                $updatedModel = BeautyContestants::fetchByToken($token);
+                if ($updatedModel) {
+                    EmailHelper::sendMissConfirmation($updatedModel);
+                }
                 $this->redirect(array('thankyou', 'token' => $token));
             } else {
                 $errorMsg = isset($result['error']) ? $result['error'] : 'Có lỗi xảy ra. Vui lòng thử lại.';
