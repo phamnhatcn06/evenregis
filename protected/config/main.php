@@ -142,11 +142,9 @@ return array(
         // database settings are configured in database.php
         'db' => require(dirname(__FILE__) . '/database.php'),
 
-        // Email component (yii-mail with SwiftMailer)
-        // Cấu hình trong protected/config/params.php -> mail
+        // Email component - cấu hình SMTP trong params.php -> mail
         'mail' => array(
-            'class' => 'ext.yii-mail.YiiMail',
-            'transportType' => 'smtp',
+            'class' => 'application.components.MailComponent',
             'viewPath' => 'application.views.mail',
             'logging' => true,
             'dryRun' => false,
