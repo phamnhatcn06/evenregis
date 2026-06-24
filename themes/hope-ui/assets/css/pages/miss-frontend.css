@@ -322,12 +322,14 @@ body.miss-page .container {
   max-width: 900px;
   text-align: left;
   padding: 40px 50px;
-  margin: 30px auto;
 }
 
 .miss-thankyou-page:has(.submit-card) {
-  position: relative;
+  position: absolute;
+  align-items: flex-start;
   overflow-y: auto;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 .thankyou-card.submit-card .thankyou-title {
