@@ -1,6 +1,7 @@
 <?php
 
 Yii::import('ext.yii-mail.YiiMail');
+Yii::import('ext.yii-mail.YiiMailMessage');
 
 class MailComponent extends YiiMail
 {
