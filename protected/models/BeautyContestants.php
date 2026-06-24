@@ -6,7 +6,9 @@ class BeautyContestants extends BaseBeautyContestants
 {
     const STATUS_REGISTERED = 0;
     const STATUS_CONFIRMED = 1;
-    const STATUS_DISQUALIFIED = 2;
+    const STATUS_WITHDRAWN = 2;
+    const STATUS_DISQUALIFIED = 3;
+    const STATUS_EMAIL_SENT = 4;
 
     public $attendee_name;
     public $property_code;
