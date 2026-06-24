@@ -47,7 +47,7 @@ class MissController extends CController
                 // Gửi email xác nhận
                 $updatedModel = BeautyContestants::fetchByToken($token);
                 if ($updatedModel) {
-                    // EmailHelper::sendMissConfirmation($updatedModel);
+                    EmailHelper::sendMissConfirmation($updatedModel);
                 }
                 $this->redirect(array('thankyou', 'token' => $token));
             } else {
