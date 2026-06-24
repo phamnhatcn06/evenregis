@@ -328,15 +328,6 @@ $baseUrl = Yii::app()->theme->baseUrl;
 </style>
 
 <div class="miss-submit-page">
-    <div class="miss-header">
-        <div class="brand-logos">
-            <img src="<?php echo $baseUrl; ?>/assets/images/logo-nhamuong.png" alt="Nhà Mường">
-            <img src="<?php echo $baseUrl; ?>/assets/images/logo-daihoi.png" alt="Đại hội Mường Thanh">
-        </div>
-        <h1 class="miss-title">HỘI TỤ BẢN SẮC - DẪN DẮT TƯƠNG LAI</h1>
-        <p class="miss-subtitle">Đăng ký dự thi Miss Đại hội Mường Thanh 2026</p>
-    </div>
-
     <div class="miss-card">
         <div class="miss-card-header">
             <h4><i class="fa fa-star me-2"></i>Gửi hồ sơ dự thi</h4>
