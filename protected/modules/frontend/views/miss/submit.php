@@ -69,7 +69,7 @@ $uploadUrl = Yii::app()->createUrl('/frontend/upload/chunk');
                             Ảnh chân dung 1 <span class="text-danger">*</span>
                             <span class="ratio">(tỉ lệ 3:4)</span>
                         </label>
-                        <div class="photo-upload-wrapper" id="wrapper-portrait">
+                        <div class="photo-upload-wrapper <?php echo !empty($model->photo_portrait) ? 'has-image' : ''; ?>" id="wrapper-portrait">
                             <input type="file" name="photo_portrait" accept="image/*"
                                 data-preview="preview-portrait"
                                 <?php echo empty($model->photo_portrait) ? 'required' : ''; ?>>
@@ -77,13 +77,12 @@ $uploadUrl = Yii::app()->createUrl('/frontend/upload/chunk');
                                 <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
                                 <div class="upload-text"><strong>Nhấn để chọn ảnh</strong><br>hoặc kéo thả vào đây</div>
                             </div>
-                            <img class="photo-preview" id="preview-portrait" alt="Preview">
+                            <img class="photo-preview" id="preview-portrait" alt="Preview"
+                                <?php if (!empty($model->photo_portrait)): ?>
+                                src="<?php echo Yii::app()->baseUrl . '/' . $model->photo_portrait; ?>"
+                                style="display: block;"
+                                <?php endif; ?>>
                         </div>
-                        <?php if (!empty($model->photo_portrait)): ?>
-                            <div class="existing-photo">
-                                <i class="fa fa-check-circle"></i> Đã có ảnh
-                            </div>
-                        <?php endif; ?>
                     </div>
                     <div class="col-md-6 mb-4">
                         <label class="photo-label">
