@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mời tham gia Vòng Sơ khảo Miss Mường Thanh 2026</title>
 </head>
+
 <body style="margin:0; padding:0; font-family: 'Segoe UI', Arial, sans-serif; background-color:#f8f4f0;">
     <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f4f0; padding:30px 0;">
         <tr>
@@ -45,7 +47,7 @@
                                 <tr>
                                     <td align="center">
                                         <a href="<?php echo $submissionUrl; ?>"
-                                           style="display:inline-block; background: linear-gradient(135deg, #d4a574 0%, #b8860b 100%); color:#ffffff; padding:18px 50px; font-size:16px; font-weight:bold; text-decoration:none; border-radius:30px; letter-spacing:1px; box-shadow: 0 4px 15px rgba(184,134,11,0.4);">
+                                            style="display:inline-block; background: linear-gradient(135deg, #d4a574 0%, #b8860b 100%); color:#ffffff; padding:18px 50px; font-size:16px; font-weight:bold; text-decoration:none; border-radius:30px; letter-spacing:1px; box-shadow: 0 4px 15px rgba(184,134,11,0.4);">
                                             THAM GIA NGAY
                                         </a>
                                     </td>
@@ -65,7 +67,7 @@
                                 <tr>
                                     <td>
                                         <p style="margin:0; font-size:15px; color:#8b6914; line-height:1.7;">
-                                            <span style="font-size:18px;">⏰</span> <strong>Thời gian nhận hồ sơ Vòng Sơ khảo sẽ kết thúc vào 23:59 ngày <?php echo $expiresAt; ?>.</strong>
+                                            <span style="font-size:18px;">⏰</span> <strong>Thời gian nhận hồ sơ Vòng Sơ khảo sẽ kết thúc vào 23:59 ngày 10/07/2026.</strong>
                                         </p>
                                         <p style="margin:10px 0 0 0; font-size:14px; color:#a07d1c;">
                                             Hãy hoàn thành thông tin và gửi bài dự thi trước thời hạn để không bỏ lỡ cơ hội của mình nhé!
@@ -115,4 +117,5 @@
         </tr>
     </table>
 </body>
+
 </html>

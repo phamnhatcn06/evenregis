@@ -33,7 +33,7 @@ class EmailHelper
 
         return self::send(
             $email,
-            '[Đại hội 2026] Mời gửi hồ sơ dự thi Miss',
+            '[Đại hội Mường Thanh 2026] Mời gửi hồ sơ dự thi Miss',
             'miss_invitation',
             $data
         );

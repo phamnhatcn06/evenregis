@@ -204,7 +204,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                                     $pCode = isset($reg->property_code) ? $reg->property_code : (isset($reg['property_code']) ? $reg['property_code'] : '');
                                                     $pName = isset($reg->property_name) ? $reg->property_name : (isset($reg['property_name']) ? $reg['property_name'] : '');
                                                     $periodName = isset($reg->period_name) ? $reg->period_name : (isset($reg['period_name']) ? $reg['period_name'] : '');
-                                                    $subAt = isset($reg->submitted_at) ? date('H:i d/m/Y', strtotime($reg->submitted_at)) : '';
+                                                    $subAt = isset($reg->submitted_at) ? MyHelper::formatDateTime($reg->submitted_at) : '';
                                                     $subBy = isset($reg->submitted_by) ? $reg->submitted_by : (isset($reg['submitted_by']) ? $reg['submitted_by'] : '');
                                                     $revBy = isset($reg->reviewed_by_name) ? $reg->reviewed_by_name : (isset($reg['reviewed_by_name']) ? $reg['reviewed_by_name'] : '');
                                                     $reason = isset($reg->rejection_reason) ? $reg->rejection_reason : (isset($reg['rejection_reason']) ? $reg['rejection_reason'] : '');
