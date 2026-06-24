@@ -13,6 +13,13 @@ $this->menu = array(
         'id' => 'btn_create',
     ),
     array(
+        'label' => 'Tạo toàn bộ token',
+        'url' => '#',
+        'color' => 'info',
+        'icon' => 'fa-key',
+        'id' => 'btn_generate_all_tokens',
+    ),
+    array(
         'label' => 'Gửi email hàng loạt',
         'url' => '#',
         'color' => 'warning',
