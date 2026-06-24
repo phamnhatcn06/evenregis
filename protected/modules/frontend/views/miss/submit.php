@@ -3,7 +3,14 @@ $this->pageTitle = 'Gửi hồ sơ dự thi Miss - ' . Yii::app()->name;
 $baseUrl = Yii::app()->theme->baseUrl;
 
 Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/css/pages/miss-frontend.css');
+Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/plugins/resumable.min.js', CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-submit.js', CClientScript::POS_END);
+
+$folderName = MyHelper::toSlug($model->attendee_name);
+if (empty($folderName)) {
+    $folderName = 'contestant-' . $model->id;
+}
+$uploadUrl = Yii::app()->createUrl('/frontend/upload/chunk');
 ?>
 
 <div class="miss-thankyou-page" style="background-image: url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg');">
