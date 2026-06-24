@@ -133,6 +133,7 @@ class BeautyContestants extends BaseBeautyContestants
             $model->contest_name = isset($data['contest_name']) ? $data['contest_name'] : '';
             $model->event_name = isset($data['event_name']) ? $data['event_name'] : '';
             $model->personal_email = isset($data['personal_email']) ? $data['personal_email'] : '';
+            $model->submitted_at = isset($data['submitted_at']) ? $data['submitted_at'] : '';
             return $model;
         }
         return null;
