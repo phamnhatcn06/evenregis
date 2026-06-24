@@ -168,8 +168,13 @@ body.miss-page .container {
   display: block;
 }
 
-.photo-upload-wrapper.has-preview .upload-placeholder {
+.photo-upload-wrapper.has-preview .upload-placeholder,
+.photo-upload-wrapper.has-image .upload-placeholder {
   display: none;
+}
+
+.photo-upload-wrapper.has-image .photo-preview {
+  display: block;
 }
 
 .photo-label {
