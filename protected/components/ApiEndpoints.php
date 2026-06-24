@@ -77,6 +77,7 @@ class ApiEndpoints
     const BEAUTY_CONTESTANT_UPDATE = '/api/beauty-contestants/update/{id}';
     const BEAUTY_CONTESTANT_DESTROY = '/api/beauty-contestants/destroy/{id}';
     const BEAUTY_CONTESTANT_GENERATE_TOKEN = '/api/beauty-contestants/{id}/generate-token';
+    const BEAUTY_CONTESTANT_GENERATE_ALL_TOKENS = '/api/beauty-contestants/generate-all-tokens';
     const BEAUTY_CONTESTANT_BY_TOKEN = '/api/beauty-contestants/by-token/{token}';
     const BEAUTY_CONTESTANT_SUBMIT_BY_TOKEN = '/api/beauty-contestants/submit-by-token';
 
