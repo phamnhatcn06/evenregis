@@ -158,7 +158,6 @@ $uploadUrl = Yii::app()->createUrl('/frontend/upload/chunk');
 
                 <div class="video-upload-wrapper mb-4"
                      data-upload-url="<?php echo $uploadUrl; ?>"
-                     data-contestant-id="<?php echo $model->id; ?>"
                      data-folder-name="<?php echo $folderName; ?>">
                     <input type="file" name="video_path" accept="video/*" id="video-input">
                     <div class="upload-icon"><i class="fa fa-film"></i></div>
