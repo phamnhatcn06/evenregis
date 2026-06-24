@@ -6,6 +6,18 @@ $baseUrl = Yii::app()->theme->baseUrl;
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
+body {
+    padding-top: 0 !important;
+    margin: 0 !important;
+}
+
+.container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+
 .miss-thankyou-page {
     min-height: 100vh;
     background: linear-gradient(135deg, rgba(255,245,248,0.92) 0%, rgba(255,238,242,0.92) 100%),
