@@ -525,11 +525,11 @@ body.miss-page .container {
     color: #fff;
 }
 
-.submitted-card .decorative-icons i:nth-child(1) { color: #17a2b8; }
-.submitted-card .decorative-icons i:nth-child(2) { color: #20c997; }
-.submitted-card .decorative-icons i:nth-child(3) { color: #17a2b8; }
-.submitted-card .decorative-icons i:nth-child(4) { color: #20c997; }
-.submitted-card .decorative-icons i:nth-child(5) { color: #17a2b8; }
+.submitted-card .decorative-icons i:nth-child(1) { color: #d4145a; }
+.submitted-card .decorative-icons i:nth-child(2) { color: #fbb03b; }
+.submitted-card .decorative-icons i:nth-child(3) { color: #d4145a; }
+.submitted-card .decorative-icons i:nth-child(4) { color: #fbb03b; }
+.submitted-card .decorative-icons i:nth-child(5) { color: #d4145a; }
 
 .submitted-title {
     font-family: 'Montserrat', sans-serif;
