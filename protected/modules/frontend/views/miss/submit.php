@@ -152,18 +152,17 @@ $uploadUrl = Yii::app()->createUrl('/frontend/upload/chunk');
                 </div>
                 <p class="text-muted small mb-3">Định dạng: MP4, MOV. Tối đa 4 phút, 500MB.</p>
 
-                <div class="video-upload-wrapper mb-4"
+                <div class="video-upload-wrapper mb-4 <?php echo !empty($model->video_path) ? 'has-video' : ''; ?>"
                      data-upload-url="<?php echo $uploadUrl; ?>"
                      data-folder-name="<?php echo $folderName; ?>">
                     <input type="file" name="video_path" accept="video/*" id="video-input">
                     <div class="upload-icon"><i class="fa fa-film"></i></div>
                     <div class="upload-text"><strong>Nhấn để chọn video</strong><br>hoặc kéo thả vào đây</div>
-                    <video class="video-preview" id="video-preview" controls></video>
-                    <?php if (!empty($model->video_path)): ?>
-                        <div class="existing-photo" style="justify-content: center; margin-top: 10px;">
-                            <i class="fa fa-check-circle"></i> Đã có video
-                        </div>
-                    <?php endif; ?>
+                    <video class="video-preview" id="video-preview" controls
+                        <?php if (!empty($model->video_path)): ?>
+                        src="<?php echo Yii::app()->baseUrl . '/' . $model->video_path; ?>"
+                        style="display: block;"
+                        <?php endif; ?>></video>
                 </div>
 
                 <div class="alert-warning-custom mb-4">
