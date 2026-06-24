@@ -3,7 +3,6 @@ $this->pageTitle = 'Gửi hồ sơ dự thi Miss - ' . Yii::app()->name;
 $baseUrl = Yii::app()->theme->baseUrl;
 
 Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/css/pages/miss-frontend.css');
-Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/plugins/resumable.min.js', CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-submit.js', CClientScript::POS_END);
 
 $folderName = MyHelper::toSlug($model->attendee_name);
