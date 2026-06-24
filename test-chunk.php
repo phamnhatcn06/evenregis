@@ -6,6 +6,10 @@ if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
 
+if ($action === 'chunk' || $action === 'merge') {
+    header('Content-Type: application/json');
+}
+
 if ($action === 'chunk') {
     $chunkIndex = isset($_POST['chunkIndex']) ? (int)$_POST['chunkIndex'] : 0;
     $totalChunks = isset($_POST['totalChunks']) ? (int)$_POST['totalChunks'] : 0;
