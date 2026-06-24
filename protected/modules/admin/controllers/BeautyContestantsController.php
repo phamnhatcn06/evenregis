@@ -356,14 +356,18 @@ class BeautyContestantsController extends AdminController
             $model = BeautyContestants::fetchFromApi($id);
         }
 
-        $emailSent = EmailHelper::sendMissInvitation($model);
+        try {
+            $emailSent = EmailHelper::sendMissInvitation($model);
 
-        if ($emailSent) {
-            $model->status = BeautyContestants::STATUS_EMAIL_SENT;
-            $model->updateViaApi();
-            echo CJSON::encode(array('success' => true, 'message' => 'Đã gửi email thành công'));
-        } else {
-            echo CJSON::encode(array('success' => false, 'message' => 'Không thể gửi email'));
+            if ($emailSent) {
+                $model->status = BeautyContestants::STATUS_EMAIL_SENT;
+                $model->updateViaApi();
+                echo CJSON::encode(array('success' => true, 'message' => 'Đã gửi email thành công'));
+            } else {
+                echo CJSON::encode(array('success' => false, 'message' => 'Không thể gửi email. Kiểm tra cấu hình SMTP.'));
+            }
+        } catch (Exception $e) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Lỗi: ' . $e->getMessage()));
         }
         Yii::app()->end();
     }
