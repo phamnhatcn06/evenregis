@@ -173,6 +173,13 @@ Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-s
                     </button>
                 </div>
             </form>
+
+        <div class="heart-divider">
+            &#9829; &#9829; &#9829;
+        </div>
+
+        <div class="flower-decoration">
+            &#127800; &#127802; &#127800;
         </div>
     </div>
 </div>
