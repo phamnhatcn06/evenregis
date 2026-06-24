@@ -256,6 +256,15 @@ body.miss-page .container {
   margin-top: 15px;
 }
 
+.video-upload-wrapper.has-video .upload-icon,
+.video-upload-wrapper.has-video .upload-text {
+  display: none;
+}
+
+.video-upload-wrapper.has-video .video-preview {
+  display: block;
+}
+
 .alert-warning-custom {
   background: linear-gradient(135deg, #fff5e6 0%, #ffefef 100%);
   border: 1px solid #ffc107;
