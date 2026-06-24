@@ -37,15 +37,11 @@ class MissController extends CController
         if (Yii::app()->request->isPostRequest) {
             $postData = $_POST['BeautyContestants'];
 
-            $files = array();
-            $fileFields = array('photo_portrait', 'photo_portrait_2', 'photo_full_body', 'photo_full_body_2', 'video_path');
-            foreach ($fileFields as $field) {
-                if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
-                    $files[$field] = $_FILES[$field];
-                }
-            }
+            // Upload files to contestant's folder
+            $uploadedPaths = $this->uploadContestantFiles($model->attendee_name, $model->id);
+            $postData = array_merge($postData, $uploadedPaths);
 
-            $result = BeautyContestants::submitByToken($token, $postData, $files);
+            $result = BeautyContestants::submitByToken($token, $postData);
 
             if ($result['success']) {
                 // Gửi email xác nhận
