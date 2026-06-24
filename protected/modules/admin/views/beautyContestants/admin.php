@@ -224,6 +224,57 @@ Yii::app()->clientScript->registerScript('beauty-contestants-scripts', "
         });
     });
 
+    // Tạo toàn bộ token
+    $('#btn_generate_all_tokens').click(function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'Tạo toàn bộ token',
+            html: '<p>Tạo submission token cho TẤT CẢ thí sinh chưa có token.</p>' +
+                  '<p>Token sẽ hết hạn vào: <strong>23:59 ngày 10/07/2026</strong></p>',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#17a2b8',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Tạo token',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Đang tạo token...',
+                    text: 'Vui lòng đợi...',
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: '" . $this->createUrl('generateAllTokens') . "',
+                    type: 'POST',
+                    data: { expires_at: '2026-07-10 23:59:59' },
+                    dataType: 'json',
+                    success: function(response) {
+                        Swal.close();
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Hoàn tất',
+                                html: 'Đã tạo: <strong>' + response.generated + '</strong> token<br>Bỏ qua (đã có): <strong>' + response.skipped + '</strong>',
+                            });
+                        } else {
+                            Toast.error(response.message || 'Có lỗi xảy ra');
+                        }
+                    },
+                    error: function() {
+                        Swal.close();
+                        Toast.error('Lỗi kết nối server');
+                    }
+                });
+            }
+        });
+    });
+
     // Gửi email hàng loạt
     $('#btn_send_bulk_email').click(function(e) {
         e.preventDefault();
