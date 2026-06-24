@@ -36,7 +36,16 @@ class MissController extends CController
             return;
         }
 
-        $model = BeautyContestants::fetchByToken($token);
+        // Map API data to model (không gọi API lần 2)
+        $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+        $model = new BeautyContestants;
+        $model->setAttributes($data, false);
+        $model->attendee_name = isset($data['attendee_name']) ? $data['attendee_name'] : '';
+        $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
+        $model->contest_name = isset($data['contest_name']) ? $data['contest_name'] : '';
+        $model->event_name = isset($data['event_name']) ? $data['event_name'] : '';
+        $model->personal_email = isset($data['personal_email']) ? $data['personal_email'] : '';
+        $model->submitted_at = isset($data['submitted_at']) ? $data['submitted_at'] : '';
 
         if (Yii::app()->request->isPostRequest) {
             $postData = $_POST['BeautyContestants'];
