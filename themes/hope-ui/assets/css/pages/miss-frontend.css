@@ -494,7 +494,7 @@ body.miss-page .container {
     left: 0;
     right: 0;
     height: 5px;
-    background: linear-gradient(90deg, #17a2b8, #20c997, #17a2b8);
+    background: linear-gradient(90deg, #d4145a, #fbb03b, #d4145a);
 }
 
 .info-icon {

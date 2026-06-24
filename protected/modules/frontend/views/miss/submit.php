@@ -28,32 +28,19 @@ Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-s
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Chiều cao (cm) <span class="text-danger">*</span></label>
                         <input type="number" step="0.1" class="form-control" name="BeautyContestants[height_cm]"
-                               value="<?php echo CHtml::encode($model->height_cm); ?>" required>
+                            value="<?php echo CHtml::encode($model->height_cm); ?>" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Cân nặng (kg) <span class="text-danger">*</span></label>
                         <input type="number" step="0.1" class="form-control" name="BeautyContestants[weight_kg]"
-                               value="<?php echo CHtml::encode($model->weight_kg); ?>" required>
+                            value="<?php echo CHtml::encode($model->weight_kg); ?>" required>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Số đo 3 vòng <span class="text-danger">*</span></label>
+                        <label class="form-label">Số đo 3 vòng (cm)<span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="BeautyContestants[measurements]"
-                               value="<?php echo CHtml::encode($model->measurements); ?>"
-                               placeholder="VD: 90-60-90" required>
+                            value="<?php echo CHtml::encode($model->measurements); ?>"
+                            placeholder="VD: 90-60-90" required>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Năng khiếu / Tài năng</label>
-                    <input type="text" class="form-control" name="BeautyContestants[talent]"
-                           value="<?php echo CHtml::encode($model->talent); ?>"
-                           placeholder="VD: Múa dân gian, Hát...">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Tiểu sử / Giới thiệu bản thân</label>
-                    <textarea class="form-control" name="BeautyContestants[bio]" rows="4"
-                              placeholder="Giới thiệu ngắn gọn về bản thân..."><?php echo CHtml::encode($model->bio); ?></textarea>
                 </div>
 
                 <div class="section-title mt-4">
@@ -69,8 +56,8 @@ Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-s
                         </label>
                         <div class="photo-upload-wrapper" id="wrapper-portrait">
                             <input type="file" name="photo_portrait" accept="image/*"
-                                   data-preview="preview-portrait"
-                                   <?php echo empty($model->photo_portrait) ? 'required' : ''; ?>>
+                                data-preview="preview-portrait"
+                                <?php echo empty($model->photo_portrait) ? 'required' : ''; ?>>
                             <div class="upload-placeholder">
                                 <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
                                 <div class="upload-text"><strong>Nhấn để chọn ảnh</strong><br>hoặc kéo thả vào đây</div>
@@ -90,7 +77,7 @@ Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-s
                         </label>
                         <div class="photo-upload-wrapper" id="wrapper-portrait2">
                             <input type="file" name="photo_portrait_2" accept="image/*"
-                                   data-preview="preview-portrait2">
+                                data-preview="preview-portrait2">
                             <div class="upload-placeholder">
                                 <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
                                 <div class="upload-text"><strong>Nhấn để chọn ảnh</strong><br>hoặc kéo thả vào đây</div>
@@ -113,8 +100,8 @@ Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-s
                         </label>
                         <div class="photo-upload-wrapper" id="wrapper-fullbody">
                             <input type="file" name="photo_full_body" accept="image/*"
-                                   data-preview="preview-fullbody"
-                                   <?php echo empty($model->photo_full_body) ? 'required' : ''; ?>>
+                                data-preview="preview-fullbody"
+                                <?php echo empty($model->photo_full_body) ? 'required' : ''; ?>>
                             <div class="upload-placeholder">
                                 <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
                                 <div class="upload-text"><strong>Nhấn để chọn ảnh</strong><br>hoặc kéo thả vào đây</div>
@@ -134,7 +121,7 @@ Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-s
                         </label>
                         <div class="photo-upload-wrapper" id="wrapper-fullbody2">
                             <input type="file" name="photo_full_body_2" accept="image/*"
-                                   data-preview="preview-fullbody2">
+                                data-preview="preview-fullbody2">
                             <div class="upload-placeholder">
                                 <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
                                 <div class="upload-text"><strong>Nhấn để chọn ảnh</strong><br>hoặc kéo thả vào đây</div>
