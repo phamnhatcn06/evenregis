@@ -107,6 +107,13 @@ class BeautyContestants extends BaseBeautyContestants
         return ApiClient::post($url, array());
     }
 
+    public static function generateAllSubmissionTokens($expiresAt)
+    {
+        return ApiClient::post(ApiEndpoints::BEAUTY_CONTESTANT_GENERATE_ALL_TOKENS, array(
+            'expires_at' => $expiresAt,
+        ));
+    }
+
     public static function fetchByToken($token)
     {
         $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_BY_TOKEN, array('token' => $token));
