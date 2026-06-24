@@ -937,9 +937,9 @@ class ReportsController extends AdminController
             array('Mã đơn vị:', $model->property_code),
             array('Đợt đăng ký:', $model->period_name),
             array('Trạng thái:', $statusText),
-            array('Ngày gửi:', $model->submitted_at ? date('d/m/Y H:i', strtotime($model->submitted_at)) : '-'),
+            array('Ngày gửi:', $model->submitted_at ? MyHelper::formatDateTime($model->submitted_at) : '-'),
             array('Người gửi:', $model->submitted_by),
-            array('Ngày duyệt:', $model->reviewed_at ? date('d/m/Y H:i', strtotime($model->reviewed_at)) : '-'),
+            array('Ngày duyệt:', $model->reviewed_at ? MyHelper::formatDateTime($model->reviewed_at) : '-'),
             array('Lý do từ chối:', $model->rejection_reason ?: '-'),
             array('Ghi chú:', $model->note ?: '-'),
         );
