@@ -29,20 +29,6 @@ body {
     justify-content: center;
 }
 
-.miss-submit-page::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-        radial-gradient(ellipse at bottom left, rgba(255,107,107,0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at top right, rgba(255,159,67,0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at bottom right, rgba(0,206,201,0.1) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-}
 
 .miss-header {
     text-align: center;
