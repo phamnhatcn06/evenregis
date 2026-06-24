@@ -381,6 +381,37 @@ class BeautyContestantsController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionGenerateAllTokens()
+    {
+        if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ');
+        }
+
+        $expiresAt = Yii::app()->request->getPost('expires_at');
+        if (empty($expiresAt)) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Thiếu thời gian hết hạn'));
+            Yii::app()->end();
+        }
+
+        $result = BeautyContestants::generateAllSubmissionTokens($expiresAt);
+
+        if ($result['success']) {
+            $data = isset($result['data']) ? $result['data'] : array();
+            $generated = isset($data['generated']) ? $data['generated'] : 0;
+            $skipped = isset($data['skipped']) ? $data['skipped'] : 0;
+            echo CJSON::encode(array(
+                'success' => true,
+                'message' => 'Tạo token thành công',
+                'generated' => $generated,
+                'skipped' => $skipped,
+            ));
+        } else {
+            $msg = isset($result['error']) ? $result['error'] : 'Không thể tạo token';
+            echo CJSON::encode(array('success' => false, 'message' => $msg));
+        }
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = BeautyContestants::fetchFromApi($id);
