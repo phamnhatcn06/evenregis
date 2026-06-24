@@ -58,7 +58,7 @@ class MissController extends CController
 
             if ($result['success']) {
                 // Gửi email xác nhận - dùng model đã có, set email từ postData
-                $model->personal_email = isset($postData['personal_email']) ? $postData['personal_email'] : '';
+                // $model->personal_email = isset($postData['personal_email']) ? $postData['personal_email'] : '';
                 EmailHelper::sendMissConfirmation($model);
                 $this->redirect(array('thankyou', 'token' => $token));
             } else {
