@@ -6,13 +6,22 @@ Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/css/pages/miss-fro
 Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/js/pages/miss-submit.js', CClientScript::POS_END);
 ?>
 
-<div class="miss-submit-page" style="background-image: url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg');">
-    <div class="miss-card">
-        <div class="miss-card-header">
-            <h4><i class="fa fa-star me-2"></i>Gửi hồ sơ dự thi</h4>
+<div class="miss-thankyou-page" style="background-image: url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg');">
+    <div class="thankyou-card submit-card">
+        <div class="decorative-icons">
+            <i class="fa fa-star"></i>
+            <i class="fa fa-heart"></i>
+            <i class="fa fa-diamond"></i>
+            <i class="fa fa-heart"></i>
+            <i class="fa fa-star"></i>
         </div>
-        <div class="miss-card-body">
-            <div class="contestant-info">
+
+        <h2 class="thankyou-title">
+            <i class="fa fa-star"></i>
+            Gửi hồ sơ dự thi
+        </h2>
+
+        <div class="contestant-info">
                 <strong>Xin chào <?php echo CHtml::encode($model->attendee_name); ?>!</strong><br>
                 Cuộc thi: <strong><?php echo CHtml::encode($model->contest_name); ?></strong><br>
                 Đơn vị: <strong><?php echo CHtml::encode($model->property_name); ?></strong>
