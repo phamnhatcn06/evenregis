@@ -21,8 +21,7 @@ body {
 .miss-thankyou-page {
     min-height: 100vh;
     width: 100vw;
-    background: linear-gradient(135deg, rgba(255,245,248,0.92) 0%, rgba(255,238,242,0.92) 100%),
-                url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg') center center / cover no-repeat fixed;
+    background: url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg') center center / cover no-repeat fixed;
     padding: 30px 15px;
     margin: 0;
     position: fixed;
