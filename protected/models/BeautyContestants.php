@@ -101,10 +101,14 @@ class BeautyContestants extends BaseBeautyContestants
         return null;
     }
 
-    public static function generateSubmissionToken($id)
+    public static function generateSubmissionToken($id, $expiresAt = null)
     {
         $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_GENERATE_TOKEN, array('id' => $id));
-        return ApiClient::post($url, array());
+        $data = array();
+        if ($expiresAt) {
+            $data['expires_at'] = $expiresAt;
+        }
+        return ApiClient::post($url, $data);
     }
 
     public static function generateAllSubmissionTokens($expiresAt)
