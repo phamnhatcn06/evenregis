@@ -62,6 +62,49 @@ class MissController extends CController
         ));
     }
 
+    /**
+     * Upload contestant files to dedicated folder
+     * @param string $attendeeName Contestant name (Vietnamese)
+     * @param int $contestantId Contestant ID
+     * @return array Uploaded file paths
+     */
+    private function uploadContestantFiles($attendeeName, $contestantId)
+    {
+        $uploadedPaths = array();
+        $fileFields = array('photo_portrait', 'photo_portrait_2', 'photo_full_body', 'photo_full_body_2', 'video_path');
+
+        // Create folder name from contestant name (no accents)
+        $folderName = MyHelper::toSlug($attendeeName);
+        if (empty($folderName)) {
+            $folderName = 'contestant-' . $contestantId;
+        }
+
+        $uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/miss/' . $folderName;
+
+        // Create directory if not exists
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        foreach ($fileFields as $field) {
+            if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
+                $file = $_FILES[$field];
+                $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+                // Generate unique filename
+                $filename = $field . '-' . time() . '.' . $ext;
+                $targetPath = $uploadDir . '/' . $filename;
+
+                if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    // Store relative path
+                    $uploadedPaths[$field] = 'uploads/miss/' . $folderName . '/' . $filename;
+                }
+            }
+        }
+
+        return $uploadedPaths;
+    }
+
     public function actionThankyou($token = null)
     {
         $model = null;
