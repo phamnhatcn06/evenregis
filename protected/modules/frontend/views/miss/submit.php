@@ -88,7 +88,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
 
 .miss-card-header h4 {
     color: #fff;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Lato', sans-serif;
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
