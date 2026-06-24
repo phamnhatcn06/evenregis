@@ -6,6 +6,7 @@ class BeautyContestantsController extends AdminController
     {
         parent::init();
         $this->publicActions[] = 'export';
+        $this->publicActions[] = 'generateAllTokens';
     }
 
     public function actionIndex()
