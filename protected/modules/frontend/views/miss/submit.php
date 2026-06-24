@@ -340,6 +340,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
             </div>
 
             <form id="miss-submit-form" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="<?php echo Yii::app()->request->csrfTokenName; ?>" value="<?php echo Yii::app()->request->csrfToken; ?>" />
                 <div class="section-title">
                     <i class="fa fa-user"></i>Thông tin cá nhân
                 </div>
