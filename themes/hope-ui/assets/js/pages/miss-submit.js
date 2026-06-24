@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Miss submit JS loaded');
+    console.log('Resumable available:', typeof Resumable !== 'undefined');
+
     // Image preview handling
     var imageInputs = document.querySelectorAll('input[type="file"][accept="image/*"]');
 
