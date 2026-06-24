@@ -8,7 +8,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
 
 .miss-thankyou-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,250,245,0.95) 100%);
+    background: linear-gradient(135deg, #fff5f8 0%, #ffeef2 50%, #fff0f5 100%);
     padding: 30px 15px;
     font-family: 'Montserrat', sans-serif;
     display: flex;
@@ -24,38 +24,73 @@ $baseUrl = Yii::app()->theme->baseUrl;
     width: 100%;
     height: 100%;
     background:
-        radial-gradient(ellipse at bottom left, rgba(255,107,107,0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at top right, rgba(255,159,67,0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at bottom right, rgba(0,206,201,0.1) 0%, transparent 50%);
+        radial-gradient(ellipse at bottom left, rgba(255,182,193,0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at top right, rgba(255,105,180,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(255,192,203,0.2) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
 
 .thankyou-card {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 24px;
+    box-shadow: 0 15px 50px rgba(212,20,90,0.1);
+    border: 1px solid rgba(255,182,193,0.5);
     backdrop-filter: blur(10px);
     overflow: hidden;
     position: relative;
     z-index: 1;
-    max-width: 600px;
+    max-width: 550px;
     width: 100%;
     text-align: center;
     padding: 50px 40px;
 }
 
+.thankyou-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #ff6b9d, #fbb03b, #ff6b9d);
+}
+
+.confetti {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    opacity: 0.8;
+}
+
 .success-icon {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    width: 110px;
+    height: 110px;
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 30px;
-    box-shadow: 0 10px 30px rgba(40,167,69,0.3);
+    margin: 0 auto 25px;
+    box-shadow: 0 15px 40px rgba(255,107,157,0.35);
+    position: relative;
+}
+
+.success-icon::after {
+    content: '';
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border: 3px dashed rgba(255,107,157,0.3);
+    border-radius: 50%;
+    animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .success-icon i {
@@ -63,11 +98,27 @@ $baseUrl = Yii::app()->theme->baseUrl;
     color: #fff;
 }
 
+.decorative-icons {
+    margin-bottom: 15px;
+}
+
+.decorative-icons i {
+    font-size: 1.5rem;
+    margin: 0 8px;
+    opacity: 0.7;
+}
+
+.decorative-icons i:nth-child(1) { color: #ff6b9d; }
+.decorative-icons i:nth-child(2) { color: #fbb03b; }
+.decorative-icons i:nth-child(3) { color: #ff8fab; }
+.decorative-icons i:nth-child(4) { color: #ffb6c1; }
+.decorative-icons i:nth-child(5) { color: #ff6b9d; }
+
 .thankyou-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #ff6b9d 0%, #d4145a 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -95,22 +146,48 @@ $baseUrl = Yii::app()->theme->baseUrl;
 }
 
 .info-box {
-    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-    border-radius: 12px;
-    padding: 20px;
+    background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 100%);
+    border-radius: 16px;
+    padding: 20px 25px;
     margin: 25px 0;
-    border-left: 4px solid #d4145a;
+    border: 1px solid rgba(255,182,193,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
 
 .info-box i {
-    color: #d4145a;
-    margin-right: 8px;
+    color: #ff6b9d;
+    font-size: 1.3rem;
+}
+
+.info-box span {
+    color: #666;
+}
+
+.heart-divider {
+    margin: 25px 0;
+    color: #ffb6c1;
+    font-size: 0.9rem;
+    letter-spacing: 5px;
 }
 
 .contact-text {
     color: #888;
     font-size: 0.9rem;
-    margin-top: 20px;
+    margin-top: 10px;
+}
+
+.contact-text i {
+    color: #ff6b9d;
+    margin-right: 5px;
+}
+
+.flower-decoration {
+    margin-top: 25px;
+    font-size: 1.8rem;
+    opacity: 0.6;
 }
 
 @media (max-width: 768px) {
@@ -123,43 +200,77 @@ $baseUrl = Yii::app()->theme->baseUrl;
     }
 
     .success-icon {
-        width: 80px;
-        height: 80px;
+        width: 90px;
+        height: 90px;
+    }
+
+    .success-icon::after {
+        width: 110px;
+        height: 110px;
     }
 
     .success-icon i {
         font-size: 40px;
+    }
+
+    .decorative-icons i {
+        font-size: 1.2rem;
     }
 }
 </style>
 
 <div class="miss-thankyou-page">
     <div class="thankyou-card">
+        <div class="decorative-icons">
+            <i class="fa fa-star"></i>
+            <i class="fa fa-heart"></i>
+            <i class="fa fa-diamond"></i>
+            <i class="fa fa-heart"></i>
+            <i class="fa fa-star"></i>
+        </div>
+
         <div class="success-icon">
             <i class="fa fa-check"></i>
         </div>
 
-        <h2 class="thankyou-title">Gửi hồ sơ thành công!</h2>
+        <h2 class="thankyou-title">
+            <i class="fa fa-heart" style="font-size: 0.8em; margin-right: 8px;"></i>
+            Gửi hồ sơ thành công!
+        </h2>
 
         <?php if ($model): ?>
             <p class="thankyou-text">
+                <i class="fa fa-user" style="color: #ff6b9d; margin-right: 5px;"></i>
                 Cảm ơn <strong><?php echo CHtml::encode($model->attendee_name); ?></strong>
                 đã gửi hồ sơ dự thi.
             </p>
             <p class="contest-name">
+                <i class="fa fa-trophy" style="color: #fbb03b; margin-right: 5px;"></i>
                 Cuộc thi: <strong><?php echo CHtml::encode($model->contest_name); ?></strong>
             </p>
         <?php else: ?>
-            <p class="thankyou-text">Cảm ơn bạn đã gửi hồ sơ dự thi.</p>
+            <p class="thankyou-text">
+                <i class="fa fa-smile-o" style="color: #ff6b9d; margin-right: 5px;"></i>
+                Cảm ơn bạn đã gửi hồ sơ dự thi.
+            </p>
         <?php endif; ?>
 
         <div class="info-box">
             <i class="fa fa-envelope"></i>
-            Email xác nhận đã được gửi đến địa chỉ email của bạn.
+            <span>Email xác nhận đã được gửi đến địa chỉ email của bạn.</span>
+        </div>
+
+        <div class="heart-divider">
+            ♥ ♥ ♥
         </div>
 
         <p class="contact-text">
+            <i class="fa fa-phone"></i>
             Nếu có thắc mắc, vui lòng liên hệ Ban tổ chức.
         </p>
+
+        <div class="flower-decoration">
+            🌸 🌺 🌸
+        </div>
     </div>
 </div>
