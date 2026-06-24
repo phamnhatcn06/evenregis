@@ -563,14 +563,14 @@ body.miss-page .container {
 }
 
 .submitted-card .info-box {
-    background: linear-gradient(135deg, #e8f7f9 0%, #e3f9f5 100%);
-    border: 1px solid rgba(23, 162, 184, 0.3);
+    background: linear-gradient(135deg, #fff5f8 0%, #fff0f5 100%);
+    border: 1px solid rgba(212, 20, 90, 0.3);
     text-align: left;
     display: block;
 }
 
 .submitted-card .info-box i {
-    color: #17a2b8;
+    color: #d4145a;
     margin-right: 10px;
 }
 
