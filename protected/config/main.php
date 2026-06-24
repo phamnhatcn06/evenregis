@@ -49,9 +49,17 @@ return array(
     ),
     // application components
     'components' => array(
-        // File cache
+        // Memcached cache
         'cache' => array(
-            'class' => 'CFileCache',
+            'class' => 'CMemCache',
+            'useMemcached' => true,
+            'servers' => array(
+                array(
+                    'host' => '127.0.0.1',
+                    'port' => 11211,
+                    'weight' => 100,
+                ),
+            ),
         ),
         'chartjs' => array('class' => 'chartjs.components.ChartJs'),
         'ePdf' => array(
