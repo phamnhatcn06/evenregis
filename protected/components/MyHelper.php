@@ -181,10 +181,13 @@ class MyHelper
         $mail = Yii::app()->mail;
         $params = Yii::app()->params['mail'];
 
+        if (empty($params)) {
+            throw new Exception("Mail params not configured in params.php");
+        }
+
         $viewPath = Yii::getPathOfAlias('application.views.mail.' . $view) . '.php';
         if (!file_exists($viewPath)) {
-            Yii::log("Email view not found: {$viewPath}", CLogger::LEVEL_ERROR, 'application.email');
-            return false;
+            throw new Exception("Email view not found: {$viewPath}");
         }
 
         extract($data);
