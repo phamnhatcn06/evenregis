@@ -318,6 +318,21 @@ body.miss-page .container {
   padding: 50px 40px;
 }
 
+.thankyou-card.submit-card {
+  max-width: 900px;
+  text-align: left;
+  padding: 40px 50px;
+}
+
+.thankyou-card.submit-card .thankyou-title {
+  text-align: center;
+}
+
+.thankyou-card.submit-card .heart-divider,
+.thankyou-card.submit-card .flower-decoration {
+  text-align: center;
+}
+
 .thankyou-card::before {
   content: "";
   position: absolute;
