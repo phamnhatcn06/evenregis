@@ -205,9 +205,18 @@ class MyHelper
         }
 
         try {
-            $result = $mail->send($message);
-            Yii::log("Email sent to {$to}: {$subject}", CLogger::LEVEL_INFO, 'application.email');
-            return $result > 0;
+            $failedRecipients = array();
+            $result = $mail->send($message, $failedRecipients);
+            if ($result > 0) {
+                Yii::log("Email sent to {$to}: {$subject}", CLogger::LEVEL_INFO, 'application.email');
+                return true;
+            } else {
+                Yii::log("Email send returned 0. Failed recipients: " . implode(', ', $failedRecipients), CLogger::LEVEL_ERROR, 'application.email');
+                return false;
+            }
+        } catch (Swift_TransportException $e) {
+            Yii::log("SMTP connection failed: " . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.email');
+            return false;
         } catch (Exception $e) {
             Yii::log("Email failed to {$to}: " . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.email');
             return false;
