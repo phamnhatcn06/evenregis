@@ -219,7 +219,7 @@ class RegistrationsTest extends CTestCase
 
         // Thuc hien submit
         $model->status = Registrations::STATUS_SUBMITTED;
-        $model->submitted_at = time();
+        $model->submitted_at = date('Y-m-d H:i:s');
 
         $this->assertEquals(Registrations::STATUS_SUBMITTED, $model->status);
         $this->assertNotNull($model->submitted_at, 'submitted_at phai duoc gan');
