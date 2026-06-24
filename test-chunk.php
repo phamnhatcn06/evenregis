@@ -1,6 +1,4 @@
 <?php
-header('Content-Type: application/json');
-
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 $uploadDir = __DIR__ . '/uploads/test/';
 
