@@ -349,11 +349,15 @@ class BeautyContestantsController extends AdminController
 
         if (empty($model->submission_token)) {
             $tokenResult = BeautyContestants::generateSubmissionToken($id, '2026-07-10 23:59:59');
-            if (!$tokenResult['success']) {
+            if ($tokenResult['success'] && isset($tokenResult['data']['data']['token'])) {
+                $model->submission_token = $tokenResult['data']['data']['token'];
+                if (isset($tokenResult['data']['data']['expires_at'])) {
+                    $model->submission_token_expires_at = $tokenResult['data']['data']['expires_at'];
+                }
+            } else {
                 echo CJSON::encode(array('success' => false, 'message' => 'Không thể tạo token'));
                 Yii::app()->end();
             }
-            $model = BeautyContestants::fetchFromApi($id);
         }
 
         try {
@@ -400,11 +404,15 @@ class BeautyContestantsController extends AdminController
 
             if (empty($contestant->submission_token)) {
                 $tokenResult = BeautyContestants::generateSubmissionToken($contestant->id, '2026-07-10 23:59:59');
-                if (!$tokenResult['success']) {
+                if ($tokenResult['success'] && isset($tokenResult['data']['data']['token'])) {
+                    $contestant->submission_token = $tokenResult['data']['data']['token'];
+                    if (isset($tokenResult['data']['data']['expires_at'])) {
+                        $contestant->submission_token_expires_at = $tokenResult['data']['data']['expires_at'];
+                    }
+                } else {
                     $failed++;
                     continue;
                 }
-                $contestant = BeautyContestants::fetchFromApi($contestant->id);
             }
 
             $emailSent = EmailHelper::sendMissInvitation($contestant);

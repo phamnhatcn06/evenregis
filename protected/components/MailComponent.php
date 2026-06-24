@@ -18,6 +18,15 @@ class MailComponent extends YiiMail
             'encryption' => $mailConfig['encryption'],
         );
 
+        // Set default stream context to bypass SSL peer verification for PHP socket stream/crypto
+        stream_context_set_default(array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true,
+            )
+        ));
+
         parent::init();
     }
 }
