@@ -138,10 +138,10 @@ class BeautyContestants extends BaseBeautyContestants
         return null;
     }
 
-    public static function submitByToken($token, $data, $files = array())
+    public static function submitByToken($token, $data)
     {
         $postData = array_merge(array('token' => $token), $data);
-        return ApiClient::postMultipart(ApiEndpoints::BEAUTY_CONTESTANT_SUBMIT_BY_TOKEN, $postData, $files);
+        return ApiClient::post(ApiEndpoints::BEAUTY_CONTESTANT_SUBMIT_BY_TOKEN, $postData);
     }
 
     public function storeViaApi()
