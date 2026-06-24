@@ -394,22 +394,34 @@ class BeautyContestantsController extends AdminController
             Yii::app()->end();
         }
 
-        $result = BeautyContestants::generateAllSubmissionTokens($expiresAt);
+        $dataProvider = BeautyContestants::getApiDataProvider(array(), 1000);
+        $contestants = $dataProvider->getData();
 
-        if ($result['success']) {
-            $data = isset($result['data']) ? $result['data'] : array();
-            $generated = isset($data['generated']) ? $data['generated'] : 0;
-            $skipped = isset($data['skipped']) ? $data['skipped'] : 0;
-            echo CJSON::encode(array(
-                'success' => true,
-                'message' => 'Tạo token thành công',
-                'generated' => $generated,
-                'skipped' => $skipped,
-            ));
-        } else {
-            $msg = isset($result['error']) ? $result['error'] : 'Không thể tạo token';
-            echo CJSON::encode(array('success' => false, 'message' => $msg));
+        $generated = 0;
+        $skipped = 0;
+        $failed = 0;
+
+        foreach ($contestants as $contestant) {
+            if (!empty($contestant->submission_token)) {
+                $skipped++;
+                continue;
+            }
+
+            $result = BeautyContestants::generateSubmissionToken($contestant->id, $expiresAt);
+            if ($result['success']) {
+                $generated++;
+            } else {
+                $failed++;
+            }
         }
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'message' => 'Tạo token thành công',
+            'generated' => $generated,
+            'skipped' => $skipped,
+            'failed' => $failed,
+        ));
         Yii::app()->end();
     }
 
