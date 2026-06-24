@@ -336,13 +336,34 @@ class BeautyContestantsController extends AdminController
             Yii::app()->end();
         }
 
-        $result = BeautyContestants::generateSubmissionToken($id);
+        $model = BeautyContestants::fetchFromApi($id);
+        if ($model === null) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy thí sinh'));
+            Yii::app()->end();
+        }
 
-        if ($result['success']) {
+        if (empty($model->personal_email)) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Thí sinh chưa có email cá nhân'));
+            Yii::app()->end();
+        }
+
+        if (empty($model->submission_token)) {
+            $tokenResult = BeautyContestants::generateSubmissionToken($id, '2026-07-10 23:59:59');
+            if (!$tokenResult['success']) {
+                echo CJSON::encode(array('success' => false, 'message' => 'Không thể tạo token'));
+                Yii::app()->end();
+            }
+            $model = BeautyContestants::fetchFromApi($id);
+        }
+
+        $emailSent = EmailHelper::sendMissInvitation($model);
+
+        if ($emailSent) {
+            $model->status = BeautyContestants::STATUS_EMAIL_SENT;
+            $model->updateViaApi();
             echo CJSON::encode(array('success' => true, 'message' => 'Đã gửi email thành công'));
         } else {
-            $msg = isset($result['error']) ? $result['error'] : 'Không thể gửi email';
-            echo CJSON::encode(array('success' => false, 'message' => $msg));
+            echo CJSON::encode(array('success' => false, 'message' => 'Không thể gửi email'));
         }
         Yii::app()->end();
     }
