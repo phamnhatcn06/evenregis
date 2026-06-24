@@ -111,7 +111,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
 }
 
 .section-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Lato', sans-serif;
     font-size: 1.3rem;
     color: #333;
     border-bottom: 2px solid #fbb03b;
