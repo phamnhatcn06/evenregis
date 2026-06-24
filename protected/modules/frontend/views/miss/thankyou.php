@@ -8,7 +8,8 @@ $baseUrl = Yii::app()->theme->baseUrl;
 
 .miss-thankyou-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #fff5f8 0%, #ffeef2 50%, #fff0f5 100%);
+    background: linear-gradient(135deg, rgba(255,245,248,0.92) 0%, rgba(255,238,242,0.92) 100%),
+                url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg') center center / cover no-repeat fixed;
     padding: 30px 15px;
     font-family: 'Montserrat', sans-serif;
     display: flex;
