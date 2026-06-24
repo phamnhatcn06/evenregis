@@ -7,13 +7,22 @@ class EmailHelper
         $mail = Yii::app()->mail;
         $params = Yii::app()->params['mail'];
 
+        $viewPath = Yii::getPathOfAlias('application.views.mail.' . $view) . '.php';
+        if (!file_exists($viewPath)) {
+            Yii::log("Email view not found: {$viewPath}", CLogger::LEVEL_ERROR, 'application.email');
+            return false;
+        }
+
+        extract($data);
+        ob_start();
+        include($viewPath);
+        $body = ob_get_clean();
+
         $message = new YiiMailMessage();
         $message->setSubject($subject);
         $message->setFrom(array($params['from_email'] => $params['from_name']));
         $message->setTo($to);
-
-        $message->view = $view;
-        $message->setBody($data, 'text/html');
+        $message->setBody($body, 'text/html');
 
         foreach ($attachments as $attachment) {
             if (is_string($attachment)) {
