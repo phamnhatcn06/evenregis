@@ -50,7 +50,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
 }
 
 .miss-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Lato', sans-serif;
     font-size: 2.5rem;
     font-weight: 700;
     background: linear-gradient(135deg, #d4145a 0%, #fbb03b 100%);
