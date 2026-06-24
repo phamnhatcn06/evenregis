@@ -11,7 +11,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
     background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,250,245,0.95) 100%),
                 url('<?php echo $baseUrl; ?>/assets/images/miss-bg.jpg') center center / cover no-repeat fixed;
     padding: 30px 15px;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .miss-submit-page::before {
@@ -50,7 +50,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
 }
 
 .miss-title {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 2.5rem;
     font-weight: 700;
     background: linear-gradient(135deg, #d4145a 0%, #fbb03b 100%);
@@ -88,7 +88,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
 
 .miss-card-header h4 {
     color: #fff;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
@@ -111,7 +111,7 @@ $baseUrl = Yii::app()->theme->baseUrl;
 }
 
 .section-title {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1.3rem;
     color: #333;
     border-bottom: 2px solid #fbb03b;
