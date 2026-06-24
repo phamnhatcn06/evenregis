@@ -18,19 +18,26 @@ class MissController extends CController
             return;
         }
 
-        $model = BeautyContestants::fetchByToken($token);
+        // Check token via API
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_BY_TOKEN, array('token' => $token));
+        $result = ApiClient::get($url);
 
-        if ($model === null) {
+        if (!$result['success'] || !isset($result['data'])) {
             $this->render('error', array(
                 'message' => 'Link đã hết hạn hoặc không hợp lệ. Vui lòng liên hệ Ban tổ chức.',
             ));
             return;
         }
 
-        if (!empty($model->submitted_at)) {
+        $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+
+        // Check if already submitted
+        if (!empty($data['submitted_at'])) {
             $this->redirect(array('alreadySubmitted', 'token' => $token));
             return;
         }
+
+        $model = BeautyContestants::fetchByToken($token);
 
         if (Yii::app()->request->isPostRequest) {
             $postData = $_POST['BeautyContestants'];
