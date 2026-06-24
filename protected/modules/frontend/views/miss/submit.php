@@ -8,8 +8,8 @@ $baseUrl = Yii::app()->theme->baseUrl;
 
 .miss-submit-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,250,245,0.95) 100%),
-                url('<?php echo $baseUrl; ?>/assets/images/miss-bg.jpg') center center / cover no-repeat fixed;
+    background: linear-gradient(135deg, rgba(255,245,248,0.92) 0%, rgba(255,238,242,0.92) 100%),
+                url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg') center center / cover no-repeat fixed;
     padding: 30px 15px;
     font-family: 'Montserrat', sans-serif;
 }
