@@ -4,14 +4,14 @@ $baseUrl = Yii::app()->theme->baseUrl;
 ?>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
 
 .miss-submit-page {
     min-height: 100vh;
     background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,250,245,0.95) 100%),
                 url('<?php echo $baseUrl; ?>/assets/images/miss-bg.jpg') center center / cover no-repeat fixed;
     padding: 30px 15px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Lato', sans-serif;
 }
 
 .miss-submit-page::before {
