@@ -6,12 +6,27 @@ $baseUrl = Yii::app()->theme->baseUrl;
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
+body {
+    padding-top: 0 !important;
+    margin: 0 !important;
+}
+
+.container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+
 .miss-submit-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(255,245,248,0.92) 0%, rgba(255,238,242,0.92) 100%),
-                url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg') center center / cover no-repeat fixed;
+    width: 100vw;
+    background: url('<?php echo $baseUrl; ?>/assets/images/background-miss.jpg') center center / cover no-repeat fixed;
     padding: 30px 15px;
     font-family: 'Montserrat', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .miss-submit-page::before {
