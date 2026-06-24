@@ -166,5 +166,52 @@ class MyHelper
             . '</button>'
             . '</form>';
     }
+
+    /**
+     * Send email using SMTP
+     * @param string $to Email recipient
+     * @param string $subject Email subject
+     * @param string $view View name in application.views.mail folder
+     * @param array $data Data to pass to view
+     * @param array $attachments File paths to attach
+     * @return bool
+     */
+    public static function sendMail($to, $subject, $view, $data = array(), $attachments = array())
+    {
+        $mail = Yii::app()->mail;
+        $params = Yii::app()->params['mail'];
+
+        $viewPath = Yii::getPathOfAlias('application.views.mail.' . $view) . '.php';
+        if (!file_exists($viewPath)) {
+            Yii::log("Email view not found: {$viewPath}", CLogger::LEVEL_ERROR, 'application.email');
+            return false;
+        }
+
+        extract($data);
+        ob_start();
+        include($viewPath);
+        $body = ob_get_clean();
+
+        $message = new YiiMailMessage();
+        $message->setSubject($subject);
+        $message->setFrom(array($params['from_email'] => $params['from_name']));
+        $message->setTo($to);
+        $message->setBody($body, 'text/html');
+
+        foreach ($attachments as $attachment) {
+            if (is_string($attachment)) {
+                $message->attach(Swift_Attachment::fromPath($attachment));
+            }
+        }
+
+        try {
+            $result = $mail->send($message);
+            Yii::log("Email sent to {$to}: {$subject}", CLogger::LEVEL_INFO, 'application.email');
+            return $result > 0;
+        } catch (Exception $e) {
+            Yii::log("Email failed to {$to}: " . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.email');
+            return false;
+        }
+    }
 }
 ?>
