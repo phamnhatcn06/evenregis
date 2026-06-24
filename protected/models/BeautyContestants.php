@@ -182,9 +182,11 @@ class BeautyContestants extends BaseBeautyContestants
     public static function getStatusLabel($status)
     {
         $labels = array(
-            self::STATUS_REGISTERED => '<span class="badge bg-info">Đã đăng ký</span>',
+            self::STATUS_REGISTERED => '<span class="badge bg-secondary">Đã đăng ký</span>',
             self::STATUS_CONFIRMED => '<span class="badge bg-success">Đã xác nhận</span>',
+            self::STATUS_WITHDRAWN => '<span class="badge bg-warning">Rút lui</span>',
             self::STATUS_DISQUALIFIED => '<span class="badge bg-danger">Loại</span>',
+            self::STATUS_EMAIL_SENT => '<span class="badge bg-info">Đã gửi email</span>',
         );
         return isset($labels[$status]) ? $labels[$status] : $status;
     }
@@ -194,7 +196,9 @@ class BeautyContestants extends BaseBeautyContestants
         return array(
             self::STATUS_REGISTERED => 'Đã đăng ký',
             self::STATUS_CONFIRMED => 'Đã xác nhận',
+            self::STATUS_WITHDRAWN => 'Rút lui',
             self::STATUS_DISQUALIFIED => 'Loại',
+            self::STATUS_EMAIL_SENT => 'Đã gửi email',
         );
     }
 
