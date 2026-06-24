@@ -4,40 +4,7 @@ class EmailHelper
 {
     public static function send($to, $subject, $view, $data = array(), $attachments = array())
     {
-        $mail = Yii::app()->mail;
-        $params = Yii::app()->params['mail'];
-
-        $viewPath = Yii::getPathOfAlias('application.views.mail.' . $view) . '.php';
-        if (!file_exists($viewPath)) {
-            Yii::log("Email view not found: {$viewPath}", CLogger::LEVEL_ERROR, 'application.email');
-            return false;
-        }
-
-        extract($data);
-        ob_start();
-        include($viewPath);
-        $body = ob_get_clean();
-
-        $message = new YiiMailMessage();
-        $message->setSubject($subject);
-        $message->setFrom(array($params['from_email'] => $params['from_name']));
-        $message->setTo($to);
-        $message->setBody($body, 'text/html');
-
-        foreach ($attachments as $attachment) {
-            if (is_string($attachment)) {
-                $message->attach(Swift_Attachment::fromPath($attachment));
-            }
-        }
-
-        try {
-            $result = $mail->send($message);
-            Yii::log("Email sent to {$to}: {$subject}", CLogger::LEVEL_INFO, 'application.email');
-            return $result > 0;
-        } catch (Exception $e) {
-            Yii::log("Email failed to {$to}: " . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.email');
-            return false;
-        }
+        return MyHelper::sendMail($to, $subject, $view, $data, $attachments);
     }
 
     public static function sendMissInvitation($contestant)
