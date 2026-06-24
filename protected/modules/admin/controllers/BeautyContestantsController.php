@@ -381,14 +381,32 @@ class BeautyContestantsController extends AdminController
 
         $sent = 0;
         $failed = 0;
+        $skipped = 0;
 
         foreach ($contestants as $contestant) {
             if (!empty($contestant->submitted_at)) {
+                $skipped++;
                 continue;
             }
 
-            $result = BeautyContestants::generateSubmissionToken($contestant->id);
-            if ($result['success']) {
+            if (empty($contestant->personal_email)) {
+                $skipped++;
+                continue;
+            }
+
+            if (empty($contestant->submission_token)) {
+                $tokenResult = BeautyContestants::generateSubmissionToken($contestant->id, '2026-07-10 23:59:59');
+                if (!$tokenResult['success']) {
+                    $failed++;
+                    continue;
+                }
+                $contestant = BeautyContestants::fetchFromApi($contestant->id);
+            }
+
+            $emailSent = EmailHelper::sendMissInvitation($contestant);
+            if ($emailSent) {
+                $contestant->status = BeautyContestants::STATUS_EMAIL_SENT;
+                $contestant->updateViaApi();
                 $sent++;
             } else {
                 $failed++;
@@ -399,6 +417,7 @@ class BeautyContestantsController extends AdminController
             'success' => true,
             'sent' => $sent,
             'failed' => $failed,
+            'skipped' => $skipped,
         ));
         Yii::app()->end();
     }
