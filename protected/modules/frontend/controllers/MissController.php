@@ -28,9 +28,7 @@ class MissController extends CController
         }
 
         if (!empty($model->submitted_at)) {
-            $this->render('already_submitted', array(
-                'model' => $model,
-            ));
+            $this->redirect(array('alreadySubmitted', 'token' => $token));
             return;
         }
 
