@@ -114,4 +114,25 @@ class MissController extends CController
             'model' => $model,
         ));
     }
+
+    public function actionAlreadySubmitted($token = null)
+    {
+        if (empty($token)) {
+            $this->redirect(array('submit'));
+            return;
+        }
+
+        $model = BeautyContestants::fetchByToken($token);
+
+        if ($model === null) {
+            $this->render('error', array(
+                'message' => 'Link không hợp lệ.',
+            ));
+            return;
+        }
+
+        $this->render('already_submitted', array(
+            'model' => $model,
+        ));
+    }
 }
