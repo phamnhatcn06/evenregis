@@ -29,10 +29,9 @@ class MissController extends CController
             return;
         }
 
-        $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
-
-        // Check if already submitted
-        if (!empty($data['submitted_at'])) {
+        // Check if token invalid/expired (code 400 = already submitted)
+        $dataCode = isset($result['data']['code']) ? $result['data']['code'] : null;
+        if ($dataCode == 400) {
             $this->redirect(array('alreadySubmitted', 'token' => $token));
             return;
         }
