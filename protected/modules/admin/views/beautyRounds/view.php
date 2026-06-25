@@ -13,6 +13,24 @@ $this->menu = array(
         'icon' => 'fa-list',
     ),
     array(
+        'label' => 'Gắn thí sinh',
+        'url' => $this->createUrl('assignContestants', array('id' => $model->id)),
+        'color' => 'info',
+        'icon' => 'fa-user-plus',
+    ),
+    array(
+        'label' => 'Chấm điểm',
+        'url' => $this->createUrl('scoring', array('id' => $model->id)),
+        'color' => 'warning',
+        'icon' => 'fa-star',
+    ),
+    array(
+        'label' => 'Chọn đi tiếp',
+        'url' => $this->createUrl('qualify', array('id' => $model->id)),
+        'color' => 'success',
+        'icon' => 'fa-check-circle',
+    ),
+    array(
         'label' => 'Cập nhật',
         'url' => $this->createUrl('update', array('id' => $model->id)),
         'color' => 'primary',
