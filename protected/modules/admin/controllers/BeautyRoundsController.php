@@ -87,11 +87,15 @@ class BeautyRoundsController extends AdminController
         $model = $this->loadModelById($id);
 
         if (Yii::app()->request->isPostRequest) {
-            $contestantIds = isset($_POST['contestant_ids']) ? $_POST['contestant_ids'] : array();
+            $registrationIds = isset($_POST['registration_ids']) ? $_POST['registration_ids'] : array();
             $nextRoundId = isset($_POST['next_round_id']) ? $_POST['next_round_id'] : null;
 
-            if (!empty($contestantIds)) {
-                $result = BeautyRoundResults::qualifyContestants($id, $contestantIds, $nextRoundId);
+            if (!empty($registrationIds)) {
+                $results = array();
+                foreach ($registrationIds as $regId) {
+                    $results[] = array('registration_id' => $regId, 'passed' => true);
+                }
+                $result = BeautyRoundResults::qualifyContestants($id, $results, $nextRoundId);
                 if ($result['success']) {
                     $this->sendJsonResponse(array('success' => true, 'message' => 'Chọn thí sinh đi tiếp thành công.'));
                 } else {
