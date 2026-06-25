@@ -95,11 +95,11 @@ class BeautyRoundResults extends BaseBeautyRoundResults
         return array();
     }
 
-    public static function assignContestants($roundId, $contestantIds)
+    public static function assignContestants($roundId, $registrationIds)
     {
         return ApiClient::post(ApiEndpoints::BEAUTY_ROUND_RESULT_ASSIGN, array(
             'round_id' => $roundId,
-            'contestant_ids' => $contestantIds,
+            'registration_ids' => $registrationIds,
         ));
     }
 
