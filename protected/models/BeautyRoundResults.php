@@ -95,6 +95,18 @@ class BeautyRoundResults extends BaseBeautyRoundResults
         return array();
     }
 
+    public static function getAssignedContestants($roundId)
+    {
+        $result = ApiClient::get(ApiEndpoints::BEAUTY_ROUND_RESULT_LIST, array(
+            'round_id' => $roundId,
+            'per_page' => 1000,
+        ));
+        if ($result['success'] && isset($result['data'])) {
+            return isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+        }
+        return array();
+    }
+
     public static function assignContestants($roundId, $registrationIds)
     {
         return ApiClient::post(ApiEndpoints::BEAUTY_ROUND_RESULT_ASSIGN, array(
