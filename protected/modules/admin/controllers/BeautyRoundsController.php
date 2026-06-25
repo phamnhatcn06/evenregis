@@ -39,7 +39,7 @@ class BeautyRoundsController extends AdminController
         }
 
         $availableContestants = BeautyRoundResults::getAvailableContestants($id);
-        $assignedContestants = BeautyRoundResults::getApiDataProvider(array('round_id' => $id))->getData();
+        $assignedContestants = BeautyRoundResults::getAssignedContestants($id);
 
         $this->render('assignContestants', array(
             'model' => $model,
