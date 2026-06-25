@@ -337,10 +337,10 @@ class ApiEndpoints
     const BEAUTY_ROUND_RESULT_DETAIL = '/api/beauty-round-results/detail/{id}';
     const BEAUTY_ROUND_RESULT_UPDATE = '/api/beauty-round-results/update/{id}';
     const BEAUTY_ROUND_RESULT_DESTROY = '/api/beauty-round-results/destroy/{id}';
-    const BEAUTY_ROUND_RESULT_ASSIGN = '/api/beauty-round-results/assign/{round_id}';
-    const BEAUTY_ROUND_RESULT_QUALIFY = '/api/beauty-round-results/qualify/{round_id}';
-    const BEAUTY_ROUND_RESULT_RANKING = '/api/beauty-round-results/ranking/{round_id}';
-    const BEAUTY_ROUND_RESULT_AVAILABLE_CONTESTANTS = '/api/beauty-round-results/available-contestants/{round_id}';
+    const BEAUTY_ROUND_RESULT_ASSIGN = '/api/beauty-round-results/assign';
+    const BEAUTY_ROUND_RESULT_QUALIFY = '/api/beauty-round-results/qualify';
+    const BEAUTY_ROUND_RESULT_RANKING = '/api/beauty-round-results/ranking';
+    const BEAUTY_ROUND_RESULT_AVAILABLE_CONTESTANTS = '/api/beauty-round-results/available-contestants';
 
     // Beauty Score
     const BEAUTY_SCORE_LIST = '/api/beauty-scores';
