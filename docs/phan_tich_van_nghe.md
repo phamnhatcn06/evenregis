@@ -378,8 +378,52 @@ if ($period->type === 'talent') {
 
 ---
 
-## 12. Câu hỏi mở
+## 12. Yêu cầu bổ sung
 
-1. Video demo có cần preview trực tiếp trên web không? (nếu 1.5GB thì nặng)
-2. Cần validation định dạng video (resolution, codec) không?
-3. Có cần tính năng "copy tiết mục từ năm trước" không?
+### 12.1 Player video/audio sau khi upload
+
+Sau khi upload thành công, khi load lại trang đăng ký tiết mục phải hiển thị player để xem/nghe file đã upload:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  FILE DEMO                                                      │
+│                                                                 │
+│  Video demo:                                                    │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  ▶ [==============|--------] 1:23 / 3:30                  │  │
+│  │     (HTML5 video player)                                  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│  [Xóa video] [Thay video khác]                                  │
+│                                                                 │
+│  Audio demo:                                                    │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  ▶ [==============|--------] 0:45 / 2:10                  │  │
+│  │     (HTML5 audio player)                                  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│  [Xóa audio] [Thay audio khác]                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Implementation:**
+```html
+<!-- Video player -->
+<?php if ($model->video_demo_path): ?>
+<video controls style="width:100%; max-height:400px;">
+    <source src="<?php echo $model->getVideoDemoUrl(); ?>" type="video/mp4">
+    Trình duyệt không hỗ trợ video.
+</video>
+<?php endif; ?>
+
+<!-- Audio player -->
+<?php if ($model->audio_demo_path): ?>
+<audio controls style="width:100%;">
+    <source src="<?php echo $model->getAudioDemoUrl(); ?>" type="audio/mpeg">
+    Trình duyệt không hỗ trợ audio.
+</audio>
+<?php endif; ?>
+```
+
+### 12.2 Các yêu cầu đã xác nhận KHÔNG cần
+
+- ❌ Không cần validation định dạng video (resolution, codec)
+- ❌ Không cần tính năng "copy tiết mục từ năm trước"
