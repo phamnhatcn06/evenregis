@@ -76,10 +76,7 @@ class BeautyRounds extends BaseBeautyRounds
     public static function getRoundTypeOptions()
     {
         return array(
-            'ao_dai' => 'Áo dài',
-            'bikini' => 'Bikini',
-            'talent' => 'Tài năng',
-            'qa' => 'Ứng xử',
+            'so-khao' => 'Sơ khảo',
             'final' => 'Chung kết',
         );
     }
