@@ -10,7 +10,7 @@ class BeautyRoundsController extends AdminController
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
-        $contestants = BeautyRoundResults::getApiDataProvider(array('round_id' => $id))->getData();
+        $contestants = BeautyRoundResults::getAssignedContestants($id);
         $this->render('view', array(
             'model' => $model,
             'contestants' => $contestants,
