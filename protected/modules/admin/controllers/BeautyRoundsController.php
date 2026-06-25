@@ -10,7 +10,115 @@ class BeautyRoundsController extends AdminController
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
-        $this->render('view', array('model' => $model));
+        $contestants = BeautyRoundResults::getApiDataProvider(array('round_id' => $id))->getData();
+        $this->render('view', array(
+            'model' => $model,
+            'contestants' => $contestants,
+        ));
+    }
+
+    public function actionAssignContestants($id)
+    {
+        $model = $this->loadModelById($id);
+
+        if (Yii::app()->request->isPostRequest) {
+            $registrationIds = isset($_POST['registration_ids']) ? $_POST['registration_ids'] : array();
+            if (!empty($registrationIds)) {
+                $result = BeautyRoundResults::assignContestants($id, $registrationIds);
+                if ($result['success']) {
+                    $this->sendJsonResponse(array('success' => true, 'message' => 'Gắn thí sinh thành công.'));
+                } else {
+                    $this->sendJsonResponse(array('success' => false, 'message' => $result['error'] ?: 'Không thể gắn thí sinh.'));
+                }
+            } else {
+                $this->sendJsonResponse(array('success' => false, 'message' => 'Vui lòng chọn thí sinh.'));
+            }
+            return;
+        }
+
+        $availableContestants = BeautyRoundResults::getAvailableContestants($id);
+        $assignedContestants = BeautyRoundResults::getApiDataProvider(array('round_id' => $id))->getData();
+
+        $this->render('assignContestants', array(
+            'model' => $model,
+            'availableContestants' => $availableContestants,
+            'assignedContestants' => $assignedContestants,
+        ));
+    }
+
+    public function actionScoring($id)
+    {
+        $model = $this->loadModelById($id);
+        $contestants = BeautyRoundResults::getApiDataProvider(array('round_id' => $id))->getData();
+
+        $this->render('scoring', array(
+            'model' => $model,
+            'contestants' => $contestants,
+        ));
+    }
+
+    public function actionSaveScore()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+        }
+
+        $resultId = isset($_POST['result_id']) ? $_POST['result_id'] : null;
+        $score = isset($_POST['score']) ? $_POST['score'] : null;
+        $note = isset($_POST['note']) ? $_POST['note'] : '';
+
+        if (!$resultId || $score === null) {
+            $this->sendJsonResponse(array('success' => false, 'message' => 'Thiếu thông tin.'));
+            return;
+        }
+
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_ROUND_RESULT_UPDATE, array('id' => $resultId));
+        $result = ApiClient::post($url, array('score' => $score, 'note' => $note));
+
+        if ($result['success']) {
+            $this->sendJsonResponse(array('success' => true, 'message' => 'Lưu điểm thành công.'));
+        } else {
+            $this->sendJsonResponse(array('success' => false, 'message' => $result['error'] ?: 'Không thể lưu điểm.'));
+        }
+    }
+
+    public function actionQualify($id)
+    {
+        $model = $this->loadModelById($id);
+
+        if (Yii::app()->request->isPostRequest) {
+            $registrationIds = isset($_POST['registration_ids']) ? $_POST['registration_ids'] : array();
+            $nextRoundId = isset($_POST['next_round_id']) ? $_POST['next_round_id'] : null;
+
+            if (!empty($registrationIds)) {
+                $result = BeautyRoundResults::qualifyContestants($id, $registrationIds, $nextRoundId);
+                if ($result['success']) {
+                    $this->sendJsonResponse(array('success' => true, 'message' => 'Chọn thí sinh đi tiếp thành công.'));
+                } else {
+                    $this->sendJsonResponse(array('success' => false, 'message' => $result['error'] ?: 'Không thể cập nhật.'));
+                }
+            } else {
+                $this->sendJsonResponse(array('success' => false, 'message' => 'Vui lòng chọn thí sinh.'));
+            }
+            return;
+        }
+
+        $ranking = BeautyRoundResults::getRanking($id);
+        $nextRounds = BeautyRounds::getListForDropdown($model->contest_id);
+        unset($nextRounds[$id]);
+
+        $this->render('qualify', array(
+            'model' => $model,
+            'ranking' => $ranking,
+            'nextRounds' => $nextRounds,
+        ));
+    }
+
+    private function sendJsonResponse($data)
+    {
+        header('Content-Type: application/json');
+        echo CJSON::encode($data);
+        Yii::app()->end();
     }
 
     public function actionCreate()
