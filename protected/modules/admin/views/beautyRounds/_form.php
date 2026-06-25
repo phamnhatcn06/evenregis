@@ -41,13 +41,23 @@ $form = $this->beginWidget('booster.widgets.TbActiveForm', array(
             'widgetOptions' => array('htmlOptions' => array('class' => 'form-control', 'step' => '0.01', 'min' => 0)),
         )); ?>
 
-        <?php echo $form->dateTimeFieldGroup($model, 'start_time', array(
-            'widgetOptions' => array('htmlOptions' => array('class' => 'form-control')),
-        )); ?>
+        <div class="form-group">
+            <label class="control-label"><?php echo $model->getAttributeLabel('start_time'); ?></label>
+            <?php echo CHtml::activeTextField($model, 'start_time', array(
+                'class' => 'form-control',
+                'type' => 'datetime-local',
+                'value' => $model->start_time ? date('Y-m-d\TH:i', strtotime($model->start_time)) : '',
+            )); ?>
+        </div>
 
-        <?php echo $form->dateTimeFieldGroup($model, 'end_time', array(
-            'widgetOptions' => array('htmlOptions' => array('class' => 'form-control')),
-        )); ?>
+        <div class="form-group">
+            <label class="control-label"><?php echo $model->getAttributeLabel('end_time'); ?></label>
+            <?php echo CHtml::activeTextField($model, 'end_time', array(
+                'class' => 'form-control',
+                'type' => 'datetime-local',
+                'value' => $model->end_time ? date('Y-m-d\TH:i', strtotime($model->end_time)) : '',
+            )); ?>
+        </div>
     </div>
 </div>
 
