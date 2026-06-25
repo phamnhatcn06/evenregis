@@ -103,11 +103,11 @@ class BeautyRoundResults extends BaseBeautyRoundResults
         ));
     }
 
-    public static function qualifyContestants($roundId, $contestantIds, $nextRoundId = null)
+    public static function qualifyContestants($roundId, $results, $nextRoundId = null)
     {
         $data = array(
             'round_id' => $roundId,
-            'contestant_ids' => $contestantIds,
+            'results' => $results,
         );
         if ($nextRoundId) {
             $data['next_round_id'] = $nextRoundId;
