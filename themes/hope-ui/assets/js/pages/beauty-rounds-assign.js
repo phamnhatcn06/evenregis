@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var formData = new FormData();
         ids.forEach(function(id) {
-            formData.append('registration_ids[]', id);
+            formData.append('contestant_ids[]', id);
         });
 
         fetch(assignUrl, {
