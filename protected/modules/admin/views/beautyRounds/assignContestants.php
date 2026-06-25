@@ -69,16 +69,16 @@ Yii::app()->clientScript->registerScriptFile(
 
     <!-- Nút chuyển -->
     <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
-        <button type="button" id="btn_move_right" class="btn btn-primary mb-2" style="width:145px;">
+        <button type="button" id="btn_move_right" class="btn btn-primary mb-2" style="width:150px;">
             <i class="fa fa-arrow-right me-1"></i>Chọn
         </button>
-        <button type="button" id="btn_move_all_right" class="btn btn-outline-primary mb-4" style="width:145px;">
+        <button type="button" id="btn_move_all_right" class="btn btn-outline-primary mb-4" style="width:150px;">
             <i class="fa fa-angle-double-right me-1"></i>Chọn tất cả
         </button>
-        <button type="button" id="btn_move_left" class="btn btn-danger mb-2" style="width:145px;">
+        <button type="button" id="btn_move_left" class="btn btn-danger mb-2" style="width:150px;">
             <i class="fa fa-arrow-left me-1"></i>Bỏ
         </button>
-        <button type="button" id="btn_move_all_left" class="btn btn-outline-danger" style="width:145px;">
+        <button type="button" id="btn_move_all_left" class="btn btn-outline-danger" style="width:150px;">
             <i class="fa fa-angle-double-left me-1"></i>Bỏ tất cả
         </button>
     </div>
@@ -113,43 +113,43 @@ Yii::app()->clientScript->registerScriptFile(
 
 <!-- Danh sách đã gắn trước đó -->
 <?php if (!empty($assignedContestants)): ?>
-<div class="card mt-4">
-    <div class="card-header">
-        <h6 class="mb-0"><i class="fa fa-list me-2"></i>Thí sinh đã gắn vào vòng (<?php echo count($assignedContestants); ?>)</h6>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width:60px">STT</th>
-                        <th style="width:80px">Ảnh</th>
-                        <th>SBD</th>
-                        <th>Họ tên</th>
-                        <th>Đơn vị</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($assignedContestants as $idx => $c): ?>
-                    <tr>
-                        <td class="text-center"><?php echo $idx + 1; ?></td>
-                        <td>
-                            <?php if (!empty($c['photo_portrait'])): ?>
-                                <img src="<?php echo CHtml::encode($c['photo_portrait']); ?>" class="rounded" style="width:40px;height:40px;object-fit:cover;">
-                            <?php else: ?>
-                                <i class="fa fa-user text-muted"></i>
-                            <?php endif; ?>
-                        </td>
-                        <td><strong><?php echo CHtml::encode($c['contestant_number']); ?></strong></td>
-                        <td><?php echo CHtml::encode($c['contestant_name']); ?></td>
-                        <td><?php echo CHtml::encode($c['property_name']); ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <div class="card mt-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fa fa-list me-2"></i>Thí sinh đã gắn vào vòng (<?php echo count($assignedContestants); ?>)</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:60px">STT</th>
+                            <th style="width:80px">Ảnh</th>
+                            <th>SBD</th>
+                            <th>Họ tên</th>
+                            <th>Đơn vị</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($assignedContestants as $idx => $c): ?>
+                            <tr>
+                                <td class="text-center"><?php echo $idx + 1; ?></td>
+                                <td>
+                                    <?php if (!empty($c['photo_portrait'])): ?>
+                                        <img src="<?php echo CHtml::encode($c['photo_portrait']); ?>" class="rounded" style="width:40px;height:40px;object-fit:cover;">
+                                    <?php else: ?>
+                                        <i class="fa fa-user text-muted"></i>
+                                    <?php endif; ?>
+                                </td>
+                                <td><strong><?php echo CHtml::encode($c['contestant_number']); ?></strong></td>
+                                <td><?php echo CHtml::encode($c['contestant_name']); ?></td>
+                                <td><?php echo CHtml::encode($c['property_name']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 <?php endif; ?>
 
 <input type="hidden" id="round_id" value="<?php echo $model->id; ?>">

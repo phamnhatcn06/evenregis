@@ -26,9 +26,11 @@ class BeautyRoundsController extends AdminController
             if (!empty($registrationIds)) {
                 $result = BeautyRoundResults::assignContestants($id, $registrationIds);
                 if ($result['success']) {
-                    $this->sendJsonResponse(array('success' => true, 'message' => 'Gắn thí sinh thành công.'));
+                    $count = isset($result['data']['count']) ? $result['data']['count'] : count($registrationIds);
+                    $this->sendJsonResponse(array('success' => true, 'message' => 'Gắn ' . $count . ' thí sinh thành công.'));
                 } else {
-                    $this->sendJsonResponse(array('success' => false, 'message' => $result['error'] ?: 'Không thể gắn thí sinh.'));
+                    $errorMsg = isset($result['error']) ? $result['error'] : (isset($result['message']) ? $result['message'] : 'Không thể gắn thí sinh.');
+                    $this->sendJsonResponse(array('success' => false, 'message' => $errorMsg));
                 }
             } else {
                 $this->sendJsonResponse(array('success' => false, 'message' => 'Vui lòng chọn thí sinh.'));
