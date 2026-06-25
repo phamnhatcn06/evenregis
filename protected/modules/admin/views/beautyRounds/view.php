@@ -105,3 +105,58 @@ $this->Tabletitle = 'Chi tiết vòng thi: ' . CHtml::encode($model->name);
         </div>
     </div>
 </div>
+
+<!-- Danh sách thí sinh trong vòng -->
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-users me-2"></i>Thí sinh trong vòng (<?php echo count($contestants); ?>)</h5>
+        <a href="<?php echo $this->createUrl('assignContestants', array('id' => $model->id)); ?>" class="btn btn-sm btn-info">
+            <i class="fa fa-user-plus me-1"></i>Gắn thí sinh
+        </a>
+    </div>
+    <div class="card-body">
+        <?php if (empty($contestants)): ?>
+            <div class="alert alert-info mb-0">
+                <i class="fa fa-info-circle me-2"></i>Chưa có thí sinh nào trong vòng này.
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:60px">STT</th>
+                            <th style="width:80px">Ảnh</th>
+                            <th>SBD</th>
+                            <th>Họ tên</th>
+                            <th>Đơn vị</th>
+                            <th style="width:100px">Điểm</th>
+                            <th style="width:120px">Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($contestants as $index => $c): ?>
+                        <tr>
+                            <td class="text-center"><?php echo $index + 1; ?></td>
+                            <td class="text-center">
+                                <?php if (!empty($c['photo_portrait'])): ?>
+                                    <img src="<?php echo CHtml::encode($c['photo_portrait']); ?>"
+                                         alt="Ảnh" class="rounded" style="width:50px;height:50px;object-fit:cover;">
+                                <?php else: ?>
+                                    <span class="text-muted"><i class="fa fa-user fa-2x"></i></span>
+                                <?php endif; ?>
+                            </td>
+                            <td><strong><?php echo CHtml::encode($c['contestant_number']); ?></strong></td>
+                            <td><?php echo CHtml::encode($c['contestant_name']); ?></td>
+                            <td><?php echo CHtml::encode($c['property_name']); ?></td>
+                            <td class="text-center">
+                                <span class="badge bg-primary fs-6"><?php echo $c['score'] !== null ? number_format($c['score'], 1) : '-'; ?></span>
+                            </td>
+                            <td><?php echo BeautyRoundResults::getStatusLabel(isset($c['status']) ? $c['status'] : 0); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
