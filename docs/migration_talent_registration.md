@@ -239,32 +239,22 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
         return 0;
     }
     
-    private function createTalentEntryOrgsTable($db)
+    private function ensureAllianceOrgIdsColumn($db)
     {
-        $tableExists = $db->createCommand("SHOW TABLES LIKE 'talent_entry_orgs'")->queryScalar();
-        if ($tableExists) {
-            echo "Table talent_entry_orgs already exists\n";
+        $columns = $db->createCommand("SHOW COLUMNS FROM talent_entries LIKE 'alliance_org_ids'")->queryAll();
+        if (!empty($columns)) {
+            echo "Column alliance_org_ids already exists\n";
             return;
         }
         
         $db->createCommand("
-            CREATE TABLE `talent_entry_orgs` (
-                `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-                `entry_id` bigint UNSIGNED NOT NULL COMMENT 'talent_entries.id (is_alliance_team=1)',
-                `property_id` bigint UNSIGNED NOT NULL COMMENT 'properties.id - Đơn vị thành viên',
-                `is_lead` tinyint NOT NULL DEFAULT '0' COMMENT 'Đơn vị chủ trì: 0=không, 1=chủ trì',
-                `joined_at` int UNSIGNED DEFAULT NULL,
-                `created_at` int UNSIGNED DEFAULT NULL,
-                PRIMARY KEY (`id`),
-                UNIQUE KEY `uq_talent_entry_org` (`entry_id`, `property_id`),
-                KEY `idx_teo_property` (`property_id`),
-                CONSTRAINT `fk_teo_entry` FOREIGN KEY (`entry_id`) REFERENCES `talent_entries` (`id`) ON DELETE CASCADE,
-                CONSTRAINT `fk_teo_property` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
-            COMMENT='Liên kết tiết mục liên quân với các đơn vị thành viên'
+            ALTER TABLE `talent_entries`
+            ADD COLUMN `alliance_org_ids` VARCHAR(255) DEFAULT NULL 
+            COMMENT 'Danh sách property_id liên quân, phân cách bởi dấu phẩy: 1,2,3'
+            AFTER `is_alliance_team`
         ")->execute();
         
-        echo "Created table talent_entry_orgs\n";
+        echo "Added column alliance_org_ids to talent_entries\n";
     }
     
     private function ensureTypeColumn($db)
