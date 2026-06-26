@@ -5274,4 +5274,114 @@ class RegistrationsController extends AdminController
 		echo CJSON::encode(array('success' => false, 'error' => 'Invalid action'));
 		Yii::app()->end();
 	}
+
+	/**
+	 * Upload document với chunk upload
+	 */
+	public function actionUploadDocumentChunk($id)
+	{
+		header('Content-Type: application/json');
+
+		$this->checkRegistrationAccess($id);
+		$model = $this->loadModelById($id);
+
+		if (!in_array($model->status, array(Registrations::STATUS_DRAFT, Registrations::STATUS_REJECTED))) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không thể tải lên khi phiếu đã nộp hoặc đã duyệt.'));
+			Yii::app()->end();
+		}
+
+		$action = Yii::app()->request->getQuery('act', 'chunk');
+
+		$uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/registrations/' . $id . '/';
+		if (!is_dir($uploadDir)) {
+			mkdir($uploadDir, 0755, true);
+		}
+
+		if ($action === 'chunk') {
+			$chunkIndex = (int)Yii::app()->request->getPost('chunkIndex', 0);
+			$filename = preg_replace('/[^a-zA-Z0-9._-]/', '', Yii::app()->request->getPost('filename', 'file'));
+			$fileId = preg_replace('/[^a-zA-Z0-9]/', '', Yii::app()->request->getPost('fileId', ''));
+
+			if (empty($fileId)) {
+				echo CJSON::encode(array('success' => false, 'error' => 'Missing fileId'));
+				Yii::app()->end();
+			}
+
+			$tempDir = Yii::getPathOfAlias('webroot') . '/uploads/temp/doc_chunks_' . $fileId . '/';
+			if (!is_dir($tempDir)) {
+				mkdir($tempDir, 0755, true);
+			}
+
+			if (isset($_FILES['chunk']) && $_FILES['chunk']['error'] === UPLOAD_ERR_OK) {
+				$chunkPath = $tempDir . $chunkIndex . '.part';
+				move_uploaded_file($_FILES['chunk']['tmp_name'], $chunkPath);
+
+				echo CJSON::encode(array(
+					'success' => true,
+					'chunkIndex' => $chunkIndex,
+					'received' => true
+				));
+			} else {
+				echo CJSON::encode(array('success' => false, 'error' => 'Upload chunk failed'));
+			}
+			Yii::app()->end();
+		}
+
+		if ($action === 'merge') {
+			$totalChunks = (int)Yii::app()->request->getPost('totalChunks', 0);
+			$filename = Yii::app()->request->getPost('filename', 'file');
+			$fileId = preg_replace('/[^a-zA-Z0-9]/', '', Yii::app()->request->getPost('fileId', ''));
+
+			$tempDir = Yii::getPathOfAlias('webroot') . '/uploads/temp/doc_chunks_' . $fileId . '/';
+
+			$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+			$allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx');
+			if (!in_array($ext, $allowedTypes)) {
+				echo CJSON::encode(array('success' => false, 'error' => 'Định dạng file không hỗ trợ'));
+				Yii::app()->end();
+			}
+
+			$safeFilename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+			$finalFilename = time() . '_' . $safeFilename;
+			$finalPath = $uploadDir . $finalFilename;
+
+			$fp = fopen($finalPath, 'wb');
+			for ($i = 0; $i < $totalChunks; $i++) {
+				$chunkPath = $tempDir . $i . '.part';
+				if (file_exists($chunkPath)) {
+					fwrite($fp, file_get_contents($chunkPath));
+					unlink($chunkPath);
+				}
+			}
+			fclose($fp);
+			@rmdir($tempDir);
+
+			// Update model document list
+			$documents = array();
+			if (!empty($model->document)) {
+				$parsed = json_decode($model->document, true);
+				if (is_array($parsed)) {
+					$documents = $parsed;
+				}
+			}
+			$documents[] = '/uploads/registrations/' . $id . '/' . $finalFilename;
+			$model->document = CJSON::encode($documents);
+
+			$result = $model->updateViaApi();
+			if ($result['success']) {
+				$size = round(filesize($finalPath) / 1024 / 1024, 2);
+				echo CJSON::encode(array(
+					'success' => true,
+					'message' => "Upload thành công! Size: {$size} MB",
+					'path' => '/uploads/registrations/' . $id . '/' . $finalFilename
+				));
+			} else {
+				echo CJSON::encode(array('success' => false, 'error' => 'Không thể lưu vào database'));
+			}
+			Yii::app()->end();
+		}
+
+		echo CJSON::encode(array('success' => false, 'error' => 'Invalid action'));
+		Yii::app()->end();
+	}
 }
