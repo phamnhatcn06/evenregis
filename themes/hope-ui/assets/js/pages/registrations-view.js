@@ -4970,6 +4970,14 @@ var RegistrationView = (function() {
             });
         });
 
+        // Delete audio
+        document.querySelectorAll('.btn-delete-talent-audio').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var entryId = btn.getAttribute('data-entry-id');
+                confirmDeleteTalentAudio(entryId);
+            });
+        });
+
         // Thêm thành viên
         document.querySelectorAll('.btn-add-talent-member').forEach(function(btn) {
             btn.addEventListener('click', function() {
