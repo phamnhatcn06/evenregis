@@ -12,22 +12,37 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  GIAI ĐOẠN 1: ĐỢT ĐĂNG KÝ CHÍNH (đã hoàn thành)                 │
+│  ĐỢT 1: ĐĂNG KÝ CHÍNH (period_id=1, type=general)               │
 │  ├── Registration → approved                                    │
 │  ├── Attendees: người tham dự đại hội                           │
-│  └── Talent entry: thông tin sơ bộ (tên, thể loại) → approved   │
-│                    ❌ Chưa có danh sách thành viên biểu diễn     │
+│  └── Talent entry: thông tin sơ bộ (tên, thể loại)              │
+│      → ⚠ Sẽ được CHUYỂN sang registration đợt 3                 │
 ├─────────────────────────────────────────────────────────────────┤
-│  GIAI ĐOẠN 2: ĐỢT ĐĂNG KÝ VĂN NGHỆ (feature mới)                │
-│  ├── Registration period: type = 'talent'                       │
-│  ├── Registration: đăng ký danh sách người thi văn nghệ         │
-│  └── Attendees: người biểu diễn, vai trò "Thi văn nghệ"         │
-│      → Phải được HO phê duyệt (approved)                        │
+│  ĐỢT 3: ĐĂNG KÝ VĂN NGHỆ (period_id=3, type=talent)             │
+│  ├── Registration MỚI: tạo riêng cho văn nghệ                   │
+│  ├── Talent entries: chuyển từ đợt 1 sang đây                   │
+│  └── Attendees biểu diễn:                                       │
+│      • Link attendee có sẵn (đợt 1) + thêm vai trò              │
+│      • HOẶC tạo attendee mới trong registration đợt 3           │
 ├─────────────────────────────────────────────────────────────────┤
 │  GIAI ĐOẠN 3: GẮN VÀO TIẾT MỤC                                  │
-│  ├── Chọn attendees (đã approved từ đợt văn nghệ)               │
+│  ├── Chọn attendees (từ đợt 1 hoặc đợt 3, đã approved)          │
+│  ├── Tự động gán vai trò "Thi văn nghệ" khi gắn vào tiết mục    │
 │  ├── Bổ sung nội dung: mô tả, kịch bản, video/audio             │
 │  └── Gửi duyệt nội dung chi tiết                                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 2.1 Migration dữ liệu (xem chi tiết: `migration_talent_registration.md`)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  TRƯỚC MIGRATION                                                │
+│  talent_entries.registration_id → registration đợt 1            │
+├─────────────────────────────────────────────────────────────────┤
+│  SAU MIGRATION                                                  │
+│  1. Tạo registration MỚI (period_id=3) cho mỗi đơn vị           │
+│  2. Cập nhật talent_entries.registration_id → registration đợt 3│
 └─────────────────────────────────────────────────────────────────┘
 ```
 
