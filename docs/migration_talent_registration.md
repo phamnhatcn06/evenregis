@@ -84,9 +84,7 @@ WHERE `id` = 3;
 ### 4.2 Tạo registrations văn nghệ cho các đơn vị
 
 ```sql
--- Lấy danh sách đơn vị có talent_entries (từ registration đợt 1)
--- Tạo registration mới với period_id=3
-
+-- BƯỚC 1: Tạo cho đơn vị chủ trì (có talent_entries trực tiếp)
 INSERT INTO `registrations` (
     `event_id`,
     `property_id`,
@@ -112,10 +110,110 @@ WHERE r.period_id = 1
   AND r.deleted_at IS NULL
   AND te.deleted_at IS NULL
   AND NOT EXISTS (
-      -- Tránh tạo trùng nếu đã có registration đợt 3
       SELECT 1 FROM `registrations` r2
       WHERE r2.property_id = r.property_id
         AND r2.event_id = r.event_id
+        AND r2.period_id = 3
+        AND r2.deleted_at IS NULL
+  );
+
+-- BƯỚC 2: Tạo cho các đơn vị LIÊN QUÂN (từ alliance_requests)
+INSERT INTO `registrations` (
+    `event_id`,
+    `property_id`,
+    `relation_property_id`,
+    `period_id`,
+    `submitted_by`,
+    `status`,
+    `created_at`,
+    `updated_at`
+)
+SELECT DISTINCT
+    r_main.event_id,
+    alliance_org.property_id,
+    r_alliance.relation_property_id,
+    3 AS period_id,
+    r_alliance.submitted_by,
+    0 AS status,
+    NOW(),
+    NOW()
+FROM `talent_entries` te
+INNER JOIN `registrations` r_main ON te.registration_id = r_main.id
+-- Lấy các đơn vị liên quân từ alliance_requests
+INNER JOIN `alliance_requests` ar ON ar.event_content_id = 4
+    AND (ar.requester_org_id = r_main.property_id OR ar.target_org_id = r_main.property_id)
+    AND ar.deleted_at IS NULL
+-- Xác định đơn vị partner
+CROSS JOIN (SELECT 'requester' AS side UNION SELECT 'target') sides
+INNER JOIN (
+    SELECT ar2.id, ar2.requester_org_id AS property_id FROM alliance_requests ar2 WHERE ar2.event_content_id = 4
+    UNION
+    SELECT ar2.id, ar2.target_org_id AS property_id FROM alliance_requests ar2 WHERE ar2.event_content_id = 4
+) alliance_org ON alliance_org.id = ar.id AND alliance_org.property_id != r_main.property_id
+-- Lấy thông tin registration đợt 1 của đơn vị liên quân
+LEFT JOIN `registrations` r_alliance ON r_alliance.property_id = alliance_org.property_id 
+    AND r_alliance.event_id = r_main.event_id
+    AND r_alliance.period_id = 1
+    AND r_alliance.deleted_at IS NULL
+WHERE te.is_alliance_team = 1
+  AND te.deleted_at IS NULL
+  AND r_main.deleted_at IS NULL
+  -- Chưa có registration đợt 3
+  AND NOT EXISTS (
+      SELECT 1 FROM `registrations` r2
+      WHERE r2.property_id = alliance_org.property_id
+        AND r2.event_id = r_main.event_id
+        AND r2.period_id = 3
+        AND r2.deleted_at IS NULL
+  );
+```
+
+**Query đơn giản hơn (nếu đã có `alliance_org_ids`):**
+
+```sql
+-- Tạo registration cho đơn vị liên quân từ alliance_org_ids
+-- Chạy SAU KHI đã migrate alliance_org_ids
+
+INSERT INTO `registrations` (
+    `event_id`,
+    `property_id`,
+    `relation_property_id`,
+    `period_id`,
+    `submitted_by`,
+    `status`,
+    `created_at`,
+    `updated_at`
+)
+SELECT DISTINCT
+    r_main.event_id,
+    CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(te.alliance_org_ids, ',', numbers.n), ',', -1) AS UNSIGNED) AS property_id,
+    r_alliance.relation_property_id,
+    3 AS period_id,
+    COALESCE(r_alliance.submitted_by, r_main.submitted_by),
+    0 AS status,
+    NOW(),
+    NOW()
+FROM `talent_entries` te
+INNER JOIN `registrations` r_main ON te.registration_id = r_main.id
+-- Tách chuỗi alliance_org_ids thành từng property_id
+INNER JOIN (
+    SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+) numbers ON CHAR_LENGTH(te.alliance_org_ids) - CHAR_LENGTH(REPLACE(te.alliance_org_ids, ',', '')) >= numbers.n - 1
+-- Lấy thông tin registration đợt 1 của đơn vị liên quân
+LEFT JOIN `registrations` r_alliance ON r_alliance.property_id = CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(te.alliance_org_ids, ',', numbers.n), ',', -1) AS UNSIGNED)
+    AND r_alliance.event_id = r_main.event_id
+    AND r_alliance.period_id = 1
+    AND r_alliance.deleted_at IS NULL
+WHERE te.is_alliance_team = 1
+  AND te.alliance_org_ids IS NOT NULL
+  AND te.alliance_org_ids != ''
+  AND te.deleted_at IS NULL
+  AND r_main.deleted_at IS NULL
+  -- Chưa có registration đợt 3
+  AND NOT EXISTS (
+      SELECT 1 FROM `registrations` r2
+      WHERE r2.property_id = CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(te.alliance_org_ids, ',', numbers.n), ',', -1) AS UNSIGNED)
+        AND r2.event_id = r_main.event_id
         AND r2.period_id = 3
         AND r2.deleted_at IS NULL
   );

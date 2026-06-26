@@ -52,7 +52,7 @@ return array(
         // Memcached cache
         'cache' => array(
             'class' => 'CMemCache',
-            'useMemcached' => true,
+            //'useMemcached' => true,
             'servers' => array(
                 array(
                     'host' => '127.0.0.1',
