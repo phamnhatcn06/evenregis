@@ -3014,7 +3014,11 @@ class RegistrationsController extends AdminController
 	}
 
 	/**
-	 * Lấy danh sách attendees của đơn vị hiện tại để thêm vào tiết mục
+	 * Lấy danh sách attendees của registration hiện tại để thêm vào tiết mục văn nghệ
+	 * Trả về tất cả attendees, đánh dấu:
+	 * - has_talent_role: đã có role talent chưa
+	 * - has_documents: đã có đủ hồ sơ chưa
+	 * - can_copy_from_previous: có thể copy hồ sơ từ đăng ký trước không
 	 */
 	public function actionGetAttendeesForTalent($registration_id = null)
 	{
@@ -3034,78 +3038,45 @@ class RegistrationsController extends AdminController
 			}
 		}
 
-		$logFile = Yii::getPathOfAlias('application.runtime') . '/talent_debug.log';
 		$registration = Registrations::fetchFromApi($registration_id);
-
-		$logData = date('[Y-m-d H:i:s] ') . "Request: GetAttendeesForTalent?registration_id=" . var_export($registration_id, true) . "\n" .
-			"  User: " . json_encode($user) . "\n" .
-			"  Registration: " . ($registration ? json_encode($registration->attributes) : 'null') . "\n";
-
-		error_log("GetAttendeesForTalent - registration_id: {$registration_id}, userPropertyId: {$userPropertyId}, userPropertyCode: {$userPropertyCode}");
-
 		$hasFullAccess = PermissionHelper::can('registrations', 'update') || $userPropertyCode === '9999';
 		if (!$registration || (!$hasFullAccess && $registration->property_id != $userPropertyId)) {
-			$logData .= "  Access Denied! registration property_id: " . ($registration ? $registration->property_id : 'null') . ", userPropertyId: {$userPropertyId}\n";
-			file_put_contents($logFile, $logData, FILE_APPEND);
-
-			error_log("GetAttendeesForTalent access denied! registration property_id: " . ($registration ? $registration->property_id : 'null'));
 			echo CJSON::encode(array('success' => false, 'message' => 'Không có quyền truy cập.'));
 			Yii::app()->end();
 		}
 
-
-		// Tìm role Thi Văn nghệ (code = 'Talent')
-		$talentRoleId = null;
-		$rolesData = Roles::getApiDataProvider(array(), 100)->getData();
-		foreach ($rolesData as $r) {
-			$rCode = isset($r['code']) ? $r['code'] : (isset($r->code) ? $r->code : '');
-			if (strcasecmp($rCode, 'talent') === 0 || strcasecmp($rCode, 'talent_performer') === 0) {
-				$talentRoleId = isset($r['id']) ? $r['id'] : (isset($r->id) ? $r->id : null);
-				break;
-			}
-		}
-		if (!$talentRoleId) {
-			$talentRoleId = 10; // Fallback
-		}
-
+		$talentRoleId = $this->getTalentRoleId();
 		$attendees = Attendees::getByRegistrationId($registration_id);
-		error_log("GetAttendeesForTalent - loaded attendees count: " . count($attendees) . ", talentRoleId: {$talentRoleId}");
-
-		$logData .= "  talentRoleId: {$talentRoleId}\n";
-		$logData .= "  Loaded Attendees Count: " . count($attendees) . "\n";
-		foreach ($attendees as $att) {
-			$logData .= "    Attendee: ID=" . ($att['id'] ?? 'null') . ", Name=" . ($att['full_name'] ?? 'null') . ", role_id=" . json_encode($att['role_id'] ?? '') . "\n";
-		}
 
 		$result = array();
 		foreach ($attendees as $att) {
-			$roleIdField = isset($att['role_id']) ? $att['role_id'] : '';
-			$roleIds = array();
-			if (is_array($roleIdField)) {
-				$roleIds = array_map('strval', $roleIdField);
-			} else {
-				$roleIds = array_map('trim', explode(',', $roleIdField));
-			}
+			$roleIds = $this->parseRoleIds($att);
+			$hasTalentRole = in_array((string)$talentRoleId, $roleIds, true);
+			$hasDocuments = $this->attendeeHasDocuments($att);
+			$staffId = isset($att['staff_id']) ? $att['staff_id'] : null;
 
-			error_log("Attendee ID: {$att['id']}, Name: {$att['full_name']}, role_ids: " . json_encode($roleIds));
-
-			// Chỉ lấy những người có vai trò "Thi văn nghệ"
-			if (!in_array((string)$talentRoleId, $roleIds, true)) {
-				continue;
+			// Kiểm tra có thể copy hồ sơ từ đăng ký trước không
+			$canCopyFromPrevious = false;
+			if (!$hasDocuments && $staffId) {
+				$previousAttendee = $this->findPreviousApprovedAttendee($staffId, $registration->event_id, $registration_id);
+				if ($previousAttendee && $this->attendeeHasDocuments($previousAttendee)) {
+					$canCopyFromPrevious = true;
+				}
 			}
 
 			$result[] = array(
 				'id' => isset($att['id']) ? $att['id'] : null,
+				'staff_id' => $staffId,
 				'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
 				'position' => isset($att['position']) ? $att['position'] : '',
+				'has_talent_role' => $hasTalentRole,
+				'has_documents' => $hasDocuments,
+				'can_copy_from_previous' => $canCopyFromPrevious,
+				'approval_status' => isset($att['approval_status']) ? $att['approval_status'] : 0,
 			);
 		}
 
-		$logData .= "  Filtered Result Count: " . count($result) . "\n";
-		file_put_contents($logFile, $logData, FILE_APPEND);
-
-		error_log("GetAttendeesForTalent - returned filtered count: " . count($result));
-		echo CJSON::encode(array('success' => true, 'data' => $result));
+		echo CJSON::encode(array('success' => true, 'data' => $result, 'talent_role_id' => $talentRoleId));
 		Yii::app()->end();
 	}
 
