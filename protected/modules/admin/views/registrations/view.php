@@ -1300,6 +1300,7 @@ Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/DataTabl
 // Register init script
 Yii::app()->clientScript->registerScript('registrations-view-init', '
     window.BASE_URL = "' . Yii::app()->createUrl('/') . '";
+    window.docChunkUploadUrl = "' . $this->createUrl('uploadDocumentChunk', array('id' => $model->id)) . '";
     document.addEventListener("DOMContentLoaded", function() {
         RegistrationView.init(' . CJSON::encode($jsConfig) . ');
         window.initDatePickers();
