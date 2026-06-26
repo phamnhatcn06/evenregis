@@ -5390,8 +5390,8 @@ var RegistrationView = (function() {
             var displayName = att.full_name || '';
             var positionText = att.position ? ' <small class="text-muted">(' + att.position + ')</small>' : '';
             var badges = '';
-            if (att.from_previous_registration) {
-                badges += ' <span class="badge bg-info ms-1" title="Sao chép hồ sơ từ đăng ký trước"><i class="fa fa-check-circle"></i></span>';
+            if (att.can_copy_from_previous) {
+                badges += ' <span class="badge bg-info ms-1" title="Sẽ sao chép hồ sơ từ đăng ký trước"><i class="fa fa-check-circle"></i></span>';
             }
             div.innerHTML = escapeHtml(displayName) + positionText + badges;
             div.addEventListener('click', function() { this.classList.toggle('active'); });
