@@ -1180,6 +1180,32 @@ class RegistrationsController extends AdminController
 		}
 	}
 
+	/**
+	 * Kiểm tra quyền chỉnh sửa talent entry
+	 * Admin có full quyền hoặc user thuộc đơn vị chủ quản
+	 */
+	protected function canEditTalentEntry($entry)
+	{
+		// Admin có quyền update registrations (wildcard *)
+		if (PermissionHelper::can('registrations', 'update')) {
+			return true;
+		}
+
+		$user = AuthHandler::getUser();
+		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
+
+		// Admin HO (code 9999)
+		if ($userPropertyCode === '9999') {
+			return true;
+		}
+
+		// Lấy property_id từ property_code
+		$userProperty = $userPropertyCode ? Properties::fetchByCode($userPropertyCode) : null;
+		$userPropertyId = $userProperty ? $userProperty->id : null;
+
+		return $entry->property_id == $userPropertyId;
+	}
+
 	protected function handleDocumentUpload($existingDocument = null)
 	{
 		$uploadedFiles = array();
