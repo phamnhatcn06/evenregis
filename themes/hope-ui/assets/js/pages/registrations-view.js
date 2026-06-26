@@ -5428,7 +5428,11 @@ var RegistrationView = (function() {
             div.setAttribute('data-id', att.id);
             var displayName = att.full_name || '';
             var positionText = att.position ? ' <small class="text-muted">(' + att.position + ')</small>' : '';
-            div.innerHTML = escapeHtml(displayName) + positionText;
+            var badges = '';
+            if (att.from_previous_registration) {
+                badges += ' <span class="badge bg-info ms-1" title="Sao chép hồ sơ từ đăng ký trước"><i class="fa fa-check-circle"></i></span>';
+            }
+            div.innerHTML = escapeHtml(displayName) + positionText + badges;
             div.addEventListener('click', function() { this.classList.toggle('active'); });
             selectedList.appendChild(div);
         });
