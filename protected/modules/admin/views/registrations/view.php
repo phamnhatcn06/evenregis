@@ -585,7 +585,7 @@ $allowedContents = isset($allowedContentCodes) ? $allowedContentCodes : array();
 $showAllContents = empty($allowedContents);
 $canShowSports = $showAllContents || in_array('sports', $allowedContents);
 $canShowCompetition = $showAllContents || in_array('competition', $allowedContents);
-$canShowTalent = $showAllContents || in_array('talent', $allowedContents);
+$canShowTalent = $showAllContents || in_array('talent', $allowedContents) || !empty($talentEntries);
 $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 ?>
 <div class="row">

@@ -17,6 +17,7 @@ class TalentEntries extends BaseTalentEntries
     public $member_count;
     public $registration_id;
     public $alliance_property_ids;
+    public $alliance_org_ids;
     public $director;
     public $director_phone;
     public $origin;
@@ -33,7 +34,7 @@ class TalentEntries extends BaseTalentEntries
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('show_id, property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team', 'safe');
+        $rules[] = array('show_id, property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, alliance_org_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team', 'safe');
         return $rules;
     }
 
@@ -81,6 +82,7 @@ class TalentEntries extends BaseTalentEntries
             $model->content = isset($data['content']) ? $data['content'] : '';
             $model->document = isset($data['document']) ? $data['document'] : '';
             $model->is_alliance_team = isset($data['is_alliance_team']) ? $data['is_alliance_team'] : null;
+            $model->alliance_org_ids = isset($data['alliance_org_ids']) ? $data['alliance_org_ids'] : '';
             $model->id = $id;
             return $model;
         }

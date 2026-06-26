@@ -22,6 +22,9 @@ class Attendees extends BaseAttendees
     public $position_name;
     public $department_code;
     public $department_name;
+    public $division_code;
+    public $division_name;
+    public $division;
     public $end_starting_date;
     public $join_hotel_date;
     public $check_in_date;
@@ -43,8 +46,8 @@ class Attendees extends BaseAttendees
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path, approval_status, rejection_reason, personal_email', 'safe');
         $rules[] = array('approval_status, transport_id', 'numerical', 'integerOnly' => true);
         $rules[] = array('join_hotel_date, check_in_date, check_out_date, transport_id, transport_name, gender, id_card', 'safe');
-        $rules[] = array('position_code, position_name, department_code, department_name', 'length', 'max' => 255);
-        $rules[] = array('position_code, position_name, department_code, department_name, end_starting_date', 'safe');
+        $rules[] = array('position_code, position_name, department_code, department_name, division_code, division_name, division', 'length', 'max' => 255);
+        $rules[] = array('position_code, position_name, department_code, department_name, division_code, division_name, division, end_starting_date', 'safe');
         $rules[] = array('id_card', 'length', 'max' => 20);
         return $rules;
     }
@@ -69,6 +72,9 @@ class Attendees extends BaseAttendees
         $labels['position_name'] = Yii::t('app', 'Tên chức danh');
         $labels['department_code'] = Yii::t('app', 'Mã phòng ban');
         $labels['department_name'] = Yii::t('app', 'Tên phòng ban');
+        $labels['division_code'] = Yii::t('app', 'Mã bộ phận');
+        $labels['division_name'] = Yii::t('app', 'Tên bộ phận');
+        $labels['division'] = Yii::t('app', 'Bộ phận');
         $labels['end_starting_date'] = Yii::t('app', 'Ngày kết thúc thử việc');
         return $labels;
     }
@@ -204,6 +210,16 @@ class Attendees extends BaseAttendees
             // Map start_date from API to join_hotel_date
             if (isset($data['start_date'])) {
                 $model->join_hotel_date = $data['start_date'];
+            }
+            // Map division properties (virtual fields)
+            if (isset($data['division_code'])) {
+                $model->division_code = $data['division_code'];
+            }
+            if (isset($data['division_name'])) {
+                $model->division_name = $data['division_name'];
+            }
+            if (isset($data['division'])) {
+                $model->division = $data['division'];
             }
             $model->id = $id;
             return $model;

@@ -2,6 +2,19 @@
 
 class RegistrationsController extends AdminController
 {
+	public function init()
+	{
+		parent::init();
+		$this->publicActions = array_merge($this->publicActions, array(
+			'uploadtalentchunk',
+			'updatetalentinfo',
+			'updatetalentmedia',
+			'addtalentmember',
+			'removetalentmember',
+			'getattendeesfortalent'
+		));
+	}
+
 	public function actionView($id)
 	{
 		$this->checkRegistrationAccess($id);
@@ -436,6 +449,31 @@ class RegistrationsController extends AdminController
 					foreach ($membersData as $member) {
 						$attId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
 						$attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+						if (empty($attInfo) && $attId) {
+							$fetchedAtt = Attendees::fetchFromApi($attId);
+							if ($fetchedAtt) {
+								$regId = $fetchedAtt->registration_id;
+								$reg = Registrations::fetchFromApi($regId);
+								$pName = '';
+								$pId = null;
+								if ($reg) {
+									$pId = $reg->property_id;
+									$pName = $reg->property_name;
+									if (empty($pName) && $pId) {
+										$prop = Properties::fetchFromApi($pId);
+										$pName = $prop ? $prop->name : '';
+									}
+								}
+								$attInfo = array(
+									'full_name' => $fetchedAtt->full_name,
+									'position_name' => $fetchedAtt->position_name ?: $fetchedAtt->position,
+									'division_name' => $fetchedAtt->division_name ?: $fetchedAtt->division,
+									'property_id' => $pId,
+									'property_name' => $pName,
+								);
+								$attendeesMap[$attId] = $attInfo; // cache it
+							}
+						}
 						$memberArr = is_array($member) ? $member : array_merge($member->attributes, get_object_vars($member));
 						if (empty($memberArr['attendee_name']) && !empty($attInfo['full_name'])) {
 							$memberArr['attendee_name'] = $attInfo['full_name'];
@@ -1123,8 +1161,14 @@ class RegistrationsController extends AdminController
 		$ssoUser = AuthHandler::getUser();
 		$userPropertyCode = isset($ssoUser['property_code']) ? $ssoUser['property_code'] : null;
 
+		// Admin HO (code 9999) hoặc có full permission - có quyền truy cập tất cả
 		if ($userPropertyCode === '9999') {
-			return; // Admin HO (code 9999) - có quyền truy cập tất cả
+			return;
+		}
+
+		// Check nếu user có quyền update registrations (admin có wildcard *)
+		if (PermissionHelper::can('registrations', 'update')) {
+			return;
 		}
 
 		$userProperty = $userPropertyCode ? Properties::fetchByCode($userPropertyCode) : null;
@@ -2840,7 +2884,14 @@ class RegistrationsController extends AdminController
 
 		// Kiểm tra attendee có thuộc đơn vị của user hiện tại không
 		$user = AuthHandler::getUser();
+		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
 		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		if ($userPropertyCode && !$userPropertyId) {
+			$userProperty = Properties::fetchByCode($userPropertyCode);
+			if ($userProperty) {
+				$userPropertyId = $userProperty->id;
+			}
+		}
 
 		$attendee = Attendees::fetchFromApi($attendeeId);
 		if (!$attendee) {
@@ -2850,7 +2901,7 @@ class RegistrationsController extends AdminController
 
 		// Kiểm tra người tham dự có thuộc registration của đơn vị user không
 		$registration = Registrations::fetchFromApi($attendee->registration_id);
-		if (!$registration || $registration->property_id != $userPropertyId) {
+		if (!$registration || ($userPropertyCode !== '9999' && $registration->property_id != $userPropertyId)) {
 			echo CJSON::encode(array('success' => false, 'message' => 'Bạn chỉ được thêm người của đơn vị mình.'));
 			Yii::app()->end();
 		}
@@ -2907,12 +2958,19 @@ class RegistrationsController extends AdminController
 
 		// Kiểm tra attendee có thuộc đơn vị của user hiện tại không
 		$user = AuthHandler::getUser();
+		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
 		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		if ($userPropertyCode && !$userPropertyId) {
+			$userProperty = Properties::fetchByCode($userPropertyCode);
+			if ($userProperty) {
+				$userPropertyId = $userProperty->id;
+			}
+		}
 
 		$attendee = Attendees::fetchFromApi($member->attendee_id);
 		if ($attendee) {
 			$registration = Registrations::fetchFromApi($attendee->registration_id);
-			if (!$registration || $registration->property_id != $userPropertyId) {
+			if (!$registration || ($userPropertyCode !== '9999' && $registration->property_id != $userPropertyId)) {
 				echo CJSON::encode(array('success' => false, 'message' => 'Bạn chỉ được xóa người của đơn vị mình.'));
 				Yii::app()->end();
 			}
@@ -2932,22 +2990,83 @@ class RegistrationsController extends AdminController
 	/**
 	 * Lấy danh sách attendees của đơn vị hiện tại để thêm vào tiết mục
 	 */
-	public function actionGetAttendeesForTalent($registration_id)
+	public function actionGetAttendeesForTalent($registration_id = null)
 	{
 		header('Content-Type: application/json');
 
-		$user = AuthHandler::getUser();
-		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		if ($registration_id === null) {
+			$registration_id = Yii::app()->request->getParam('registration_id');
+		}
 
+		$user = AuthHandler::getUser();
+		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		if ($userPropertyCode && !$userPropertyId) {
+			$userProperty = Properties::fetchByCode($userPropertyCode);
+			if ($userProperty) {
+				$userPropertyId = $userProperty->id;
+			}
+		}
+
+		$logFile = Yii::getPathOfAlias('application.runtime') . '/talent_debug.log';
 		$registration = Registrations::fetchFromApi($registration_id);
-		if (!$registration || $registration->property_id != $userPropertyId) {
+
+		$logData = date('[Y-m-d H:i:s] ') . "Request: GetAttendeesForTalent?registration_id=" . var_export($registration_id, true) . "\n" .
+			"  User: " . json_encode($user) . "\n" .
+			"  Registration: " . ($registration ? json_encode($registration->attributes) : 'null') . "\n";
+
+		error_log("GetAttendeesForTalent - registration_id: {$registration_id}, userPropertyId: {$userPropertyId}, userPropertyCode: {$userPropertyCode}");
+
+		if (!$registration || ($userPropertyCode !== '9999' && $registration->property_id != $userPropertyId)) {
+			$logData .= "  Access Denied! registration property_id: " . ($registration ? $registration->property_id : 'null') . ", userPropertyId: {$userPropertyId}\n";
+			file_put_contents($logFile, $logData, FILE_APPEND);
+
+			error_log("GetAttendeesForTalent access denied! registration property_id: " . ($registration ? $registration->property_id : 'null'));
 			echo CJSON::encode(array('success' => false, 'message' => 'Không có quyền truy cập.'));
 			Yii::app()->end();
 		}
 
+
+		// Tìm role Thi Văn nghệ (code = 'Talent')
+		$talentRoleId = null;
+		$rolesData = Roles::getApiDataProvider(array(), 100)->getData();
+		foreach ($rolesData as $r) {
+			$rCode = isset($r['code']) ? $r['code'] : (isset($r->code) ? $r->code : '');
+			if (strcasecmp($rCode, 'talent') === 0 || strcasecmp($rCode, 'talent_performer') === 0) {
+				$talentRoleId = isset($r['id']) ? $r['id'] : (isset($r->id) ? $r->id : null);
+				break;
+			}
+		}
+		if (!$talentRoleId) {
+			$talentRoleId = 10; // Fallback
+		}
+
 		$attendees = Attendees::getByRegistrationId($registration_id);
+		error_log("GetAttendeesForTalent - loaded attendees count: " . count($attendees) . ", talentRoleId: {$talentRoleId}");
+
+		$logData .= "  talentRoleId: {$talentRoleId}\n";
+		$logData .= "  Loaded Attendees Count: " . count($attendees) . "\n";
+		foreach ($attendees as $att) {
+			$logData .= "    Attendee: ID=" . ($att['id'] ?? 'null') . ", Name=" . ($att['full_name'] ?? 'null') . ", role_id=" . json_encode($att['role_id'] ?? '') . "\n";
+		}
+
 		$result = array();
 		foreach ($attendees as $att) {
+			$roleIdField = isset($att['role_id']) ? $att['role_id'] : '';
+			$roleIds = array();
+			if (is_array($roleIdField)) {
+				$roleIds = array_map('strval', $roleIdField);
+			} else {
+				$roleIds = array_map('trim', explode(',', $roleIdField));
+			}
+
+			error_log("Attendee ID: {$att['id']}, Name: {$att['full_name']}, role_ids: " . json_encode($roleIds));
+
+			// Chỉ lấy những người có vai trò "Thi văn nghệ"
+			if (!in_array((string)$talentRoleId, $roleIds, true)) {
+				continue;
+			}
+
 			$result[] = array(
 				'id' => isset($att['id']) ? $att['id'] : null,
 				'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
@@ -2955,6 +3074,10 @@ class RegistrationsController extends AdminController
 			);
 		}
 
+		$logData .= "  Filtered Result Count: " . count($result) . "\n";
+		file_put_contents($logFile, $logData, FILE_APPEND);
+
+		error_log("GetAttendeesForTalent - returned filtered count: " . count($result));
 		echo CJSON::encode(array('success' => true, 'data' => $result));
 		Yii::app()->end();
 	}
@@ -5050,6 +5173,105 @@ class RegistrationsController extends AdminController
 		), true);
 
 		echo CJSON::encode(array('success' => true, 'html' => $html));
+		Yii::app()->end();
+	}
+
+	public function actionUploadTalentChunk()
+	{
+		header('Content-Type: application/json');
+
+		$action = Yii::app()->request->getQuery('act', 'chunk');
+		$entryId = Yii::app()->request->getPost('entryId');
+		if (!$entryId) {
+			$entryId = Yii::app()->request->getQuery('entryId');
+		}
+
+		if (!$entryId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Missing entryId'));
+			Yii::app()->end();
+		}
+
+		$entry = TalentEntries::fetchFromApi($entryId);
+		if (!$entry) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Talent entry not found'));
+			Yii::app()->end();
+		}
+
+		// Verify write access to registration
+		$this->checkRegistrationAccess($entry->registration_id);
+
+		$uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/talent/' . $entryId . '/';
+		if (!is_dir($uploadDir)) {
+			mkdir($uploadDir, 0755, true);
+		}
+
+		if ($action === 'chunk') {
+			$chunkIndex = (int)Yii::app()->request->getPost('chunkIndex', 0);
+			$totalChunks = (int)Yii::app()->request->getPost('totalChunks', 0);
+			$filename = preg_replace('/[^a-zA-Z0-9._-]/', '', Yii::app()->request->getPost('filename', 'file'));
+			$fileId = preg_replace('/[^a-zA-Z0-9]/', '', Yii::app()->request->getPost('fileId', ''));
+
+			if (empty($fileId)) {
+				echo CJSON::encode(array('success' => false, 'error' => 'Missing fileId'));
+				Yii::app()->end();
+			}
+
+			$tempDir = Yii::getPathOfAlias('webroot') . '/uploads/temp/chunks_' . $fileId . '/';
+			if (!is_dir($tempDir)) {
+				mkdir($tempDir, 0755, true);
+			}
+
+			if (isset($_FILES['chunk']) && $_FILES['chunk']['error'] === UPLOAD_ERR_OK) {
+				$chunkPath = $tempDir . $chunkIndex . '.part';
+				move_uploaded_file($_FILES['chunk']['tmp_name'], $chunkPath);
+
+				echo CJSON::encode(array(
+					'success' => true,
+					'chunkIndex' => $chunkIndex,
+					'received' => true
+				));
+			} else {
+				echo CJSON::encode(array('success' => false, 'error' => 'Upload chunk failed'));
+			}
+			Yii::app()->end();
+		}
+
+		if ($action === 'merge') {
+			$totalChunks = (int)Yii::app()->request->getPost('totalChunks', 0);
+			$filename = preg_replace('/[^a-zA-Z0-9._-]/', '', Yii::app()->request->getPost('filename', 'file'));
+			$fileId = preg_replace('/[^a-zA-Z0-9]/', '', Yii::app()->request->getPost('fileId', ''));
+			$fileType = Yii::app()->request->getPost('fileType', 'video'); // 'video' or 'audio'
+
+			$tempDir = Yii::getPathOfAlias('webroot') . '/uploads/temp/chunks_' . $fileId . '/';
+			
+			$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+			$finalFilename = $fileType . '-' . time() . '.' . $ext;
+			$finalPath = $uploadDir . $finalFilename;
+
+			$fp = fopen($finalPath, 'wb');
+			for ($i = 0; $i < $totalChunks; $i++) {
+				$chunkPath = $tempDir . $i . '.part';
+				if (file_exists($chunkPath)) {
+					fwrite($fp, file_get_contents($chunkPath));
+					unlink($chunkPath);
+				}
+			}
+			fclose($fp);
+			@rmdir($tempDir);
+
+			$relativePath = 'uploads/talent/' . $entryId . '/' . $finalFilename;
+			$fullUrl = Yii::app()->baseUrl . '/' . $relativePath;
+			$size = round(filesize($finalPath) / 1024 / 1024, 2);
+
+			echo CJSON::encode(array(
+				'success' => true,
+				'message' => "Upload thành công! Size: {$size} MB",
+				'path' => $fullUrl
+			));
+			Yii::app()->end();
+		}
+
+		echo CJSON::encode(array('success' => false, 'error' => 'Invalid action'));
 		Yii::app()->end();
 	}
 }

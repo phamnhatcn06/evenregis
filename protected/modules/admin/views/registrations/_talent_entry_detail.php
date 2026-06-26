@@ -120,6 +120,10 @@ $isOwner = ($entryPropertyId == $model->property_id);
                         <input type="file" class="d-none talent-video-file"
                             data-entry-id="<?php echo $entryId; ?>"
                             accept="video/mp4,video/quicktime,.mp4,.mov">
+                        <div class="progress talent-video-progress mt-1" data-entry-id="<?php echo $entryId; ?>" style="display:none; height: 18px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="small talent-video-upload-status text-muted mt-1" data-entry-id="<?php echo $entryId; ?>" style="display:none;"></div>
                     <?php elseif ($videoPath): ?>
                         <div class="d-flex align-items-center gap-2">
                             <a href="<?php echo CHtml::encode($videoPath); ?>" target="_blank" class="btn btn-sm btn-outline-info">
@@ -155,6 +159,10 @@ $isOwner = ($entryPropertyId == $model->property_id);
                         <input type="file" class="d-none talent-audio-file"
                             data-entry-id="<?php echo $entryId; ?>"
                             accept="audio/mpeg,audio/mp3,.mp3">
+                        <div class="progress talent-audio-progress mt-1" data-entry-id="<?php echo $entryId; ?>" style="display:none; height: 18px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="small talent-audio-upload-status text-muted mt-1" data-entry-id="<?php echo $entryId; ?>" style="display:none;"></div>
                     <?php elseif ($musicPath): ?>
                         <div class="d-flex align-items-center gap-2">
                             <audio controls class="w-100" style="max-height:40px;">
@@ -241,11 +249,11 @@ $isOwner = ($entryPropertyId == $model->property_id);
                                     <table class="table table-sm table-bordered mb-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th style="width:45px;" class="text-center">STT</th>
-                                                <th>Họ tên</th>
+                                                <th style="width:50px;" class="text-center">STT</th>
+                                                <th style="width:250px;">Họ tên</th>
                                                 <th>Chức danh</th>
-                                                <?php if ($canEdit && $isCurrentProperty): ?>
-                                                    <th style="width:50px;" class="text-center"></th>
+                                                <?php if ($canEdit): ?>
+                                                    <th style="width:70px;" class="text-center">Thao tác</th>
                                                 <?php endif; ?>
                                             </tr>
                                         </thead>
@@ -255,13 +263,15 @@ $isOwner = ($entryPropertyId == $model->property_id);
                                                     <td class="text-center"><?php echo $idx + 1; ?></td>
                                                     <td><?php echo CHtml::encode($member['attendee_name'] ?? ''); ?></td>
                                                     <td><?php echo CHtml::encode($member['position_name'] ?? '-'); ?></td>
-                                                    <?php if ($canEdit && $isCurrentProperty): ?>
+                                                    <?php if ($canEdit): ?>
                                                         <td class="text-center">
-                                                            <button type="button" class="btn btn-xs btn-outline-danger btn-remove-talent-member"
-                                                                data-member-id="<?php echo $member['id']; ?>"
-                                                                data-entry-id="<?php echo $entryId; ?>" title="Xóa">
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
+                                                            <?php if ($isCurrentProperty): ?>
+                                                                <button type="button" class="btn btn-xs btn-outline-danger btn-remove-talent-member"
+                                                                    data-member-id="<?php echo $member['id']; ?>"
+                                                                    data-entry-id="<?php echo $entryId; ?>" title="Xóa">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            <?php endif; ?>
                                                         </td>
                                                     <?php endif; ?>
                                                 </tr>

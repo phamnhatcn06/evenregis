@@ -62,3 +62,68 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Thêm/Xoá người tham gia (Dual Listbox) -->
+<div class="modal fade" id="addTalentMemberModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-users me-2"></i>Thêm người tham gia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="talent_member_entry_id">
+                <div class="row" id="talent_member_dual_listbox_wrapper">
+                    <!-- Cột trái: Người tham dự có sẵn -->
+                    <div class="col-md-5">
+                        <div class="card h-100">
+                            <div class="card-header py-2 bg-light">
+                                <small class="fw-bold">Danh sách người có sẵn</small>
+                                <input type="text" class="form-control form-control-sm mt-2" id="talent_member_available_search" placeholder="Tìm kiếm...">
+                            </div>
+                            <div class="card-body p-0" style="height:300px;overflow-y:auto;">
+                                <div class="list-group list-group-flush" id="talent_member_available_list">
+                                    <div class="text-center text-muted p-3"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Cột giữa: Nút chuyển đổi -->
+                    <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="btn_add_talent_member_item" title="Thêm">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="btn_add_all_talent_member_item" title="Thêm tất cả">
+                            <i class="fa fa-angle-double-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger mb-2" id="btn_remove_talent_member_item" title="Xóa">
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="btn_remove_all_talent_member_item" title="Xóa tất cả">
+                            <i class="fa fa-angle-double-left"></i>
+                        </button>
+                    </div>
+                    <!-- Cột phải: Người được chọn -->
+                    <div class="col-md-5">
+                        <div class="card h-100">
+                            <div class="card-header py-2 bg-light">
+                                <small class="fw-bold">Đã chọn tham gia</small>
+                                <input type="text" class="form-control form-control-sm mt-2" id="talent_member_selected_search" placeholder="Tìm kiếm...">
+                            </div>
+                            <div class="card-body p-0" style="height:300px;overflow-y:auto;">
+                                <div class="list-group list-group-flush" id="talent_member_selected_list">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-sm btn-primary" id="btn_save_talent_members">
+                    <i class="fa fa-save me-1"></i>Xác nhận
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
