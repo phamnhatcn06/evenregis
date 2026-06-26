@@ -455,6 +455,13 @@ class RegistrationsController extends AdminController
 						if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
 							$memberArr['division_name'] = $attInfo['division_name'];
 						}
+						// Thêm property_id và property_name để phân biệt đơn vị trong liên quân
+						if (empty($memberArr['property_id']) && !empty($attInfo['property_id'])) {
+							$memberArr['property_id'] = $attInfo['property_id'];
+						}
+						if (empty($memberArr['property_name']) && !empty($attInfo['property_name'])) {
+							$memberArr['property_name'] = $attInfo['property_name'];
+						}
 						$enrichedMembers[] = $memberArr;
 					}
 					$talentEntryMembers[$entryId] = $enrichedMembers;
