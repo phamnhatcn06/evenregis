@@ -465,23 +465,31 @@ class RegistrationsController extends AdminController
 				'event_id' => $model->event_id,
 			), 200)->getData();
 
+			$currentPropertyId = (string)$model->property_id;
+
 			foreach ($allEntriesData as $entry) {
-				$entryPropertyId = isset($entry->property_id) ? $entry->property_id : (isset($entry['property_id']) ? $entry['property_id'] : null);
+				$entryPropertyId = isset($entry->property_id) ? (string)$entry->property_id : (isset($entry['property_id']) ? (string)$entry['property_id'] : '');
 				$allianceIds = isset($entry->alliance_property_ids) ? $entry->alliance_property_ids : (isset($entry['alliance_property_ids']) ? $entry['alliance_property_ids'] : '');
 
-				// Parse alliance_property_ids (có thể là string "1,2,3" hoặc array)
+				// Parse alliance_property_ids (có thể là string "1,2,3" hoặc array hoặc JSON)
 				$allianceIdArray = array();
 				if (!empty($allianceIds)) {
 					if (is_array($allianceIds)) {
-						$allianceIdArray = $allianceIds;
-					} else {
-						$allianceIdArray = array_map('trim', explode(',', $allianceIds));
+						$allianceIdArray = array_map('strval', $allianceIds);
+					} elseif (is_string($allianceIds)) {
+						// Thử parse JSON trước
+						$decoded = json_decode($allianceIds, true);
+						if (is_array($decoded)) {
+							$allianceIdArray = array_map('strval', $decoded);
+						} else {
+							$allianceIdArray = array_map('trim', explode(',', $allianceIds));
+						}
 					}
 				}
 
 				// Check nếu đơn vị hiện tại là owner hoặc trong alliance
-				$isOwner = ($entryPropertyId == $model->property_id);
-				$isAlliance = in_array($model->property_id, $allianceIdArray);
+				$isOwner = ($entryPropertyId === $currentPropertyId);
+				$isAlliance = in_array($currentPropertyId, $allianceIdArray, true);
 
 				if ($isOwner || $isAlliance) {
 					$loadTalentEntry($entry);
