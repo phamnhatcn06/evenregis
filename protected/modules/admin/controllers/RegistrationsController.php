@@ -2923,7 +2923,8 @@ class RegistrationsController extends AdminController
 
 		// Kiểm tra người tham dự có thuộc registration của đơn vị user không
 		$registration = Registrations::fetchFromApi($attendee->registration_id);
-		if (!$registration || ($userPropertyCode !== '9999' && $registration->property_id != $userPropertyId)) {
+		$hasFullAccess = PermissionHelper::can('registrations', 'update') || $userPropertyCode === '9999';
+		if (!$registration || (!$hasFullAccess && $registration->property_id != $userPropertyId)) {
 			echo CJSON::encode(array('success' => false, 'message' => 'Bạn chỉ được thêm người của đơn vị mình.'));
 			Yii::app()->end();
 		}
