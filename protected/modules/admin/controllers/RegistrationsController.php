@@ -3041,7 +3041,8 @@ class RegistrationsController extends AdminController
 
 		error_log("GetAttendeesForTalent - registration_id: {$registration_id}, userPropertyId: {$userPropertyId}, userPropertyCode: {$userPropertyCode}");
 
-		if (!$registration || ($userPropertyCode !== '9999' && $registration->property_id != $userPropertyId)) {
+		$hasFullAccess = PermissionHelper::can('registrations', 'update') || $userPropertyCode === '9999';
+		if (!$registration || (!$hasFullAccess && $registration->property_id != $userPropertyId)) {
 			$logData .= "  Access Denied! registration property_id: " . ($registration ? $registration->property_id : 'null') . ", userPropertyId: {$userPropertyId}\n";
 			file_put_contents($logFile, $logData, FILE_APPEND);
 
