@@ -164,8 +164,8 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
         $transaction = $db->beginTransaction();
         
         try {
-            // 1. Tạo bảng talent_entry_orgs nếu chưa có
-            $this->createTalentEntryOrgsTable($db);
+            // 1. Thêm cột alliance_org_ids vào talent_entries
+            $this->ensureAllianceOrgIdsColumn($db);
             
             // 2. Đảm bảo cột type tồn tại
             $this->ensureTypeColumn($db);
