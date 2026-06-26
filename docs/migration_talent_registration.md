@@ -289,38 +289,20 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
             ->queryAll(true, array(':period_id' => self::GENERAL_PERIOD_ID));
     }
     
-    private function migrateAllianceData($db)
+    private function migrateAllianceOrgIds($db)
     {
-        $stats = array('leads' => 0, 'members' => 0);
+        $updated = 0;
         
         // Lấy tất cả talent_entries có is_alliance_team = 1
         $allianceEntries = $db->createCommand()
-            ->select('te.id AS entry_id, te.created_at, r.property_id, r.event_id')
+            ->select('te.id AS entry_id, r.property_id, r.event_id')
             ->from('talent_entries te')
             ->join('registrations r', 'te.registration_id = r.id')
             ->where('te.is_alliance_team = 1 AND te.deleted_at IS NULL AND r.deleted_at IS NULL')
             ->queryAll();
         
         foreach ($allianceEntries as $entry) {
-            // 1. Thêm đơn vị chủ trì (owner của tiết mục)
-            $exists = $db->createCommand()
-                ->select('id')
-                ->from('talent_entry_orgs')
-                ->where('entry_id = :eid AND property_id = :pid')
-                ->queryScalar(array(':eid' => $entry['entry_id'], ':pid' => $entry['property_id']));
-            
-            if (!$exists) {
-                $db->createCommand()->insert('talent_entry_orgs', array(
-                    'entry_id' => $entry['entry_id'],
-                    'property_id' => $entry['property_id'],
-                    'is_lead' => 1,
-                    'joined_at' => strtotime($entry['created_at']),
-                    'created_at' => time(),
-                ));
-                $stats['leads']++;
-            }
-            
-            // 2. Tìm các đơn vị liên quân từ bảng alliances
+            // Tìm content_id của văn nghệ trong event
             $talentContentId = $db->createCommand()
                 ->select('ec.id')
                 ->from('event_contents ec')
@@ -330,42 +312,31 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
             
             if (!$talentContentId) continue;
             
-            $alliances = $db->createCommand()
-                ->select('org_a_id, org_b_id, confirmed_at')
+            // Lấy danh sách đơn vị liên quân từ bảng alliances
+            $partnerIds = $db->createCommand()
+                ->select("CASE WHEN org_a_id = :pid THEN org_b_id ELSE org_a_id END AS partner_id")
                 ->from('alliances')
                 ->where('event_content_id = :ecid AND status = 1 AND deleted_at IS NULL')
                 ->andWhere('(org_a_id = :pid OR org_b_id = :pid)')
-                ->queryAll(true, array(
+                ->queryColumn(array(
                     ':ecid' => $talentContentId,
                     ':pid' => $entry['property_id'],
                 ));
             
-            foreach ($alliances as $al) {
-                // Lấy đơn vị partner (không phải owner)
-                $partnerId = ($al['org_a_id'] == $entry['property_id']) 
-                    ? $al['org_b_id'] 
-                    : $al['org_a_id'];
-                
-                $exists = $db->createCommand()
-                    ->select('id')
-                    ->from('talent_entry_orgs')
-                    ->where('entry_id = :eid AND property_id = :pid')
-                    ->queryScalar(array(':eid' => $entry['entry_id'], ':pid' => $partnerId));
-                
-                if (!$exists) {
-                    $db->createCommand()->insert('talent_entry_orgs', array(
-                        'entry_id' => $entry['entry_id'],
-                        'property_id' => $partnerId,
-                        'is_lead' => 0,
-                        'joined_at' => $al['confirmed_at'],
-                        'created_at' => time(),
-                    ));
-                    $stats['members']++;
-                }
+            if (!empty($partnerIds)) {
+                $allianceOrgIds = implode(',', $partnerIds);
+                $db->createCommand()->update(
+                    'talent_entries',
+                    array('alliance_org_ids' => $allianceOrgIds),
+                    'id = :id',
+                    array(':id' => $entry['entry_id'])
+                );
+                $updated++;
+                echo "Updated entry #{$entry['entry_id']} with alliance_org_ids: {$allianceOrgIds}\n";
             }
         }
         
-        return $stats;
+        return $updated;
     }
 }
 ```
