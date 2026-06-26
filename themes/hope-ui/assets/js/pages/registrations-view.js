@@ -5583,6 +5583,126 @@ var RegistrationView = (function() {
         deleteMissContestant: deleteMissContestant,
         removeTalentAllianceProperty: removeTalentAllianceProperty,
         loadAttendeesForEditTalent: loadAttendeesForEditTalent,
-        bindTalentDetailEvents: bindTalentDetailEvents
+        bindTalentDetailEvents: bindTalentDetailEvents,
+        startDocumentChunkUpload: startDocumentChunkUpload
     };
+
+    function startDocumentChunkUpload() {
+        var fileInput = document.getElementById('upload_documents');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            Toast.error('Vui lòng chọn file để tải lên.');
+            return;
+        }
+
+        var files = Array.from(fileInput.files);
+        var totalFiles = files.length;
+        var currentFileIndex = 0;
+
+        var progressDiv = document.getElementById('uploadDocProgress');
+        var statusEl = document.getElementById('uploadDocStatus');
+        var barEl = document.getElementById('uploadDocBar');
+        var btn = document.getElementById('btn_upload_document');
+
+        btn.disabled = true;
+        progressDiv.style.display = 'block';
+
+        function uploadNextFile() {
+            if (currentFileIndex >= totalFiles) {
+                Toast.success('Tải lên ' + totalFiles + ' file thành công!');
+                var modalEl = document.getElementById('uploadDocumentModal');
+                if (modalEl) {
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+                location.reload();
+                return;
+            }
+
+            var file = files[currentFileIndex];
+            statusEl.textContent = 'Đang tải file ' + (currentFileIndex + 1) + '/' + totalFiles + ': ' + file.name;
+            uploadFileInChunks(file, function(progress) {
+                var overallProgress = ((currentFileIndex + progress / 100) / totalFiles) * 100;
+                barEl.style.width = overallProgress + '%';
+                barEl.textContent = Math.round(overallProgress) + '%';
+            }, function(success) {
+                if (success) {
+                    currentFileIndex++;
+                    uploadNextFile();
+                } else {
+                    btn.disabled = false;
+                    progressDiv.style.display = 'none';
+                    Toast.error('Lỗi tải file: ' + file.name);
+                }
+            });
+        }
+
+        uploadNextFile();
+    }
+
+    function uploadFileInChunks(file, onProgress, onComplete) {
+        var CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+        var totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        var currentChunk = 0;
+        var fileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        function sendChunk() {
+            var start = currentChunk * CHUNK_SIZE;
+            var end = Math.min(start + CHUNK_SIZE, file.size);
+            var chunk = file.slice(start, end);
+
+            var formData = new FormData();
+            formData.append('chunk', chunk);
+            formData.append('chunkIndex', currentChunk);
+            formData.append('totalChunks', totalChunks);
+            formData.append('filename', file.name);
+            formData.append('fileId', fileId);
+
+            fetch(window.docChunkUploadUrl + '&act=chunk', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    currentChunk++;
+                    onProgress((currentChunk / totalChunks) * 100);
+                    if (currentChunk < totalChunks) {
+                        sendChunk();
+                    } else {
+                        mergeChunks();
+                    }
+                } else {
+                    onComplete(false);
+                }
+            })
+            .catch(function() {
+                onComplete(false);
+            });
+        }
+
+        function mergeChunks() {
+            var formData = new FormData();
+            formData.append('totalChunks', totalChunks);
+            formData.append('filename', file.name);
+            formData.append('fileId', fileId);
+
+            fetch(window.docChunkUploadUrl + '&act=merge', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                onComplete(data.success);
+            })
+            .catch(function() {
+                onComplete(false);
+            });
+        }
+
+        sendChunk();
+    }
 })();
+
+function startDocumentChunkUpload() {
+    RegistrationView.startDocumentChunkUpload();
+}
