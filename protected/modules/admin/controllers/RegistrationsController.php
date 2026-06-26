@@ -458,54 +458,33 @@ class RegistrationsController extends AdminController
 				}
 			};
 
-			// 1. Lấy talent entries của chính đơn vị này (owner)
-			$filterParams = array(
-				'property_id' => $model->property_id,
-				'registration_id' => $model->id,
-			);
-			if (!empty($showIds)) {
-				$filterParams['event_id'] = $model->event_id;
-			}
-			$entriesData = TalentEntries::getApiDataProvider($filterParams, 100)->getData();
-			foreach ($entriesData as $entry) {
-				$loadTalentEntry($entry);
-			}
+			// Lấy tất cả talent entries của event, sau đó filter:
+			// - property_id = đơn vị hiện tại (owner)
+			// - HOẶC đơn vị hiện tại nằm trong alliance_property_ids
+			$allEntriesData = TalentEntries::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+			), 200)->getData();
 
-			// 2. Lấy talent entries mà đơn vị này được mời liên quân (alliance approved cho talent)
-			// Tìm event_content_id cho talent
-			$talentEventContentId = null;
-			$ecResult = ApiClient::get(ApiEndpoints::EVENT_CONTENT_LIST, array('event_id' => $model->event_id));
-			if ($ecResult['success'] && isset($ecResult['data'])) {
-				$ecData = isset($ecResult['data']['data']) ? $ecResult['data']['data'] : $ecResult['data'];
-				foreach ($ecData as $ec) {
-					$code = isset($ec['content_code']) ? $ec['content_code'] : (isset($ec['code']) ? $ec['code'] : '');
-					if ($code === 'talent' || $code === 'talents') {
-						$talentEventContentId = isset($ec['id']) ? $ec['id'] : null;
-						break;
+			foreach ($allEntriesData as $entry) {
+				$entryPropertyId = isset($entry->property_id) ? $entry->property_id : (isset($entry['property_id']) ? $entry['property_id'] : null);
+				$allianceIds = isset($entry->alliance_property_ids) ? $entry->alliance_property_ids : (isset($entry['alliance_property_ids']) ? $entry['alliance_property_ids'] : '');
+
+				// Parse alliance_property_ids (có thể là string "1,2,3" hoặc array)
+				$allianceIdArray = array();
+				if (!empty($allianceIds)) {
+					if (is_array($allianceIds)) {
+						$allianceIdArray = $allianceIds;
+					} else {
+						$allianceIdArray = array_map('trim', explode(',', $allianceIds));
 					}
 				}
-			}
 
-			if ($talentEventContentId) {
-				$approvedAllianceRequests = AllianceRequests::getApiDataProvider(array(
-					'event_id' => $model->event_id,
-					'target_org_id' => $model->property_id,
-					'status' => AllianceRequests::STATUS_APPROVED,
-					'event_content_id' => $talentEventContentId,
-				), 50)->getData();
+				// Check nếu đơn vị hiện tại là owner hoặc trong alliance
+				$isOwner = ($entryPropertyId == $model->property_id);
+				$isAlliance = in_array($model->property_id, $allianceIdArray);
 
-				foreach ($approvedAllianceRequests as $req) {
-					$requesterOrgId = isset($req->requester_org_id) ? $req->requester_org_id : null;
-					if ($requesterOrgId) {
-						// Lấy talent entries của đơn vị gửi yêu cầu liên quân
-						$allianceEntries = TalentEntries::getApiDataProvider(array(
-							'property_id' => $requesterOrgId,
-							'event_id' => $model->event_id,
-						), 100)->getData();
-						foreach ($allianceEntries as $entry) {
-							$loadTalentEntry($entry);
-						}
-					}
+				if ($isOwner || $isAlliance) {
+					$loadTalentEntry($entry);
 				}
 			}
 		}
