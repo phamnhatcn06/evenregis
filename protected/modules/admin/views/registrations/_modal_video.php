@@ -15,7 +15,7 @@
                 <a href="#" id="videoDownloadLink" class="btn btn-outline-primary" target="_blank" style="display:none;">
                     <i class="fa fa-external-link me-1"></i>Mở link gốc
                 </a>
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" onclick="stopVideo()">Đóng</button>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
