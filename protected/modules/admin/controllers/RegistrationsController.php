@@ -882,6 +882,10 @@ class RegistrationsController extends AdminController
 				}
 
 				$resetResult = Attendees::resetRejectedToPending($id);
+
+				// Cập nhật status tiết mục văn nghệ sang submitted
+				TalentEntries::updateStatusByPropertyId($model->property_id, TalentEntries::STATUS_SUBMITTED);
+
 				$msg = 'Đã nộp phiếu đăng ký.';
 				if ($resetResult['count'] > 0) {
 					$msg .= ' Đã chuyển ' . $resetResult['count'] . ' người bị từ chối về trạng thái chờ duyệt.';
