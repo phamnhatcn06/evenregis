@@ -2887,7 +2887,8 @@ class RegistrationsController extends AdminController
 
 	/**
 	 * Thêm thành viên vào tiết mục văn nghệ
-	 * Mỗi đơn vị chỉ được thêm người của đơn vị mình
+	 * - Tự động thêm role talent nếu chưa có
+	 * - Nếu attendee chưa có hồ sơ nhưng có hồ sơ từ đăng ký trước → copy + auto-approved
 	 */
 	public function actionAddTalentMember()
 	{
@@ -2906,7 +2907,6 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
-		// Kiểm tra attendee có thuộc đơn vị của user hiện tại không
 		$user = AuthHandler::getUser();
 		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
 		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
@@ -2923,7 +2923,6 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
-		// Kiểm tra người tham dự có thuộc registration của đơn vị user không
 		$registration = Registrations::fetchFromApi($attendee->registration_id);
 		$hasFullAccess = PermissionHelper::can('registrations', 'update') || $userPropertyCode === '9999';
 		if (!$registration || (!$hasFullAccess && $registration->property_id != $userPropertyId)) {
@@ -2940,13 +2939,62 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		$talentRoleId = $this->getTalentRoleId();
+		$copiedFromPrevious = false;
+
+		// 1. Thêm role talent nếu chưa có
+		$currentRoleIds = $this->parseRoleIds(array('role_id' => $attendee->role_id));
+		if (!in_array((string)$talentRoleId, $currentRoleIds, true)) {
+			$currentRoleIds[] = (string)$talentRoleId;
+			$newRoleId = implode(',', array_unique(array_filter($currentRoleIds)));
+			$url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $attendeeId));
+			ApiClient::post($url, array('role_id' => $newRoleId));
+		}
+
+		// 2. Nếu chưa có hồ sơ, kiểm tra có thể copy từ đăng ký trước không
+		$attendeeData = array(
+			'portrait_path' => $attendee->portrait_path,
+			'photo_path' => isset($attendee->photo_path) ? $attendee->photo_path : null,
+			'cccd_front_path' => $attendee->cccd_front_path,
+			'cccd_back_path' => $attendee->cccd_back_path,
+			'contract_path' => $attendee->contract_path,
+		);
+
+		if (!$this->attendeeHasDocuments($attendeeData) && $attendee->staff_id) {
+			$previousAttendee = $this->findPreviousApprovedAttendee(
+				$attendee->staff_id,
+				$registration->event_id,
+				$attendee->registration_id
+			);
+
+			if ($previousAttendee && $this->attendeeHasDocuments($previousAttendee)) {
+				// Copy hồ sơ từ đăng ký trước + auto-approved
+				$updateData = array(
+					'portrait_path' => isset($previousAttendee['portrait_path']) ? $previousAttendee['portrait_path'] : (isset($previousAttendee['photo_path']) ? $previousAttendee['photo_path'] : ''),
+					'cccd_front_path' => isset($previousAttendee['cccd_front_path']) ? $previousAttendee['cccd_front_path'] : '',
+					'cccd_back_path' => isset($previousAttendee['cccd_back_path']) ? $previousAttendee['cccd_back_path'] : '',
+					'contract_path' => isset($previousAttendee['contract_path']) ? $previousAttendee['contract_path'] : '',
+					'approval_status' => Attendees::APPROVAL_APPROVED,
+					'approved_by' => isset($user['email']) ? $user['email'] : null,
+				);
+				$url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $attendeeId));
+				ApiClient::post($url, $updateData);
+				$copiedFromPrevious = true;
+			}
+		}
+
+		// 3. Thêm vào talent entry members
 		$member = new TalentEntryMembers;
 		$member->entry_id = $entryId;
 		$member->attendee_id = $attendeeId;
 		$result = $member->storeViaApi();
 
 		if ($result['success']) {
-			echo CJSON::encode(array('success' => true, 'message' => 'Thêm thành viên thành công.'));
+			$message = 'Thêm thành viên thành công.';
+			if ($copiedFromPrevious) {
+				$message .= ' Đã sao chép hồ sơ từ đăng ký trước.';
+			}
+			echo CJSON::encode(array('success' => true, 'message' => $message, 'copied_from_previous' => $copiedFromPrevious));
 		} else {
 			$error = isset($result['error']) ? $result['error'] : 'Thêm thất bại.';
 			echo CJSON::encode(array('success' => false, 'message' => $error));
