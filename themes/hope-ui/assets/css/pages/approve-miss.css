@@ -1,0 +1,129 @@
+.contestant-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.contestant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-img-wrapper {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.contestant-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.contestant-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+}
+
+.compare-checkbox {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+.compare-checkbox .form-check-input {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.compare-checkbox .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.contestant-card.selected {
+    border: 3px solid #0d6efd;
+}
+
+/* Modal Detail Styles */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.photo-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.photo-item.main-photo {
+    grid-column: span 2;
+}
+
+.photo-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.photo-item.main-photo img {
+    height: 300px;
+}
+
+.photo-item img:hover {
+    transform: scale(1.05);
+}
+
+.photo-item .photo-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Compare Modal */
+#modalCompare .modal-body {
+    background: #f8f9fa;
+}
+
+.compare-column {
+    padding: 15px;
+}
+
+.compare-column .card {
+    height: 100%;
+}
+
+.compare-column .contestant-photo {
+    height: 250px;
+    object-fit: cover;
+}
+
+.compare-table th {
+    width: 40%;
+    background: #f8f9fa;
+}
