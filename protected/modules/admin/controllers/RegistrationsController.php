@@ -2702,6 +2702,228 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	/**
+	 * Cập nhật mô tả và nội dung tiết mục văn nghệ
+	 * Chỉ đơn vị chủ quản mới được sửa
+	 */
+	public function actionUpdateTalentInfo($id)
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$entry = TalentEntries::fetchFromApi($id);
+		if (!$entry) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục.'));
+			Yii::app()->end();
+		}
+
+		// Kiểm tra quyền: chỉ đơn vị chủ quản mới được sửa
+		$user = AuthHandler::getUser();
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		if ($entry->property_id != $userPropertyId) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Bạn không có quyền chỉnh sửa tiết mục này.'));
+			Yii::app()->end();
+		}
+
+		$entry->description = Yii::app()->request->getPost('description', $entry->description);
+		$entry->content = Yii::app()->request->getPost('content', $entry->content);
+
+		$result = $entry->updateViaApi();
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật thành công.'));
+		} else {
+			$error = isset($result['error']) ? $result['error'] : 'Cập nhật thất bại.';
+			echo CJSON::encode(array('success' => false, 'message' => $error));
+		}
+		Yii::app()->end();
+	}
+
+	/**
+	 * Cập nhật video và audio tiết mục văn nghệ
+	 * Chỉ đơn vị chủ quản mới được sửa
+	 */
+	public function actionUpdateTalentMedia($id)
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$entry = TalentEntries::fetchFromApi($id);
+		if (!$entry) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục.'));
+			Yii::app()->end();
+		}
+
+		// Kiểm tra quyền: chỉ đơn vị chủ quản mới được sửa
+		$user = AuthHandler::getUser();
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		if ($entry->property_id != $userPropertyId) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Bạn không có quyền chỉnh sửa tiết mục này.'));
+			Yii::app()->end();
+		}
+
+		$entry->video_path = Yii::app()->request->getPost('video_path', $entry->video_path);
+		$entry->music_path = Yii::app()->request->getPost('music_path', $entry->music_path);
+
+		$result = $entry->updateViaApi();
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Cập nhật thành công.'));
+		} else {
+			$error = isset($result['error']) ? $result['error'] : 'Cập nhật thất bại.';
+			echo CJSON::encode(array('success' => false, 'message' => $error));
+		}
+		Yii::app()->end();
+	}
+
+	/**
+	 * Thêm thành viên vào tiết mục văn nghệ
+	 * Mỗi đơn vị chỉ được thêm người của đơn vị mình
+	 */
+	public function actionAddTalentMember()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$entryId = Yii::app()->request->getPost('entry_id');
+		$attendeeId = Yii::app()->request->getPost('attendee_id');
+
+		if (!$entryId || !$attendeeId) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Thiếu thông tin bắt buộc.'));
+			Yii::app()->end();
+		}
+
+		// Kiểm tra attendee có thuộc đơn vị của user hiện tại không
+		$user = AuthHandler::getUser();
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+		$attendee = Attendees::fetchFromApi($attendeeId);
+		if (!$attendee) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy người tham dự.'));
+			Yii::app()->end();
+		}
+
+		// Kiểm tra người tham dự có thuộc registration của đơn vị user không
+		$registration = Registrations::fetchFromApi($attendee->registration_id);
+		if (!$registration || $registration->property_id != $userPropertyId) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Bạn chỉ được thêm người của đơn vị mình.'));
+			Yii::app()->end();
+		}
+
+		// Kiểm tra đã có trong danh sách chưa
+		$existingMembers = TalentEntryMembers::getApiDataProvider(array('entry_id' => $entryId), 100)->getData();
+		foreach ($existingMembers as $m) {
+			if ($m->attendee_id == $attendeeId) {
+				echo CJSON::encode(array('success' => false, 'message' => 'Người này đã có trong danh sách.'));
+				Yii::app()->end();
+			}
+		}
+
+		$member = new TalentEntryMembers;
+		$member->entry_id = $entryId;
+		$member->attendee_id = $attendeeId;
+		$result = $member->storeViaApi();
+
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Thêm thành viên thành công.'));
+		} else {
+			$error = isset($result['error']) ? $result['error'] : 'Thêm thất bại.';
+			echo CJSON::encode(array('success' => false, 'message' => $error));
+		}
+		Yii::app()->end();
+	}
+
+	/**
+	 * Xóa thành viên khỏi tiết mục văn nghệ
+	 * Mỗi đơn vị chỉ được xóa người của đơn vị mình
+	 */
+	public function actionRemoveTalentMember()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$memberId = Yii::app()->request->getPost('member_id');
+
+		if (!$memberId) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Thiếu thông tin bắt buộc.'));
+			Yii::app()->end();
+		}
+
+		// Lấy thông tin member
+		$member = TalentEntryMembers::fetchFromApi($memberId);
+		if (!$member) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy thành viên.'));
+			Yii::app()->end();
+		}
+
+		// Kiểm tra attendee có thuộc đơn vị của user hiện tại không
+		$user = AuthHandler::getUser();
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+		$attendee = Attendees::fetchFromApi($member->attendee_id);
+		if ($attendee) {
+			$registration = Registrations::fetchFromApi($attendee->registration_id);
+			if (!$registration || $registration->property_id != $userPropertyId) {
+				echo CJSON::encode(array('success' => false, 'message' => 'Bạn chỉ được xóa người của đơn vị mình.'));
+				Yii::app()->end();
+			}
+		}
+
+		$result = TalentEntryMembers::deleteViaApi($memberId);
+
+		if ($result['success']) {
+			echo CJSON::encode(array('success' => true, 'message' => 'Xóa thành viên thành công.'));
+		} else {
+			$error = isset($result['error']) ? $result['error'] : 'Xóa thất bại.';
+			echo CJSON::encode(array('success' => false, 'message' => $error));
+		}
+		Yii::app()->end();
+	}
+
+	/**
+	 * Lấy danh sách attendees của đơn vị hiện tại để thêm vào tiết mục
+	 */
+	public function actionGetAttendeesForTalent($registration_id)
+	{
+		header('Content-Type: application/json');
+
+		$user = AuthHandler::getUser();
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+		$registration = Registrations::fetchFromApi($registration_id);
+		if (!$registration || $registration->property_id != $userPropertyId) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không có quyền truy cập.'));
+			Yii::app()->end();
+		}
+
+		$attendees = Attendees::getByRegistrationId($registration_id);
+		$result = array();
+		foreach ($attendees as $att) {
+			$result[] = array(
+				'id' => isset($att['id']) ? $att['id'] : null,
+				'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
+				'position' => isset($att['position']) ? $att['position'] : '',
+			);
+		}
+
+		echo CJSON::encode(array('success' => true, 'data' => $result));
+		Yii::app()->end();
+	}
+
 	public function actionGetOrganizations()
 	{
 		$user = AuthHandler::getUser();
