@@ -3109,6 +3109,333 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
+	/**
+	 * Lấy danh sách nhân viên có thể thêm vào văn nghệ
+	 * Bao gồm cả nhân viên đã có attendee approved ở đăng ký trước (có hồ sơ đầy đủ)
+	 */
+	public function actionGetStaffsForTalent($registration_id = null)
+	{
+		header('Content-Type: application/json');
+
+		if ($registration_id === null) {
+			$registration_id = Yii::app()->request->getParam('registration_id');
+		}
+
+		$user = AuthHandler::getUser();
+		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		if ($userPropertyCode && !$userPropertyId) {
+			$userProperty = Properties::fetchByCode($userPropertyCode);
+			if ($userProperty) {
+				$userPropertyId = $userProperty->id;
+			}
+		}
+
+		$registration = Registrations::fetchFromApi($registration_id);
+		$hasFullAccess = PermissionHelper::can('registrations', 'update') || $userPropertyCode === '9999';
+		if (!$registration || (!$hasFullAccess && $registration->property_id != $userPropertyId)) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không có quyền truy cập.'));
+			Yii::app()->end();
+		}
+
+		// Tìm role Thi Văn nghệ
+		$talentRoleId = $this->getTalentRoleId();
+
+		// Lấy attendees hiện tại của registration này
+		$currentAttendees = Attendees::getByRegistrationId($registration_id);
+		$currentStaffIds = array();
+		$attendeesWithTalentRole = array();
+
+		foreach ($currentAttendees as $att) {
+			$staffId = isset($att['staff_id']) ? $att['staff_id'] : null;
+			if ($staffId) {
+				$currentStaffIds[$staffId] = $att;
+			}
+			// Kiểm tra có role talent không
+			$roleIds = $this->parseRoleIds($att);
+			if (in_array((string)$talentRoleId, $roleIds, true)) {
+				$attendeesWithTalentRole[] = array(
+					'id' => $att['id'],
+					'staff_id' => $staffId,
+					'full_name' => isset($att['full_name']) ? $att['full_name'] : '',
+					'position' => isset($att['position']) ? $att['position'] : '',
+					'has_talent_role' => true,
+					'approval_status' => isset($att['approval_status']) ? $att['approval_status'] : 0,
+					'has_documents' => $this->attendeeHasDocuments($att),
+				);
+			}
+		}
+
+		// Lấy danh sách staffs của property hiện tại
+		$staffsData = Staffs::getApiDataProvider(array('property_id' => $registration->property_id, 'is_active' => 1), 500)->getData();
+
+		$result = array();
+		foreach ($staffsData as $staff) {
+			$staffId = isset($staff->id) ? $staff->id : (isset($staff['id']) ? $staff['id'] : null);
+			$staffCode = isset($staff->staff_code) ? $staff->staff_code : (isset($staff['staff_code']) ? $staff['staff_code'] : '');
+			$fullName = isset($staff->full_name) ? $staff->full_name : (isset($staff['full_name']) ? $staff['full_name'] : '');
+			$position = isset($staff->position_name) ? $staff->position_name : (isset($staff['position_name']) ? $staff['position_name'] : '');
+
+			if (!$staffId) continue;
+
+			$item = array(
+				'staff_id' => $staffId,
+				'staff_code' => $staffCode,
+				'full_name' => $fullName,
+				'position' => $position,
+				'attendee_id' => null,
+				'has_talent_role' => false,
+				'approval_status' => null,
+				'has_documents' => false,
+				'from_previous_registration' => false,
+			);
+
+			// Kiểm tra xem staff này đã có attendee trong registration hiện tại chưa
+			if (isset($currentStaffIds[$staffId])) {
+				$att = $currentStaffIds[$staffId];
+				$item['attendee_id'] = $att['id'];
+				$item['approval_status'] = isset($att['approval_status']) ? $att['approval_status'] : 0;
+				$item['has_documents'] = $this->attendeeHasDocuments($att);
+				$roleIds = $this->parseRoleIds($att);
+				$item['has_talent_role'] = in_array((string)$talentRoleId, $roleIds, true);
+			} else {
+				// Tìm attendee approved từ các đăng ký trước của staff này
+				$previousAttendee = $this->findPreviousApprovedAttendee($staffId, $registration->event_id, $registration_id);
+				if ($previousAttendee) {
+					$item['from_previous_registration'] = true;
+					$item['previous_attendee_id'] = $previousAttendee['id'];
+					$item['has_documents'] = $this->attendeeHasDocuments($previousAttendee);
+					$item['approval_status'] = isset($previousAttendee['approval_status']) ? $previousAttendee['approval_status'] : 0;
+				}
+			}
+
+			$result[] = $item;
+		}
+
+		echo CJSON::encode(array('success' => true, 'data' => $result, 'talent_role_id' => $talentRoleId));
+		Yii::app()->end();
+	}
+
+	/**
+	 * Thêm staff vào văn nghệ
+	 * Nếu staff đã có attendee approved ở đăng ký trước → copy data + thêm role talent + auto-approved
+	 */
+	public function actionAddStaffToTalent()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+
+		$registrationId = Yii::app()->request->getPost('registration_id');
+		$staffId = Yii::app()->request->getPost('staff_id');
+		$entryId = Yii::app()->request->getPost('entry_id');
+
+		if (!$registrationId || !$staffId) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Thiếu thông tin bắt buộc.'));
+			Yii::app()->end();
+		}
+
+		$user = AuthHandler::getUser();
+		$userPropertyCode = isset($user['property_code']) ? $user['property_code'] : null;
+		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+		if ($userPropertyCode && !$userPropertyId) {
+			$userProperty = Properties::fetchByCode($userPropertyCode);
+			if ($userProperty) {
+				$userPropertyId = $userProperty->id;
+			}
+		}
+
+		$registration = Registrations::fetchFromApi($registrationId);
+		$hasFullAccess = PermissionHelper::can('registrations', 'update') || $userPropertyCode === '9999';
+		if (!$registration || (!$hasFullAccess && $registration->property_id != $userPropertyId)) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không có quyền truy cập.'));
+			Yii::app()->end();
+		}
+
+		$talentRoleId = $this->getTalentRoleId();
+
+		// Kiểm tra staff có attendee trong registration hiện tại không
+		$currentAttendees = Attendees::getByRegistrationId($registrationId);
+		$existingAttendee = null;
+		foreach ($currentAttendees as $att) {
+			if (isset($att['staff_id']) && $att['staff_id'] == $staffId) {
+				$existingAttendee = $att;
+				break;
+			}
+		}
+
+		$attendeeId = null;
+
+		if ($existingAttendee) {
+			// Đã có attendee → chỉ cần thêm role talent
+			$attendeeId = $existingAttendee['id'];
+			$roleIds = $this->parseRoleIds($existingAttendee);
+
+			if (!in_array((string)$talentRoleId, $roleIds, true)) {
+				$roleIds[] = (string)$talentRoleId;
+				$newRoleId = implode(',', array_unique($roleIds));
+				$url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $attendeeId));
+				$updateResult = ApiClient::post($url, array('role_id' => $newRoleId));
+				if (!$updateResult['success']) {
+					echo CJSON::encode(array('success' => false, 'message' => 'Không thể cập nhật vai trò.'));
+					Yii::app()->end();
+				}
+			}
+		} else {
+			// Chưa có attendee → tìm từ đăng ký trước
+			$previousAttendee = $this->findPreviousApprovedAttendee($staffId, $registration->event_id, $registrationId);
+
+			if ($previousAttendee && $this->attendeeHasDocuments($previousAttendee)) {
+				// Copy data từ đăng ký trước + set role talent + auto-approved
+				$newAttendee = new Attendees;
+				$newAttendee->event_id = $registration->event_id;
+				$newAttendee->registration_id = $registrationId;
+				$newAttendee->property_id = $registration->property_id;
+				$newAttendee->staff_id = $staffId;
+				$newAttendee->full_name = isset($previousAttendee['full_name']) ? $previousAttendee['full_name'] : '';
+				$newAttendee->position = isset($previousAttendee['position']) ? $previousAttendee['position'] : '';
+				$newAttendee->role_id = (string)$talentRoleId;
+				$newAttendee->portrait_path = isset($previousAttendee['portrait_path']) ? $previousAttendee['portrait_path'] : (isset($previousAttendee['photo_path']) ? $previousAttendee['photo_path'] : '');
+				$newAttendee->cccd_front_path = isset($previousAttendee['cccd_front_path']) ? $previousAttendee['cccd_front_path'] : '';
+				$newAttendee->cccd_back_path = isset($previousAttendee['cccd_back_path']) ? $previousAttendee['cccd_back_path'] : '';
+				$newAttendee->contract_path = isset($previousAttendee['contract_path']) ? $previousAttendee['contract_path'] : '';
+				$newAttendee->gender = isset($previousAttendee['gender']) ? $previousAttendee['gender'] : '';
+				$newAttendee->id_card = isset($previousAttendee['id_card']) ? $previousAttendee['id_card'] : '';
+				$newAttendee->personal_email = isset($previousAttendee['personal_email']) ? $previousAttendee['personal_email'] : '';
+				$newAttendee->approval_status = Attendees::APPROVAL_APPROVED;
+				$ssoUser = AuthHandler::getUser();
+				$newAttendee->approved_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+				$result = $newAttendee->storeViaApi();
+				if (!$result['success']) {
+					$error = isset($result['error']) ? $result['error'] : 'Không thể tạo người tham dự.';
+					echo CJSON::encode(array('success' => false, 'message' => $error));
+					Yii::app()->end();
+				}
+				$attendeeId = isset($result['data']['id']) ? $result['data']['id'] : null;
+			} else {
+				// Tạo mới attendee từ thông tin staff
+				$staff = Staffs::fetchFromApi($staffId);
+				if (!$staff) {
+					echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy nhân viên.'));
+					Yii::app()->end();
+				}
+
+				$newAttendee = new Attendees;
+				$newAttendee->event_id = $registration->event_id;
+				$newAttendee->registration_id = $registrationId;
+				$newAttendee->property_id = $registration->property_id;
+				$newAttendee->staff_id = $staffId;
+				$newAttendee->full_name = $staff->full_name;
+				$newAttendee->position = isset($staff->position_name) ? $staff->position_name : '';
+				$newAttendee->role_id = (string)$talentRoleId;
+				$newAttendee->approval_status = Attendees::APPROVAL_PENDING;
+
+				$result = $newAttendee->storeViaApi();
+				if (!$result['success']) {
+					$error = isset($result['error']) ? $result['error'] : 'Không thể tạo người tham dự.';
+					echo CJSON::encode(array('success' => false, 'message' => $error));
+					Yii::app()->end();
+				}
+				$attendeeId = isset($result['data']['id']) ? $result['data']['id'] : null;
+			}
+		}
+
+		// Nếu có entry_id, thêm vào talent entry members
+		if ($entryId && $attendeeId) {
+			$existingMembers = TalentEntryMembers::getApiDataProvider(array('entry_id' => $entryId), 100)->getData();
+			$alreadyMember = false;
+			foreach ($existingMembers as $m) {
+				if ($m->attendee_id == $attendeeId) {
+					$alreadyMember = true;
+					break;
+				}
+			}
+
+			if (!$alreadyMember) {
+				$member = new TalentEntryMembers;
+				$member->entry_id = $entryId;
+				$member->attendee_id = $attendeeId;
+				$memberResult = $member->storeViaApi();
+				if (!$memberResult['success']) {
+					echo CJSON::encode(array('success' => false, 'message' => 'Đã tạo người tham dự nhưng không thể thêm vào tiết mục.'));
+					Yii::app()->end();
+				}
+			}
+		}
+
+		echo CJSON::encode(array(
+			'success' => true,
+			'message' => 'Thêm thành công.',
+			'attendee_id' => $attendeeId,
+			'copied_from_previous' => isset($previousAttendee) && $previousAttendee && $this->attendeeHasDocuments($previousAttendee)
+		));
+		Yii::app()->end();
+	}
+
+	/**
+	 * Helper: Lấy talent role ID
+	 */
+	private function getTalentRoleId()
+	{
+		$rolesData = Roles::getApiDataProvider(array(), 100)->getData();
+		foreach ($rolesData as $r) {
+			$rCode = isset($r['code']) ? $r['code'] : (isset($r->code) ? $r->code : '');
+			if (strcasecmp($rCode, 'talent') === 0 || strcasecmp($rCode, 'talent_performer') === 0) {
+				return isset($r['id']) ? $r['id'] : (isset($r->id) ? $r->id : null);
+			}
+		}
+		return 10; // Fallback
+	}
+
+	/**
+	 * Helper: Parse role IDs từ attendee
+	 */
+	private function parseRoleIds($att)
+	{
+		$roleIdField = isset($att['role_id']) ? $att['role_id'] : '';
+		if (is_array($roleIdField)) {
+			return array_map('strval', $roleIdField);
+		}
+		return array_map('trim', explode(',', $roleIdField));
+	}
+
+	/**
+	 * Helper: Kiểm tra attendee có đầy đủ documents không
+	 */
+	private function attendeeHasDocuments($att)
+	{
+		$portrait = isset($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
+		$cccdFront = isset($att['cccd_front_path']) ? $att['cccd_front_path'] : '';
+		$cccdBack = isset($att['cccd_back_path']) ? $att['cccd_back_path'] : '';
+		$contract = isset($att['contract_path']) ? $att['contract_path'] : '';
+		return !empty($portrait) && !empty($cccdFront) && !empty($cccdBack) && !empty($contract);
+	}
+
+	/**
+	 * Helper: Tìm attendee đã approved từ đăng ký trước của staff
+	 */
+	private function findPreviousApprovedAttendee($staffId, $eventId, $excludeRegistrationId)
+	{
+		$attendeesData = Attendees::getApiDataProvider(array(
+			'staff_id' => $staffId,
+			'event_id' => $eventId,
+			'approval_status' => Attendees::APPROVAL_APPROVED,
+		), 10)->getData();
+
+		foreach ($attendeesData as $att) {
+			$attArray = is_object($att) ? $att->attributes : $att;
+			$regId = isset($attArray['registration_id']) ? $attArray['registration_id'] : null;
+			if ($regId && $regId != $excludeRegistrationId) {
+				return $attArray;
+			}
+		}
+		return null;
+	}
+
 	public function actionGetOrganizations()
 	{
 		$user = AuthHandler::getUser();
