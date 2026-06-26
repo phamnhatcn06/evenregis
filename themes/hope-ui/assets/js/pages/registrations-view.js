@@ -5643,7 +5643,7 @@ var RegistrationView = (function() {
         var CHUNK_SIZE = 1024 * 1024; // 1MB chunks
         var totalChunks = Math.ceil(file.size / CHUNK_SIZE);
         var currentChunk = 0;
-        var fileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        var fileId = Date.now() + '_' + Math.random().toString(36).substring(2, 11);
 
         function sendChunk() {
             var start = currentChunk * CHUNK_SIZE;
