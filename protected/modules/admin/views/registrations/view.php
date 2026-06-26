@@ -866,67 +866,20 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                             <div id="talent-entries-container">
                                 <?php if (empty($talentEntries)): ?>
                                     <p class="text-muted mb-0 no-talent-message">Chưa đăng ký tiết mục văn nghệ nào.</p>
-                                    <div class="table-responsive" style="display: none;">
-                                        <table class="table table-bordered table-striped table-sm mb-0 content-table" id="talent-entries-table">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="col-stt text-center">STT</th>
-                                                    <th class="col-name">Tiết mục</th>
-                                                    <th class="col-count text-center">Thể loại</th>
-                                                    <th class="col-list">Nguồn gốc/Xuất xứ</th>
-                                                    <?php if ($canEdit): ?>
-                                                        <th class="col-action text-center">Thao tác</th>
-                                                    <?php endif; ?>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
                                 <?php else: ?>
-                                    <p class="text-muted mb-0 no-talent-message" style="display: none;">Chưa đăng ký tiết mục văn nghệ nào.</p>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-striped table-sm mb-0 content-table" id="talent-entries-table">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="col-stt text-center">STT</th>
-                                                    <th class="col-name">Tiết mục</th>
-                                                    <th class="col-count text-center">Thể loại</th>
-                                                    <th class="col-list">Nguồn gốc/Xuất xứ</th>
-                                                    <?php if ($canEdit): ?>
-                                                        <th class="col-action text-center">Thao tác</th>
-                                                    <?php endif; ?>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php $talentIdx = 0;
-                                                foreach ($talentEntries as $entry): $talentIdx++;
-                                                    $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
-                                                    $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
-                                                    $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
-                                                    $entryOrigin = isset($entry->origin) ? $entry->origin : (isset($entry['origin']) ? $entry['origin'] : '');
-                                                ?>
-                                                    <tr id="talent-row-<?php echo $entryId; ?>">
-                                                        <td class="text-center"><?php echo $talentIdx; ?></td>
-                                                        <td class="talent-title"><?php echo CHtml::encode($entryTitle); ?></td>
-                                                        <td class="text-center"><span class="badge bg-info talent-category"><?php echo CHtml::encode($categoryName); ?></span></td>
-                                                        <td class="talent-origin"><?php echo CHtml::encode($entryOrigin); ?></td>
-                                                        <?php if ($canEdit): ?>
-                                                            <td class="text-center text-nowrap">
-                                                                <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editTalentEntry(<?php echo $entryId; ?>)" title="Sửa">
-                                                                    <i class="fa fa-pencil"></i>
-                                                                </button>
-                                                                <form method="post" action="<?php echo $this->createUrl('deleteTalentEntry', array('id' => $entryId, 'registration_id' => $model->id)); ?>" id="delete-talent-form-<?php echo $entryId; ?>" style="display:none;"></form>
-                                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteTalent(<?php echo $entryId; ?>)" title="Xóa">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        <?php endif; ?>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    <?php foreach ($talentEntries as $entry):
+                                        $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+                                        // Lấy members cho entry này (bao gồm tất cả đơn vị liên quân)
+                                        $entryMembers = isset($talentEntryMembers[$entryId]) ? $talentEntryMembers[$entryId] : array();
+                                    ?>
+                                        <?php $this->renderPartial('_talent_entry_detail', array(
+                                            'entry' => $entry,
+                                            'members' => $entryMembers,
+                                            'allAllianceMembers' => $entryMembers,
+                                            'model' => $model,
+                                            'canEdit' => $canEdit,
+                                        )); ?>
+                                    <?php endforeach; ?>
                                 <?php endif; ?>
                             </div>
                         </div><!-- end main col -->
