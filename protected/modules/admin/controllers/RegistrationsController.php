@@ -11,7 +11,9 @@ class RegistrationsController extends AdminController
 			'updatetalentmedia',
 			'addtalentmember',
 			'removetalentmember',
-			'getattendeesfortalent'
+			'getattendeesfortalent',
+			'getstaffsfortalent',
+			'addstafftotalent'
 		));
 	}
 
