@@ -220,16 +220,15 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                 $entriesUpdated += $affected;
             }
             
-            // 7. Migrate dữ liệu liên quân vào talent_entry_orgs
-            $allianceStats = $this->migrateAllianceData($db);
+            // 7. Migrate dữ liệu liên quân vào alliance_org_ids
+            $allianceUpdated = $this->migrateAllianceOrgIds($db);
             
             $transaction->commit();
             
             echo "\n=== Migration completed ===\n";
             echo "Registrations created: {$regCreated}\n";
             echo "Talent entries updated: {$entriesUpdated}\n";
-            echo "Alliance lead orgs added: {$allianceStats['leads']}\n";
-            echo "Alliance member orgs added: {$allianceStats['members']}\n";
+            echo "Alliance entries updated: {$allianceUpdated}\n";
             
         } catch (Exception $e) {
             $transaction->rollback();
