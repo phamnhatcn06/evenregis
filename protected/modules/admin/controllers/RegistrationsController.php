@@ -4489,34 +4489,6 @@ class RegistrationsController extends AdminController
 		Yii::app()->end();
 	}
 
-	public function actionGetAttendeesForTalent($registration_id)
-	{
-		$this->checkRegistrationAccess($registration_id);
-		$result = array();
-
-		$attendees = Attendees::getByRegistrationId($registration_id);
-
-		foreach ($attendees as $att) {
-			$id = isset($att['id']) ? $att['id'] : null;
-			$fullName = isset($att['full_name']) ? $att['full_name'] : '';
-			$positionName = isset($att['position']) ? $att['position'] : '';
-
-			if (!$id) continue;
-
-			$result[] = array(
-				'id' => $id,
-				'name' => $fullName,
-				'position' => $positionName,
-				'department_name' => isset($att['department_name']) ? $att['department_name'] : (isset($att['division_name']) ? $att['division_name'] : ''),
-				'display' => $fullName . ($positionName ? ' (' . $positionName . ')' : ''),
-			);
-		}
-
-		header('Content-Type: application/json');
-		echo CJSON::encode(array('success' => true, 'data' => $result));
-		Yii::app()->end();
-	}
-
 	public function actionAddTalentRegistration()
 	{
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
