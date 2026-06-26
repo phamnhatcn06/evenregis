@@ -31,6 +31,73 @@ Chuyển dữ liệu văn nghệ (`talent_entries`) từ đợt đăng ký chín
 
 ## 4. Migration Script
 
+### 4.0 Tạo bảng `talent_entry_orgs` (liên quân văn nghệ)
+
+```sql
+-- Bảng liên kết tiết mục liên quân với các đơn vị thành viên
+-- Tương tự alliance_team_orgs cho sport_teams
+
+CREATE TABLE `talent_entry_orgs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `entry_id` bigint UNSIGNED NOT NULL COMMENT 'talent_entries.id (is_alliance_team=1)',
+  `property_id` bigint UNSIGNED NOT NULL COMMENT 'properties.id - Đơn vị thành viên',
+  `is_lead` tinyint NOT NULL DEFAULT '0' COMMENT 'Đơn vị chủ trì: 0=không, 1=chủ trì',
+  `joined_at` int UNSIGNED DEFAULT NULL,
+  `created_at` int UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_talent_entry_org` (`entry_id`, `property_id`),
+  KEY `idx_teo_property` (`property_id`),
+  CONSTRAINT `fk_teo_entry` FOREIGN KEY (`entry_id`) REFERENCES `talent_entries` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_teo_property` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
+COMMENT='Liên kết tiết mục liên quân với các đơn vị thành viên';
+```
+
+### 4.0.1 Migrate dữ liệu liên quân hiện có
+
+```sql
+-- Bước 1: Thêm đơn vị chủ trì (từ registration.property_id của talent_entry)
+INSERT INTO `talent_entry_orgs` (`entry_id`, `property_id`, `is_lead`, `joined_at`, `created_at`)
+SELECT 
+    te.id AS entry_id,
+    r.property_id,
+    1 AS is_lead,  -- Đơn vị tạo tiết mục = chủ trì
+    UNIX_TIMESTAMP(te.created_at),
+    UNIX_TIMESTAMP(NOW())
+FROM `talent_entries` te
+INNER JOIN `registrations` r ON te.registration_id = r.id
+WHERE te.is_alliance_team = 1
+  AND te.deleted_at IS NULL
+  AND r.deleted_at IS NULL
+ON DUPLICATE KEY UPDATE `is_lead` = 1;
+
+-- Bước 2: Thêm các đơn vị liên quân (từ bảng alliances)
+-- Giả sử alliances.event_content_id trỏ đến event_contents có content_code='talent'
+INSERT INTO `talent_entry_orgs` (`entry_id`, `property_id`, `is_lead`, `joined_at`, `created_at`)
+SELECT 
+    te.id AS entry_id,
+    CASE 
+        WHEN al.org_a_id = r.property_id THEN al.org_b_id
+        ELSE al.org_a_id
+    END AS property_id,
+    0 AS is_lead,
+    al.confirmed_at,
+    UNIX_TIMESTAMP(NOW())
+FROM `talent_entries` te
+INNER JOIN `registrations` r ON te.registration_id = r.id
+INNER JOIN `event_contents` ec ON ec.event_id = r.event_id AND ec.content_id = (
+    SELECT id FROM contents WHERE code = 'talent' LIMIT 1
+)
+INNER JOIN `alliances` al ON al.event_content_id = ec.id 
+    AND (al.org_a_id = r.property_id OR al.org_b_id = r.property_id)
+    AND al.status = 1  -- active
+WHERE te.is_alliance_team = 1
+  AND te.deleted_at IS NULL
+  AND r.deleted_at IS NULL
+  AND al.deleted_at IS NULL
+ON DUPLICATE KEY UPDATE `joined_at` = VALUES(`joined_at`);
+```
+
 ### 4.1 Thêm cột `type` vào `registration_periods` (nếu chưa có)
 
 ```sql
