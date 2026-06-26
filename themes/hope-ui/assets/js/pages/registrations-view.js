@@ -5387,14 +5387,32 @@ var RegistrationView = (function() {
 
         talentMemberAllAttendees.forEach(function(att) {
             if (selectedIds.includes(att.id)) return;
+            // Bỏ qua staff_xxx nếu đã selected bởi attendee_id thực
+            if (typeof att.id === 'string' && att.id.startsWith('staff_')) {
+                var staffId = att.staff_id;
+                var alreadySelectedByAttendee = talentMemberSelectedAttendees.some(function(s) {
+                    return s.staff_id == staffId;
+                });
+                if (alreadySelectedByAttendee) return;
+            }
 
             availableCount++;
             var div = document.createElement('div');
             div.className = 'list-group-item list-group-item-action py-2';
             div.setAttribute('data-id', att.id);
+            if (att.staff_id) div.setAttribute('data-staff-id', att.staff_id);
+            if (att.from_previous_registration) div.setAttribute('data-from-previous', 'true');
+
             var displayName = att.full_name || '';
             var positionText = att.position ? ' <small class="text-muted">(' + att.position + ')</small>' : '';
-            div.innerHTML = escapeHtml(displayName) + positionText;
+            var badges = '';
+            if (att.from_previous_registration) {
+                badges += ' <span class="badge bg-info ms-1" title="Có hồ sơ từ đăng ký trước - sẽ tự động duyệt"><i class="fa fa-check-circle"></i> Đã có HS</span>';
+            }
+            if (att.has_talent_role) {
+                badges += ' <span class="badge bg-success ms-1"><i class="fa fa-music"></i></span>';
+            }
+            div.innerHTML = escapeHtml(displayName) + positionText + badges;
             div.addEventListener('click', function() { this.classList.toggle('active'); });
             availableList.appendChild(div);
         });
