@@ -494,6 +494,10 @@ class RegistrationsController extends AdminController
 				$isOwner = ($entryPropertyId === $currentPropertyId);
 				$isAlliance = in_array($currentPropertyId, $allianceIdArray, true);
 
+				// Debug log
+				$entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : 'N/A');
+				Yii::log("Talent Entry ID: {$entryId}, entryPropertyId: {$entryPropertyId}, allianceIds: " . print_r($allianceIdArray, true) . ", isOwner: " . ($isOwner ? 'Y' : 'N') . ", isAlliance: " . ($isAlliance ? 'Y' : 'N'), 'info');
+
 				if ($isOwner || $isAlliance) {
 					$loadTalentEntry($entry);
 				}
