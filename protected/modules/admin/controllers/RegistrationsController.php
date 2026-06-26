@@ -386,6 +386,7 @@ class RegistrationsController extends AdminController
 		// Load Talent Entries cho registration
 		$talentEntries = array();
 		$talentEntryMembers = array();
+		$loadedEntryIds = array();
 		if ($model->property_id && $model->event_id) {
 			// Lấy talent shows của event
 			$showsData = TalentShows::getApiDataProvider(array('event_id' => $model->event_id), 100)->getData();
@@ -395,27 +396,15 @@ class RegistrationsController extends AdminController
 				if ($showId) $showIds[] = $showId;
 			}
 
-			// Lấy talent entries của property cho các shows này
-			$filterParams = array(
-				'property_id' => $model->property_id,
-				'registration_id' => $model->id,
-			);
-			if (!empty($showIds)) {
-				// Nếu API hỗ trợ filter theo event_id thì dùng luôn
-				$filterParams['event_id'] = $model->event_id;
-			}
-			$entriesData = TalentEntries::getApiDataProvider($filterParams, 100)->getData();
-
-			foreach ($entriesData as $entry) {
+			// Helper function để load và enrich entry
+			$loadTalentEntry = function ($entry) use (&$talentEntries, &$talentEntryMembers, &$loadedEntryIds, $attendeesMap, $showIds) {
 				$entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+				if (!$entryId || in_array($entryId, $loadedEntryIds)) {
+					return;
+				}
 				$entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
-				$entryRegId = isset($entry->registration_id) ? $entry->registration_id : (isset($entry['registration_id']) ? $entry['registration_id'] : null);
 
-				// Chỉ lấy entries thuộc shows của event này và thuộc registration hiện tại
 				if ($entryId && (empty($showIds) || in_array($entryShowId, $showIds))) {
-					if ($entryRegId && $entryRegId != $model->id) {
-						continue;
-					}
 					// Fetch category name if not available
 					if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
 						$catId = isset($entry->category_id) ? $entry->category_id : $entry['category_id'];
@@ -436,6 +425,8 @@ class RegistrationsController extends AdminController
 						$entry['music_path'] = $this->cleanStorageUrl($entry['music_path']);
 					}
 					$talentEntries[] = $entry;
+					$loadedEntryIds[] = $entryId;
+
 					$membersResult = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array('entry_id' => $entryId));
 					$membersData = array();
 					if ($membersResult['success'] && isset($membersResult['data'])) {
@@ -455,7 +446,6 @@ class RegistrationsController extends AdminController
 						if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
 							$memberArr['division_name'] = $attInfo['division_name'];
 						}
-						// Thêm property_id và property_name để phân biệt đơn vị trong liên quân
 						if (empty($memberArr['property_id']) && !empty($attInfo['property_id'])) {
 							$memberArr['property_id'] = $attInfo['property_id'];
 						}
@@ -465,6 +455,41 @@ class RegistrationsController extends AdminController
 						$enrichedMembers[] = $memberArr;
 					}
 					$talentEntryMembers[$entryId] = $enrichedMembers;
+				}
+			};
+
+			// 1. Lấy talent entries của chính đơn vị này (owner)
+			$filterParams = array(
+				'property_id' => $model->property_id,
+				'registration_id' => $model->id,
+			);
+			if (!empty($showIds)) {
+				$filterParams['event_id'] = $model->event_id;
+			}
+			$entriesData = TalentEntries::getApiDataProvider($filterParams, 100)->getData();
+			foreach ($entriesData as $entry) {
+				$loadTalentEntry($entry);
+			}
+
+			// 2. Lấy talent entries mà đơn vị này được mời liên quân (alliance approved cho talent)
+			$approvedAllianceRequests = AllianceRequests::getApiDataProvider(array(
+				'event_id' => $model->event_id,
+				'target_org_id' => $model->property_id,
+				'status' => AllianceRequests::STATUS_APPROVED,
+				'content_code' => 'talent',
+			), 50)->getData();
+
+			foreach ($approvedAllianceRequests as $req) {
+				$requesterOrgId = isset($req->requester_org_id) ? $req->requester_org_id : null;
+				if ($requesterOrgId) {
+					// Lấy talent entries của đơn vị gửi yêu cầu liên quân
+					$allianceEntries = TalentEntries::getApiDataProvider(array(
+						'property_id' => $requesterOrgId,
+						'event_id' => $model->event_id,
+					), 100)->getData();
+					foreach ($allianceEntries as $entry) {
+						$loadTalentEntry($entry);
+					}
 				}
 			}
 		}
