@@ -1094,24 +1094,29 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 <div class="modal fade" id="uploadDocumentModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form id="uploadDocumentForm" method="post" action="<?php echo $this->createUrl('uploadDocument', array('id' => $model->id)); ?>" enctype="multipart/form-data">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fa fa-upload me-2"></i>Tải lên tệp đính kèm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-upload me-2"></i>Tải lên tệp đính kèm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Chọn tệp đính kèm <span class="text-danger">*</span></label>
+                    <input type="file" id="upload_documents" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx">
+                    <small class="text-muted d-block mt-1">Hỗ trợ: jpg, png, gif, pdf, doc, docx, xls, xlsx. Mỗi file tối đa 50MB.</small>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Chọn tệp đính kèm <span class="text-danger">*</span></label>
-                        <input type="file" name="documents[]" id="upload_documents" multiple required>
+                <div id="uploadDocProgress" style="display:none;">
+                    <div class="mb-2"><small id="uploadDocStatus">Đang tải lên...</small></div>
+                    <div class="progress" style="height:20px;">
+                        <div id="uploadDocBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%">0%</div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary" id="btn_upload_document">
-                        <i class="fa fa-upload me-1"></i>Tải lên
-                    </button>
-                </div>
-            </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="btn_upload_document" onclick="startDocumentChunkUpload()">
+                    <i class="fa fa-upload me-1"></i>Tải lên
+                </button>
+            </div>
         </div>
     </div>
 </div>
