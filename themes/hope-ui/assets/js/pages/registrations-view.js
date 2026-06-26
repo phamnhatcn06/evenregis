@@ -4961,6 +4961,14 @@ var RegistrationView = (function() {
             });
         });
 
+        // Delete video
+        document.querySelectorAll('.btn-delete-talent-video').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var entryId = btn.getAttribute('data-entry-id');
+                confirmDeleteTalentVideo(entryId);
+            });
+        });
+
         // Thêm thành viên
         document.querySelectorAll('.btn-add-talent-member').forEach(function(btn) {
             btn.addEventListener('click', function() {
