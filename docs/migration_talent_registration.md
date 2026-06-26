@@ -467,8 +467,8 @@ private function assignTalentRole($attendeeId)
 ## 7. Rollback (nếu cần)
 
 ```sql
--- 1. Xóa dữ liệu talent_entry_orgs
-TRUNCATE TABLE `talent_entry_orgs`;
+-- 1. Xóa dữ liệu alliance_org_ids
+UPDATE `talent_entries` SET alliance_org_ids = NULL WHERE alliance_org_ids IS NOT NULL;
 
 -- 2. Chuyển talent_entries về registration đợt 1
 UPDATE `talent_entries` te
@@ -487,8 +487,8 @@ UPDATE `registrations`
 SET deleted_at = NOW() 
 WHERE period_id = 3;
 
--- 4. (Tùy chọn) Xóa bảng talent_entry_orgs
--- DROP TABLE IF EXISTS `talent_entry_orgs`;
+-- 4. (Tùy chọn) Xóa cột alliance_org_ids
+-- ALTER TABLE `talent_entries` DROP COLUMN `alliance_org_ids`;
 ```
 
 ## 8. So sánh cấu trúc Thể thao vs Văn nghệ
@@ -498,5 +498,31 @@ WHERE period_id = 3;
 | `alliances` | `alliances` | Dùng chung - liên kết 2 đơn vị |
 | `alliance_requests` | `alliance_requests` | Dùng chung - yêu cầu liên quân |
 | `sport_teams.is_alliance` | `talent_entries.is_alliance_team` | Cờ đội/tiết mục liên quân |
-| `alliance_team_orgs` | `talent_entry_orgs` ✅ | Liên kết team/entry với các đơn vị |
+| `sport_teams.alliance_org_ids` | `talent_entries.alliance_org_ids` ✅ | Danh sách property_id liên quân |
 | `sport_team_members` | `talent_entry_members` | Thành viên đội/tiết mục |
+
+## 9. Logic khi đơn vị liên quân thêm attendee
+
+Khi đơn vị B (trong `alliance_org_ids` của tiết mục) thêm attendee:
+
+```php
+// Kiểm tra đơn vị có quyền thêm vào tiết mục không
+public function canAddMemberToEntry($propertyId, $entryId)
+{
+    $entry = TalentEntries::model()->with('registration')->findByPk($entryId);
+    if (!$entry) return false;
+    
+    // Đơn vị chủ trì (owner)
+    if ($entry->registration->property_id == $propertyId) {
+        return true;
+    }
+    
+    // Đơn vị liên quân
+    if ($entry->is_alliance_team && $entry->alliance_org_ids) {
+        $allianceIds = explode(',', $entry->alliance_org_ids);
+        return in_array($propertyId, $allianceIds);
+    }
+    
+    return false;
+}
+```
