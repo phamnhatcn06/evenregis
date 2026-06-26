@@ -5271,6 +5271,62 @@ var RegistrationView = (function() {
         });
     }
 
+    function addVideoButtons(entryId, videoUrl) {
+        var inputGroup = document.querySelector('.talent-video-input[data-entry-id="' + entryId + '"]');
+        if (!inputGroup) return;
+        var container = inputGroup.parentElement;
+
+        // Check if buttons already exist
+        if (container.querySelector('.btn-preview-video')) return;
+
+        // Create preview button
+        var previewBtn = document.createElement('button');
+        previewBtn.type = 'button';
+        previewBtn.className = 'btn btn-outline-info btn-preview-video';
+        previewBtn.setAttribute('data-url', videoUrl);
+        previewBtn.title = 'Xem trước';
+        previewBtn.innerHTML = '<i class="fa fa-play"></i>';
+        previewBtn.addEventListener('click', function() {
+            viewTalentVideo(videoUrl, 'Xem video tiết mục');
+        });
+
+        // Create delete button
+        var deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-outline-danger btn-delete-talent-video';
+        deleteBtn.setAttribute('data-entry-id', entryId);
+        deleteBtn.title = 'Xóa video';
+        deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
+        deleteBtn.addEventListener('click', function() {
+            confirmDeleteTalentVideo(entryId);
+        });
+
+        container.appendChild(previewBtn);
+        container.appendChild(deleteBtn);
+    }
+
+    function stopAllMedia() {
+        var container = document.getElementById('videoContainer');
+        if (container) {
+            // Stop video
+            var video = container.querySelector('video');
+            if (video) {
+                video.pause();
+                video.src = '';
+            }
+            // Stop iframe (YouTube)
+            var iframe = container.querySelector('iframe');
+            if (iframe) {
+                iframe.src = '';
+            }
+            container.innerHTML = '';
+        }
+        // Stop any audio on the page
+        document.querySelectorAll('audio').forEach(function(audio) {
+            audio.pause();
+        });
+    }
+
     function viewTalentVideo(url, title) {
         var container = document.getElementById('videoContainer');
         var downloadLink = document.getElementById('videoDownloadLink');
