@@ -2838,10 +2838,8 @@ class RegistrationsController extends AdminController
 			Yii::app()->end();
 		}
 
-		// Kiểm tra quyền: chỉ đơn vị chủ quản mới được sửa
-		$user = AuthHandler::getUser();
-		$userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
-		if ($entry->property_id != $userPropertyId) {
+		// Kiểm tra quyền: admin có full quyền hoặc đơn vị chủ quản
+		if (!$this->canEditTalentEntry($entry)) {
 			echo CJSON::encode(array('success' => false, 'message' => 'Bạn không có quyền chỉnh sửa tiết mục này.'));
 			Yii::app()->end();
 		}
