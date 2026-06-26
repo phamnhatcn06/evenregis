@@ -80,6 +80,7 @@ var RegistrationView = (function() {
         bindTalentEvents();
         bindTalentDetailEvents();
         bindTalentMemberModalEvents();
+        bindVideoModalEvents();
 
         if (isHotel && propertyId) {
             loadAttendeeStaffList();
