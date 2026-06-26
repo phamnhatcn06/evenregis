@@ -472,23 +472,39 @@ class RegistrationsController extends AdminController
 			}
 
 			// 2. Lấy talent entries mà đơn vị này được mời liên quân (alliance approved cho talent)
-			$approvedAllianceRequests = AllianceRequests::getApiDataProvider(array(
-				'event_id' => $model->event_id,
-				'target_org_id' => $model->property_id,
-				'status' => AllianceRequests::STATUS_APPROVED,
-				'content_code' => 'talent',
-			), 50)->getData();
+			// Tìm event_content_id cho talent
+			$talentEventContentId = null;
+			$ecResult = ApiClient::get(ApiEndpoints::EVENT_CONTENT_LIST, array('event_id' => $model->event_id));
+			if ($ecResult['success'] && isset($ecResult['data'])) {
+				$ecData = isset($ecResult['data']['data']) ? $ecResult['data']['data'] : $ecResult['data'];
+				foreach ($ecData as $ec) {
+					$code = isset($ec['content_code']) ? $ec['content_code'] : (isset($ec['code']) ? $ec['code'] : '');
+					if ($code === 'talent' || $code === 'talents') {
+						$talentEventContentId = isset($ec['id']) ? $ec['id'] : null;
+						break;
+					}
+				}
+			}
 
-			foreach ($approvedAllianceRequests as $req) {
-				$requesterOrgId = isset($req->requester_org_id) ? $req->requester_org_id : null;
-				if ($requesterOrgId) {
-					// Lấy talent entries của đơn vị gửi yêu cầu liên quân
-					$allianceEntries = TalentEntries::getApiDataProvider(array(
-						'property_id' => $requesterOrgId,
-						'event_id' => $model->event_id,
-					), 100)->getData();
-					foreach ($allianceEntries as $entry) {
-						$loadTalentEntry($entry);
+			if ($talentEventContentId) {
+				$approvedAllianceRequests = AllianceRequests::getApiDataProvider(array(
+					'event_id' => $model->event_id,
+					'target_org_id' => $model->property_id,
+					'status' => AllianceRequests::STATUS_APPROVED,
+					'event_content_id' => $talentEventContentId,
+				), 50)->getData();
+
+				foreach ($approvedAllianceRequests as $req) {
+					$requesterOrgId = isset($req->requester_org_id) ? $req->requester_org_id : null;
+					if ($requesterOrgId) {
+						// Lấy talent entries của đơn vị gửi yêu cầu liên quân
+						$allianceEntries = TalentEntries::getApiDataProvider(array(
+							'property_id' => $requesterOrgId,
+							'event_id' => $model->event_id,
+						), 100)->getData();
+						foreach ($allianceEntries as $entry) {
+							$loadTalentEntry($entry);
+						}
 					}
 				}
 			}
