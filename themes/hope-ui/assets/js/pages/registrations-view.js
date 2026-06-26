@@ -5539,13 +5539,22 @@ var RegistrationView = (function() {
             });
     }
 
+    function parseItemId(idStr) {
+        // ID có thể là số hoặc string 'staff_xxx'
+        if (idStr && idStr.startsWith && idStr.startsWith('staff_')) {
+            return idStr;
+        }
+        return parseInt(idStr);
+    }
+
     function bindTalentMemberModalEvents() {
         document.getElementById('btn_add_talent_member_item')?.addEventListener('click', function() {
             var activeItems = document.querySelectorAll('#talent_member_available_list .list-group-item.active');
             activeItems.forEach(function(item) {
-                var id = parseInt(item.getAttribute('data-id'));
-                var att = talentMemberAllAttendees.find(function(a) { return a.id === id; });
-                if (att && !talentMemberSelectedAttendees.some(function(s) { return s.id === id; })) {
+                var idStr = item.getAttribute('data-id');
+                var id = parseItemId(idStr);
+                var att = talentMemberAllAttendees.find(function(a) { return a.id === id || a.id == idStr; });
+                if (att && !talentMemberSelectedAttendees.some(function(s) { return s.id === id || s.id == idStr; })) {
                     talentMemberSelectedAttendees.push(att);
                 }
             });
@@ -5564,8 +5573,9 @@ var RegistrationView = (function() {
         document.getElementById('btn_remove_talent_member_item')?.addEventListener('click', function() {
             var activeItems = document.querySelectorAll('#talent_member_selected_list .list-group-item.active');
             activeItems.forEach(function(item) {
-                var id = parseInt(item.getAttribute('data-id'));
-                talentMemberSelectedAttendees = talentMemberSelectedAttendees.filter(function(s) { return s.id !== id; });
+                var idStr = item.getAttribute('data-id');
+                var id = parseItemId(idStr);
+                talentMemberSelectedAttendees = talentMemberSelectedAttendees.filter(function(s) { return s.id !== id && s.id != idStr; });
             });
             renderTalentMemberLists();
         });
