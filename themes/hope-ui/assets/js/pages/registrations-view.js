@@ -5098,6 +5098,11 @@ var RegistrationView = (function() {
                             // Automatically save to DB
                             var saveBtn = document.querySelector('.btn-save-talent-media[data-entry-id="' + entryId + '"]');
                             if (saveBtn) saveBtn.click();
+
+                            // Add preview and delete buttons if video upload
+                            if (fileType === 'video') {
+                                addVideoButtons(entryId, data.path);
+                            }
                         }
                     } else {
                         statusText.innerHTML = '<i class="fa fa-times-circle"></i> Lỗi: ' + (data.error || 'Ghép tệp thất bại');
