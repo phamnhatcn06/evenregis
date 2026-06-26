@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="fa fa-play-circle me-2"></i><span id="videoModalTitle">Video tiết mục</span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="stopVideo()"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-0">
                 <div id="videoContainer" class="ratio ratio-16x9">
