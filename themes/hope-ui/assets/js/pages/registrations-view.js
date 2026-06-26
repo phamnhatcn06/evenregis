@@ -5598,6 +5598,15 @@ var RegistrationView = (function() {
             });
     }
 
+    function bindVideoModalEvents() {
+        var videoModal = document.getElementById('videoModal');
+        if (videoModal) {
+            videoModal.addEventListener('hidden.bs.modal', function() {
+                stopAllMedia();
+            });
+        }
+    }
+
     function bindTalentMemberModalEvents() {
         document.getElementById('btn_add_talent_member_item')?.addEventListener('click', function() {
             var activeItems = document.querySelectorAll('#talent_member_available_list .list-group-item.active');
