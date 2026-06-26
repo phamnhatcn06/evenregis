@@ -496,7 +496,7 @@ class RegistrationsController extends AdminController
 
 				// Debug log
 				$entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : 'N/A');
-				Yii::log("Talent Entry ID: {$entryId}, entryPropertyId: {$entryPropertyId}, allianceIds: " . print_r($allianceIdArray, true) . ", isOwner: " . ($isOwner ? 'Y' : 'N') . ", isAlliance: " . ($isAlliance ? 'Y' : 'N'), 'info');
+				error_log("Talent Entry ID: {$entryId}, entryPropertyId: {$entryPropertyId}, allianceIds: " . json_encode($allianceIdArray) . ", isOwner: " . ($isOwner ? 'Y' : 'N') . ", isAlliance: " . ($isAlliance ? 'Y' : 'N'));
 
 				if ($isOwner || $isAlliance) {
 					$loadTalentEntry($entry);
