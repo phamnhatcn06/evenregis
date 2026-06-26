@@ -2993,7 +2993,8 @@ class RegistrationsController extends AdminController
 		$attendee = Attendees::fetchFromApi($member->attendee_id);
 		if ($attendee) {
 			$registration = Registrations::fetchFromApi($attendee->registration_id);
-			if (!$registration || ($userPropertyCode !== '9999' && $registration->property_id != $userPropertyId)) {
+			$hasFullAccess = PermissionHelper::can('registrations', 'update') || $userPropertyCode === '9999';
+			if (!$registration || (!$hasFullAccess && $registration->property_id != $userPropertyId)) {
 				echo CJSON::encode(array('success' => false, 'message' => 'Bạn chỉ được xóa người của đơn vị mình.'));
 				Yii::app()->end();
 			}
