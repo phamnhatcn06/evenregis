@@ -290,34 +290,25 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
     private function migrateAllianceOrgIds($db)
     {
         $updated = 0;
+        const TALENT_EVENT_CONTENT_ID = 4; // event_content_id cho văn nghệ
         
         // Lấy tất cả talent_entries có is_alliance_team = 1
         $allianceEntries = $db->createCommand()
-            ->select('te.id AS entry_id, r.property_id, r.event_id')
+            ->select('te.id AS entry_id, r.property_id')
             ->from('talent_entries te')
             ->join('registrations r', 'te.registration_id = r.id')
             ->where('te.is_alliance_team = 1 AND te.deleted_at IS NULL AND r.deleted_at IS NULL')
             ->queryAll();
         
         foreach ($allianceEntries as $entry) {
-            // Tìm content_id của văn nghệ trong event
-            $talentContentId = $db->createCommand()
-                ->select('ec.id')
-                ->from('event_contents ec')
-                ->join('contents c', 'ec.content_id = c.id')
-                ->where("ec.event_id = :event_id AND c.code = 'talent'")
-                ->queryScalar(array(':event_id' => $entry['event_id']));
-            
-            if (!$talentContentId) continue;
-            
-            // Lấy danh sách đơn vị liên quân từ bảng alliances
+            // Lấy danh sách đơn vị liên quân từ bảng alliance_requests
             $partnerIds = $db->createCommand()
-                ->select("CASE WHEN org_a_id = :pid THEN org_b_id ELSE org_a_id END AS partner_id")
-                ->from('alliances')
-                ->where('event_content_id = :ecid AND status = 1 AND deleted_at IS NULL')
-                ->andWhere('(org_a_id = :pid OR org_b_id = :pid)')
+                ->select("CASE WHEN requester_org_id = :pid THEN target_org_id ELSE requester_org_id END AS partner_id")
+                ->from('alliance_requests')
+                ->where('event_content_id = :ecid AND status = 2 AND deleted_at IS NULL')
+                ->andWhere('(requester_org_id = :pid OR target_org_id = :pid)')
                 ->queryColumn(array(
-                    ':ecid' => $talentContentId,
+                    ':ecid' => TALENT_EVENT_CONTENT_ID,
                     ':pid' => $entry['property_id'],
                 ));
             
