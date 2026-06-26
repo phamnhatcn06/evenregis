@@ -176,7 +176,7 @@ WHERE r_old.period_id = 1
 ```php
 <?php
 /**
- * Migration: Tách đăng ký văn nghệ sang registration riêng
+ * Migration: Tách đăng ký văn nghệ sang registration riêng + tạo bảng talent_entry_orgs
  * 
  * Chạy: php protected/commands/shell.php migrateTalentRegistrations
  */
@@ -192,19 +192,22 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
         $transaction = $db->beginTransaction();
         
         try {
-            // 1. Đảm bảo cột type tồn tại
+            // 1. Tạo bảng talent_entry_orgs nếu chưa có
+            $this->createTalentEntryOrgsTable($db);
+            
+            // 2. Đảm bảo cột type tồn tại
             $this->ensureTypeColumn($db);
             
-            // 2. Lấy danh sách property có talent_entries từ đợt 1
+            // 3. Lấy danh sách property có talent_entries từ đợt 1
             $properties = $this->getPropertiesWithTalent($db);
             
             echo "Found " . count($properties) . " properties with talent entries\n";
             
-            $created = 0;
-            $updated = 0;
+            $regCreated = 0;
+            $entriesUpdated = 0;
             
             foreach ($properties as $prop) {
-                // 3. Kiểm tra đã có registration đợt 3 chưa
+                // 4. Kiểm tra đã có registration đợt 3 chưa
                 $existingReg = $db->createCommand()
                     ->select('id')
                     ->from('registrations')
@@ -216,7 +219,7 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                     ));
                 
                 if (!$existingReg) {
-                    // 4. Tạo registration mới cho đợt văn nghệ
+                    // 5. Tạo registration mới cho đợt văn nghệ
                     $db->createCommand()->insert('registrations', array(
                         'event_id' => $prop['event_id'],
                         'property_id' => $prop['property_id'],
@@ -228,11 +231,11 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                         'updated_at' => date('Y-m-d H:i:s'),
                     ));
                     $existingReg = $db->getLastInsertID();
-                    $created++;
+                    $regCreated++;
                     echo "Created registration #{$existingReg} for property #{$prop['property_id']}\n";
                 }
                 
-                // 5. Cập nhật talent_entries trỏ sang registration mới
+                // 6. Cập nhật talent_entries trỏ sang registration mới
                 $affected = $db->createCommand()->update(
                     'talent_entries',
                     array(
@@ -242,14 +245,19 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                     'registration_id = :old_reg_id AND deleted_at IS NULL',
                     array(':old_reg_id' => $prop['old_registration_id'])
                 );
-                $updated += $affected;
+                $entriesUpdated += $affected;
             }
+            
+            // 7. Migrate dữ liệu liên quân vào talent_entry_orgs
+            $allianceStats = $this->migrateAllianceData($db);
             
             $transaction->commit();
             
             echo "\n=== Migration completed ===\n";
-            echo "Registrations created: {$created}\n";
-            echo "Talent entries updated: {$updated}\n";
+            echo "Registrations created: {$regCreated}\n";
+            echo "Talent entries updated: {$entriesUpdated}\n";
+            echo "Alliance lead orgs added: {$allianceStats['leads']}\n";
+            echo "Alliance member orgs added: {$allianceStats['members']}\n";
             
         } catch (Exception $e) {
             $transaction->rollback();
@@ -258,6 +266,34 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
         }
         
         return 0;
+    }
+    
+    private function createTalentEntryOrgsTable($db)
+    {
+        $tableExists = $db->createCommand("SHOW TABLES LIKE 'talent_entry_orgs'")->queryScalar();
+        if ($tableExists) {
+            echo "Table talent_entry_orgs already exists\n";
+            return;
+        }
+        
+        $db->createCommand("
+            CREATE TABLE `talent_entry_orgs` (
+                `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+                `entry_id` bigint UNSIGNED NOT NULL COMMENT 'talent_entries.id (is_alliance_team=1)',
+                `property_id` bigint UNSIGNED NOT NULL COMMENT 'properties.id - Đơn vị thành viên',
+                `is_lead` tinyint NOT NULL DEFAULT '0' COMMENT 'Đơn vị chủ trì: 0=không, 1=chủ trì',
+                `joined_at` int UNSIGNED DEFAULT NULL,
+                `created_at` int UNSIGNED DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uq_talent_entry_org` (`entry_id`, `property_id`),
+                KEY `idx_teo_property` (`property_id`),
+                CONSTRAINT `fk_teo_entry` FOREIGN KEY (`entry_id`) REFERENCES `talent_entries` (`id`) ON DELETE CASCADE,
+                CONSTRAINT `fk_teo_property` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
+            COMMENT='Liên kết tiết mục liên quân với các đơn vị thành viên'
+        ")->execute();
+        
+        echo "Created table talent_entry_orgs\n";
     }
     
     private function ensureTypeColumn($db)
@@ -290,6 +326,85 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
             ->join('registrations r', 'te.registration_id = r.id')
             ->where('r.period_id = :period_id AND r.deleted_at IS NULL AND te.deleted_at IS NULL')
             ->queryAll(true, array(':period_id' => self::GENERAL_PERIOD_ID));
+    }
+    
+    private function migrateAllianceData($db)
+    {
+        $stats = array('leads' => 0, 'members' => 0);
+        
+        // Lấy tất cả talent_entries có is_alliance_team = 1
+        $allianceEntries = $db->createCommand()
+            ->select('te.id AS entry_id, te.created_at, r.property_id, r.event_id')
+            ->from('talent_entries te')
+            ->join('registrations r', 'te.registration_id = r.id')
+            ->where('te.is_alliance_team = 1 AND te.deleted_at IS NULL AND r.deleted_at IS NULL')
+            ->queryAll();
+        
+        foreach ($allianceEntries as $entry) {
+            // 1. Thêm đơn vị chủ trì (owner của tiết mục)
+            $exists = $db->createCommand()
+                ->select('id')
+                ->from('talent_entry_orgs')
+                ->where('entry_id = :eid AND property_id = :pid')
+                ->queryScalar(array(':eid' => $entry['entry_id'], ':pid' => $entry['property_id']));
+            
+            if (!$exists) {
+                $db->createCommand()->insert('talent_entry_orgs', array(
+                    'entry_id' => $entry['entry_id'],
+                    'property_id' => $entry['property_id'],
+                    'is_lead' => 1,
+                    'joined_at' => strtotime($entry['created_at']),
+                    'created_at' => time(),
+                ));
+                $stats['leads']++;
+            }
+            
+            // 2. Tìm các đơn vị liên quân từ bảng alliances
+            $talentContentId = $db->createCommand()
+                ->select('ec.id')
+                ->from('event_contents ec')
+                ->join('contents c', 'ec.content_id = c.id')
+                ->where("ec.event_id = :event_id AND c.code = 'talent'")
+                ->queryScalar(array(':event_id' => $entry['event_id']));
+            
+            if (!$talentContentId) continue;
+            
+            $alliances = $db->createCommand()
+                ->select('org_a_id, org_b_id, confirmed_at')
+                ->from('alliances')
+                ->where('event_content_id = :ecid AND status = 1 AND deleted_at IS NULL')
+                ->andWhere('(org_a_id = :pid OR org_b_id = :pid)')
+                ->queryAll(true, array(
+                    ':ecid' => $talentContentId,
+                    ':pid' => $entry['property_id'],
+                ));
+            
+            foreach ($alliances as $al) {
+                // Lấy đơn vị partner (không phải owner)
+                $partnerId = ($al['org_a_id'] == $entry['property_id']) 
+                    ? $al['org_b_id'] 
+                    : $al['org_a_id'];
+                
+                $exists = $db->createCommand()
+                    ->select('id')
+                    ->from('talent_entry_orgs')
+                    ->where('entry_id = :eid AND property_id = :pid')
+                    ->queryScalar(array(':eid' => $entry['entry_id'], ':pid' => $partnerId));
+                
+                if (!$exists) {
+                    $db->createCommand()->insert('talent_entry_orgs', array(
+                        'entry_id' => $entry['entry_id'],
+                        'property_id' => $partnerId,
+                        'is_lead' => 0,
+                        'joined_at' => $al['confirmed_at'],
+                        'created_at' => time(),
+                    ));
+                    $stats['members']++;
+                }
+            }
+        }
+        
+        return $stats;
     }
 }
 ```
