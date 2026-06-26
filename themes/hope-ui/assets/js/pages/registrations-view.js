@@ -5457,18 +5457,38 @@ var RegistrationView = (function() {
         var promises = [];
 
         // Add actions
-        toAdd.forEach(function(attendeeId) {
-            var formData = new FormData();
-            formData.append('entry_id', entryId);
-            formData.append('attendee_id', attendeeId);
+        toAdd.forEach(function(id) {
+            var att = talentMemberSelectedAttendees.find(function(a) { return a.id === id; });
 
-            promises.push(
-                fetch(window.BASE_URL + '/admin/registrations/addTalentMember', {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                }).then(function(res) { return res.json(); })
-            );
+            // Kiểm tra nếu là staff từ đăng ký trước (id dạng 'staff_xxx')
+            if (typeof id === 'string' && id.startsWith('staff_')) {
+                var staffId = att ? att.staff_id : id.replace('staff_', '');
+                var formData = new FormData();
+                formData.append('registration_id', registrationId);
+                formData.append('staff_id', staffId);
+                formData.append('entry_id', entryId);
+
+                promises.push(
+                    fetch(window.BASE_URL + '/admin/registrations/addStaffToTalent', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    }).then(function(res) { return res.json(); })
+                );
+            } else {
+                // Attendee đã có sẵn
+                var formData = new FormData();
+                formData.append('entry_id', entryId);
+                formData.append('attendee_id', id);
+
+                promises.push(
+                    fetch(window.BASE_URL + '/admin/registrations/addTalentMember', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    }).then(function(res) { return res.json(); })
+                );
+            }
         });
 
         // Remove actions
@@ -5500,7 +5520,12 @@ var RegistrationView = (function() {
                 if (failed.length > 0) {
                     Toast.error(failed[0].message || 'Có lỗi xảy ra khi lưu danh sách.');
                 } else {
-                    Toast.success('Cập nhật danh sách thành công');
+                    var copiedCount = results.filter(function(r) { return r.copied_from_previous; }).length;
+                    var msg = 'Cập nhật danh sách thành công';
+                    if (copiedCount > 0) {
+                        msg += '. Đã sao chép hồ sơ cho ' + copiedCount + ' nhân viên từ đăng ký trước.';
+                    }
+                    Toast.success(msg);
                     location.reload();
                 }
             })
