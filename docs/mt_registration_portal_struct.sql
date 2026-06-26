@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: localhost:3306
--- Thời gian đã tạo: Th6 18, 2026 lúc 09:49 AM
--- Phiên bản máy phục vụ: 8.0.46-0ubuntu0.22.04.2
+-- Thời gian đã tạo: Th6 26, 2026 lúc 03:21 AM
+-- Phiên bản máy phục vụ: 8.0.46-0ubuntu0.22.04.3
 -- Phiên bản PHP: 8.2.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -375,7 +375,11 @@ CREATE TABLE `beauty_contestants` (
   `talent` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `bio` text COLLATE utf8mb4_unicode_ci,
   `photo_portrait` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `photo_portrait_2` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh chân dung 2',
   `photo_full_body` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `photo_full_body_2` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh toàn thân 2',
+  `video_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Video dự thi (max 4 phút)',
+  `submitted_at` datetime DEFAULT NULL COMMENT 'Thời điểm thí sinh tự submit',
   `award` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `final_rank` int DEFAULT NULL,
   `registered_at` datetime DEFAULT NULL,
@@ -461,6 +465,7 @@ CREATE TABLE `beauty_round_results` (
   `registration_id` bigint UNSIGNED NOT NULL,
   `round_id` bigint UNSIGNED NOT NULL,
   `score` decimal(8,2) DEFAULT NULL,
+  `passed` tinyint DEFAULT '0' COMMENT '0: Chưa đạt, 1: Đạt/Vượt qua',
   `note` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -484,6 +489,21 @@ CREATE TABLE `beauty_scores` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `beauty_submission_tokens`
+--
+
+CREATE TABLE `beauty_submission_tokens` (
+  `id` int UNSIGNED NOT NULL,
+  `contestant_id` bigint UNSIGNED NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Unique secure token',
+  `expires_at` int UNSIGNED NOT NULL COMMENT 'Unix timestamp',
+  `used_at` int UNSIGNED DEFAULT NULL COMMENT 'Khi submit thành công',
+  `created_at` int UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1183,6 +1203,7 @@ CREATE TABLE `registration_periods` (
   `end_time` datetime NOT NULL,
   `max_per_org` int DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general' COMMENT 'general: đăng ký chính | talent: văn nghệ | sport: thể thao',
   `note` tinyint(1) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1504,6 +1525,7 @@ CREATE TABLE `talent_entries` (
   `director_phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Số điện thoại người chịu trách nhiệm',
   `origin` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Xuất xứ tiết mục',
   `is_alliance_team` tinyint DEFAULT '0' COMMENT 'Cờ đội liên quân: 0=không, 1=có',
+  `alliance_org_ids` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Danh sách property_id liên quân, phân cách bởi dấu phẩy: 1,2,3',
   `submitted_at` datetime DEFAULT NULL,
   `approved_by` bigint UNSIGNED DEFAULT NULL,
   `approved_at` datetime DEFAULT NULL,
@@ -1801,6 +1823,15 @@ ALTER TABLE `beauty_scores`
   ADD PRIMARY KEY (`id`),
   ADD KEY `beauty_scores_round_id_foreign` (`round_id`),
   ADD KEY `beauty_scores_contestant_id_foreign` (`contestant_id`);
+
+--
+-- Chỉ mục cho bảng `beauty_submission_tokens`
+--
+ALTER TABLE `beauty_submission_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_token` (`token`),
+  ADD KEY `idx_contestant` (`contestant_id`),
+  ADD KEY `idx_expires` (`expires_at`);
 
 --
 -- Chỉ mục cho bảng `competitions`
@@ -2387,6 +2418,12 @@ ALTER TABLE `beauty_scores`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT cho bảng `beauty_submission_tokens`
+--
+ALTER TABLE `beauty_submission_tokens`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT cho bảng `competitions`
 --
 ALTER TABLE `competitions`
@@ -2832,6 +2869,12 @@ ALTER TABLE `beauty_round_results`
 ALTER TABLE `beauty_scores`
   ADD CONSTRAINT `beauty_scores_contestant_id_foreign` FOREIGN KEY (`contestant_id`) REFERENCES `beauty_contestants` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `beauty_scores_round_id_foreign` FOREIGN KEY (`round_id`) REFERENCES `beauty_rounds` (`id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `beauty_submission_tokens`
+--
+ALTER TABLE `beauty_submission_tokens`
+  ADD CONSTRAINT `fk_bst_contestant` FOREIGN KEY (`contestant_id`) REFERENCES `beauty_contestants` (`id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `competition_departments`

@@ -45,25 +45,23 @@ AFTER `is_alliance_team`;
 
 ```sql
 -- Cập nhật alliance_org_ids cho các tiết mục liên quân
--- Lấy từ bảng alliances dựa vào event_content_id (content văn nghệ)
+-- Lấy từ bảng alliance_requests với event_content_id = 4 (văn nghệ)
 
 UPDATE `talent_entries` te
 INNER JOIN `registrations` r ON te.registration_id = r.id
 SET te.alliance_org_ids = (
     SELECT GROUP_CONCAT(
         DISTINCT CASE 
-            WHEN al.org_a_id = r.property_id THEN al.org_b_id
-            ELSE al.org_a_id
+            WHEN ar.requester_org_id = r.property_id THEN ar.target_org_id
+            ELSE ar.requester_org_id
         END
         ORDER BY 1 SEPARATOR ','
     )
-    FROM `alliances` al
-    INNER JOIN `event_contents` ec ON al.event_content_id = ec.id
-    INNER JOIN `contents` c ON ec.content_id = c.id AND c.code = 'talent'
-    WHERE ec.event_id = r.event_id
-      AND (al.org_a_id = r.property_id OR al.org_b_id = r.property_id)
-      AND al.status = 1
-      AND al.deleted_at IS NULL
+    FROM `alliance_requests` ar
+    WHERE ar.event_content_id = 4  -- Văn nghệ
+      AND ar.status = 2            -- Approved
+      AND (ar.requester_org_id = r.property_id OR ar.target_org_id = r.property_id)
+      AND ar.deleted_at IS NULL
 )
 WHERE te.is_alliance_team = 1
   AND te.deleted_at IS NULL
