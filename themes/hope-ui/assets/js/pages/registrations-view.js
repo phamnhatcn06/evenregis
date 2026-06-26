@@ -5281,6 +5281,9 @@ var RegistrationView = (function() {
         loadAttendeesForAddTalentMember(entryId);
     }
 
+    // Biến lưu trữ staffs (bao gồm cả từ đăng ký trước)
+    var talentMemberAllStaffs = [];
+
     function loadAttendeesForAddTalentMember(entryId) {
         // Fetch current members of this entry
         fetch(window.BASE_URL + '/admin/registrations/getTalentEntry?id=' + entryId)
@@ -5301,12 +5304,13 @@ var RegistrationView = (function() {
                 return {
                     id: parseInt(m.attendee_id),
                     full_name: m.name,
-                    position: '' // will be filled or left blank
+                    position: '',
+                    staff_id: m.staff_id || null
                 };
             });
 
-            // Fetch available attendees for this registration
-            return fetch(window.BASE_URL + '/admin/registrations/getAttendeesForTalent?registration_id=' + registrationId, {
+            // Fetch available staffs (bao gồm cả từ đăng ký trước có hồ sơ đầy đủ)
+            return fetch(window.BASE_URL + '/admin/registrations/getStaffsForTalent?registration_id=' + registrationId, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
         })
@@ -5316,8 +5320,39 @@ var RegistrationView = (function() {
             if (!container) return;
 
             if (data.success) {
-                talentMemberAllAttendees = data.data || [];
-                
+                talentMemberAllStaffs = data.data || [];
+
+                // Tạo danh sách attendees từ staffs
+                talentMemberAllAttendees = [];
+                talentMemberAllStaffs.forEach(function(staff) {
+                    if (staff.attendee_id) {
+                        // Staff đã có attendee trong registration hiện tại
+                        talentMemberAllAttendees.push({
+                            id: parseInt(staff.attendee_id),
+                            staff_id: staff.staff_id,
+                            full_name: staff.full_name,
+                            position: staff.position,
+                            has_talent_role: staff.has_talent_role,
+                            has_documents: staff.has_documents,
+                            approval_status: staff.approval_status,
+                            from_previous_registration: false
+                        });
+                    } else if (staff.from_previous_registration && staff.has_documents) {
+                        // Staff có attendee approved từ đăng ký trước với hồ sơ đầy đủ
+                        talentMemberAllAttendees.push({
+                            id: 'staff_' + staff.staff_id, // ID tạm, sẽ được tạo khi thêm
+                            staff_id: staff.staff_id,
+                            full_name: staff.full_name,
+                            position: staff.position,
+                            has_talent_role: false,
+                            has_documents: true,
+                            approval_status: staff.approval_status,
+                            from_previous_registration: true,
+                            previous_attendee_id: staff.previous_attendee_id
+                        });
+                    }
+                });
+
                 // Enrich positions in selected list from available list if present
                 talentMemberSelectedAttendees.forEach(function(sel) {
                     var found = talentMemberAllAttendees.find(function(all) { return all.id === sel.id; });
