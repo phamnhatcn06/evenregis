@@ -467,6 +467,9 @@ class RegistrationsController extends AdminController
 
 			$currentPropertyId = (string)$model->property_id;
 
+			// Debug log
+			Yii::log('Talent Debug - currentPropertyId: ' . $currentPropertyId . ', entries count: ' . count($allEntriesData), 'info');
+
 			foreach ($allEntriesData as $entry) {
 				$entryPropertyId = isset($entry->property_id) ? (string)$entry->property_id : (isset($entry['property_id']) ? (string)$entry['property_id'] : '');
 				$allianceIds = isset($entry->alliance_property_ids) ? $entry->alliance_property_ids : (isset($entry['alliance_property_ids']) ? $entry['alliance_property_ids'] : '');
