@@ -116,6 +116,7 @@ class RegistrationsController extends AdminController
 		foreach ($attendeesData as $att) {
 			$attId = isset($att['id']) ? $att['id'] : null;
 			if ($attId) {
+				$att['property_id'] = $model->property_id;
 				$att['property_name'] = $model->property_name;
 				$att['personal_email'] = isset($att['personal_email']) ? $att['personal_email'] : '';
 				$attendeesMap[$attId] = $att;
@@ -136,6 +137,7 @@ class RegistrationsController extends AdminController
 					foreach ($partnerAttendees as $att) {
 						$attId = isset($att['id']) ? $att['id'] : null;
 						if ($attId) {
+							$att['property_id'] = $model->relation_property_id;
 							$att['property_name'] = $model->relation_property_name;
 							$att['personal_email'] = isset($att['personal_email']) ? $att['personal_email'] : '';
 							$attendeesMap[$attId] = $att;
