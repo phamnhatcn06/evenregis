@@ -158,6 +158,10 @@ $isOwner = ($entryPropertyId == $model->property_id);
                                     data-url="<?php echo CHtml::encode($musicPath); ?>" title="Nghe thử">
                                     <i class="fa fa-play"></i>
                                 </button>
+                                <button type="button" class="btn btn-outline-danger btn-delete-talent-audio"
+                                    data-entry-id="<?php echo $entryId; ?>" title="Xóa audio">
+                                    <i class="fa fa-trash"></i>
+                                </button>
                             <?php endif; ?>
                         </div>
                         <input type="file" class="d-none talent-audio-file"
