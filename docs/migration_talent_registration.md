@@ -6,10 +6,10 @@ Chuyển dữ liệu văn nghệ (`talent_entries`) từ đợt đăng ký chín
 
 ## 2. Hiện trạng vs Mục tiêu
 
-| Hiện trạng | Mục tiêu |
-|------------|----------|
-| `talent_entries.registration_id` → registration đợt 1 | `talent_entries.registration_id` → registration đợt 3 |
-| Chưa có registration đợt văn nghệ | Mỗi đơn vị có talent_entries sẽ có 1 registration đợt 3 |
+| Hiện trạng                                            | Mục tiêu                                                |
+| ----------------------------------------------------- | ------------------------------------------------------- |
+| `talent_entries.registration_id` → registration đợt 1 | `talent_entries.registration_id` → registration đợt 3   |
+| Chưa có registration đợt văn nghệ                     | Mỗi đơn vị có talent_entries sẽ có 1 registration đợt 3 |
 
 ## 3. Flow mới
 
@@ -36,7 +36,7 @@ Chuyển dữ liệu văn nghệ (`talent_entries`) từ đợt đăng ký chín
 ```sql
 -- Giống sport_teams.alliance_org_ids - lưu danh sách property_id liên quân
 ALTER TABLE `talent_entries`
-ADD COLUMN `alliance_org_ids` VARCHAR(255) DEFAULT NULL 
+ADD COLUMN `alliance_org_ids` VARCHAR(255) DEFAULT NULL
 COMMENT 'Danh sách property_id liên quân, phân cách bởi dấu phẩy: 1,2,3'
 AFTER `is_alliance_team`;
 ```
@@ -51,7 +51,7 @@ UPDATE `talent_entries` te
 INNER JOIN `registrations` r ON te.registration_id = r.id
 SET te.alliance_org_ids = (
     SELECT GROUP_CONCAT(
-        DISTINCT CASE 
+        DISTINCT CASE
             WHEN ar.requester_org_id = r.property_id THEN ar.target_org_id
             ELSE ar.requester_org_id
         END
@@ -59,12 +59,10 @@ SET te.alliance_org_ids = (
     )
     FROM `alliance_requests` ar
     WHERE ar.event_content_id = 4  -- Văn nghệ
-      AND ar.status = 2            -- Approved
       AND (ar.requester_org_id = r.property_id OR ar.target_org_id = r.property_id)
       AND ar.deleted_at IS NULL
 )
-WHERE te.is_alliance_team = 1
-  AND te.deleted_at IS NULL
+WHERE te.deleted_at IS NULL
   AND r.deleted_at IS NULL;
 ```
 
@@ -73,13 +71,13 @@ WHERE te.is_alliance_team = 1
 ```sql
 -- Kiểm tra và thêm cột type
 ALTER TABLE `registration_periods`
-  ADD COLUMN `type` VARCHAR(50) NOT NULL DEFAULT 'general' 
+  ADD COLUMN `type` VARCHAR(50) NOT NULL DEFAULT 'general'
   COMMENT 'general: đăng ký chính | talent: văn nghệ | sport: thể thao'
   AFTER `is_active`;
 
 -- Cập nhật type cho đợt văn nghệ (period_id=3)
-UPDATE `registration_periods` 
-SET `type` = 'talent' 
+UPDATE `registration_periods`
+SET `type` = 'talent'
 WHERE `id` = 3;
 ```
 
@@ -90,13 +88,13 @@ WHERE `id` = 3;
 -- Tạo registration mới với period_id=3
 
 INSERT INTO `registrations` (
-    `event_id`, 
-    `property_id`, 
+    `event_id`,
+    `property_id`,
     `relation_property_id`,
-    `period_id`, 
-    `submitted_by`, 
-    `status`, 
-    `created_at`, 
+    `period_id`,
+    `submitted_by`,
+    `status`,
+    `created_at`,
     `updated_at`
 )
 SELECT DISTINCT
@@ -115,8 +113,8 @@ WHERE r.period_id = 1
   AND te.deleted_at IS NULL
   AND NOT EXISTS (
       -- Tránh tạo trùng nếu đã có registration đợt 3
-      SELECT 1 FROM `registrations` r2 
-      WHERE r2.property_id = r.property_id 
+      SELECT 1 FROM `registrations` r2
+      WHERE r2.property_id = r.property_id
         AND r2.event_id = r.event_id
         AND r2.period_id = 3
         AND r2.deleted_at IS NULL
@@ -130,7 +128,7 @@ WHERE r.period_id = 1
 UPDATE `talent_entries` te
 INNER JOIN `registrations` r_old ON te.registration_id = r_old.id
 INNER JOIN `registrations` r_new ON (
-    r_new.property_id = r_old.property_id 
+    r_new.property_id = r_old.property_id
     AND r_new.event_id = r_old.event_id
     AND r_new.period_id = 3
     AND r_new.deleted_at IS NULL
@@ -147,7 +145,7 @@ WHERE r_old.period_id = 1
 <?php
 /**
  * Migration: Tách đăng ký văn nghệ sang registration riêng + tạo bảng talent_entry_orgs
- * 
+ *
  * Chạy: php protected/commands/shell.php migrateTalentRegistrations
  */
 
@@ -155,27 +153,27 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
 {
     const TALENT_PERIOD_ID = 3;
     const GENERAL_PERIOD_ID = 1;
-    
+
     public function run($args)
     {
         $db = Yii::app()->db;
         $transaction = $db->beginTransaction();
-        
+
         try {
             // 1. Thêm cột alliance_org_ids vào talent_entries
             $this->ensureAllianceOrgIdsColumn($db);
-            
+
             // 2. Đảm bảo cột type tồn tại
             $this->ensureTypeColumn($db);
-            
+
             // 3. Lấy danh sách property có talent_entries từ đợt 1
             $properties = $this->getPropertiesWithTalent($db);
-            
+
             echo "Found " . count($properties) . " properties with talent entries\n";
-            
+
             $regCreated = 0;
             $entriesUpdated = 0;
-            
+
             foreach ($properties as $prop) {
                 // 4. Kiểm tra đã có registration đợt 3 chưa
                 $existingReg = $db->createCommand()
@@ -187,7 +185,7 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                         ':event_id' => $prop['event_id'],
                         ':period_id' => self::TALENT_PERIOD_ID,
                     ));
-                
+
                 if (!$existingReg) {
                     // 5. Tạo registration mới cho đợt văn nghệ
                     $db->createCommand()->insert('registrations', array(
@@ -204,7 +202,7 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                     $regCreated++;
                     echo "Created registration #{$existingReg} for property #{$prop['property_id']}\n";
                 }
-                
+
                 // 6. Cập nhật talent_entries trỏ sang registration mới
                 $affected = $db->createCommand()->update(
                     'talent_entries',
@@ -217,26 +215,26 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                 );
                 $entriesUpdated += $affected;
             }
-            
+
             // 7. Migrate dữ liệu liên quân vào alliance_org_ids
             $allianceUpdated = $this->migrateAllianceOrgIds($db);
-            
+
             $transaction->commit();
-            
+
             echo "\n=== Migration completed ===\n";
             echo "Registrations created: {$regCreated}\n";
             echo "Talent entries updated: {$entriesUpdated}\n";
             echo "Alliance entries updated: {$allianceUpdated}\n";
-            
+
         } catch (Exception $e) {
             $transaction->rollback();
             echo "Error: " . $e->getMessage() . "\n";
             return 1;
         }
-        
+
         return 0;
     }
-    
+
     private function ensureAllianceOrgIdsColumn($db)
     {
         $columns = $db->createCommand("SHOW COLUMNS FROM talent_entries LIKE 'alliance_org_ids'")->queryAll();
@@ -244,30 +242,30 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
             echo "Column alliance_org_ids already exists\n";
             return;
         }
-        
+
         $db->createCommand("
             ALTER TABLE `talent_entries`
-            ADD COLUMN `alliance_org_ids` VARCHAR(255) DEFAULT NULL 
+            ADD COLUMN `alliance_org_ids` VARCHAR(255) DEFAULT NULL
             COMMENT 'Danh sách property_id liên quân, phân cách bởi dấu phẩy: 1,2,3'
             AFTER `is_alliance_team`
         ")->execute();
-        
+
         echo "Added column alliance_org_ids to talent_entries\n";
     }
-    
+
     private function ensureTypeColumn($db)
     {
         $columns = $db->createCommand("SHOW COLUMNS FROM registration_periods LIKE 'type'")->queryAll();
         if (empty($columns)) {
             $db->createCommand("
                 ALTER TABLE `registration_periods`
-                ADD COLUMN `type` VARCHAR(50) NOT NULL DEFAULT 'general' 
+                ADD COLUMN `type` VARCHAR(50) NOT NULL DEFAULT 'general'
                 COMMENT 'general: đăng ký chính | talent: văn nghệ | sport: thể thao'
                 AFTER `is_active`
             ")->execute();
             echo "Added 'type' column to registration_periods\n";
         }
-        
+
         // Cập nhật type cho đợt văn nghệ
         $db->createCommand()->update(
             'registration_periods',
@@ -276,7 +274,7 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
             array(':id' => self::TALENT_PERIOD_ID)
         );
     }
-    
+
     private function getPropertiesWithTalent($db)
     {
         return $db->createCommand()
@@ -286,13 +284,13 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
             ->where('r.period_id = :period_id AND r.deleted_at IS NULL AND te.deleted_at IS NULL')
             ->queryAll(true, array(':period_id' => self::GENERAL_PERIOD_ID));
     }
-    
+
     const TALENT_EVENT_CONTENT_ID = 4; // event_content_id cho văn nghệ
-    
+
     private function migrateAllianceOrgIds($db)
     {
         $updated = 0;
-        
+
         // Lấy tất cả talent_entries có is_alliance_team = 1
         $allianceEntries = $db->createCommand()
             ->select('te.id AS entry_id, r.property_id')
@@ -300,7 +298,7 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
             ->join('registrations r', 'te.registration_id = r.id')
             ->where('te.is_alliance_team = 1 AND te.deleted_at IS NULL AND r.deleted_at IS NULL')
             ->queryAll();
-        
+
         foreach ($allianceEntries as $entry) {
             // Lấy danh sách đơn vị liên quân từ bảng alliance_requests
             $partnerIds = $db->createCommand()
@@ -312,7 +310,7 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                     ':ecid' => self::TALENT_EVENT_CONTENT_ID,
                     ':pid' => $entry['property_id'],
                 ));
-            
+
             if (!empty($partnerIds)) {
                 $allianceOrgIds = implode(',', $partnerIds);
                 $db->createCommand()->update(
@@ -325,7 +323,7 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                 echo "Updated entry #{$entry['entry_id']} with alliance_org_ids: {$allianceOrgIds}\n";
             }
         }
-        
+
         return $updated;
     }
 }
@@ -361,7 +359,7 @@ public function actionGetAvailableAttendees()
 {
     $propertyId = Yii::app()->request->getQuery('property_id');
     $eventId = Yii::app()->request->getQuery('event_id');
-    
+
     // Lấy attendees từ CẢ đợt 1 và đợt 3, đã approved
     $attendees = Yii::app()->db->createCommand()
         ->select('a.id, a.name, a.position, a.avatar_path, r.period_id')
@@ -376,7 +374,7 @@ public function actionGetAvailableAttendees()
             ':prop_id' => $propertyId,
             ':event_id' => $eventId,
         ));
-    
+
     echo CJSON::encode(array('success' => true, 'data' => $attendees));
 }
 
@@ -390,9 +388,9 @@ public function actionAddMember()
     $attendeeId = Yii::app()->request->getPost('attendee_id');
     $role = Yii::app()->request->getPost('role', '');
     $isLead = Yii::app()->request->getPost('is_lead', 0);
-    
+
     $transaction = Yii::app()->db->beginTransaction();
-    
+
     try {
         // 1. Thêm vào talent_entry_members
         $member = new TalentEntryMembers();
@@ -401,14 +399,14 @@ public function actionAddMember()
         $member->role = $role;
         $member->is_lead = $isLead;
         $member->save();
-        
+
         // 2. Thêm vai trò "Thi văn nghệ" nếu chưa có
         $this->assignTalentRole($attendeeId);
-        
+
         $transaction->commit();
-        
+
         echo CJSON::encode(array('success' => true, 'message' => 'Đã thêm thành viên'));
-        
+
     } catch (Exception $e) {
         $transaction->rollback();
         echo CJSON::encode(array('success' => false, 'message' => $e->getMessage()));
@@ -423,15 +421,15 @@ private function assignTalentRole($attendeeId)
         ->from('roles')
         ->where("code = 'talent_performer' OR name LIKE '%văn nghệ%'")
         ->queryScalar();
-    
+
     if (!$talentRoleId) return;
-    
+
     // Kiểm tra đã có chưa
     $exists = AttendeeRoles::model()->exists(
         'attendee_id = :aid AND role_id = :rid AND deleted_at IS NULL',
         array(':aid' => $attendeeId, ':rid' => $talentRoleId)
     );
-    
+
     if (!$exists) {
         $ar = new AttendeeRoles();
         $ar->attendee_id = $attendeeId;
@@ -464,7 +462,7 @@ UPDATE `talent_entries` SET alliance_org_ids = NULL WHERE alliance_org_ids IS NO
 UPDATE `talent_entries` te
 INNER JOIN `registrations` r_new ON te.registration_id = r_new.id
 INNER JOIN `registrations` r_old ON (
-    r_old.property_id = r_new.property_id 
+    r_old.property_id = r_new.property_id
     AND r_old.event_id = r_new.event_id
     AND r_old.period_id = 1
     AND r_old.deleted_at IS NULL
@@ -473,8 +471,8 @@ SET te.registration_id = r_old.id
 WHERE r_new.period_id = 3;
 
 -- 3. Xóa registrations đợt văn nghệ (soft delete)
-UPDATE `registrations` 
-SET deleted_at = NOW() 
+UPDATE `registrations`
+SET deleted_at = NOW()
 WHERE period_id = 3;
 
 -- 4. (Tùy chọn) Xóa cột alliance_org_ids
@@ -483,13 +481,13 @@ WHERE period_id = 3;
 
 ## 8. So sánh cấu trúc Thể thao vs Văn nghệ
 
-| Thể thao | Văn nghệ | Mô tả |
-|----------|----------|-------|
-| `alliances` | `alliances` | Dùng chung - liên kết 2 đơn vị |
-| `alliance_requests` | `alliance_requests` | Dùng chung - yêu cầu liên quân |
-| `sport_teams.is_alliance` | `talent_entries.is_alliance_team` | Cờ đội/tiết mục liên quân |
+| Thể thao                       | Văn nghệ                             | Mô tả                           |
+| ------------------------------ | ------------------------------------ | ------------------------------- |
+| `alliances`                    | `alliances`                          | Dùng chung - liên kết 2 đơn vị  |
+| `alliance_requests`            | `alliance_requests`                  | Dùng chung - yêu cầu liên quân  |
+| `sport_teams.is_alliance`      | `talent_entries.is_alliance_team`    | Cờ đội/tiết mục liên quân       |
 | `sport_teams.alliance_org_ids` | `talent_entries.alliance_org_ids` ✅ | Danh sách property_id liên quân |
-| `sport_team_members` | `talent_entry_members` | Thành viên đội/tiết mục |
+| `sport_team_members`           | `talent_entry_members`               | Thành viên đội/tiết mục         |
 
 ## 9. Logic khi đơn vị liên quân thêm attendee
 
@@ -501,18 +499,18 @@ public function canAddMemberToEntry($propertyId, $entryId)
 {
     $entry = TalentEntries::model()->with('registration')->findByPk($entryId);
     if (!$entry) return false;
-    
+
     // Đơn vị chủ trì (owner)
     if ($entry->registration->property_id == $propertyId) {
         return true;
     }
-    
+
     // Đơn vị liên quân
     if ($entry->is_alliance_team && $entry->alliance_org_ids) {
         $allianceIds = explode(',', $entry->alliance_org_ids);
         return in_array($propertyId, $allianceIds);
     }
-    
+
     return false;
 }
 ```
