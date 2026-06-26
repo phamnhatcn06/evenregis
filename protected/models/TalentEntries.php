@@ -172,4 +172,36 @@ class TalentEntries extends BaseTalentEntries
             self::STATUS_PENDING => 'Chờ xử lý',
         );
     }
+
+    /**
+     * Cập nhật status của tất cả tiết mục văn nghệ theo property_id
+     * @param int $propertyId
+     * @param int $status
+     * @return array ['success' => bool, 'count' => int, 'message' => string]
+     */
+    public static function updateStatusByPropertyId($propertyId, $status)
+    {
+        $entries = self::getApiDataProvider(array('property_id' => $propertyId), 1000)->getData();
+        $count = 0;
+        $errors = array();
+
+        foreach ($entries as $entry) {
+            $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+            if (!$entryId) continue;
+
+            $url = ApiEndpoints::url(ApiEndpoints::TALENT_ENTRY_UPDATE, array('id' => $entryId));
+            $result = ApiClient::post($url, array('status' => $status));
+            if ($result['success']) {
+                $count++;
+            } else {
+                $errors[] = $entryId;
+            }
+        }
+
+        return array(
+            'success' => empty($errors),
+            'count' => $count,
+            'message' => empty($errors) ? 'Cập nhật thành công' : 'Lỗi cập nhật: ' . implode(', ', $errors),
+        );
+    }
 }
