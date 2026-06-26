@@ -846,8 +846,8 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
                             </div>
                         <?php endif; ?>
                         <div class="<?php echo $talentHasAlliance ? 'col-md-9' : 'col-12'; ?>">
-                            <?php if ($canEdit): ?>
-                                <!-- Đơn vị liên quân -->
+                            <?php if ($canEdit && empty($talentEntries)): ?>
+                                <!-- Đơn vị liên quân - chỉ hiển thị khi chưa có tiết mục -->
                                 <div class="row mb-3 g-3 align-items-end">
                                     <div class="col-md-6">
                                         <label class="form-label mb-1">Đơn vị liên quân</label>
