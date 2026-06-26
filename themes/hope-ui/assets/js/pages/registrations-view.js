@@ -4900,6 +4900,300 @@ var RegistrationView = (function() {
         });
     }
 
+    // ==================== TALENT ENTRY DETAIL (New Interface) ====================
+    function bindTalentDetailEvents() {
+        // Lưu thông tin tiết mục (mô tả + nội dung)
+        document.querySelectorAll('.btn-save-talent-info').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var entryId = btn.getAttribute('data-entry-id');
+                saveTalentInfo(entryId, btn);
+            });
+        });
+
+        // Lưu video/audio
+        document.querySelectorAll('.btn-save-talent-media').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var entryId = btn.getAttribute('data-entry-id');
+                saveTalentMedia(entryId, btn);
+            });
+        });
+
+        // Upload video file
+        document.querySelectorAll('.btn-upload-talent-video').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var entryId = btn.getAttribute('data-entry-id');
+                var fileInput = document.querySelector('.talent-video-file[data-entry-id="' + entryId + '"]');
+                if (fileInput) fileInput.click();
+            });
+        });
+
+        // Upload audio file
+        document.querySelectorAll('.btn-upload-talent-audio').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var entryId = btn.getAttribute('data-entry-id');
+                var fileInput = document.querySelector('.talent-audio-file[data-entry-id="' + entryId + '"]');
+                if (fileInput) fileInput.click();
+            });
+        });
+
+        // Preview video
+        document.querySelectorAll('.btn-preview-video').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var url = btn.getAttribute('data-url');
+                if (url) viewTalentVideo(url, 'Xem video tiết mục');
+            });
+        });
+
+        // Preview audio
+        document.querySelectorAll('.btn-preview-audio').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var url = btn.getAttribute('data-url');
+                if (url) previewTalentAudio(url);
+            });
+        });
+
+        // Thêm thành viên
+        document.querySelectorAll('.btn-add-talent-member').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var entryId = btn.getAttribute('data-entry-id');
+                showAddTalentMemberModal(entryId);
+            });
+        });
+
+        // Xóa thành viên
+        document.querySelectorAll('.btn-remove-talent-member').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var memberId = btn.getAttribute('data-member-id');
+                var entryId = btn.getAttribute('data-entry-id');
+                confirmRemoveTalentMember(memberId, entryId);
+            });
+        });
+    }
+
+    function saveTalentInfo(entryId, btn) {
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+
+        var description = document.querySelector('.talent-description-input[data-entry-id="' + entryId + '"]');
+        var content = document.querySelector('.talent-content-input[data-entry-id="' + entryId + '"]');
+
+        var formData = new FormData();
+        if (description) formData.append('description', description.value);
+        if (content) formData.append('content', content.value);
+
+        fetch(window.BASE_URL + '/admin/registrations/updateTalentInfo?id=' + entryId, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            if (data.success) {
+                Toast.success('Lưu thông tin thành công');
+            } else {
+                Toast.error(data.message || 'Có lỗi xảy ra');
+            }
+        })
+        .catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            Toast.error('Lỗi kết nối');
+        });
+    }
+
+    function saveTalentMedia(entryId, btn) {
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+
+        var videoInput = document.querySelector('.talent-video-input[data-entry-id="' + entryId + '"]');
+        var audioInput = document.querySelector('.talent-audio-input[data-entry-id="' + entryId + '"]');
+
+        var formData = new FormData();
+        if (videoInput) formData.append('video_path', videoInput.value);
+        if (audioInput) formData.append('music_path', audioInput.value);
+
+        fetch(window.BASE_URL + '/admin/registrations/updateTalentMedia?id=' + entryId, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            if (data.success) {
+                Toast.success('Lưu video/audio thành công');
+            } else {
+                Toast.error(data.message || 'Có lỗi xảy ra');
+            }
+        })
+        .catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            Toast.error('Lỗi kết nối');
+        });
+    }
+
+    function viewTalentVideo(url, title) {
+        var container = document.getElementById('videoContainer');
+        var downloadLink = document.getElementById('videoDownloadLink');
+        if (!container) return;
+
+        document.getElementById('videoModalTitle').textContent = title || 'Video tiết mục';
+
+        var youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if (youtubeMatch) {
+            container.innerHTML = '<iframe src="https://www.youtube.com/embed/' + youtubeMatch[1] + '?autoplay=1" allowfullscreen allow="autoplay" class="w-100 h-100" style="border:none;"></iframe>';
+            if (downloadLink) {
+                downloadLink.href = 'https://www.youtube.com/watch?v=' + youtubeMatch[1];
+                downloadLink.style.display = 'inline-block';
+            }
+        } else if (url.match(/\.(mp4|webm|ogg|mov)$/i)) {
+            container.innerHTML = '<video controls autoplay class="w-100 h-100"><source src="' + url + '" type="video/mp4">Trình duyệt không hỗ trợ video.</video>';
+            if (downloadLink) {
+                downloadLink.href = url;
+                downloadLink.style.display = 'inline-block';
+            }
+        } else {
+            container.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100 bg-light"><div class="text-center"><i class="fa fa-external-link fa-3x text-muted mb-3"></i><p>Link video bên ngoài</p><a href="' + url + '" target="_blank" class="btn btn-primary"><i class="fa fa-play-circle me-1"></i>Mở video</a></div></div>';
+            if (downloadLink) {
+                downloadLink.href = url;
+                downloadLink.style.display = 'inline-block';
+            }
+        }
+        var modal = new bootstrap.Modal(document.getElementById('videoModal'));
+        modal.show();
+    }
+
+    function previewTalentAudio(url) {
+        Swal.fire({
+            title: 'Nghe thử audio',
+            html: '<audio controls autoplay class="w-100"><source src="' + url + '" type="audio/mpeg">Trình duyệt không hỗ trợ.</audio>',
+            showConfirmButton: true,
+            confirmButtonText: 'Đóng'
+        });
+    }
+
+    function showAddTalentMemberModal(entryId) {
+        Swal.fire({
+            title: 'Thêm người tham gia',
+            html: '<div id="swal-member-list" class="text-start" style="max-height:300px;overflow-y:auto;"><div class="text-center text-muted"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div></div>',
+            showCancelButton: true,
+            confirmButtonText: 'Thêm',
+            cancelButtonText: 'Hủy',
+            didOpen: function() {
+                loadAttendeesForAddTalentMember(entryId);
+            },
+            preConfirm: function() {
+                var selectedIds = [];
+                document.querySelectorAll('#swal-member-list input:checked').forEach(function(cb) {
+                    selectedIds.push(cb.value);
+                });
+                if (selectedIds.length === 0) {
+                    Swal.showValidationMessage('Chọn ít nhất một người');
+                    return false;
+                }
+                return selectedIds;
+            }
+        }).then(function(result) {
+            if (result.isConfirmed && result.value) {
+                addTalentMembers(entryId, result.value);
+            }
+        });
+    }
+
+    function loadAttendeesForAddTalentMember(entryId) {
+        fetch(window.BASE_URL + '/admin/registrations/getAttendeesForTalent?registration_id=' + registrationId, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            var container = document.getElementById('swal-member-list');
+            if (!container) return;
+
+            if (data.success && data.data && data.data.length > 0) {
+                container.innerHTML = '';
+                data.data.forEach(function(att) {
+                    var div = document.createElement('div');
+                    div.className = 'form-check mb-2';
+                    div.innerHTML = '<input class="form-check-input" type="checkbox" value="' + att.id + '" id="add-member-' + att.id + '">' +
+                        '<label class="form-check-label" for="add-member-' + att.id + '">' + escapeHtml(att.full_name) +
+                        (att.position ? ' <small class="text-muted">(' + escapeHtml(att.position) + ')</small>' : '') + '</label>';
+                    container.appendChild(div);
+                });
+            } else {
+                container.innerHTML = '<p class="text-muted">Không có người tham dự nào.</p>';
+            }
+        })
+        .catch(function() {
+            var container = document.getElementById('swal-member-list');
+            if (container) container.innerHTML = '<p class="text-danger">Lỗi tải dữ liệu</p>';
+        });
+    }
+
+    function addTalentMembers(entryId, attendeeIds) {
+        var promises = attendeeIds.map(function(attendeeId) {
+            var formData = new FormData();
+            formData.append('entry_id', entryId);
+            formData.append('attendee_id', attendeeId);
+            return fetch(window.BASE_URL + '/admin/registrations/addTalentMember', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(function(res) { return res.json(); });
+        });
+
+        Promise.all(promises).then(function(results) {
+            var successCount = results.filter(function(r) { return r.success; }).length;
+            if (successCount > 0) {
+                Toast.success('Đã thêm ' + successCount + ' người');
+                location.reload();
+            } else {
+                Toast.error(results[0].message || 'Không thể thêm');
+            }
+        });
+    }
+
+    function confirmRemoveTalentMember(memberId, entryId) {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: 'Bạn có chắc muốn xóa người này khỏi tiết mục?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('member_id', memberId);
+
+                fetch(window.BASE_URL + '/admin/registrations/removeTalentMember', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        Toast.success('Xóa thành công');
+                        location.reload();
+                    } else {
+                        Toast.error(data.message || 'Xóa thất bại');
+                    }
+                })
+                .catch(function() {
+                    Toast.error('Lỗi kết nối');
+                });
+            }
+        });
+    }
+
     return {
         init: init,
         resetAddModal: resetSportModal,
@@ -4924,6 +5218,7 @@ var RegistrationView = (function() {
         editMissContestant: editMissContestant,
         deleteMissContestant: deleteMissContestant,
         removeTalentAllianceProperty: removeTalentAllianceProperty,
-        loadAttendeesForEditTalent: loadAttendeesForEditTalent
+        loadAttendeesForEditTalent: loadAttendeesForEditTalent,
+        bindTalentDetailEvents: bindTalentDetailEvents
     };
 })();
