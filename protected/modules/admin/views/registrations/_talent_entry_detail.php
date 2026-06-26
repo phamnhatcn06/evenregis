@@ -115,6 +115,10 @@ $isOwner = ($entryPropertyId == $model->property_id);
                                     data-url="<?php echo CHtml::encode($videoPath); ?>" title="Xem trước">
                                     <i class="fa fa-play"></i>
                                 </button>
+                                <button type="button" class="btn btn-outline-danger btn-delete-talent-video"
+                                    data-entry-id="<?php echo $entryId; ?>" title="Xóa video">
+                                    <i class="fa fa-trash"></i>
+                                </button>
                             <?php endif; ?>
                         </div>
                         <input type="file" class="d-none talent-video-file"
