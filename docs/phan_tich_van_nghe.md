@@ -57,6 +57,9 @@
 
 ### 3.2 Attendee và tiết mục
 - Attendee phải được **phê duyệt (approved)** mới gắn vào tiết mục
+- Attendee có thể từ **đợt 1 hoặc đợt 3** (cùng property_id, event_id)
+- Nếu link attendee có sẵn → **tự động thêm vai trò "Thi văn nghệ"** vào `attendee_roles`
+- Nếu thêm người mới → tạo attendee trong registration đợt 3
 - Mỗi đơn vị chỉ thêm attendee **của đơn vị mình**
 - Mỗi đơn vị chỉ có **1 tiết mục** (hoặc 1 tiết mục liên quân)
 - Attendee có thể tham gia **nhiều tiết mục** (không giới hạn)
