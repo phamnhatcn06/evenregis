@@ -183,25 +183,35 @@ $isOwner = ($entryPropertyId == $model->property_id);
                 <?php endif; ?>
             </h6>
 
-            <?php if (empty($allAllianceMembers)): ?>
+            <?php
+            // Nhóm thành viên theo đơn vị
+            $membersByProperty = array();
+            foreach ($allAllianceMembers as $member) {
+                $propId = isset($member['property_id']) ? $member['property_id'] : 0;
+                $propName = isset($member['property_name']) ? $member['property_name'] : 'Không xác định';
+                if (!isset($membersByProperty[$propId])) {
+                    $membersByProperty[$propId] = array(
+                        'name' => $propName,
+                        'members' => array(),
+                    );
+                }
+                $membersByProperty[$propId]['members'][] = $member;
+            }
+
+            // Đảm bảo đơn vị hiện tại luôn có card để thêm người (kể cả chưa có ai)
+            $currentPropertyId = $model->property_id;
+            $currentPropertyName = isset($model->property_name) ? $model->property_name : '';
+            if (!isset($membersByProperty[$currentPropertyId]) && $canEdit) {
+                $membersByProperty[$currentPropertyId] = array(
+                    'name' => $currentPropertyName,
+                    'members' => array(),
+                );
+            }
+            ?>
+
+            <?php if (empty($membersByProperty)): ?>
                 <p class="text-muted fst-italic">Chưa có người tham gia.</p>
             <?php else: ?>
-                <?php
-                // Nhóm thành viên theo đơn vị
-                $membersByProperty = array();
-                foreach ($allAllianceMembers as $member) {
-                    $propId = isset($member['property_id']) ? $member['property_id'] : 0;
-                    $propName = isset($member['property_name']) ? $member['property_name'] : 'Không xác định';
-                    if (!isset($membersByProperty[$propId])) {
-                        $membersByProperty[$propId] = array(
-                            'name' => $propName,
-                            'members' => array(),
-                        );
-                    }
-                    $membersByProperty[$propId]['members'][] = $member;
-                }
-                ?>
-
                 <?php foreach ($membersByProperty as $propId => $propData):
                     $isCurrentProperty = ($propId == $model->property_id);
                 ?>
@@ -224,38 +234,42 @@ $isOwner = ($entryPropertyId == $model->property_id);
                             <?php endif; ?>
                         </div>
                         <div class="card-body py-2">
-                            <div class="table-responsive">
-                                <table class="table table-sm table-bordered mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width:45px;" class="text-center">STT</th>
-                                            <th>Họ tên</th>
-                                            <th>Chức danh</th>
-                                            <?php if ($canEdit && $isCurrentProperty): ?>
-                                                <th style="width:50px;" class="text-center"></th>
-                                            <?php endif; ?>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($propData['members'] as $idx => $member): ?>
+                            <?php if (empty($propData['members'])): ?>
+                                <p class="text-muted fst-italic mb-0">Chưa có người tham gia từ đơn vị này.</p>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0">
+                                        <thead class="table-light">
                                             <tr>
-                                                <td class="text-center"><?php echo $idx + 1; ?></td>
-                                                <td><?php echo CHtml::encode($member['attendee_name'] ?? ''); ?></td>
-                                                <td><?php echo CHtml::encode($member['position_name'] ?? '-'); ?></td>
+                                                <th style="width:45px;" class="text-center">STT</th>
+                                                <th>Họ tên</th>
+                                                <th>Chức danh</th>
                                                 <?php if ($canEdit && $isCurrentProperty): ?>
-                                                    <td class="text-center">
-                                                        <button type="button" class="btn btn-xs btn-outline-danger btn-remove-talent-member"
-                                                            data-member-id="<?php echo $member['id']; ?>"
-                                                            data-entry-id="<?php echo $entryId; ?>" title="Xóa">
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    </td>
+                                                    <th style="width:50px;" class="text-center"></th>
                                                 <?php endif; ?>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($propData['members'] as $idx => $member): ?>
+                                                <tr>
+                                                    <td class="text-center"><?php echo $idx + 1; ?></td>
+                                                    <td><?php echo CHtml::encode($member['attendee_name'] ?? ''); ?></td>
+                                                    <td><?php echo CHtml::encode($member['position_name'] ?? '-'); ?></td>
+                                                    <?php if ($canEdit && $isCurrentProperty): ?>
+                                                        <td class="text-center">
+                                                            <button type="button" class="btn btn-xs btn-outline-danger btn-remove-talent-member"
+                                                                data-member-id="<?php echo $member['id']; ?>"
+                                                                data-entry-id="<?php echo $entryId; ?>" title="Xóa">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    <?php endif; ?>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
