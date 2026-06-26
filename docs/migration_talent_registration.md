@@ -287,10 +287,11 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
             ->queryAll(true, array(':period_id' => self::GENERAL_PERIOD_ID));
     }
     
+    const TALENT_EVENT_CONTENT_ID = 4; // event_content_id cho văn nghệ
+    
     private function migrateAllianceOrgIds($db)
     {
         $updated = 0;
-        const TALENT_EVENT_CONTENT_ID = 4; // event_content_id cho văn nghệ
         
         // Lấy tất cả talent_entries có is_alliance_team = 1
         $allianceEntries = $db->createCommand()
