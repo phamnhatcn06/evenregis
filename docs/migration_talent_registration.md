@@ -309,7 +309,7 @@ class MigrateTalentRegistrationsCommand extends CConsoleCommand
                 ->where('event_content_id = :ecid AND status = 2 AND deleted_at IS NULL')
                 ->andWhere('(requester_org_id = :pid OR target_org_id = :pid)')
                 ->queryColumn(array(
-                    ':ecid' => TALENT_EVENT_CONTENT_ID,
+                    ':ecid' => self::TALENT_EVENT_CONTENT_ID,
                     ':pid' => $entry['property_id'],
                 ));
             
