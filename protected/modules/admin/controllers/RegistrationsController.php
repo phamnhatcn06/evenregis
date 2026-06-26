@@ -472,7 +472,7 @@ class RegistrationsController extends AdminController
 
 			foreach ($allEntriesData as $entry) {
 				$entryPropertyId = isset($entry->property_id) ? (string)$entry->property_id : (isset($entry['property_id']) ? (string)$entry['property_id'] : '');
-				$allianceIds = isset($entry->alliance_property_ids) ? $entry->alliance_property_ids : (isset($entry['alliance_property_ids']) ? $entry['alliance_property_ids'] : '');
+				$allianceIds = isset($entry->alliance_org_ids) ? $entry->alliance_org_ids : (isset($entry['alliance_org_ids']) ? $entry['alliance_org_ids'] : '');
 
 				// Parse alliance_property_ids (có thể là string "1,2,3" hoặc array hoặc JSON)
 				$allianceIdArray = array();
