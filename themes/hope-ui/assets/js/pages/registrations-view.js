@@ -5232,10 +5232,50 @@ var RegistrationView = (function() {
         .then(function(data) {
             if (data.success) {
                 Toast.success('Đã xóa video');
-                // Clear input và ẩn nút preview/delete
                 var videoInput = document.querySelector('.talent-video-input[data-entry-id="' + entryId + '"]');
                 if (videoInput) videoInput.value = '';
-                // Reload page để cập nhật UI
+                location.reload();
+            } else {
+                Toast.error(data.message || 'Có lỗi xảy ra');
+            }
+        })
+        .catch(function() {
+            Toast.error('Lỗi kết nối');
+        });
+    }
+
+    function confirmDeleteTalentAudio(entryId) {
+        Swal.fire({
+            title: 'Xác nhận xóa audio',
+            text: 'Bạn có chắc chắn muốn xóa audio này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                deleteTalentAudio(entryId);
+            }
+        });
+    }
+
+    function deleteTalentAudio(entryId) {
+        var formData = new FormData();
+        formData.append('music_path', '');
+
+        fetch(window.BASE_URL + '/admin/registrations/updateTalentMedia?id=' + entryId, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                Toast.success('Đã xóa audio');
+                var audioInput = document.querySelector('.talent-audio-input[data-entry-id="' + entryId + '"]');
+                if (audioInput) audioInput.value = '';
                 location.reload();
             } else {
                 Toast.error(data.message || 'Có lỗi xảy ra');
