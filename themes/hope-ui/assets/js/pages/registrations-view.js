@@ -5188,6 +5188,50 @@ var RegistrationView = (function() {
         });
     }
 
+    function confirmDeleteTalentVideo(entryId) {
+        Swal.fire({
+            title: 'Xác nhận xóa video',
+            text: 'Bạn có chắc chắn muốn xóa video này? Hành động này không thể hoàn tác.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                deleteTalentVideo(entryId);
+            }
+        });
+    }
+
+    function deleteTalentVideo(entryId) {
+        var formData = new FormData();
+        formData.append('video_path', '');
+
+        fetch(window.BASE_URL + '/admin/registrations/updateTalentMedia?id=' + entryId, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                Toast.success('Đã xóa video');
+                // Clear input và ẩn nút preview/delete
+                var videoInput = document.querySelector('.talent-video-input[data-entry-id="' + entryId + '"]');
+                if (videoInput) videoInput.value = '';
+                // Reload page để cập nhật UI
+                location.reload();
+            } else {
+                Toast.error(data.message || 'Có lỗi xảy ra');
+            }
+        })
+        .catch(function() {
+            Toast.error('Lỗi kết nối');
+        });
+    }
+
     function saveTalentMedia(entryId, btn) {
         var originalHtml = btn.innerHTML;
         btn.disabled = true;
