@@ -535,7 +535,10 @@ private function assignTalentRole($attendeeId)
 ## 7. Rollback (nếu cần)
 
 ```sql
--- Rollback: Chuyển talent_entries về registration đợt 1
+-- 1. Xóa dữ liệu talent_entry_orgs
+TRUNCATE TABLE `talent_entry_orgs`;
+
+-- 2. Chuyển talent_entries về registration đợt 1
 UPDATE `talent_entries` te
 INNER JOIN `registrations` r_new ON te.registration_id = r_new.id
 INNER JOIN `registrations` r_old ON (
@@ -547,8 +550,21 @@ INNER JOIN `registrations` r_old ON (
 SET te.registration_id = r_old.id
 WHERE r_new.period_id = 3;
 
--- Xóa registrations đợt văn nghệ (soft delete)
+-- 3. Xóa registrations đợt văn nghệ (soft delete)
 UPDATE `registrations` 
 SET deleted_at = NOW() 
 WHERE period_id = 3;
+
+-- 4. (Tùy chọn) Xóa bảng talent_entry_orgs
+-- DROP TABLE IF EXISTS `talent_entry_orgs`;
 ```
+
+## 8. So sánh cấu trúc Thể thao vs Văn nghệ
+
+| Thể thao | Văn nghệ | Mô tả |
+|----------|----------|-------|
+| `alliances` | `alliances` | Dùng chung - liên kết 2 đơn vị |
+| `alliance_requests` | `alliance_requests` | Dùng chung - yêu cầu liên quân |
+| `sport_teams.is_alliance` | `talent_entries.is_alliance_team` | Cờ đội/tiết mục liên quân |
+| `alliance_team_orgs` | `talent_entry_orgs` ✅ | Liên kết team/entry với các đơn vị |
+| `sport_team_members` | `talent_entry_members` | Thành viên đội/tiết mục |
