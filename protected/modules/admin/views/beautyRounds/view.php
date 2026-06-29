@@ -46,6 +46,11 @@ $this->menu = array(
     ),
 );
 $this->Tabletitle = 'Chi tiết vòng thi: ' . CHtml::encode($model->name);
+
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/beauty-rounds-view.js',
+    CClientScript::POS_END
+);
 ?>
 
 <div class="card">
