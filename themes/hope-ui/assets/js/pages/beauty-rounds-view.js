@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(function(data) {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
+                console.log('Assign response:', data);
 
                 if (data.success) {
                     var modal = bootstrap.Modal.getInstance(document.getElementById('modal_assign_contestant'));
@@ -79,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     Toast.error(data.message || 'Có lỗi xảy ra');
+                    console.error('Assign error:', data.debug);
                 }
             })
             .catch(function() {
