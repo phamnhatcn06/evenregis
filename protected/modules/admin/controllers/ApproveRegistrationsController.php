@@ -495,9 +495,10 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
-        // Load alliance property names for talent entries
+        // Load alliance property names for all talent entries (cả owned và alliance)
         $talentAllianceProperties = array();
-        foreach ($talentEntries as $entry) {
+        $allTalentEntries = array_merge($talentEntries, $allianceTalentEntries);
+        foreach ($allTalentEntries as $entry) {
             $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
             $allianceIds = isset($entry->alliance_org_ids) ? $entry->alliance_org_ids : (isset($entry['alliance_org_ids']) ? $entry['alliance_org_ids'] : '');
             if (empty($allianceIds)) {
@@ -540,6 +541,7 @@ class ApproveRegistrationsController extends AdminController
             'sportTeamMembers' => $sportTeamMembers,
             'beautyContestants' => $beautyContestants,
             'talentEntries' => $talentEntries,
+            'allianceTalentEntries' => $allianceTalentEntries,
             'talentEntryMembers' => $talentEntryMembers,
             'talentAllianceProperties' => $talentAllianceProperties,
             'periodContentCodes' => $periodContentCodes,
