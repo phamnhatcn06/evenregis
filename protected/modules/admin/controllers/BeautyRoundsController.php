@@ -27,12 +27,13 @@ class BeautyRoundsController extends AdminController
             $registrationIds = isset($_POST['registration_ids']) ? $_POST['registration_ids'] : array();
             if (!empty($registrationIds)) {
                 $result = BeautyRoundResults::assignContestants($id, $registrationIds);
+                Yii::log('AssignContestants result: ' . print_r($result, true), 'info', 'beauty');
                 if ($result['success']) {
                     $count = isset($result['data']['count']) ? $result['data']['count'] : count($registrationIds);
-                    $this->sendJsonResponse(array('success' => true, 'message' => 'Gắn ' . $count . ' thí sinh thành công.'));
+                    $this->sendJsonResponse(array('success' => true, 'message' => 'Gắn ' . $count . ' thí sinh thành công.', 'debug' => $result));
                 } else {
                     $errorMsg = isset($result['error']) ? $result['error'] : (isset($result['message']) ? $result['message'] : 'Không thể gắn thí sinh.');
-                    $this->sendJsonResponse(array('success' => false, 'message' => $errorMsg));
+                    $this->sendJsonResponse(array('success' => false, 'message' => $errorMsg, 'debug' => $result));
                 }
             } else {
                 $this->sendJsonResponse(array('success' => false, 'message' => 'Vui lòng chọn thí sinh.'));
