@@ -148,9 +148,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (data.success) {
                     Toast.success(data.message);
-                    location.reload();
+                    console.log('SUCCESS - Check data.debug:', data.debug);
+                    // location.reload(); // TẠM TẮT ĐỂ DEBUG
                 } else {
                     Toast.error(data.message);
+                    console.log('ERROR - Check data.debug:', data.debug);
                 }
             })
             .catch(function() {
