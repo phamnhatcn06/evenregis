@@ -46,6 +46,7 @@ class ApproveMissController extends AdminController
 
         $data = array(
             'id' => $model->id,
+            'contest_id' => $model->contest_id,
             'attendee_name' => $model->attendee_name,
             'property_name' => $model->property_name,
             'contest_name' => $model->contest_name,
