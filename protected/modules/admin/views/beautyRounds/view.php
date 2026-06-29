@@ -13,10 +13,11 @@ $this->menu = array(
         'icon' => 'fa-list',
     ),
     array(
-        'label' => 'Gắn thí sinh',
-        'url' => $this->createUrl('assignContestants', array('id' => $model->id)),
+        'label' => 'Thêm thí sinh',
+        'url' => '#',
         'color' => 'info',
         'icon' => 'fa-user-plus',
+        'htmlOptions' => array('data-bs-toggle' => 'modal', 'data-bs-target' => '#modal_assign_contestant'),
     ),
     array(
         'label' => 'Chấm điểm',
