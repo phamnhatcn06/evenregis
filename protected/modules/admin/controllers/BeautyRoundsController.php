@@ -244,6 +244,16 @@ class BeautyRoundsController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionDebugAvailable($id)
+    {
+        $result = ApiClient::get(ApiEndpoints::BEAUTY_ROUND_RESULT_AVAILABLE_CONTESTANTS, array(
+            'round_id' => $id,
+        ));
+        header('Content-Type: application/json');
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = BeautyRounds::fetchFromApi($id);
