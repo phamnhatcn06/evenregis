@@ -11,9 +11,11 @@ class BeautyRoundsController extends AdminController
     {
         $model = $this->loadModelById($id);
         $contestants = BeautyRoundResults::getAssignedContestants($id);
+        $availableContestants = BeautyRoundResults::getAvailableContestants($id);
         $this->render('view', array(
             'model' => $model,
             'contestants' => $contestants,
+            'availableContestants' => $availableContestants,
         ));
     }
 
