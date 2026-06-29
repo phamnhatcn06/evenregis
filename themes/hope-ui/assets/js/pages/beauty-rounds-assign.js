@@ -133,12 +133,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('registration_ids[]', id);
             });
 
+            console.log('Sending IDs:', ids);
+            console.log('Assign URL:', assignUrl);
+
             fetch(assignUrl, {
                 method: 'POST',
                 body: formData
             })
             .then(function(res) { return res.json(); })
             .then(function(data) {
+                console.log('API Response:', data);
                 btnSave.disabled = false;
                 btnSave.innerHTML = originalHtml;
 
