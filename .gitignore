@@ -49,3 +49,4 @@ temp/
 uploads/
 protected/config/database.php
 protected/config/params.php
+protected/config/main.php
