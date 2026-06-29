@@ -443,6 +443,7 @@ class ApproveRegistrationsController extends AdminController
             'beautyContestants' => $beautyContestants,
             'talentEntries' => $talentEntries,
             'talentEntryMembers' => $talentEntryMembers,
+            'talentAllianceProperties' => $talentAllianceProperties,
             'periodContentCodes' => $periodContentCodes,
         ));
     }
