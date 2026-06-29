@@ -315,6 +315,7 @@ class ApproveRegistrationsController extends AdminController
         // Load Talent Entries - chỉ nếu period có content 'talent'
         $talentEntries = array();
         $talentEntryMembers = array();
+        $allianceTalentEntries = array(); // Tiết mục liên quân mà đơn vị được mời tham gia
         if ($model->property_id && (empty($periodContentCodes) || in_array('talent', $periodContentCodes))) {
             // Lấy talent shows của event
             $showIds = array();
@@ -336,6 +337,14 @@ class ApproveRegistrationsController extends AdminController
             }
             $entriesData = TalentEntries::getApiDataProvider($filterParams, 100)->getData();
 
+            // Lấy tất cả entries của event để tìm các tiết mục liên quân mà đơn vị được mời
+            $allEntriesData = array();
+            if ($model->event_id) {
+                $allEntriesData = TalentEntries::getApiDataProvider(array('event_id' => $model->event_id), 200)->getData();
+            }
+
+            $processedEntryIds = array();
+
             foreach ($entriesData as $entry) {
                 $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
                 $entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
@@ -346,6 +355,7 @@ class ApproveRegistrationsController extends AdminController
                     if ($entryRegId && $entryRegId != $model->id) {
                         continue;
                     }
+                    $processedEntryIds[] = $entryId;
                     // Fetch category name if not available
                     if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
                         $catId = isset($entry->category_id) ? $entry->category_id : $entry['category_id'];
@@ -389,6 +399,94 @@ class ApproveRegistrationsController extends AdminController
                         }
                         if (empty($memberArr['property_name']) && !empty($attInfo['property_name'])) {
                             $memberArr['property_name'] = $attInfo['property_name'];
+                        }
+                        $enrichedMembers[] = $memberArr;
+                    }
+                    $talentEntryMembers[$entryId] = $enrichedMembers;
+                }
+            }
+
+            // Tìm các tiết mục liên quân mà đơn vị này được mời tham gia (alliance_org_ids chứa property_id)
+            foreach ($allEntriesData as $entry) {
+                $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+                if (!$entryId || in_array($entryId, $processedEntryIds)) {
+                    continue;
+                }
+
+                $allianceIds = isset($entry->alliance_org_ids) ? $entry->alliance_org_ids : (isset($entry['alliance_org_ids']) ? $entry['alliance_org_ids'] : '');
+                if (empty($allianceIds)) {
+                    $allianceIds = isset($entry->alliance_property_ids) ? $entry->alliance_property_ids : (isset($entry['alliance_property_ids']) ? $entry['alliance_property_ids'] : '');
+                }
+
+                $idArray = array();
+                if (is_array($allianceIds)) {
+                    $idArray = $allianceIds;
+                } elseif (is_string($allianceIds) && !empty($allianceIds)) {
+                    $decoded = json_decode($allianceIds, true);
+                    if (is_array($decoded)) {
+                        $idArray = $decoded;
+                    } else {
+                        $idArray = array_filter(array_map('trim', explode(',', $allianceIds)));
+                    }
+                }
+
+                // Kiểm tra xem property_id hiện tại có trong danh sách alliance không
+                if (in_array($model->property_id, $idArray)) {
+                    // Fetch category name
+                    if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
+                        $catId = isset($entry->category_id) ? $entry->category_id : $entry['category_id'];
+                        $cat = TalentCategories::fetchFromApi($catId);
+                        if ($cat) {
+                            if (is_object($entry)) {
+                                $entry->category_name = $cat->name;
+                            } else {
+                                $entry['category_name'] = $cat->name;
+                            }
+                        }
+                    }
+
+                    // Fetch owner property name
+                    $ownerPropertyId = isset($entry->property_id) ? $entry->property_id : (isset($entry['property_id']) ? $entry['property_id'] : null);
+                    if ($ownerPropertyId && empty($entry->property_name)) {
+                        $ownerProp = Properties::fetchFromApi($ownerPropertyId);
+                        if ($ownerProp) {
+                            if (is_object($entry)) {
+                                $entry->property_name = $ownerProp->name;
+                            } else {
+                                $entry['property_name'] = $ownerProp->name;
+                            }
+                        }
+                    }
+
+                    if (is_object($entry)) {
+                        $entry->video_path = $this->cleanStorageUrl($entry->video_path);
+                        $entry->music_path = $this->cleanStorageUrl($entry->music_path);
+                    } else {
+                        $entry['video_path'] = $this->cleanStorageUrl($entry['video_path']);
+                        $entry['music_path'] = $this->cleanStorageUrl($entry['music_path']);
+                    }
+
+                    $allianceTalentEntries[] = $entry;
+
+                    // Load members cho entry liên quân
+                    $membersResult = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array('entry_id' => $entryId));
+                    $membersData = array();
+                    if ($membersResult['success'] && isset($membersResult['data'])) {
+                        $membersData = isset($membersResult['data']['data']) ? $membersResult['data']['data'] : $membersResult['data'];
+                    }
+                    $enrichedMembers = array();
+                    foreach ($membersData as $member) {
+                        $attId = isset($member['attendee_id']) ? $member['attendee_id'] : null;
+                        $memberArr = is_array($member) ? $member : get_object_vars($member);
+                        // Fetch attendee info from API if not in local map
+                        if (empty($memberArr['attendee_name']) && $attId) {
+                            $attData = Attendees::fetchFromApi($attId);
+                            if ($attData) {
+                                $memberArr['attendee_name'] = $attData->full_name;
+                                $memberArr['position_name'] = $attData->position_name;
+                                $memberArr['division_name'] = $attData->division_name;
+                                $memberArr['property_name'] = $attData->property_name;
+                            }
                         }
                         $enrichedMembers[] = $memberArr;
                     }
