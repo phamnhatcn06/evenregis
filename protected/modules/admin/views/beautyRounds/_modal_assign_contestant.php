@@ -41,7 +41,7 @@
                                     data-search="<?php echo CHtml::encode(strtolower($c['contestant_name'] . ' ' . $c['contestant_number'] . ' ' . $c['property_name'])); ?>">
                                     <td class="text-center">
                                         <input type="checkbox" class="form-check-input contestant-check"
-                                            value="<?php echo $c['registration_id']; ?>">
+                                            value="<?php echo $c['id']; ?>">
                                     </td>
                                     <td class="text-center">
                                         <?php if (!empty($c['photo_portrait'])): ?>
