@@ -387,9 +387,47 @@ class ApproveRegistrationsController extends AdminController
                         if (empty($memberArr['division_name']) && !empty($attInfo['division_name'])) {
                             $memberArr['division_name'] = $attInfo['division_name'];
                         }
+                        if (empty($memberArr['property_name']) && !empty($attInfo['property_name'])) {
+                            $memberArr['property_name'] = $attInfo['property_name'];
+                        }
                         $enrichedMembers[] = $memberArr;
                     }
                     $talentEntryMembers[$entryId] = $enrichedMembers;
+                }
+            }
+        }
+
+        // Load alliance property names for talent entries
+        $talentAllianceProperties = array();
+        foreach ($talentEntries as $entry) {
+            $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+            $allianceIds = isset($entry->alliance_org_ids) ? $entry->alliance_org_ids : (isset($entry['alliance_org_ids']) ? $entry['alliance_org_ids'] : '');
+            if (empty($allianceIds)) {
+                $allianceIds = isset($entry->alliance_property_ids) ? $entry->alliance_property_ids : (isset($entry['alliance_property_ids']) ? $entry['alliance_property_ids'] : '');
+            }
+            $talentAllianceProperties[$entryId] = array();
+            if (!empty($allianceIds)) {
+                $idArray = array();
+                if (is_array($allianceIds)) {
+                    $idArray = $allianceIds;
+                } elseif (is_string($allianceIds)) {
+                    $decoded = json_decode($allianceIds, true);
+                    if (is_array($decoded)) {
+                        $idArray = $decoded;
+                    } else {
+                        $idArray = array_filter(array_map('trim', explode(',', $allianceIds)));
+                    }
+                }
+                foreach ($idArray as $propId) {
+                    if ($propId) {
+                        $prop = Properties::fetchFromApi($propId);
+                        if ($prop) {
+                            $talentAllianceProperties[$entryId][] = array(
+                                'id' => $propId,
+                                'name' => $prop->name,
+                            );
+                        }
+                    }
                 }
             }
         }
