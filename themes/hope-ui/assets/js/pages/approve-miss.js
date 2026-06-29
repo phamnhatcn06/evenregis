@@ -58,20 +58,56 @@ document.addEventListener('DOMContentLoaded', function() {
             var colClass = selectedIds.length === 2 ? 'col-md-6' : (selectedIds.length === 3 ? 'col-md-4' : 'col-md-3');
             var html = '';
 
-            results.forEach(function(res) {
+            results.forEach(function(res, idx) {
                 if (!res.success) return;
                 var d = res.data;
-                var photo = d.photo_portrait || d.photo_full_body || '';
+                var carouselId = 'compare-carousel-' + idx;
+
+                var photos = [];
+                if (d.photo_portrait) photos.push({ url: d.photo_portrait, label: 'Chân dung 1' });
+                if (d.photo_portrait_2) photos.push({ url: d.photo_portrait_2, label: 'Chân dung 2' });
+                if (d.photo_full_body) photos.push({ url: d.photo_full_body, label: 'Toàn thân 1' });
+                if (d.photo_full_body_2) photos.push({ url: d.photo_full_body_2, label: 'Toàn thân 2' });
 
                 html += '<div class="' + colClass + ' compare-column">';
-                html += '<div class="card">';
-                if (photo) {
-                    html += '<img src="' + photo + '" class="card-img-top contestant-photo" alt="">';
+                html += '<div class="card h-100">';
+
+                if (photos.length > 0) {
+                    html += '<div id="' + carouselId + '" class="carousel slide compare-carousel" data-bs-ride="false">';
+
+                    if (photos.length > 1) {
+                        html += '<div class="carousel-indicators">';
+                        photos.forEach(function(p, i) {
+                            html += '<button type="button" data-bs-target="#' + carouselId + '" data-bs-slide-to="' + i + '"' + (i === 0 ? ' class="active"' : '') + '></button>';
+                        });
+                        html += '</div>';
+                    }
+
+                    html += '<div class="carousel-inner">';
+                    photos.forEach(function(p, i) {
+                        html += '<div class="carousel-item' + (i === 0 ? ' active' : '') + '">';
+                        html += '<img src="' + p.url + '" alt="' + p.label + '">';
+                        html += '<div class="photo-label-overlay">' + p.label + '</div>';
+                        html += '</div>';
+                    });
+                    html += '</div>';
+
+                    if (photos.length > 1) {
+                        html += '<button class="carousel-control-prev" type="button" data-bs-target="#' + carouselId + '" data-bs-slide="prev">';
+                        html += '<span class="carousel-control-prev-icon"></span></button>';
+                        html += '<button class="carousel-control-next" type="button" data-bs-target="#' + carouselId + '" data-bs-slide="next">';
+                        html += '<span class="carousel-control-next-icon"></span></button>';
+                    }
+                    html += '</div>';
+                } else {
+                    html += '<div class="compare-carousel d-flex align-items-center justify-content-center" style="height:280px;">';
+                    html += '<i class="fa fa-user fa-4x text-muted"></i></div>';
                 }
+
                 html += '<div class="card-body">';
-                html += '<h5 class="card-title">' + (d.attendee_name || '') + '</h5>';
+                html += '<h5 class="card-title text-center mb-3">' + (d.attendee_name || '') + '</h5>';
                 html += '<table class="table table-sm table-bordered compare-table">';
-                html += '<tr><th>Đơn vị</th><td>' + (d.property_name || '') + '</td></tr>';
+                html += '<tr><th>Đơn vị</th><td>' + (d.property_name || '-') + '</td></tr>';
                 html += '<tr><th>Chiều cao</th><td>' + (d.height_cm ? d.height_cm + ' cm' : '-') + '</td></tr>';
                 html += '<tr><th>Cân nặng</th><td>' + (d.weight_kg ? d.weight_kg + ' kg' : '-') + '</td></tr>';
                 html += '<tr><th>Số đo</th><td>' + (d.measurements || '-') + '</td></tr>';
