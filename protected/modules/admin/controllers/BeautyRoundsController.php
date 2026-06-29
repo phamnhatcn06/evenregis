@@ -256,10 +256,10 @@ class BeautyRoundsController extends AdminController
 
     public function actionDebugAssign($id)
     {
-        // Test assign với 1 thí sinh
+        // Test assign với 1 thí sinh (dùng id từ beauty_registrations, không phải registration_id)
         $result = ApiClient::post(ApiEndpoints::BEAUTY_ROUND_RESULT_ASSIGN, array(
             'round_id' => $id,
-            'registration_ids' => array(2), // Test với ID = 2
+            'registration_ids' => array(2, 3, 4), // Test với ID = 2, 3, 4
         ));
         header('Content-Type: application/json');
         echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
