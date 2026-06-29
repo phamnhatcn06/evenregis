@@ -166,3 +166,8 @@ Yii::app()->clientScript->registerScriptFile(
         <?php endif; ?>
     </div>
 </div>
+
+<?php $this->renderPartial('_modal_assign_contestant', array(
+    'model' => $model,
+    'availableContestants' => $availableContestants,
+)); ?>
