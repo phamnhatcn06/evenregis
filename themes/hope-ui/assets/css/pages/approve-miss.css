@@ -108,22 +108,77 @@
 /* Compare Modal */
 #modalCompare .modal-body {
     background: #f8f9fa;
+    padding: 20px;
 }
 
 .compare-column {
-    padding: 15px;
+    padding: 10px;
 }
 
 .compare-column .card {
     height: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.compare-column .contestant-photo {
-    height: 250px;
-    object-fit: cover;
+.compare-carousel {
+    background: #000;
+}
+
+.compare-carousel .carousel-inner {
+    height: 280px;
+}
+
+.compare-carousel .carousel-item {
+    height: 280px;
+}
+
+.compare-carousel .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+
+.compare-carousel .carousel-control-prev,
+.compare-carousel .carousel-control-next {
+    width: 15%;
+    opacity: 0.7;
+}
+
+.compare-carousel .carousel-control-prev:hover,
+.compare-carousel .carousel-control-next:hover {
+    opacity: 1;
+}
+
+.compare-carousel .carousel-indicators {
+    margin-bottom: 5px;
+}
+
+.compare-carousel .carousel-indicators button {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 3px;
+}
+
+.compare-carousel .photo-label-overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 12px;
 }
 
 .compare-table th {
-    width: 40%;
+    width: 45%;
     background: #f8f9fa;
+    font-weight: 600;
+}
+
+.compare-table td {
+    word-break: break-word;
 }
