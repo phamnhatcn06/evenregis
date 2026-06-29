@@ -12,6 +12,10 @@ class BeautyRoundsController extends AdminController
         $model = $this->loadModelById($id);
         $contestants = BeautyRoundResults::getAssignedContestants($id);
         $availableContestants = BeautyRoundResults::getAvailableContestants($id);
+
+        // DEBUG
+        Yii::log('getAssignedContestants for round ' . $id . ': ' . print_r($contestants, true), 'info', 'beauty');
+
         $this->render('view', array(
             'model' => $model,
             'contestants' => $contestants,
