@@ -297,7 +297,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-approve').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            approveContestant(this.dataset.id);
+            var card = this.closest('.contestant-card');
+            var id = this.dataset.id;
+            var contestId = card ? card.dataset.contestId : '';
+            var name = card ? card.querySelector('.card-title').textContent : '';
+            approveContestant(id, contestId, name);
         });
     });
 
