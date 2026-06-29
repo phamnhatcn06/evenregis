@@ -7,6 +7,7 @@ class ApproveMissController extends AdminController
         parent::init();
         $this->publicActions[] = 'index';
         $this->publicActions[] = 'getDetail';
+        $this->publicActions[] = 'getRounds';
         $this->publicActions[] = 'approve';
         $this->publicActions[] = 'reject';
     }
