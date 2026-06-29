@@ -541,6 +541,168 @@ $attributes = array(
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
+
+            <!-- Tiết mục liên quân được mời tham gia -->
+            <?php if (!empty($allianceTalentEntries)): ?>
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3 text-warning"><i class="fa fa-handshake-o me-2"></i>Tiết mục liên quân được mời tham gia (<?php echo count($allianceTalentEntries); ?>)</h6>
+                <?php foreach ($allianceTalentEntries as $entryIdx => $entry):
+                    $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+                    $entryTitle = isset($entry->title) ? $entry->title : (isset($entry['title']) ? $entry['title'] : '-');
+                    $categoryName = isset($entry->category_name) ? $entry->category_name : (isset($entry['category_name']) ? $entry['category_name'] : '-');
+                    $ownerPropertyName = isset($entry->property_name) ? $entry->property_name : (isset($entry['property_name']) ? $entry['property_name'] : '');
+                    $members = ($entryId && isset($talentEntryMembers[$entryId])) ? $talentEntryMembers[$entryId] : array();
+                    $allianceProps = ($entryId && isset($talentAllianceProperties[$entryId])) ? $talentAllianceProperties[$entryId] : array();
+                    $durationSeconds = isset($entry->duration_seconds) ? (int)$entry->duration_seconds : (isset($entry['duration_seconds']) ? (int)$entry['duration_seconds'] : 0);
+                    $director = isset($entry->director) ? $entry->director : (isset($entry['director']) ? $entry['director'] : '');
+                    $directorPhone = isset($entry->director_phone) ? $entry->director_phone : (isset($entry['director_phone']) ? $entry['director_phone'] : '');
+                    $origin = isset($entry->origin) ? $entry->origin : (isset($entry['origin']) ? $entry['origin'] : '');
+                    $participantCount = isset($entry->participant_count) ? (int)$entry->participant_count : (isset($entry['participant_count']) ? (int)$entry['participant_count'] : 0);
+                    $description = isset($entry->description) ? $entry->description : (isset($entry['description']) ? $entry['description'] : '');
+                    $content = isset($entry->content) ? $entry->content : (isset($entry['content']) ? $entry['content'] : '');
+                    $note = isset($entry->note) ? $entry->note : (isset($entry['note']) ? $entry['note'] : '');
+                    $musicPath = isset($entry->music_path) ? $entry->music_path : (isset($entry['music_path']) ? $entry['music_path'] : '');
+                    $videoPath = isset($entry->video_path) ? $entry->video_path : (isset($entry['video_path']) ? $entry['video_path'] : '');
+                ?>
+                    <div class="card mb-3 border border-warning">
+                        <div class="card-header bg-warning bg-opacity-25 d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="text-dark"><?php echo ($entryIdx + 1) . '. ' . CHtml::encode($entryTitle); ?></strong>
+                                <span class="badge bg-info ms-2"><?php echo CHtml::encode($categoryName); ?></span>
+                                <span class="badge bg-warning text-dark ms-1"><i class="fa fa-handshake-o me-1"></i>Được mời</span>
+                            </div>
+                            <span class="text-muted small"><?php echo count($members); ?> người tham gia</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Đơn vị chủ trì -->
+                            <div class="alert alert-info py-2 mb-3">
+                                <strong><i class="fa fa-building me-2"></i>Đơn vị chủ trì:</strong>
+                                <span class="badge bg-primary ms-1"><?php echo CHtml::encode($ownerPropertyName); ?></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-sm table-bordered mb-3">
+                                        <tbody>
+                                            <tr>
+                                                <th style="width:40%;background:#f8f9fa;">Thời lượng</th>
+                                                <td>
+                                                    <?php if ($durationSeconds > 0): ?>
+                                                        <?php echo floor($durationSeconds / 60) . ':' . str_pad($durationSeconds % 60, 2, '0', STR_PAD_LEFT); ?> (<?php echo $durationSeconds; ?> giây)
+                                                    <?php else: ?>
+                                                        -
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th style="background:#f8f9fa;">Đạo diễn/Biên đạo</th>
+                                                <td><?php echo $director ? CHtml::encode($director) : '-'; ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th style="background:#f8f9fa;">SĐT đạo diễn</th>
+                                                <td><?php echo $directorPhone ? CHtml::encode($directorPhone) : '-'; ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th style="background:#f8f9fa;">Nguồn gốc/Xuất xứ</th>
+                                                <td><?php echo $origin ? CHtml::encode($origin) : '-'; ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th style="background:#f8f9fa;">Số người tham gia</th>
+                                                <td><?php echo $participantCount ?: '-'; ?></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm table-bordered mb-3">
+                                        <tbody>
+                                            <tr>
+                                                <th style="width:40%;background:#f8f9fa;">Mô tả ngắn</th>
+                                                <td><?php echo $description ? CHtml::encode($description) : '-'; ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th style="background:#f8f9fa;">Nội dung chi tiết</th>
+                                                <td style="white-space:pre-line;"><?php echo $content ? CHtml::encode($content) : '-'; ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th style="background:#f8f9fa;">Ghi chú</th>
+                                                <td><?php echo $note ? CHtml::encode($note) : '-'; ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th style="background:#f8f9fa;">Tài liệu/Media</th>
+                                                <td>
+                                                    <?php if ($musicPath): ?>
+                                                        <a href="<?php echo CHtml::encode($musicPath); ?>" target="_blank" class="btn btn-xs btn-outline-secondary me-1">
+                                                            <i class="fa fa-music me-1"></i>Nhạc nền
+                                                        </a>
+                                                    <?php endif; ?>
+                                                    <?php if ($videoPath): ?>
+                                                        <a href="<?php echo CHtml::encode($videoPath); ?>" target="_blank" class="btn btn-xs btn-outline-danger">
+                                                            <i class="fa fa-play-circle me-1"></i>Video
+                                                        </a>
+                                                    <?php endif; ?>
+                                                    <?php if (!$musicPath && !$videoPath): ?>-<?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Đơn vị liên quân -->
+                            <?php if (!empty($allianceProps)): ?>
+                                <div class="alert alert-warning py-2 mb-3">
+                                    <strong><i class="fa fa-users me-2"></i>Đơn vị liên quân:</strong>
+                                    <?php foreach ($allianceProps as $aProp): ?>
+                                        <span class="badge <?php echo $aProp['id'] == $model->property_id ? 'bg-success' : 'bg-secondary'; ?> ms-1">
+                                            <?php echo CHtml::encode($aProp['name']); ?>
+                                            <?php if ($aProp['id'] == $model->property_id): ?><i class="fa fa-check ms-1"></i><?php endif; ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Danh sách người tham gia theo đơn vị -->
+                            <h6 class="fw-bold mb-2"><i class="fa fa-users me-1 text-info"></i>Danh sách người biểu diễn (<?php echo count($members); ?>)</h6>
+                            <?php if (!empty($members)): ?>
+                                <?php
+                                $membersByProperty = array();
+                                foreach ($members as $member) {
+                                    $propName = isset($member['property_name']) ? $member['property_name'] : 'Không xác định';
+                                    if (!isset($membersByProperty[$propName])) {
+                                        $membersByProperty[$propName] = array();
+                                    }
+                                    $membersByProperty[$propName][] = $member;
+                                }
+                                ?>
+                                <?php foreach ($membersByProperty as $propName => $propMembers): ?>
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary mb-1"><?php echo CHtml::encode($propName); ?> (<?php echo count($propMembers); ?>)</span>
+                                        <div class="ms-3">
+                                            <?php foreach ($propMembers as $idx => $member):
+                                                $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
+                                                $pos = isset($member['position_name']) ? $member['position_name'] : '';
+                                                $div = isset($member['division_name']) ? $member['division_name'] : '';
+                                                $nameInfo = CHtml::encode($name);
+                                                $details = array();
+                                                if ($pos) $details[] = CHtml::encode($pos);
+                                                if ($div) $details[] = 'Bộ phận: ' . CHtml::encode($div);
+                                                if (!empty($details)) {
+                                                    $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
+                                                }
+                                            ?>
+                                                <div class="mb-1"><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p class="text-muted mb-0">Chưa có người biểu diễn</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 <?php endif; ?>
