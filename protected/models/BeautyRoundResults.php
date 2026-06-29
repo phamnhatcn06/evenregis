@@ -101,6 +101,9 @@ class BeautyRoundResults extends BaseBeautyRoundResults
             'round_id' => $roundId,
             'per_page' => 1000,
         ));
+        // DEBUG
+        Yii::log('API Result for round ' . $roundId . ': ' . json_encode($result), 'info', 'beauty');
+
         if ($result['success'] && isset($result['data'])) {
             return isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
         }
