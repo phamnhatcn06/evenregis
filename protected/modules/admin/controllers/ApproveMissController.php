@@ -11,7 +11,7 @@ class ApproveMissController extends AdminController
         $this->publicActions[] = 'reject';
     }
 
-    public function actionIndex()
+    public function actionAdmin()
     {
         $params = array(
             'with' => 'attendee,attendee.property,attendee.property.regional,contest',
