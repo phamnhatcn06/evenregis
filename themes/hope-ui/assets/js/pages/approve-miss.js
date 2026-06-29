@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 var d = res.data;
                 document.getElementById('detail_id').value = d.id;
+                document.getElementById('detail_contest_id').value = d.contest_id || '';
                 document.getElementById('detail_name').textContent = d.attendee_name || '';
                 document.getElementById('detail_property').textContent = d.property_name || '';
                 document.getElementById('detail_contest').textContent = d.contest_name || '';
