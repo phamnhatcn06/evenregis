@@ -70,6 +70,27 @@ class ApproveMissController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionGetRounds($contest_id)
+    {
+        $rounds = BeautyRounds::getApiDataProvider(array(
+            'contest_id' => $contest_id,
+            'sort' => 'round_order',
+        ), 100)->getData();
+
+        $data = array();
+        foreach ($rounds as $r) {
+            $data[] = array(
+                'id' => $r->id,
+                'name' => $r->name,
+                'round_type' => $r->round_type,
+                'round_order' => $r->round_order,
+            );
+        }
+
+        echo CJSON::encode(array('success' => true, 'data' => $data));
+        Yii::app()->end();
+    }
+
     public function actionApprove()
     {
         if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
@@ -77,6 +98,8 @@ class ApproveMissController extends AdminController
         }
 
         $id = Yii::app()->request->getPost('id');
+        $roundId = Yii::app()->request->getPost('round_id');
+
         if (empty($id)) {
             echo CJSON::encode(array('success' => false, 'message' => 'Thiếu ID'));
             Yii::app()->end();
@@ -91,11 +114,23 @@ class ApproveMissController extends AdminController
         $model->status = BeautyContestants::STATUS_CONFIRMED;
         $result = $model->updateViaApi();
 
-        if ($result['success']) {
-            echo CJSON::encode(array('success' => true, 'message' => 'Đã duyệt thí sinh'));
-        } else {
+        if (!$result['success']) {
             echo CJSON::encode(array('success' => false, 'message' => $result['error'] ?: 'Có lỗi xảy ra'));
+            Yii::app()->end();
         }
+
+        if (!empty($roundId)) {
+            $assignResult = BeautyRoundResults::assignContestants($roundId, array($id));
+            if (!$assignResult['success']) {
+                echo CJSON::encode(array(
+                    'success' => true,
+                    'message' => 'Đã duyệt thí sinh nhưng không thể gán vào vòng thi: ' . ($assignResult['error'] ?: '')
+                ));
+                Yii::app()->end();
+            }
+        }
+
+        echo CJSON::encode(array('success' => true, 'message' => 'Đã duyệt và gán thí sinh vào vòng thi'));
         Yii::app()->end();
     }
 
