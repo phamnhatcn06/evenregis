@@ -40,7 +40,7 @@ Yii::app()->clientScript->registerScriptFile(
                     <?php else: ?>
                         <?php foreach ($availableContestants as $c): ?>
                             <label class="list-group-item list-group-item-action d-flex align-items-center contestant-item"
-                                data-id="<?php echo $c['registration_id']; ?>"
+                                data-id="<?php echo $c['id']; ?>"
                                 data-number="<?php echo CHtml::encode($c['contestant_number']); ?>"
                                 data-name="<?php echo CHtml::encode($c['contestant_name']); ?>"
                                 data-property="<?php echo CHtml::encode($c['property_name']); ?>"
