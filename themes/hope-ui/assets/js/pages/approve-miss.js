@@ -314,8 +314,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('btn_approve_modal').addEventListener('click', function() {
         var id = document.getElementById('detail_id').value;
+        var contestId = document.getElementById('detail_contest_id') ? document.getElementById('detail_contest_id').value : '';
+        var name = document.getElementById('detail_name').textContent;
         bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
-        approveContestant(id);
+        approveContestant(id, contestId, name);
     });
 
     document.getElementById('btn_reject_modal').addEventListener('click', function() {
