@@ -35,6 +35,7 @@
                     </div>
                     <div class="col-md-7">
                         <input type="hidden" id="detail_id">
+                <input type="hidden" id="detail_contest_id">
                         <table class="table table-bordered">
                             <tbody>
                                 <tr>
