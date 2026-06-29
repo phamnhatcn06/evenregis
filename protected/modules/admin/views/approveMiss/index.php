@@ -147,6 +147,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 <script>
 var approveMissConfig = {
     getDetailUrl: '<?php echo $this->createUrl("getDetail"); ?>',
+    getRoundsUrl: '<?php echo $this->createUrl("getRounds"); ?>',
     approveUrl: '<?php echo $this->createUrl("approve"); ?>',
     rejectUrl: '<?php echo $this->createUrl("reject"); ?>'
 };
