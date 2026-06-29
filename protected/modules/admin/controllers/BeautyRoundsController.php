@@ -254,6 +254,18 @@ class BeautyRoundsController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionDebugAssign($id)
+    {
+        // Test assign với 1 thí sinh
+        $result = ApiClient::post(ApiEndpoints::BEAUTY_ROUND_RESULT_ASSIGN, array(
+            'round_id' => $id,
+            'registration_ids' => array(2), // Test với ID = 2
+        ));
+        header('Content-Type: application/json');
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = BeautyRounds::fetchFromApi($id);
