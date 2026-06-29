@@ -183,35 +183,85 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    function approveContestant(id) {
-        Swal.fire({
-            title: 'Xác nhận duyệt',
-            text: 'Bạn có chắc chắn muốn duyệt thí sinh này?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Duyệt',
-            cancelButtonText: 'Hủy'
-        }).then(function(result) {
-            if (result.isConfirmed) {
-                fetch(approveMissConfig.approveUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'id=' + id
-                })
+    function approveContestant(id, contestId, name) {
+        document.getElementById('approve_contestant_id').value = id;
+        document.getElementById('approve_contest_id').value = contestId || '';
+        document.getElementById('approve_contestant_name').textContent = name || 'Thí sinh #' + id;
+
+        var roundsList = document.getElementById('rounds_list');
+        var roundsLoading = document.getElementById('rounds_loading');
+
+        roundsList.innerHTML = '';
+        roundsLoading.style.display = 'block';
+
+        var modal = new bootstrap.Modal(document.getElementById('modalApprove'));
+        modal.show();
+
+        if (contestId) {
+            fetch(approveMissConfig.getRoundsUrl + '?contest_id=' + contestId)
                 .then(function(res) { return res.json(); })
                 .then(function(res) {
-                    if (res.success) {
-                        Toast.success(res.message);
-                        location.reload();
+                    roundsLoading.style.display = 'none';
+                    if (res.success && res.data.length > 0) {
+                        var html = '';
+                        res.data.forEach(function(r) {
+                            html += '<label class="list-group-item list-group-item-action d-flex align-items-center">';
+                            html += '<input type="radio" name="approve_round" value="' + r.id + '" class="form-check-input me-3">';
+                            html += '<div>';
+                            html += '<strong>' + r.name + '</strong>';
+                            if (r.round_type) {
+                                html += ' <span class="badge bg-secondary ms-2">' + r.round_type + '</span>';
+                            }
+                            html += '</div>';
+                            html += '</label>';
+                        });
+                        roundsList.innerHTML = html;
                     } else {
-                        Toast.error(res.message);
+                        roundsList.innerHTML = '<div class="text-muted p-3">Chưa có vòng thi nào được tạo</div>';
                     }
+                })
+                .catch(function() {
+                    roundsLoading.style.display = 'none';
+                    roundsList.innerHTML = '<div class="text-danger p-3">Lỗi tải danh sách vòng thi</div>';
                 });
-            }
-        });
+        } else {
+            roundsLoading.style.display = 'none';
+            roundsList.innerHTML = '<div class="text-muted p-3">Không xác định được cuộc thi</div>';
+        }
     }
+
+    document.getElementById('btn_confirm_approve').addEventListener('click', function() {
+        var id = document.getElementById('approve_contestant_id').value;
+        var selectedRound = document.querySelector('input[name="approve_round"]:checked');
+        var roundId = selectedRound ? selectedRound.value : '';
+
+        var btn = this;
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang xử lý...';
+
+        fetch(approveMissConfig.approveUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'id=' + id + '&round_id=' + roundId
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+            if (res.success) {
+                Toast.success(res.message);
+                location.reload();
+            } else {
+                Toast.error(res.message);
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        })
+        .catch(function() {
+            Toast.error('Lỗi kết nối server');
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        });
+    });
 
     function rejectContestant(id) {
         Swal.fire({
