@@ -87,9 +87,23 @@
                             </tbody>
                         </table>
 
-                        <div id="detail_video_container" class="flex-grow-1" style="display:none;">
+                        <div id="detail_video_container" class="mt-2" style="display:none;">
                             <label class="form-label fw-bold small mb-1">Video dự thi:</label>
-                            <video id="detail_video" controls class="w-100 h-100" style="max-height:100%;object-fit:contain;"></video>
+                            <video id="detail_video" controls class="w-100" style="max-height:250px;"></video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal xem ảnh fullscreen -->
+            <div class="modal fade" id="modalImageViewer" tabindex="-1" style="z-index:1060;">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header border-0 py-2">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body d-flex align-items-center justify-content-center p-0">
+                            <img id="fullscreen_image" src="" class="img-fluid" style="max-height:90vh;object-fit:contain;">
                         </div>
                     </div>
                 </div>
