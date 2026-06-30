@@ -327,37 +327,55 @@ document.addEventListener('DOMContentLoaded', function() {
         rejectContestant(id);
     });
 
-    // Click ảnh để xem fullscreen với carousel
+    // Click ảnh/video để xem fullscreen với carousel
     var photoIds = ['detail_photo_portrait', 'detail_photo_portrait_2', 'detail_photo_full_body', 'detail_photo_full_body_2'];
     var photoLabels = ['Chân dung 1', 'Chân dung 2', 'Toàn thân 1', 'Toàn thân 2'];
 
-    function openImageViewer(startIndex) {
+    function getValidMedia() {
+        var media = [];
+        photoIds.forEach(function(id, idx) {
+            var img = document.getElementById(id);
+            if (img && img.src && img.src !== '' && img.src !== window.location.href && !img.src.endsWith('/') && img.naturalWidth > 0) {
+                media.push({ type: 'image', src: img.src, label: photoLabels[idx], originalIndex: idx });
+            }
+        });
+
+        var video = document.getElementById('detail_video');
+        if (video && video.src && video.src !== '' && video.src !== window.location.href) {
+            media.push({ type: 'video', src: video.src, label: 'Video dự thi', originalIndex: photoIds.length });
+        }
+
+        return media;
+    }
+
+    function openMediaViewer(startIndex) {
         var carouselInner = document.getElementById('fullscreen_carousel_inner');
         var indicators = document.getElementById('fullscreen_carousel_indicators');
         carouselInner.innerHTML = '';
         indicators.innerHTML = '';
 
-        var validPhotos = [];
-        photoIds.forEach(function(id, idx) {
-            var img = document.getElementById(id);
-            if (img && img.src && img.src !== '' && img.src !== window.location.href && !img.src.endsWith('/') && img.naturalWidth > 0) {
-                validPhotos.push({ src: img.src, label: photoLabels[idx], originalIndex: idx });
-            }
-        });
-
-        if (validPhotos.length === 0) return;
+        var validMedia = getValidMedia();
+        if (validMedia.length === 0) return;
 
         var activeIdx = 0;
-        validPhotos.forEach(function(photo, idx) {
-            if (photo.originalIndex === startIndex) activeIdx = idx;
+        validMedia.forEach(function(item, idx) {
+            if (item.originalIndex === startIndex) activeIdx = idx;
         });
 
-        validPhotos.forEach(function(photo, idx) {
+        validMedia.forEach(function(media, idx) {
             var item = document.createElement('div');
             item.className = 'carousel-item h-100' + (idx === activeIdx ? ' active' : '');
+
+            var content = '';
+            if (media.type === 'image') {
+                content = '<img src="' + media.src + '" class="img-fluid" style="max-height:calc(90vh - 50px);object-fit:contain;">';
+            } else {
+                content = '<video src="' + media.src + '" controls class="img-fluid" style="max-height:calc(90vh - 50px);"></video>';
+            }
+
             item.innerHTML = '<div class="d-flex flex-column align-items-center justify-content-center h-100">' +
-                '<img src="' + photo.src + '" class="img-fluid" style="max-height:calc(90vh - 50px);object-fit:contain;">' +
-                '<div class="text-white mt-2 fs-5">' + photo.label + '</div>' +
+                content +
+                '<div class="text-white mt-2 fs-5">' + media.label + '</div>' +
                 '</div>';
             carouselInner.appendChild(item);
 
@@ -373,14 +391,28 @@ document.addEventListener('DOMContentLoaded', function() {
         viewer.show();
     }
 
+    // Pause video khi chuyển slide
+    document.getElementById('fullscreenCarousel').addEventListener('slide.bs.carousel', function() {
+        var videos = this.querySelectorAll('video');
+        videos.forEach(function(v) { v.pause(); });
+    });
+
     photoIds.forEach(function(id, idx) {
         var img = document.getElementById(id);
         if (img) {
             img.addEventListener('click', function() {
-                if (this.src && !this.src.endsWith('/')) {
-                    openImageViewer(idx);
+                if (this.src && this.naturalWidth > 0) {
+                    openMediaViewer(idx);
                 }
             });
+        }
+    });
+
+    // Click video cũng mở slider
+    document.getElementById('detail_video').addEventListener('click', function(e) {
+        if (e.target.paused) {
+            openMediaViewer(photoIds.length);
+            e.preventDefault();
         }
     });
 });
