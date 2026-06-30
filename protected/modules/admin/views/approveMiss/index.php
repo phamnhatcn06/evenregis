@@ -84,7 +84,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                 <div class="card contestant-card h-100" data-id="<?php echo $c->id; ?>" data-contest-id="<?php echo $c->contest_id; ?>">
                     <div class="card-img-wrapper">
                         <?php if ($photoUrl): ?>
-                            <img src="<?php echo CHtml::encode(BASE_URL . $photoUrl); ?>" class="card-img-top contestant-photo" alt="<?php echo CHtml::encode($attendeeName); ?>">
+                            <img src="<?php echo CHtml::encode($photoUrl); ?>" class="card-img-top contestant-photo" alt="<?php echo CHtml::encode($attendeeName); ?>">
                         <?php else: ?>
                             <div class="card-img-top contestant-photo-placeholder">
                                 <i class="fa fa-user fa-4x text-muted"></i>
