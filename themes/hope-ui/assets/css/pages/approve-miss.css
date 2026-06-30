@@ -220,16 +220,6 @@
 }
 
 /* Fullscreen image viewer carousel */
-#fullscreenCarousel .carousel-caption {
-    bottom: 20px;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 10px 20px;
-    border-radius: 5px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-}
-
 #fullscreenCarousel .carousel-control-prev,
 #fullscreenCarousel .carousel-control-next {
     width: 10%;
