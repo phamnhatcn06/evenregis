@@ -5,44 +5,44 @@
                 <h5 class="modal-title" id="modalDetailLabel">Chi tiết thí sinh</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-3" style="height:calc(100vh - 120px);overflow:hidden;">
                 <input type="hidden" id="detail_id">
                 <input type="hidden" id="detail_contest_id">
 
                 <div class="row h-100">
-                    <!-- Cột trái: 4 ảnh -->
-                    <div class="col-md-6">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="text-center border rounded p-2">
-                                    <img id="detail_photo_portrait" src="" alt="Ảnh chân dung" class="img-fluid" style="height:280px;object-fit:contain;">
-                                    <div class="photo-label mt-2 fw-bold">Chân dung 1</div>
+                    <!-- Cột trái: 4 ảnh (2x2) -->
+                    <div class="col-md-6 h-100">
+                        <div class="row g-2 h-100">
+                            <div class="col-6" style="height:50%;">
+                                <div class="text-center border rounded p-1 h-100 d-flex flex-column">
+                                    <img id="detail_photo_portrait" src="" alt="Ảnh chân dung" class="img-fluid flex-grow-1" style="object-fit:contain;max-height:calc(100% - 25px);">
+                                    <div class="photo-label fw-bold small">Chân dung 1</div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="text-center border rounded p-2">
-                                    <img id="detail_photo_portrait_2" src="" alt="Ảnh chân dung 2" class="img-fluid" style="height:280px;object-fit:contain;">
-                                    <div class="photo-label mt-2 fw-bold">Chân dung 2</div>
+                            <div class="col-6" style="height:50%;">
+                                <div class="text-center border rounded p-1 h-100 d-flex flex-column">
+                                    <img id="detail_photo_portrait_2" src="" alt="Ảnh chân dung 2" class="img-fluid flex-grow-1" style="object-fit:contain;max-height:calc(100% - 25px);">
+                                    <div class="photo-label fw-bold small">Chân dung 2</div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="text-center border rounded p-2">
-                                    <img id="detail_photo_full_body" src="" alt="Ảnh toàn thân" class="img-fluid" style="height:280px;object-fit:contain;">
-                                    <div class="photo-label mt-2 fw-bold">Toàn thân 1</div>
+                            <div class="col-6" style="height:50%;">
+                                <div class="text-center border rounded p-1 h-100 d-flex flex-column">
+                                    <img id="detail_photo_full_body" src="" alt="Ảnh toàn thân" class="img-fluid flex-grow-1" style="object-fit:contain;max-height:calc(100% - 25px);">
+                                    <div class="photo-label fw-bold small">Toàn thân 1</div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="text-center border rounded p-2">
-                                    <img id="detail_photo_full_body_2" src="" alt="Ảnh toàn thân 2" class="img-fluid" style="height:280px;object-fit:contain;">
-                                    <div class="photo-label mt-2 fw-bold">Toàn thân 2</div>
+                            <div class="col-6" style="height:50%;">
+                                <div class="text-center border rounded p-1 h-100 d-flex flex-column">
+                                    <img id="detail_photo_full_body_2" src="" alt="Ảnh toàn thân 2" class="img-fluid flex-grow-1" style="object-fit:contain;max-height:calc(100% - 25px);">
+                                    <div class="photo-label fw-bold small">Toàn thân 2</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Cột phải: Thông tin + Video -->
-                    <div class="col-md-6">
-                        <table class="table table-bordered">
+                    <div class="col-md-6 h-100 d-flex flex-column">
+                        <table class="table table-bordered table-sm mb-2">
                             <tbody>
                                 <tr>
                                     <th style="width:35%;">Họ tên</th>
@@ -87,9 +87,9 @@
                             </tbody>
                         </table>
 
-                        <div id="detail_video_container" class="mt-3" style="display:none;">
-                            <label class="form-label fw-bold">Video dự thi:</label>
-                            <video id="detail_video" controls class="w-100" style="max-height:300px;"></video>
+                        <div id="detail_video_container" class="flex-grow-1" style="display:none;">
+                            <label class="form-label fw-bold small mb-1">Video dự thi:</label>
+                            <video id="detail_video" controls class="w-100 h-100" style="max-height:100%;object-fit:contain;"></video>
                         </div>
                     </div>
                 </div>
