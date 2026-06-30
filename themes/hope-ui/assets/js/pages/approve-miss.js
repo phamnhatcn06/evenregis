@@ -153,7 +153,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('detail_talent').textContent = d.talent || '-';
                 document.getElementById('detail_email').textContent = d.personal_email || '-';
                 document.getElementById('detail_submitted_at').textContent = d.submitted_at || '-';
-                document.getElementById('detail_bio').textContent = d.bio || '';
 
                 var photos = ['photo_portrait', 'photo_portrait_2', 'photo_full_body', 'photo_full_body_2'];
                 photos.forEach(function(p) {
