@@ -63,36 +63,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 var d = res.data;
                 var carouselId = 'compare-carousel-' + idx;
 
-                var photos = [];
-                if (d.photo_portrait) photos.push({ url: d.photo_portrait, label: 'Chân dung 1' });
-                if (d.photo_portrait_2) photos.push({ url: d.photo_portrait_2, label: 'Chân dung 2' });
-                if (d.photo_full_body) photos.push({ url: d.photo_full_body, label: 'Toàn thân 1' });
-                if (d.photo_full_body_2) photos.push({ url: d.photo_full_body_2, label: 'Toàn thân 2' });
+                var media = [];
+                if (d.photo_portrait) media.push({ url: d.photo_portrait, label: 'Chân dung 1', type: 'image' });
+                if (d.photo_portrait_2) media.push({ url: d.photo_portrait_2, label: 'Chân dung 2', type: 'image' });
+                if (d.photo_full_body) media.push({ url: d.photo_full_body, label: 'Toàn thân 1', type: 'image' });
+                if (d.photo_full_body_2) media.push({ url: d.photo_full_body_2, label: 'Toàn thân 2', type: 'image' });
+                if (d.video_path) media.push({ url: d.video_path, label: 'Video dự thi', type: 'video' });
 
                 html += '<div class="' + colClass + ' compare-column">';
                 html += '<div class="card h-100">';
 
-                if (photos.length > 0) {
-                    html += '<div id="' + carouselId + '" class="carousel slide compare-carousel" data-bs-ride="false">';
+                if (media.length > 0) {
+                    html += '<div id="' + carouselId + '" class="carousel slide compare-carousel" data-bs-ride="false" style="height:70vh;">';
 
-                    if (photos.length > 1) {
+                    if (media.length > 1) {
                         html += '<div class="carousel-indicators">';
-                        photos.forEach(function(p, i) {
+                        media.forEach(function(m, i) {
                             html += '<button type="button" data-bs-target="#' + carouselId + '" data-bs-slide-to="' + i + '"' + (i === 0 ? ' class="active"' : '') + '></button>';
                         });
                         html += '</div>';
                     }
 
-                    html += '<div class="carousel-inner">';
-                    photos.forEach(function(p, i) {
-                        html += '<div class="carousel-item' + (i === 0 ? ' active' : '') + '">';
-                        html += '<img src="' + p.url + '" alt="' + p.label + '">';
-                        html += '<div class="photo-label-overlay">' + p.label + '</div>';
+                    html += '<div class="carousel-inner h-100">';
+                    media.forEach(function(m, i) {
+                        html += '<div class="carousel-item h-100' + (i === 0 ? ' active' : '') + '">';
+                        if (m.type === 'video') {
+                            html += '<video controls class="w-100 h-100" style="object-fit:contain;background:#000;"><source src="' + m.url + '" type="video/mp4"></video>';
+                        } else {
+                            html += '<img src="' + m.url + '" alt="' + m.label + '" style="width:100%;height:100%;object-fit:contain;">';
+                        }
+                        html += '<div class="photo-label-overlay">' + m.label + '</div>';
                         html += '</div>';
                     });
                     html += '</div>';
 
-                    if (photos.length > 1) {
+                    if (media.length > 1) {
                         html += '<button class="carousel-control-prev" type="button" data-bs-target="#' + carouselId + '" data-bs-slide="prev">';
                         html += '<span class="carousel-control-prev-icon"></span></button>';
                         html += '<button class="carousel-control-next" type="button" data-bs-target="#' + carouselId + '" data-bs-slide="next">';
@@ -100,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     html += '</div>';
                 } else {
-                    html += '<div class="compare-carousel d-flex align-items-center justify-content-center" style="height:280px;">';
+                    html += '<div class="compare-carousel d-flex align-items-center justify-content-center" style="height:70vh;">';
                     html += '<i class="fa fa-user fa-4x text-muted"></i></div>';
                 }
 
