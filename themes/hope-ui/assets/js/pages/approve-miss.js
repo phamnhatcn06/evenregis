@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var validPhotos = [];
         photoIds.forEach(function(id, idx) {
             var img = document.getElementById(id);
-            if (img && img.src && !img.src.endsWith('/')) {
+            if (img && img.src && img.src !== '' && img.src !== window.location.href && !img.src.endsWith('/') && img.naturalWidth > 0) {
                 validPhotos.push({ src: img.src, label: photoLabels[idx], originalIndex: idx });
             }
         });
