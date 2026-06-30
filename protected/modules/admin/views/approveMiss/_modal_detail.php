@@ -14,26 +14,30 @@
                     <div class="col-md-6 h-100">
                         <div class="row g-2 h-100">
                             <div class="col-6" style="height:50%;">
-                                <div class="text-center border rounded p-1 h-100 d-flex flex-column">
-                                    <img id="detail_photo_portrait" src="" alt="Ảnh chân dung" class="img-fluid flex-grow-1" style="object-fit:contain;max-height:calc(100% - 25px);">
+                                <div class="photo-wrapper text-center border rounded p-1 h-100 d-flex flex-column position-relative">
+                                    <img id="detail_photo_portrait" src="" alt="Ảnh chân dung" class="img-fluid flex-grow-1 photo-zoomable" style="object-fit:contain;max-height:calc(100% - 25px);cursor:pointer;">
+                                    <div class="photo-zoom-icon"><i class="fa fa-search-plus"></i></div>
                                     <div class="photo-label fw-bold small">Chân dung 1</div>
                                 </div>
                             </div>
                             <div class="col-6" style="height:50%;">
-                                <div class="text-center border rounded p-1 h-100 d-flex flex-column">
-                                    <img id="detail_photo_portrait_2" src="" alt="Ảnh chân dung 2" class="img-fluid flex-grow-1" style="object-fit:contain;max-height:calc(100% - 25px);">
+                                <div class="photo-wrapper text-center border rounded p-1 h-100 d-flex flex-column position-relative">
+                                    <img id="detail_photo_portrait_2" src="" alt="Ảnh chân dung 2" class="img-fluid flex-grow-1 photo-zoomable" style="object-fit:contain;max-height:calc(100% - 25px);cursor:pointer;">
+                                    <div class="photo-zoom-icon"><i class="fa fa-search-plus"></i></div>
                                     <div class="photo-label fw-bold small">Chân dung 2</div>
                                 </div>
                             </div>
                             <div class="col-6" style="height:50%;">
-                                <div class="text-center border rounded p-1 h-100 d-flex flex-column">
-                                    <img id="detail_photo_full_body" src="" alt="Ảnh toàn thân" class="img-fluid flex-grow-1" style="object-fit:contain;max-height:calc(100% - 25px);">
+                                <div class="photo-wrapper text-center border rounded p-1 h-100 d-flex flex-column position-relative">
+                                    <img id="detail_photo_full_body" src="" alt="Ảnh toàn thân" class="img-fluid flex-grow-1 photo-zoomable" style="object-fit:contain;max-height:calc(100% - 25px);cursor:pointer;">
+                                    <div class="photo-zoom-icon"><i class="fa fa-search-plus"></i></div>
                                     <div class="photo-label fw-bold small">Toàn thân 1</div>
                                 </div>
                             </div>
                             <div class="col-6" style="height:50%;">
-                                <div class="text-center border rounded p-1 h-100 d-flex flex-column">
-                                    <img id="detail_photo_full_body_2" src="" alt="Ảnh toàn thân 2" class="img-fluid flex-grow-1" style="object-fit:contain;max-height:calc(100% - 25px);">
+                                <div class="photo-wrapper text-center border rounded p-1 h-100 d-flex flex-column position-relative">
+                                    <img id="detail_photo_full_body_2" src="" alt="Ảnh toàn thân 2" class="img-fluid flex-grow-1 photo-zoomable" style="object-fit:contain;max-height:calc(100% - 25px);cursor:pointer;">
+                                    <div class="photo-zoom-icon"><i class="fa fa-search-plus"></i></div>
                                     <div class="photo-label fw-bold small">Toàn thân 2</div>
                                 </div>
                             </div>
