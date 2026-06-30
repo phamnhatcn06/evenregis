@@ -107,8 +107,8 @@ class MissController extends CController
                 $targetPath = $uploadDir . '/' . $filename;
 
                 if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                    // Store relative path
-                    $uploadedPaths[$field] = 'uploads/miss/' . $folderName . '/' . $filename;
+                    // Store relative path with leading slash
+                    $uploadedPaths[$field] = '/uploads/miss/' . $folderName . '/' . $filename;
                 }
             }
         }
