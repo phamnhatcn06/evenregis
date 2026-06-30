@@ -157,12 +157,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 var photos = ['photo_portrait', 'photo_portrait_2', 'photo_full_body', 'photo_full_body_2'];
                 photos.forEach(function(p) {
                     var img = document.getElementById('detail_' + p);
+                    var wrapper = img.closest('.col-6');
                     if (d[p]) {
                         img.src = d[p];
-                        img.parentElement.style.display = 'block';
+                        wrapper.style.display = 'block';
                     } else {
                         img.src = '';
-                        img.parentElement.style.display = 'none';
+                        wrapper.style.display = 'none';
                     }
                 });
 
