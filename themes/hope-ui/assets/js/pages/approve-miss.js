@@ -355,10 +355,10 @@ document.addEventListener('DOMContentLoaded', function() {
         validPhotos.forEach(function(photo, idx) {
             var item = document.createElement('div');
             item.className = 'carousel-item h-100' + (idx === activeIdx ? ' active' : '');
-            item.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100">' +
-                '<img src="' + photo.src + '" class="img-fluid" style="max-height:90vh;object-fit:contain;">' +
-                '</div>' +
-                '<div class="carousel-caption"><h5>' + photo.label + '</h5></div>';
+            item.innerHTML = '<div class="d-flex flex-column align-items-center justify-content-center h-100">' +
+                '<img src="' + photo.src + '" class="img-fluid" style="max-height:calc(90vh - 50px);object-fit:contain;">' +
+                '<div class="text-white mt-2 fs-5">' + photo.label + '</div>' +
+                '</div>';
             carouselInner.appendChild(item);
 
             var indicator = document.createElement('button');
