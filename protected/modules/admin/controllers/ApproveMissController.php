@@ -254,4 +254,21 @@ class ApproveMissController extends AdminController
         asort($list);
         return $list;
     }
+
+    protected function getRoundsList()
+    {
+        $result = ApiClient::get(ApiEndpoints::BEAUTY_ROUND_LIST, array(
+            'per_page' => 100,
+            'sort' => 'round_order',
+        ));
+
+        $list = array();
+        if ($result['success'] && isset($result['data']['data'])) {
+            foreach ($result['data']['data'] as $item) {
+                $contestName = isset($item['contest_name']) ? $item['contest_name'] . ' - ' : '';
+                $list[$item['id']] = $contestName . $item['name'];
+            }
+        }
+        return $list;
+    }
 }
