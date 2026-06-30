@@ -32,7 +32,10 @@ class ApproveMissController extends AdminController
         $dataProvider = BeautyContestants::getApiDataProvider($params, 1000);
         $contestants = $dataProvider->getData();
 
-        // Filter theo property_id phía PHP
+        $contests = $this->getActiveContests();
+        $properties = $this->getPropertiesWithContestants($contestants);
+
+        // Filter theo property_id phía PHP (sau khi lấy properties)
         $filterPropertyId = isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null;
         if ($filterPropertyId !== null) {
             $contestants = array_filter($contestants, function ($c) use ($filterPropertyId) {
@@ -40,9 +43,6 @@ class ApproveMissController extends AdminController
             });
             $contestants = array_values($contestants);
         }
-
-        $contests = $this->getActiveContests();
-        $properties = $this->getPropertiesWithContestants($contestants);
 
         $this->render('index', array(
             'contestants' => $contestants,
