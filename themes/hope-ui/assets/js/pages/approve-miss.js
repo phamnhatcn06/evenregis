@@ -326,4 +326,20 @@ document.addEventListener('DOMContentLoaded', function() {
         bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
         rejectContestant(id);
     });
+
+    // Click ảnh để xem fullscreen
+    var photos = ['detail_photo_portrait', 'detail_photo_portrait_2', 'detail_photo_full_body', 'detail_photo_full_body_2'];
+    photos.forEach(function(id) {
+        var img = document.getElementById(id);
+        if (img) {
+            img.style.cursor = 'pointer';
+            img.addEventListener('click', function() {
+                if (this.src) {
+                    document.getElementById('fullscreen_image').src = this.src;
+                    var viewer = new bootstrap.Modal(document.getElementById('modalImageViewer'));
+                    viewer.show();
+                }
+            });
+        }
+    });
 });
