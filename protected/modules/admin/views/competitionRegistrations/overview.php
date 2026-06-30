@@ -11,6 +11,13 @@ $this->menu = array(
         'color' => 'secondary',
         'icon' => 'fa-list',
     ),
+    array(
+        'label' => 'Xuất Excel tất cả',
+        'url' => '#',
+        'color' => 'success',
+        'icon' => 'fa-file-excel-o',
+        'id' => 'btn-export-all-excel',
+    ),
 );
 $this->Tabletitle = 'Tổng quan thí sinh thi nghiệp vụ';
 ?>

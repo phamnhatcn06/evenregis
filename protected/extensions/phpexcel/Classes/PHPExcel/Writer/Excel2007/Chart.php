@@ -938,7 +938,7 @@ class PHPExcel_Writer_Excel2007_Chart extends PHPExcel_Writer_Excel2007_WriterPa
 											 $objWriter,
 											 $groupType,
 											 $dataType='str',
-											 PHPExcel_Worksheet $pSheet
+											 PHPExcel_Worksheet $pSheet = null
 										   )
 	{
 		if (is_null($plotSeriesValues)) {

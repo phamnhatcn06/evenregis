@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.show();
 
         if (contestId) {
-            fetch(approveMissConfig.getRoundsUrl + '?contest_id=' + contestId)
+            fetch(approveMissConfig.getRoundsUrl + '?contest_id=' + contestId + '&contestant_id=' + id)
                 .then(function(res) { return res.json(); })
                 .then(function(res) {
                     roundsLoading.style.display = 'none';
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                         roundsList.innerHTML = html;
                     } else {
-                        roundsList.innerHTML = '<div class="text-muted p-3">Chưa có vòng thi nào được tạo</div>';
+                        roundsList.innerHTML = '<div class="text-muted p-3"><i class="fa fa-info-circle me-1"></i>Thí sinh đã được gán vào tất cả các vòng hoặc chưa có vòng thi nào</div>';
                     }
                 })
                 .catch(function() {

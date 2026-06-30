@@ -71,15 +71,28 @@ class ApproveMissController extends AdminController
         Yii::app()->end();
     }
 
-    public function actionGetRounds($contest_id)
+    public function actionGetRounds($contest_id, $contestant_id = null)
     {
         $rounds = BeautyRounds::getApiDataProvider(array(
             'contest_id' => $contest_id,
             'sort' => 'round_order',
         ), 100)->getData();
 
+        $assignedRoundIds = array();
+        if ($contestant_id) {
+            $results = BeautyRoundResults::getApiDataProvider(array(
+                'registration_id' => $contestant_id,
+            ), 100)->getData();
+            foreach ($results as $r) {
+                $assignedRoundIds[] = $r->round_id;
+            }
+        }
+
         $data = array();
         foreach ($rounds as $r) {
+            if (in_array($r->id, $assignedRoundIds)) {
+                continue;
+            }
             $data[] = array(
                 'id' => $r->id,
                 'name' => $r->name,

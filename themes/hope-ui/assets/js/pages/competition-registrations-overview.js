@@ -204,5 +204,17 @@
         filterOrganization.addEventListener('change', loadOrganizationStats);
     }
 
+    // Xuất Excel tất cả nghiệp vụ
+    var btnExportAll = document.getElementById('btn-export-all-excel');
+    if (btnExportAll) {
+        btnExportAll.addEventListener('click', function(e) {
+            e.preventDefault();
+            var eventId = filterEvent ? filterEvent.value : '';
+            var basePath = window.location.pathname.replace(/\/(admin|overview)$/, '');
+            var url = basePath + '/exportAllExcel?event_id=' + eventId;
+            window.location.href = url;
+        });
+    }
+
     loadStats();
 })();

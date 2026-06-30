@@ -937,7 +937,7 @@ class CompetitionRegistrationsController extends AdminController
         }
 
         // Export Excel
-        Yii::import('application.extensions.phpexcel.PHPExcel');
+        $this->initPHPExcel();
         $excel = new PHPExcel();
         $sheet = $excel->getActiveSheet();
         $sheet->setTitle('Danh sách thí sinh');
@@ -982,6 +982,210 @@ class CompetitionRegistrationsController extends AdminController
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $writer->save('php://output');
         Yii::app()->end();
+    }
+
+    public function actionExportAllExcel()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+
+        if (empty($eventId)) {
+            $activeEvents = Events::getActiveList();
+            if (!empty($activeEvents)) {
+                $eventId = key($activeEvents);
+            }
+        }
+
+        if (empty($eventId)) {
+            throw new CHttpException(400, 'Chưa chọn sự kiện.');
+        }
+
+        // Lấy tất cả đăng ký thi của event
+        $compRegs = CompetitionRegistrations::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'per_page' => 10000,
+        ), 10000)->getData();
+
+        // Lấy danh sách nghiệp vụ
+        $competitionsData = Competitions::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        $competitionMap = array();
+        foreach ($competitionsData as $comp) {
+            $competitionMap[$comp->id] = $comp->name;
+        }
+
+        // Lấy thông tin properties và regions
+        $regionals = Regionals::getApiDataProvider(array(), 100)->getData();
+        $regionalMap = array();
+        foreach ($regionals as $r) {
+            $regionalMap[$r->id] = $r->name;
+        }
+
+        $properties = Properties::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $propertyRegionMap = array();
+        $propertyNameMap = array();
+        foreach ($properties as $p) {
+            $propertyRegionMap[$p->id] = isset($p->region_id) ? $p->region_id : null;
+            $propertyNameMap[$p->id] = $p->name;
+        }
+
+        // Nhóm thí sinh theo nghiệp vụ
+        $dataByCompetition = array();
+        foreach ($compRegs as $compReg) {
+            if (isset($compReg->deleted_at) && $compReg->deleted_at) continue;
+
+            $compId = $compReg->competition_id;
+            $compName = isset($competitionMap[$compId]) ? $competitionMap[$compId] : 'Chưa xác định';
+
+            if (!isset($dataByCompetition[$compId])) {
+                $dataByCompetition[$compId] = array(
+                    'name' => $compName,
+                    'contestants' => array(),
+                );
+            }
+
+            // Lấy thông tin thí sinh
+            $propId = null;
+            $propName = '';
+            $regionName = '';
+            $attendeeName = '-';
+            $attendeePosition = '';
+            $attendeeDepartment = '';
+            $attendeeGender = '';
+            $attendeePhone = '';
+            $attendeeEmail = '';
+
+            if (isset($compReg->attendee) && is_array($compReg->attendee)) {
+                $att = $compReg->attendee;
+                $attendeeName = isset($att['full_name']) ? $att['full_name'] : '-';
+                $attendeeGender = isset($att['gender']) ? $att['gender'] : '';
+                $attendeePhone = isset($att['phone']) ? $att['phone'] : '';
+                $attendeeEmail = isset($att['email']) ? $att['email'] : '';
+
+                if (isset($att['position']) && is_array($att['position'])) {
+                    $attendeePosition = isset($att['position']['name']) ? $att['position']['name'] : '';
+                }
+                if (isset($att['department']) && is_array($att['department'])) {
+                    $attendeeDepartment = isset($att['department']['name']) ? $att['department']['name'] : '';
+                }
+                if (isset($att['property']) && is_array($att['property'])) {
+                    $propId = isset($att['property']['id']) ? $att['property']['id'] : null;
+                    $propName = isset($att['property']['name']) ? $att['property']['name'] : '';
+                    if (isset($att['property']['region']) && is_array($att['property']['region'])) {
+                        $regionName = isset($att['property']['region']['name']) ? $att['property']['region']['name'] : '';
+                    }
+                }
+            }
+
+            // Fallback
+            if (!$regionName && $propId && isset($propertyRegionMap[$propId])) {
+                $regId = $propertyRegionMap[$propId];
+                if ($regId && isset($regionalMap[$regId])) {
+                    $regionName = $regionalMap[$regId];
+                }
+            }
+            if (!$propName && $propId && isset($propertyNameMap[$propId])) {
+                $propName = $propertyNameMap[$propId];
+            }
+
+            $dataByCompetition[$compId]['contestants'][] = array(
+                'candidate_number' => $compReg->candidate_number,
+                'region_name' => $regionName,
+                'property_name' => $propName,
+                'attendee_name' => $attendeeName,
+                'attendee_gender' => ($attendeeGender == '1' || $attendeeGender === 1 || $attendeeGender == 'male') ? 'Nam' : (($attendeeGender == '0' || $attendeeGender === 0 || $attendeeGender == 'female') ? 'Nữ' : ''),
+                'attendee_position' => $attendeePosition,
+                'attendee_department' => $attendeeDepartment,
+                'attendee_phone' => $attendeePhone,
+                'attendee_email' => $attendeeEmail,
+                'status' => $compReg->status == CompetitionRegistrations::STATUS_CONFIRMED ? 'Đã xác nhận' : 'Chờ xác nhận',
+            );
+        }
+
+        // Sắp xếp nghiệp vụ theo tên
+        uasort($dataByCompetition, function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
+        // Export Excel
+        $this->initPHPExcel();
+        $excel = new PHPExcel();
+        $excel->removeSheetByIndex(0);
+
+        $sheetIndex = 0;
+        foreach ($dataByCompetition as $compId => $compData) {
+            $sheet = new PHPExcel_Worksheet($excel, $this->sanitizeSheetName($compData['name']));
+            $excel->addSheet($sheet, $sheetIndex);
+
+            // Header
+            $headers = array('STT', 'SBD', 'Cụm', 'Đơn vị', 'Họ tên', 'Giới tính', 'Chức danh', 'Phòng ban', 'Điện thoại', 'Email', 'Trạng thái');
+            $col = 'A';
+            foreach ($headers as $header) {
+                $sheet->setCellValue($col . '1', $header);
+                $col++;
+            }
+
+            $headerStyle = array(
+                'font' => array('bold' => true),
+                'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'CCCCCC')),
+                'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+                'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER),
+            );
+            $sheet->getStyle('A1:K1')->applyFromArray($headerStyle);
+
+            // Sắp xếp thí sinh theo cụm, đơn vị, tên
+            usort($compData['contestants'], function ($a, $b) {
+                $cmp = strnatcasecmp($a['region_name'], $b['region_name']);
+                if ($cmp === 0) {
+                    $cmp = strnatcasecmp($a['property_name'], $b['property_name']);
+                }
+                if ($cmp === 0) {
+                    $cmp = strnatcasecmp($a['attendee_name'], $b['attendee_name']);
+                }
+                return $cmp;
+            });
+
+            // Data
+            $rowNum = 2;
+            $idx = 1;
+            foreach ($compData['contestants'] as $row) {
+                $sheet->setCellValue('A' . $rowNum, $idx++);
+                $sheet->setCellValue('B' . $rowNum, $row['candidate_number']);
+                $sheet->setCellValue('C' . $rowNum, $row['region_name']);
+                $sheet->setCellValue('D' . $rowNum, $row['property_name']);
+                $sheet->setCellValue('E' . $rowNum, $row['attendee_name']);
+                $sheet->setCellValue('F' . $rowNum, $row['attendee_gender']);
+                $sheet->setCellValue('G' . $rowNum, $row['attendee_position']);
+                $sheet->setCellValue('H' . $rowNum, $row['attendee_department']);
+                $sheet->setCellValueExplicit('I' . $rowNum, $row['attendee_phone'], PHPExcel_Cell_DataType::TYPE_STRING);
+                $sheet->setCellValue('J' . $rowNum, $row['attendee_email']);
+                $sheet->setCellValue('K' . $rowNum, $row['status']);
+                $rowNum++;
+            }
+
+            // Auto width
+            foreach (range('A', 'K') as $colLetter) {
+                $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+            }
+
+            $sheetIndex++;
+        }
+
+        // Output
+        $filename = 'DanhSachThiSinh_TatCaNghiepVu_' . date('Ymd_His') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save('php://output');
+        Yii::app()->end();
+    }
+
+    private function sanitizeSheetName($name)
+    {
+        // Excel sheet name max 31 chars, không chứa ký tự đặc biệt
+        $name = preg_replace('/[\\\\\/\?\*\[\]:\'"]/', '', $name);
+        $name = mb_substr($name, 0, 31, 'UTF-8');
+        return $name ?: 'Sheet';
     }
 
     // Debug action - xem structure data từ API
@@ -1241,6 +1445,25 @@ class CompetitionRegistrationsController extends AdminController
             'contestants' => $contestants,
         ));
         Yii::app()->end();
+    }
+
+    protected function initPHPExcel()
+    {
+        $phpExcelPath = Yii::getPathOfAlias('application.extensions.phpexcel.Classes');
+        if (!defined('PHPEXCEL_ROOT')) {
+            define('PHPEXCEL_ROOT', $phpExcelPath . DIRECTORY_SEPARATOR);
+        }
+        spl_autoload_register(function ($class) {
+            if (strpos($class, 'PHPExcel') === 0) {
+                $file = PHPEXCEL_ROOT . str_replace('_', DIRECTORY_SEPARATOR, $class) . '.php';
+                if (file_exists($file)) {
+                    require_once $file;
+                    return true;
+                }
+            }
+            return false;
+        }, true, true);
+        require_once $phpExcelPath . '/PHPExcel.php';
     }
 
     protected function loadModelById($id)

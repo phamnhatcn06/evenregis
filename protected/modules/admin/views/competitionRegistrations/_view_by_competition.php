@@ -257,7 +257,7 @@
                 .then(function(data) {
                     if (data.success) {
                         var d = data.data;
-                        var genderLabel = d.attendee_gender === 'male' ? 'Nam' : (d.attendee_gender === 'female' ? 'Nữ' : '-');
+                        var genderLabel = (d.attendee_gender === 'male' || d.attendee_gender === '1' || d.attendee_gender === 1 || d.attendee_gender == 1) ? 'Nam' : ((d.attendee_gender === 'female' || d.attendee_gender === '0' || d.attendee_gender === 0 || d.attendee_gender == 0) ? 'Nữ' : '-');
                         var html = '<table class="table table-bordered">';
                         html += '<tr><th style="width:35%;background:#f8f9fa;">Số báo danh</th><td><strong>' + (d.candidate_number || '-') + '</strong></td></tr>';
                         html += '<tr><th style="background:#f8f9fa;">Họ tên</th><td>' + (d.attendee_name || '-') + '</td></tr>';

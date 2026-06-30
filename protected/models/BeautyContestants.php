@@ -25,6 +25,7 @@ class BeautyContestants extends BaseBeautyContestants
     public $submission_token_expires_at;
     public $submitted_at;
     public $personal_email;
+    public $contestant_number;
 
     public static function model($className = __CLASS__)
     {
@@ -97,6 +98,7 @@ class BeautyContestants extends BaseBeautyContestants
             $model->submission_token = isset($data['submission_token']) ? $data['submission_token'] : '';
             $model->submission_token_expires_at = isset($data['submission_token_expires_at']) ? $data['submission_token_expires_at'] : '';
             $model->submitted_at = isset($data['submitted_at']) ? $data['submitted_at'] : '';
+            $model->contestant_number = isset($data['contestant_number']) ? $data['contestant_number'] : (isset($data['candidate_number']) ? $data['candidate_number'] : '');
             $model->id = $id;
             return $model;
         }
