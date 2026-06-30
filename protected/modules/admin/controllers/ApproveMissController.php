@@ -25,6 +25,9 @@ class ApproveMissController extends AdminController
         if (isset($_GET['status']) && $_GET['status'] !== '') {
             $params['status'] = $_GET['status'];
         }
+        if (isset($_GET['keyword']) && $_GET['keyword'] !== '') {
+            $params['keyword'] = $_GET['keyword'];
+        }
 
         $dataProvider = BeautyContestants::getApiDataProvider($params, 1000);
         $contestants = $dataProvider->getData();
