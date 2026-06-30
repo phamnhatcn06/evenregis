@@ -202,4 +202,23 @@ class ApproveMissController extends AdminController
         }
         return $list;
     }
+
+    protected function getPropertiesWithContestants()
+    {
+        $result = ApiClient::get(ApiEndpoints::BEAUTY_CONTESTANT_LIST, array(
+            'per_page' => 1000,
+            'group_by' => 'property_id',
+        ));
+
+        $list = array();
+        if ($result['success'] && isset($result['data']['data'])) {
+            foreach ($result['data']['data'] as $item) {
+                if (!empty($item['property_id']) && !empty($item['property_name'])) {
+                    $list[$item['property_id']] = $item['property_name'];
+                }
+            }
+        }
+        asort($list);
+        return $list;
+    }
 }
