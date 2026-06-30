@@ -13,7 +13,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 <div class="card mb-3">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label">Cuộc thi</label>
                 <select name="contest_id" class="form-select">
                     <option value="">-- Tất cả --</option>
