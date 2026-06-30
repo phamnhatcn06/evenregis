@@ -99,15 +99,27 @@
                 </div>
             </div>
 
-            <!-- Modal xem ảnh fullscreen -->
+            <!-- Modal xem ảnh fullscreen với carousel -->
             <div class="modal fade" id="modalImageViewer" tabindex="-1" style="z-index:1060;">
                 <div class="modal-dialog modal-fullscreen">
                     <div class="modal-content bg-dark">
                         <div class="modal-header border-0 py-2">
+                            <span id="fullscreen_label" class="text-white"></span>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body d-flex align-items-center justify-content-center p-0">
-                            <img id="fullscreen_image" src="" class="img-fluid" style="max-height:90vh;object-fit:contain;">
+                            <div id="fullscreenCarousel" class="carousel slide w-100 h-100" data-bs-ride="false">
+                                <div class="carousel-inner h-100" id="fullscreen_carousel_inner">
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#fullscreenCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#fullscreenCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                </button>
+                                <div class="carousel-indicators" id="fullscreen_carousel_indicators">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
