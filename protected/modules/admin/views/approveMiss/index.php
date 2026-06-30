@@ -13,9 +13,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 <div class="card mb-3">
     <div class="card-body">
         <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-2">
+            <div class="col-lg-2 col-md-4">
                 <label class="form-label">Cuộc thi</label>
-                <select name="contest_id" class="form-select">
+                <select name="contest_id" class="form-select form-select-sm">
                     <option value="">-- Tất cả --</option>
                     <?php foreach ($contests as $id => $name): ?>
                         <option value="<?php echo $id; ?>" <?php echo (isset($_GET['contest_id']) && $_GET['contest_id'] == $id) ? 'selected' : ''; ?>>
@@ -24,9 +24,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-lg-2 col-md-4">
                 <label class="form-label">Đơn vị</label>
-                <select name="property_id" class="form-select">
+                <select name="property_id" class="form-select form-select-sm">
                     <option value="">-- Tất cả --</option>
                     <?php foreach ($properties as $id => $name): ?>
                         <option value="<?php echo $id; ?>" <?php echo (isset($_GET['property_id']) && $_GET['property_id'] == $id) ? 'selected' : ''; ?>>
@@ -35,9 +35,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-lg-2 col-md-4">
                 <label class="form-label">Vòng thi</label>
-                <select name="round_id" class="form-select">
+                <select name="round_id" class="form-select form-select-sm">
                     <option value="">-- Tất cả --</option>
                     <?php foreach ($rounds as $id => $name): ?>
                         <option value="<?php echo $id; ?>" <?php echo (isset($_GET['round_id']) && $_GET['round_id'] == $id) ? 'selected' : ''; ?>>
@@ -46,9 +46,9 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-lg-2 col-md-4">
                 <label class="form-label">Trạng thái</label>
-                <select name="status" class="form-select">
+                <select name="status" class="form-select form-select-sm">
                     <option value="">-- Tất cả --</option>
                     <?php foreach (BeautyContestants::getStatusOptions() as $val => $label): ?>
                         <option value="<?php echo $val; ?>" <?php echo (isset($_GET['status']) && $_GET['status'] == $val) ? 'selected' : ''; ?>>
@@ -57,39 +57,24 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <?php endforeach; ?>
                 </select>
             </div>
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label">Tên thí sinh</label>
+                <input type="text" name="keyword" class="form-control form-control-sm" placeholder="Nhập tên..." value="<?php echo isset($_GET['keyword']) ? CHtml::encode($_GET['keyword']) : ''; ?>">
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <button type="submit" class="btn btn-primary btn-sm me-1"><i class="fa fa-search"></i> Lọc</button>
+                <a href="<?php echo $this->createUrl('admin'); ?>" class="btn btn-outline-secondary btn-sm"><i class="fa fa-refresh"></i></a>
+            </div>
         </form>
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
-            <?php if (isset($_GET['contest_id']) && $_GET['contest_id'] !== ''): ?>
-                <input type="hidden" name="contest_id" value="<?php echo CHtml::encode($_GET['contest_id']); ?>">
-            <?php endif; ?>
-            <?php if (isset($_GET['property_id']) && $_GET['property_id'] !== ''): ?>
-                <input type="hidden" name="property_id" value="<?php echo CHtml::encode($_GET['property_id']); ?>">
-            <?php endif; ?>
-            <?php if (isset($_GET['round_id']) && $_GET['round_id'] !== ''): ?>
-                <input type="hidden" name="round_id" value="<?php echo CHtml::encode($_GET['round_id']); ?>">
-            <?php endif; ?>
-            <?php if (isset($_GET['status']) && $_GET['status'] !== ''): ?>
-                <input type="hidden" name="status" value="<?php echo CHtml::encode($_GET['status']); ?>">
-            <?php endif; ?>
-            <div class="col-md-3">
-                <label class="form-label">Tên thí sinh</label>
-                <input type="text" name="keyword" class="form-control" placeholder="Nhập tên..." value="<?php echo isset($_GET['keyword']) ? CHtml::encode($_GET['keyword']) : ''; ?>">
-            </div>
-            <div class="col-md-1">
-                <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
-            </div>
-            <div class="col-md-8 text-end">
-                <button type="button" id="btn_compare" class="btn btn-info" disabled>
-                    <i class="fa fa-columns me-1"></i>So sánh (<span id="compare_count">0</span>)
-                </button>
-                <button type="button" id="btn_clear_compare" class="btn btn-outline-secondary">
-                    <i class="fa fa-times me-1"></i>Xóa chọn
-                </button>
-            </div>
+<div class="mb-3 text-end">
+    <button type="button" id="btn_compare" class="btn btn-info btn-sm" disabled>
+        <i class="fa fa-columns me-1"></i>So sánh (<span id="compare_count">0</span>)
+    </button>
+    <button type="button" id="btn_clear_compare" class="btn btn-outline-secondary btn-sm">
+        <i class="fa fa-times me-1"></i>Xóa chọn
+    </button>
         </form>
     </div>
 </div>
