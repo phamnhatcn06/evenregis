@@ -28,14 +28,19 @@ class ApproveMissController extends AdminController
         if (isset($_GET['keyword']) && $_GET['keyword'] !== '') {
             $params['keyword'] = $_GET['keyword'];
         }
+        if (isset($_GET['property_id']) && $_GET['property_id'] !== '') {
+            $params['property_id'] = $_GET['property_id'];
+        }
 
         $dataProvider = BeautyContestants::getApiDataProvider($params, 1000);
         $contestants = $dataProvider->getData();
         $contests = $this->getActiveContests();
+        $properties = $this->getPropertiesWithContestants();
 
         $this->render('index', array(
             'contestants' => $contestants,
             'contests' => $contests,
+            'properties' => $properties,
         ));
     }
 
