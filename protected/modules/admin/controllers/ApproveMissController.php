@@ -210,21 +210,29 @@ class ApproveMissController extends AdminController
         return $list;
     }
 
-    protected function getPropertiesWithContestants()
+    protected function getPropertiesWithContestants($contestants = null)
     {
-        $result = ApiClient::get(ApiEndpoints::BEAUTY_CONTESTANT_LIST, array(
-            'per_page' => 1000,
-            'group_by' => 'property_id',
-        ));
-
         $list = array();
-        if ($result['success'] && isset($result['data']['data'])) {
-            foreach ($result['data']['data'] as $item) {
-                if (!empty($item['property_id']) && !empty($item['property_name'])) {
-                    $list[$item['property_id']] = $item['property_name'];
+
+        if ($contestants === null) {
+            $result = ApiClient::get(ApiEndpoints::BEAUTY_CONTESTANT_LIST, array(
+                'per_page' => 1000,
+            ));
+            if ($result['success'] && isset($result['data']['data'])) {
+                foreach ($result['data']['data'] as $item) {
+                    if (!empty($item['property_id']) && !empty($item['property_name'])) {
+                        $list[$item['property_id']] = $item['property_name'];
+                    }
+                }
+            }
+        } else {
+            foreach ($contestants as $c) {
+                if (!empty($c->property_id) && !empty($c->property_name)) {
+                    $list[$c->property_id] = $c->property_name;
                 }
             }
         }
+
         asort($list);
         return $list;
     }
