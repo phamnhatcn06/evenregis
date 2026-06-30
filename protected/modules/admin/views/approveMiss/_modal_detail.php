@@ -91,9 +91,9 @@
                             </tbody>
                         </table>
 
-                        <div id="detail_video_container" class="mt-2" style="display:none;">
+                        <div id="detail_video_container" class="mt-2 flex-grow-1 d-flex flex-column" style="display:none;min-height:0;">
                             <label class="form-label fw-bold small mb-1">Video dự thi:</label>
-                            <video id="detail_video" controls class="w-100" style="max-height:250px;"></video>
+                            <video id="detail_video" controls class="w-100 flex-grow-1" style="min-height:0;object-fit:contain;"></video>
                         </div>
                     </div>
                 </div>
