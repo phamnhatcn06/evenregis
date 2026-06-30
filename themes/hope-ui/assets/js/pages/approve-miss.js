@@ -327,17 +327,58 @@ document.addEventListener('DOMContentLoaded', function() {
         rejectContestant(id);
     });
 
-    // Click ảnh để xem fullscreen
-    var photos = ['detail_photo_portrait', 'detail_photo_portrait_2', 'detail_photo_full_body', 'detail_photo_full_body_2'];
-    photos.forEach(function(id) {
+    // Click ảnh để xem fullscreen với carousel
+    var photoIds = ['detail_photo_portrait', 'detail_photo_portrait_2', 'detail_photo_full_body', 'detail_photo_full_body_2'];
+    var photoLabels = ['Chân dung 1', 'Chân dung 2', 'Toàn thân 1', 'Toàn thân 2'];
+
+    function openImageViewer(startIndex) {
+        var carouselInner = document.getElementById('fullscreen_carousel_inner');
+        var indicators = document.getElementById('fullscreen_carousel_indicators');
+        carouselInner.innerHTML = '';
+        indicators.innerHTML = '';
+
+        var validPhotos = [];
+        photoIds.forEach(function(id, idx) {
+            var img = document.getElementById(id);
+            if (img && img.src && !img.src.endsWith('/')) {
+                validPhotos.push({ src: img.src, label: photoLabels[idx], originalIndex: idx });
+            }
+        });
+
+        if (validPhotos.length === 0) return;
+
+        var activeIdx = 0;
+        validPhotos.forEach(function(photo, idx) {
+            if (photo.originalIndex === startIndex) activeIdx = idx;
+        });
+
+        validPhotos.forEach(function(photo, idx) {
+            var item = document.createElement('div');
+            item.className = 'carousel-item h-100' + (idx === activeIdx ? ' active' : '');
+            item.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100">' +
+                '<img src="' + photo.src + '" class="img-fluid" style="max-height:90vh;object-fit:contain;">' +
+                '</div>' +
+                '<div class="carousel-caption"><h5>' + photo.label + '</h5></div>';
+            carouselInner.appendChild(item);
+
+            var indicator = document.createElement('button');
+            indicator.type = 'button';
+            indicator.setAttribute('data-bs-target', '#fullscreenCarousel');
+            indicator.setAttribute('data-bs-slide-to', idx);
+            if (idx === activeIdx) indicator.classList.add('active');
+            indicators.appendChild(indicator);
+        });
+
+        var viewer = new bootstrap.Modal(document.getElementById('modalImageViewer'));
+        viewer.show();
+    }
+
+    photoIds.forEach(function(id, idx) {
         var img = document.getElementById(id);
         if (img) {
-            img.style.cursor = 'pointer';
             img.addEventListener('click', function() {
-                if (this.src) {
-                    document.getElementById('fullscreen_image').src = this.src;
-                    var viewer = new bootstrap.Modal(document.getElementById('modalImageViewer'));
-                    viewer.show();
+                if (this.src && !this.src.endsWith('/')) {
+                    openImageViewer(idx);
                 }
             });
         }
