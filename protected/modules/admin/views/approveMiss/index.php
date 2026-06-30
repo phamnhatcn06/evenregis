@@ -75,8 +75,6 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
     <button type="button" id="btn_clear_compare" class="btn btn-outline-secondary btn-sm">
         <i class="fa fa-times me-1"></i>Xóa chọn
     </button>
-        </form>
-    </div>
 </div>
 
 <div class="row" id="contestants-grid">
