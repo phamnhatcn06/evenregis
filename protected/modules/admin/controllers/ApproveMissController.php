@@ -34,8 +34,9 @@ class ApproveMissController extends AdminController
 
         $contests = $this->getActiveContests();
         $properties = $this->getPropertiesWithContestants($contestants);
+        $rounds = $this->getRoundsList();
 
-        // Filter theo property_id phía PHP (sau khi lấy properties)
+        // Filter theo property_id phía PHP
         $filterPropertyId = isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null;
         if ($filterPropertyId !== null) {
             $contestants = array_filter($contestants, function ($c) use ($filterPropertyId) {
@@ -44,10 +45,27 @@ class ApproveMissController extends AdminController
             $contestants = array_values($contestants);
         }
 
+        // Filter theo round_id - chỉ lấy thí sinh đã gán vào vòng thi
+        $filterRoundId = isset($_GET['round_id']) && $_GET['round_id'] !== '' ? $_GET['round_id'] : null;
+        if ($filterRoundId !== null) {
+            $roundResults = BeautyRoundResults::getApiDataProvider(array(
+                'round_id' => $filterRoundId,
+            ), 1000)->getData();
+            $contestantIdsInRound = array();
+            foreach ($roundResults as $r) {
+                $contestantIdsInRound[] = $r->registration_id;
+            }
+            $contestants = array_filter($contestants, function ($c) use ($contestantIdsInRound) {
+                return in_array($c->id, $contestantIdsInRound);
+            });
+            $contestants = array_values($contestants);
+        }
+
         $this->render('index', array(
             'contestants' => $contestants,
             'contests' => $contests,
             'properties' => $properties,
+            'rounds' => $rounds,
         ));
     }
 
