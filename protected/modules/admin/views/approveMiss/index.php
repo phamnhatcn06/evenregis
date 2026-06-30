@@ -24,7 +24,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label">Trạng thái</label>
                 <select name="status" class="form-select">
                     <option value="">-- Tất cả --</option>
@@ -35,8 +35,12 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary"><i class="fa fa-search me-1"></i>Lọc</button>
+            <div class="col-md-3">
+                <label class="form-label">Tên thí sinh</label>
+                <input type="text" name="keyword" class="form-control" placeholder="Nhập tên thí sinh..." value="<?php echo isset($_GET['keyword']) ? CHtml::encode($_GET['keyword']) : ''; ?>">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
             </div>
             <div class="col-md-4 text-end">
                 <button type="button" id="btn_compare" class="btn btn-info" disabled>
