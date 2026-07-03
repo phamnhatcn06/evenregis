@@ -1596,11 +1596,11 @@ class RegistrationsController extends AdminController
 				$reason = '';
 
 				// Kiểm tra xem người này có thể đăng ký môn sportId không
-				if ($sportId) {
-					$checkResult = SportTeamMembers::canRegisterSport($attId, $sportId);
-					$canRegister = $checkResult['can_register'];
-					$reason = $checkResult['error'];
-				}
+				// if ($sportId) {
+				// 	$checkResult = SportTeamMembers::canRegisterSport($attId, $sportId);
+				// 	$canRegister = $checkResult['can_register'];
+				// 	$reason = $checkResult['error'];
+				// }
 
 				$result[] = array(
 					'id' => $attId,
@@ -5620,7 +5620,7 @@ class RegistrationsController extends AdminController
 			$fileType = Yii::app()->request->getPost('fileType', 'video'); // 'video' or 'audio'
 
 			$tempDir = Yii::getPathOfAlias('webroot') . '/uploads/temp/chunks_' . $fileId . '/';
-			
+
 			$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 			$finalFilename = $fileType . '-' . time() . '.' . $ext;
 			$finalPath = $uploadDir . $finalFilename;
