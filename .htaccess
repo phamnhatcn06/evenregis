@@ -24,6 +24,12 @@ RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
   </FilesMatch>
   Header unset ETag
   FileETag None
+
+  # Video streaming - Enable Range Requests
+  <FilesMatch "\.(mp4|webm|mov|ogg|m4v)$">
+     Header set Accept-Ranges bytes
+     Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
 </IfModule>
 
 <IfModule mod_expires.c>
