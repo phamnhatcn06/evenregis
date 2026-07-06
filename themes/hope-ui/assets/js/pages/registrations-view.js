@@ -5391,7 +5391,11 @@ var RegistrationView = (function() {
                 downloadLink.style.display = 'inline-block';
             }
         } else if (url.match(/\.(mp4|webm|ogg|mov)$/i)) {
-            container.innerHTML = '<video controls autoplay class="w-100 h-100"><source src="' + url + '" type="video/mp4">Trình duyệt không hỗ trợ video.</video>';
+            container.innerHTML = '<video id="modalVideoPlayer" class="plyr-video w-100 h-100" playsinline controls><source src="' + url + '" type="video/mp4">Trình duyệt không hỗ trợ video.</video>';
+            if (typeof Plyr !== 'undefined') {
+                var videoEl = document.getElementById('modalVideoPlayer');
+                if (videoEl) new Plyr(videoEl, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
+            }
             if (downloadLink) {
                 downloadLink.href = url;
                 downloadLink.style.display = 'inline-block';
