@@ -161,7 +161,7 @@ $this->Tabletitle = 'Chi tiết tiết mục: ' . CHtml::encode($model->title);
                             <h6 class="text-primary mb-3"><i class="fa fa-video-camera me-1"></i>Video</h6>
                             <?php if (!empty($model->video_path)): ?>
                                 <div class="ratio ratio-16x9 mb-2">
-                                    <video class="plyr-video" playsinline controls>
+                                    <video class="plyr-video" playsinline controls preload="metadata">
                                         <source src="<?php echo CHtml::encode($model->video_path); ?>" type="video/mp4">
                                         Trình duyệt không hỗ trợ phát video.
                                     </video>
