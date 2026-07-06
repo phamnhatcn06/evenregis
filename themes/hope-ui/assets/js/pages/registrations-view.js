@@ -5391,13 +5391,19 @@ var RegistrationView = (function() {
                 downloadLink.style.display = 'inline-block';
             }
         } else if (url.match(/\.(mp4|webm|ogg|mov)$/i)) {
-            container.innerHTML = '<video id="modalVideoPlayer" class="plyr-video w-100 h-100" playsinline controls><source src="' + url + '" type="video/mp4">Trình duyệt không hỗ trợ video.</video>';
+            // Ưu tiên file _web để streaming mượt hơn
+            var streamUrl = typeof VideoPlayer !== 'undefined' ? VideoPlayer.getStreamUrl(url) : url;
+            var originalUrl = typeof VideoPlayer !== 'undefined' ? VideoPlayer.getDownloadUrl(url) : url;
+
+            container.innerHTML = '<video id="modalVideoPlayer" class="plyr-video w-100 h-100" playsinline controls preload="metadata"><source src="' + streamUrl + '" type="video/mp4">Trình duyệt không hỗ trợ video.</video>';
             if (typeof Plyr !== 'undefined') {
                 var videoEl = document.getElementById('modalVideoPlayer');
                 if (videoEl) new Plyr(videoEl, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
             }
             if (downloadLink) {
-                downloadLink.href = url;
+                downloadLink.href = originalUrl;
+                downloadLink.innerHTML = '<i class="fa fa-download me-1"></i>Tải video gốc';
+                downloadLink.setAttribute('download', '');
                 downloadLink.style.display = 'inline-block';
             }
         } else {
