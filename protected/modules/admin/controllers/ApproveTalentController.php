@@ -11,7 +11,7 @@ class ApproveTalentController extends AdminController
         $this->publicActions[] = 'reject';
     }
 
-    public function actionIndex()
+    public function actionAdmin()
     {
         $params = array(
             'with' => 'property,category,members',
