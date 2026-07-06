@@ -177,6 +177,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (d.video_path) {
                     video.src = d.video_path;
                     videoContainer.style.display = 'block';
+                    if (typeof Plyr !== 'undefined' && !video.plyr) {
+                        video.plyr = new Plyr(video, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
+                    }
                 } else {
                     video.src = '';
                     videoContainer.style.display = 'none';
