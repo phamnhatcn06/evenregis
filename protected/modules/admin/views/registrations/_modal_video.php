@@ -8,7 +8,7 @@
             </div>
             <div class="modal-body p-0">
                 <div id="videoContainer" class="ratio ratio-16x9">
-                    <!-- Video content will be injected here -->
+                    <video id="modalVideoPlayer" class="plyr-video" playsinline controls></video>
                 </div>
             </div>
             <div class="modal-footer">
