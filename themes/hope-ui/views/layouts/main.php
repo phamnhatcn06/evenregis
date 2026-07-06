@@ -28,6 +28,7 @@ $appName = Yii::app()->name;
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/custom.min.css?v=2.0.0" />
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/dark.min.css" />
     <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/customizer.min.css" />
+    <link rel="stylesheet" href="<?php echo $baseUrl; ?>/assets/css/plugins/plyr.min.css" />
     <style>
         /* 
 
