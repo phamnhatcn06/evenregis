@@ -156,4 +156,35 @@ var VideoPlayer = {
     }
 };
 
+/**
+ * Lấy URL streaming (ưu tiên file _web nếu có)
+ * @param {string} videoPath - Đường dẫn video gốc
+ * @returns {string} URL để streaming
+ */
+VideoPlayer.getStreamUrl = function(videoPath) {
+    if (!videoPath) return '';
+
+    // Nếu đã là _web thì giữ nguyên
+    if (videoPath.indexOf('_web.') !== -1) return videoPath;
+
+    // Thử file _web
+    var webPath = videoPath.replace(/\.(\w+)$/, '_web.$1');
+    return webPath;
+};
+
+/**
+ * Lấy URL download (file gốc)
+ * @param {string} videoPath - Đường dẫn video
+ * @returns {string} URL để download
+ */
+VideoPlayer.getDownloadUrl = function(videoPath) {
+    if (!videoPath) return '';
+
+    // Nếu là file _web, trả về file gốc
+    if (videoPath.indexOf('_web.') !== -1) {
+        return videoPath.replace('_web.', '.');
+    }
+    return videoPath;
+};
+
 window.VideoPlayer = VideoPlayer;
