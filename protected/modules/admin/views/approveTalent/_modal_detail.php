@@ -92,7 +92,9 @@
                     </div>
                     <div class="col-md-8" id="detail_video_container" style="display:none;">
                         <label class="form-label fw-bold">Video:</label>
-                        <video id="detail_video" controls class="w-100" style="max-height:250px;"></video>
+                        <div id="detail_video_wrapper">
+                            <video id="detail_video" class="plyr-video" playsinline controls style="max-height:250px;"></video>
+                        </div>
                     </div>
                 </div>
                 <div class="row mt-3" id="detail_document_container" style="display:none;">
