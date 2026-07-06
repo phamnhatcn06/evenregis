@@ -218,6 +218,8 @@ $appName = Yii::app()->name;
     <script src="<?php echo $baseUrl; ?>/assets/js/hope-ui.js" defer></script>
     <script src="<?php echo $baseUrl; ?>/assets/js/plugins/toast.js"></script>
     <script src="<?php echo $baseUrl; ?>/assets/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="<?php echo $baseUrl; ?>/assets/js/plugins/plyr.min.js"></script>
+    <script src="<?php echo $baseUrl; ?>/assets/js/plugins/video-player.js"></script>
     <script>
         function clearUserCache() {
             fetch('<?php echo Yii::app()->createUrl('/admin/default/clearCache'); ?>', {
