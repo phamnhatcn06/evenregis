@@ -265,6 +265,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     videoContainer.style.display = 'none';
                 }
 
+                var noMediaAlert = document.getElementById('detail_no_media');
+                var contentRow = document.getElementById('detail_content_row');
+                if (hasAnyMedia) {
+                    noMediaAlert.style.display = 'none';
+                    contentRow.style.display = 'flex';
+                } else {
+                    noMediaAlert.style.display = 'block';
+                    contentRow.style.display = 'none';
+                }
+
                 var approveBtn = document.getElementById('btn_approve_modal');
                 var rejectBtn = document.getElementById('btn_reject_modal');
                 approveBtn.style.display = (d.status == 1) ? 'none' : 'inline-block';
