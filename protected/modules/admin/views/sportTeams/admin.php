@@ -181,7 +181,7 @@ Yii::app()->clientScript->registerScript('sport-teams-init', '
     window.BASE_URL = "' . Yii::app()->createUrl('/') . '";
 ', CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js?v=1.0.3',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js?v=1.0.4',
     CClientScript::POS_END
 );
 ?>
