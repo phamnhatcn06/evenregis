@@ -134,8 +134,84 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    function resetModalDetail() {
+        document.getElementById('detail_id').value = '';
+        document.getElementById('detail_contest_id').value = '';
+        document.getElementById('detail_name').textContent = '';
+        document.getElementById('detail_property').textContent = '';
+        document.getElementById('detail_contest').textContent = '';
+        document.getElementById('detail_status').innerHTML = '';
+        document.getElementById('detail_height').textContent = '';
+        document.getElementById('detail_weight').textContent = '';
+        document.getElementById('detail_measurements').textContent = '';
+        document.getElementById('detail_talent').textContent = '';
+        document.getElementById('detail_email').textContent = '';
+        document.getElementById('detail_submitted_at').textContent = '';
+
+        var photos = ['photo_portrait', 'photo_portrait_2', 'photo_full_body', 'photo_full_body_2'];
+        photos.forEach(function(p) {
+            var img = document.getElementById('detail_' + p);
+            if (img) {
+                img.src = '';
+                var wrapper = img.closest('.col-6');
+                if (wrapper) wrapper.style.display = 'none';
+            }
+        });
+
+        var video = document.getElementById('detail_video');
+        if (video) {
+            if (video.plyr) video.plyr.pause();
+            video.pause();
+            video.src = '';
+        }
+        document.getElementById('detail_video_container').style.display = 'none';
+    }
+
+    function stopAllMedia() {
+        var video = document.getElementById('detail_video');
+        if (video) {
+            if (video.plyr) video.plyr.pause();
+            video.pause();
+        }
+
+        document.querySelectorAll('#modalDetail video, #modalDetail audio').forEach(function(el) {
+            el.pause();
+        });
+
+        document.querySelectorAll('#modalCompare video, #modalCompare audio').forEach(function(el) {
+            el.pause();
+        });
+
+        document.querySelectorAll('#modalImageViewer video').forEach(function(el) {
+            el.pause();
+        });
+    }
+
+    document.getElementById('modalDetail').addEventListener('hidden.bs.modal', function() {
+        stopAllMedia();
+    });
+
+    document.getElementById('modalCompare').addEventListener('hidden.bs.modal', function() {
+        stopAllMedia();
+    });
+
+    document.getElementById('modalImageViewer').addEventListener('hidden.bs.modal', function() {
+        stopAllMedia();
+    });
+
     function loadDetail(id) {
-        var modal = new bootstrap.Modal(document.getElementById('modalDetail'));
+        resetModalDetail();
+
+        var modalEl = document.getElementById('modalDetail');
+        var modalBody = modalEl.querySelector('.modal-body');
+        var loadingHtml = '<div id="detail_loading" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white" style="z-index:10;"><i class="fa fa-spinner fa-spin fa-3x text-primary"></i></div>';
+
+        var existingLoading = document.getElementById('detail_loading');
+        if (existingLoading) existingLoading.remove();
+        modalBody.style.position = 'relative';
+        modalBody.insertAdjacentHTML('afterbegin', loadingHtml);
+
+        var modal = new bootstrap.Modal(modalEl);
         modal.show();
 
         fetch(approveMissConfig.getDetailUrl + '?id=' + id)
