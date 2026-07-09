@@ -2291,13 +2291,23 @@ class ReportsController extends AdminController
             }
         }
 
+        // Chỉ lấy các môn được cấu hình active với sự kiện (event_sports)
+        $eventSportsList = EventSports::getByEventId($selectedEventId);
+        $activeSportIds = array();
+        foreach ($eventSportsList as $es) {
+            $esSportId = isset($es['sport_id']) ? $es['sport_id'] : null;
+            if ($esSportId) $activeSportIds[$esSportId] = true;
+        }
+
         // Fetch sports
         $sportsList = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
         $sportNameMap = array();
         foreach ($sportsList as $sp) {
             $spId = isset($sp->id) ? $sp->id : null;
             $spName = isset($sp->name) ? $sp->name : '';
-            if ($spId) $sportNameMap[$spId] = $spName;
+            if (!$spId) continue;
+            if (!empty($activeSportIds) && !isset($activeSportIds[$spId])) continue;
+            $sportNameMap[$spId] = $spName;
         }
 
         // Fetch sport teams
