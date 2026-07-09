@@ -265,6 +265,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 var rejectBtn = document.getElementById('btn_reject_modal');
                 approveBtn.style.display = (d.status == 1) ? 'none' : 'inline-block';
                 rejectBtn.style.display = (d.status == 3) ? 'none' : 'inline-block';
+
+                var loading = document.getElementById('detail_loading');
+                if (loading) loading.remove();
+            })
+            .catch(function() {
+                Toast.error('Lỗi kết nối server');
+                var loading = document.getElementById('detail_loading');
+                if (loading) loading.remove();
             });
     }
 
