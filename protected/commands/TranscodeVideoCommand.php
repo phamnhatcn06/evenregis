@@ -135,9 +135,20 @@ class TranscodeVideoCommand extends CConsoleCommand
         $result = $this->transcode($fullPath, $webFile, $crf);
 
         if ($result) {
-            $originalSize = $this->formatFileSize(filesize($fullPath));
-            $webSize = $this->formatFileSize(filesize($webFile));
-            echo "Thành công: {$originalSize} → {$webSize}\n";
+            $originalBytes = filesize($fullPath);
+            $webBytes = filesize($webFile);
+
+            // Nếu file web lớn hơn hoặc bằng file gốc → xóa
+            if ($webBytes >= $originalBytes) {
+                unlink($webFile);
+                echo "File gốc đã tối ưu sẵn ({$this->formatFileSize($originalBytes)}), không cần transcode.\n";
+                return 0;
+            }
+
+            $originalSize = $this->formatFileSize($originalBytes);
+            $webSize = $this->formatFileSize($webBytes);
+            $reduction = round((1 - $webBytes / $originalBytes) * 100);
+            echo "Thành công: {$originalSize} → {$webSize} (-{$reduction}%)\n";
             return 0;
         }
 
