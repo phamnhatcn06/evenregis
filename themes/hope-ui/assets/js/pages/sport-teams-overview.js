@@ -209,6 +209,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     btnExportTeams.href = baseUrl + '/admin/reports/exportSports?event_id=' + eventId + '&teams_only=1';
                 }
 
+                var btnExportDetail = document.getElementById('btn-export-detail');
+                if (btnExportDetail) {
+                    btnExportDetail.href = baseUrl + '/admin/reports/exportSportsDetail?event_id=' + eventId;
+                }
+
                 if (resData.success) {
                     if (totalAthletesEl) totalAthletesEl.textContent = resData.total_athletes || 0;
                     if (totalTeamsEl) totalTeamsEl.textContent = resData.total_teams || 0;
