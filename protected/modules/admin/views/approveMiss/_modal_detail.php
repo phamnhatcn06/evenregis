@@ -9,7 +9,14 @@
                 <input type="hidden" id="detail_id">
                 <input type="hidden" id="detail_contest_id">
 
-                <div class="row h-100">
+                <!-- Thông báo chưa nộp hồ sơ -->
+                <div id="detail_no_media" class="alert alert-warning text-center py-5" style="display:none;">
+                    <i class="fa fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h5>Thí sinh chưa nộp thông tin</h5>
+                    <p class="mb-0 text-muted">Chưa có ảnh hoặc video dự thi</p>
+                </div>
+
+                <div class="row h-100" id="detail_content_row">
                     <!-- Cột trái: 4 ảnh (2x2) -->
                     <div class="col-md-6 h-100">
                         <div class="row g-2 h-100">
