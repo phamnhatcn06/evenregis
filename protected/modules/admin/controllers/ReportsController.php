@@ -2485,11 +2485,11 @@ class ReportsController extends AdminController
 
             // Header row
             $sheet->setCellValue('A1', 'DANH SÁCH CHI TIẾT CÁC ĐỘI THAM GIA MÔN ' . mb_strtoupper($sportData['name'], 'UTF-8'));
-            $sheet->mergeCells('A1:F1');
+            $sheet->mergeCells('A1:G1');
             $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new PHPExcel_Style_Color('3A57E8'));
 
             // Column headers
-            $headers = array('STT', 'Cụm', 'Tên đội thi', 'Tên VĐV', 'Giới tính', 'Phòng ban', 'Đơn vị');
+            $headers = array('Cụm', 'Tên đội thi', 'STT', 'Tên VĐV', 'Giới tính', 'Phòng ban', 'Đơn vị');
             $col = 'A';
             foreach ($headers as $header) {
                 $sheet->setCellValue($col . '3', $header);
@@ -2497,7 +2497,19 @@ class ReportsController extends AdminController
                 $col++;
             }
 
+            // Nội dung đơn (mỗi đội chỉ 1 VĐV) -> STT đánh liên tục cả sheet
+            $isSingleContent = true;
+            foreach ($sportData['regions'] as $regionData) {
+                foreach ($regionData['teams'] as $teamData) {
+                    if (count($teamData['members']) > 1) {
+                        $isSingleContent = false;
+                        break 2;
+                    }
+                }
+            }
+
             $row = 4;
+            $stt = 1;
 
             // Sort regions by name
             uasort($sportData['regions'], function($a, $b) {
@@ -2518,9 +2530,9 @@ class ReportsController extends AdminController
                     $teamRowCount = count($teamData['members']);
                     if ($teamRowCount === 0) $teamRowCount = 1;
 
-                    // STT reset theo từng đội để tiện đếm số người mỗi đội
+                    // Nội dung nhiều người: STT reset theo từng đội để tiện đếm số người mỗi đội
                     foreach ($teamData['members'] as $idx => $member) {
-                        $sheet->setCellValue('A' . $row, $idx + 1);
+                        $sheet->setCellValue('C' . $row, $isSingleContent ? $stt++ : $idx + 1);
                         $sheet->setCellValue('D' . $row, $member['full_name']);
                         $sheet->setCellValue('E' . $row, $member['gender']);
                         $sheet->setCellValue('F' . $row, $member['division']);
@@ -2532,20 +2544,20 @@ class ReportsController extends AdminController
 
                     // Merge team name cells
                     if ($teamRowCount > 1) {
-                        $sheet->mergeCells('C' . $teamStartRow . ':C' . ($teamStartRow + $teamRowCount - 1));
+                        $sheet->mergeCells('B' . $teamStartRow . ':B' . ($teamStartRow + $teamRowCount - 1));
                     }
-                    $sheet->setCellValue('C' . $teamStartRow, $teamData['team_name']);
-                    $sheet->getStyle('C' . $teamStartRow)->applyFromArray($teamStyle);
-                    $sheet->getStyle('C' . $teamStartRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                    $sheet->setCellValue('B' . $teamStartRow, $teamData['team_name']);
+                    $sheet->getStyle('B' . $teamStartRow)->applyFromArray($teamStyle);
+                    $sheet->getStyle('B' . $teamStartRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
                 }
 
                 // Merge region name cells
                 if ($regionRowCount > 1) {
-                    $sheet->mergeCells('B' . $regionStartRow . ':B' . ($regionStartRow + $regionRowCount - 1));
+                    $sheet->mergeCells('A' . $regionStartRow . ':A' . ($regionStartRow + $regionRowCount - 1));
                 }
-                $sheet->setCellValue('B' . $regionStartRow, $regionData['name']);
-                $sheet->getStyle('B' . $regionStartRow)->applyFromArray($regionStyle);
-                $sheet->getStyle('B' . $regionStartRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+                $sheet->setCellValue('A' . $regionStartRow, $regionData['name']);
+                $sheet->getStyle('A' . $regionStartRow)->applyFromArray($regionStyle);
+                $sheet->getStyle('A' . $regionStartRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
             }
 
             // Auto size columns
