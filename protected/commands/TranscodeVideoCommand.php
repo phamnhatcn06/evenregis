@@ -17,7 +17,7 @@ class TranscodeVideoCommand extends CConsoleCommand
     public $defaultAction = 'index';
 
     // FFmpeg quality settings
-    const DEFAULT_CRF = 23;        // Chất lượng (18=gần lossless, 23=tốt, 28=nhỏ hơn)
+    const DEFAULT_CRF = 28;        // Chất lượng (18=gần lossless, 23=tốt, 28=nhỏ hơn)
     const DEFAULT_PRESET = 'medium'; // Tốc độ encode (ultrafast, fast, medium, slow)
     const DEFAULT_AUDIO_BITRATE = '128k';
 
