@@ -236,12 +236,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('detail_submitted_at').textContent = d.submitted_at || '-';
 
                 var photos = ['photo_portrait', 'photo_portrait_2', 'photo_full_body', 'photo_full_body_2'];
+                var hasAnyMedia = false;
+
                 photos.forEach(function(p) {
                     var img = document.getElementById('detail_' + p);
                     var wrapper = img.closest('.col-6');
                     if (d[p]) {
                         img.src = d[p];
                         wrapper.style.display = 'block';
+                        hasAnyMedia = true;
                     } else {
                         img.src = '';
                         wrapper.style.display = 'none';
@@ -253,6 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (d.video_path) {
                     video.src = d.video_path;
                     videoContainer.style.display = 'block';
+                    hasAnyMedia = true;
                     if (typeof Plyr !== 'undefined' && !video.plyr) {
                         video.plyr = new Plyr(video, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
                     }
