@@ -93,11 +93,10 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
             }
 
             $unitName = '';
-            if (!empty($c->registration_id)) {
-                $unitName = BeautyContestants::getPropertyNameByRegistrationId($c->registration_id);
-            }
-            if (empty($unitName) && !empty($c->property_name)) {
+            if (!empty($c->property_name)) {
                 $unitName = $c->property_name;
+            } elseif (!empty($c->registration_id)) {
+                $unitName = BeautyContestants::getPropertyNameByRegistrationId($c->registration_id);
             }
 
             $attendeeName = '';
