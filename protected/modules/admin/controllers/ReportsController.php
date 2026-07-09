@@ -2518,8 +2518,9 @@ class ReportsController extends AdminController
                     $teamRowCount = count($teamData['members']);
                     if ($teamRowCount === 0) $teamRowCount = 1;
 
+                    // STT reset theo từng đội để tiện đếm số người mỗi đội
                     foreach ($teamData['members'] as $idx => $member) {
-                        $sheet->setCellValue('A' . $row, $stt++);
+                        $sheet->setCellValue('A' . $row, $idx + 1);
                         $sheet->setCellValue('D' . $row, $member['full_name']);
                         $sheet->setCellValue('E' . $row, $member['gender']);
                         $sheet->setCellValue('F' . $row, $member['division']);
