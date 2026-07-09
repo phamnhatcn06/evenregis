@@ -165,6 +165,11 @@ document.addEventListener('DOMContentLoaded', function() {
             video.src = '';
         }
         document.getElementById('detail_video_container').style.display = 'none';
+
+        var noMediaAlert = document.getElementById('detail_no_media');
+        var contentRow = document.getElementById('detail_content_row');
+        if (noMediaAlert) noMediaAlert.style.display = 'none';
+        if (contentRow) contentRow.style.display = 'flex';
     }
 
     function stopAllMedia() {
