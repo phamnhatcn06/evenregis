@@ -2498,7 +2498,6 @@ class ReportsController extends AdminController
             }
 
             $row = 4;
-            $stt = 1;
 
             // Sort regions by name
             uasort($sportData['regions'], function($a, $b) {
