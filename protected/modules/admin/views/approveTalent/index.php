@@ -36,18 +36,29 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Trạng thái</label>
+                <label class="form-label">Trạng thái duyệt</label>
                 <select name="status" class="form-select">
                     <option value="">-- Tất cả --</option>
                     <?php foreach (TalentEntries::getStatusOptions() as $val => $label): ?>
-                        <option value="<?php echo $val; ?>" <?php echo (isset($_GET['status']) && $_GET['status'] == $val) ? 'selected' : ''; ?>>
+                        <option value="<?php echo $val; ?>" <?php echo (isset($_GET['status']) && $_GET['status'] !== '' && $_GET['status'] == $val) ? 'selected' : ''; ?>>
                             <?php echo CHtml::encode($label); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary"><i class="fa fa-search me-1"></i>Lọc</button>
+                <label class="form-label">Video</label>
+                <select name="has_video" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    <option value="1" <?php echo (isset($_GET['has_video']) && $_GET['has_video'] == '1') ? 'selected' : ''; ?>>Đã upload</option>
+                    <option value="0" <?php echo (isset($_GET['has_video']) && $_GET['has_video'] === '0') ? 'selected' : ''; ?>>Chưa upload</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-search me-1"></i>Lọc</button>
+                </div>
             </div>
         </form>
     </div>
