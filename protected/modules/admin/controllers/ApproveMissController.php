@@ -95,7 +95,7 @@ class ApproveMissController extends AdminController
             'photo_portrait_2' => $model->photo_portrait_2,
             'photo_full_body' => $model->photo_full_body,
             'photo_full_body_2' => $model->photo_full_body_2,
-            'video_path' => $model->video_path,
+            'video_path' => $this->getOptimizedVideoPath($model->video_path),
             'submitted_at' => $model->submitted_at,
             'created_at' => $model->created_at,
         );
