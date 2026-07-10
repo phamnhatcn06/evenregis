@@ -434,11 +434,11 @@ $attributes = array(
                                         <tbody>
                                             <tr>
                                                 <th style="width:40%;background:#f8f9fa;">Mô tả ngắn</th>
-                                                <td><?php echo $description ? CHtml::encode($description) : '-'; ?></td>
+                                                <td style="word-wrap:break-word;max-width:300px;"><?php echo $description ? CHtml::encode($description) : '-'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th style="background:#f8f9fa;">Nội dung chi tiết</th>
-                                                <td style="white-space:pre-line;"><?php echo $content ? CHtml::encode($content) : '-'; ?></td>
+                                                <td style="white-space:pre-line;word-wrap:break-word;max-width:300px;"><?php echo $content ? CHtml::encode($content) : '-'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th style="background:#f8f9fa;">Ghi chú</th>
@@ -618,11 +618,11 @@ $attributes = array(
                                         <tbody>
                                             <tr>
                                                 <th style="width:40%;background:#f8f9fa;">Mô tả ngắn</th>
-                                                <td><?php echo $description ? CHtml::encode($description) : '-'; ?></td>
+                                                <td style="word-wrap:break-word;max-width:300px;"><?php echo $description ? CHtml::encode($description) : '-'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th style="background:#f8f9fa;">Nội dung chi tiết</th>
-                                                <td style="white-space:pre-line;"><?php echo $content ? CHtml::encode($content) : '-'; ?></td>
+                                                <td style="white-space:pre-line;word-wrap:break-word;max-width:300px;"><?php echo $content ? CHtml::encode($content) : '-'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th style="background:#f8f9fa;">Ghi chú</th>
