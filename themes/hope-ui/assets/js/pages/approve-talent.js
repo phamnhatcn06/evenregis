@@ -49,25 +49,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    document.getElementById('modalDetail').addEventListener('hidden.bs.modal', function() {
-        stopAllMedia();
-    });
+    var modalDetail = document.getElementById('modalDetail');
+    if (modalDetail) {
+        modalDetail.addEventListener('hidden.bs.modal', function() {
+            stopAllMedia();
+        });
+    }
 
-    document.getElementById('modalVideoViewer').addEventListener('hidden.bs.modal', function() {
-        var video = document.getElementById('fullscreen_video');
-        if (video) {
-            video.pause();
-            video.src = '';
-        }
-    });
+    var modalVideoViewer = document.getElementById('modalVideoViewer');
+    if (modalVideoViewer) {
+        modalVideoViewer.addEventListener('hidden.bs.modal', function() {
+            var video = document.getElementById('fullscreen_video');
+            if (video) {
+                video.pause();
+                video.src = '';
+            }
+        });
+    }
 
-    document.getElementById('modalMusicViewer').addEventListener('hidden.bs.modal', function() {
-        var audio = document.getElementById('fullscreen_music');
-        if (audio) {
-            audio.pause();
-            audio.src = '';
-        }
-    });
+    var modalMusicViewer = document.getElementById('modalMusicViewer');
+    if (modalMusicViewer) {
+        modalMusicViewer.addEventListener('hidden.bs.modal', function() {
+            var audio = document.getElementById('fullscreen_music');
+            if (audio) {
+                audio.pause();
+                audio.src = '';
+            }
+        });
+    }
 
     document.querySelectorAll('.btn-view-detail').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
