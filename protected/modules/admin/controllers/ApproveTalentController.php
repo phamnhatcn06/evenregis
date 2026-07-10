@@ -29,6 +29,17 @@ class ApproveTalentController extends AdminController
 
         $dataProvider = TalentEntries::getApiDataProvider($params, 1000);
         $entries = $dataProvider->getData();
+
+        // Filter by video upload status
+        $hasVideo = isset($_GET['has_video']) ? $_GET['has_video'] : '';
+        if ($hasVideo !== '') {
+            $entries = array_filter($entries, function($e) use ($hasVideo) {
+                $hasVideoPath = !empty($e->video_path);
+                return $hasVideo === '1' ? $hasVideoPath : !$hasVideoPath;
+            });
+            $entries = array_values($entries);
+        }
+
         $shows = $this->getActiveShows();
         $categories = $this->getCategories();
 
