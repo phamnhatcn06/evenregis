@@ -120,6 +120,44 @@
                     <i class="fa fa-check me-1"></i>Duyệt
                 </button>
             </div>
+
+            <!-- Modal xem video fullscreen -->
+            <div class="modal fade" id="modalVideoViewer" tabindex="-1" style="z-index:1060;">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header border-0 py-2">
+                            <span class="text-white fw-bold">Video tiết mục</span>
+                            <div class="ms-auto d-flex gap-2">
+                                <a id="fullscreen_video_download" href="#" class="btn btn-sm btn-outline-light" download>
+                                    <i class="fa fa-download me-1"></i>Tải bản gốc
+                                </a>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                        </div>
+                        <div class="modal-body d-flex align-items-center justify-content-center p-0">
+                            <video id="fullscreen_video" playsinline controls preload="auto" style="max-width:100%;max-height:100%;"></video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal nghe nhạc fullscreen -->
+            <div class="modal fade" id="modalMusicViewer" tabindex="-1" style="z-index:1060;">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header border-0 py-2">
+                            <span class="text-white fw-bold"><i class="fa fa-music me-2"></i>File nhạc tiết mục</span>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fa fa-music fa-4x text-info"></i>
+                            </div>
+                            <audio id="fullscreen_music" controls preload="auto" class="w-100"></audio>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
