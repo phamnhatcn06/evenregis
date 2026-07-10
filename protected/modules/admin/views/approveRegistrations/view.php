@@ -1162,6 +1162,41 @@ function rejectAllAttendees() {
     });
 }
 
+// Video modal functions
+function viewTalentVideo(url, title) {
+    var container = document.getElementById('videoContainer');
+    var downloadLink = document.getElementById('videoDownloadLink');
+    document.getElementById('videoModalTitle').textContent = title || 'Video tiết mục';
+
+    // Check if YouTube link
+    var youtubeMatch = url.match(/(?:youtube\\.com\\/(?:watch\\?v=|embed\\/)|youtu\\.be\\/)([a-zA-Z0-9_-]{11})/);
+    if (youtubeMatch) {
+        container.innerHTML = '<iframe src=\"https://www.youtube.com/embed/' + youtubeMatch[1] + '?autoplay=1\" class=\"w-100 h-100\" frameborder=\"0\" allow=\"autoplay; encrypted-media\" allowfullscreen></iframe>';
+        downloadLink.style.display = 'none';
+    } else {
+        container.innerHTML = '<video id=\"modalVideoPlayer\" class=\"w-100 h-100\" playsinline controls preload=\"metadata\" src=\"' + url + '\"></video>';
+        downloadLink.href = url;
+        downloadLink.style.display = 'inline-block';
+    }
+    var modal = new bootstrap.Modal(document.getElementById('videoModal'));
+    modal.show();
+}
+
+function stopVideo() {
+    var container = document.getElementById('videoContainer');
+    container.innerHTML = '<video id=\"modalVideoPlayer\" class=\"plyr-video\" playsinline controls preload=\"metadata\"></video>';
+}
+
+document.getElementById('videoModal').addEventListener('hidden.bs.modal', function() {
+    stopVideo();
+});
+
+$(document).on('click', '.btn-view-video', function() {
+    var url = $(this).data('url');
+    var title = $(this).data('title');
+    viewTalentVideo(url, title);
+});
+
 $(document).on('click', '.btn-view-talent-detail', function() {
     var entry = JSON.parse($(this).attr('data-entry'));
     var members = JSON.parse($(this).attr('data-members'));
