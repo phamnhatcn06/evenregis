@@ -172,4 +172,58 @@ document.addEventListener('DOMContentLoaded', function() {
         bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
         rejectEntry(id);
     });
+
+    // Video popup
+    document.getElementById('modalVideoViewer').addEventListener('hidden.bs.modal', function() {
+        var video = document.getElementById('fullscreen_video');
+        if (video) {
+            video.pause();
+            video.src = '';
+        }
+    });
+
+    document.getElementById('btn_play_video').addEventListener('click', function() {
+        var videoSrc = document.getElementById('detail_video_src').value;
+        var downloadSrc = document.getElementById('detail_video_download').href;
+        if (!videoSrc) return;
+
+        var fullscreenVideo = document.getElementById('fullscreen_video');
+        var fullscreenDownload = document.getElementById('fullscreen_video_download');
+        fullscreenVideo.src = videoSrc;
+        if (fullscreenDownload) fullscreenDownload.href = downloadSrc;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalVideoViewer'));
+        modal.show();
+
+        fullscreenVideo.play();
+    });
+
+    // Music popup
+    document.getElementById('modalMusicViewer').addEventListener('hidden.bs.modal', function() {
+        var audio = document.getElementById('fullscreen_music');
+        if (audio) {
+            audio.pause();
+            audio.src = '';
+        }
+    });
+
+    document.getElementById('btn_play_music').addEventListener('click', function() {
+        var musicSrc = document.getElementById('detail_music_src').value;
+        if (!musicSrc) return;
+
+        var fullscreenMusic = document.getElementById('fullscreen_music');
+        fullscreenMusic.src = musicSrc;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalMusicViewer'));
+        modal.show();
+
+        fullscreenMusic.play();
+    });
+
+    // Stop all media when closing detail modal
+    document.getElementById('modalDetail').addEventListener('hidden.bs.modal', function() {
+        document.querySelectorAll('#modalDetail audio, #modalDetail video').forEach(function(el) {
+            el.pause();
+        });
+    });
 });
