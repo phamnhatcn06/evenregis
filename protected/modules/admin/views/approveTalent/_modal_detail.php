@@ -91,7 +91,12 @@
                         <audio id="detail_music" controls class="w-100"></audio>
                     </div>
                     <div class="col-md-8" id="detail_video_container" style="display:none;">
-                        <label class="form-label fw-bold">Video:</label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label fw-bold mb-0">Video:</label>
+                            <a id="detail_video_download" href="#" class="btn btn-sm btn-outline-primary" download>
+                                <i class="fa fa-download me-1"></i>Tải bản gốc
+                            </a>
+                        </div>
                         <div id="detail_video_wrapper">
                             <video id="detail_video" class="plyr-video" playsinline controls preload="metadata" style="max-height:250px;"></video>
                         </div>
