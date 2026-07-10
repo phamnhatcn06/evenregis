@@ -98,7 +98,7 @@
                             </a>
                         </div>
                         <div id="detail_video_wrapper">
-                            <video id="detail_video" class="plyr-video" playsinline controls preload="metadata" style="max-height:250px;"></video>
+                            <video id="detail_video" class="plyr-video" playsinline controls preload="auto" style="max-height:250px;"></video>
                         </div>
                     </div>
                 </div>
