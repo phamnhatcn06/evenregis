@@ -99,7 +99,12 @@
                         </table>
 
                         <div id="detail_video_container" class="mt-2 flex-grow-1 d-flex flex-column" style="display:none;min-height:0;">
-                            <label class="form-label fw-bold small mb-1">Video dự thi:</label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-bold small mb-0">Video dự thi:</label>
+                                <a id="detail_video_download" href="#" class="btn btn-sm btn-outline-primary" download>
+                                    <i class="fa fa-download me-1"></i>Tải bản gốc
+                                </a>
+                            </div>
                             <div id="detail_video_wrapper" class="flex-grow-1" style="min-height:0;">
                                 <video id="detail_video" class="plyr-video" playsinline controls preload="metadata" style="width:100%;height:100%;object-fit:contain;"></video>
                             </div>
