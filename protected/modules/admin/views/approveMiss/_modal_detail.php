@@ -106,7 +106,7 @@
                                 </a>
                             </div>
                             <div id="detail_video_wrapper" class="flex-grow-1" style="min-height:0;">
-                                <video id="detail_video" class="plyr-video" playsinline controls preload="metadata" style="width:100%;height:100%;object-fit:contain;"></video>
+                                <video id="detail_video" class="plyr-video" playsinline controls preload="auto" style="width:100%;height:100%;object-fit:contain;"></video>
                             </div>
                         </div>
                     </div>
