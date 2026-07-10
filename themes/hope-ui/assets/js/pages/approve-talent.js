@@ -283,31 +283,38 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnPlayVideo) {
         btnPlayVideo.addEventListener('click', function() {
             var videoSrc = document.getElementById('detail_video_src').value;
-            var downloadSrc = document.getElementById('detail_video_download').href;
+            var downloadBtn = document.getElementById('detail_video_download');
+            var downloadSrc = downloadBtn ? downloadBtn.href : '';
             if (!videoSrc) return;
 
-        var fullscreenVideo = document.getElementById('fullscreen_video');
-        var fullscreenDownload = document.getElementById('fullscreen_video_download');
-        fullscreenVideo.src = videoSrc;
-        if (fullscreenDownload) fullscreenDownload.href = downloadSrc;
+            var fullscreenVideo = document.getElementById('fullscreen_video');
+            var fullscreenDownload = document.getElementById('fullscreen_video_download');
+            if (fullscreenVideo) {
+                fullscreenVideo.src = videoSrc;
+            }
+            if (fullscreenDownload) fullscreenDownload.href = downloadSrc;
 
-        var modal = new bootstrap.Modal(document.getElementById('modalVideoViewer'));
-        modal.show();
+            var modal = new bootstrap.Modal(document.getElementById('modalVideoViewer'));
+            modal.show();
 
-        fullscreenVideo.play();
-    });
+            if (fullscreenVideo) fullscreenVideo.play();
+        });
+    }
 
     // Music popup
-    document.getElementById('btn_play_music').addEventListener('click', function() {
-        var musicSrc = document.getElementById('detail_music_src').value;
-        if (!musicSrc) return;
+    var btnPlayMusic = document.getElementById('btn_play_music');
+    if (btnPlayMusic) {
+        btnPlayMusic.addEventListener('click', function() {
+            var musicSrc = document.getElementById('detail_music_src').value;
+            if (!musicSrc) return;
 
-        var fullscreenMusic = document.getElementById('fullscreen_music');
-        fullscreenMusic.src = musicSrc;
-
-        var modal = new bootstrap.Modal(document.getElementById('modalMusicViewer'));
-        modal.show();
-
-        fullscreenMusic.play();
-    });
+            var fullscreenMusic = document.getElementById('fullscreen_music');
+            if (fullscreenMusic) {
+                fullscreenMusic.src = musicSrc;
+                var modal = new bootstrap.Modal(document.getElementById('modalMusicViewer'));
+                modal.show();
+                fullscreenMusic.play();
+            }
+        });
+    }
 });
