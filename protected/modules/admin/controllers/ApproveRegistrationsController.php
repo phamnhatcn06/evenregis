@@ -328,9 +328,9 @@ class ApproveRegistrationsController extends AdminController
             }
 
             // Lấy talent entries của property cho các shows này
+            // Không dùng registration_id vì API không hỗ trợ filter này
             $filterParams = array(
                 'property_id' => $model->property_id,
-                'registration_id' => $model->id,
             );
             if ($model->event_id) {
                 $filterParams['event_id'] = $model->event_id;
