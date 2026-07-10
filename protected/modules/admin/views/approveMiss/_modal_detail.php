@@ -98,16 +98,16 @@
                             </tbody>
                         </table>
 
-                        <div id="detail_video_container" class="mt-2 flex-grow-1 d-flex flex-column" style="display:none;min-height:0;">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label class="form-label fw-bold small mb-0">Video dự thi:</label>
-                                <a id="detail_video_download" href="#" class="btn btn-sm btn-outline-primary" download>
+                        <div id="detail_video_container" class="mt-3" style="display:none;">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary" id="btn_play_video">
+                                    <i class="fa fa-play me-1"></i>Xem Video
+                                </button>
+                                <a id="detail_video_download" href="#" class="btn btn-outline-primary" download>
                                     <i class="fa fa-download me-1"></i>Tải bản gốc
                                 </a>
                             </div>
-                            <div id="detail_video_wrapper" class="flex-grow-1" style="min-height:0;">
-                                <video id="detail_video" class="plyr-video" playsinline controls preload="auto" style="width:100%;height:100%;object-fit:contain;"></video>
-                            </div>
+                            <input type="hidden" id="detail_video_src">
                         </div>
                     </div>
                 </div>
