@@ -271,4 +271,28 @@ class ApproveMissController extends AdminController
         }
         return $list;
     }
+
+    /**
+     * Lấy đường dẫn video đã tối ưu (_web) nếu tồn tại
+     */
+    protected function getOptimizedVideoPath($videoPath)
+    {
+        if (empty($videoPath)) {
+            return $videoPath;
+        }
+
+        $basePath = Yii::getPathOfAlias('webroot');
+        $relativePath = ltrim(str_replace(Yii::app()->baseUrl, '', $videoPath), '/');
+        $fullPath = $basePath . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
+
+        $pathInfo = pathinfo($fullPath);
+        $webFile = $pathInfo['dirname'] . DIRECTORY_SEPARATOR . $pathInfo['filename'] . '_web.' . $pathInfo['extension'];
+
+        if (file_exists($webFile)) {
+            $webRelative = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_web.' . $pathInfo['extension'];
+            return str_replace($basePath, Yii::app()->baseUrl, str_replace(DIRECTORY_SEPARATOR, '/', $webRelative));
+        }
+
+        return $videoPath;
+    }
 }
