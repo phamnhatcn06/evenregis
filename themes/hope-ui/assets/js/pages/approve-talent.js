@@ -64,8 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (downloadBtn) {
                         downloadBtn.href = d.video_path_original || d.video_path;
                     }
+                    video.preload = 'auto';
                     if (typeof Plyr !== 'undefined' && !video.plyr) {
-                        video.plyr = new Plyr(video, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
+                        video.plyr = new Plyr(video, {
+                            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                            loadSprite: false,
+                            iconUrl: null,
+                            previewThumbnails: { enabled: false }
+                        });
                     }
                 } else {
                     video.src = '';
