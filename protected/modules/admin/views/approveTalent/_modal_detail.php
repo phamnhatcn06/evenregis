@@ -86,20 +86,20 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4" id="detail_music_container" style="display:none;">
-                        <label class="form-label fw-bold">File nhạc:</label>
-                        <audio id="detail_music" controls class="w-100"></audio>
+                    <div class="col-auto" id="detail_music_container" style="display:none;">
+                        <button type="button" class="btn btn-info" id="btn_play_music">
+                            <i class="fa fa-music me-1"></i>Nghe nhạc
+                        </button>
+                        <input type="hidden" id="detail_music_src">
                     </div>
-                    <div class="col-md-8" id="detail_video_container" style="display:none;">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label fw-bold mb-0">Video:</label>
-                            <a id="detail_video_download" href="#" class="btn btn-sm btn-outline-primary" download>
-                                <i class="fa fa-download me-1"></i>Tải bản gốc
-                            </a>
-                        </div>
-                        <div id="detail_video_wrapper">
-                            <video id="detail_video" class="plyr-video" playsinline controls preload="auto" style="max-height:250px;"></video>
-                        </div>
+                    <div class="col-auto" id="detail_video_container" style="display:none;">
+                        <button type="button" class="btn btn-primary" id="btn_play_video">
+                            <i class="fa fa-play me-1"></i>Xem Video
+                        </button>
+                        <a id="detail_video_download" href="#" class="btn btn-outline-primary" download>
+                            <i class="fa fa-download me-1"></i>Tải bản gốc
+                        </a>
+                        <input type="hidden" id="detail_video_src">
                     </div>
                 </div>
                 <div class="row mt-3" id="detail_document_container" style="display:none;">
