@@ -257,26 +257,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 var videoContainer = document.getElementById('detail_video_container');
-                var video = document.getElementById('detail_video');
+                var videoSrcInput = document.getElementById('detail_video_src');
                 var downloadBtn = document.getElementById('detail_video_download');
                 if (d.video_path) {
-                    video.src = d.video_path;
+                    videoSrcInput.value = d.video_path;
                     videoContainer.style.display = 'block';
                     hasAnyMedia = true;
                     if (downloadBtn) {
                         downloadBtn.href = d.video_path_original || d.video_path;
                     }
-                    video.preload = 'auto';
-                    if (typeof Plyr !== 'undefined' && !video.plyr) {
-                        video.plyr = new Plyr(video, {
-                            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-                            loadSprite: false,
-                            iconUrl: null,
-                            previewThumbnails: { enabled: false }
-                        });
-                    }
                 } else {
-                    video.src = '';
+                    videoSrcInput.value = '';
                     videoContainer.style.display = 'none';
                     if (downloadBtn) downloadBtn.href = '#';
                 }
