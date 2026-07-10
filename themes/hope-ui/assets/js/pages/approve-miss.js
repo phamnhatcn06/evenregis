@@ -158,12 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        var video = document.getElementById('detail_video');
-        if (video) {
-            if (video.plyr) video.plyr.pause();
-            video.pause();
-            video.src = '';
-        }
+        var videoSrcInput = document.getElementById('detail_video_src');
+        if (videoSrcInput) videoSrcInput.value = '';
         document.getElementById('detail_video_container').style.display = 'none';
 
         var noMediaAlert = document.getElementById('detail_no_media');
