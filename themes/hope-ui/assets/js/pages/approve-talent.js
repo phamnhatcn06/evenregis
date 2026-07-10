@@ -46,35 +46,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 var musicContainer = document.getElementById('detail_music_container');
-                var music = document.getElementById('detail_music');
+                var musicSrcInput = document.getElementById('detail_music_src');
                 if (d.music_path) {
-                    music.src = d.music_path;
+                    musicSrcInput.value = d.music_path;
                     musicContainer.style.display = 'block';
                 } else {
-                    music.src = '';
+                    musicSrcInput.value = '';
                     musicContainer.style.display = 'none';
                 }
 
                 var videoContainer = document.getElementById('detail_video_container');
-                var video = document.getElementById('detail_video');
+                var videoSrcInput = document.getElementById('detail_video_src');
                 var downloadBtn = document.getElementById('detail_video_download');
                 if (d.video_path) {
-                    video.src = d.video_path;
+                    videoSrcInput.value = d.video_path;
                     videoContainer.style.display = 'block';
                     if (downloadBtn) {
                         downloadBtn.href = d.video_path_original || d.video_path;
                     }
-                    video.preload = 'auto';
-                    if (typeof Plyr !== 'undefined' && !video.plyr) {
-                        video.plyr = new Plyr(video, {
-                            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-                            loadSprite: false,
-                            iconUrl: null,
-                            previewThumbnails: { enabled: false }
-                        });
-                    }
                 } else {
-                    video.src = '';
+                    videoSrcInput.value = '';
                     videoContainer.style.display = 'none';
                     if (downloadBtn) downloadBtn.href = '#';
                 }
