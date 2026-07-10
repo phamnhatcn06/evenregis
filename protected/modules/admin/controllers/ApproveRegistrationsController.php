@@ -350,11 +350,9 @@ class ApproveRegistrationsController extends AdminController
                 $entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
                 $entryRegId = isset($entry->registration_id) ? $entry->registration_id : (isset($entry['registration_id']) ? $entry['registration_id'] : null);
 
-                // Chỉ lấy entries thuộc shows của event này và thuộc registration hiện tại
+                // Chỉ lấy entries thuộc shows của event này
+                // Không filter theo registration_id vì talent entries được lưu theo property_id
                 if ($entryId && (empty($showIds) || in_array($entryShowId, $showIds))) {
-                    if ($entryRegId && $entryRegId != $model->id) {
-                        continue;
-                    }
                     $processedEntryIds[] = $entryId;
                     // Fetch category name if not available
                     if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
