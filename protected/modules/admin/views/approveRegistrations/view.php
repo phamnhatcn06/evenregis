@@ -453,9 +453,9 @@ $attributes = array(
                                                         </a>
                                                     <?php endif; ?>
                                                     <?php if ($videoPath): ?>
-                                                        <a href="<?php echo CHtml::encode($videoPath); ?>" target="_blank" class="btn btn-xs btn-outline-danger">
+                                                        <button type="button" class="btn btn-xs btn-outline-danger btn-view-video" data-url="<?php echo CHtml::encode($videoPath); ?>" data-title="<?php echo CHtml::encode($entryTitle); ?>">
                                                             <i class="fa fa-play-circle me-1"></i>Video
-                                                        </a>
+                                                        </button>
                                                     <?php endif; ?>
                                                     <?php if (!$musicPath && !$videoPath): ?>-<?php endif; ?>
                                                 </td>
@@ -637,9 +637,9 @@ $attributes = array(
                                                         </a>
                                                     <?php endif; ?>
                                                     <?php if ($videoPath): ?>
-                                                        <a href="<?php echo CHtml::encode($videoPath); ?>" target="_blank" class="btn btn-xs btn-outline-danger">
+                                                        <button type="button" class="btn btn-xs btn-outline-danger btn-view-video" data-url="<?php echo CHtml::encode($videoPath); ?>" data-title="<?php echo CHtml::encode($entryTitle); ?>">
                                                             <i class="fa fa-play-circle me-1"></i>Video
-                                                        </a>
+                                                        </button>
                                                     <?php endif; ?>
                                                     <?php if (!$musicPath && !$videoPath): ?>-<?php endif; ?>
                                                 </td>
