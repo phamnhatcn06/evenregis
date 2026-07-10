@@ -737,6 +737,29 @@ $attributes = array(
     </div>
 </div>
 
+<!-- Modal Xem Video Tiết Mục Văn Nghệ -->
+<div class="modal fade" id="videoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-play-circle me-2"></i><span id="videoModalTitle">Video tiết mục</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="videoContainer" class="ratio ratio-16x9">
+                    <video id="modalVideoPlayer" class="plyr-video" playsinline controls preload="metadata"></video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="videoDownloadLink" class="btn btn-outline-primary" target="_blank" style="display:none;">
+                    <i class="fa fa-external-link me-1"></i>Mở link gốc
+                </a>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Xem Chi Tiết Tiết Mục Văn Nghệ -->
 <div class="modal fade" id="detailTalentModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
