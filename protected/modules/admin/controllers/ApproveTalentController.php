@@ -62,7 +62,7 @@ class ApproveTalentController extends AdminController
             'participant_count' => $model->participant_count,
             'is_alliance_team' => $model->is_alliance_team,
             'music_path' => $model->music_path,
-            'video_path' => $model->video_path,
+            'video_path' => $this->getOptimizedVideoPath($model->video_path),
             'document' => $model->document,
             'status' => $model->status,
             'status_label' => TalentEntries::getStatusLabel($model->status),
