@@ -102,6 +102,13 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                 <i class="fa fa-user me-1"></i><?php echo $e->participant_count; ?> người
                             </p>
                         <?php endif; ?>
+                        <p class="card-text small mb-1">
+                            <?php if (!empty($e->video_path)): ?>
+                                <span class="text-success"><i class="fa fa-video-camera me-1"></i>Đã upload video</span>
+                            <?php else: ?>
+                                <span class="text-warning"><i class="fa fa-exclamation-circle me-1"></i>Chưa upload video</span>
+                            <?php endif; ?>
+                        </p>
                         <?php if (!empty($e->description)): ?>
                             <p class="card-text small text-muted mt-2 entry-description"><?php echo CHtml::encode(mb_substr($e->description, 0, 100)); ?><?php echo mb_strlen($e->description) > 100 ? '...' : ''; ?></p>
                         <?php endif; ?>
