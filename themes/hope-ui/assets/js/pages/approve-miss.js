@@ -258,16 +258,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 var videoContainer = document.getElementById('detail_video_container');
                 var video = document.getElementById('detail_video');
+                var downloadBtn = document.getElementById('detail_video_download');
                 if (d.video_path) {
                     video.src = d.video_path;
                     videoContainer.style.display = 'block';
                     hasAnyMedia = true;
+                    if (downloadBtn) {
+                        downloadBtn.href = d.video_path_original || d.video_path;
+                    }
                     if (typeof Plyr !== 'undefined' && !video.plyr) {
                         video.plyr = new Plyr(video, { controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'] });
                     }
                 } else {
                     video.src = '';
                     videoContainer.style.display = 'none';
+                    if (downloadBtn) downloadBtn.href = '#';
                 }
 
                 var noMediaAlert = document.getElementById('detail_no_media');
