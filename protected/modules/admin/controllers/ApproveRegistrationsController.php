@@ -327,32 +327,23 @@ class ApproveRegistrationsController extends AdminController
                 }
             }
 
-            // Lấy talent entries của property cho các shows này
-            // Không dùng registration_id vì API không hỗ trợ filter này
-            $filterParams = array(
-                'property_id' => $model->property_id,
-            );
-            if ($model->event_id) {
-                $filterParams['event_id'] = $model->event_id;
-            }
-            $entriesData = TalentEntries::getApiDataProvider($filterParams, 100)->getData();
-
-            // Lấy tất cả entries của event để tìm các tiết mục liên quân mà đơn vị được mời
+            // Lấy tất cả talent entries của event, sau đó filter theo property_id bằng PHP
+            // (giống RegistrationsController vì API filter property_id không tin cậy)
             $allEntriesData = array();
             if ($model->event_id) {
-                $allEntriesData = TalentEntries::getApiDataProvider(array('event_id' => $model->event_id), 200)->getData();
+                $allEntriesData = TalentEntries::getApiDataProvider(array('event_id' => $model->event_id), 500)->getData();
             }
 
+            $currentPropertyId = (string)$model->property_id;
             $processedEntryIds = array();
 
-            foreach ($entriesData as $entry) {
+            foreach ($allEntriesData as $entry) {
                 $entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
                 $entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
-                $entryRegId = isset($entry->registration_id) ? $entry->registration_id : (isset($entry['registration_id']) ? $entry['registration_id'] : null);
+                $entryPropertyId = isset($entry->property_id) ? (string)$entry->property_id : (isset($entry['property_id']) ? (string)$entry['property_id'] : '');
 
-                // Chỉ lấy entries thuộc shows của event này
-                // Không filter theo registration_id vì talent entries được lưu theo property_id
-                if ($entryId && (empty($showIds) || in_array($entryShowId, $showIds))) {
+                // Chỉ lấy entries của đơn vị hiện tại (owner)
+                if ($entryId && $entryPropertyId === $currentPropertyId && (empty($showIds) || in_array($entryShowId, $showIds))) {
                     $processedEntryIds[] = $entryId;
                     // Fetch category name if not available
                     if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
