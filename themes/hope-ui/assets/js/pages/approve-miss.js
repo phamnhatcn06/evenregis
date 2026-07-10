@@ -169,12 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function stopAllMedia() {
-        var video = document.getElementById('detail_video');
-        if (video) {
-            if (video.plyr) video.plyr.pause();
-            video.pause();
-        }
-
         document.querySelectorAll('#modalDetail video, #modalDetail audio').forEach(function(el) {
             el.pause();
         });
