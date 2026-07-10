@@ -10,7 +10,7 @@
 
 .card-img-wrapper {
     position: relative;
-    height: 280px;
+    aspect-ratio: 9 / 16;
     overflow: hidden;
     background: #f8f9fa;
 }
