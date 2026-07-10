@@ -190,6 +190,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('#modalImageViewer video').forEach(function(el) {
             el.pause();
         });
+
+        var fullscreenVideo = document.getElementById('fullscreen_video');
+        if (fullscreenVideo) {
+            fullscreenVideo.pause();
+            fullscreenVideo.src = '';
+        }
     }
 
     document.getElementById('modalDetail').addEventListener('hidden.bs.modal', function() {
@@ -202,6 +208,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('modalImageViewer').addEventListener('hidden.bs.modal', function() {
         stopAllMedia();
+    });
+
+    document.getElementById('modalVideoViewer').addEventListener('hidden.bs.modal', function() {
+        var video = document.getElementById('fullscreen_video');
+        if (video) {
+            video.pause();
+            video.src = '';
+        }
+    });
+
+    document.getElementById('btn_play_video').addEventListener('click', function() {
+        var videoSrc = document.getElementById('detail_video_src').value;
+        var downloadSrc = document.getElementById('detail_video_download').href;
+        if (!videoSrc) return;
+
+        var fullscreenVideo = document.getElementById('fullscreen_video');
+        var fullscreenDownload = document.getElementById('fullscreen_video_download');
+        fullscreenVideo.src = videoSrc;
+        if (fullscreenDownload) fullscreenDownload.href = downloadSrc;
+
+        var modal = new bootstrap.Modal(document.getElementById('modalVideoViewer'));
+        modal.show();
+
+        fullscreenVideo.play();
     });
 
     function loadDetail(id) {
