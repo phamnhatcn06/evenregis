@@ -1169,7 +1169,7 @@ $(document).on('click', '.btn-view-talent-detail', function() {
         mediaHtml += '<a href=\"' + entry.music_path + '\" target=\"_blank\" class=\"btn btn-xs btn-outline-secondary me-2\"><i class=\"fa fa-music me-1\"></i>Nghe nhạc nền</a>';
     }
     if (entry.video_path) {
-        mediaHtml += '<a href=\"' + entry.video_path + '\" target=\"_blank\" class=\"btn btn-xs btn-outline-danger\"><i class=\"fa fa-play-circle me-1\"></i>Xem video</a>';
+        mediaHtml += '<button type=\"button\" class=\"btn btn-xs btn-outline-danger btn-view-video\" data-url=\"' + entry.video_path + '\" data-title=\"' + (entry.title || '') + '\"><i class=\"fa fa-play-circle me-1\"></i>Xem video</button>';
     }
     if (!mediaHtml) {
         mediaHtml = '-';
