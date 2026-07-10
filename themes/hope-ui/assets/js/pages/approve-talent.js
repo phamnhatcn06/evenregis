@@ -1,5 +1,74 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    function resetModalDetail() {
+        document.getElementById('detail_id').value = '';
+        document.getElementById('detail_title').textContent = '';
+        document.getElementById('detail_property').textContent = '';
+        document.getElementById('detail_show').textContent = '';
+        document.getElementById('detail_category').textContent = '';
+        document.getElementById('detail_status').innerHTML = '';
+        document.getElementById('detail_duration').textContent = '';
+        document.getElementById('detail_participant_count').textContent = '';
+        document.getElementById('detail_alliance').textContent = '';
+        document.getElementById('detail_director').textContent = '';
+        document.getElementById('detail_director_phone').textContent = '';
+        document.getElementById('detail_origin').textContent = '';
+        document.getElementById('detail_created_at').textContent = '';
+        document.getElementById('detail_description').textContent = '';
+        document.getElementById('detail_content').textContent = '';
+
+        document.getElementById('detail_note_container').style.display = 'none';
+        document.getElementById('detail_note').textContent = '';
+
+        var musicSrcInput = document.getElementById('detail_music_src');
+        if (musicSrcInput) musicSrcInput.value = '';
+        document.getElementById('detail_music_container').style.display = 'none';
+
+        var videoSrcInput = document.getElementById('detail_video_src');
+        if (videoSrcInput) videoSrcInput.value = '';
+        document.getElementById('detail_video_container').style.display = 'none';
+
+        document.getElementById('detail_document_container').style.display = 'none';
+    }
+
+    function stopAllMedia() {
+        document.querySelectorAll('#modalDetail audio, #modalDetail video').forEach(function(el) {
+            el.pause();
+        });
+
+        var fullscreenVideo = document.getElementById('fullscreen_video');
+        if (fullscreenVideo) {
+            fullscreenVideo.pause();
+            fullscreenVideo.src = '';
+        }
+
+        var fullscreenMusic = document.getElementById('fullscreen_music');
+        if (fullscreenMusic) {
+            fullscreenMusic.pause();
+            fullscreenMusic.src = '';
+        }
+    }
+
+    document.getElementById('modalDetail').addEventListener('hidden.bs.modal', function() {
+        stopAllMedia();
+    });
+
+    document.getElementById('modalVideoViewer').addEventListener('hidden.bs.modal', function() {
+        var video = document.getElementById('fullscreen_video');
+        if (video) {
+            video.pause();
+            video.src = '';
+        }
+    });
+
+    document.getElementById('modalMusicViewer').addEventListener('hidden.bs.modal', function() {
+        var audio = document.getElementById('fullscreen_music');
+        if (audio) {
+            audio.pause();
+            audio.src = '';
+        }
+    });
+
     document.querySelectorAll('.btn-view-detail').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -8,7 +77,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function loadDetail(id) {
-        var modal = new bootstrap.Modal(document.getElementById('modalDetail'));
+        resetModalDetail();
+
+        var modalEl = document.getElementById('modalDetail');
+        var modalBody = modalEl.querySelector('.modal-body');
+        var loadingHtml = '<div id="detail_loading" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white" style="z-index:10;"><i class="fa fa-spinner fa-spin fa-3x text-primary"></i></div>';
+
+        var existingLoading = document.getElementById('detail_loading');
+        if (existingLoading) existingLoading.remove();
+        modalBody.style.position = 'relative';
+        modalBody.insertAdjacentHTML('afterbegin', loadingHtml);
+
+        var modal = new bootstrap.Modal(modalEl);
         modal.show();
 
         fetch(approveTalentConfig.getDetailUrl + '?id=' + id)
@@ -16,6 +96,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(function(res) {
                 if (!res.success) {
                     Toast.error(res.message || 'Không thể tải thông tin');
+                    var loading = document.getElementById('detail_loading');
+                    if (loading) loading.remove();
                     return;
                 }
                 var d = res.data;
@@ -83,6 +165,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 var rejectBtn = document.getElementById('btn_reject_modal');
                 approveBtn.style.display = (d.status == 3) ? 'none' : 'inline-block';
                 rejectBtn.style.display = (d.status == 4) ? 'none' : 'inline-block';
+
+                var loading = document.getElementById('detail_loading');
+                if (loading) loading.remove();
+            })
+            .catch(function() {
+                Toast.error('Lỗi kết nối server');
+                var loading = document.getElementById('detail_loading');
+                if (loading) loading.remove();
             });
     }
 
@@ -174,14 +264,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Video popup
-    document.getElementById('modalVideoViewer').addEventListener('hidden.bs.modal', function() {
-        var video = document.getElementById('fullscreen_video');
-        if (video) {
-            video.pause();
-            video.src = '';
-        }
-    });
-
     document.getElementById('btn_play_video').addEventListener('click', function() {
         var videoSrc = document.getElementById('detail_video_src').value;
         var downloadSrc = document.getElementById('detail_video_download').href;
@@ -199,14 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Music popup
-    document.getElementById('modalMusicViewer').addEventListener('hidden.bs.modal', function() {
-        var audio = document.getElementById('fullscreen_music');
-        if (audio) {
-            audio.pause();
-            audio.src = '';
-        }
-    });
-
     document.getElementById('btn_play_music').addEventListener('click', function() {
         var musicSrc = document.getElementById('detail_music_src').value;
         if (!musicSrc) return;
@@ -218,12 +292,5 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.show();
 
         fullscreenMusic.play();
-    });
-
-    // Stop all media when closing detail modal
-    document.getElementById('modalDetail').addEventListener('hidden.bs.modal', function() {
-        document.querySelectorAll('#modalDetail audio, #modalDetail video').forEach(function(el) {
-            el.pause();
-        });
     });
 });
