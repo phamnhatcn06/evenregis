@@ -260,23 +260,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.getElementById('btn_approve_modal').addEventListener('click', function() {
-        var id = document.getElementById('detail_id').value;
-        bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
-        approveEntry(id);
-    });
+    var btnApproveModal = document.getElementById('btn_approve_modal');
+    if (btnApproveModal) {
+        btnApproveModal.addEventListener('click', function() {
+            var id = document.getElementById('detail_id').value;
+            bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
+            approveEntry(id);
+        });
+    }
 
-    document.getElementById('btn_reject_modal').addEventListener('click', function() {
-        var id = document.getElementById('detail_id').value;
-        bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
-        rejectEntry(id);
-    });
+    var btnRejectModal = document.getElementById('btn_reject_modal');
+    if (btnRejectModal) {
+        btnRejectModal.addEventListener('click', function() {
+            var id = document.getElementById('detail_id').value;
+            bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
+            rejectEntry(id);
+        });
+    }
 
     // Video popup
-    document.getElementById('btn_play_video').addEventListener('click', function() {
-        var videoSrc = document.getElementById('detail_video_src').value;
-        var downloadSrc = document.getElementById('detail_video_download').href;
-        if (!videoSrc) return;
+    var btnPlayVideo = document.getElementById('btn_play_video');
+    if (btnPlayVideo) {
+        btnPlayVideo.addEventListener('click', function() {
+            var videoSrc = document.getElementById('detail_video_src').value;
+            var downloadSrc = document.getElementById('detail_video_download').href;
+            if (!videoSrc) return;
 
         var fullscreenVideo = document.getElementById('fullscreen_video');
         var fullscreenDownload = document.getElementById('fullscreen_video_download');
