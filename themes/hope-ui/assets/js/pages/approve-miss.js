@@ -725,11 +725,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Click video cũng mở slider
-    document.getElementById('detail_video').addEventListener('click', function(e) {
-        if (e.target.paused) {
-            openMediaViewer(photoIds.length);
-            e.preventDefault();
-        }
-    });
+    var detailVideo = document.getElementById('detail_video');
+    if (detailVideo) {
+        detailVideo.addEventListener('click', function(e) {
+            if (e.target.paused) {
+                openMediaViewer(photoIds.length);
+                e.preventDefault();
+            }
+        });
+    }
 });
 
