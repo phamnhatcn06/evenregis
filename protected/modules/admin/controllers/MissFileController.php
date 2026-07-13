@@ -28,9 +28,27 @@ class MissFileController extends AdminController
         }
 
         // Get mime type
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $filePath);
-        finfo_close($finfo);
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($finfo, $filePath);
+            finfo_close($finfo);
+        } elseif (function_exists('mime_content_type')) {
+            $mimeType = mime_content_type($filePath);
+        } else {
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            $mimeTypes = array(
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp',
+                'mp4' => 'video/mp4',
+                'mov' => 'video/quicktime',
+                'avi' => 'video/x-msvideo',
+                'webm' => 'video/webm'
+            );
+            $mimeType = isset($mimeTypes[$ext]) ? $mimeTypes[$ext] : 'application/octet-stream';
+        }
 
         // Try to resize image if requested and it is an image
         $w = Yii::app()->request->getQuery('w');
@@ -53,8 +71,14 @@ class MissFileController extends AdminController
 
         // Only allow image and video files
         $allowedTypes = array(
-            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-            'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/webp',
+            'video/mp4',
+            'video/quicktime',
+            'video/x-msvideo',
+            'video/webm'
         );
 
         if (!in_array($mimeType, $allowedTypes)) {
