@@ -141,7 +141,7 @@
                             <span id="fullscreen_label" class="text-white"></span>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="modal-body d-flex align-items-center justify-content-center p-0">
+                        <div class="modal-body d-flex align-items-center justify-content-center p-0 position-relative">
                             <div id="fullscreenCarousel" class="carousel slide w-100 h-100" data-bs-ride="false">
                                 <div class="carousel-inner h-100" id="fullscreen_carousel_inner">
                                 </div>
@@ -153,6 +153,18 @@
                                 </button>
                                 <div class="carousel-indicators" id="fullscreen_carousel_indicators">
                                 </div>
+                            </div>
+                            <!-- Thanh công cụ Zoom -->
+                            <div class="zoom-controls position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2" style="z-index:1070;">
+                                <button type="button" class="btn btn-dark border border-secondary btn-zoom-in" id="btn_zoom_in" title="Phóng to" style="opacity:0.85; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">
+                                    <i class="fa fa-search-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-dark border border-secondary btn-zoom-out" id="btn_zoom_out" title="Thu nhỏ" style="opacity:0.85; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">
+                                    <i class="fa fa-search-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-dark border border-secondary btn-zoom-reset" id="btn_zoom_reset" title="Đặt lại" style="opacity:0.85; width:42px; height:42px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;">
+                                    <i class="fa fa-refresh"></i>
+                                </button>
                             </div>
                         </div>
                     </div>

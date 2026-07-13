@@ -241,3 +241,26 @@
     border-radius: 50%;
     margin: 0 5px;
 }
+
+/* Image zoom style */
+.zoom-target {
+    transition: transform 0.1s ease-out;
+    transform-origin: center center;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.zoom-target:active {
+    cursor: grabbing;
+}
+
+.zoom-controls button {
+    transition: all 0.2s ease;
+}
+
+.zoom-controls button:hover {
+    transform: scale(1.1);
+    background-color: #212529 !important;
+    border-color: #fff !important;
+}

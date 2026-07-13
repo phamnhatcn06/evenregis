@@ -92,13 +92,13 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                 $photoUrl = $c->photo_full_body;
             }
 
-            // Convert to thumbnail URL (w=350) using MissFileController
+            // Convert to thumbnail URL (w=500) using MissFileController
             $thumbUrl = '';
             if (!empty($photoUrl)) {
                 $pos = strpos($photoUrl, '/uploads/miss/');
                 if ($pos !== false) {
                     $cleanPath = substr($photoUrl, $pos + strlen('/uploads/miss/'));
-                    $thumbUrl = Yii::app()->createUrl('/admin/missFile/view') . '?path=' . urlencode($cleanPath) . '&w=350';
+                    $thumbUrl = Yii::app()->createUrl('/admin/missFile/view') . '?path=' . urlencode($cleanPath) . '&w=500';
                 } else {
                     $thumbUrl = $photoUrl;
                 }
