@@ -91,10 +91,10 @@ class ApproveMissController extends AdminController
             'personal_email' => $model->personal_email,
             'status' => $model->status,
             'status_label' => BeautyContestants::getStatusLabel($model->status),
-            'photo_portrait' => $model->photo_portrait,
-            'photo_portrait_2' => $model->photo_portrait_2,
-            'photo_full_body' => $model->photo_full_body,
-            'photo_full_body_2' => $model->photo_full_body_2,
+            'photo_portrait' => $this->getOptimizedPhotoUrl($model->photo_portrait, 800),
+            'photo_portrait_2' => $this->getOptimizedPhotoUrl($model->photo_portrait_2, 800),
+            'photo_full_body' => $this->getOptimizedPhotoUrl($model->photo_full_body, 800),
+            'photo_full_body_2' => $this->getOptimizedPhotoUrl($model->photo_full_body_2, 800),
             'video_path' => $this->getOptimizedVideoPath($model->video_path),
             'video_path_original' => $model->video_path,
             'submitted_at' => $model->submitted_at,
@@ -295,5 +295,22 @@ class ApproveMissController extends AdminController
         }
 
         return $videoPath;
+    }
+
+    /**
+     * Lấy đường dẫn ảnh tối ưu (thumbnail) qua controller
+     */
+    protected function getOptimizedPhotoUrl($photoUrl, $width = 800)
+    {
+        if (empty($photoUrl)) {
+            return $photoUrl;
+        }
+
+        if (strpos($photoUrl, '/uploads/miss/') === 0) {
+            $cleanPath = str_replace('/uploads/miss/', '', $photoUrl);
+            return Yii::app()->createUrl('/admin/missFile/view', array('path' => $cleanPath, 'w' => $width));
+        }
+
+        return $photoUrl;
     }
 }

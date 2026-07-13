@@ -32,6 +32,25 @@ class MissFileController extends AdminController
         $mimeType = finfo_file($finfo, $filePath);
         finfo_close($finfo);
 
+        // Try to resize image if requested and it is an image
+        $w = Yii::app()->request->getQuery('w');
+        if ($w && is_numeric($w) && strpos($mimeType, 'image/') === 0) {
+            $pathInfo = pathinfo($filePath);
+            $cacheFile = $pathInfo['dirname'] . DIRECTORY_SEPARATOR . $pathInfo['filename'] . '_' . $w . 'w.' . $pathInfo['extension'];
+            if (!file_exists($cacheFile)) {
+                try {
+                    $thumb = Yii::app()->phpThumb->create($filePath);
+                    $thumb->resize($w, 0);
+                    $thumb->save($cacheFile);
+                } catch (Exception $e) {
+                    // Fallback to original file on failure
+                }
+            }
+            if (file_exists($cacheFile)) {
+                $filePath = $cacheFile;
+            }
+        }
+
         // Only allow image and video files
         $allowedTypes = array(
             'image/jpeg', 'image/png', 'image/gif', 'image/webp',

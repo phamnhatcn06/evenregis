@@ -92,6 +92,17 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                 $photoUrl = $c->photo_full_body;
             }
 
+            // Convert to thumbnail URL (w=350) using MissFileController
+            $thumbUrl = '';
+            if (!empty($photoUrl)) {
+                if (strpos($photoUrl, '/uploads/miss/') === 0) {
+                    $cleanPath = str_replace('/uploads/miss/', '', $photoUrl);
+                    $thumbUrl = Yii::app()->createUrl('/admin/missFile/view', array('path' => $cleanPath, 'w' => 350));
+                } else {
+                    $thumbUrl = $photoUrl;
+                }
+            }
+
             $unitName = '';
             if (!empty($c->property_name)) {
                 $unitName = $c->property_name;
@@ -109,8 +120,8 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
             <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
                 <div class="card contestant-card h-100" data-id="<?php echo $c->id; ?>" data-contest-id="<?php echo $c->contest_id; ?>">
                     <div class="card-img-wrapper">
-                        <?php if ($photoUrl): ?>
-                            <img src="<?php echo CHtml::encode($photoUrl); ?>" class="card-img-top contestant-photo" alt="<?php echo CHtml::encode($attendeeName); ?>">
+                        <?php if ($thumbUrl): ?>
+                            <img src="<?php echo CHtml::encode($thumbUrl); ?>" class="card-img-top contestant-photo" alt="<?php echo CHtml::encode($attendeeName); ?>" loading="lazy">
                         <?php else: ?>
                             <div class="card-img-top contestant-photo-placeholder">
                                 <i class="fa fa-user fa-4x text-muted"></i>
