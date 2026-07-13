@@ -306,9 +306,10 @@ class ApproveMissController extends AdminController
             return $photoUrl;
         }
 
-        if (strpos($photoUrl, '/uploads/miss/') === 0) {
-            $cleanPath = str_replace('/uploads/miss/', '', $photoUrl);
-            return Yii::app()->createUrl('/admin/missFile/view', array('path' => $cleanPath, 'w' => $width));
+        $pos = strpos($photoUrl, '/uploads/miss/');
+        if ($pos !== false) {
+            $cleanPath = substr($photoUrl, $pos + strlen('/uploads/miss/'));
+            return Yii::app()->createUrl('/admin/missFile/view') . '?path=' . urlencode($cleanPath) . '&w=' . $width;
         }
 
         return $photoUrl;

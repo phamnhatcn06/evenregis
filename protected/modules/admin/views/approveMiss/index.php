@@ -95,9 +95,10 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
             // Convert to thumbnail URL (w=350) using MissFileController
             $thumbUrl = '';
             if (!empty($photoUrl)) {
-                if (strpos($photoUrl, '/uploads/miss/') === 0) {
-                    $cleanPath = str_replace('/uploads/miss/', '', $photoUrl);
-                    $thumbUrl = Yii::app()->createUrl('/admin/missFile/view', array('path' => $cleanPath, 'w' => 350));
+                $pos = strpos($photoUrl, '/uploads/miss/');
+                if ($pos !== false) {
+                    $cleanPath = substr($photoUrl, $pos + strlen('/uploads/miss/'));
+                    $thumbUrl = Yii::app()->createUrl('/admin/missFile/view') . '?path=' . urlencode($cleanPath) . '&w=350';
                 } else {
                     $thumbUrl = $photoUrl;
                 }
