@@ -146,6 +146,9 @@ $this->Tabletitle = 'Tổng quan đội thể thao';
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0 text-dark"><i class="fa fa-table text-primary me-2"></i>Tổng hợp đăng ký thể thao theo cụm và đơn vị</h5>
                 <div>
+                    <a id="btn-export-athletes-region" href="#" class="btn btn-warning btn-sm me-2">
+                        <i class="fa fa-sitemap me-1"></i> Xuất DS VĐV theo cụm
+                    </a>
                     <a id="btn-export-detail" href="#" class="btn btn-info btn-sm me-2">
                         <i class="fa fa-users me-1"></i> Xuất DS VĐV
                     </a>
