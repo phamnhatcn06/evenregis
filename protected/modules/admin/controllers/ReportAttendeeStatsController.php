@@ -961,12 +961,181 @@ class ReportAttendeeStatsController extends AdminController
             $teamsByRegionSport[$regionId][$spId][] = $teamId;
         }
 
+        // Map nhãn nội dung theo sport_id (dùng cho sheet tổng hợp)
+        $contentLabelMap = array();
+        foreach ($contents as $content) {
+            $contentLabelMap[$content['sport_id']] = $content['label'];
+        }
+
+        // Cuộc thi nghiệp vụ (map id -> tên)
+        $competitionNameMap = array();
+        $competitionsRes = Competitions::getApiDataProvider(array(), 500)->getData();
+        foreach ($competitionsRes as $comp) {
+            $compId = isset($comp->id) ? $comp->id : null;
+            if ($compId) {
+                $competitionNameMap[$compId] = isset($comp->name) ? $comp->name : '';
+            }
+        }
+
+        // Hàm xác định cụm của một đơn vị
+        $resolveRegionId = function ($propId) use ($propertyMap, $regionalMap) {
+            $regionId = ($propId && isset($propertyMap[$propId]) && $propertyMap[$propId]['region_id'])
+                ? $propertyMap[$propId]['region_id'] : 0;
+            return ($regionId && isset($regionalMap[$regionId])) ? $regionId : 0;
+        };
+
+        // Đăng ký thi nghiệp vụ: group theo cụm + cuộc thi, và theo người
+        $compRegs = CompetitionRegistrations::getRawListByEvent($eventId);
+        $contestantsByRegionComp = array(); // regionId => compId => array thí sinh
+        $compsByAttendee = array();         // attId => compId => candidate_number
+        $eventCompIds = array();            // các cuộc thi có thí sinh trong sự kiện
+        foreach ($compRegs as $cr) {
+            $crDeletedAt = isset($cr['deleted_at']) ? $cr['deleted_at'] : null;
+            if ($crDeletedAt) continue;
+            $crStatus = isset($cr['status']) ? (int)$cr['status'] : CompetitionRegistrations::STATUS_PENDING;
+            if ($crStatus === CompetitionRegistrations::STATUS_CANCELLED) continue;
+
+            $attId = isset($cr['attendee_id']) ? $cr['attendee_id'] : null;
+            $compId = isset($cr['competition_id']) ? $cr['competition_id'] : null;
+            if (!$attId || !$compId || !isset($attendeeMap[$attId])) continue;
+
+            $candidateNumber = isset($cr['candidate_number']) ? $cr['candidate_number'] : '';
+            $attInfo = $attendeeMap[$attId];
+            $regionId = $resolveRegionId($attInfo['property_id']);
+
+            $eventCompIds[$compId] = true;
+            $compsByAttendee[$attId][$compId] = $candidateNumber;
+            $contestantsByRegionComp[$regionId][$compId][] = array(
+                'full_name' => $attInfo['full_name'],
+                'property_name' => $attInfo['property_name'],
+                'position' => $attInfo['position'],
+                'candidate_number' => $candidateNumber,
+            );
+        }
+
+        // Danh sách cuộc thi hiển thị, sắp theo tên
+        $displayCompetitions = array();
+        foreach (array_keys($eventCompIds) as $compId) {
+            $displayCompetitions[] = array(
+                'id' => $compId,
+                'name' => isset($competitionNameMap[$compId]) && $competitionNameMap[$compId] !== ''
+                    ? $competitionNameMap[$compId] : ('Cuộc thi #' . $compId),
+            );
+        }
+        usort($displayCompetitions, function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
+        // Tổng hợp người tham gia (VĐV + thí sinh nghiệp vụ) cho sheet đầu tiên
+        $participants = array();
+        foreach ($membersByTeam as $tId => $members) {
+            $team = $teams[$tId];
+            $spId = isset($team->sport_id) ? $team->sport_id : null;
+            if (!$spId || !isset($contentLabelMap[$spId])) continue;
+            $propId = isset($team->property_id) ? $team->property_id : null;
+            $teamPropertyName = !empty($team->property_name)
+                ? $team->property_name
+                : (($propId && isset($propertyMap[$propId])) ? $propertyMap[$propId]['name'] : '');
+
+            foreach ($members as $m) {
+                $attId = isset($m['attendee_id']) ? $m['attendee_id'] : null;
+                $key = $attId ? 'a' . $attId : 'm' . (isset($m['id']) ? $m['id'] : uniqid());
+                if (!isset($participants[$key])) {
+                    $attInfo = ($attId && isset($attendeeMap[$attId])) ? $attendeeMap[$attId] : null;
+                    $pPropId = $attInfo && $attInfo['property_id'] ? $attInfo['property_id'] : $propId;
+                    $pRegionId = $resolveRegionId($pPropId);
+                    $participants[$key] = array(
+                        'full_name' => !empty($m['attendee_name']) ? $m['attendee_name']
+                            : ($attInfo && !empty($attInfo['full_name']) ? $attInfo['full_name']
+                                : (isset($m['name']) ? $m['name'] : '')),
+                        'property_name' => $attInfo && !empty($attInfo['property_name']) ? $attInfo['property_name'] : $teamPropertyName,
+                        'region_name' => isset($regionalMap[$pRegionId]) ? $regionalMap[$pRegionId]['name'] : 'Chưa phân cụm',
+                        'position' => !empty($m['attendee_position']) ? $m['attendee_position']
+                            : ($attInfo && !empty($attInfo['position']) ? $attInfo['position'] : ''),
+                        'contents' => array(),
+                    );
+                }
+                $participants[$key]['contents'][$contentLabelMap[$spId]] = true;
+            }
+        }
+        foreach ($compsByAttendee as $attId => $comps) {
+            $key = 'a' . $attId;
+            if (!isset($participants[$key])) {
+                $attInfo = $attendeeMap[$attId];
+                $pRegionId = $resolveRegionId($attInfo['property_id']);
+                $participants[$key] = array(
+                    'full_name' => $attInfo['full_name'],
+                    'property_name' => $attInfo['property_name'],
+                    'region_name' => isset($regionalMap[$pRegionId]) ? $regionalMap[$pRegionId]['name'] : 'Chưa phân cụm',
+                    'position' => $attInfo['position'],
+                    'contents' => array(),
+                );
+            }
+            foreach (array_keys($comps) as $compId) {
+                $compName = isset($competitionNameMap[$compId]) && $competitionNameMap[$compId] !== ''
+                    ? $competitionNameMap[$compId] : ('Cuộc thi #' . $compId);
+                $participants[$key]['contents']['Nghiệp vụ: ' . $compName] = true;
+            }
+        }
+        $participants = array_values($participants);
+        usort($participants, function ($a, $b) {
+            $cmp = strnatcasecmp($a['region_name'], $b['region_name']);
+            if ($cmp !== 0) return $cmp;
+            $cmp = strnatcasecmp($a['property_name'], $b['property_name']);
+            if ($cmp !== 0) return $cmp;
+            return strnatcasecmp($a['full_name'], $b['full_name']);
+        });
+
         $excel = $this->createPhpExcel();
         $excel->removeSheetByIndex(0);
 
-        // Danh sách sheet: các cụm active + "Chưa phân cụm" nếu có đội chưa thuộc cụm nào
+        // Sheet đầu tiên: tổng hợp tất cả VĐV + thí sinh nghiệp vụ
+        $usedTitles = array();
+        $summarySheet = $excel->createSheet(0);
+        $summarySheet->setTitle($this->buildSheetTitle('Tổng hợp', $usedTitles));
+
+        $summarySheet->setCellValue('A1', 'DANH SÁCH VĐV VÀ THÍ SINH THI NGHIỆP VỤ');
+        $summarySheet->mergeCells('A1:F1');
+        $summarySheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+        $summarySheet->setCellValue('A3', 'STT');
+        $summarySheet->setCellValue('B3', 'Họ và tên');
+        $summarySheet->setCellValue('C3', 'Đơn vị');
+        $summarySheet->setCellValue('D3', 'Cụm');
+        $summarySheet->setCellValue('E3', 'Chức danh');
+        $summarySheet->setCellValue('F3', 'Nội dung tham gia');
+        $summarySheet->getStyle('A3:F3')->applyFromArray(array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '2563EB')),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+        ));
+
+        $row = 4;
+        $stt = 1;
+        foreach ($participants as $p) {
+            $summarySheet->setCellValue('A' . $row, $stt++);
+            $summarySheet->setCellValue('B' . $row, $p['full_name']);
+            $summarySheet->setCellValue('C' . $row, $p['property_name']);
+            $summarySheet->setCellValue('D' . $row, $p['region_name']);
+            $summarySheet->setCellValue('E' . $row, $p['position']);
+            $summarySheet->setCellValue('F' . $row, implode(', ', array_keys($p['contents'])));
+            $summarySheet->getStyle('A' . $row . ':F' . $row)->applyFromArray(array(
+                'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+            ));
+            $row++;
+        }
+
+        $summarySheet->getColumnDimension('A')->setWidth(6);
+        $summarySheet->getColumnDimension('B')->setWidth(30);
+        $summarySheet->getColumnDimension('C')->setWidth(30);
+        $summarySheet->getColumnDimension('D')->setWidth(18);
+        $summarySheet->getColumnDimension('E')->setWidth(22);
+        $summarySheet->getColumnDimension('F')->setWidth(60);
+        $summarySheet->getStyle('F4:F' . max(4, $row - 1))->getAlignment()->setWrapText(true);
+
+        // Danh sách sheet cụm: các cụm active + "Chưa phân cụm" nếu có đội/thí sinh chưa thuộc cụm nào
         $sheetRegionals = $sortedRegionals;
-        if (isset($teamsByRegionSport[0])) {
+        if (isset($teamsByRegionSport[0]) || isset($contestantsByRegionComp[0])) {
             $sheetRegionals[] = array('id' => 0, 'name' => 'Chưa phân cụm', 'code' => '');
         }
 
