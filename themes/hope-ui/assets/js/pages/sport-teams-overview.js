@@ -214,6 +214,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     btnExportDetail.href = baseUrl + '/admin/reports/exportSportsDetail?event_id=' + eventId;
                 }
 
+                var btnExportAthletesRegion = document.getElementById('btn-export-athletes-region');
+                if (btnExportAthletesRegion) {
+                    btnExportAthletesRegion.href = baseUrl + '/admin/reports/exportAthletesByRegion?event_id=' + eventId;
+                }
+
                 if (resData.success) {
                     if (totalAthletesEl) totalAthletesEl.textContent = resData.total_athletes || 0;
                     if (totalTeamsEl) totalTeamsEl.textContent = resData.total_teams || 0;
