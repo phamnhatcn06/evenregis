@@ -968,7 +968,7 @@ class ReportAttendeeStatsController extends AdminController
         $excel->removeSheetByIndex(0);
 
         // Danh sách sheet: các cụm active + "Chưa phân cụm" nếu có đội chưa thuộc cụm nào
-        $sheetRegionals = array_values($regionalMap);
+        $sheetRegionals = $sortedRegionals;
         if (isset($teamsByRegionSport[0])) {
             $sheetRegionals[] = array('id' => 0, 'name' => 'Chưa phân cụm', 'code' => '');
         }
