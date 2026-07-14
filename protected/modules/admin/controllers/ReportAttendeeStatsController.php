@@ -1356,6 +1356,17 @@ class ReportAttendeeStatsController extends AdminController
     }
 
     /**
+     * Hiển thị giới tính: 1 = Nam, 0 = Nữ
+     */
+    protected function formatGender($gender)
+    {
+        if ($gender === null || $gender === '') {
+            return '';
+        }
+        return ((int)$gender === 1) ? 'Nam' : 'Nữ';
+    }
+
+    /**
      * Khởi tạo PHPExcel (thư viện nằm trong ext.phpexcel.Classes,
      * phải tạm gỡ autoloader của Yii khi load để tránh xung đột)
      */
