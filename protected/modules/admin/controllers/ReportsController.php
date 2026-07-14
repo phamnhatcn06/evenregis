@@ -2592,4 +2592,325 @@ class ReportsController extends AdminController
         $objWriter->save('php://output');
         Yii::app()->end();
     }
+
+    /**
+     * Xuất danh sách VĐV theo cụm: mỗi VĐV một dòng, các cột nội dung thể thao
+     * active theo sự kiện, đánh dấu "x" nếu VĐV tham gia nội dung đó.
+     */
+    public function actionExportAthletesByRegion($event_id = null)
+    {
+        $user = AuthHandler::getUser();
+        if (!$user) {
+            throw new CHttpException(403, 'Bạn cần đăng nhập để xuất báo cáo.');
+        }
+
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+        $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
+        $userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+        $selectedEventId = $event_id;
+        $eventName = '';
+        if ($selectedEventId) {
+            $event = Events::fetchFromApi($selectedEventId);
+            $eventName = $event ? $event->name : '';
+        }
+
+        // Fetch regionals
+        $regionals = Regionals::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        $regionalMap = array();
+        $regionalCodeMap = array();
+        foreach ($regionals as $reg) {
+            $regId = isset($reg->id) ? $reg->id : null;
+            if ($regId) {
+                $regionalMap[$regId] = isset($reg->name) ? $reg->name : '';
+                $regionalCodeMap[$regId] = isset($reg->code) ? $reg->code : '';
+            }
+        }
+
+        // Fetch properties
+        $properties = array();
+        if ($isHO) {
+            $properties = Properties::getApiDataProvider(array('is_active' => 1), 1000)->getData();
+        } else if ($userPropertyId) {
+            $prop = Properties::fetchFromApi($userPropertyId);
+            if ($prop) $properties = array($prop);
+        }
+
+        $propertyMap = array();
+        foreach ($properties as $prop) {
+            $propId = isset($prop->id) ? $prop->id : null;
+            if ($propId) {
+                $propertyMap[$propId] = array(
+                    'region_id' => isset($prop->region_id) ? $prop->region_id : null,
+                    'code' => isset($prop->code) ? $prop->code : '',
+                    'name' => isset($prop->name) ? $prop->name : '',
+                );
+            }
+        }
+
+        // Fetch active registrations
+        $regParams = array('event_id' => $selectedEventId, 'per_page' => 1000);
+        if (!$isHO && $userPropertyId) {
+            $regParams['property_id'] = $userPropertyId;
+        }
+        $registrationsRes = Registrations::getApiDataProvider($regParams, 1000)->getData();
+        $activeRegistrationIds = array();
+        foreach ($registrationsRes as $reg) {
+            $deletedAt = isset($reg->deleted_at) ? $reg->deleted_at : null;
+            if ($deletedAt) continue;
+            $status = isset($reg->status) ? (int)$reg->status : 0;
+            if ($status !== Registrations::STATUS_DRAFT) {
+                $regId = isset($reg->id) ? $reg->id : null;
+                if ($regId) $activeRegistrationIds[$regId] = true;
+            }
+        }
+
+        // Fetch attendees and build map
+        $attParams = array('event_id' => $selectedEventId, 'per_page' => 5000);
+        if (!$isHO && $userPropertyId) {
+            $attParams['property_id'] = $userPropertyId;
+        }
+        $rawAttendees = Attendees::getApiDataProvider($attParams, 5000)->getData();
+        $attendeeMap = array();
+        foreach ($rawAttendees as $att) {
+            $attId = isset($att->id) ? $att->id : null;
+            $attDeletedAt = isset($att->deleted_at) ? $att->deleted_at : null;
+            if ($attDeletedAt) continue;
+            $regId = isset($att->registration_id) ? $att->registration_id : null;
+            if ($attId && $regId && isset($activeRegistrationIds[$regId])) {
+                $attendeeMap[$attId] = $att;
+            }
+        }
+
+        // Chỉ lấy các nội dung được cấu hình active với sự kiện (event_sports)
+        $eventSportsList = EventSports::getByEventId($selectedEventId);
+        $activeSportIds = array();
+        foreach ($eventSportsList as $es) {
+            $esSportId = isset($es['sport_id']) ? $es['sport_id'] : null;
+            if ($esSportId) $activeSportIds[$esSportId] = true;
+        }
+
+        // Fetch sports -> danh sách cột nội dung
+        $sportsList = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $sportColumns = array();
+        foreach ($sportsList as $sp) {
+            $spId = isset($sp->id) ? $sp->id : null;
+            $spName = isset($sp->name) ? $sp->name : '';
+            if (!$spId) continue;
+            if (!empty($activeSportIds) && !isset($activeSportIds[$spId])) continue;
+            $sportColumns[$spId] = $spName;
+        }
+        uasort($sportColumns, 'strnatcasecmp');
+
+        // Fetch sport teams
+        $teamParams = array('event_id' => $selectedEventId, 'per_page' => 1000);
+        if (!$isHO && $userPropertyId) {
+            $teamParams['property_id'] = $userPropertyId;
+        }
+        $rawTeams = SportTeams::getApiDataProvider($teamParams, 1000)->getData();
+        $teamMap = array();
+        foreach ($rawTeams as $team) {
+            $teamDeletedAt = isset($team->deleted_at) ? $team->deleted_at : null;
+            if ($teamDeletedAt) continue;
+            $regId = isset($team->registration_id) ? $team->registration_id : null;
+            if (!$regId || !isset($activeRegistrationIds[$regId])) continue;
+            $status = isset($team->status) ? (int)$team->status : 0;
+            if ($status === SportTeams::STATUS_CANCELLED) continue;
+            $teamId = isset($team->id) ? $team->id : null;
+            if ($teamId) $teamMap[$teamId] = $team;
+        }
+
+        // Fetch team members -> map attendee_id => [sport_id => true]
+        $membersRes = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'event_id' => $selectedEventId,
+            'per_page' => 5000,
+        ));
+        $teamMembers = array();
+        if ($membersRes['success']) {
+            $teamMembers = isset($membersRes['data']['data']) ? $membersRes['data']['data'] : $membersRes['data'];
+            if (!is_array($teamMembers)) $teamMembers = array();
+        }
+
+        $attendeeSports = array();
+        foreach ($teamMembers as $m) {
+            $teamId = isset($m['sport_team_id']) ? $m['sport_team_id'] : null;
+            if (!$teamId || !isset($teamMap[$teamId])) continue;
+
+            $spId = isset($teamMap[$teamId]->sport_id) ? $teamMap[$teamId]->sport_id : null;
+            if (!$spId || !isset($sportColumns[$spId])) continue;
+
+            $attendeeId = isset($m['attendee_id']) ? $m['attendee_id'] : null;
+            if (!$attendeeId || !isset($attendeeMap[$attendeeId])) continue;
+
+            if (!isset($attendeeSports[$attendeeId])) {
+                $attendeeSports[$attendeeId] = array();
+            }
+            $attendeeSports[$attendeeId][$spId] = true;
+        }
+
+        // Build rows: mỗi VĐV một dòng
+        $rows = array();
+        foreach ($attendeeSports as $attendeeId => $sports) {
+            $att = $attendeeMap[$attendeeId];
+            $propId = isset($att->property_id) ? $att->property_id : null;
+            $propInfo = ($propId && isset($propertyMap[$propId])) ? $propertyMap[$propId] : null;
+            $regionId = $propInfo ? $propInfo['region_id'] : null;
+
+            $regionCode = ($regionId && isset($regionalCodeMap[$regionId])) ? $regionalCodeMap[$regionId] : '';
+            $regionName = ($regionId && isset($regionalMap[$regionId])) ? $regionalMap[$regionId] : 'Chưa phân cụm';
+
+            $gender = isset($att->gender) ? $att->gender : '';
+            $genderText = '';
+            if ($gender === 'male' || $gender === 1 || $gender === '1') $genderText = 'Nam';
+            elseif ($gender === 'female' || $gender === 2 || $gender === '2') $genderText = 'Nữ';
+
+            $rows[] = array(
+                'region_sort' => $regionCode !== '' ? $regionCode : 'ZZZ',
+                'region_label' => $regionCode !== '' ? $regionCode : $regionName,
+                'property_code' => $propInfo ? $propInfo['code'] : '',
+                'full_name' => isset($att->full_name) ? $att->full_name : '',
+                'gender' => $genderText,
+                'staff_code' => isset($att->staff_code) ? $att->staff_code : '',
+                'position' => isset($att->position_name) ? $att->position_name : '',
+                'division' => isset($att->division_name) ? $att->division_name : '',
+                'sports' => $sports,
+            );
+        }
+
+        // Sắp xếp theo cụm -> mã đơn vị -> tên VĐV
+        usort($rows, function ($a, $b) {
+            $cmp = strnatcasecmp($a['region_sort'], $b['region_sort']);
+            if ($cmp !== 0) return $cmp;
+            $cmp = strnatcasecmp($a['property_code'], $b['property_code']);
+            if ($cmp !== 0) return $cmp;
+            return strnatcasecmp($a['full_name'], $b['full_name']);
+        });
+
+        // Initialize PHPExcel
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $objPHPExcel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        $objPHPExcel->getProperties()->setCreator("System")
+            ->setLastModifiedBy("System")
+            ->setTitle("Danh sach VDV theo cum")
+            ->setSubject("Danh sach VDV theo cum");
+
+        $headerStyle = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 10),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '3A57E8')
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                'wrap' => true,
+            ),
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('rgb' => 'CCCCCC')
+                )
+            )
+        );
+
+        $borderStyle = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('rgb' => 'E9ECEF')
+                )
+            )
+        );
+
+        $sheet = $objPHPExcel->setActiveSheetIndex(0);
+        $sheet->setTitle('DS VDV theo cum');
+
+        $fixedHeaders = array('STT', 'Cụm', 'Mã ĐV', 'Họ và tên', 'Giới tính', 'Mã NV', 'Chức danh', 'Bộ phận');
+        $totalColumns = count($fixedHeaders) + count($sportColumns);
+        $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalColumns - 1);
+
+        // Title row
+        $title = 'DANH SÁCH VẬN ĐỘNG VIÊN THAM GIA ' . mb_strtoupper($eventName ?: 'ĐẠI HỘI', 'UTF-8');
+        $sheet->setCellValue('A1', $title);
+        $sheet->mergeCells('A1:' . $lastColLetter . '1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        // Header row
+        $colIndex = 0;
+        foreach ($fixedHeaders as $header) {
+            $sheet->setCellValueByColumnAndRow($colIndex, 2, $header);
+            $colIndex++;
+        }
+        foreach ($sportColumns as $spName) {
+            $sheet->setCellValueByColumnAndRow($colIndex, 2, $spName);
+            $colIndex++;
+        }
+        $sheet->getStyle('A2:' . $lastColLetter . '2')->applyFromArray($headerStyle);
+        $sheet->getRowDimension(2)->setRowHeight(45);
+
+        // Data rows
+        $row = 3;
+        $stt = 1;
+        foreach ($rows as $rowData) {
+            $colIndex = 0;
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $stt++);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $rowData['region_label']);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $rowData['property_code']);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $rowData['full_name']);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $rowData['gender']);
+            $sheet->setCellValueExplicitByColumnAndRow($colIndex++, $row, $rowData['staff_code'], PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $rowData['position']);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $rowData['division']);
+
+            foreach ($sportColumns as $spId => $spName) {
+                if (isset($rowData['sports'][$spId])) {
+                    $sheet->setCellValueByColumnAndRow($colIndex, $row, 'x');
+                    $sheet->getStyleByColumnAndRow($colIndex, $row)->getAlignment()
+                        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                }
+                $colIndex++;
+            }
+
+            $sheet->getStyle('A' . $row . ':' . $lastColLetter . $row)->applyFromArray($borderStyle);
+            $row++;
+        }
+
+        if (empty($rows)) {
+            $sheet->setCellValue('A3', 'Không có dữ liệu VĐV nào.');
+        }
+
+        // Column widths: auto cho các cột thông tin, cố định cho các cột nội dung
+        for ($i = 0; $i < count($fixedHeaders); $i++) {
+            $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setAutoSize(true);
+        }
+        for ($i = count($fixedHeaders); $i < $totalColumns; $i++) {
+            $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth(12);
+        }
+
+        // Freeze title + header
+        $sheet->freezePane('A3');
+
+        $safeName = preg_replace('/[^A-Za-z0-9]/', '_', UrlTransliterate::cleanString($eventName ?: 'Event', '_'));
+        $filename = "DS_VDV_theo_cum_" . $safeName . "_" . date('Ymd') . ".xlsx";
+
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        Yii::app()->end();
+    }
 }
