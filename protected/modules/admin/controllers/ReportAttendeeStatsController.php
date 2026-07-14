@@ -1049,6 +1049,9 @@ class ReportAttendeeStatsController extends AdminController
                         'full_name' => !empty($m['attendee_name']) ? $m['attendee_name']
                             : ($attInfo && !empty($attInfo['full_name']) ? $attInfo['full_name']
                                 : (isset($m['name']) ? $m['name'] : '')),
+                        'gender' => ($attInfo && $attInfo['gender'] !== null && $attInfo['gender'] !== '')
+                            ? $attInfo['gender']
+                            : (isset($m['gender']) ? $m['gender'] : null),
                         'property_name' => $attInfo && !empty($attInfo['property_name']) ? $attInfo['property_name'] : $teamPropertyName,
                         'region_name' => isset($regionalMap[$pRegionId]) ? $regionalMap[$pRegionId]['name'] : 'Chưa phân cụm',
                         'position' => !empty($m['attendee_position']) ? $m['attendee_position']
