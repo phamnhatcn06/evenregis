@@ -127,9 +127,14 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
         <div class="card border shadow-sm">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fa fa-table me-2 text-primary"></i>Chi tiết theo Cụm và Đơn vị</h5>
-                <a href="<?php echo $this->createUrl('/admin/reports/admin'); ?>" class="btn btn-outline-secondary btn-sm">
-                    <i class="fa fa-arrow-left me-1"></i> Quay lại báo cáo chung
-                </a>
+                <div class="d-flex gap-2">
+                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportAthletesByRegional', array('event_id' => $selectedEventId)); ?>" class="btn btn-success btn-sm">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất DS VĐV theo cụm
+                    </a>
+                    <a href="<?php echo $this->createUrl('/admin/reports/admin'); ?>" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa fa-arrow-left me-1"></i> Quay lại báo cáo chung
+                    </a>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
