@@ -931,6 +931,7 @@ class ReportAttendeeStatsController extends AdminController
                     'position' => isset($att->position) ? $att->position : '',
                     'property_name' => isset($att->property_name) ? $att->property_name : '',
                     'property_id' => isset($att->property_id) ? $att->property_id : null,
+                    'gender' => isset($att->gender) ? $att->gender : null,
                 );
             }
         }
