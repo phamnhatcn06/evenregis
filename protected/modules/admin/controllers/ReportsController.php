@@ -2761,10 +2761,10 @@ class ReportsController extends AdminController
             $regionCode = ($regionId && isset($regionalCodeMap[$regionId])) ? $regionalCodeMap[$regionId] : '';
             $regionName = ($regionId && isset($regionalMap[$regionId])) ? $regionalMap[$regionId] : 'Chưa phân cụm';
 
-            $gender = isset($att->gender) ? $att->gender : '';
+            $gender = isset($att->gender) ? $att->gender : null;
             $genderText = '';
             if ($gender === 'male' || $gender === 1 || $gender === '1') $genderText = 'Nam';
-            elseif ($gender === 'female' || $gender === 2 || $gender === '2') $genderText = 'Nữ';
+            elseif ($gender === 'female' || $gender === 0 || $gender === '0') $genderText = 'Nữ';
 
             $rows[] = array(
                 'region_sort' => $regionCode !== '' ? $regionCode : 'ZZZ',
