@@ -7,11 +7,12 @@ Yii::setPathOfAlias('chartjs', dirname(__FILE__) . '/../extensions/yii-chartjs')
 // CWebApplication properties can be configured here.
 return array(
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
-    'name' => 'Website Đăng ký sự kiện',
+    'name' => 'Website đăng ký và triển khai Sự kiện',
     'theme' => 'hope-ui',
     'sourceLanguage' => 'en',
     'language' => 'vi',
-    'defaultController' => 'frontend',
+    'timeZone' => 'Asia/Ho_Chi_Minh',
+    'defaultController' => 'site',
     // preloading 'log' component
     'preload' => array('log', 'chartjs'),
     // autoloading model and component classes
@@ -34,7 +35,7 @@ return array(
             'ipFilters' => array('127.0.0.1', '::1'),
         ),
         'admin' => array(
-            'defaultController' => 'users/login',
+            'defaultController' => 'default',
         ),
         'frontend' => array(
             'defaultController' => 'users/login',
@@ -48,6 +49,18 @@ return array(
     ),
     // application components
     'components' => array(
+        // Memcached cache
+        'cache' => array(
+            'class' => 'CMemCache',
+            // 'useMemcached' => true,
+            'servers' => array(
+                array(
+                    'host' => '127.0.0.1',
+                    'port' => 11211,
+                    'weight' => 100,
+                ),
+            ),
+        ),
         'chartjs' => array('class' => 'chartjs.components.ChartJs'),
         'ePdf' => array(
             'class' => 'ext.yii-pdf.EYiiPdf',
@@ -92,6 +105,9 @@ return array(
         ),
         'phpThumb' => array(
             'class' => 'ext.EPhpThumb.EPhpThumb',
+            'options' => array(
+                'jpegQuality' => 90,
+            ),
         ),
         'mobileDetect' => array(
             'class' => 'ext.MobileDetect.MobileDetect',
@@ -101,8 +117,8 @@ return array(
         ),
         'booster' => array(
             'class' => 'ext.booster.components.Booster',
-            'bootstrapCss' => true,
-            'responsiveCss' => true,
+            'bootstrapCss' => false,  // Disabled - using Bootstrap 5 from Hope UI theme
+            'responsiveCss' => false, // Disabled - using Bootstrap 5 from Hope UI theme
         ),
         'preload' => array(
             'booster',
@@ -129,6 +145,14 @@ return array(
         ),
         // database settings are configured in database.php
         'db' => require(dirname(__FILE__) . '/database.php'),
+
+        // Email component - cấu hình SMTP trong params.php -> mail
+        'mail' => array(
+            'class' => 'application.components.MailComponent',
+            'viewPath' => 'application.views.mail',
+            'logging' => true,
+            'dryRun' => false,
+        ),
         //
         //        'dbadvert' => array(
         //            'connectionString' => 'sqlsrv:Server=SWS3-NHAT; Database=MuongThanh_Dashboard',
@@ -146,28 +170,22 @@ return array(
         'log' => array(
             'class' => 'CLogRouter',
             'routes' => array(
-                //                array(
-                //                    'class' => 'CWebLogRoute',
-                //                ),
-                //                array(
-                //                    'class'=>'ext.yii-debug-toolbar.YiiDebugToolbarRoute',
-                //                    'ipFilters'=>array('127.0.0.1','::1'),
-                //                ),
-                /*
-            array(
-            'class'=>'CFileLogRoute',
-            'levels'=>'trace,log',
-            'categories' => 'system.db.CDbCommand',
-            'logFile' => 'db.log',
+                // array(
+                //     'class' => 'CFileLogRoute',
+                //     'levels' => 'error, warning, info',
+                //     'categories' => 'application.*',
+                //     'logFile' => 'application.log',
+                // ),
+                // Hiển thị lỗi chi tiết trên browser (chỉ dùng khi dev)
+                array(
+                    'class' => 'CWebLogRoute',
+                    'levels' => 'error, warning, trace',
+                    'showInFireBug' => false,
+                ),
             ),
-             */),
         ),
     ),
     // application-level parameters that can be accessed
     // using Yii::app()->params['paramName']
-    'params' => array(
-        // this is used in contact page
-        'adminEmail' => 'webmaster@example.com',
-        'onCache' => 0,
-    ),
+    'params' => require(dirname(__FILE__) . '/params.php'),
 );

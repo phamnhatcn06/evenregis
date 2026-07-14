@@ -4,7 +4,7 @@
 return array(
     //'connectionString' => 'sqlite:' . dirname(__FILE__) . '/../data/testdrive.db',
     // uncomment the following lines to use a MySQL database
-    'connectionString' => 'mysql:host=localhost;dbname=yii_event',
+    'connectionString' => 'mysql:host=localhost;dbname=lrv_even',
     'emulatePrepare' => true,
     'username' => 'root',
     'password' => '123456a@',
@@ -13,4 +13,7 @@ return array(
     'charset' => 'utf8',
     'enableParamLogging' => true,
     'enableProfiling' => true,
+    'initSQLs' => array(
+        "SET time_zone = '+07:00'",
+    ),
 );

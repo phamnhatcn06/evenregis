@@ -2,6 +2,7 @@
 return array(
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
     'name' => 'My Console Application',
+    'timeZone' => 'Asia/Ho_Chi_Minh',
     // preloading 'log' component
     'preload' => array('log'),
     'import' => array(
