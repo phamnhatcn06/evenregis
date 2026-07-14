@@ -2644,7 +2644,7 @@ class ReportsController extends AdminController
             if ($propId) {
                 $propertyMap[$propId] = array(
                     'region_id' => isset($prop->region_id) ? $prop->region_id : null,
-                    'code' => isset($prop->code) ? $prop->code : '',
+                    'prefix' => isset($prop->prefix) ? $prop->prefix : '',
                     'name' => isset($prop->name) ? $prop->name : '',
                 );
             }
