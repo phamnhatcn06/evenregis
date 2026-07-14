@@ -82,6 +82,24 @@ class SportTeamMembers extends BaseSportTeamMembers
     }
 
     /**
+     * Lấy danh sách raw thành viên đội theo sự kiện (dạng mảng từ API)
+     */
+    public static function getRawListByEvent($eventId, $perPage = 10000)
+    {
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'event_id' => $eventId,
+            'per_page' => $perPage,
+        ));
+        if ($result['success']) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+        return array();
+    }
+
+    /**
      * Map attendee_name từ nested attendee object
      */
     public function setAttendee($value)
