@@ -1334,16 +1334,10 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->getColumnDimension('F')->setWidth(11);
         }
 
-        if ($excel->getSheetCount() === 0) {
-            $sheet = $excel->createSheet(0);
-            $sheet->setTitle('Danh sách VĐV');
-            $sheet->setCellValue('A1', 'Chưa có dữ liệu');
-        }
-
         $excel->setActiveSheetIndex(0);
 
         // Output
-        $filename = 'danh_sach_vdv_theo_cum.xlsx';
+        $filename = 'danh_sach_vdv_thi_sinh_theo_cum.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
