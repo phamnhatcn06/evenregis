@@ -953,6 +953,10 @@ class ReportAttendeeStatsController extends AdminController
             $propId = isset($team->property_id) ? $team->property_id : null;
             $regionId = ($propId && isset($propertyMap[$propId]) && $propertyMap[$propId]['region_id'])
                 ? $propertyMap[$propId]['region_id'] : 0;
+            // Cụm không có trong danh sách active thì gom vào "Chưa phân cụm"
+            if ($regionId && !isset($regionalMap[$regionId])) {
+                $regionId = 0;
+            }
             $spId = isset($team->sport_id) ? $team->sport_id : null;
             if (!$spId || !isset($activeSportIds[$spId])) continue;
             $teamsByRegionSport[$regionId][$spId][] = $teamId;
