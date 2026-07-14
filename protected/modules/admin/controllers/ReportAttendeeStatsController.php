@@ -1100,16 +1100,17 @@ class ReportAttendeeStatsController extends AdminController
         $summarySheet->setTitle($this->buildSheetTitle('Tổng hợp', $usedTitles));
 
         $summarySheet->setCellValue('A1', 'DANH SÁCH VĐV VÀ THÍ SINH THI NGHIỆP VỤ');
-        $summarySheet->mergeCells('A1:F1');
+        $summarySheet->mergeCells('A1:G1');
         $summarySheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 
         $summarySheet->setCellValue('A3', 'STT');
         $summarySheet->setCellValue('B3', 'Họ và tên');
-        $summarySheet->setCellValue('C3', 'Đơn vị');
-        $summarySheet->setCellValue('D3', 'Cụm');
-        $summarySheet->setCellValue('E3', 'Chức danh');
-        $summarySheet->setCellValue('F3', 'Nội dung tham gia');
-        $summarySheet->getStyle('A3:F3')->applyFromArray(array(
+        $summarySheet->setCellValue('C3', 'Giới tính');
+        $summarySheet->setCellValue('D3', 'Đơn vị');
+        $summarySheet->setCellValue('E3', 'Cụm');
+        $summarySheet->setCellValue('F3', 'Chức danh');
+        $summarySheet->setCellValue('G3', 'Nội dung tham gia');
+        $summarySheet->getStyle('A3:G3')->applyFromArray(array(
             'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
             'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '2563EB')),
             'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
@@ -1120,11 +1121,12 @@ class ReportAttendeeStatsController extends AdminController
         foreach ($participants as $p) {
             $summarySheet->setCellValue('A' . $row, $stt++);
             $summarySheet->setCellValue('B' . $row, $p['full_name']);
-            $summarySheet->setCellValue('C' . $row, $p['property_name']);
-            $summarySheet->setCellValue('D' . $row, $p['region_name']);
-            $summarySheet->setCellValue('E' . $row, $p['position']);
-            $summarySheet->setCellValue('F' . $row, implode(', ', array_keys($p['contents'])));
-            $summarySheet->getStyle('A' . $row . ':F' . $row)->applyFromArray(array(
+            $summarySheet->setCellValue('C' . $row, $this->formatGender($p['gender']));
+            $summarySheet->setCellValue('D' . $row, $p['property_name']);
+            $summarySheet->setCellValue('E' . $row, $p['region_name']);
+            $summarySheet->setCellValue('F' . $row, $p['position']);
+            $summarySheet->setCellValue('G' . $row, implode(', ', array_keys($p['contents'])));
+            $summarySheet->getStyle('A' . $row . ':G' . $row)->applyFromArray(array(
                 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
             ));
             $row++;
@@ -1132,11 +1134,12 @@ class ReportAttendeeStatsController extends AdminController
 
         $summarySheet->getColumnDimension('A')->setWidth(6);
         $summarySheet->getColumnDimension('B')->setWidth(30);
-        $summarySheet->getColumnDimension('C')->setWidth(30);
-        $summarySheet->getColumnDimension('D')->setWidth(18);
-        $summarySheet->getColumnDimension('E')->setWidth(22);
-        $summarySheet->getColumnDimension('F')->setWidth(60);
-        $summarySheet->getStyle('F4:F' . max(4, $row - 1))->getAlignment()->setWrapText(true);
+        $summarySheet->getColumnDimension('C')->setWidth(10);
+        $summarySheet->getColumnDimension('D')->setWidth(30);
+        $summarySheet->getColumnDimension('E')->setWidth(18);
+        $summarySheet->getColumnDimension('F')->setWidth(22);
+        $summarySheet->getColumnDimension('G')->setWidth(60);
+        $summarySheet->getStyle('G4:G' . max(4, $row - 1))->getAlignment()->setWrapText(true);
 
         // Danh sách sheet cụm: các cụm active + "Chưa phân cụm" nếu có đội/thí sinh chưa thuộc cụm nào
         $sheetRegionals = $sortedRegionals;
