@@ -76,6 +76,24 @@ class CompetitionRegistrations extends BaseCompetitionRegistrations
         ));
     }
 
+    /**
+     * Lấy danh sách raw đăng ký thi nghiệp vụ theo sự kiện (dạng mảng từ API)
+     */
+    public static function getRawListByEvent($eventId, $perPage = 10000)
+    {
+        $result = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, array(
+            'event_id' => $eventId,
+            'per_page' => $perPage,
+        ));
+        if ($result['success']) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+        return array();
+    }
+
     public static function confirmViaApi($id)
     {
         $url = ApiEndpoints::url(ApiEndpoints::COMPETITION_REGISTRATION_CONFIRM, array('id' => $id));
