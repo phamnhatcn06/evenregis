@@ -1164,9 +1164,7 @@ class ReportAttendeeStatsController extends AdminController
         $reportData = $this->buildReport($eventId, $isHO, $userPropertyId);
         $sportStats = isset($reportData['sportStats']) ? $reportData['sportStats'] : array();
 
-        Yii::import('application.extensions.phpexcel.PHPExcel');
-
-        $excel = new PHPExcel();
+        $excel = $this->createPhpExcel();
         $sheet = $excel->getActiveSheet();
         $sheet->setTitle('VĐV theo môn TT');
 
