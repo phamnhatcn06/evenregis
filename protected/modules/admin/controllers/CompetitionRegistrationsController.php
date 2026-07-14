@@ -936,6 +936,24 @@ class CompetitionRegistrationsController extends AdminController
             );
         }
 
+        // Sắp xếp thí sinh theo cụm, đơn vị, họ tên (cụm rỗng xuống cuối)
+        usort($rows, function ($a, $b) {
+            $rA = $a['region_name'];
+            $rB = $b['region_name'];
+
+            if ($rA === '' && $rB !== '') return 1;
+            if ($rB === '' && $rA !== '') return -1;
+
+            $cmp = strnatcasecmp($rA, $rB);
+            if ($cmp === 0) {
+                $cmp = strnatcasecmp($a['property_name'], $b['property_name']);
+            }
+            if ($cmp === 0) {
+                $cmp = strnatcasecmp($a['attendee_name'], $b['attendee_name']);
+            }
+            return $cmp;
+        });
+
         // Export Excel
         $this->initPHPExcel();
         $excel = new PHPExcel();
