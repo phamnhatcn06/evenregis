@@ -838,7 +838,8 @@ class ReportAttendeeStatsController extends AdminController
                 );
             }
         }
-        usort($regionalMap, function ($a, $b) {
+        $sortedRegionals = array_values($regionalMap);
+        usort($sortedRegionals, function ($a, $b) {
             return strnatcasecmp($a['name'], $b['name']);
         });
 
