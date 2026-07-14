@@ -1116,6 +1116,20 @@ class ReportAttendeeStatsController extends AdminController
     }
 
     /**
+     * Khởi tạo PHPExcel (thư viện nằm trong ext.phpexcel.Classes,
+     * phải tạm gỡ autoloader của Yii khi load để tránh xung đột)
+     */
+    protected function createPhpExcel()
+    {
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $excel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+        return $excel;
+    }
+
+    /**
      * Tạo tên sheet hợp lệ (bỏ ký tự cấm, tối đa 31 ký tự, không trùng)
      */
     protected function buildSheetTitle($name, &$usedTitles)
