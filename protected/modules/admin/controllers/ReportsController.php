@@ -2768,8 +2768,8 @@ class ReportsController extends AdminController
 
             $rows[] = array(
                 'region_sort' => $regionCode !== '' ? $regionCode : 'ZZZ',
-                'region_label' => $regionCode !== '' ? $regionCode : $regionName,
-                'property_code' => $propInfo ? $propInfo['code'] : '',
+                'region_label' => $regionName,
+                'property_code' => $propInfo ? $propInfo['prefix'] : '',
                 'full_name' => isset($att->full_name) ? $att->full_name : '',
                 'gender' => $genderText,
                 'staff_code' => isset($att->staff_code) ? $att->staff_code : '',
