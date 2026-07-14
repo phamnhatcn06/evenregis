@@ -1139,19 +1139,25 @@ class ReportAttendeeStatsController extends AdminController
             $sheetRegionals[] = array('id' => 0, 'name' => 'Chưa phân cụm', 'code' => '');
         }
 
-        $usedTitles = array();
-        $sheetIndex = 0;
+        $sheetIndex = 1;
         foreach ($sheetRegionals as $regional) {
             $regionId = $regional['id'];
             $sheet = $excel->createSheet($sheetIndex++);
             $sheet->setTitle($this->buildSheetTitle($regional['name'], $usedTitles));
 
             // Tiêu đề sheet
-            $sheet->setCellValue('A1', 'DANH SÁCH VĐV — CỤM: ' . mb_strtoupper($regional['name'], 'UTF-8'));
+            $sheet->setCellValue('A1', 'DANH SÁCH VĐV VÀ THÍ SINH — CỤM: ' . mb_strtoupper($regional['name'], 'UTF-8'));
             $sheet->mergeCells('A1:F1');
             $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 
             $row = 3;
+
+            // Phần I: Thể thao
+            $sheet->setCellValue('A' . $row, 'I. THỂ THAO');
+            $sheet->mergeCells('A' . $row . ':F' . $row);
+            $sheet->getStyle('A' . $row)->getFont()->setBold(true)->setSize(12);
+            $row += 2;
+
             foreach ($contents as $content) {
                 $spId = $content['sport_id'];
                 $teamIds = isset($teamsByRegionSport[$regionId][$spId]) ? $teamsByRegionSport[$regionId][$spId] : array();
