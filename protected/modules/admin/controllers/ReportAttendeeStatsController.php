@@ -1069,6 +1069,7 @@ class ReportAttendeeStatsController extends AdminController
                 $pRegionId = $resolveRegionId($attInfo['property_id']);
                 $participants[$key] = array(
                     'full_name' => $attInfo['full_name'],
+                    'gender' => $attInfo['gender'],
                     'property_name' => $attInfo['property_name'],
                     'region_name' => isset($regionalMap[$pRegionId]) ? $regionalMap[$pRegionId]['name'] : 'Chưa phân cụm',
                     'position' => $attInfo['position'],
