@@ -962,9 +962,7 @@ class ReportAttendeeStatsController extends AdminController
             $teamsByRegionSport[$regionId][$spId][] = $teamId;
         }
 
-        Yii::import('application.extensions.phpexcel.PHPExcel');
-
-        $excel = new PHPExcel();
+        $excel = $this->createPhpExcel();
         $excel->removeSheetByIndex(0);
 
         // Danh sách sheet: các cụm active + "Chưa phân cụm" nếu có đội chưa thuộc cụm nào
