@@ -1261,6 +1261,70 @@ class ReportAttendeeStatsController extends AdminController
                 $row++; // dòng trống giữa các nội dung
             }
 
+            // Phần II: Thi nghiệp vụ
+            if (!empty($displayCompetitions)) {
+                $sheet->setCellValue('A' . $row, 'II. THI NGHIỆP VỤ');
+                $sheet->mergeCells('A' . $row . ':F' . $row);
+                $sheet->getStyle('A' . $row)->getFont()->setBold(true)->setSize(12);
+                $row += 2;
+
+                foreach ($displayCompetitions as $competition) {
+                    $compId = $competition['id'];
+                    $contestants = isset($contestantsByRegionComp[$regionId][$compId])
+                        ? $contestantsByRegionComp[$regionId][$compId] : array();
+
+                    // Header cuộc thi
+                    $sheet->setCellValue('A' . $row, $competition['name'] . ' (' . count($contestants) . ' thí sinh)');
+                    $sheet->mergeCells('A' . $row . ':F' . $row);
+                    $sheet->getStyle('A' . $row)->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
+                    $sheet->getStyle('A' . $row . ':F' . $row)->getFill()
+                        ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+                        ->getStartColor()->setRGB('10B981');
+                    $row++;
+
+                    if (empty($contestants)) {
+                        $sheet->setCellValue('A' . $row, 'Chưa có thí sinh đăng ký');
+                        $sheet->mergeCells('A' . $row . ':F' . $row);
+                        $sheet->getStyle('A' . $row)->getFont()->setItalic(true);
+                        $row += 2;
+                        continue;
+                    }
+
+                    usort($contestants, function ($a, $b) {
+                        $cmp = strnatcasecmp($a['property_name'], $b['property_name']);
+                        return $cmp !== 0 ? $cmp : strnatcasecmp($a['full_name'], $b['full_name']);
+                    });
+
+                    // Header cột danh sách thí sinh
+                    $sheet->setCellValue('A' . $row, 'STT');
+                    $sheet->setCellValue('B' . $row, 'Họ và tên');
+                    $sheet->setCellValue('C' . $row, 'Đơn vị');
+                    $sheet->setCellValue('D' . $row, 'Chức danh');
+                    $sheet->setCellValue('E' . $row, 'Số báo danh');
+                    $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray(array(
+                        'font' => array('bold' => true),
+                        'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'F3F4F6')),
+                        'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+                    ));
+                    $row++;
+
+                    $stt = 1;
+                    foreach ($contestants as $contestant) {
+                        $sheet->setCellValue('A' . $row, $stt++);
+                        $sheet->setCellValue('B' . $row, $contestant['full_name']);
+                        $sheet->setCellValue('C' . $row, $contestant['property_name']);
+                        $sheet->setCellValue('D' . $row, $contestant['position']);
+                        $sheet->setCellValue('E' . $row, $contestant['candidate_number']);
+                        $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray(array(
+                            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+                        ));
+                        $row++;
+                    }
+
+                    $row++; // dòng trống giữa các cuộc thi
+                }
+            }
+
             // Độ rộng cột
             $sheet->getColumnDimension('A')->setWidth(6);
             $sheet->getColumnDimension('B')->setWidth(30);
