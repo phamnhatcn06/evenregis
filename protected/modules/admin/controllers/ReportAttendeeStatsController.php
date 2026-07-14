@@ -727,9 +727,7 @@ class ReportAttendeeStatsController extends AdminController
             $filename = $type === 'most' ? 'top50_nhieu_mon_the_thao.xlsx' : 'top50_it_mon_the_thao.xlsx';
         }
 
-        Yii::import('application.extensions.phpexcel.PHPExcel');
-
-        $excel = new PHPExcel();
+        $excel = $this->createPhpExcel();
         $sheet = $excel->getActiveSheet();
         $sheet->setTitle('Báo cáo');
 
