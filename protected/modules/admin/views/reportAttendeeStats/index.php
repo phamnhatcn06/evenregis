@@ -128,6 +128,9 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fa fa-table me-2 text-primary"></i>Chi tiết theo Cụm và Đơn vị</h5>
                 <div class="d-flex gap-2">
+                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportAttendeeDetail', array('event_id' => $selectedEventId)); ?>" class="btn btn-primary btn-sm">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất chi tiết người tham dự
+                    </a>
                     <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportAthletesByRegional', array('event_id' => $selectedEventId)); ?>" class="btn btn-success btn-sm">
                         <i class="fa fa-file-excel-o me-1"></i> Xuất DS VĐV theo cụm
                     </a>
