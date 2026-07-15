@@ -1513,22 +1513,45 @@ class ReportAttendeeStatsController extends AdminController
             return strnatcasecmp($a['name'], $b['name']);
         });
 
-        // Người tham dự (map tra cứu)
+        // Bản đăng ký active (không bị xóa, không phải nháp)
+        $activeRegistrationIds = array();
+        $registrationsRes = Registrations::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 1000), 10000)->getData();
+        foreach ($registrationsRes as $reg) {
+            $regDeletedAt = isset($reg->deleted_at) ? $reg->deleted_at : null;
+            if ($regDeletedAt) continue;
+            $regStatus = isset($reg->status) ? (int)$reg->status : 0;
+            if ($regStatus === Registrations::STATUS_DRAFT) continue;
+            $regId = isset($reg->id) ? $reg->id : null;
+            if ($regId) {
+                $activeRegistrationIds[$regId] = true;
+            }
+        }
+
+        // Người tham dự (map tra cứu): chỉ lấy người đang active,
+        // không bị xóa và thuộc một bản đăng ký active
         $attendeeMap = array();
         $rawAttendees = Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData();
         foreach ($rawAttendees as $att) {
             $attId = isset($att->id) ? $att->id : null;
-            if ($attId) {
-                $attendeeMap[$attId] = array(
-                    'full_name' => isset($att->full_name) ? $att->full_name : '',
-                    'gender' => isset($att->gender) ? $att->gender : null,
-                    'staff_code' => isset($att->staff_code) ? $att->staff_code : '',
-                    'position' => isset($att->position) ? $att->position : '',
-                    'department_name' => isset($att->department_name) ? $att->department_name : '',
-                    'property_id' => isset($att->property_id) ? $att->property_id : null,
-                    'property_name' => isset($att->property_name) ? $att->property_name : '',
-                );
-            }
+            if (!$attId) continue;
+
+            $attDeletedAt = isset($att->deleted_at) ? $att->deleted_at : null;
+            if ($attDeletedAt) continue;
+
+            if (isset($att->is_active) && $att->is_active !== null && $att->is_active !== '' && !(int)$att->is_active) continue;
+
+            $regId = isset($att->registration_id) ? $att->registration_id : null;
+            if (!$regId || !isset($activeRegistrationIds[$regId])) continue;
+
+            $attendeeMap[$attId] = array(
+                'full_name' => isset($att->full_name) ? $att->full_name : '',
+                'gender' => isset($att->gender) ? $att->gender : null,
+                'staff_code' => isset($att->staff_code) ? $att->staff_code : '',
+                'position' => isset($att->position) ? $att->position : '',
+                'department_name' => isset($att->department_name) ? $att->department_name : '',
+                'property_id' => isset($att->property_id) ? $att->property_id : null,
+                'property_name' => isset($att->property_name) ? $att->property_name : '',
+            );
         }
 
         $resolveRegionId = function ($propId) use ($propertyMap, $regionalMap) {
