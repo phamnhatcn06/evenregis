@@ -1589,26 +1589,29 @@ class ReportAttendeeStatsController extends AdminController
             $spId = isset($team->sport_id) ? $team->sport_id : null;
             if (!$spId || !isset($activeSportIds[$spId])) continue;
 
+            // Chỉ nhận thành viên gắn với người tham dự đã qua rà soát
+            // (đang active, không bị xóa, thuộc bản đăng ký active)
             $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
-            $key = $attId ? 'a' . $attId : 'm' . (isset($sm['id']) ? $sm['id'] : uniqid());
+            if (!$attId || !isset($attendeeMap[$attId])) continue;
+
+            $key = 'a' . $attId;
             if (!isset($participants[$key])) {
-                $attInfo = ($attId && isset($attendeeMap[$attId])) ? $attendeeMap[$attId] : null;
+                $attInfo = $attendeeMap[$attId];
                 $teamPropId = isset($team->property_id) ? $team->property_id : null;
-                $propId = ($attInfo && $attInfo['property_id']) ? $attInfo['property_id'] : $teamPropId;
+                $propId = $attInfo['property_id'] ? $attInfo['property_id'] : $teamPropId;
                 $propInfo = ($propId && isset($propertyMap[$propId])) ? $propertyMap[$propId] : null;
                 $participants[$key] = $initParticipant(array(
-                    'full_name' => !empty($sm['attendee_name']) ? $sm['attendee_name']
-                        : ($attInfo && !empty($attInfo['full_name']) ? $attInfo['full_name']
-                            : (isset($sm['name']) ? $sm['name'] : '')),
-                    'gender' => ($attInfo && $attInfo['gender'] !== null && $attInfo['gender'] !== '')
+                    'full_name' => !empty($attInfo['full_name']) ? $attInfo['full_name']
+                        : (isset($sm['attendee_name']) ? $sm['attendee_name'] : ''),
+                    'gender' => ($attInfo['gender'] !== null && $attInfo['gender'] !== '')
                         ? $attInfo['gender']
                         : (isset($sm['gender']) ? $sm['gender'] : null),
-                    'staff_code' => $attInfo ? $attInfo['staff_code'] : '',
-                    'position' => !empty($sm['attendee_position']) ? $sm['attendee_position']
-                        : ($attInfo && !empty($attInfo['position']) ? $attInfo['position'] : ''),
-                    'department_name' => $attInfo ? $attInfo['department_name'] : '',
+                    'staff_code' => $attInfo['staff_code'],
+                    'position' => !empty($attInfo['position']) ? $attInfo['position']
+                        : (isset($sm['attendee_position']) ? $sm['attendee_position'] : ''),
+                    'department_name' => $attInfo['department_name'],
                     'property_code' => $propInfo ? $propInfo['code'] : '',
-                    'property_name' => ($attInfo && !empty($attInfo['property_name'])) ? $attInfo['property_name']
+                    'property_name' => !empty($attInfo['property_name']) ? $attInfo['property_name']
                         : ($propInfo ? $propInfo['name'] : (!empty($team->property_name) ? $team->property_name : '')),
                 ), $resolveRegionId($propId));
             }
