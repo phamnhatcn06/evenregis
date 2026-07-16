@@ -169,6 +169,30 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
+        // Gộp các attendee trùng nhau: cùng mã nhân viên hoặc cùng số CCCD/CMND
+        // thì tính là 1 người (quy về bản ghi gặp đầu tiên)
+        $attendeeAlias = array();
+        $staffCodeIndex = array();
+        $idCardIndex = array();
+        foreach ($attendees as $attId => $att) {
+            $staffCode = isset($att->staff_code) ? mb_strtoupper(trim((string)$att->staff_code), 'UTF-8') : '';
+            $idCard = isset($att->id_card) ? trim((string)$att->id_card) : '';
+
+            $canonicalId = null;
+            if ($staffCode !== '' && isset($staffCodeIndex[$staffCode])) {
+                $canonicalId = $staffCodeIndex[$staffCode];
+            } elseif ($idCard !== '' && isset($idCardIndex[$idCard])) {
+                $canonicalId = $idCardIndex[$idCard];
+            }
+            if ($canonicalId === null) {
+                $canonicalId = $attId;
+            }
+
+            $attendeeAlias[$attId] = $canonicalId;
+            if ($staffCode !== '') $staffCodeIndex[$staffCode] = $canonicalId;
+            if ($idCard !== '') $idCardIndex[$idCard] = $canonicalId;
+        }
+
         // Lấy event_sports để filter chỉ các môn active với event này
         $eventSportsList = EventSports::getByEventId($eventId);
         $activeSportIds = array();
