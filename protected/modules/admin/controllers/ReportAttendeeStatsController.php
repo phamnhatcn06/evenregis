@@ -482,13 +482,16 @@ class ReportAttendeeStatsController extends AdminController
 
         // Đếm số VĐV cho từng môn con (child sport)
         // Chỉ đếm những môn được cấu hình trong event_sports
+        // Đếm unique theo người sau khi gộp trùng mã NV / CCCD
+        $childSportSeen = array();
         foreach ($sportMembers as $sm) {
             $smDeletedAt = isset($sm['deleted_at']) ? $sm['deleted_at'] : null;
             if ($smDeletedAt) continue;
 
             $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
             $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
-            if (!$attId || !isset($attendeeStats[$attId])) continue;
+            if (!$attId || !isset($attendeeAlias[$attId])) continue;
+            $attId = $attendeeAlias[$attId];
 
             $sportId = isset($teamSportMap[$teamId]) ? $teamSportMap[$teamId] : null;
             if (!$sportId) continue;
@@ -500,7 +503,10 @@ class ReportAttendeeStatsController extends AdminController
 
             // Đếm cho child sport
             if ($sportId != $parentSportId && isset($sportStats[$parentSportId]['children'][$sportId])) {
-                $sportStats[$parentSportId]['children'][$sportId]['total_athletes']++;
+                if (!isset($childSportSeen[$sportId][$attId])) {
+                    $childSportSeen[$sportId][$attId] = true;
+                    $sportStats[$parentSportId]['children'][$sportId]['total_athletes']++;
+                }
             }
         }
 
