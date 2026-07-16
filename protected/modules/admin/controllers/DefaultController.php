@@ -77,10 +77,7 @@ class DefaultController extends AdminController
                 if (isset($periodsResult['data']['data'])) {
                     $periods = $periodsResult['data']['data'];
                 }
-                if (!empty($periods)) {
-                    // Lấy đợt cũ nhất (đầu tiên trong list đã sort ASC)
-                    $defaultPeriodId = $periods[0]['id'];
-                }
+                // Mặc định thống kê tất cả các đợt ($defaultPeriodId = null)
             }
         }
 
