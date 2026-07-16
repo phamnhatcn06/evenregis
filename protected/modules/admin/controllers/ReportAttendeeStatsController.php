@@ -554,7 +554,9 @@ class ReportAttendeeStatsController extends AdminController
 
             $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
             $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
-            if (!$attId || !isset($attendeePropertyMap[$attId])) continue;
+            if (!$attId || !isset($attendeeAlias[$attId])) continue;
+            $attId = $attendeeAlias[$attId];
+            if (!isset($attendeePropertyMap[$attId])) continue;
 
             $propId = $attendeePropertyMap[$attId];
             if (!isset($propertySportCount[$propId])) continue;
