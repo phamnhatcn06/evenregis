@@ -221,20 +221,10 @@ class DefaultController extends AdminController
             $talentEntries = (int)$talentRes['data']['pagination']['total'];
         }
 
-        // Attendees need to be filtered by registration -> period
-        // Chỉ đếm attendees từ registration đã submitted hoặc approved
-        $attendeeFilterParams = array('per_page' => 1, 'registration_status' => 'submitted,approved');
-        if ($periodId) {
-            $attendeeFilterParams['period_id'] = $periodId;
-        } elseif ($eventId) {
-            $attendeeFilterParams['event_id'] = $eventId;
-        }
-
-        $totalAttendees = 0;
-        $attendeeRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $attendeeFilterParams);
-        if ($attendeeRes['success'] && isset($attendeeRes['data']['pagination']['total'])) {
-            $totalAttendees = (int)$attendeeRes['data']['pagination']['total'];
-        }
+        // Số người đăng ký: cùng logic với báo cáo thống kê —
+        // attendee active thuộc bản đăng ký active (không nháp, không bị xóa),
+        // gộp trùng theo mã nhân viên / số CCCD
+        $totalAttendees = Attendees::countUniqueRegistered($eventId, $periodId);
 
         $competitionParticipants = 0;
         $compRes = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, $statsFilterParams);
