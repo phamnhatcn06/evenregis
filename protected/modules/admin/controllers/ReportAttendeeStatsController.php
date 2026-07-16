@@ -300,7 +300,8 @@ class ReportAttendeeStatsController extends AdminController
 
             $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
             $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
-            if (!$attId || !isset($attendeeStats[$attId])) continue;
+            if (!$attId || !isset($attendeeAlias[$attId])) continue;
+            $attId = $attendeeAlias[$attId];
 
             $sportId = isset($teamSportMap[$teamId]) ? $teamSportMap[$teamId] : null;
             if (!$sportId) continue;
@@ -318,16 +319,16 @@ class ReportAttendeeStatsController extends AdminController
             if ($crDeletedAt) continue;
 
             $attId = isset($cr['attendee_id']) ? $cr['attendee_id'] : null;
-            if ($attId && isset($attendeeStats[$attId])) {
-                $attendeeStats[$attId]['has_competition'] = true;
+            if ($attId && isset($attendeeAlias[$attId])) {
+                $attendeeStats[$attendeeAlias[$attId]]['has_competition'] = true;
             }
         }
 
         // Đếm miss
         foreach ($beautyContestants as $bc) {
             $attId = isset($bc['attendee_id']) ? $bc['attendee_id'] : null;
-            if ($attId && isset($attendeeStats[$attId])) {
-                $attendeeStats[$attId]['has_miss'] = true;
+            if ($attId && isset($attendeeAlias[$attId])) {
+                $attendeeStats[$attendeeAlias[$attId]]['has_miss'] = true;
             }
         }
 
