@@ -1423,7 +1423,7 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
-        // Đơn vị
+        // Đơn vị (Mã ĐV lấy từ prefix, fallback về code nếu trống)
         $propertyMap = array();
         $properties = Properties::getApiDataProvider(array('is_active' => 1), 1000)->getData();
         foreach ($properties as $p) {
@@ -1431,7 +1431,7 @@ class ReportAttendeeStatsController extends AdminController
             if ($pId) {
                 $propertyMap[$pId] = array(
                     'name' => isset($p->name) ? $p->name : '',
-                    'code' => isset($p->code) ? $p->code : '',
+                    'code' => !empty($p->prefix) ? $p->prefix : (isset($p->code) ? $p->code : ''),
                     'region_id' => isset($p->region_id) ? $p->region_id : null,
                 );
             }
