@@ -279,14 +279,17 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
-        // Tính toán cho từng attendee
+        // Tính toán cho từng attendee (chỉ theo attendee đại diện sau khi gộp trùng)
         $attendeeStats = array();
         foreach ($attendees as $attId => $att) {
-            $attendeeStats[$attId] = array(
-                'parent_sports' => array(),
-                'has_competition' => false,
-                'has_miss' => false,
-            );
+            $canonicalId = $attendeeAlias[$attId];
+            if (!isset($attendeeStats[$canonicalId])) {
+                $attendeeStats[$canonicalId] = array(
+                    'parent_sports' => array(),
+                    'has_competition' => false,
+                    'has_miss' => false,
+                );
+            }
         }
 
         // Đếm sports (theo parent sport để tính là 1 môn)
