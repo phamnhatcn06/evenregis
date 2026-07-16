@@ -1547,11 +1547,36 @@ class ReportAttendeeStatsController extends AdminController
                 'full_name' => isset($att->full_name) ? $att->full_name : '',
                 'gender' => isset($att->gender) ? $att->gender : null,
                 'staff_code' => isset($att->staff_code) ? $att->staff_code : '',
+                'id_card' => isset($att->id_card) ? $att->id_card : '',
                 'position' => isset($att->position) ? $att->position : '',
                 'department_name' => isset($att->department_name) ? $att->department_name : '',
                 'property_id' => isset($att->property_id) ? $att->property_id : null,
                 'property_name' => isset($att->property_name) ? $att->property_name : '',
             );
+        }
+
+        // Gộp các attendee trùng nhau: cùng mã nhân viên hoặc cùng số CCCD/CMND
+        // thì quy về 1 attendee đại diện (bản ghi gặp đầu tiên)
+        $attendeeAlias = array();
+        $staffCodeIndex = array();
+        $idCardIndex = array();
+        foreach ($attendeeMap as $attId => $info) {
+            $staffCode = mb_strtoupper(trim((string)$info['staff_code']), 'UTF-8');
+            $idCard = trim((string)$info['id_card']);
+
+            $canonicalId = null;
+            if ($staffCode !== '' && isset($staffCodeIndex[$staffCode])) {
+                $canonicalId = $staffCodeIndex[$staffCode];
+            } elseif ($idCard !== '' && isset($idCardIndex[$idCard])) {
+                $canonicalId = $idCardIndex[$idCard];
+            }
+            if ($canonicalId === null) {
+                $canonicalId = $attId;
+            }
+
+            $attendeeAlias[$attId] = $canonicalId;
+            if ($staffCode !== '') $staffCodeIndex[$staffCode] = $canonicalId;
+            if ($idCard !== '') $idCardIndex[$idCard] = $canonicalId;
         }
 
         $resolveRegionId = function ($propId) use ($propertyMap, $regionalMap) {
