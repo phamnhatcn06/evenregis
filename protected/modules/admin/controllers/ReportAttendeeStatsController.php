@@ -1654,6 +1654,9 @@ class ReportAttendeeStatsController extends AdminController
             $attId = isset($cr['attendee_id']) ? $cr['attendee_id'] : null;
             if (!$attId || !isset($attendeeMap[$attId])) continue;
 
+            // Quy về attendee đại diện nếu trùng mã NV / CCCD
+            $attId = $attendeeAlias[$attId];
+
             $key = 'a' . $attId;
             if (!isset($participants[$key])) {
                 $attInfo = $attendeeMap[$attId];
