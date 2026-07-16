@@ -360,6 +360,73 @@ class Attendees extends BaseAttendees
         ));
     }
 
+    /**
+     * Đếm số người đăng ký (unique) theo logic báo cáo thống kê:
+     * - Bản đăng ký active: không bị xóa, không phải nháp
+     * - Người tham dự: đang active, không bị xóa, thuộc bản đăng ký active
+     * - Gộp trùng: cùng mã nhân viên hoặc cùng số CCCD/CMND thì tính là 1 người
+     */
+    public static function countUniqueRegistered($eventId = null, $periodId = null)
+    {
+        // Bản đăng ký active
+        $regParams = array('per_page' => 1000);
+        if ($eventId) $regParams['event_id'] = $eventId;
+        if ($periodId) $regParams['period_id'] = $periodId;
+
+        $activeRegistrationIds = array();
+        $registrations = Registrations::getApiDataProvider($regParams, 10000)->getData();
+        foreach ($registrations as $reg) {
+            $regDeletedAt = isset($reg->deleted_at) ? $reg->deleted_at : null;
+            if ($regDeletedAt) continue;
+            $regStatus = isset($reg->status) ? (int)$reg->status : 0;
+            if ($regStatus === Registrations::STATUS_DRAFT) continue;
+            $regId = isset($reg->id) ? $reg->id : null;
+            if ($regId) {
+                $activeRegistrationIds[$regId] = true;
+            }
+        }
+
+        if (empty($activeRegistrationIds)) {
+            return 0;
+        }
+
+        // Người tham dự hợp lệ, gộp trùng theo mã NV / CCCD
+        $attParams = array('per_page' => 10000);
+        if ($eventId) $attParams['event_id'] = $eventId;
+
+        $count = 0;
+        $staffCodeIndex = array();
+        $idCardIndex = array();
+        $rawAttendees = self::getApiDataProvider($attParams, 10000)->getData();
+        foreach ($rawAttendees as $att) {
+            $attId = isset($att->id) ? $att->id : null;
+            if (!$attId) continue;
+
+            $attDeletedAt = isset($att->deleted_at) ? $att->deleted_at : null;
+            if ($attDeletedAt) continue;
+
+            if (isset($att->is_active) && $att->is_active !== null && $att->is_active !== '' && !(int)$att->is_active) continue;
+
+            $regId = isset($att->registration_id) ? $att->registration_id : null;
+            if (!$regId || !isset($activeRegistrationIds[$regId])) continue;
+
+            $staffCode = isset($att->staff_code) ? mb_strtoupper(trim((string)$att->staff_code), 'UTF-8') : '';
+            $idCard = isset($att->id_card) ? trim((string)$att->id_card) : '';
+
+            $isDuplicate = ($staffCode !== '' && isset($staffCodeIndex[$staffCode]))
+                || ($idCard !== '' && isset($idCardIndex[$idCard]));
+
+            if ($staffCode !== '') $staffCodeIndex[$staffCode] = true;
+            if ($idCard !== '') $idCardIndex[$idCard] = true;
+
+            if (!$isDuplicate) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
     public static function getRoleBadgeClass($roleName)
     {
         $roleNameLower = mb_strtolower(trim($roleName), 'UTF-8');
