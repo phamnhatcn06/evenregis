@@ -279,6 +279,35 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
+        // Lấy thành viên tiết mục văn nghệ (chỉ tiết mục không bị xóa
+        // và thuộc bản đăng ký active)
+        $talentMembers = array();
+        $validTalentEntryIds = array();
+        $talentEntriesRes = TalentEntries::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 1000), 1000)->getData();
+        foreach ($talentEntriesRes as $entry) {
+            $entryDeletedAt = isset($entry->deleted_at) ? $entry->deleted_at : null;
+            if ($entryDeletedAt) continue;
+            $entryRegId = isset($entry->registration_id) ? $entry->registration_id : null;
+            if (!$entryRegId || !isset($activeRegistrationIds[$entryRegId])) continue;
+            $entryId = isset($entry->id) ? $entry->id : null;
+            if ($entryId) {
+                $validTalentEntryIds[$entryId] = true;
+            }
+        }
+        if (!empty($validTalentEntryIds)) {
+            $rawTalentMembers = TalentEntryMembers::getRawListByEvent($eventId);
+            foreach ($rawTalentMembers as $tm) {
+                $tmDeletedAt = isset($tm['deleted_at']) ? $tm['deleted_at'] : null;
+                if ($tmDeletedAt) continue;
+                $entryId = isset($tm['entry_id']) ? $tm['entry_id'] : null;
+                if (!$entryId || !isset($validTalentEntryIds[$entryId])) continue;
+                $attId = isset($tm['attendee_id']) ? $tm['attendee_id'] : null;
+                if ($attId && isset($attendees[$attId])) {
+                    $talentMembers[] = array('attendee_id' => $attId);
+                }
+            }
+        }
+
         // Tính toán cho từng attendee (chỉ theo attendee đại diện sau khi gộp trùng)
         $attendeeStats = array();
         foreach ($attendees as $attId => $att) {
@@ -288,6 +317,7 @@ class ReportAttendeeStatsController extends AdminController
                     'parent_sports' => array(),
                     'has_competition' => false,
                     'has_miss' => false,
+                    'has_talent' => false,
                 );
             }
         }
