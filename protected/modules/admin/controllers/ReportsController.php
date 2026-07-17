@@ -923,11 +923,11 @@ class ReportsController extends AdminController
         // SHEET 0: THÔNG TIN CHUNG
         $sheet = $objPHPExcel->setActiveSheetIndex(0);
         $sheet->setTitle('Thong_tin_chung');
-        
+
         $sheet->setCellValue('A1', 'THÔNG TIN CHUNG PHIẾU ĐĂNG KÝ');
         $sheet->mergeCells('A1:B1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new PHPExcel_Style_Color('3A57E8'));
-        
+
         $statusList = Registrations::getStatusList();
         $statusText = isset($statusList[$model->status]) ? $statusList[$model->status] : $model->status;
 
@@ -958,7 +958,7 @@ class ReportsController extends AdminController
         $sheet = $objPHPExcel->createSheet(1);
         $sheet->setTitle('Nguoi_tham_du');
         $headers = array('STT', 'Họ và tên', 'Phòng ban', 'Chức danh', 'Vai trò', 'Ngày vào làm', 'Ngày đến', 'Ngày đi', 'Phương tiện', 'Trạng thái');
-        
+
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '1', $header);
@@ -980,7 +980,7 @@ class ReportsController extends AdminController
                 $checkOutDate = isset($att['check_out_date']) ? $att['check_out_date'] : '';
                 $transportName = isset($att['transport_name']) ? $att['transport_name'] : '';
                 $appStatus = isset($att['approval_status']) ? (int)$att['approval_status'] : 0;
-                
+
                 $statusValText = 'Chờ duyệt';
                 if ($appStatus === Attendees::APPROVAL_APPROVED) $statusValText = 'Đã duyệt';
                 elseif ($appStatus === Attendees::APPROVAL_REJECTED) $statusValText = 'Từ chối';
@@ -995,7 +995,7 @@ class ReportsController extends AdminController
                 $sheet->setCellValue('H' . $row, $checkOutDate ? date('d/m/Y', strtotime($checkOutDate)) : '-');
                 $sheet->setCellValue('I' . $row, $transportName);
                 $sheet->setCellValue('J' . $row, $statusValText);
-                
+
                 $sheet->getStyle('A' . $row . ':J' . $row)->applyFromArray($borderStyle);
                 $row++;
             }
@@ -1008,7 +1008,7 @@ class ReportsController extends AdminController
         $sheet = $objPHPExcel->createSheet(2);
         $sheet->setTitle('The_thao');
         $headers = array('STT', 'Bộ môn thi đấu', 'Tên đội', 'Họ tên vận động viên', 'Phòng ban - Chức danh', 'Đơn vị thành viên');
-        
+
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '1', $header);
@@ -1028,7 +1028,7 @@ class ReportsController extends AdminController
                 $sportName = isset($team->sport_name) ? $team->sport_name : '';
                 $teamName = isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : (isset($team['name']) ? $team['name'] : ''));
                 $members = ($teamId && isset($sportTeamMembers[$teamId])) ? $sportTeamMembers[$teamId] : array();
-                
+
                 if (empty($members)) {
                     $sheet->setCellValue('A' . $row, $stt++);
                     $sheet->setCellValue('B' . $row, $sportName);
@@ -1042,14 +1042,14 @@ class ReportsController extends AdminController
                         $memberPosition = isset($member['position_name']) ? $member['position_name'] : '';
                         $memberDivision = isset($member['division_name']) ? $member['division_name'] : '';
                         $memberProperty = isset($member['property_name']) ? $member['property_name'] : '';
-                        
+
                         $sheet->setCellValue('A' . $row, $stt++);
                         $sheet->setCellValue('B' . $row, $sportName);
                         $sheet->setCellValue('C' . $row, $teamName);
                         $sheet->setCellValue('D' . $row, $memberName);
                         $sheet->setCellValue('E' . $row, $memberPosition . ($memberDivision ? ' (BP: ' . $memberDivision . ')' : ''));
                         $sheet->setCellValue('F' . $row, $memberProperty);
-                        
+
                         $sheet->getStyle('A' . $row . ':F' . $row)->applyFromArray($borderStyle);
                         $row++;
                     }
@@ -1064,7 +1064,7 @@ class ReportsController extends AdminController
         $sheet = $objPHPExcel->createSheet(3);
         $sheet->setTitle('Nghiep_vu');
         $headers = array('STT', 'Tên cuộc thi', 'Họ tên thí sinh', 'Phòng ban', 'Chức danh');
-        
+
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '1', $header);
@@ -1090,7 +1090,7 @@ class ReportsController extends AdminController
                 $sheet->setCellValue('C' . $row, $attName);
                 $sheet->setCellValue('D' . $row, $division);
                 $sheet->setCellValue('E' . $row, $position);
-                
+
                 $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray($borderStyle);
                 $row++;
             }
@@ -1103,7 +1103,7 @@ class ReportsController extends AdminController
         $sheet = $objPHPExcel->createSheet(4);
         $sheet->setTitle('Thi_Miss');
         $headers = array('STT', 'Cuộc thi', 'Họ tên thí sinh', 'Số báo danh', 'Chiều cao (cm)', 'Cân nặng (kg)', 'Số đo', 'Năng khiếu', 'Tiểu sử');
-        
+
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '1', $header);
@@ -1128,7 +1128,7 @@ class ReportsController extends AdminController
                 $sheet->setCellValue('G' . $row, isset($c->measurements) ? $c->measurements : '');
                 $sheet->setCellValue('H' . $row, isset($c->talent) ? $c->talent : '');
                 $sheet->setCellValue('I' . $row, isset($c->bio) ? $c->bio : '');
-                
+
                 $sheet->getStyle('A' . $row . ':I' . $row)->applyFromArray($borderStyle);
                 $row++;
             }
@@ -1141,7 +1141,7 @@ class ReportsController extends AdminController
         $sheet = $objPHPExcel->createSheet(5);
         $sheet->setTitle('Thi_Van_nghe');
         $headers = array('STT', 'Tên tiết mục', 'Thể loại', 'Hội diễn', 'Số diễn viên', 'Đạo diễn / Biên đạo', 'SĐT đạo diễn', 'Trạng thái');
-        
+
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '1', $header);
@@ -1179,7 +1179,7 @@ class ReportsController extends AdminController
                 $sheet->setCellValue('F' . $row, $eDir);
                 $sheet->setCellValue('G' . $row, $eDirPhone);
                 $sheet->setCellValue('H' . $row, $statusTextText);
-                
+
                 $sheet->getStyle('A' . $row . ':H' . $row)->applyFromArray($borderStyle);
                 $row++;
             }
@@ -1703,7 +1703,7 @@ class ReportsController extends AdminController
             }
 
             // Sort properties by code
-            uksort($propData, function($a, $b) use ($propertyRegionalMap) {
+            uksort($propData, function ($a, $b) use ($propertyRegionalMap) {
                 $codeA = isset($propertyRegionalMap[$a]) ? $propertyRegionalMap[$a]['code'] : '';
                 $codeB = isset($propertyRegionalMap[$b]) ? $propertyRegionalMap[$b]['code'] : '';
                 return strnatcasecmp($codeA, $codeB);
@@ -2168,14 +2168,14 @@ class ReportsController extends AdminController
 
         // Sort properties trong mỗi regional theo code
         foreach ($regionalData as &$rd) {
-            usort($rd['properties'], function($a, $b) {
+            usort($rd['properties'], function ($a, $b) {
                 return strnatcasecmp($a['property_code'], $b['property_code']);
             });
         }
         unset($rd);
 
         // Sort regionals theo tên
-        usort($regionalData, function($a, $b) {
+        usort($regionalData, function ($a, $b) {
             if ($a['regional_id'] == 0) return 1;
             if ($b['regional_id'] == 0) return -1;
             return strnatcasecmp($a['regional_name'], $b['regional_name']);
@@ -2400,7 +2400,7 @@ class ReportsController extends AdminController
         }
 
         // Sort by sport name
-        uasort($dataBySport, function($a, $b) {
+        uasort($dataBySport, function ($a, $b) {
             return strnatcasecmp($a['name'], $b['name']);
         });
 
@@ -2512,7 +2512,7 @@ class ReportsController extends AdminController
             $stt = 1;
 
             // Sort regions by name
-            uasort($sportData['regions'], function($a, $b) {
+            uasort($sportData['regions'], function ($a, $b) {
                 return strnatcasecmp($a['name'], $b['name']);
             });
 
@@ -2521,7 +2521,7 @@ class ReportsController extends AdminController
                 $regionRowCount = 0;
 
                 // Sort teams by name
-                uasort($regionData['teams'], function($a, $b) {
+                uasort($regionData['teams'], function ($a, $b) {
                     return strnatcasecmp($a['team_name'], $b['team_name']);
                 });
 
