@@ -449,6 +449,7 @@ class ReportAttendeeStatsController extends AdminController
                         'sports_attendees' => 0,
                         'competition_attendees' => 0,
                         'miss_attendees' => 0,
+                        'talent_attendees' => 0,
                         'attendees_3_sports' => 0,
                         'attendees_3_categories' => 0,
                         'attendees_2_categories' => 0,
@@ -461,6 +462,7 @@ class ReportAttendeeStatsController extends AdminController
             $regionalData[$regionId]['totals']['sports_attendees'] += $pStats['sports_attendees'];
             $regionalData[$regionId]['totals']['competition_attendees'] += $pStats['competition_attendees'];
             $regionalData[$regionId]['totals']['miss_attendees'] += $pStats['miss_attendees'];
+            $regionalData[$regionId]['totals']['talent_attendees'] += $pStats['talent_attendees'];
             $regionalData[$regionId]['totals']['attendees_3_sports'] += $pStats['attendees_3_sports'];
             $regionalData[$regionId]['totals']['attendees_3_categories'] += $pStats['attendees_3_categories'];
             $regionalData[$regionId]['totals']['attendees_2_categories'] += $pStats['attendees_2_categories'];
