@@ -1802,7 +1802,7 @@ class ReportAttendeeStatsController extends AdminController
         }
 
         // Độ rộng cột
-        $fixedWidths = array(6, 12, 10, 28, 9, 12, 32, 26);
+        $fixedWidths = array(6, 12, 10, 30, 28, 9, 12, 32, 26);
         foreach ($fixedWidths as $i => $width) {
             $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth($width);
         }
