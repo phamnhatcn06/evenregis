@@ -82,6 +82,10 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                 <div class="fw-bold fs-4"><?php echo number_format($summary['total_miss_attendees']); ?></div>
                                 <small style="opacity: 0.7;"><i class="fa fa-star me-1"></i>Miss</small>
                             </div>
+                            <div class="text-center">
+                                <div class="fw-bold fs-4"><?php echo number_format($summary['total_talent_attendees']); ?></div>
+                                <small style="opacity: 0.7;"><i class="fa fa-music me-1"></i>Văn nghệ</small>
+                            </div>
                         </div>
                     </div>
                 </div>
