@@ -3,6 +3,27 @@ document.addEventListener('DOMContentLoaded', function() {
     var selectEventProperty = document.getElementById('select_event_property');
     var selectProperty = document.getElementById('select_property');
 
+    // Select2 cho dropdown Đơn vị trong modal (hỗ trợ gõ tìm kiếm)
+    var $selectProperty = null;
+    if (selectProperty && window.jQuery && jQuery.fn.select2) {
+        $selectProperty = jQuery(selectProperty);
+        $selectProperty.select2({
+            dropdownParent: jQuery('#modalSelectProperty'),
+            width: '100%',
+            language: {
+                noResults: function() { return 'Không tìm thấy đơn vị'; },
+                searching: function() { return 'Đang tìm...'; }
+            }
+        });
+    }
+
+    // Đồng bộ lại select2 sau khi danh sách option thay đổi bằng innerHTML
+    function refreshSelectProperty() {
+        if ($selectProperty) {
+            $selectProperty.val('').trigger('change');
+        }
+    }
+
     if (selectEventProperty && selectProperty) {
         selectEventProperty.addEventListener('change', function() {
             var eventId = this.value;
