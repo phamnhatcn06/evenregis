@@ -123,21 +123,18 @@ $this->Tabletitle = 'Tổng quan đội thể thao';
 <?php $this->renderPartial('_modal_select_sport', array('sports' => $sports, 'events' => $events)); ?>
 
 <?php
-$booster = Yii::app()->booster;
-$assetsUrl = $booster->getAssetsUrl();
-Yii::app()->clientScript->registerCssFile($assetsUrl . '/select2/select2.css');
-Yii::app()->clientScript->registerScriptFile($assetsUrl . '/select2/select2.min.js', CClientScript::POS_END);
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
 Yii::app()->clientScript->registerScript('sport-teams-init', '
     window.BASE_URL = "' . Yii::app()->createUrl('/') . '";
 ', CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/sport-teams-overview.js?v=1.0.6',
     CClientScript::POS_END
 );
 ?>
 
 <style>
 .select2-container { z-index: 99999 !important; }
-.select2-drop { z-index: 99999 !important; }
-.select2-drop-mask { z-index: 99998 !important; }
+.select2-dropdown { z-index: 99999 !important; }
 </style>
