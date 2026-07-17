@@ -1795,7 +1795,7 @@ class ReportAttendeeStatsController extends AdminController
         $lastDataRow = max($headerRow + 1, $row - 1);
         $firstMarkCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
         $sheet->getStyle('A3:A' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('E3:F' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F3:G' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         if ($totalCols > $fixedCount) {
             $sheet->getStyle($firstMarkCol . '3:' . $lastColLetter . $lastDataRow)
                 ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
