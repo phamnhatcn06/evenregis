@@ -201,6 +201,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                             <td class="text-center"><?php echo $prop['sports_attendees'] ?: '-'; ?></td>
                                             <td class="text-center"><?php echo $prop['competition_attendees'] ?: '-'; ?></td>
                                             <td class="text-center"><?php echo $prop['miss_attendees'] ?: '-'; ?></td>
+                                            <td class="text-center"><?php echo $prop['talent_attendees'] ?: '-'; ?></td>
                                             <td class="text-center"><?php echo $prop['attendees_3_sports'] ?: '-'; ?></td>
                                             <td class="text-center"><?php echo $prop['attendees_3_categories'] ?: '-'; ?></td>
                                             <td class="text-center"><?php echo $prop['attendees_2_categories'] ?: '-'; ?></td>
