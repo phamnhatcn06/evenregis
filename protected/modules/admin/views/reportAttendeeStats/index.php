@@ -515,12 +515,13 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
         <div class="alert alert-info mt-4">
             <h6 class="alert-heading"><i class="fa fa-info-circle me-1"></i> Ghi chú:</h6>
             <ul class="mb-0 small">
-                <li><strong>Tổng số người đăng ký (Unique)</strong>: Số người tham gia ít nhất 1 hạng mục (Thể thao, Nghiệp vụ, hoặc Miss)</li>
+                <li><strong>Tổng số người đăng ký (Unique)</strong>: Số người tham gia ít nhất 1 hạng mục (Thể thao, Nghiệp vụ, Miss, hoặc Văn nghệ)</li>
                 <li><strong>Thể thao</strong>: Số người có đăng ký ít nhất 1 môn thể thao</li>
                 <li><strong>Nghiệp vụ</strong>: Số người có đăng ký thi nghiệp vụ</li>
                 <li><strong>Miss</strong>: Số người có đăng ký thi sắc đẹp</li>
+                <li><strong>Văn nghệ</strong>: Số người tham gia ít nhất 1 tiết mục văn nghệ</li>
                 <li><strong>≥3 môn TT</strong>: Số người đăng ký từ 3 bộ môn thể thao trở lên (ví dụ: Bóng đá, Cầu lông, Bóng bàn)</li>
-                <li><strong>3 hạng mục</strong>: Số người tham gia cả 3 hạng mục (Thể thao + Nghiệp vụ + Miss)</li>
+                <li><strong>3 hạng mục</strong>: Số người tham gia từ 3 hạng mục trở lên (trong 4 hạng mục: Thể thao, Nghiệp vụ, Miss, Văn nghệ)</li>
                 <li><strong>2 hạng mục</strong>: Số người tham gia đúng 2 hạng mục</li>
                 <li><strong>Top 50 ít/nhiều môn TT</strong>: Đếm số môn thể thao (parent sport) mà đơn vị có VĐV đăng ký</li>
             </ul>
