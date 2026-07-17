@@ -152,13 +152,14 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                 <th rowspan="2" class="align-middle" style="min-width: 150px;">Cụm</th>
                                 <th rowspan="2" class="align-middle" style="min-width: 200px;">Đơn vị</th>
                                 <th rowspan="2" class="text-center align-middle" style="width: 100px;">Tổng người<br><small class="text-muted">(Unique)</small></th>
-                                <th colspan="3" class="text-center bg-info text-white">Theo hạng mục</th>
+                                <th colspan="4" class="text-center bg-info text-white">Theo hạng mục</th>
                                 <th colspan="3" class="text-center bg-warning">Đăng ký nhiều</th>
                             </tr>
                             <tr>
                                 <th class="text-center bg-info-subtle" style="width: 90px;"><i class="fa fa-futbol-o me-1"></i>Thể thao</th>
                                 <th class="text-center bg-info-subtle" style="width: 90px;"><i class="fa fa-trophy me-1"></i>Nghiệp vụ</th>
                                 <th class="text-center bg-info-subtle" style="width: 70px;"><i class="fa fa-star me-1"></i>Miss</th>
+                                <th class="text-center bg-info-subtle" style="width: 90px;"><i class="fa fa-music me-1"></i>Văn nghệ</th>
                                 <th class="text-center bg-warning-subtle" style="width: 80px;">≥3 môn TT</th>
                                 <th class="text-center bg-warning-subtle" style="width: 80px;">3 hạng mục</th>
                                 <th class="text-center bg-warning-subtle" style="width: 80px;">2 hạng mục</th>
