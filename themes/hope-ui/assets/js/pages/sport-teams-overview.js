@@ -30,9 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Clear select_property
             selectProperty.innerHTML = '<option value="">-- Đang tải... --</option>';
+            refreshSelectProperty();
 
             if (!eventId) {
                 selectProperty.innerHTML = '<option value="">-- Chọn sự kiện trước --</option>';
+                refreshSelectProperty();
                 return;
             }
 
