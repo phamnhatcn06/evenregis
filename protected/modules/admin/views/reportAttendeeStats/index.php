@@ -173,7 +173,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                             if (empty($regionals)):
                             ?>
                                 <tr>
-                                    <td colspan="10" class="text-center text-muted py-4">
+                                    <td colspan="11" class="text-center text-muted py-4">
                                         <i class="fa fa-info-circle me-1"></i> Chưa có dữ liệu đăng ký
                                     </td>
                                 </tr>
