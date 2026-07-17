@@ -57,9 +57,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         selectProperty.innerHTML = '<option value="">-- Lỗi tải đơn vị --</option>';
                     }
+                    refreshSelectProperty();
                 })
                 .catch(function() {
                     selectProperty.innerHTML = '<option value="">-- Lỗi kết nối --</option>';
+                    refreshSelectProperty();
                 });
         });
     }
