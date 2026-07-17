@@ -1727,7 +1727,7 @@ class ReportAttendeeStatsController extends AdminController
         $sheet = $excel->getActiveSheet();
         $sheet->setTitle('Chi tiết người tham dự');
 
-        $fixedHeaders = array('STT', 'Cụm', 'Mã ĐV', 'Họ và tên', 'Giới tính', 'Mã NV', 'Chức danh', 'Bộ phận');
+        $fixedHeaders = array('STT', 'Cụm', 'Mã ĐV', 'Tên đơn vị', 'Họ và tên', 'Giới tính', 'Mã NV', 'Chức danh', 'Bộ phận');
         $fixedCount = count($fixedHeaders);
         $totalCols = $fixedCount + count($sportColumns) + count($compColumns);
         $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalCols - 1);
