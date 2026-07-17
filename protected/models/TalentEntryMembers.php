@@ -61,4 +61,22 @@ class TalentEntryMembers extends BaseTalentEntryMembers
             'pagination' => array('pageSize' => $pageSize),
         ));
     }
+
+    /**
+     * Lấy danh sách raw thành viên tiết mục văn nghệ theo sự kiện (dạng mảng từ API)
+     */
+    public static function getRawListByEvent($eventId, $perPage = 10000)
+    {
+        $result = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array(
+            'event_id' => $eventId,
+            'per_page' => $perPage,
+        ));
+        if ($result['success']) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+        return array();
+    }
 }
