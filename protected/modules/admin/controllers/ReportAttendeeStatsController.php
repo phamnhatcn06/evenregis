@@ -362,6 +362,14 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
+        // Đếm văn nghệ
+        foreach ($talentMembers as $tm) {
+            $attId = isset($tm['attendee_id']) ? $tm['attendee_id'] : null;
+            if ($attId && isset($attendeeAlias[$attId])) {
+                $attendeeStats[$attendeeAlias[$attId]]['has_talent'] = true;
+            }
+        }
+
         // Tổng hợp theo property và regional
         $propertyStats = array();
         $summary = $this->getEmptySummary();
