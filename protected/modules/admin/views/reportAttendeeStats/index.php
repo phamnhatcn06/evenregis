@@ -215,6 +215,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                         <td class="text-center"><?php echo $regional['totals']['sports_attendees'] ?: '-'; ?></td>
                                         <td class="text-center"><?php echo $regional['totals']['competition_attendees'] ?: '-'; ?></td>
                                         <td class="text-center"><?php echo $regional['totals']['miss_attendees'] ?: '-'; ?></td>
+                                        <td class="text-center"><?php echo $regional['totals']['talent_attendees'] ?: '-'; ?></td>
                                         <td class="text-center"><?php echo $regional['totals']['attendees_3_sports'] ?: '-'; ?></td>
                                         <td class="text-center"><?php echo $regional['totals']['attendees_3_categories'] ?: '-'; ?></td>
                                         <td class="text-center"><?php echo $regional['totals']['attendees_2_categories'] ?: '-'; ?></td>
