@@ -1772,6 +1772,7 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $stt++);
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['region_name']);
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['property_code']);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['property_name']);
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['full_name']);
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $this->formatGender($p['gender']));
             $sheet->setCellValueExplicitByColumnAndRow($colIndex++, $row, $p['staff_code'], PHPExcel_Cell_DataType::TYPE_STRING);
