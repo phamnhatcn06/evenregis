@@ -231,6 +231,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                                     <td class="text-center"><?php echo number_format($summary['total_sports_attendees']); ?></td>
                                     <td class="text-center"><?php echo number_format($summary['total_competition_attendees']); ?></td>
                                     <td class="text-center"><?php echo number_format($summary['total_miss_attendees']); ?></td>
+                                    <td class="text-center"><?php echo number_format($summary['total_talent_attendees']); ?></td>
                                     <td class="text-center"><?php echo number_format($summary['attendees_3_sports']); ?></td>
                                     <td class="text-center"><?php echo number_format($summary['attendees_3_categories']); ?></td>
                                     <td class="text-center"><?php echo number_format($summary['attendees_2_categories']); ?></td>
