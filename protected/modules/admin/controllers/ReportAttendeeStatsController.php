@@ -771,6 +771,7 @@ class ReportAttendeeStatsController extends AdminController
             'total_sports_attendees' => 0,
             'total_competition_attendees' => 0,
             'total_miss_attendees' => 0,
+            'total_talent_attendees' => 0,
             'attendees_3_sports' => 0,
             'attendees_3_categories' => 0,
             'attendees_2_categories' => 0,
