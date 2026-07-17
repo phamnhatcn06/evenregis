@@ -379,12 +379,14 @@ class ReportAttendeeStatsController extends AdminController
             $hasSports = $sportsCount > 0;
             $hasComp = $stats['has_competition'];
             $hasMiss = $stats['has_miss'];
+            $hasTalent = $stats['has_talent'];
 
             // Đếm số hạng mục tham gia
             $categoryCount = 0;
             if ($hasSports) $categoryCount++;
             if ($hasComp) $categoryCount++;
             if ($hasMiss) $categoryCount++;
+            if ($hasTalent) $categoryCount++;
 
             // Chỉ đếm những người có tham gia ít nhất 1 hạng mục
             if ($categoryCount == 0) continue;
