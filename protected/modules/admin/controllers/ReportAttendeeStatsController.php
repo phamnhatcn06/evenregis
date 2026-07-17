@@ -404,6 +404,7 @@ class ReportAttendeeStatsController extends AdminController
                     'sports_attendees' => 0,
                     'competition_attendees' => 0,
                     'miss_attendees' => 0,
+                    'talent_attendees' => 0,
                     'attendees_3_sports' => 0,
                     'attendees_3_categories' => 0,
                     'attendees_2_categories' => 0,
@@ -414,6 +415,7 @@ class ReportAttendeeStatsController extends AdminController
             if ($hasSports) $propertyStats[$propId]['sports_attendees']++;
             if ($hasComp) $propertyStats[$propId]['competition_attendees']++;
             if ($hasMiss) $propertyStats[$propId]['miss_attendees']++;
+            if ($hasTalent) $propertyStats[$propId]['talent_attendees']++;
             if ($sportsCount >= 3) $propertyStats[$propId]['attendees_3_sports']++;
             if ($categoryCount >= 3) $propertyStats[$propId]['attendees_3_categories']++;
             if ($categoryCount == 2) $propertyStats[$propId]['attendees_2_categories']++;
@@ -423,6 +425,7 @@ class ReportAttendeeStatsController extends AdminController
             if ($hasSports) $summary['total_sports_attendees']++;
             if ($hasComp) $summary['total_competition_attendees']++;
             if ($hasMiss) $summary['total_miss_attendees']++;
+            if ($hasTalent) $summary['total_talent_attendees']++;
             if ($sportsCount >= 3) $summary['attendees_3_sports']++;
             if ($categoryCount >= 3) $summary['attendees_3_categories']++;
             if ($categoryCount == 2) $summary['attendees_2_categories']++;
