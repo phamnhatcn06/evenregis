@@ -141,52 +141,6 @@ class ApproveTalentController extends AdminController
         Yii::app()->end();
     }
 
-    public function actionDebugApprove($entry_id, $round_id = null)
-    {
-        header('Content-Type: application/json');
-
-        $model = TalentEntries::fetchFromApi($entry_id);
-        if ($model === null) {
-            echo json_encode(array('error' => 'entry not found'));
-            Yii::app()->end();
-        }
-        $model->status = TalentEntries::STATUS_APPROVED;
-        if (!empty($round_id)) {
-            $model->round_id = $round_id;
-        }
-        if (empty($model->show_id) && !empty($model->round_id)) {
-            $round = TalentRounds::fetchFromApi($model->round_id);
-            if ($round !== null) {
-                $model->show_id = $round->talent_show_id;
-            }
-        }
-
-        // Tái tạo payload y hệt updateViaApi để soi
-        $data = $model->attributes;
-        $data['category_id'] = $model->category_id;
-        $data['director'] = $model->director;
-        $data['director_phone'] = $model->director_phone;
-        $data['origin'] = $model->origin;
-        $data['participant_count'] = $model->participant_count;
-        $data['content'] = $model->content;
-        $data['document'] = $model->document;
-        $data['is_alliance_team'] = $model->is_alliance_team;
-        $data['round_id'] = $model->round_id;
-        $data['show_id'] = $model->show_id;
-        $data = array_filter($data, function ($value) {
-            return $value !== null && $value !== '';
-        });
-        unset($data['id']);
-
-        $result = $model->updateViaApi();
-
-        echo json_encode(array(
-            'payload_sent' => $data,
-            'api_response' => $result,
-        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        Yii::app()->end();
-    }
-
     public function actionApprove()
     {
         if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
