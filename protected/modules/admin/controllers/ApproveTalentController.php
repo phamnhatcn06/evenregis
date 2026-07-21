@@ -97,19 +97,28 @@ class ApproveTalentController extends AdminController
      */
     public function actionGetRounds($entry_id, $show_id = null)
     {
-        $currentRoundId = null;
-        if (empty($show_id)) {
-            $entry = TalentEntries::fetchFromApi($entry_id);
-            if ($entry === null) {
-                echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục'));
-                Yii::app()->end();
+        $entry = TalentEntries::fetchFromApi($entry_id);
+        if ($entry === null) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục'));
+            Yii::app()->end();
+        }
+        $currentRoundId = $entry->round_id;
+
+        // Tiết mục không lưu show_id trực tiếp -> suy ra hội diễn từ vòng hiện tại.
+        // Fallback: show_id do người dùng đang lọc trên màn hình.
+        if (empty($show_id) && !empty($currentRoundId)) {
+            $currentRound = TalentRounds::fetchFromApi($currentRoundId);
+            if ($currentRound !== null) {
+                $show_id = $currentRound->talent_show_id;
             }
-            $show_id = $entry->show_id;
-            $currentRoundId = $entry->round_id;
         }
 
         if (empty($show_id)) {
-            echo CJSON::encode(array('success' => true, 'data' => array()));
+            echo CJSON::encode(array(
+                'success' => true,
+                'data' => array(),
+                'message' => 'Chưa xác định được hội diễn. Hãy lọc theo hội diễn ở trên rồi thử lại.',
+            ));
             Yii::app()->end();
         }
 
