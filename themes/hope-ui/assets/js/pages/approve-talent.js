@@ -252,7 +252,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             fetch(approveTalentConfig.approveUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
                 body: 'id=' + id + '&round_id=' + roundId
             })
             .then(function(res) { return res.json(); })
