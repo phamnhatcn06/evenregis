@@ -47,6 +47,7 @@ class ApproveTalentController extends AdminController
 
         $shows = $this->getActiveShows();
         $categories = $this->getCategories();
+        $properties = $this->getProperties();
 
         list($rounds, $grouped) = $this->groupEntriesByRound($entries);
 
@@ -54,6 +55,7 @@ class ApproveTalentController extends AdminController
             'entries' => $entries,
             'shows' => $shows,
             'categories' => $categories,
+            'properties' => $properties,
             'rounds' => $rounds,
             'grouped' => $grouped,
         ));
