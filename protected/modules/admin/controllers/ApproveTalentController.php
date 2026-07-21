@@ -45,11 +45,89 @@ class ApproveTalentController extends AdminController
         $shows = $this->getActiveShows();
         $categories = $this->getCategories();
 
+        list($rounds, $grouped) = $this->groupEntriesByRound($entries);
+
         $this->render('index', array(
             'entries' => $entries,
             'shows' => $shows,
             'categories' => $categories,
+            'rounds' => $rounds,
+            'grouped' => $grouped,
         ));
+    }
+
+    /**
+     * Nhóm tiết mục theo vòng thi để hiển thị dạng tab.
+     * @param TalentEntries[] $entries
+     * @return array [rounds, grouped]
+     *   - rounds: mảng vòng thi đã sắp xếp [['id'=>, 'name'=>, 'count'=>], ...] (id=0 là chưa phân vòng)
+     *   - grouped: round_id => TalentEntries[]
+     */
+    protected function groupEntriesByRound($entries)
+    {
+        $grouped = array();
+        $roundNames = array();
+        $roundOrders = array();
+
+        foreach ($entries as $e) {
+            $roundId = !empty($e->round_id) ? $e->round_id : 0;
+            if (!isset($grouped[$roundId])) {
+                $grouped[$roundId] = array();
+            }
+            $grouped[$roundId][] = $e;
+
+            if ($roundId && !isset($roundNames[$roundId])) {
+                $roundNames[$roundId] = !empty($e->round_name) ? $e->round_name : null;
+            }
+        }
+
+        // Bổ sung tên/thứ tự cho vòng thi chưa có đủ thông tin từ danh sách.
+        foreach (array_keys($grouped) as $roundId) {
+            if ($roundId === 0) {
+                continue;
+            }
+            if (empty($roundNames[$roundId]) || !isset($roundOrders[$roundId])) {
+                $round = TalentRounds::fetchFromApi($roundId);
+                if ($round !== null) {
+                    if (empty($roundNames[$roundId])) {
+                        $roundNames[$roundId] = $round->name;
+                    }
+                    $roundOrders[$roundId] = $round->round_order;
+                }
+            }
+        }
+
+        $rounds = array();
+        foreach ($grouped as $roundId => $items) {
+            if ($roundId === 0) {
+                continue;
+            }
+            $rounds[] = array(
+                'id' => $roundId,
+                'name' => !empty($roundNames[$roundId]) ? $roundNames[$roundId] : ('Vòng #' . $roundId),
+                'count' => count($items),
+                'order' => isset($roundOrders[$roundId]) ? $roundOrders[$roundId] : 9999,
+            );
+        }
+
+        usort($rounds, function ($a, $b) {
+            if ($a['order'] == $b['order']) {
+                return strcmp($a['name'], $b['name']);
+            }
+            return $a['order'] - $b['order'];
+        });
+
+        // Tab "Chưa phân vòng" đặt cuối cùng nếu có tiết mục chưa gán vòng.
+        if (isset($grouped[0])) {
+            $rounds[] = array(
+                'id' => 0,
+                'name' => 'Chưa phân vòng',
+                'count' => count($grouped[0]),
+                'order' => PHP_INT_MAX,
+            );
+        }
+
+        return array($rounds, $grouped);
     }
 
     public function actionGetDetail($id)
