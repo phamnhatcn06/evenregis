@@ -197,6 +197,10 @@ class TalentEntries extends BaseTalentEntries
             $model->round_id = $roundId;
         }
 
+        // Backend bắt buộc approved_by khi duyệt -> lấy từ SSO token.
+        $ssoUser = AuthHandler::getUser();
+        $model->approved_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
         // API detail không trả show_id, nhưng update lại bắt buộc -> suy từ vòng thi.
         if (empty($model->show_id) && !empty($model->round_id)) {
             $round = TalentRounds::fetchFromApi($model->round_id);
