@@ -37,6 +37,7 @@ class TalentRounds extends BaseTalentRounds
             $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
             $model = new self;
             $model->setAttributes($data, false);
+            $model->talent_show_id = isset($data['talent_show_id']) ? $data['talent_show_id'] : null;
             $model->talent_show_name = isset($data['talent_show_name']) ? $data['talent_show_name'] : '';
             $model->id = $id;
             return $model;
