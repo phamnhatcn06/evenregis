@@ -91,20 +91,31 @@ class ApproveTalentController extends AdminController
     }
 
     /**
-     * Lấy danh sách vòng thi của một hội diễn (để gán khi duyệt)
+     * Lấy danh sách vòng thi của hội diễn chứa tiết mục (để gán khi duyệt)
+     * show_id được tra từ chính tiết mục vì API list không trả về show_id
      */
-    public function actionGetRounds($show_id, $entry_id = null)
+    public function actionGetRounds($entry_id, $show_id = null)
     {
+        $currentRoundId = null;
+        if (empty($show_id)) {
+            $entry = TalentEntries::fetchFromApi($entry_id);
+            if ($entry === null) {
+                echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục'));
+                Yii::app()->end();
+            }
+            $show_id = $entry->show_id;
+            $currentRoundId = $entry->round_id;
+        }
+
+        if (empty($show_id)) {
+            echo CJSON::encode(array('success' => true, 'data' => array()));
+            Yii::app()->end();
+        }
+
         $rounds = TalentRounds::getApiDataProvider(array(
             'talent_show_id' => $show_id,
             'sort' => 'round_order',
         ), 100)->getData();
-
-        $currentRoundId = null;
-        if ($entry_id) {
-            $entry = TalentEntries::fetchFromApi($entry_id);
-            $currentRoundId = $entry ? $entry->round_id : null;
-        }
 
         $data = array();
         foreach ($rounds as $r) {
