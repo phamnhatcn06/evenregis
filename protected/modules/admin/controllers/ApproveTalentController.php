@@ -172,7 +172,16 @@ class ApproveTalentController extends AdminController
             'status_label' => TalentEntries::getStatusLabel($model->status),
             'note' => $model->note,
             'created_at' => $model->created_at,
+            'is_final_round' => false,
         );
+
+        // Xác định tiết mục có đang ở vòng chung kết không (để ẩn/hiện nút duyệt).
+        if (!empty($model->round_id)) {
+            $round = TalentRounds::fetchFromApi($model->round_id);
+            if ($round !== null) {
+                $data['is_final_round'] = ($round->round_type === 'final');
+            }
+        }
 
         echo CJSON::encode(array('success' => true, 'data' => $data));
         Yii::app()->end();
