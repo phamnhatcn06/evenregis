@@ -137,10 +137,12 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
 </div>
 
 <?php $this->renderPartial('_modal_detail'); ?>
+<?php $this->renderPartial('_modal_approve'); ?>
 
 <script>
 var approveTalentConfig = {
     getDetailUrl: '<?php echo $this->createUrl("getDetail"); ?>',
+    getRoundsUrl: '<?php echo $this->createUrl("getRounds"); ?>',
     approveUrl: '<?php echo $this->createUrl("approve"); ?>',
     rejectUrl: '<?php echo $this->createUrl("reject"); ?>'
 };
