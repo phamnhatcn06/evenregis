@@ -7,6 +7,7 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="detail_id">
+                <input type="hidden" id="detail_show_id">
                 <div class="row">
                     <div class="col-md-6">
                         <table class="table table-bordered">
