@@ -200,7 +200,14 @@ document.addEventListener('DOMContentLoaded', function() {
         var modal = new bootstrap.Modal(document.getElementById('modalApprove'));
         modal.show();
 
-        fetch(approveTalentConfig.getRoundsUrl + '?entry_id=' + id)
+        var showFilter = document.querySelector('select[name="show_id"]');
+        var filterShowId = showFilter ? showFilter.value : '';
+        var roundsUrl = approveTalentConfig.getRoundsUrl + '?entry_id=' + id;
+        if (filterShowId) {
+            roundsUrl += '&show_id=' + filterShowId;
+        }
+
+        fetch(roundsUrl)
             .then(function(res) { return res.json(); })
             .then(function(res) {
                 roundsLoading.style.display = 'none';
