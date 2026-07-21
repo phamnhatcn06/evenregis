@@ -310,6 +310,90 @@ class TalentEntriesController extends AdminController
         }
     }
 
+    public function actionScoring($id)
+    {
+        $entry = $this->loadModelById($id);
+        $scores = TalentScores::getByEntry($id);
+        $average = TalentScores::computeAverage($scores);
+
+        Yii::app()->clientScript->registerScriptFile(
+            Yii::app()->theme->baseUrl . '/assets/js/pages/talent-entries-scoring.js',
+            CClientScript::POS_END
+        );
+
+        $this->render('scoring', array(
+            'entry' => $entry,
+            'scores' => $scores,
+            'average' => $average,
+        ));
+    }
+
+    public function actionSaveScore()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+        }
+
+        $scoreId = isset($_POST['id']) && $_POST['id'] !== '' ? $_POST['id'] : null;
+        $entryId = isset($_POST['entry_id']) ? $_POST['entry_id'] : null;
+        $judgeId = isset($_POST['judge_id']) ? $_POST['judge_id'] : null;
+        $score = isset($_POST['score']) ? $_POST['score'] : null;
+        $criteria = isset($_POST['criteria']) ? $_POST['criteria'] : '';
+        $note = isset($_POST['note']) ? $_POST['note'] : '';
+
+        if (!$entryId || !$judgeId || $score === null || $score === '') {
+            $this->sendJsonResponse(array('success' => false, 'message' => 'Vui lòng nhập đầy đủ giám khảo và điểm.'));
+            return;
+        }
+
+        $model = $scoreId ? TalentScores::fetchFromApi($scoreId) : new TalentScores;
+        if ($model === null) {
+            $this->sendJsonResponse(array('success' => false, 'message' => 'Không tìm thấy phiếu điểm.'));
+            return;
+        }
+
+        $model->entry_id = $entryId;
+        $model->judge_id = $judgeId;
+        $model->score = $score;
+        $model->criteria = $criteria;
+        $model->note = $note;
+
+        $result = $scoreId ? $model->updateViaApi() : $model->storeViaApi();
+
+        if ($result['success']) {
+            $this->sendJsonResponse(array('success' => true, 'message' => 'Lưu điểm thành công.'));
+        } else {
+            $this->sendJsonResponse(array('success' => false, 'message' => $result['error'] ?: 'Không thể lưu điểm.'));
+        }
+    }
+
+    public function actionDeleteScore()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+        }
+
+        $scoreId = isset($_POST['id']) ? $_POST['id'] : null;
+        if (!$scoreId) {
+            $this->sendJsonResponse(array('success' => false, 'message' => 'Thiếu thông tin.'));
+            return;
+        }
+
+        $result = TalentScores::deleteViaApi($scoreId);
+        if ($result['success']) {
+            $this->sendJsonResponse(array('success' => true, 'message' => 'Xóa điểm thành công.'));
+        } else {
+            $this->sendJsonResponse(array('success' => false, 'message' => $result['error'] ?: 'Không thể xóa điểm.'));
+        }
+    }
+
+    private function sendJsonResponse($data)
+    {
+        header('Content-Type: application/json');
+        echo CJSON::encode($data);
+        Yii::app()->end();
+    }
+
     protected function getActiveShows()
     {
         $result = ApiClient::get(ApiEndpoints::TALENT_SHOW_LIST, array(
