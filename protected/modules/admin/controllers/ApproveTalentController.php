@@ -132,6 +132,7 @@ class ApproveTalentController extends AdminController
                 'name' => 'Chưa phân vòng',
                 'count' => count($grouped[0]),
                 'order' => PHP_INT_MAX,
+                'is_final' => false,
             );
         }
 
