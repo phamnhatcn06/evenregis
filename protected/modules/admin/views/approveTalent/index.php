@@ -77,7 +77,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
             $duration = $e->duration_seconds ? gmdate('i:s', $e->duration_seconds) : '';
             ?>
             <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                <div class="card talent-card h-100" data-id="<?php echo $e->id; ?>">
+                <div class="card talent-card h-100" data-id="<?php echo $e->id; ?>" data-show-id="<?php echo CHtml::encode($e->show_id); ?>">
                     <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
                         <span class="badge bg-primary"><?php echo CHtml::encode($categoryName); ?></span>
                         <?php echo TalentEntries::getStatusLabel($e->status); ?>
