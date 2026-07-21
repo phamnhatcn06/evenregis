@@ -173,7 +173,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 var approveBtn = document.getElementById('btn_approve_modal');
                 var rejectBtn = document.getElementById('btn_reject_modal');
-                approveBtn.style.display = (d.status == 3) ? 'none' : 'inline-block';
+                // Vẫn cho duyệt (lên vòng tiếp) khi chưa ở vòng chung kết.
+                approveBtn.style.display = d.is_final_round ? 'none' : 'inline-block';
+                approveBtn.innerHTML = (d.status == 3)
+                    ? '<i class="fa fa-check me-1"></i>Duyệt lên vòng tiếp'
+                    : '<i class="fa fa-check me-1"></i>Duyệt';
                 rejectBtn.style.display = (d.status == 4) ? 'none' : 'inline-block';
 
                 var loading = document.getElementById('detail_loading');
