@@ -90,6 +90,37 @@ class ApproveTalentController extends AdminController
         Yii::app()->end();
     }
 
+    /**
+     * Lấy danh sách vòng thi của một hội diễn (để gán khi duyệt)
+     */
+    public function actionGetRounds($show_id, $entry_id = null)
+    {
+        $rounds = TalentRounds::getApiDataProvider(array(
+            'talent_show_id' => $show_id,
+            'sort' => 'round_order',
+        ), 100)->getData();
+
+        $currentRoundId = null;
+        if ($entry_id) {
+            $entry = TalentEntries::fetchFromApi($entry_id);
+            $currentRoundId = $entry ? $entry->round_id : null;
+        }
+
+        $data = array();
+        foreach ($rounds as $r) {
+            $data[] = array(
+                'id' => $r->id,
+                'name' => $r->name,
+                'round_type' => TalentRounds::getRoundTypeLabel($r->round_type),
+                'round_order' => $r->round_order,
+                'is_current' => ($currentRoundId !== null && $r->id == $currentRoundId),
+            );
+        }
+
+        echo CJSON::encode(array('success' => true, 'data' => $data));
+        Yii::app()->end();
+    }
+
     public function actionApprove()
     {
         if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
@@ -97,22 +128,17 @@ class ApproveTalentController extends AdminController
         }
 
         $id = Yii::app()->request->getPost('id');
+        $roundId = Yii::app()->request->getPost('round_id');
         if (empty($id)) {
             echo CJSON::encode(array('success' => false, 'message' => 'Thiếu ID'));
             Yii::app()->end();
         }
 
-        $model = TalentEntries::fetchFromApi($id);
-        if ($model === null) {
-            echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục'));
-            Yii::app()->end();
-        }
-
-        $model->status = TalentEntries::STATUS_APPROVED;
-        $result = $model->updateViaApi();
+        $result = TalentEntries::approveWithRound($id, $roundId);
 
         if ($result['success']) {
-            echo CJSON::encode(array('success' => true, 'message' => 'Đã duyệt tiết mục'));
+            $message = !empty($roundId) ? 'Đã duyệt và gán tiết mục vào vòng thi' : 'Đã duyệt tiết mục';
+            echo CJSON::encode(array('success' => true, 'message' => $message));
         } else {
             echo CJSON::encode(array('success' => false, 'message' => $result['error'] ?: 'Có lỗi xảy ra'));
         }
