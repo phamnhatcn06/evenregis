@@ -25,6 +25,9 @@ class ApproveTalentController extends AdminController
         if (isset($_GET['category_id']) && $_GET['category_id'] !== '') {
             $params['category_id'] = $_GET['category_id'];
         }
+        if (isset($_GET['property_id']) && $_GET['property_id'] !== '') {
+            $params['property_id'] = $_GET['property_id'];
+        }
         if (isset($_GET['status']) && $_GET['status'] !== '') {
             $params['status'] = $_GET['status'];
         }
