@@ -49,8 +49,9 @@ $showApprove = !$isFinalRound;
                 <button type="button" class="btn btn-sm btn-info flex-fill btn-view-detail" data-id="<?php echo $e->id; ?>">
                     <i class="fa fa-eye me-1"></i>Chi tiết
                 </button>
-                <?php if ($e->status != TalentEntries::STATUS_APPROVED): ?>
-                    <button type="button" class="btn btn-sm btn-success btn-approve" data-id="<?php echo $e->id; ?>" data-show-id="<?php echo CHtml::encode($e->show_id); ?>" title="Duyệt">
+                <?php if ($showApprove): ?>
+                    <?php $approveTitle = ($e->status == TalentEntries::STATUS_APPROVED) ? 'Duyệt lên vòng tiếp' : 'Duyệt'; ?>
+                    <button type="button" class="btn btn-sm btn-success btn-approve" data-id="<?php echo $e->id; ?>" data-show-id="<?php echo CHtml::encode($e->show_id); ?>" title="<?php echo $approveTitle; ?>">
                         <i class="fa fa-check"></i>
                     </button>
                 <?php endif; ?>
