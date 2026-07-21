@@ -62,6 +62,9 @@ class ApproveTalentController extends AdminController
         $data = array(
             'id' => $model->id,
             'title' => $model->title,
+            'show_id' => $model->show_id,
+            'round_id' => $model->round_id,
+            'round_name' => $model->round_name,
             'property_name' => $model->property_name,
             'category_name' => $model->category_name,
             'show_name' => $model->show_name,
