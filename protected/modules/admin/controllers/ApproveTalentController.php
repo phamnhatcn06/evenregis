@@ -142,6 +142,18 @@ class ApproveTalentController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionDebugApprove($entry_id, $round_id = null)
+    {
+        header('Content-Type: application/json');
+        $ssoUser = AuthHandler::getUser();
+        $result = TalentEntries::approveWithRound($entry_id, $round_id);
+        echo json_encode(array(
+            'sso_user' => $ssoUser,
+            'api_response' => $result,
+        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        Yii::app()->end();
+    }
+
     public function actionApprove()
     {
         if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
