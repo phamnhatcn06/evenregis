@@ -130,6 +130,7 @@ class TalentEntries extends BaseTalentEntries
         $data['content'] = $this->content;
         $data['document'] = $this->document;
         $data['is_alliance_team'] = $this->is_alliance_team;
+        $data['round_id'] = $this->round_id;
 
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
