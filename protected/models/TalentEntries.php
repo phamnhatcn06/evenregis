@@ -74,6 +74,7 @@ class TalentEntries extends BaseTalentEntries
             $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
             $model = new self;
             $model->setAttributes($data, false);
+            $model->show_id = isset($data['show_id']) ? $data['show_id'] : null;
             $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
             $model->category_name = isset($data['category_name']) ? $data['category_name'] : '';
             $model->show_name = isset($data['show_name']) ? $data['show_name'] : '';
