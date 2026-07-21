@@ -196,6 +196,15 @@ class TalentEntries extends BaseTalentEntries
         if (!empty($roundId)) {
             $model->round_id = $roundId;
         }
+
+        // API detail không trả show_id, nhưng update lại bắt buộc -> suy từ vòng thi.
+        if (empty($model->show_id) && !empty($model->round_id)) {
+            $round = TalentRounds::fetchFromApi($model->round_id);
+            if ($round !== null) {
+                $model->show_id = $round->talent_show_id;
+            }
+        }
+
         return $model->updateViaApi();
     }
 
