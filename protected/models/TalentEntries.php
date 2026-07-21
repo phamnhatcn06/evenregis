@@ -187,12 +187,15 @@ class TalentEntries extends BaseTalentEntries
      */
     public static function approveWithRound($id, $roundId = null)
     {
-        $data = array('status' => self::STATUS_APPROVED);
-        if (!empty($roundId)) {
-            $data['round_id'] = $roundId;
+        $model = self::fetchFromApi($id);
+        if ($model === null) {
+            return array('success' => false, 'error' => 'Không tìm thấy tiết mục');
         }
-        $url = ApiEndpoints::url(ApiEndpoints::TALENT_ENTRY_UPDATE, array('id' => $id));
-        return ApiClient::post($url, $data);
+        $model->status = self::STATUS_APPROVED;
+        if (!empty($roundId)) {
+            $model->round_id = $roundId;
+        }
+        return $model->updateViaApi();
     }
 
     /**
