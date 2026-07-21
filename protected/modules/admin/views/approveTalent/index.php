@@ -111,7 +111,7 @@ $('#filter-property').select2({
             <div class="tab-pane fade <?php echo $i === 0 ? 'show active' : ''; ?>" id="<?php echo $tabId; ?>" role="tabpanel">
                 <div class="row">
                     <?php foreach ($grouped[$round['id']] as $e): ?>
-                        <?php $this->renderPartial('_card', array('e' => $e)); ?>
+                        <?php $this->renderPartial('_card', array('e' => $e, 'isFinalRound' => !empty($round['is_final']))); ?>
                     <?php endforeach; ?>
                 </div>
             </div>
