@@ -73,6 +73,7 @@ class ApproveTalentController extends AdminController
         $grouped = array();
         $roundNames = array();
         $roundOrders = array();
+        $roundTypes = array();
 
         foreach ($entries as $e) {
             $roundId = !empty($e->round_id) ? $e->round_id : 0;
@@ -86,18 +87,19 @@ class ApproveTalentController extends AdminController
             }
         }
 
-        // Bổ sung tên/thứ tự cho vòng thi chưa có đủ thông tin từ danh sách.
+        // Bổ sung tên/thứ tự/loại vòng cho vòng thi chưa có đủ thông tin từ danh sách.
         foreach (array_keys($grouped) as $roundId) {
             if ($roundId === 0) {
                 continue;
             }
-            if (empty($roundNames[$roundId]) || !isset($roundOrders[$roundId])) {
+            if (empty($roundNames[$roundId]) || !isset($roundOrders[$roundId]) || !isset($roundTypes[$roundId])) {
                 $round = TalentRounds::fetchFromApi($roundId);
                 if ($round !== null) {
                     if (empty($roundNames[$roundId])) {
                         $roundNames[$roundId] = $round->name;
                     }
                     $roundOrders[$roundId] = $round->round_order;
+                    $roundTypes[$roundId] = $round->round_type;
                 }
             }
         }
@@ -112,6 +114,7 @@ class ApproveTalentController extends AdminController
                 'name' => !empty($roundNames[$roundId]) ? $roundNames[$roundId] : ('Vòng #' . $roundId),
                 'count' => count($items),
                 'order' => isset($roundOrders[$roundId]) ? $roundOrders[$roundId] : 9999,
+                'is_final' => isset($roundTypes[$roundId]) && $roundTypes[$roundId] === 'final',
             );
         }
 
