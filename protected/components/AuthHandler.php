@@ -224,6 +224,7 @@ class AuthHandler extends CApplicationComponent
             'beautycontests' => 'events',
             'beautycontestants' => 'events',
             'talententries' => 'events',
+            'talentrounds' => 'events',
             'sportteams' => 'events',
             'competitionregistrations' => 'events',
         );
