@@ -8,6 +8,7 @@ class ApproveTalentController extends AdminController
         $this->publicActions[] = 'index';
         $this->publicActions[] = 'getDetail';
         $this->publicActions[] = 'getRounds';
+        $this->publicActions[] = 'debugRounds';
         $this->publicActions[] = 'approve';
         $this->publicActions[] = 'reject';
     }
