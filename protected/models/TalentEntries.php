@@ -25,6 +25,8 @@ class TalentEntries extends BaseTalentEntries
     public $content;
     public $document;
     public $is_alliance_team;
+    public $round_id;
+    public $round_name;
 
     public static function model($className = __CLASS__)
     {
@@ -34,7 +36,7 @@ class TalentEntries extends BaseTalentEntries
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('show_id, property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, alliance_org_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team', 'safe');
+        $rules[] = array('show_id, property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, alliance_org_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team, round_id, round_name', 'safe');
         return $rules;
     }
 
