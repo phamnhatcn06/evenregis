@@ -326,6 +326,21 @@ class ApproveTalentController extends AdminController
         return $list;
     }
 
+    protected function getProperties()
+    {
+        $result = ApiClient::get(ApiEndpoints::PROPERTY_LIST, array(
+            'per_page' => 1000,
+        ));
+
+        $list = array();
+        if ($result['success'] && isset($result['data']['data'])) {
+            foreach ($result['data']['data'] as $item) {
+                $list[$item['id']] = $item['name'];
+            }
+        }
+        return $list;
+    }
+
     /**
      * Lấy đường dẫn video đã tối ưu (_web) nếu tồn tại
      */
