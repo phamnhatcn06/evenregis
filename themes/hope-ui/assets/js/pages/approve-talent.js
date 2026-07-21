@@ -323,8 +323,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnApproveModal) {
         btnApproveModal.addEventListener('click', function() {
             var id = document.getElementById('detail_id').value;
+            var showId = document.getElementById('detail_show_id').value;
+            var name = document.getElementById('detail_title').textContent;
             bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
-            approveEntry(id);
+            approveEntry(id, showId, name);
         });
     }
 
