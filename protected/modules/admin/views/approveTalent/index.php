@@ -119,7 +119,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                 <i class="fa fa-eye me-1"></i>Chi tiết
                             </button>
                             <?php if ($e->status != TalentEntries::STATUS_APPROVED): ?>
-                                <button type="button" class="btn btn-sm btn-success btn-approve" data-id="<?php echo $e->id; ?>" title="Duyệt">
+                                <button type="button" class="btn btn-sm btn-success btn-approve" data-id="<?php echo $e->id; ?>" data-show-id="<?php echo CHtml::encode($e->show_id); ?>" title="Duyệt">
                                     <i class="fa fa-check"></i>
                                 </button>
                             <?php endif; ?>
