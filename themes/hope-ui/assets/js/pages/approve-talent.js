@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 var d = res.data;
                 document.getElementById('detail_id').value = d.id;
+                document.getElementById('detail_show_id').value = d.show_id || '';
                 document.getElementById('detail_title').textContent = d.title || '';
                 document.getElementById('detail_property').textContent = d.property_name || '';
                 document.getElementById('detail_show').textContent = d.show_name || '';
