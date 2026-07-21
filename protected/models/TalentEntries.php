@@ -179,6 +179,22 @@ class TalentEntries extends BaseTalentEntries
     }
 
     /**
+     * Duyệt tiết mục và gán vào vòng thi (nếu có)
+     * @param string $id
+     * @param string|null $roundId
+     * @return array
+     */
+    public static function approveWithRound($id, $roundId = null)
+    {
+        $data = array('status' => self::STATUS_APPROVED);
+        if (!empty($roundId)) {
+            $data['round_id'] = $roundId;
+        }
+        $url = ApiEndpoints::url(ApiEndpoints::TALENT_ENTRY_UPDATE, array('id' => $id));
+        return ApiClient::post($url, $data);
+    }
+
+    /**
      * Cập nhật status của tất cả tiết mục văn nghệ theo property_id
      * @param int $propertyId
      * @param int $status
