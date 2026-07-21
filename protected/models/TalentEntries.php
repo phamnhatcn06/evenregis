@@ -85,6 +85,8 @@ class TalentEntries extends BaseTalentEntries
             $model->document = isset($data['document']) ? $data['document'] : '';
             $model->is_alliance_team = isset($data['is_alliance_team']) ? $data['is_alliance_team'] : null;
             $model->alliance_org_ids = isset($data['alliance_org_ids']) ? $data['alliance_org_ids'] : '';
+            $model->round_id = isset($data['round_id']) ? $data['round_id'] : null;
+            $model->round_name = isset($data['round_name']) ? $data['round_name'] : '';
             $model->id = $id;
             return $model;
         }
