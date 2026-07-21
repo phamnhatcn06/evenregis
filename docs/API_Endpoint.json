@@ -2106,6 +2106,27 @@
                                             "key": "personal_email",
                                             "value": "beauty@gmail.com",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "photo_portrait_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_full_body_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "video_path",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "submitted_at",
+                                            "value": "",
+                                            "type": "text",
+                                            "disabled": true
                                         }
                                     ]
                                 },
@@ -2253,6 +2274,27 @@
                                             "key": "personal_email",
                                             "value": "beauty@gmail.com",
                                             "type": "text"
+                                        },
+                                        {
+                                            "key": "photo_portrait_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_full_body_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "video_path",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "submitted_at",
+                                            "value": "",
+                                            "type": "text",
+                                            "disabled": true
                                         }
                                     ]
                                 },
@@ -2302,6 +2344,131 @@
                                             "language": "json"
                                         }
                                     }
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Generate Submission Token",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/beauty-contestants/1/generate-token",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "beauty-contestants",
+                                        "1",
+                                        "generate-token"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail By Token",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/beauty-contestants/by-token/YOUR_TOKEN_HERE",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "beauty-contestants",
+                                        "by-token",
+                                        "YOUR_TOKEN_HERE"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Submit By Token",
+                            "request": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "token",
+                                            "value": "YOUR_TOKEN_HERE",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "height_cm",
+                                            "value": "170.5",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "weight_kg",
+                                            "value": "50.0",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "measurements",
+                                            "value": "90-60-90",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "talent",
+                                            "value": "Múa dân gian",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "bio",
+                                            "value": "Tiểu sử cập nhật qua token",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "photo_portrait",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_portrait_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_full_body",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "photo_full_body_2",
+                                            "value": "",
+                                            "type": "file"
+                                        },
+                                        {
+                                            "key": "video_path",
+                                            "value": "",
+                                            "type": "file"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/beauty-contestants/submit-by-token",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "beauty-contestants",
+                                        "submit-by-token"
+                                    ]
                                 }
                             },
                             "response": []
@@ -3102,7 +3269,8 @@
                                         "beauty-round-results",
                                         "assign"
                                     ]
-                                }
+                                },
+                                "description": "Gán các thí sinh (từ bảng beauty_contestants) vào vòng thi. Mảng registration_ids chứa danh sách các ID của thí sinh (beauty_contestants.id)."
                             },
                             "response": []
                         },
@@ -3141,7 +3309,8 @@
                                         "beauty-round-results",
                                         "qualify"
                                     ]
-                                }
+                                },
+                                "description": "Cập nhật trạng thái đạt/không đạt cho các thí sinh trong vòng thi. registration_id trong kết quả tương ứng với ID thí sinh (beauty_contestants.id)."
                             },
                             "response": []
                         },
@@ -3172,7 +3341,8 @@
                                             "value": "1"
                                         }
                                     ]
-                                }
+                                },
+                                "description": "Lấy bảng xếp hạng điểm số của các thí sinh trong vòng thi, sắp xếp theo điểm giảm dần. Kết quả trả về chứa các trường contestant_name, contestant_number, property_name, photo_portrait và rank."
                             },
                             "response": []
                         },
@@ -3203,7 +3373,8 @@
                                             "value": "1"
                                         }
                                     ]
-                                }
+                                },
+                                "description": "Lấy danh sách các thí sinh có thể gán vào vòng thi. Đối với vòng 1, trả về toàn bộ thí sinh active từ beauty_contestants. Đối với vòng N (N > 1), trả về thí sinh đã vượt qua vòng trước đó. Kết quả trả về các trường registration_id (ID thí sinh), contestant_number, contestant_name, property_name, photo_portrait."
                             },
                             "response": []
                         }
@@ -3811,6 +3982,49 @@
                             "response": []
                         },
                         {
+                            "name": "Get List By Property",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/competition-registrations/list-by-property?property_id=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "competition-registrations",
+                                        "list-by-property"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "property_id",
+                                            "value": "1",
+                                            "description": "ID của khách sạn/đơn vị cần lọc dữ liệu"
+                                        },
+                                        {
+                                            "key": "event_id",
+                                            "value": "1",
+                                            "description": "(Tuỳ chọn) ID của sự kiện (ví dụ 1 là Đại hội)"
+                                        },
+                                        {
+                                            "key": "competition_id",
+                                            "value": "1",
+                                            "description": "(Tuỳ chọn) ID của chuyên môn thi"
+                                        }
+                                    ]
+                                },
+                                "description": "Lấy danh sách các đăng ký thi nghiệp vụ (competition) của một đơn vị cụ thể"
+                            },
+                            "response": []
+                        },
+                        {
                             "name": "Create",
                             "request": {
                                 "method": "POST",
@@ -4340,6 +4554,468 @@
                                         "1",
                                         "1"
                                     ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Competition Team",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [
+                                        {
+                                            "key": "cache-control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "content-type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-limit",
+                                            "value": "2000"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-remaining",
+                                            "value": "1967"
+                                        },
+                                        {
+                                            "key": "access-control-allow-origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "code": 401,
+                                    "body": "{\"code\":401,\"message\":\"Token kh\\u00f4ng t\\u1ed3n t\\u1ea1i, vui l\\u00f2ng nh\\u1eadp token!\",\"data\":null}",
+                                    "name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams/store",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams/store"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"competition_id\":5,\"registration_id\":16,\"candidate_number\":\"aqeticikt\",\"team_name\":\"ph\",\"captain_id\":7,\"status\":\"1\",\"registered_at\":\"2026-06-16T10:47:06\",\"confirmed_by\":11,\"confirmed_at\":\"2026-06-16T10:47:06\",\"note\":\"explicabo\"}"
+                                },
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams/detail/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams/detail/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "laboriosam",
+                                            "description": "The ID of the detail."
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [
+                                        {
+                                            "key": "cache-control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "content-type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-limit",
+                                            "value": "2000"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-remaining",
+                                            "value": "1966"
+                                        },
+                                        {
+                                            "key": "access-control-allow-origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "code": 401,
+                                    "body": "{\"code\":401,\"message\":\"Token kh\\u00f4ng t\\u1ed3n t\\u1ea1i, vui l\\u00f2ng nh\\u1eadp token!\",\"data\":null}",
+                                    "name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams/update/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams/update/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "repellat",
+                                            "description": "The ID of the update."
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"competition_id\":17,\"registration_id\":3,\"candidate_number\":\"tackcjgrrkjxlkmiihwu\",\"team_name\":\"ucdjrmbjvrvprjzfyckqslwc\",\"captain_id\":1,\"status\":\"2\",\"registered_at\":\"2026-06-16T10:47:06\",\"confirmed_by\":4,\"confirmed_at\":\"2026-06-16T10:47:06\",\"note\":\"consequatur\"}"
+                                },
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-teams/destroy/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-teams/destroy/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "dolores",
+                                            "description": "The ID of the destroy."
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Competition Team Member",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members"
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [
+                                        {
+                                            "key": "cache-control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "content-type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-limit",
+                                            "value": "2000"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-remaining",
+                                            "value": "1965"
+                                        },
+                                        {
+                                            "key": "access-control-allow-origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "code": 401,
+                                    "body": "{\"code\":401,\"message\":\"Token kh\\u00f4ng t\\u1ed3n t\\u1ea1i, vui l\\u00f2ng nh\\u1eadp token!\",\"data\":null}",
+                                    "name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members/store",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members/store"
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"team_id\":1,\"attendee_id\":6,\"role\":\"cqtimsc\",\"is_captain\":\"1\",\"sort_order\":18}"
+                                },
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members/detail/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members/detail/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "esse",
+                                            "description": "The ID of the detail."
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": [
+                                {
+                                    "header": [
+                                        {
+                                            "key": "cache-control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "content-type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-limit",
+                                            "value": "2000"
+                                        },
+                                        {
+                                            "key": "x-ratelimit-remaining",
+                                            "value": "1964"
+                                        },
+                                        {
+                                            "key": "access-control-allow-origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "code": 401,
+                                    "body": "{\"code\":401,\"message\":\"Token kh\\u00f4ng t\\u1ed3n t\\u1ea1i, vui l\\u00f2ng nh\\u1eadp token!\",\"data\":null}",
+                                    "name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members/update/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members/update/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "doloribus",
+                                            "description": "The ID of the update."
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\"team_id\":20,\"attendee_id\":17,\"role\":\"do\",\"is_captain\":\"0\",\"sort_order\":10}"
+                                },
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "url": {
+                                    "host": "{{baseUrl}}",
+                                    "path": "api/competition-team-members/destroy/1",
+                                    "query": [],
+                                    "raw": "{{base_url}}/api/competition-team-members/destroy/1",
+                                    "variable": [
+                                        {
+                                            "id": "id",
+                                            "key": "id",
+                                            "value": "aperiam",
+                                            "description": "The ID of the destroy."
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": null,
+                                "description": "",
+                                "auth": {
+                                    "type": "noauth"
                                 }
                             },
                             "response": []
@@ -7754,6 +8430,48 @@
                                             "value": "1",
                                             "type": "text",
                                             "description": "0: Nam, 1: Nữ, 2: Khác"
+                                        },
+                                        {
+                                            "key": "id_card",
+                                            "value": "012345678912",
+                                            "description": "CMND/CCCD/Passport",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "staff_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã nhân viên (đồng bộ từ staffs nếu không có, hoặc thêm mới nếu nhập tay)"
+                                        },
+                                        {
+                                            "key": "position_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã chức vụ"
+                                        },
+                                        {
+                                            "key": "position_name",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Tên chức vụ"
+                                        },
+                                        {
+                                            "key": "department_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã phòng ban"
+                                        },
+                                        {
+                                            "key": "department_name",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Tên phòng ban"
+                                        },
+                                        {
+                                            "key": "end_starting_date",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Ngày kết thúc thử việc"
                                         }
                                     ]
                                 },
@@ -7945,6 +8663,48 @@
                                             "value": "1",
                                             "type": "text",
                                             "description": "0: Nam, 1: Nữ, 2: Khác"
+                                        },
+                                        {
+                                            "key": "id_card",
+                                            "value": "012345678912",
+                                            "description": "CMND/CCCD/Passport",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "staff_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã nhân viên (đồng bộ từ staffs nếu không có, hoặc thêm mới nếu nhập tay)"
+                                        },
+                                        {
+                                            "key": "position_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã chức vụ"
+                                        },
+                                        {
+                                            "key": "position_name",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Tên chức vụ"
+                                        },
+                                        {
+                                            "key": "department_code",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Mã phòng ban"
+                                        },
+                                        {
+                                            "key": "department_name",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Tên phòng ban"
+                                        },
+                                        {
+                                            "key": "end_starting_date",
+                                            "value": "",
+                                            "type": "text",
+                                            "description": "Ngày kết thúc thử việc"
                                         }
                                     ]
                                 },
@@ -10456,6 +11216,38 @@
                 {
                     "name": "Sport Team",
                     "item": [
+                        {
+                            "name": "Get List By Property",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/sport-teams/list-by-property?property_id=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "sport-teams",
+                                        "list-by-property"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "property_id",
+                                            "value": "1",
+                                            "description": "ID of the property"
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
                         {
                             "name": "Get List",
                             "request": {
@@ -13083,6 +13875,190 @@
                                     "path": [
                                         "api",
                                         "talent-scores",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Talent Round",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/talent-rounds?per_page=20&page=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "talent-rounds"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "talent_show_id",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"talent_show_id\": 1,\n    \"name\": \"Vòng Chung kết - Biểu diễn tài năng\",\n    \"round_type\": \"qualification\",\n    \"round_order\": 3,\n    \"max_score\": 100,\n    \"weight\": 0.4,\n    \"start_time\": \"2026-06-15 19:00:00\",\n    \"end_time\": \"2026-06-15 22:00:00\",\n    \"note\": \"Tiết mục có tối đa 10 phút biểu diễn.\",\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/talent-rounds/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "talent-rounds",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/talent-rounds/detail/3",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "talent-rounds",
+                                        "detail",
+                                        "3"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"talent_show_id\": 1,\n    \"name\": \"Vòng Chung kết - Biểu diễn tài năng\",\n    \"round_type\": \"qualification\",\n    \"round_order\": 3,\n    \"max_score\": 100,\n    \"weight\": 0.4,\n    \"start_time\": \"2026-06-15 19:00:00\",\n    \"end_time\": \"2026-06-15 22:00:00\",\n    \"note\": \"Tiết mục có tối đa 10 phút biểu diễn.\",\n    \"auth_email\": \"admin@example.com\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/talent-rounds/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "talent-rounds",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/talent-rounds/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "talent-rounds",
                                         "destroy",
                                         "1"
                                     ]
