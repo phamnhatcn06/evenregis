@@ -132,6 +132,25 @@ class ApproveTalentController extends AdminController
         Yii::app()->end();
     }
 
+    public function actionDebugRounds($entry_id)
+    {
+        header('Content-Type: application/json');
+        $detailUrl = ApiEndpoints::url(ApiEndpoints::TALENT_ENTRY_DETAIL, array('id' => $entry_id));
+        $detailRaw = ApiClient::get($detailUrl);
+        $entry = TalentEntries::fetchFromApi($entry_id);
+        $showId = $entry ? $entry->show_id : null;
+        $roundsRaw = ApiClient::get(ApiEndpoints::TALENT_ROUND_LIST, array('talent_show_id' => $showId, 'per_page' => 100));
+        $roundsAll = ApiClient::get(ApiEndpoints::TALENT_ROUND_LIST, array('per_page' => 100));
+        echo json_encode(array(
+            'entry_show_id' => $showId,
+            'entry_round_id' => $entry ? $entry->round_id : null,
+            'detail_raw_keys' => $entry && isset($detailRaw['data']) ? array_keys(isset($detailRaw['data']['data']) ? $detailRaw['data']['data'] : $detailRaw['data']) : null,
+            'rounds_filtered' => $roundsRaw,
+            'rounds_all' => $roundsAll,
+        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        Yii::app()->end();
+    }
+
     public function actionApprove()
     {
         if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
