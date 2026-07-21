@@ -3,6 +3,9 @@
 $categoryName = !empty($e->category_name) ? $e->category_name : '';
 $propertyName = !empty($e->property_name) ? $e->property_name : '';
 $duration = $e->duration_seconds ? gmdate('i:s', $e->duration_seconds) : '';
+$isFinalRound = isset($isFinalRound) ? $isFinalRound : false;
+// Vẫn cho duyệt (lên vòng tiếp) khi tiết mục chưa ở vòng chung kết.
+$showApprove = !$isFinalRound;
 ?>
 <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
     <div class="card talent-card h-100" data-id="<?php echo $e->id; ?>" data-show-id="<?php echo CHtml::encode($e->show_id); ?>">
