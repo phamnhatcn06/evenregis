@@ -200,40 +200,40 @@ document.addEventListener('DOMContentLoaded', function() {
         var modal = new bootstrap.Modal(document.getElementById('modalApprove'));
         modal.show();
 
+        var url = approveTalentConfig.getRoundsUrl + '?entry_id=' + id;
         if (showId) {
-            fetch(approveTalentConfig.getRoundsUrl + '?show_id=' + showId + '&entry_id=' + id)
-                .then(function(res) { return res.json(); })
-                .then(function(res) {
-                    roundsLoading.style.display = 'none';
-                    if (res.success && res.data.length > 0) {
-                        var html = '';
-                        res.data.forEach(function(r) {
-                            html += '<label class="list-group-item list-group-item-action d-flex align-items-center">';
-                            html += '<input type="radio" name="approve_round" value="' + r.id + '" class="form-check-input me-3"' + (r.is_current ? ' checked' : '') + '>';
-                            html += '<div>';
-                            html += '<strong>' + r.name + '</strong>';
-                            if (r.round_type) {
-                                html += ' <span class="badge bg-secondary ms-2">' + r.round_type + '</span>';
-                            }
-                            if (r.is_current) {
-                                html += ' <span class="badge bg-info ms-1">Vòng hiện tại</span>';
-                            }
-                            html += '</div>';
-                            html += '</label>';
-                        });
-                        roundsList.innerHTML = html;
-                    } else {
-                        roundsList.innerHTML = '<div class="text-muted p-3"><i class="fa fa-info-circle me-1"></i>Hội diễn này chưa có vòng thi nào</div>';
-                    }
-                })
-                .catch(function() {
-                    roundsLoading.style.display = 'none';
-                    roundsList.innerHTML = '<div class="text-danger p-3">Lỗi tải danh sách vòng thi</div>';
-                });
-        } else {
-            roundsLoading.style.display = 'none';
-            roundsList.innerHTML = '<div class="text-muted p-3">Không xác định được hội diễn</div>';
+            url += '&show_id=' + showId;
         }
+
+        fetch(url)
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+                roundsLoading.style.display = 'none';
+                if (res.success && res.data.length > 0) {
+                    var html = '';
+                    res.data.forEach(function(r) {
+                        html += '<label class="list-group-item list-group-item-action d-flex align-items-center">';
+                        html += '<input type="radio" name="approve_round" value="' + r.id + '" class="form-check-input me-3"' + (r.is_current ? ' checked' : '') + '>';
+                        html += '<div>';
+                        html += '<strong>' + r.name + '</strong>';
+                        if (r.round_type) {
+                            html += ' <span class="badge bg-secondary ms-2">' + r.round_type + '</span>';
+                        }
+                        if (r.is_current) {
+                            html += ' <span class="badge bg-info ms-1">Vòng hiện tại</span>';
+                        }
+                        html += '</div>';
+                        html += '</label>';
+                    });
+                    roundsList.innerHTML = html;
+                } else {
+                    roundsList.innerHTML = '<div class="text-muted p-3"><i class="fa fa-info-circle me-1"></i>Hội diễn này chưa có vòng thi nào</div>';
+                }
+            })
+            .catch(function() {
+                roundsLoading.style.display = 'none';
+                roundsList.innerHTML = '<div class="text-danger p-3">Lỗi tải danh sách vòng thi</div>';
+            });
     }
 
     var btnConfirmApprove = document.getElementById('btn_confirm_approve');
