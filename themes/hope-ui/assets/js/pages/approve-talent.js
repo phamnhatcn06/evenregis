@@ -200,12 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var modal = new bootstrap.Modal(document.getElementById('modalApprove'));
         modal.show();
 
-        var url = approveTalentConfig.getRoundsUrl + '?entry_id=' + id;
-        if (showId) {
-            url += '&show_id=' + showId;
-        }
-
-        fetch(url)
+        fetch(approveTalentConfig.getRoundsUrl + '?entry_id=' + id)
             .then(function(res) { return res.json(); })
             .then(function(res) {
                 roundsLoading.style.display = 'none';
