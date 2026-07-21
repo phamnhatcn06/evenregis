@@ -26,7 +26,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
             </div>
             <div class="col-md-3">
                 <label class="form-label">Đơn vị</label>
-                <select name="property_id" class="form-select">
+                <select name="property_id" class="form-select" id="filter-property">
                     <option value="">-- Tất cả --</option>
                     <?php foreach ($properties as $id => $name): ?>
                         <option value="<?php echo $id; ?>" <?php echo (isset($_GET['property_id']) && $_GET['property_id'] == $id) ? 'selected' : ''; ?>>
