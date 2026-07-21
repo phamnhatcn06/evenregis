@@ -8,6 +8,20 @@ $this->Tabletitle = 'Xét duyệt tiết mục Văn nghệ';
 
 Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/css/pages/approve-talent.css');
 Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/js/pages/approve-talent.js', CClientScript::POS_END);
+
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
+
+Yii::app()->clientScript->registerScript('approve-talent-select2', "
+$('#filter-property').select2({
+    placeholder: '-- Tất cả --',
+    allowClear: true,
+    width: '100%',
+    language: {
+        noResults: function() { return 'Không tìm thấy'; }
+    }
+});
+", CClientScript::POS_READY);
 ?>
 
 <div class="card mb-3">
