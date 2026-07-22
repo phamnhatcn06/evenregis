@@ -11,6 +11,7 @@
 /**
  * Chuyển URL ảnh gốc sang URL thumbnail phục vụ qua MissFileController.
  */
+if (!function_exists('missExportThumbUrl')):
 function missExportThumbUrl($photoUrl, $width = 900)
 {
     if (empty($photoUrl)) {
