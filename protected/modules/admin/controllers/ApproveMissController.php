@@ -244,8 +244,7 @@ class ApproveMissController extends AdminController
             Yii::app()->end();
         }
 
-        $model->status = BeautyContestants::STATUS_DISQUALIFIED;
-        $result = $model->updateViaApi();
+        $result = $model->updateStatusViaApi(BeautyContestants::STATUS_DISQUALIFIED);
 
         if ($result['success']) {
             echo CJSON::encode(array('success' => true, 'message' => 'Đã từ chối thí sinh'));
