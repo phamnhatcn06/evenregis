@@ -264,3 +264,27 @@
     background-color: #212529 !important;
     border-color: #fff !important;
 }
+
+/* Tabs vòng thi - chữ to hơn, dàn đều kín 1 hàng */
+#roundTabs {
+    flex-wrap: nowrap;
+    display: flex;
+}
+
+#roundTabs .nav-item {
+    flex: 1 1 0;
+}
+
+#roundTabs .nav-link {
+    width: 100%;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+
+#roundTabs .nav-link .badge {
+    font-size: 0.8rem;
+    vertical-align: middle;
+}
