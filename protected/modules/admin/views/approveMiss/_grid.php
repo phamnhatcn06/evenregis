@@ -73,15 +73,15 @@
                             </p>
                         <?php endif; ?>
                         <?php
-                        $birthYear = MyHelper::getBirthYear($c->birthday);
+                        $birthDate = MyHelper::formatDate($c->birthday);
                         $age = MyHelper::calculateAge($c->birthday);
                         ?>
                         <p class="card-text small mb-1">
                             <i class="fa fa-birthday-cake me-1"></i>
-                            <?php if ($birthYear !== ''): ?>
-                                <?php echo CHtml::encode($birthYear); ?><?php echo $age !== null ? ' (' . $age . ' tuổi)' : ''; ?>
+                            <?php if ($birthDate !== ''): ?>
+                                <?php echo CHtml::encode($birthDate); ?><?php echo $age !== null ? ' (' . $age . ' tuổi)' : ''; ?>
                             <?php else: ?>
-                                <span class="text-muted">Chưa có năm sinh</span>
+                                <span class="text-muted">Chưa có ngày sinh</span>
                             <?php endif; ?>
                         </p>
                         <?php if (!empty($c->height_cm) || !empty($c->weight_kg)): ?>
