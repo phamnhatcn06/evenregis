@@ -453,6 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var id = document.getElementById('approve_contestant_id').value;
         var selectedRound = document.querySelector('input[name="approve_round"]:checked');
         var roundId = selectedRound ? selectedRound.value : '';
+        var roundType = selectedRound ? selectedRound.getAttribute('data-round-type') : '';
 
         var btn = this;
         var originalHtml = btn.innerHTML;
