@@ -82,7 +82,7 @@ class UploadController extends CController
             fclose($fp);
             @rmdir($tempDir);
 
-            $relativePath = 'uploads/miss/' . $folderName . '/' . $finalFilename;
+            $relativePath = '/uploads/miss/' . $folderName . '/' . $finalFilename;
             $size = round(filesize($finalPath) / 1024 / 1024, 2);
 
             echo CJSON::encode(array(
