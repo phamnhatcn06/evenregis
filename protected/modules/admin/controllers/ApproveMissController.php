@@ -60,19 +60,31 @@ class ApproveMissController extends AdminController
         }
         $rounds = BeautyRounds::getApiDataProvider($roundParams, 100)->getData();
 
-        // Gom nhóm thí sinh theo từng vòng thi -> tabs
-        $roundTabs = array();
+        // Xác định vòng cao nhất mà mỗi thí sinh đang tham gia.
+        // $rounds đã sắp theo round_order tăng dần nên vòng ghi nhận sau cùng
+        // chính là vòng mới nhất -> thí sinh chỉ hiển thị ở vòng đó.
         $assignedIds = array();
+        $latestRoundOf = array();
         foreach ($rounds as $round) {
             $results = BeautyRoundResults::getApiDataProvider(array(
                 'round_id' => $round->id,
             ), 1000)->getData();
 
-            $items = array();
             foreach ($results as $res) {
                 if (isset($contestantMap[$res->registration_id])) {
-                    $items[] = $contestantMap[$res->registration_id];
+                    $latestRoundOf[$res->registration_id] = $round->id;
                     $assignedIds[$res->registration_id] = true;
+                }
+            }
+        }
+
+        // Gom nhóm thí sinh theo vòng cao nhất -> tabs
+        $roundTabs = array();
+        foreach ($rounds as $round) {
+            $items = array();
+            foreach ($contestants as $c) {
+                if (isset($latestRoundOf[$c->id]) && $latestRoundOf[$c->id] == $round->id) {
+                    $items[] = $c;
                 }
             }
 
