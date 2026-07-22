@@ -118,6 +118,30 @@ class BeautyRoundResults extends BaseBeautyRoundResults
         ));
     }
 
+    /**
+     * Gán 1 thí sinh vào vòng mới và gỡ (disable) kết quả ở tất cả vòng khác,
+     * đảm bảo thí sinh chỉ còn tồn tại/hiển thị ở vòng gán mới nhất.
+     *
+     * @param string $roundId Vòng gán mới
+     * @param string $registrationId Thí sinh (beauty_contestants.id)
+     * @return array Kết quả của lệnh assign
+     */
+    public static function assignExclusive($roundId, $registrationId)
+    {
+        // Gỡ kết quả ở các vòng khác trước khi gán vòng mới
+        $existing = self::getApiDataProvider(array(
+            'registration_id' => $registrationId,
+        ), 200)->getData();
+
+        foreach ($existing as $res) {
+            if (!empty($res->id) && isset($res->round_id) && $res->round_id != $roundId) {
+                self::deleteViaApi($res->id);
+            }
+        }
+
+        return self::assignContestants($roundId, array($registrationId));
+    }
+
     public static function qualifyContestants($roundId, $results, $nextRoundId = null)
     {
         $data = array(
