@@ -337,23 +337,38 @@ class ApproveMissController extends AdminController
                 continue;
             }
             $a = $attendeeMap[$c->attendee_id];
-            $c->department_name = !empty($a->department_name) ? $a->department_name : $a->division_name;
+            $c->department_name = $this->resolveDepartmentName($a);
             $c->division_name = $a->division_name;
-
-            // Ưu tiên birthday từ attendee; nếu trống thì lấy từ staff qua staff_id
-            $birthday = $a->birthday;
-            if (empty($birthday) && !empty($a->staff_id)) {
-                $staffId = $a->staff_id;
-                if (!array_key_exists($staffId, $staffBirthdayCache)) {
-                    $staff = Staffs::fetchFromApi($staffId);
-                    $staffBirthdayCache[$staffId] = ($staff !== null && !empty($staff->birthday)) ? $staff->birthday : null;
-                }
-                if (!empty($staffBirthdayCache[$staffId])) {
-                    $birthday = $staffBirthdayCache[$staffId];
-                }
-            }
-            $c->birthday = $birthday;
+            $c->birthday = $this->resolveBirthday($a, $staffBirthdayCache);
         }
+    }
+
+    /**
+     * Tên phòng ban của attendee: ưu tiên department_name, fallback division_name.
+     */
+    protected function resolveDepartmentName($attendee)
+    {
+        return !empty($attendee->department_name) ? $attendee->department_name : $attendee->division_name;
+    }
+
+    /**
+     * Ngày sinh: ưu tiên từ attendee; nếu trống thì lấy từ staff qua staff_id.
+     * @param array $staffBirthdayCache Cache theo staff_id để tránh gọi API trùng.
+     */
+    protected function resolveBirthday($attendee, &$staffBirthdayCache = array())
+    {
+        $birthday = $attendee->birthday;
+        if (empty($birthday) && !empty($attendee->staff_id)) {
+            $staffId = $attendee->staff_id;
+            if (!array_key_exists($staffId, $staffBirthdayCache)) {
+                $staff = Staffs::fetchFromApi($staffId);
+                $staffBirthdayCache[$staffId] = ($staff !== null && !empty($staff->birthday)) ? $staff->birthday : null;
+            }
+            if (!empty($staffBirthdayCache[$staffId])) {
+                $birthday = $staffBirthdayCache[$staffId];
+            }
+        }
+        return $birthday;
     }
 
     /**
