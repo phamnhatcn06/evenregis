@@ -126,33 +126,37 @@ endif;
         }
 
         .photo-col {
-            width: 90mm;
+            width: 88mm;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
         }
 
+        /* Khung ảnh tỉ lệ cố định 9:16 (88mm x 156.4mm) */
         .photo-frame {
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            width: 100%;
-            height: 150mm;
+            width: 88mm;
+            height: 156.4mm;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background: #f8f9fa;
         }
 
         .photo-frame img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #adb5bd;
             font-size: 14px;
+            background: #f1f3f5;
         }
 
         .info-col {
