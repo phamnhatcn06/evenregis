@@ -92,6 +92,7 @@ class ApproveMissController extends AdminController
                 'id' => $round->id,
                 'name' => $round->name,
                 'contest_name' => isset($round->contest_name) ? $round->contest_name : '',
+                'round_type' => isset($round->round_type) ? $round->round_type : '',
                 'contestants' => $items,
             );
         }
