@@ -506,11 +506,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(function(res) { return res.json(); })
                 .then(function(res) {
                     if (res.success) {
+                        updateCardAfterReject(id);
                         Toast.success(res.message);
-                        location.reload();
                     } else {
                         Toast.error(res.message);
                     }
+                })
+                .catch(function() {
+                    Toast.error('Lỗi kết nối server');
                 });
             }
         });
