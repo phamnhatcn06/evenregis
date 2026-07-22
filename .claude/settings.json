@@ -1,5 +1,5 @@
 {
-  "model": "claude-fable-5",
+  "model": "opus",
   "context_window": 1000000,
   "permissions": {
     "allow_file_read": true,
