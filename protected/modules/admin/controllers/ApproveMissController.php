@@ -121,11 +121,29 @@ class ApproveMissController extends AdminController
             Yii::app()->end();
         }
 
+        // Bổ sung phòng ban + ngày sinh (ưu tiên attendee, fallback staff)
+        $departmentName = '';
+        $birthdayDisplay = '';
+        if (!empty($model->attendee_id)) {
+            $attendee = Attendees::fetchFromApi($model->attendee_id);
+            if ($attendee !== null) {
+                $departmentName = $this->resolveDepartmentName($attendee);
+                $birthday = $this->resolveBirthday($attendee);
+                $dateStr = MyHelper::formatDate($birthday);
+                if ($dateStr !== '') {
+                    $age = MyHelper::calculateAge($birthday);
+                    $birthdayDisplay = $dateStr . ($age !== null ? ' (' . $age . ' tuổi)' : '');
+                }
+            }
+        }
+
         $data = array(
             'id' => $model->id,
             'contest_id' => $model->contest_id,
             'attendee_name' => $model->attendee_name,
             'property_name' => $model->property_name,
+            'department_name' => $departmentName,
+            'birthday_display' => $birthdayDisplay,
             'contest_name' => $model->contest_name,
             'height_cm' => $model->height_cm,
             'weight_kg' => $model->weight_kg,
