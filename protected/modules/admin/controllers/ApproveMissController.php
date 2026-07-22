@@ -288,6 +288,49 @@ class ApproveMissController extends AdminController
     }
 
     /**
+     * Bổ sung thông tin bộ phận (department) và năm sinh cho danh sách thí sinh.
+     * Dữ liệu lấy từ người tham dự (attendees) tương ứng — chỉ cần 1 lần gọi API
+     * rồi map theo attendee_id để tránh N+1.
+     *
+     * Lưu ý: năm sinh (birthday) lấy từ nhân viên (staff) tương ứng của attendee.
+     * Field này chỉ hiển thị khi API attendees/staff trả về `birthday`.
+     */
+    protected function enrichContestantsWithAttendeeInfo(&$contestants)
+    {
+        if (empty($contestants)) {
+            return;
+        }
+
+        // Gom attendee_id cần tra cứu
+        $attendeeIds = array();
+        foreach ($contestants as $c) {
+            if (!empty($c->attendee_id)) {
+                $attendeeIds[$c->attendee_id] = true;
+            }
+        }
+        if (empty($attendeeIds)) {
+            return;
+        }
+
+        // Lấy danh sách người tham dự (1 lần) rồi map theo id
+        $attendees = Attendees::getApiDataProvider(array(), 10000)->getData();
+        $attendeeMap = array();
+        foreach ($attendees as $a) {
+            $attendeeMap[$a->id] = $a;
+        }
+
+        foreach ($contestants as $c) {
+            if (empty($c->attendee_id) || !isset($attendeeMap[$c->attendee_id])) {
+                continue;
+            }
+            $a = $attendeeMap[$c->attendee_id];
+            $c->department_name = !empty($a->department_name) ? $a->department_name : $a->division_name;
+            $c->division_name = $a->division_name;
+            $c->birthday = $a->birthday;
+        }
+    }
+
+    /**
      * Lấy đường dẫn video đã tối ưu (_web) nếu tồn tại
      */
     protected function getOptimizedVideoPath($videoPath)
