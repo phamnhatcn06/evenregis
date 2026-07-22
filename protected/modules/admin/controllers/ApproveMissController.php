@@ -141,7 +141,7 @@ class ApproveMissController extends AdminController
 
     public function actionApprove()
     {
-        if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
+        if (!Yii::app()->request->isPostRequest) {
             throw new CHttpException(400, 'Yêu cầu không hợp lệ');
         }
 
