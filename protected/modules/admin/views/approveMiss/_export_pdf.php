@@ -204,7 +204,7 @@ endif;
                 width: auto;
                 min-height: auto;
                 margin: 0;
-                padding: 0;
+                padding: 10mm;
                 box-shadow: none;
             }
         }
