@@ -262,6 +262,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('detail_contest_id').value = d.contest_id || '';
                 document.getElementById('detail_name').textContent = d.attendee_name || '';
                 document.getElementById('detail_property').textContent = d.property_name || '';
+                document.getElementById('detail_department').textContent = d.department_name || '-';
+                document.getElementById('detail_birthday').textContent = d.birthday_display || '-';
                 document.getElementById('detail_contest').textContent = d.contest_name || '';
                 document.getElementById('detail_status').innerHTML = d.status_label || '';
                 document.getElementById('detail_height').textContent = d.height_cm ? d.height_cm + ' cm' : '-';
