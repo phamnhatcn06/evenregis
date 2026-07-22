@@ -330,6 +330,8 @@ class ApproveMissController extends AdminController
             $attendeeMap[$a->id] = $a;
         }
 
+        $staffBirthdayCache = array();
+
         foreach ($contestants as $c) {
             if (empty($c->attendee_id) || !isset($attendeeMap[$c->attendee_id])) {
                 continue;
@@ -337,7 +339,20 @@ class ApproveMissController extends AdminController
             $a = $attendeeMap[$c->attendee_id];
             $c->department_name = !empty($a->department_name) ? $a->department_name : $a->division_name;
             $c->division_name = $a->division_name;
-            $c->birthday = $a->birthday;
+
+            // Ưu tiên birthday từ attendee; nếu trống thì lấy từ staff qua staff_id
+            $birthday = $a->birthday;
+            if (empty($birthday) && !empty($a->staff_id)) {
+                $staffId = $a->staff_id;
+                if (!array_key_exists($staffId, $staffBirthdayCache)) {
+                    $staff = Staffs::fetchFromApi($staffId);
+                    $staffBirthdayCache[$staffId] = ($staff !== null && !empty($staff->birthday)) ? $staff->birthday : null;
+                }
+                if (!empty($staffBirthdayCache[$staffId])) {
+                    $birthday = $staffBirthdayCache[$staffId];
+                }
+            }
+            $c->birthday = $birthday;
         }
     }
 
