@@ -34,7 +34,8 @@ endif;
     <style>
         @page {
             size: A4 landscape;
-            margin: 10mm;
+            /* Lề 0 để trình duyệt không in ngày giờ / URL ở đầu-cuối trang */
+            margin: 0;
         }
 
         * {
