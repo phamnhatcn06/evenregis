@@ -402,14 +402,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function updateCardAfterApprove(id, roundId) {
+    function updateCardAfterApprove(id, roundId, roundType) {
         var card = document.querySelector('.contestant-card[data-id="' + id + '"]');
         if (!card) return;
 
         var statusBadge = card.querySelector('.status-badge');
         if (statusBadge) statusBadge.innerHTML = statusBadgeHtml(1);
-        var approveBtn = card.querySelector('.btn-approve');
-        if (approveBtn) approveBtn.remove();
+
+        // Chỉ ẩn nút Duyệt khi thí sinh đã được gán vào vòng chung kết.
+        // Chưa tới final -> vẫn giữ nút để có thể gán vào các vòng tiếp theo.
+        if (roundType === 'final') {
+            var approveBtn = card.querySelector('.btn-approve');
+            if (approveBtn) approveBtn.remove();
+        }
 
         var col = card.parentElement; // cột bao ngoài thẻ
         var sourcePane = card.closest('.tab-pane');
