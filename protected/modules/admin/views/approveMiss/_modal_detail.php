@@ -64,6 +64,14 @@
                                     <td id="detail_property"></td>
                                 </tr>
                                 <tr>
+                                    <th>Phòng ban</th>
+                                    <td id="detail_department"></td>
+                                </tr>
+                                <tr>
+                                    <th>Ngày sinh</th>
+                                    <td id="detail_birthday"></td>
+                                </tr>
+                                <tr>
                                     <th>Cuộc thi</th>
                                     <td id="detail_contest"></td>
                                 </tr>
