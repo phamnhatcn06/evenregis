@@ -11,6 +11,7 @@ class BeautyContestants extends BaseBeautyContestants
     const STATUS_EMAIL_SENT = 4;
 
     public $attendee_name;
+    public $property_id;
     public $property_code;
     public $property_name;
     public $contest_name;
