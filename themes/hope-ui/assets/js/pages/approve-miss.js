@@ -375,6 +375,75 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // ===== Cập nhật DOM tại chỗ sau khi duyệt/từ chối (không reload cả trang) =====
+    function statusBadgeHtml(status) {
+        if (status == 1) return '<span class="badge bg-success">Đã xác nhận</span>';
+        if (status == 3) return '<span class="badge bg-danger">Loại</span>';
+        return '';
+    }
+
+    // Badge số đếm nằm ở nút tab tương ứng với tab-pane (#round-x -> #tab-round-x)
+    function getPaneCountBadge(paneEl) {
+        if (!paneEl) return null;
+        return document.querySelector('#tab-' + paneEl.id + ' .badge');
+    }
+
+    function adjustCount(badgeEl, delta) {
+        if (!badgeEl) return;
+        var n = parseInt(badgeEl.textContent, 10) || 0;
+        badgeEl.textContent = Math.max(0, n + delta);
+    }
+
+    // Nếu lưới không còn thẻ thí sinh nào -> hiển thị lại thông báo trống
+    function ensureEmptyState(rowEl) {
+        if (!rowEl) return;
+        if (!rowEl.querySelector('.contestant-card')) {
+            rowEl.innerHTML = '<div class="col-12"><div class="alert alert-info mb-0">Không có thí sinh nào trong vòng thi này.</div></div>';
+        }
+    }
+
+    function updateCardAfterApprove(id, roundId) {
+        var card = document.querySelector('.contestant-card[data-id="' + id + '"]');
+        if (!card) return;
+
+        var statusBadge = card.querySelector('.status-badge');
+        if (statusBadge) statusBadge.innerHTML = statusBadgeHtml(1);
+        var approveBtn = card.querySelector('.btn-approve');
+        if (approveBtn) approveBtn.remove();
+
+        var col = card.parentElement; // cột bao ngoài thẻ
+        var sourcePane = card.closest('.tab-pane');
+
+        // Có chọn vòng và vòng đích khác vòng hiện tại -> di chuyển thẻ sang tab đó
+        if (roundId) {
+            var targetPane = document.getElementById('round-' + roundId);
+            if (targetPane && targetPane !== sourcePane) {
+                var targetRow = targetPane.querySelector('.row');
+                if (targetRow) {
+                    // Bỏ thông báo trống trước khi thêm thẻ đầu tiên
+                    if (!targetRow.querySelector('.contestant-card')) {
+                        targetRow.innerHTML = '';
+                    }
+                    targetRow.appendChild(col);
+
+                    adjustCount(getPaneCountBadge(sourcePane), -1);
+                    adjustCount(getPaneCountBadge(targetPane), 1);
+
+                    if (sourcePane) ensureEmptyState(sourcePane.querySelector('.row'));
+                }
+            }
+        }
+    }
+
+    function updateCardAfterReject(id) {
+        var card = document.querySelector('.contestant-card[data-id="' + id + '"]');
+        if (!card) return;
+        var statusBadge = card.querySelector('.status-badge');
+        if (statusBadge) statusBadge.innerHTML = statusBadgeHtml(3);
+        var rejectBtn = card.querySelector('.btn-reject');
+        if (rejectBtn) rejectBtn.remove();
+    }
+
     document.getElementById('btn_confirm_approve').addEventListener('click', function() {
         var id = document.getElementById('approve_contestant_id').value;
         var selectedRound = document.querySelector('input[name="approve_round"]:checked');
@@ -395,19 +464,21 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(function(res) { return res.json(); })
         .then(function(res) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
             if (res.success) {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('modalApprove'));
+                if (modal) modal.hide();
+                updateCardAfterApprove(id, roundId);
                 Toast.success(res.message);
-                location.reload();
             } else {
                 Toast.error(res.message);
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
             }
         })
         .catch(function() {
-            Toast.error('Lỗi kết nối server');
             btn.disabled = false;
             btn.innerHTML = originalHtml;
+            Toast.error('Lỗi kết nối server');
         });
     });
 
