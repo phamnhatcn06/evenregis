@@ -166,16 +166,16 @@ class ApproveMissController extends AdminController
             }
         }
 
+        // Trả về tất cả vòng để có thể gán vào bất kỳ vòng nào; vòng đã gán được
+        // đánh dấu bằng cờ `assigned` (vẫn chọn lại được).
         $data = array();
         foreach ($rounds as $r) {
-            if (in_array($r->id, $assignedRoundIds)) {
-                continue;
-            }
             $data[] = array(
                 'id' => $r->id,
                 'name' => $r->name,
                 'round_type' => $r->round_type,
                 'round_order' => $r->round_order,
+                'assigned' => in_array($r->id, $assignedRoundIds),
             );
         }
 
