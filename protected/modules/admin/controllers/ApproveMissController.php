@@ -44,6 +44,9 @@ class ApproveMissController extends AdminController
             $contestants = array_values($contestants);
         }
 
+        // Bổ sung bộ phận (department) và năm sinh cho từng thí sinh
+        $this->enrichContestantsWithAttendeeInfo($contestants);
+
         // Map contestant id => object để tra cứu khi gom nhóm theo vòng
         $contestantMap = array();
         foreach ($contestants as $c) {
