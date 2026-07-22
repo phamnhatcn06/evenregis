@@ -47,7 +47,8 @@ class Attendees extends BaseAttendees
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path', 'length', 'max' => 500);
         $rules[] = array('cccd_front_path, cccd_back_path, portrait_path, contract_path, approval_status, rejection_reason, personal_email', 'safe');
         $rules[] = array('approval_status, transport_id', 'numerical', 'integerOnly' => true);
-        $rules[] = array('join_hotel_date, check_in_date, check_out_date, transport_id, transport_name, gender, id_card, birthday', 'safe');
+        $rules[] = array('join_hotel_date, check_in_date, check_out_date, transport_id, transport_name, gender, id_card, birthday, phone_number', 'safe');
+        $rules[] = array('phone_number', 'length', 'max' => 50);
         $rules[] = array('position_code, position_name, department_code, department_name, division_code, division_name, division', 'length', 'max' => 255);
         $rules[] = array('position_code, position_name, department_code, department_name, division_code, division_name, division, end_starting_date', 'safe');
         $rules[] = array('id_card', 'length', 'max' => 20);
