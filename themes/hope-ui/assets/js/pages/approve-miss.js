@@ -426,7 +426,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.isConfirmed) {
                 fetch(approveMissConfig.rejectUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     body: 'id=' + id + '&reason=' + encodeURIComponent(result.value || '')
                 })
                 .then(function(res) { return res.json(); })
