@@ -10,38 +10,96 @@ class ApproveMissController extends AdminController
         $this->publicActions[] = 'getRounds';
         $this->publicActions[] = 'approve';
         $this->publicActions[] = 'reject';
+        $this->publicActions[] = 'exportPdf';
     }
 
     public function actionAdmin()
+    {
+        $grouping = $this->buildRoundGrouping(
+            isset($_GET['contest_id']) && $_GET['contest_id'] !== '' ? $_GET['contest_id'] : null,
+            isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null,
+            isset($_GET['status']) && $_GET['status'] !== '' ? $_GET['status'] : null,
+            isset($_GET['keyword']) && $_GET['keyword'] !== '' ? $_GET['keyword'] : null
+        );
+
+        $this->render('index', array(
+            'contests' => $this->getActiveContests(),
+            'properties' => $this->getPropertiesWithContestants($grouping['allContestants']),
+            'roundTabs' => $grouping['roundTabs'],
+            'unassigned' => $grouping['unassigned'],
+        ));
+    }
+
+    /**
+     * Xuất PDF (in trình duyệt) danh sách thí sinh của một vòng thi.
+     * Mỗi thí sinh là một trang landscape: bên trái ảnh đại diện, bên phải
+     * toàn bộ thông tin. Header mỗi trang ghi rõ vòng đang được gán.
+     *
+     * @param mixed $round_id ID vòng thi, hoặc 'unassigned' cho nhóm chưa phân vòng.
+     */
+    public function actionExportPdf($round_id)
+    {
+        $grouping = $this->buildRoundGrouping(
+            isset($_GET['contest_id']) && $_GET['contest_id'] !== '' ? $_GET['contest_id'] : null,
+            isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null,
+            isset($_GET['status']) && $_GET['status'] !== '' ? $_GET['status'] : null,
+            isset($_GET['keyword']) && $_GET['keyword'] !== '' ? $_GET['keyword'] : null
+        );
+
+        $roundName = '';
+        $contestants = array();
+        if ($round_id === 'unassigned') {
+            $roundName = 'Chưa phân vòng';
+            $contestants = $grouping['unassigned'];
+        } else {
+            foreach ($grouping['roundTabs'] as $tab) {
+                if ($tab['id'] == $round_id) {
+                    $roundName = $tab['name'];
+                    $contestants = $tab['contestants'];
+                    break;
+                }
+            }
+        }
+
+        $this->renderPartial('_export_pdf', array(
+            'roundName' => $roundName,
+            'contestants' => $contestants,
+        ));
+    }
+
+    /**
+     * Gom nhóm thí sinh theo vòng thi cao nhất mà họ đang được gán.
+     *
+     * @return array Mảng gồm:
+     *  - allContestants: toàn bộ thí sinh trước khi lọc theo đơn vị (dùng cho dropdown đơn vị)
+     *  - rounds: danh sách vòng thi
+     *  - roundTabs: các tab theo vòng, mỗi tab kèm danh sách thí sinh
+     *  - unassigned: thí sinh chưa được gán vào vòng nào
+     */
+    protected function buildRoundGrouping($contestId = null, $propertyId = null, $status = null, $keyword = null)
     {
         $params = array(
             'with' => 'attendee,attendee.property,attendee.property.regional,contest',
             'sort' => 'attendee.property.regional.code',
         );
-
-        if (isset($_GET['contest_id']) && $_GET['contest_id'] !== '') {
-            $params['contest_id'] = $_GET['contest_id'];
+        if ($contestId !== null) {
+            $params['contest_id'] = $contestId;
         }
-        if (isset($_GET['status']) && $_GET['status'] !== '') {
-            $params['status'] = $_GET['status'];
+        if ($status !== null) {
+            $params['status'] = $status;
         }
-        if (isset($_GET['keyword']) && $_GET['keyword'] !== '') {
-            $params['keyword'] = $_GET['keyword'];
+        if ($keyword !== null) {
+            $params['keyword'] = $keyword;
         }
 
-        $dataProvider = BeautyContestants::getApiDataProvider($params, 1000);
-        $contestants = $dataProvider->getData();
-
-        $contests = $this->getActiveContests();
-        $properties = $this->getPropertiesWithContestants($contestants);
+        $allContestants = BeautyContestants::getApiDataProvider($params, 1000)->getData();
 
         // Filter theo property_id phía PHP
-        $filterPropertyId = isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null;
-        if ($filterPropertyId !== null) {
-            $contestants = array_filter($contestants, function ($c) use ($filterPropertyId) {
-                return isset($c->property_id) && $c->property_id == $filterPropertyId;
-            });
-            $contestants = array_values($contestants);
+        $contestants = $allContestants;
+        if ($propertyId !== null) {
+            $contestants = array_values(array_filter($contestants, function ($c) use ($propertyId) {
+                return isset($c->property_id) && $c->property_id == $propertyId;
+            }));
         }
 
         // Bổ sung bộ phận (department) và năm sinh cho từng thí sinh
@@ -55,8 +113,8 @@ class ApproveMissController extends AdminController
 
         // Lấy danh sách vòng thi (sắp xếp theo round_order)
         $roundParams = array('sort' => 'round_order');
-        if (isset($_GET['contest_id']) && $_GET['contest_id'] !== '') {
-            $roundParams['contest_id'] = $_GET['contest_id'];
+        if ($contestId !== null) {
+            $roundParams['contest_id'] = $contestId;
         }
         $rounds = BeautyRounds::getApiDataProvider($roundParams, 100)->getData();
 
@@ -105,12 +163,12 @@ class ApproveMissController extends AdminController
             }
         }
 
-        $this->render('index', array(
-            'contests' => $contests,
-            'properties' => $properties,
+        return array(
+            'allContestants' => $allContestants,
+            'rounds' => $rounds,
             'roundTabs' => $roundTabs,
             'unassigned' => $unassigned,
-        ));
+        );
     }
 
     public function actionGetDetail($id)
