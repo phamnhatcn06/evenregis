@@ -100,6 +100,37 @@ class MyHelper
     }
 
     /**
+     * Tính tuổi từ ngày sinh (chấp nhận timestamp hoặc chuỗi ngày).
+     * @return int|null Số tuổi, hoặc null nếu không xác định được ngày sinh
+     */
+    public static function calculateAge($birthday)
+    {
+        if (empty($birthday)) return null;
+        $ts = is_numeric($birthday) ? (int) $birthday : strtotime($birthday);
+        if ($ts === false || $ts <= 0) return null;
+        try {
+            $dob = new DateTime('@' . $ts);
+            $now = new DateTime();
+            if ($dob > $now) return null;
+            return (int) $now->diff($dob)->y;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Lấy năm sinh (yyyy) từ ngày sinh.
+     * @return string Năm sinh, hoặc chuỗi rỗng nếu không xác định được
+     */
+    public static function getBirthYear($birthday)
+    {
+        if (empty($birthday)) return '';
+        $ts = is_numeric($birthday) ? (int) $birthday : strtotime($birthday);
+        if ($ts === false || $ts <= 0) return '';
+        return date('Y', $ts);
+    }
+
+    /**
      * Format datetime to dd-mm-yyyy HH:ii
      */
     public static function formatDateTime($date)
