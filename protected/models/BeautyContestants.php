@@ -173,6 +173,17 @@ class BeautyContestants extends BaseBeautyContestants
         return ApiClient::post($url, $this->attributes);
     }
 
+    /**
+     * Chỉ cập nhật trạng thái (duyệt / từ chối) — KHÔNG đụng tới các trường khác
+     * như link ảnh, video. API backend cập nhật một phần (partial update) nên chỉ
+     * cần gửi đúng trường status.
+     */
+    public function updateStatusViaApi($status)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_UPDATE, array('id' => $this->id));
+        return ApiClient::post($url, array('status' => $status));
+    }
+
     public static function deleteViaApi($id)
     {
         $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_DESTROY, array('id' => $id));
