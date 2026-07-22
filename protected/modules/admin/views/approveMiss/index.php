@@ -95,7 +95,10 @@ $firstActive = 0; // index tab active mặc định
     <?php endif; ?>
     <?php foreach ($roundTabs as $i => $tab): ?>
         <div class="tab-pane fade <?php echo $i === $firstActive ? 'show active' : ''; ?>" id="round-<?php echo $tab['id']; ?>" role="tabpanel">
-            <?php $this->renderPartial('_grid', array('contestants' => $tab['contestants'])); ?>
+            <?php $this->renderPartial('_grid', array(
+                'contestants' => $tab['contestants'],
+                'isFinalRound' => (isset($tab['round_type']) && $tab['round_type'] === 'final'),
+            )); ?>
         </div>
     <?php endforeach; ?>
     <?php if ($hasUnassigned): ?>
