@@ -202,8 +202,7 @@ class ApproveMissController extends AdminController
             Yii::app()->end();
         }
 
-        $model->status = BeautyContestants::STATUS_CONFIRMED;
-        $result = $model->updateViaApi();
+        $result = $model->updateStatusViaApi(BeautyContestants::STATUS_CONFIRMED);
 
         if (!$result['success']) {
             echo CJSON::encode(array('success' => false, 'message' => $result['error'] ?: 'Có lỗi xảy ra'));
