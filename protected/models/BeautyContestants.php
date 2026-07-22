@@ -174,14 +174,19 @@ class BeautyContestants extends BaseBeautyContestants
     }
 
     /**
-     * Chỉ cập nhật trạng thái (duyệt / từ chối) — KHÔNG đụng tới các trường khác
-     * như link ảnh, video. API backend cập nhật một phần (partial update) nên chỉ
-     * cần gửi đúng trường status.
+     * Cập nhật trạng thái (duyệt / từ chối). KHÔNG gửi lại link ảnh/video để tránh
+     * làm hỏng đường dẫn đã lưu. Backend validate đầy đủ nên vẫn phải kèm các
+     * trường bắt buộc (contest_id, attendee_id) — nếu thiếu sẽ báo "Xác minh dữ
+     * liệu thất bại".
      */
     public function updateStatusViaApi($status)
     {
         $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_UPDATE, array('id' => $this->id));
-        return ApiClient::post($url, array('status' => $status));
+        return ApiClient::post($url, array(
+            'status' => $status,
+            'contest_id' => $this->contest_id,
+            'attendee_id' => $this->attendee_id,
+        ));
     }
 
     public static function deleteViaApi($id)
