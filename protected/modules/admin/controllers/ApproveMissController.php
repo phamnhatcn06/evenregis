@@ -34,7 +34,6 @@ class ApproveMissController extends AdminController
 
         $contests = $this->getActiveContests();
         $properties = $this->getPropertiesWithContestants($contestants);
-        $rounds = $this->getRoundsList();
 
         // Filter theo property_id phía PHP
         $filterPropertyId = isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null;
@@ -45,27 +44,56 @@ class ApproveMissController extends AdminController
             $contestants = array_values($contestants);
         }
 
-        // Filter theo round_id - chỉ lấy thí sinh đã gán vào vòng thi
-        $filterRoundId = isset($_GET['round_id']) && $_GET['round_id'] !== '' ? $_GET['round_id'] : null;
-        if ($filterRoundId !== null) {
-            $roundResults = BeautyRoundResults::getApiDataProvider(array(
-                'round_id' => $filterRoundId,
+        // Map contestant id => object để tra cứu khi gom nhóm theo vòng
+        $contestantMap = array();
+        foreach ($contestants as $c) {
+            $contestantMap[$c->id] = $c;
+        }
+
+        // Lấy danh sách vòng thi (sắp xếp theo round_order)
+        $roundParams = array('sort' => 'round_order');
+        if (isset($_GET['contest_id']) && $_GET['contest_id'] !== '') {
+            $roundParams['contest_id'] = $_GET['contest_id'];
+        }
+        $rounds = BeautyRounds::getApiDataProvider($roundParams, 100)->getData();
+
+        // Gom nhóm thí sinh theo từng vòng thi -> tabs
+        $roundTabs = array();
+        $assignedIds = array();
+        foreach ($rounds as $round) {
+            $results = BeautyRoundResults::getApiDataProvider(array(
+                'round_id' => $round->id,
             ), 1000)->getData();
-            $contestantIdsInRound = array();
-            foreach ($roundResults as $r) {
-                $contestantIdsInRound[] = $r->registration_id;
+
+            $items = array();
+            foreach ($results as $res) {
+                if (isset($contestantMap[$res->registration_id])) {
+                    $items[] = $contestantMap[$res->registration_id];
+                    $assignedIds[$res->registration_id] = true;
+                }
             }
-            $contestants = array_filter($contestants, function ($c) use ($contestantIdsInRound) {
-                return in_array($c->id, $contestantIdsInRound);
-            });
-            $contestants = array_values($contestants);
+
+            $roundTabs[] = array(
+                'id' => $round->id,
+                'name' => $round->name,
+                'contest_name' => isset($round->contest_name) ? $round->contest_name : '',
+                'contestants' => $items,
+            );
+        }
+
+        // Thí sinh chưa được gán vào vòng nào
+        $unassigned = array();
+        foreach ($contestants as $c) {
+            if (!isset($assignedIds[$c->id])) {
+                $unassigned[] = $c;
+            }
         }
 
         $this->render('index', array(
-            'contestants' => $contestants,
             'contests' => $contests,
             'properties' => $properties,
-            'rounds' => $rounds,
+            'roundTabs' => $roundTabs,
+            'unassigned' => $unassigned,
         ));
     }
 
