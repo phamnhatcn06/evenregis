@@ -26,6 +26,9 @@ class BeautyContestants extends BaseBeautyContestants
     public $submitted_at;
     public $personal_email;
     public $contestant_number;
+    public $department_name;
+    public $division_name;
+    public $birthday;
 
     public static function model($className = __CLASS__)
     {
