@@ -475,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (res.success) {
                 var modal = bootstrap.Modal.getInstance(document.getElementById('modalApprove'));
                 if (modal) modal.hide();
-                updateCardAfterApprove(id, roundId);
+                updateCardAfterApprove(id, roundId, roundType);
                 Toast.success(res.message);
             } else {
                 Toast.error(res.message);
