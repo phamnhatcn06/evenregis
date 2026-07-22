@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         var html = '';
                         res.data.forEach(function(r) {
                             html += '<label class="list-group-item list-group-item-action d-flex align-items-center">';
-                            html += '<input type="radio" name="approve_round" value="' + r.id + '" class="form-check-input me-3">';
+                            html += '<input type="radio" name="approve_round" value="' + r.id + '" data-round-type="' + (r.round_type || '') + '" class="form-check-input me-3">';
                             html += '<div>';
                             html += '<strong>' + r.name + '</strong>';
                             if (r.round_type) {
