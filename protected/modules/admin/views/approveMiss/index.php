@@ -89,12 +89,26 @@ $firstActive = 0; // index tab active mặc định
     <?php endif; ?>
 </ul>
 
+<?php
+// Giữ nguyên bộ lọc hiện tại khi xuất PDF để trùng khớp danh sách đang xem
+$exportFilters = array();
+foreach (array('contest_id', 'property_id', 'status', 'keyword') as $f) {
+    if (isset($_GET[$f]) && $_GET[$f] !== '') {
+        $exportFilters[$f] = $_GET[$f];
+    }
+}
+?>
 <div class="tab-content" id="roundTabsContent">
     <?php if (empty($roundTabs) && !$hasUnassigned): ?>
         <div class="alert alert-info">Chưa có vòng thi nào. Vui lòng tạo vòng thi trước.</div>
     <?php endif; ?>
     <?php foreach ($roundTabs as $i => $tab): ?>
         <div class="tab-pane fade <?php echo $i === $firstActive ? 'show active' : ''; ?>" id="round-<?php echo $tab['id']; ?>" role="tabpanel">
+            <div class="mb-3 text-end">
+                <a href="<?php echo $this->createUrl('exportPdf', array_merge(array('round_id' => $tab['id']), $exportFilters)); ?>" target="_blank" class="btn btn-danger btn-sm">
+                    <i class="fa fa-file-pdf-o me-1"></i>Xuất PDF
+                </a>
+            </div>
             <?php $this->renderPartial('_grid', array(
                 'contestants' => $tab['contestants'],
                 'isFinalRound' => (isset($tab['round_type']) && $tab['round_type'] === 'final'),
@@ -103,6 +117,11 @@ $firstActive = 0; // index tab active mặc định
     <?php endforeach; ?>
     <?php if ($hasUnassigned): ?>
         <div class="tab-pane fade <?php echo empty($roundTabs) ? 'show active' : ''; ?>" id="round-unassigned" role="tabpanel">
+            <div class="mb-3 text-end">
+                <a href="<?php echo $this->createUrl('exportPdf', array_merge(array('round_id' => 'unassigned'), $exportFilters)); ?>" target="_blank" class="btn btn-danger btn-sm">
+                    <i class="fa fa-file-pdf-o me-1"></i>Xuất PDF
+                </a>
+            </div>
             <?php $this->renderPartial('_grid', array('contestants' => $unassigned, 'isFinalRound' => false)); ?>
         </div>
     <?php endif; ?>
