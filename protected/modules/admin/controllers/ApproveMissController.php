@@ -303,8 +303,8 @@ class ApproveMissController extends AdminController
      * Dữ liệu lấy từ người tham dự (attendees) tương ứng — chỉ cần 1 lần gọi API
      * rồi map theo attendee_id để tránh N+1.
      *
-     * Lưu ý: năm sinh (birthday) lấy từ nhân viên (staff) tương ứng của attendee.
-     * Field này chỉ hiển thị khi API attendees/staff trả về `birthday`.
+     * Lưu ý: năm sinh (birthday) ưu tiên lấy từ attendee; nếu attendee không có
+     * thì tra sang nhân viên (staff) tương ứng qua staff_id (có cache tránh gọi trùng).
      */
     protected function enrichContestantsWithAttendeeInfo(&$contestants)
     {
