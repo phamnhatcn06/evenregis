@@ -279,10 +279,6 @@ endif;
                         <div class="info-col">
                             <table class="info">
                                 <tbody>
-                                    <tr>
-                                        <th>Trạng thái</th>
-                                        <td><?php echo strip_tags(BeautyContestants::getStatusLabel($c->status)); ?></td>
-                                    </tr>
                                     <?php foreach ($rows as $label => $value): ?>
                                         <tr>
                                             <th><?php echo CHtml::encode($label); ?></th>
