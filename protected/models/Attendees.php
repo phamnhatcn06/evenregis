@@ -34,6 +34,7 @@ class Attendees extends BaseAttendees
     public $gender;
     public $id_card;
     public $birthday;
+    public $phone_number;
 
     public static function model($className = __CLASS__)
     {
