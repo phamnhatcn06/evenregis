@@ -64,11 +64,11 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title mb-2"><?php echo CHtml::encode($attendeeName); ?></h5>
-                        <p class="card-text text-muted mb-1">
+                        <p class="card-text fw-bold text-dark mb-1" style="font-size:0.95rem;">
                             <i class="fa fa-building me-1"></i><?php echo CHtml::encode($unitName); ?>
                         </p>
                         <?php if (!empty($c->department_name)): ?>
-                            <p class="card-text text-muted small mb-1">
+                            <p class="card-text fw-bold text-dark mb-1" style="font-size:0.95rem;">
                                 <i class="fa fa-sitemap me-1"></i><?php echo CHtml::encode($c->department_name); ?>
                             </p>
                         <?php endif; ?>
@@ -76,7 +76,7 @@
                         $birthDate = MyHelper::formatDate($c->birthday);
                         $age = MyHelper::calculateAge($c->birthday);
                         ?>
-                        <p class="card-text small mb-1">
+                        <p class="card-text fw-bold text-dark mb-1" style="font-size:0.95rem;">
                             <i class="fa fa-birthday-cake me-1"></i>
                             <?php if ($birthDate !== ''): ?>
                                 <?php echo CHtml::encode($birthDate); ?><?php echo $age !== null ? ' (' . $age . ' tuổi)' : ''; ?>
