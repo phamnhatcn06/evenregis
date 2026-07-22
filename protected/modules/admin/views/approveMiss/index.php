@@ -103,7 +103,7 @@ $firstActive = 0; // index tab active mặc định
     <?php endforeach; ?>
     <?php if ($hasUnassigned): ?>
         <div class="tab-pane fade <?php echo empty($roundTabs) ? 'show active' : ''; ?>" id="round-unassigned" role="tabpanel">
-            <?php $this->renderPartial('_grid', array('contestants' => $unassigned)); ?>
+            <?php $this->renderPartial('_grid', array('contestants' => $unassigned, 'isFinalRound' => false)); ?>
         </div>
     <?php endif; ?>
 </div>
