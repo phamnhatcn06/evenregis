@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 var d = res.data;
                 document.getElementById('detail_id').value = d.id;
+                document.getElementById('detail_show_id').value = d.show_id || '';
                 document.getElementById('detail_title').textContent = d.title || '';
                 document.getElementById('detail_property').textContent = d.property_name || '';
                 document.getElementById('detail_show').textContent = d.show_name || '';
@@ -172,7 +173,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 var approveBtn = document.getElementById('btn_approve_modal');
                 var rejectBtn = document.getElementById('btn_reject_modal');
-                approveBtn.style.display = (d.status == 3) ? 'none' : 'inline-block';
+                // Vẫn cho duyệt (lên vòng tiếp) khi chưa ở vòng chung kết.
+                approveBtn.style.display = d.is_final_round ? 'none' : 'inline-block';
+                approveBtn.innerHTML = (d.status == 3)
+                    ? '<i class="fa fa-check me-1"></i>Duyệt lên vòng tiếp'
+                    : '<i class="fa fa-check me-1"></i>Duyệt';
                 rejectBtn.style.display = (d.status == 4) ? 'none' : 'inline-block';
 
                 var loading = document.getElementById('detail_loading');
@@ -185,33 +190,94 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    function approveEntry(id) {
-        Swal.fire({
-            title: 'Xác nhận duyệt',
-            text: 'Bạn có chắc chắn muốn duyệt tiết mục này?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Duyệt',
-            cancelButtonText: 'Hủy'
-        }).then(function(result) {
-            if (result.isConfirmed) {
-                fetch(approveTalentConfig.approveUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'id=' + id
-                })
-                .then(function(res) { return res.json(); })
-                .then(function(res) {
-                    if (res.success) {
-                        Toast.success(res.message);
-                        location.reload();
-                    } else {
-                        Toast.error(res.message);
-                    }
-                });
-            }
+    function approveEntry(id, showId, name) {
+        document.getElementById('approve_entry_id').value = id;
+        document.getElementById('approve_show_id').value = showId || '';
+        document.getElementById('approve_entry_name').textContent = name || 'Tiết mục #' + id;
+
+        var roundsList = document.getElementById('rounds_list');
+        var roundsLoading = document.getElementById('rounds_loading');
+
+        roundsList.innerHTML = '';
+        roundsLoading.style.display = 'block';
+
+        var modal = new bootstrap.Modal(document.getElementById('modalApprove'));
+        modal.show();
+
+        var showFilter = document.querySelector('select[name="show_id"]');
+        var filterShowId = showFilter ? showFilter.value : '';
+        var roundsUrl = approveTalentConfig.getRoundsUrl + '?entry_id=' + id;
+        if (filterShowId) {
+            roundsUrl += '&show_id=' + filterShowId;
+        }
+
+        fetch(roundsUrl)
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+                roundsLoading.style.display = 'none';
+                if (res.success && res.data.length > 0) {
+                    var html = '';
+                    res.data.forEach(function(r) {
+                        html += '<label class="list-group-item list-group-item-action d-flex align-items-center">';
+                        html += '<input type="radio" name="approve_round" value="' + r.id + '" class="form-check-input me-3"' + (r.is_current ? ' checked' : '') + '>';
+                        html += '<div>';
+                        html += '<strong>' + r.name + '</strong>';
+                        if (r.round_type) {
+                            html += ' <span class="badge bg-secondary ms-2">' + r.round_type + '</span>';
+                        }
+                        if (r.is_current) {
+                            html += ' <span class="badge bg-info ms-1">Vòng hiện tại</span>';
+                        }
+                        html += '</div>';
+                        html += '</label>';
+                    });
+                    roundsList.innerHTML = html;
+                } else {
+                    roundsList.innerHTML = '<div class="text-muted p-3"><i class="fa fa-info-circle me-1"></i>Hội diễn này chưa có vòng thi nào</div>';
+                }
+            })
+            .catch(function() {
+                roundsLoading.style.display = 'none';
+                roundsList.innerHTML = '<div class="text-danger p-3">Lỗi tải danh sách vòng thi</div>';
+            });
+    }
+
+    var btnConfirmApprove = document.getElementById('btn_confirm_approve');
+    if (btnConfirmApprove) {
+        btnConfirmApprove.addEventListener('click', function() {
+            var id = document.getElementById('approve_entry_id').value;
+            var selectedRound = document.querySelector('input[name="approve_round"]:checked');
+            var roundId = selectedRound ? selectedRound.value : '';
+
+            var btn = this;
+            var originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang xử lý...';
+
+            fetch(approveTalentConfig.approveUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: 'id=' + id + '&round_id=' + roundId
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+                if (res.success) {
+                    Toast.success(res.message);
+                    location.reload();
+                } else {
+                    Toast.error(res.message);
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            })
+            .catch(function() {
+                Toast.error('Lỗi kết nối server');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            });
         });
     }
 
@@ -230,7 +296,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.isConfirmed) {
                 fetch(approveTalentConfig.rejectUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     body: 'id=' + id + '&reason=' + encodeURIComponent(result.value || '')
                 })
                 .then(function(res) { return res.json(); })
@@ -249,7 +318,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-approve').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            approveEntry(this.dataset.id);
+            var card = this.closest('.talent-card');
+            var name = card ? card.querySelector('.card-title').textContent : '';
+            approveEntry(this.dataset.id, this.dataset.showId, name);
         });
     });
 
@@ -264,8 +335,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnApproveModal) {
         btnApproveModal.addEventListener('click', function() {
             var id = document.getElementById('detail_id').value;
+            var showId = document.getElementById('detail_show_id').value;
+            var name = document.getElementById('detail_title').textContent;
             bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
-            approveEntry(id);
+            approveEntry(id, showId, name);
         });
     }
 

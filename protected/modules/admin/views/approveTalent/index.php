@@ -8,6 +8,20 @@ $this->Tabletitle = 'Xét duyệt tiết mục Văn nghệ';
 
 Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/css/pages/approve-talent.css');
 Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/js/pages/approve-talent.js', CClientScript::POS_END);
+
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
+
+Yii::app()->clientScript->registerScript('approve-talent-select2', "
+$('#filter-property').select2({
+    placeholder: '-- Tất cả --',
+    allowClear: true,
+    width: '100%',
+    language: {
+        noResults: function() { return 'Không tìm thấy'; }
+    }
+});
+", CClientScript::POS_READY);
 ?>
 
 <div class="card mb-3">
@@ -19,6 +33,17 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                     <option value="">-- Tất cả --</option>
                     <?php foreach ($shows as $id => $name): ?>
                         <option value="<?php echo $id; ?>" <?php echo (isset($_GET['show_id']) && $_GET['show_id'] == $id) ? 'selected' : ''; ?>>
+                            <?php echo CHtml::encode($name); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Đơn vị</label>
+                <select name="property_id" class="form-select" id="filter-property">
+                    <option value="">-- Tất cả --</option>
+                    <?php foreach ($properties as $id => $name): ?>
+                        <option value="<?php echo $id; ?>" <?php echo (isset($_GET['property_id']) && $_GET['property_id'] == $id) ? 'selected' : ''; ?>>
                             <?php echo CHtml::encode($name); ?>
                         </option>
                     <?php endforeach; ?>
@@ -64,83 +89,43 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
     </div>
 </div>
 
-<div class="row" id="entries-grid">
-    <?php if (empty($entries)): ?>
-        <div class="col-12">
-            <div class="alert alert-info">Không có tiết mục nào.</div>
-        </div>
-    <?php else: ?>
-        <?php foreach ($entries as $e): ?>
-            <?php
-            $categoryName = !empty($e->category_name) ? $e->category_name : '';
-            $propertyName = !empty($e->property_name) ? $e->property_name : '';
-            $duration = $e->duration_seconds ? gmdate('i:s', $e->duration_seconds) : '';
-            ?>
-            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                <div class="card talent-card h-100" data-id="<?php echo $e->id; ?>">
-                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                        <span class="badge bg-primary"><?php echo CHtml::encode($categoryName); ?></span>
-                        <?php echo TalentEntries::getStatusLabel($e->status); ?>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title mb-2"><?php echo CHtml::encode($e->title); ?></h5>
-                        <p class="card-text text-muted mb-1">
-                            <i class="fa fa-building me-1"></i><?php echo CHtml::encode($propertyName); ?>
-                        </p>
-                        <?php if ($e->is_alliance_team): ?>
-                            <p class="card-text small mb-1">
-                                <span class="badge bg-warning text-dark"><i class="fa fa-users me-1"></i>Đội liên quân</span>
-                            </p>
-                        <?php endif; ?>
-                        <?php if ($duration): ?>
-                            <p class="card-text small mb-1">
-                                <i class="fa fa-clock-o me-1"></i><?php echo $duration; ?>
-                            </p>
-                        <?php endif; ?>
-                        <?php if (!empty($e->participant_count)): ?>
-                            <p class="card-text small mb-1">
-                                <i class="fa fa-user me-1"></i><?php echo $e->participant_count; ?> người
-                            </p>
-                        <?php endif; ?>
-                        <p class="card-text mb-1">
-                            <?php if (!empty($e->video_path)): ?>
-                                <span class="badge bg-success"><i class="fa fa-check-circle me-1"></i>Đã upload video</span>
-                            <?php else: ?>
-                                <span class="badge bg-warning text-dark"><i class="fa fa-exclamation-triangle me-1"></i>Chưa upload video</span>
-                            <?php endif; ?>
-                        </p>
-                        <?php if (!empty($e->description)): ?>
-                            <p class="card-text small text-muted mt-2 entry-description"><?php echo CHtml::encode(mb_substr($e->description, 0, 100)); ?><?php echo mb_strlen($e->description) > 100 ? '...' : ''; ?></p>
-                        <?php endif; ?>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-sm btn-info flex-fill btn-view-detail" data-id="<?php echo $e->id; ?>">
-                                <i class="fa fa-eye me-1"></i>Chi tiết
-                            </button>
-                            <?php if ($e->status != TalentEntries::STATUS_APPROVED): ?>
-                                <button type="button" class="btn btn-sm btn-success btn-approve" data-id="<?php echo $e->id; ?>" title="Duyệt">
-                                    <i class="fa fa-check"></i>
-                                </button>
-                            <?php endif; ?>
-                            <?php if ($e->status != TalentEntries::STATUS_REJECTED): ?>
-                                <button type="button" class="btn btn-sm btn-danger btn-reject" data-id="<?php echo $e->id; ?>" title="Từ chối">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+<?php if (empty($entries)): ?>
+    <div class="alert alert-info">Không có tiết mục nào.</div>
+<?php else: ?>
+    <ul class="nav nav-tabs mb-3" id="round-tabs" role="tablist">
+        <?php foreach ($rounds as $i => $round): ?>
+            <?php $tabId = 'round-' . $round['id']; ?>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link <?php echo $i === 0 ? 'active' : ''; ?>" id="<?php echo $tabId; ?>-tab"
+                    data-bs-toggle="tab" data-bs-target="#<?php echo $tabId; ?>" type="button" role="tab">
+                    <?php echo CHtml::encode($round['name']); ?>
+                    <span class="badge bg-secondary ms-1"><?php echo $round['count']; ?></span>
+                </button>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+
+    <div class="tab-content" id="round-tabs-content">
+        <?php foreach ($rounds as $i => $round): ?>
+            <?php $tabId = 'round-' . $round['id']; ?>
+            <div class="tab-pane fade <?php echo $i === 0 ? 'show active' : ''; ?>" id="<?php echo $tabId; ?>" role="tabpanel">
+                <div class="row">
+                    <?php foreach ($grouped[$round['id']] as $e): ?>
+                        <?php $this->renderPartial('_card', array('e' => $e, 'isFinalRound' => !empty($round['is_final']))); ?>
+                    <?php endforeach; ?>
                 </div>
             </div>
         <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+    </div>
+<?php endif; ?>
 
 <?php $this->renderPartial('_modal_detail'); ?>
+<?php $this->renderPartial('_modal_approve'); ?>
 
 <script>
 var approveTalentConfig = {
     getDetailUrl: '<?php echo $this->createUrl("getDetail"); ?>',
+    getRoundsUrl: '<?php echo $this->createUrl("getRounds"); ?>',
     approveUrl: '<?php echo $this->createUrl("approve"); ?>',
     rejectUrl: '<?php echo $this->createUrl("reject"); ?>'
 };

@@ -25,6 +25,8 @@ class TalentEntries extends BaseTalentEntries
     public $content;
     public $document;
     public $is_alliance_team;
+    public $round_id;
+    public $round_name;
 
     public static function model($className = __CLASS__)
     {
@@ -34,7 +36,7 @@ class TalentEntries extends BaseTalentEntries
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('show_id, property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, alliance_org_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team', 'safe');
+        $rules[] = array('show_id, property_name, category_name, show_name, member_count, registration_id, alliance_property_ids, alliance_org_ids, director, director_phone, origin, participant_count, content, document, is_alliance_team, round_id, round_name', 'safe');
         return $rules;
     }
 
@@ -72,6 +74,7 @@ class TalentEntries extends BaseTalentEntries
             $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
             $model = new self;
             $model->setAttributes($data, false);
+            $model->show_id = isset($data['show_id']) ? $data['show_id'] : null;
             $model->property_name = isset($data['property_name']) ? $data['property_name'] : '';
             $model->category_name = isset($data['category_name']) ? $data['category_name'] : '';
             $model->show_name = isset($data['show_name']) ? $data['show_name'] : '';
@@ -83,6 +86,8 @@ class TalentEntries extends BaseTalentEntries
             $model->document = isset($data['document']) ? $data['document'] : '';
             $model->is_alliance_team = isset($data['is_alliance_team']) ? $data['is_alliance_team'] : null;
             $model->alliance_org_ids = isset($data['alliance_org_ids']) ? $data['alliance_org_ids'] : '';
+            $model->round_id = isset($data['round_id']) ? $data['round_id'] : null;
+            $model->round_name = isset($data['round_name']) ? $data['round_name'] : '';
             $model->id = $id;
             return $model;
         }
@@ -126,6 +131,8 @@ class TalentEntries extends BaseTalentEntries
         $data['content'] = $this->content;
         $data['document'] = $this->document;
         $data['is_alliance_team'] = $this->is_alliance_team;
+        $data['round_id'] = $this->round_id;
+        $data['show_id'] = $this->show_id;
 
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
@@ -171,6 +178,38 @@ class TalentEntries extends BaseTalentEntries
             self::STATUS_REJECTED => 'Từ chối',
             self::STATUS_PENDING => 'Chờ xử lý',
         );
+    }
+
+    /**
+     * Duyệt tiết mục và gán vào vòng thi (nếu có)
+     * @param string $id
+     * @param string|null $roundId
+     * @return array
+     */
+    public static function approveWithRound($id, $roundId = null)
+    {
+        $model = self::fetchFromApi($id);
+        if ($model === null) {
+            return array('success' => false, 'error' => 'Không tìm thấy tiết mục');
+        }
+        $model->status = self::STATUS_APPROVED;
+        if (!empty($roundId)) {
+            $model->round_id = $roundId;
+        }
+
+        // Backend bắt buộc approved_by khi duyệt -> lấy từ SSO token.
+        $ssoUser = AuthHandler::getUser();
+        $model->approved_by = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+        // API detail không trả show_id, nhưng update lại bắt buộc -> suy từ vòng thi.
+        if (empty($model->show_id) && !empty($model->round_id)) {
+            $round = TalentRounds::fetchFromApi($model->round_id);
+            if ($round !== null) {
+                $model->show_id = $round->talent_show_id;
+            }
+        }
+
+        return $model->updateViaApi();
     }
 
     /**

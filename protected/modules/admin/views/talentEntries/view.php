@@ -12,6 +12,12 @@ $this->menu = array(
         'icon' => 'fa-user-plus',
     ),
     array(
+        'label' => 'Chấm điểm',
+        'url' => $this->createUrl('scoring', array('id' => $model->id)),
+        'color' => 'warning',
+        'icon' => 'fa-star',
+    ),
+    array(
         'label' => 'Cập nhật',
         'url' => $this->createUrl('update', array('id' => $model->id)),
         'color' => 'primary',

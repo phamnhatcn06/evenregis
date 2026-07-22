@@ -279,6 +279,13 @@ class ApiEndpoints
     const TALENT_ENTRY_MEMBER_DETAIL = '/api/talent-entry-members/detail/{id}';
     const TALENT_ENTRY_MEMBER_DESTROY = '/api/talent-entry-members/destroy/{id}';
 
+    // Talent Round
+    const TALENT_ROUND_LIST = '/api/talent-rounds';
+    const TALENT_ROUND_STORE = '/api/talent-rounds/store';
+    const TALENT_ROUND_DETAIL = '/api/talent-rounds/detail/{id}';
+    const TALENT_ROUND_UPDATE = '/api/talent-rounds/update/{id}';
+    const TALENT_ROUND_DESTROY = '/api/talent-rounds/destroy/{id}';
+
     // Alliance Request - Additional
     const ALLIANCE_REQUEST_RESPOND = '/api/alliance-requests/respond/{id}';
     const ALLIANCE_REQUEST_BY_TARGET = '/api/alliance-requests/by-target/{org_id}';

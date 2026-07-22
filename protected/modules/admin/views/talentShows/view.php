@@ -19,6 +19,12 @@ $this->menu = array(
         'icon' => 'fa-music',
     ),
     array(
+        'label' => 'Vòng thi',
+        'url' => $this->createUrl('/admin/talentRounds/admin', array('TalentRounds[talent_show_id]' => $model->id)),
+        'color' => 'success',
+        'icon' => 'fa-layer-group',
+    ),
+    array(
         'label' => 'Cập nhật',
         'url' => $this->createUrl('update', array('id' => $model->id)),
         'color' => 'warning',

@@ -7,6 +7,8 @@ class ApproveTalentController extends AdminController
         parent::init();
         $this->publicActions[] = 'index';
         $this->publicActions[] = 'getDetail';
+        $this->publicActions[] = 'getRounds';
+        $this->publicActions[] = 'debugApprove';
         $this->publicActions[] = 'approve';
         $this->publicActions[] = 'reject';
     }
@@ -22,6 +24,9 @@ class ApproveTalentController extends AdminController
         }
         if (isset($_GET['category_id']) && $_GET['category_id'] !== '') {
             $params['category_id'] = $_GET['category_id'];
+        }
+        if (isset($_GET['property_id']) && $_GET['property_id'] !== '') {
+            $params['property_id'] = $_GET['property_id'];
         }
         if (isset($_GET['status']) && $_GET['status'] !== '') {
             $params['status'] = $_GET['status'];
@@ -42,12 +47,96 @@ class ApproveTalentController extends AdminController
 
         $shows = $this->getActiveShows();
         $categories = $this->getCategories();
+        $properties = $this->getProperties();
+
+        list($rounds, $grouped) = $this->groupEntriesByRound($entries);
 
         $this->render('index', array(
             'entries' => $entries,
             'shows' => $shows,
             'categories' => $categories,
+            'properties' => $properties,
+            'rounds' => $rounds,
+            'grouped' => $grouped,
         ));
+    }
+
+    /**
+     * Nhóm tiết mục theo vòng thi để hiển thị dạng tab.
+     * @param TalentEntries[] $entries
+     * @return array [rounds, grouped]
+     *   - rounds: mảng vòng thi đã sắp xếp [['id'=>, 'name'=>, 'count'=>], ...] (id=0 là chưa phân vòng)
+     *   - grouped: round_id => TalentEntries[]
+     */
+    protected function groupEntriesByRound($entries)
+    {
+        $grouped = array();
+        $roundNames = array();
+        $roundOrders = array();
+        $roundTypes = array();
+
+        foreach ($entries as $e) {
+            $roundId = !empty($e->round_id) ? $e->round_id : 0;
+            if (!isset($grouped[$roundId])) {
+                $grouped[$roundId] = array();
+            }
+            $grouped[$roundId][] = $e;
+
+            if ($roundId && !isset($roundNames[$roundId])) {
+                $roundNames[$roundId] = !empty($e->round_name) ? $e->round_name : null;
+            }
+        }
+
+        // Bổ sung tên/thứ tự/loại vòng cho vòng thi chưa có đủ thông tin từ danh sách.
+        foreach (array_keys($grouped) as $roundId) {
+            if ($roundId === 0) {
+                continue;
+            }
+            if (empty($roundNames[$roundId]) || !isset($roundOrders[$roundId]) || !isset($roundTypes[$roundId])) {
+                $round = TalentRounds::fetchFromApi($roundId);
+                if ($round !== null) {
+                    if (empty($roundNames[$roundId])) {
+                        $roundNames[$roundId] = $round->name;
+                    }
+                    $roundOrders[$roundId] = $round->round_order;
+                    $roundTypes[$roundId] = $round->round_type;
+                }
+            }
+        }
+
+        $rounds = array();
+        foreach ($grouped as $roundId => $items) {
+            if ($roundId === 0) {
+                continue;
+            }
+            $rounds[] = array(
+                'id' => $roundId,
+                'name' => !empty($roundNames[$roundId]) ? $roundNames[$roundId] : ('Vòng #' . $roundId),
+                'count' => count($items),
+                'order' => isset($roundOrders[$roundId]) ? $roundOrders[$roundId] : 9999,
+                'is_final' => isset($roundTypes[$roundId]) && $roundTypes[$roundId] === 'final',
+            );
+        }
+
+        usort($rounds, function ($a, $b) {
+            if ($a['order'] == $b['order']) {
+                return strcmp($a['name'], $b['name']);
+            }
+            return $a['order'] - $b['order'];
+        });
+
+        // Tab "Chưa phân vòng" đặt cuối cùng nếu có tiết mục chưa gán vòng.
+        if (isset($grouped[0])) {
+            $rounds[] = array(
+                'id' => 0,
+                'name' => 'Chưa phân vòng',
+                'count' => count($grouped[0]),
+                'order' => PHP_INT_MAX,
+                'is_final' => false,
+            );
+        }
+
+        return array($rounds, $grouped);
     }
 
     public function actionGetDetail($id)
@@ -61,6 +150,9 @@ class ApproveTalentController extends AdminController
         $data = array(
             'id' => $model->id,
             'title' => $model->title,
+            'show_id' => $model->show_id,
+            'round_id' => $model->round_id,
+            'round_name' => $model->round_name,
             'property_name' => $model->property_name,
             'category_name' => $model->category_name,
             'show_name' => $model->show_name,
@@ -80,9 +172,81 @@ class ApproveTalentController extends AdminController
             'status_label' => TalentEntries::getStatusLabel($model->status),
             'note' => $model->note,
             'created_at' => $model->created_at,
+            'is_final_round' => false,
         );
 
+        // Xác định tiết mục có đang ở vòng chung kết không (để ẩn/hiện nút duyệt).
+        if (!empty($model->round_id)) {
+            $round = TalentRounds::fetchFromApi($model->round_id);
+            if ($round !== null) {
+                $data['is_final_round'] = ($round->round_type === 'final');
+            }
+        }
+
         echo CJSON::encode(array('success' => true, 'data' => $data));
+        Yii::app()->end();
+    }
+
+    /**
+     * Lấy danh sách vòng thi của hội diễn chứa tiết mục (để gán khi duyệt)
+     * show_id được tra từ chính tiết mục vì API list không trả về show_id
+     */
+    public function actionGetRounds($entry_id, $show_id = null)
+    {
+        $entry = TalentEntries::fetchFromApi($entry_id);
+        if ($entry === null) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục'));
+            Yii::app()->end();
+        }
+        $currentRoundId = $entry->round_id;
+
+        // Tiết mục không lưu show_id trực tiếp -> suy ra hội diễn từ vòng hiện tại.
+        // Fallback: show_id do người dùng đang lọc trên màn hình.
+        if (empty($show_id) && !empty($currentRoundId)) {
+            $currentRound = TalentRounds::fetchFromApi($currentRoundId);
+            if ($currentRound !== null) {
+                $show_id = $currentRound->talent_show_id;
+            }
+        }
+
+        if (empty($show_id)) {
+            echo CJSON::encode(array(
+                'success' => true,
+                'data' => array(),
+                'message' => 'Chưa xác định được hội diễn. Hãy lọc theo hội diễn ở trên rồi thử lại.',
+            ));
+            Yii::app()->end();
+        }
+
+        $rounds = TalentRounds::getApiDataProvider(array(
+            'talent_show_id' => $show_id,
+            'sort' => 'round_order',
+        ), 100)->getData();
+
+        $data = array();
+        foreach ($rounds as $r) {
+            $data[] = array(
+                'id' => $r->id,
+                'name' => $r->name,
+                'round_type' => TalentRounds::getRoundTypeLabel($r->round_type),
+                'round_order' => $r->round_order,
+                'is_current' => ($currentRoundId !== null && $r->id == $currentRoundId),
+            );
+        }
+
+        echo CJSON::encode(array('success' => true, 'data' => $data));
+        Yii::app()->end();
+    }
+
+    public function actionDebugApprove($entry_id, $round_id = null)
+    {
+        header('Content-Type: application/json');
+        $ssoUser = AuthHandler::getUser();
+        $result = TalentEntries::approveWithRound($entry_id, $round_id);
+        echo json_encode(array(
+            'sso_user' => $ssoUser,
+            'api_response' => $result,
+        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         Yii::app()->end();
     }
 
@@ -93,22 +257,17 @@ class ApproveTalentController extends AdminController
         }
 
         $id = Yii::app()->request->getPost('id');
+        $roundId = Yii::app()->request->getPost('round_id');
         if (empty($id)) {
             echo CJSON::encode(array('success' => false, 'message' => 'Thiếu ID'));
             Yii::app()->end();
         }
 
-        $model = TalentEntries::fetchFromApi($id);
-        if ($model === null) {
-            echo CJSON::encode(array('success' => false, 'message' => 'Không tìm thấy tiết mục'));
-            Yii::app()->end();
-        }
-
-        $model->status = TalentEntries::STATUS_APPROVED;
-        $result = $model->updateViaApi();
+        $result = TalentEntries::approveWithRound($id, $roundId);
 
         if ($result['success']) {
-            echo CJSON::encode(array('success' => true, 'message' => 'Đã duyệt tiết mục'));
+            $message = !empty($roundId) ? 'Đã duyệt và gán tiết mục vào vòng thi' : 'Đã duyệt tiết mục';
+            echo CJSON::encode(array('success' => true, 'message' => $message));
         } else {
             echo CJSON::encode(array('success' => false, 'message' => $result['error'] ?: 'Có lỗi xảy ra'));
         }
@@ -169,6 +328,21 @@ class ApproveTalentController extends AdminController
     {
         $result = ApiClient::get(ApiEndpoints::TALENT_CATEGORY_LIST, array(
             'per_page' => 100,
+        ));
+
+        $list = array();
+        if ($result['success'] && isset($result['data']['data'])) {
+            foreach ($result['data']['data'] as $item) {
+                $list[$item['id']] = $item['name'];
+            }
+        }
+        return $list;
+    }
+
+    protected function getProperties()
+    {
+        $result = ApiClient::get(ApiEndpoints::PROPERTY_LIST, array(
+            'per_page' => 1000,
         ));
 
         $list = array();
