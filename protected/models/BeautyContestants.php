@@ -182,11 +182,17 @@ class BeautyContestants extends BaseBeautyContestants
     public function updateStatusViaApi($status)
     {
         $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_UPDATE, array('id' => $this->id));
-        return ApiClient::post($url, array(
+        $data = array(
             'status' => $status,
             'contest_id' => $this->contest_id,
             'attendee_id' => $this->attendee_id,
-        ));
+        );
+        // candidate_number nằm trong bộ trường bắt buộc của backend; gửi lại giá
+        // trị hiện có (nếu có) để không rơi vào lỗi "Xác minh dữ liệu thất bại".
+        if ($this->candidate_number !== null && $this->candidate_number !== '') {
+            $data['candidate_number'] = $this->candidate_number;
+        }
+        return ApiClient::post($url, $data);
     }
 
     public static function deleteViaApi($id)
