@@ -24,6 +24,7 @@ function missExportThumbUrl($photoUrl, $width = 900)
     }
     return $photoUrl;
 }
+endif;
 ?>
 <!DOCTYPE html>
 <html lang="vi">
