@@ -2,7 +2,9 @@
 /**
  * Lưới thẻ thí sinh cho một tab (vòng thi)
  * @var array $contestants Danh sách thí sinh của vòng thi
+ * @var bool $isFinalRound Tab hiện tại có phải vòng chung kết không
  */
+$isFinalRound = isset($isFinalRound) ? $isFinalRound : false;
 ?>
 <div class="row">
     <?php if (empty($contestants)): ?>
