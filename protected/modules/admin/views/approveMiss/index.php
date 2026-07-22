@@ -36,17 +36,6 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                 </select>
             </div>
             <div class="col-lg-2 col-md-4">
-                <label class="form-label">Vòng thi</label>
-                <select name="round_id" class="form-select form-select-sm">
-                    <option value="">-- Tất cả --</option>
-                    <?php foreach ($rounds as $id => $name): ?>
-                        <option value="<?php echo $id; ?>" <?php echo (isset($_GET['round_id']) && $_GET['round_id'] == $id) ? 'selected' : ''; ?>>
-                            <?php echo CHtml::encode($name); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-lg-2 col-md-4">
                 <label class="form-label">Trạng thái</label>
                 <select name="status" class="form-select form-select-sm">
                     <option value="">-- Tất cả --</option>
