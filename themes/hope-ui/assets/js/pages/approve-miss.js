@@ -149,6 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('detail_contest_id').value = '';
         document.getElementById('detail_name').textContent = '';
         document.getElementById('detail_property').textContent = '';
+        document.getElementById('detail_department').textContent = '';
+        document.getElementById('detail_birthday').textContent = '';
         document.getElementById('detail_contest').textContent = '';
         document.getElementById('detail_status').innerHTML = '';
         document.getElementById('detail_height').textContent = '';
