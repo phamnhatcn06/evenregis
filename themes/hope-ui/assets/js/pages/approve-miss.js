@@ -315,7 +315,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 var approveBtn = document.getElementById('btn_approve_modal');
                 var rejectBtn = document.getElementById('btn_reject_modal');
-                approveBtn.style.display = (d.status == 1) ? 'none' : 'inline-block';
+                // Duyệt = gán vòng: luôn cho phép (getRounds sẽ báo nếu đã gán hết vòng)
+                approveBtn.style.display = 'inline-block';
                 rejectBtn.style.display = (d.status == 3) ? 'none' : 'inline-block';
 
                 var loading = document.getElementById('detail_loading');
