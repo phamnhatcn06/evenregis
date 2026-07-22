@@ -351,19 +351,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (res.success && res.data.length > 0) {
                         var html = '';
                         res.data.forEach(function(r) {
+                            var typeLabel = r.round_type === 'final' ? 'Chung kết' : (r.round_type === 'so-khao' ? 'Sơ khảo' : r.round_type);
                             html += '<label class="list-group-item list-group-item-action d-flex align-items-center">';
                             html += '<input type="radio" name="approve_round" value="' + r.id + '" data-round-type="' + (r.round_type || '') + '" class="form-check-input me-3">';
                             html += '<div>';
                             html += '<strong>' + r.name + '</strong>';
                             if (r.round_type) {
-                                html += ' <span class="badge bg-secondary ms-2">' + r.round_type + '</span>';
+                                html += ' <span class="badge bg-secondary ms-2">' + typeLabel + '</span>';
+                            }
+                            if (r.assigned) {
+                                html += ' <span class="badge bg-success ms-1">Đã gán</span>';
                             }
                             html += '</div>';
                             html += '</label>';
                         });
                         roundsList.innerHTML = html;
                     } else {
-                        roundsList.innerHTML = '<div class="text-muted p-3"><i class="fa fa-info-circle me-1"></i>Thí sinh đã được gán vào tất cả các vòng hoặc chưa có vòng thi nào</div>';
+                        roundsList.innerHTML = '<div class="text-muted p-3"><i class="fa fa-info-circle me-1"></i>Cuộc thi chưa có vòng thi nào</div>';
                     }
                 })
                 .catch(function() {
