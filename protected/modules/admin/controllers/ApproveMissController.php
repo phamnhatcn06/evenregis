@@ -211,7 +211,7 @@ class ApproveMissController extends AdminController
         }
 
         if (!empty($roundId)) {
-            $assignResult = BeautyRoundResults::assignContestants($roundId, array($id));
+            $assignResult = BeautyRoundResults::assignExclusive($roundId, $id);
             if (!$assignResult['success']) {
                 echo CJSON::encode(array(
                     'success' => true,
