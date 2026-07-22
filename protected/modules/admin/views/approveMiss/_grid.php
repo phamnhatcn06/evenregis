@@ -107,8 +107,8 @@ $isFinalRound = isset($isFinalRound) ? $isFinalRound : false;
                             <button type="button" class="btn btn-sm btn-info flex-fill btn-view-detail" data-id="<?php echo $c->id; ?>">
                                 <i class="fa fa-eye me-1"></i>Chi tiết
                             </button>
-                            <?php if ($c->status != BeautyContestants::STATUS_CONFIRMED): ?>
-                                <button type="button" class="btn btn-sm btn-success btn-approve" data-id="<?php echo $c->id; ?>" title="Duyệt">
+                            <?php if (!$isFinalRound): ?>
+                                <button type="button" class="btn btn-sm btn-success btn-approve" data-id="<?php echo $c->id; ?>" title="Duyệt / gán vòng">
                                     <i class="fa fa-check"></i>
                                 </button>
                             <?php endif; ?>
