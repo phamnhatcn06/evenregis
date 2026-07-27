@@ -152,30 +152,44 @@ class EmailHelper
             $recipients = array('cswm@muongthanh.vn');
         }
 
-        // 3. Tải cấu hình đợt đăng ký & phân loại Đợt 1 / Đợt 2
+        // 3. Tải cấu hình đợt đăng ký — lấy content_id của period rồi map sang code qua bảng Contents
         $periodContentCodes = array();
         if ($model->period_id) {
-            $periodContents = RegistrationPeriodContents::getContentsByPeriod($model->period_id);
-            foreach ($periodContents as $pc) {
-                $code = '';
-                if (is_array($pc)) {
-                    $code = isset($pc['content_code']) ? $pc['content_code'] : (isset($pc['content']['code']) ? $pc['content']['code'] : '');
-                } else {
-                    $code = isset($pc->content_code) ? $pc->content_code : (isset($pc->content) && isset($pc->content->code) ? $pc->content->code : '');
+            $contentIds = RegistrationPeriodContents::getContentIdsByPeriod($model->period_id);
+            if (!empty($contentIds)) {
+                $contentsList = Contents::getApiDataProvider(array(), 200)->getData();
+                $contentCodeMap = array();
+                foreach ($contentsList as $ct) {
+                    $ctId = is_object($ct) ? $ct->id : (isset($ct['id']) ? $ct['id'] : null);
+                    $ctCode = is_object($ct) ? $ct->code : (isset($ct['code']) ? $ct['code'] : null);
+                    if ($ctId !== null) {
+                        $contentCodeMap[$ctId] = $ctCode;
+                    }
                 }
-                if ($code) {
-                    if ($code === 'sport') $code = 'sports';
-                    if ($code === 'competitions') $code = 'competition';
-                    if ($code === 'talents') $code = 'talent';
-                    if ($code === 'beauty_contests') $code = 'miss';
-                    $periodContentCodes[] = $code;
+                foreach ($contentIds as $cid) {
+                    $code = isset($contentCodeMap[$cid]) ? $contentCodeMap[$cid] : '';
+                    if ($code) {
+                        if ($code === 'sport') $code = 'sports';
+                        if ($code === 'competitions') $code = 'competition';
+                        if ($code === 'talents') $code = 'talent';
+                        if ($code === 'beauty_contests') $code = 'miss';
+                        $periodContentCodes[] = $code;
+                    }
                 }
             }
         }
 
+        // Cờ đợt để hiển thị (fallback theo tên period khi không lấy được content codes)
         $periodNameLower = mb_strtolower((string)$model->period_name);
-        $isDot1 = in_array('sports', $periodContentCodes) || (strpos($periodNameLower, 'đợt 1') !== false || strpos($periodNameLower, 'dot 1') !== false);
-        $isDot2 = in_array('competition', $periodContentCodes) || (strpos($periodNameLower, 'đợt 2') !== false || strpos($periodNameLower, 'dot 2') !== false);
+        $noCodes = empty($periodContentCodes);
+        $isDot1 = in_array('sports', $periodContentCodes) || ($noCodes && (strpos($periodNameLower, 'đợt 1') !== false || strpos($periodNameLower, 'dot 1') !== false));
+        $isDot2 = in_array('competition', $periodContentCodes) || ($noCodes && (strpos($periodNameLower, 'đợt 2') !== false || strpos($periodNameLower, 'dot 2') !== false));
+
+        // Điều kiện hiển thị từng nội dung theo cấu hình period (fallback khi thiếu codes)
+        $showSports = in_array('sports', $periodContentCodes) || ($noCodes && $isDot1);
+        $showTalent = in_array('talent', $periodContentCodes) || ($noCodes && $isDot1);
+        $showMiss = in_array('miss', $periodContentCodes) || ($noCodes && $isDot1);
+        $showCompetition = in_array('competition', $periodContentCodes) || ($noCodes && $isDot2);
 
         // 4. Tải danh sách người tham dự
         $attendees = Attendees::getByRegistrationId($registrationId);
