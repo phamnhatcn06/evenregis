@@ -27,7 +27,7 @@
             text-align: center;
             font-size: 16px;
             font-weight: bold;
-            color: #0d6efd;
+            color: #000000;
             text-transform: uppercase;
             margin-top: 10px;
             margin-bottom: 5px;
@@ -35,7 +35,8 @@
 
         .sub-title {
             text-align: center;
-            font-size: 12px;
+            font-size: 14px;
+            font-weight: bold;
             color: #475569;
             margin-bottom: 15px;
         }
