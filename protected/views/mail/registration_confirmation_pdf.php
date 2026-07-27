@@ -220,7 +220,7 @@
     <!-- Section 1: Đợt 1 - Đăng ký thi đấu thể thao -->
     <?php if (!empty($isDot1) || !empty($sportTeams)): ?>
         <div class="section-header">
-            ĐỢT 1: DANH SÁCH CHI TIẾT CÁC ĐỘI THI ĐẤU THỂ THAO
+            DANH SÁCH CHI TIẾT CÁC ĐỘI THI ĐẤU THỂ THAO
         </div>
 
         <?php if (empty($sportTeams)): ?>
