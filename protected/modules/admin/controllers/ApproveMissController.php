@@ -205,8 +205,15 @@ class ApproveMissController extends AdminController
             $rowNum++;
         }
 
-        foreach (range('A', $lastCol) as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        // Dùng độ rộng cố định thay vì setAutoSize(true) — autosize tính toán
+        // rất tốn CPU/RAM với nhiều dòng, dễ gây timeout/500 trên server.
+        $columnWidths = array(
+            'A' => 6, 'B' => 22, 'C' => 18, 'D' => 22, 'E' => 20, 'F' => 24,
+            'G' => 13, 'H' => 8, 'I' => 14, 'J' => 14, 'K' => 16, 'L' => 26,
+            'M' => 32, 'N' => 26, 'O' => 16,
+        );
+        foreach ($columnWidths as $columnID => $width) {
+            $sheet->getColumnDimension($columnID)->setWidth($width);
         }
 
         $safeRound = preg_replace('/[^A-Za-z0-9]+/', '_', $this->toAscii($roundName));
