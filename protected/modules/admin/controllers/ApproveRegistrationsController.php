@@ -729,9 +729,21 @@ class ApproveRegistrationsController extends AdminController
                 $fullName
             );
 
+            // Tự động gửi email xác nhận cho đơn vị sau khi phê duyệt (lấy mail_confirm từ property API & submitted_by)
+            $emailNote = '';
+            try {
+                $emailResult = EmailHelper::sendRegistrationConfirmation($registrationId);
+                if (empty($emailResult['success'])) {
+                    $emailNote = ' (Lưu ý: chưa gửi được email xác nhận)';
+                }
+            } catch (Exception $e) {
+                Yii::log('Auto send approval confirmation email failed: ' . $e->getMessage(), 'warning', 'application.controllers.ApproveRegistrationsController');
+                $emailNote = ' (Lưu ý: chưa gửi được email xác nhận)';
+            }
+
             echo CJSON::encode(array(
                 'success' => true,
-                'message' => "Đã phê duyệt phiếu đăng ký và {$successCount} người tham dự.",
+                'message' => "Đã phê duyệt phiếu đăng ký và {$successCount} người tham dự." . $emailNote,
             ));
         } else {
             echo CJSON::encode(array('success' => false, 'error' => 'Không thể phê duyệt phiếu đăng ký.'));
