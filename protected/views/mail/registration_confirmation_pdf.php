@@ -123,9 +123,13 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            font-size: 11pt;
             margin-bottom: 12px;
             table-layout: fixed;
+        }
+
+        .col-stt {
+            width: 24px;
         }
 
         .data-table th {
