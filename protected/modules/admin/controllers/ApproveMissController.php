@@ -69,6 +69,173 @@ class ApproveMissController extends AdminController
     }
 
     /**
+     * Xuất Excel danh sách thí sinh của một vòng thi (theo tab đang xem),
+     * bao gồm toàn bộ thông tin của mỗi thí sinh. Giữ nguyên bộ lọc hiện tại
+     * để danh sách trùng khớp với những gì đang hiển thị.
+     *
+     * @param mixed $round_id ID vòng thi, hoặc 'unassigned' cho nhóm chưa phân vòng.
+     */
+    public function actionExportExcel($round_id)
+    {
+        $grouping = $this->buildRoundGrouping(
+            isset($_GET['contest_id']) && $_GET['contest_id'] !== '' ? $_GET['contest_id'] : null,
+            isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null,
+            isset($_GET['status']) && $_GET['status'] !== '' ? $_GET['status'] : null,
+            isset($_GET['keyword']) && $_GET['keyword'] !== '' ? $_GET['keyword'] : null
+        );
+
+        $roundName = '';
+        $contestants = array();
+        if ($round_id === 'unassigned') {
+            $roundName = 'Chưa phân vòng';
+            $contestants = $grouping['unassigned'];
+        } else {
+            foreach ($grouping['roundTabs'] as $tab) {
+                if ($tab['id'] == $round_id) {
+                    $roundName = $tab['name'];
+                    $contestants = $tab['contestants'];
+                    break;
+                }
+            }
+        }
+
+        // Khởi tạo PHPExcel
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $objPHPExcel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        $objPHPExcel->getProperties()->setCreator("System")
+            ->setLastModifiedBy("System")
+            ->setTitle("Danh sach thi sinh Miss")
+            ->setSubject("Danh sach thi sinh Miss");
+
+        $sheet = $objPHPExcel->setActiveSheetIndex(0);
+        $sheet->setTitle('Miss');
+
+        $headerStyle = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '3A57E8')
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('rgb' => 'CCCCCC')
+                )
+            )
+        );
+
+        $borderStyle = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    'color' => array('rgb' => 'E9ECEF')
+                )
+            )
+        );
+
+        $headers = array(
+            'STT', 'Cuộc thi', 'Vòng thi', 'Đơn vị', 'Bộ phận', 'Thí sinh',
+            'Ngày sinh', 'Tuổi', 'Chiều cao (cm)', 'Cân nặng (kg)', 'Số đo',
+            'Năng khiếu', 'Tiểu sử', 'Email cá nhân', 'Trạng thái'
+        );
+        $lastCol = 'O';
+        $col = 'A';
+        foreach ($headers as $h) {
+            $sheet->setCellValue($col . '1', $h);
+            $sheet->getStyle($col . '1')->applyFromArray($headerStyle);
+            $col++;
+        }
+
+        $statusOptions = BeautyContestants::getStatusOptions();
+
+        $rowNum = 2;
+        $stt = 1;
+        foreach ($contestants as $c) {
+            $unitName = '';
+            if (!empty($c->property_name)) {
+                $unitName = $c->property_name;
+            } elseif (!empty($c->registration_id)) {
+                $unitName = BeautyContestants::getPropertyNameByRegistrationId($c->registration_id);
+            }
+
+            $attendeeName = '';
+            if (isset($c->members) && !empty($c->members)) {
+                $attendeeName = $c->members[0]['attendee_name'];
+            } elseif (!empty($c->attendee_name)) {
+                $attendeeName = $c->attendee_name;
+            }
+
+            $birthDate = MyHelper::formatDate($c->birthday);
+            $age = MyHelper::calculateAge($c->birthday);
+
+            $statusText = isset($statusOptions[$c->status]) ? $statusOptions[$c->status] : $c->status;
+
+            $sheet->setCellValue('A' . $rowNum, $stt++);
+            $sheet->setCellValue('B' . $rowNum, isset($c->contest_name) ? $c->contest_name : '');
+            $sheet->setCellValue('C' . $rowNum, $roundName);
+            $sheet->setCellValue('D' . $rowNum, $unitName);
+            $sheet->setCellValue('E' . $rowNum, isset($c->department_name) ? $c->department_name : '');
+            $sheet->setCellValue('F' . $rowNum, $attendeeName);
+            $sheet->setCellValueExplicit('G' . $rowNum, $birthDate, PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValue('H' . $rowNum, $age !== null ? $age : '');
+            $sheet->setCellValue('I' . $rowNum, $c->height_cm);
+            $sheet->setCellValue('J' . $rowNum, $c->weight_kg);
+            $sheet->setCellValueExplicit('K' . $rowNum, $c->measurements, PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValue('L' . $rowNum, $c->talent);
+            $sheet->setCellValue('M' . $rowNum, $c->bio);
+            $sheet->setCellValue('N' . $rowNum, isset($c->personal_email) ? $c->personal_email : '');
+            $sheet->setCellValue('O' . $rowNum, $statusText);
+
+            $sheet->getStyle('A' . $rowNum . ':' . $lastCol . $rowNum)->applyFromArray($borderStyle);
+            $rowNum++;
+        }
+
+        foreach (range('A', $lastCol) as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $safeRound = preg_replace('/[^A-Za-z0-9]+/', '_', $this->toAscii($roundName));
+        $filename = "Danh_sach_Miss_" . ($safeRound !== '' ? $safeRound . '_' : '') . date('Ymd_His') . ".xlsx";
+
+        // Xóa mọi output buffer để tránh file lỗi
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        Yii::app()->end();
+    }
+
+    /**
+     * Chuyển chuỗi tiếng Việt có dấu về không dấu để dùng trong tên file.
+     */
+    protected function toAscii($str)
+    {
+        $str = (string) $str;
+        if (function_exists('iconv')) {
+            $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $str);
+            if ($converted !== false) {
+                $str = $converted;
+            }
+        }
+        return preg_replace('/[^A-Za-z0-9]+/', '_', $str);
+    }
+
+    /**
      * Gom nhóm thí sinh theo vòng thi cao nhất mà họ đang được gán.
      *
      * @return array Mảng gồm:
