@@ -256,7 +256,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th width="35" class="text-center">STT</th>
+                            <th class="text-center col-stt">STT</th>
                             <th width="190">Họ và tên VĐV</th>
                             <th width="65" class="text-center">Giới tính</th>
                             <th width="140">Đơn vị</th>
@@ -316,7 +316,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th width="35" class="text-center">STT</th>
+                            <th class="text-center col-stt">STT</th>
                             <th width="190">Họ và tên thí sinh</th>
                             <th width="65" class="text-center">Giới tính</th>
                             <th width="140">Chức danh / Vị trí</th>
