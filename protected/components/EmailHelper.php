@@ -371,9 +371,9 @@ class EmailHelper
             });
         }
 
-        // 6b. Tải danh sách tiết mục Văn nghệ (Đợt 1) — lọc theo registration_id
+        // 6b. Tải danh sách tiết mục Văn nghệ — lọc theo registration_id (Đợt 3 mới có chi tiết người tham dự)
         $talentEntriesData = array();
-        if ($isDot1 || empty($periodContentCodes) || in_array('talent', $periodContentCodes)) {
+        if ($showTalent) {
             $talentList = TalentEntries::getApiDataProvider(array('registration_id' => $registrationId), 1000)->getData();
             if (!empty($talentList)) {
                 // API không lọc theo entry_id nên tải toàn bộ rồi lọc client-side
