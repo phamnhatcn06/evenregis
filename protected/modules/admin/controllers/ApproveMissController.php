@@ -99,6 +99,8 @@ class ApproveMissController extends AdminController
             isset($_GET['keyword']) && $_GET['keyword'] !== '' ? $_GET['keyword'] : null
         );
 
+        $mark('AFTER buildRoundGrouping');
+
         $roundName = '';
         $contestants = array();
         if ($round_id === 'unassigned') {
@@ -113,6 +115,8 @@ class ApproveMissController extends AdminController
                 }
             }
         }
+
+        $mark('CONTESTANTS count=' . count($contestants));
 
         // Khởi tạo PHPExcel
         $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
