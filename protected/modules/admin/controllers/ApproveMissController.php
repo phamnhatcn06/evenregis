@@ -92,6 +92,22 @@ class ApproveMissController extends AdminController
         };
         $mark('START round_id=' . $round_id);
 
+        // [DEBUG TẠM] Bắt fatal error cuối cùng (memory, v.v.) khi worker chết.
+        // Nếu là segfault thật thì hàm này KHÔNG chạy.
+        register_shutdown_function(function () use ($dbg) {
+            $e = error_get_last();
+            if ($e !== null) {
+                @file_put_contents(
+                    $dbg,
+                    date('H:i:s') . " | SHUTDOWN error: [" . $e['type'] . "] " . $e['message']
+                        . " @ " . $e['file'] . ":" . $e['line'] . "\n",
+                    FILE_APPEND
+                );
+            } else {
+                @file_put_contents($dbg, date('H:i:s') . " | SHUTDOWN: no error_get_last (segfault?)\n", FILE_APPEND);
+            }
+        });
+
         $grouping = $this->buildRoundGrouping(
             isset($_GET['contest_id']) && $_GET['contest_id'] !== '' ? $_GET['contest_id'] : null,
             isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null,
