@@ -298,10 +298,10 @@
                     <thead>
                         <tr>
                             <th class="text-center col-stt">STT</th>
-                            <th width="190">Họ và tên thí sinh</th>
-                            <th width="65" class="text-center">Giới tính</th>
-                            <th width="140">Chức danh / Vị trí</th>
-                            <th>Bộ phận / Phòng ban</th>
+                            <th width="30%">Họ và tên thí sinh</th>
+                            <th width="12%" class="text-center">Giới tính</th>
+                            <th width="26%">Chức danh / Vị trí</th>
+                            <th width="26%">Bộ phận / Phòng ban</th>
                         </tr>
                     </thead>
                     <tbody>
