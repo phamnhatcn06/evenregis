@@ -967,7 +967,7 @@ class ApproveRegistrationsController extends AdminController
         }
 
         // Check if Đợt 1 / Đợt 2
-        $periodNameLower = mb_strtolower($model->period_name);
+        $periodNameLower = mb_strtolower((string)$model->period_name);
         $isDot1 = in_array('sports', $periodContentCodes) || (strpos($periodNameLower, 'đợt 1') !== false || strpos($periodNameLower, 'dot 1') !== false);
         $isDot2 = in_array('competition', $periodContentCodes) || (strpos($periodNameLower, 'đợt 2') !== false || strpos($periodNameLower, 'dot 2') !== false);
 

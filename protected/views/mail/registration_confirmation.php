@@ -100,10 +100,11 @@
                                                                     <td style="border:1px solid #cbd5e1; font-weight:bold; color:#1e293b;"><?php echo CHtml::encode($member['attendee_name']); ?></td>
                                                                     <td style="border:1px solid #cbd5e1; text-align:center;">
                                                                         <?php
-                                                                        $g = $member['gender'];
-                                                                        if ($g === 1 || $g === '1' || strtolower($g) === 'male' || strtolower($g) === 'nam') {
+                                                                        $g = isset($member['gender']) ? $member['gender'] : null;
+                                                                        $gStr = ($g !== null) ? strtolower((string)$g) : '';
+                                                                        if ($g === 1 || $g === '1' || $gStr === 'male' || $gStr === 'nam') {
                                                                             echo '<span style="color:#0284c7; font-weight:bold;">Nam</span>';
-                                                                        } elseif ($g === 0 || $g === '0' || strtolower($g) === 'female' || strtolower($g) === 'nữ' || strtolower($g) === 'nu') {
+                                                                        } elseif ($g === 0 || $g === '0' || $gStr === 'female' || $gStr === 'nữ' || $gStr === 'nu') {
                                                                             echo '<span style="color:#e11d48; font-weight:bold;">Nữ</span>';
                                                                         } else {
                                                                             echo '-';
