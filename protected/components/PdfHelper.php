@@ -14,14 +14,14 @@ class PdfHelper
 
         spl_autoload_register(function ($class) use ($vendorDir) {
             if ($class === 'Dompdf\Cpdf' || $class === 'Cpdf') {
-                $cpdfFile = $vendorDir . '/dompdf/lib/Cpdf.php';
+                $cpdfFile = $vendorDir . '/dompdf/dompdf/lib/Cpdf.php';
                 if (file_exists($cpdfFile)) {
                     require_once $cpdfFile;
                     return true;
                 }
             }
             $prefixes = array(
-                'Dompdf\\' => $vendorDir . '/dompdf/src/',
+                'Dompdf\\' => $vendorDir . '/dompdf/dompdf/src/',
                 'FontLib\\' => $vendorDir . '/phenx/php-font-lib/src/FontLib/',
                 'Svg\\' => $vendorDir . '/phenx/php-svg-lib/src/Svg/',
                 'Sabberworm\\CSS\\' => $vendorDir . '/sabberworm/php-css-parser/src/',
@@ -39,7 +39,7 @@ class PdfHelper
                 }
             }
             return false;
-        }, true, true); // $prepend = true để đăng ký autoloader trước Yii autoloader
+        }, true, true);
 
         $registered = true;
     }
