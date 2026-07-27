@@ -76,7 +76,7 @@
 
                             <!-- PDF Notification Box -->
                             <div style="background-color:#e0f2fe; border:1px solid #bae6fd; border-radius:6px; padding:15px 20px; margin-bottom:25px; color:#0369a1; font-size:14px; line-height:1.6;">
-                                📎 <strong>Tệp đính kèm:</strong> Danh sách chi tiết VĐV tham gia thi đấu các môn thể thao và các thí sinh dự thi nghiệp vụ được đính kèm trong file PDF kèm theo email này.
+                                📎 <strong>Tệp đính kèm:</strong> Danh sách chi tiết người tham dự các nội dung<?php echo !empty($registeredCategories) ? ' (' . CHtml::encode($registeredCategories) . ')' : ''; ?> được đính kèm trong file PDF kèm theo email này.
                             </div>
 
                             <p style="font-size:14px; color:#4a5568; margin-top:20px; line-height:1.6;">
