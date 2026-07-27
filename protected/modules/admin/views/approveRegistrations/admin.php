@@ -50,24 +50,32 @@ $baseColumns = array(
 // Cột thao tác cho tab Chờ duyệt
 $actionColumnSubmitted = array(
     'header' => 'Thao tác',
-    'width' => '120px',
+    'width' => '180px',
     'type' => 'raw',
     'filter' => false,
     'sortable' => false,
     'value' => function ($data) {
-        return '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm btn-primary"><i class="fa fa-eye me-1"></i>Xem & Duyệt</a>';
+        $propertyName = isset($data->property_name) ? $data->property_name : '';
+        $submittedBy = isset($data->submitted_by) ? $data->submitted_by : '';
+        $html = '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm btn-primary me-1"><i class="fa fa-eye me-1"></i>Xem & Duyệt</a>';
+        $html .= '<button type="button" class="btn btn-sm btn-outline-info btn-send-mail" data-id="' . $data->id . '" data-property="' . CHtml::encode($propertyName) . '" data-email="' . CHtml::encode($submittedBy) . '" title="Gửi mail xác nhận"><i class="fa fa-envelope me-1"></i>Gửi mail</button>';
+        return $html;
     }
 );
 
 // Cột thao tác cho tab Trả về và Đã duyệt
 $actionColumnOther = array(
     'header' => 'Thao tác',
-    'width' => '100px',
+    'width' => '160px',
     'type' => 'raw',
     'filter' => false,
     'sortable' => false,
     'value' => function ($data) {
-        return '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm btn-outline-secondary"><i class="fa fa-eye me-1"></i>Xem</a>';
+        $propertyName = isset($data->property_name) ? $data->property_name : '';
+        $submittedBy = isset($data->submitted_by) ? $data->submitted_by : '';
+        $html = '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm btn-outline-secondary me-1"><i class="fa fa-eye me-1"></i>Xem</a>';
+        $html .= '<button type="button" class="btn btn-sm btn-outline-info btn-send-mail" data-id="' . $data->id . '" data-property="' . CHtml::encode($propertyName) . '" data-email="' . CHtml::encode($submittedBy) . '" title="Gửi mail xác nhận"><i class="fa fa-envelope me-1"></i>Gửi mail</button>';
+        return $html;
     }
 );
 
@@ -366,4 +374,6 @@ document.getElementById('filter-event').addEventListener('change', function() {
     });
 });
 ", CClientScript::POS_END);
+
+$this->renderPartial('_modal_send_mail');
 ?>

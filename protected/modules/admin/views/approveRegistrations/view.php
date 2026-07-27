@@ -58,8 +58,11 @@ $attributes = array(
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fa fa-info-circle me-2"></i>Thông tin đăng ký</h5>
-                <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED): ?>
-                    <div class="d-flex gap-2">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-info btn-sm px-3" onclick="openSendMailModal('<?php echo $model->id; ?>', '<?php echo CHtml::encode($model->property_name); ?>', '<?php echo CHtml::encode($model->submitted_by); ?>')">
+                        <i class="fa fa-envelope me-1"></i>Gửi mail xác nhận
+                    </button>
+                    <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED): ?>
                         <button type="button" class="btn btn-success btn-sm px-3" onclick="approveRegistration()">
                             <i class="fa fa-check-circle me-1"></i>Duyệt
                         </button>
@@ -69,8 +72,8 @@ $attributes = array(
                         <button type="button" class="btn btn-outline-danger btn-sm px-3" onclick="rejectRegistration()">
                             <i class="fa fa-ban me-1"></i>Từ chối
                         </button>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="card-body">
                 <table class="table table-bordered table-striped mb-0">
@@ -1273,4 +1276,6 @@ $(document).ready(function() {
     }
 });
 ", CClientScript::POS_END);
+
+$this->renderPartial('_modal_send_mail');
 ?>
