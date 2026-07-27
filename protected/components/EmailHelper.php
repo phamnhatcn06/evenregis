@@ -357,15 +357,67 @@ class EmailHelper
             });
         }
 
+        // 6b. Tải danh sách tiết mục Văn nghệ (Đợt 1) — lọc theo registration_id
+        $talentEntriesData = array();
+        if ($isDot1 || empty($periodContentCodes) || in_array('talent', $periodContentCodes)) {
+            $talentList = TalentEntries::getApiDataProvider(array('registration_id' => $registrationId), 1000)->getData();
+            if (!empty($talentList)) {
+                // API không lọc theo entry_id nên tải toàn bộ rồi lọc client-side
+                $allTalentMembers = TalentEntryMembers::getApiDataProvider(array(), 5000)->getData();
+                foreach ($talentList as $entry) {
+                    $entryId = $entry->id;
+                    $members = array();
+                    foreach ($allTalentMembers as $tm) {
+                        if ($tm->entry_id != $entryId) {
+                            continue;
+                        }
+                        $aid = $tm->attendee_id;
+                        $info = isset($attendeesMap[$aid]) ? $attendeesMap[$aid] : array();
+                        $members[] = array(
+                            'attendee_name' => !empty($info['full_name']) ? $info['full_name'] : ('#' . $aid),
+                            'gender' => isset($info['gender']) ? $info['gender'] : null,
+                            'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
+                            'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
+                        );
+                    }
+                    $talentEntriesData[] = array(
+                        'category_name' => $entry->category_name,
+                        'title' => $entry->title,
+                        'members' => $members,
+                    );
+                }
+            }
+        }
+
+        // 6c. Tải danh sách thí sinh Miss (Đợt 1) — API không lọc theo registration_id, lọc client-side theo property_id
+        $beautyContestantsData = array();
+        if ($model->property_id && ($isDot1 || empty($periodContentCodes) || in_array('miss', $periodContentCodes))) {
+            $allContestants = BeautyContestants::getApiDataProvider(array(), 5000)->getData();
+            foreach ($allContestants as $c) {
+                if ($c->property_id != $model->property_id) {
+                    continue;
+                }
+                $aid = $c->attendee_id;
+                $info = isset($attendeesMap[$aid]) ? $attendeesMap[$aid] : array();
+                $beautyContestantsData[] = array(
+                    'attendee_name' => !empty($c->attendee_name) ? $c->attendee_name : (isset($info['full_name']) ? $info['full_name'] : ''),
+                    'candidate_number' => $c->candidate_number,
+                    'contest_name' => $c->contest_name,
+                    'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
+                    'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
+                );
+            }
+        }
+
         // 7. Tổng hợp Hạng mục đã đăng ký & Nội dung tóm tắt cho Bảng tổng quan
         $categoriesMap = array();
         if ($isDot1 || !empty($sportTeamsData)) {
             $categoriesMap['sports'] = 'Thể thao';
         }
-        if (in_array('talent', $periodContentCodes)) {
+        if (in_array('talent', $periodContentCodes) || !empty($talentEntriesData)) {
             $categoriesMap['talent'] = 'Văn nghệ';
         }
-        if (in_array('miss', $periodContentCodes)) {
+        if (in_array('miss', $periodContentCodes) || !empty($beautyContestantsData)) {
             $categoriesMap['miss'] = 'Miss Mường Thanh';
         }
         if ($isDot2 || !empty($competitionRegistrations)) {
