@@ -334,7 +334,7 @@
     <!-- Section 1c: Đợt 1 - Miss Mường Thanh -->
     <?php if (!empty($beautyContestants)): ?>
         <div class="section-header">
-            ĐỢT 1: DANH SÁCH THÍ SINH MISS MƯỜNG THANH
+            DANH SÁCH THÍ SINH MISS MƯỜNG THANH
         </div>
         <table class="data-table">
             <thead>
