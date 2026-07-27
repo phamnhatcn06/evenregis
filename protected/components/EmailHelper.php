@@ -403,12 +403,13 @@ class EmailHelper
             }
         }
 
-        // 6c. Tải danh sách thí sinh Miss (Đợt 1) — API không lọc theo registration_id, lọc client-side theo property_id
+        // 6c. Tải danh sách thí sinh Miss — lọc theo registration_id của phiếu đang xuất
+        // (filter server-side của API không hoạt động nên tải toàn bộ rồi lọc client-side)
         $beautyContestantsData = array();
-        if ($model->property_id && ($isDot1 || empty($periodContentCodes) || in_array('miss', $periodContentCodes))) {
+        if ($showMiss) {
             $allContestants = BeautyContestants::getApiDataProvider(array(), 5000)->getData();
             foreach ($allContestants as $c) {
-                if ($c->property_id != $model->property_id) {
+                if ($c->registration_id != $registrationId) {
                     continue;
                 }
                 $aid = $c->attendee_id;
