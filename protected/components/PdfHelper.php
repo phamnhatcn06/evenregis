@@ -83,6 +83,25 @@ class PdfHelper
             'defaultFont' => 'Times New Roman',
         ));
 
+        // Đăng ký font Times New Roman (TTF có glyph tiếng Việt) đóng gói trong application.data.fonts
+        $fontBase = str_replace('\\', '/', Yii::getPathOfAlias('application.data.fonts'));
+        $timesFonts = array(
+            array('weight' => 'normal', 'style' => 'normal', 'file' => 'times.ttf'),
+            array('weight' => 'bold', 'style' => 'normal', 'file' => 'timesbd.ttf'),
+            array('weight' => 'normal', 'style' => 'italic', 'file' => 'timesi.ttf'),
+            array('weight' => 'bold', 'style' => 'italic', 'file' => 'timesbi.ttf'),
+        );
+        $fontMetrics = $dompdf->getFontMetrics();
+        foreach ($timesFonts as $f) {
+            $ttf = $fontBase . '/' . $f['file'];
+            if (file_exists($ttf)) {
+                $fontMetrics->registerFont(
+                    array('family' => 'Times New Roman', 'weight' => $f['weight'], 'style' => $f['style']),
+                    'file://' . $ttf
+                );
+            }
+        }
+
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
