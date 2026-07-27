@@ -16,10 +16,10 @@
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); padding:30px 25px; text-align:center;">
-                            <h1 style="color:#ffffff; margin:0 0 8px 0; font-size:24px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">
+                            <h1 style="color:#000000; margin:0 0 8px 0; font-size:24px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">
                                 XÁC NHẬN THÔNG TIN ĐĂNG KÝ
                             </h1>
-                            <p style="color:#e0e7ff; margin:0; font-size:15px;">
+                            <p style="color:#000000; margin:0; font-size:15px;">
                                 <?php echo CHtml::encode(isset($model->event_name) ? $model->event_name : 'Đại hội Mường Thanh 2026'); ?>
                             </p>
                         </td>
