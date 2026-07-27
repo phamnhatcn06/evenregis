@@ -219,7 +219,7 @@
         <?php else: ?>
             <?php foreach ($sportTeams as $tIdx => $team): ?>
                 <div class="group-title">
-                    ⚽ <?php echo CHtml::encode($team['sport_name']); ?> - <?php echo CHtml::encode($team['team_name']); ?>
+                    <?php echo CHtml::encode($team['sport_name']); ?> - <?php echo CHtml::encode($team['team_name']); ?>
                     (<?php echo count($team['members']); ?> VĐV)
                     <?php if (!empty($team['is_alliance'])): ?>
                         <span style="color:#c2410c;">[Liên quân: <?php echo CHtml::encode(implode(', ', $team['alliance_properties'])); ?>]</span>
