@@ -68,10 +68,19 @@ class PdfHelper
         include($viewPath);
         $html = ob_get_clean();
 
+        // Thư mục cache font phải ghi được để dompdf tự cài Times New Roman (TTF có glyph tiếng Việt)
+        $fontDir = Yii::getPathOfAlias('application.runtime') . DIRECTORY_SEPARATOR . 'dompdf_fonts';
+        if (!file_exists($fontDir)) {
+            @mkdir($fontDir, 0777, true);
+        }
+
         $dompdf = new Dompdf\Dompdf(array(
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => true,
-            'defaultFont' => 'DejaVu Sans',
+            'isFontSubsettingEnabled' => true,
+            'fontDir' => $fontDir,
+            'fontCache' => $fontDir,
+            'defaultFont' => 'Times New Roman',
         ));
 
         $dompdf->loadHtml($html);
