@@ -252,6 +252,38 @@ class ApproveMissController extends AdminController
     }
 
     /**
+     * Làm sạch chuỗi trước khi ghi vào cell Excel.
+     *
+     * PHPExcel/Excel2007 đẩy nội dung cell qua libxml; nếu chuỗi chứa byte
+     * UTF-8 hỏng hoặc ký tự điều khiển bị cấm trong XML, một số bản PHP/libxml
+     * sẽ segfault khi save (crash im lặng, không ghi PHP error log).
+     */
+    protected function cleanCell($value)
+    {
+        if ($value === null || $value === false) {
+            return '';
+        }
+        $value = (string) $value;
+        if ($value === '') {
+            return '';
+        }
+
+        // Ép về UTF-8 hợp lệ, bỏ mọi byte hỏng
+        if (function_exists('iconv')) {
+            $converted = @iconv('UTF-8', 'UTF-8//IGNORE', $value);
+            if ($converted !== false) {
+                $value = $converted;
+            }
+        }
+
+        // Loại ký tự điều khiển không hợp lệ trong XML 1.0
+        // (giữ lại TAB \x09, LF \x0A, CR \x0D)
+        $value = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $value);
+
+        return $value;
+    }
+
+    /**
      * Chuyển chuỗi tiếng Việt có dấu về không dấu để dùng trong tên file.
      */
     protected function toAscii($str)
