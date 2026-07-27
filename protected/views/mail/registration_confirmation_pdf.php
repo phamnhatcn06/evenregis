@@ -370,7 +370,7 @@
     <!-- Section 2: Đợt 2 - Đăng ký thi nghiệp vụ -->
     <?php if (!empty($isDot2) || !empty($competitionRegistrations)): ?>
         <div class="section-header-green">
-            ĐỢT 2: DANH SÁCH CHI TIẾT THÍ SINH THI NGHIỆP VỤ
+            DANH SÁCH CHI TIẾT THÍ SINH THI NGHIỆP VỤ
         </div>
 
         <?php if (empty($competitionRegistrations)): ?>
