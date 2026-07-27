@@ -6,6 +6,7 @@ class Properties extends BaseProperties
 {
 	public $region_id;
 	public $has_golf;
+	public $mail_confirm;
 
 	public static function model($className = __CLASS__)
 	{
@@ -26,6 +27,9 @@ class Properties extends BaseProperties
 			}
 			if (isset($data['has_golf'])) {
 				$model->has_golf = (int)$data['has_golf'];
+			}
+			if (isset($data['mail_confirm'])) {
+				$model->mail_confirm = $data['mail_confirm'];
 			}
 			return $model;
 		}

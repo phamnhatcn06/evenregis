@@ -886,6 +886,13 @@ class RegistrationsController extends AdminController
 				// Cập nhật status tiết mục văn nghệ sang submitted
 				TalentEntries::updateStatusByPropertyId($model->property_id, TalentEntries::STATUS_SUBMITTED);
 
+				// Tự động gửi email xác nhận đăng ký cho đơn vị (lấy mail_confirm từ property API & submitted_by)
+				try {
+					EmailHelper::sendRegistrationConfirmation($id);
+				} catch (Exception $e) {
+					Yii::log('Auto send submit confirmation email failed: ' . $e->getMessage(), 'warning', 'application.controllers.RegistrationsController');
+				}
+
 				$msg = 'Đã nộp phiếu đăng ký.';
 				if ($resetResult['count'] > 0) {
 					$msg .= ' Đã chuyển ' . $resetResult['count'] . ' người bị từ chối về trạng thái chờ duyệt.';

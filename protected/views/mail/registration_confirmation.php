@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác nhận thông tin đăng ký</title>
 </head>
+
 <body style="margin:0; padding:0; font-family: Arial, Helvetica, sans-serif; background-color:#f4f6f9; color:#333333; line-height:1.6;">
     <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f9; padding:30px 10px;">
         <tr>
             <td align="center">
                 <table width="680" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e2e8f0;">
-                    
+
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); padding:30px 25px; text-align:center;">
@@ -27,11 +29,11 @@
                     <tr>
                         <td style="padding:30px 25px;">
                             <p style="font-size:16px; margin-top:0; margin-bottom:15px; color:#2d3748;">
-                                Kính gửi <strong><?php echo CHtml::encode(isset($model->property_name) ? $model->property_name : 'Đơn vị'); ?></strong>,
+                                Kính gửi đơn vị: <strong><?php echo CHtml::encode(isset($model->property_name) ? $model->property_name : 'Đơn vị'); ?></strong>,
                             </p>
 
                             <p style="font-size:15px; color:#4a5568; margin-bottom:20px; line-height:1.6;">
-                                Ban tổ chức xin gửi xác nhận thông tin chi tiết phiếu đăng ký tham dự 
+                                Ban tổ chức xin gửi xác nhận thông tin chi tiết phiếu đăng ký tham dự
                                 <strong><?php echo CHtml::encode(isset($model->period_name) ? $model->period_name : ''); ?></strong>
                                 của đơn vị như dưới đây:
                             </p>
@@ -201,4 +203,5 @@
         </tr>
     </table>
 </body>
+
 </html>

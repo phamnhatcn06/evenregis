@@ -57,4 +57,280 @@ class EmailHelper
             $data
         );
     }
+
+    /**
+     * Tách và làm sạch danh sách email từ chuỗi hoặc mảng
+     * @param mixed $raw Chuỗi email (phân cách bằng dấu phẩy, chấm phẩy, xuống dòng) hoặc mảng
+     * @return array Danh sách email hợp lệ đã loại trùng
+     */
+    public static function parseEmailList($raw)
+    {
+        if (empty($raw)) {
+            return array();
+        }
+        $list = array();
+        if (is_array($raw)) {
+            $list = $raw;
+        } elseif (is_string($raw)) {
+            $split = preg_split('/[\s,;]+/', $raw);
+            if (is_array($split)) {
+                $list = $split;
+            }
+        }
+        $validEmails = array();
+        foreach ($list as $item) {
+            $email = trim($item);
+            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $validEmails[] = strtolower($email);
+            }
+        }
+        return array_values(array_unique($validEmails));
+    }
+
+    /**
+     * Gửi mail xác nhận phiếu đăng ký (Đợt 1 - Thể thao / Đợt 2 - Thi nghiệp vụ)
+     * Tự động lấy danh sách email từ `mail_confirm` của đơn vị (Property), `submitted_by`, và customRecipient.
+     *
+     * @param int|string $registrationId ID phiếu đăng ký
+     * @param mixed $customRecipient Email bổ sung từ giao diện (nếu có)
+     * @return array Kết quả gửi mail array('success' => bool, 'message' => string, 'recipients' => array)
+     */
+    public static function sendRegistrationConfirmation($registrationId, $customRecipient = null)
+    {
+        if (!$registrationId) {
+            return array('success' => false, 'error' => 'Thiếu ID phiếu đăng ký.');
+        }
+
+        $model = Registrations::fetchFromApi($registrationId);
+        if (!$model) {
+            return array('success' => false, 'error' => 'Không tìm thấy phiếu đăng ký.');
+        }
+
+        // 1. Tải thông tin Property và lấy cột mail_confirm từ API trả về
+        $propertyMailConfirm = null;
+        if ($model->property_id) {
+            $property = Properties::fetchFromApi($model->property_id);
+            if ($property) {
+                if (empty($model->property_name)) {
+                    $model->property_name = $property->name;
+                }
+                if (!empty($property->mail_confirm)) {
+                    $propertyMailConfirm = $property->mail_confirm;
+                }
+            }
+        }
+
+        // Tải các thông tin hiển thị còn thiếu
+        if (empty($model->event_name) && $model->event_id) {
+            $event = Events::fetchFromApi($model->event_id);
+            $model->event_name = $event ? $event->name : '';
+        }
+        if (empty($model->period_name) && $model->period_id) {
+            $period = RegistrationPeriods::fetchFromApi($model->period_id);
+            $model->period_name = $period ? $period->name : '';
+        }
+
+        // 2. Thu thập và làm sạch danh sách email nhận
+        $rawRecipients = array();
+        if (!empty($customRecipient)) {
+            $rawRecipients[] = $customRecipient;
+        }
+        if (!empty($propertyMailConfirm)) {
+            $rawRecipients[] = $propertyMailConfirm;
+        }
+        if (isset($model->mail_confirm) && !empty($model->mail_confirm)) {
+            $rawRecipients[] = $model->mail_confirm;
+        }
+        if (!empty($model->submitted_by)) {
+            $rawRecipients[] = $model->submitted_by;
+        }
+
+        $recipients = self::parseEmailList($rawRecipients);
+
+        // Nếu không có email nào hợp lệ, fallback về email mặc định cswm@muongthanh.vn
+        if (empty($recipients)) {
+            $recipients = array('cswm@muongthanh.vn');
+        }
+
+        // 3. Tải cấu hình đợt đăng ký & phân loại Đợt 1 / Đợt 2
+        $periodContentCodes = array();
+        if ($model->period_id) {
+            $periodContents = RegistrationPeriodContents::getContentsByPeriod($model->period_id);
+            foreach ($periodContents as $pc) {
+                $code = '';
+                if (is_array($pc)) {
+                    $code = isset($pc['content_code']) ? $pc['content_code'] : (isset($pc['content']['code']) ? $pc['content']['code'] : '');
+                } else {
+                    $code = isset($pc->content_code) ? $pc->content_code : (isset($pc->content) && isset($pc->content->code) ? $pc->content->code : '');
+                }
+                if ($code) {
+                    if ($code === 'sport') $code = 'sports';
+                    if ($code === 'competitions') $code = 'competition';
+                    if ($code === 'talents') $code = 'talent';
+                    if ($code === 'beauty_contests') $code = 'miss';
+                    $periodContentCodes[] = $code;
+                }
+            }
+        }
+
+        $periodNameLower = mb_strtolower((string)$model->period_name);
+        $isDot1 = in_array('sports', $periodContentCodes) || (strpos($periodNameLower, 'đợt 1') !== false || strpos($periodNameLower, 'dot 1') !== false);
+        $isDot2 = in_array('competition', $periodContentCodes) || (strpos($periodNameLower, 'đợt 2') !== false || strpos($periodNameLower, 'dot 2') !== false);
+
+        // 4. Tải danh sách người tham dự
+        $attendees = Attendees::getByRegistrationId($registrationId);
+        $attendeesMap = array();
+        foreach ($attendees as $att) {
+            $attId = isset($att['id']) ? $att['id'] : null;
+            if ($attId) {
+                $attendeesMap[$attId] = $att;
+            }
+        }
+
+        // 5. Tải danh sách Thi nghiệp vụ (Đợt 2)
+        $competitionRegistrations = array();
+        if ($isDot2 || empty($periodContentCodes) || in_array('competition', $periodContentCodes)) {
+            $compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $registrationId), 200)->getData();
+            foreach ($compRegsData as $reg) {
+                $compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
+                if (!$compId) continue;
+
+                if (!isset($competitionRegistrations[$compId])) {
+                    $compName = isset($reg->competition_name) ? $reg->competition_name : (isset($reg['competition_name']) ? $reg['competition_name'] : '');
+                    if (empty($compName)) {
+                        $comp = Competitions::fetchFromApi($compId);
+                        $compName = $comp ? $comp->name : '';
+                    }
+                    $competitionRegistrations[$compId] = array(
+                        'competition_id' => $compId,
+                        'competition_name' => $compName,
+                        'attendees' => array(),
+                    );
+                }
+
+                $attendeeId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
+                $attendeeInfo = isset($attendeesMap[$attendeeId]) ? $attendeesMap[$attendeeId] : array();
+
+                $competitionRegistrations[$compId]['attendees'][] = array(
+                    'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
+                    'attendee_id' => $attendeeId,
+                    'attendee_name' => isset($attendeeInfo['full_name']) ? $attendeeInfo['full_name'] : '',
+                    'position_name' => isset($attendeeInfo['position_name']) ? $attendeeInfo['position_name'] : '',
+                    'division_name' => isset($attendeeInfo['division_name']) ? $attendeeInfo['division_name'] : '',
+                );
+            }
+        }
+
+        // 6. Tải danh sách Đội thi thể thao & VĐV (Đợt 1)
+        $sportTeamsData = array();
+        if ($model->event_id && $model->property_id && ($isDot1 || empty($periodContentCodes) || in_array('sports', $periodContentCodes))) {
+            $apiResult = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST_BY_PROPERTY, array(
+                'property_id' => $model->property_id,
+                'event_id' => $model->event_id,
+            ));
+            $teamsData = array();
+            if ($apiResult['success'] && isset($apiResult['data']['data'])) {
+                $teamsData = $apiResult['data']['data'];
+            } elseif ($apiResult['success'] && isset($apiResult['data']) && is_array($apiResult['data'])) {
+                $teamsData = $apiResult['data'];
+            }
+
+            foreach ($teamsData as $team) {
+                $isObject = is_object($team);
+                $teamId = $isObject ? (isset($team->id) ? $team->id : null) : (isset($team['id']) ? $team['id'] : null);
+                if (!$teamId) continue;
+
+                $sportName = $isObject ? (isset($team->sport_name) ? $team->sport_name : '') : (isset($team['sport_name']) ? $team['sport_name'] : '');
+                $sportId = $isObject ? (isset($team->sport_id) ? $team->sport_id : null) : (isset($team['sport_id']) ? $team['sport_id'] : null);
+                $teamName = $isObject ? (isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : '')) : (isset($team['team_name']) ? $team['team_name'] : (isset($team['name']) ? $team['name'] : ''));
+
+                if (empty($sportName) && $sportId) {
+                    $sport = Sports::fetchFromApi($sportId);
+                    $sportName = $sport ? $sport->name : '';
+                }
+
+                $membersData = array();
+                if (isset($team->members) && is_array($team->members)) {
+                    $membersData = $team->members;
+                } elseif (isset($team['members']) && is_array($team['members'])) {
+                    $membersData = $team['members'];
+                } else {
+                    $membersData = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 100)->getData();
+                }
+
+                $enrichedMembers = array();
+                $allianceProperties = array();
+                foreach ($membersData as $member) {
+                    $memberIsObj = is_object($member);
+                    $attId = $memberIsObj ? (isset($member->attendee_id) ? $member->attendee_id : null) : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
+                    $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+
+                    $attName = $memberIsObj ? (isset($member->attendee_name) ? $member->attendee_name : '') : (isset($member['attendee_name']) ? $member['attendee_name'] : '');
+                    if (empty($attName) && !empty($attInfo['full_name'])) {
+                        $attName = $attInfo['full_name'];
+                    }
+                    $gender = $memberIsObj ? (isset($member->gender) ? $member->gender : null) : (isset($member['gender']) ? $member['gender'] : null);
+                    if ($gender === null && isset($attInfo['gender'])) {
+                        $gender = $attInfo['gender'];
+                    }
+                    $propName = $memberIsObj ? (isset($member->property_name) ? $member->property_name : '') : (isset($member['property_name']) ? $member['property_name'] : '');
+                    if (empty($propName) && !empty($attInfo['property_name'])) {
+                        $propName = $attInfo['property_name'];
+                    }
+                    if (empty($propName)) {
+                        $propName = $model->property_name;
+                    }
+
+                    $enrichedMembers[] = array(
+                        'attendee_name' => $attName,
+                        'gender' => $gender,
+                        'property_name' => $propName,
+                        'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
+                        'division_name' => isset($attInfo['division_name']) ? $attInfo['division_name'] : '',
+                    );
+
+                    if (!empty($propName) && $propName !== $model->property_name && !in_array($propName, $allianceProperties)) {
+                        $allianceProperties[] = $propName;
+                    }
+                }
+
+                $sportTeamsData[] = array(
+                    'sport_name' => $sportName,
+                    'team_name' => $teamName,
+                    'members' => $enrichedMembers,
+                    'alliance_properties' => $allianceProperties,
+                    'is_alliance' => !empty($allianceProperties),
+                );
+            }
+        }
+
+        // Data truyền sang email view
+        $data = array(
+            'model' => $model,
+            'periodContentCodes' => $periodContentCodes,
+            'isDot1' => $isDot1,
+            'isDot2' => $isDot2,
+            'sportTeams' => $sportTeamsData,
+            'competitionRegistrations' => $competitionRegistrations,
+            'attendeesCount' => count($attendees),
+        );
+
+        $subject = '[Đại hội Mường Thanh 2026] Xác nhận thông tin đăng ký - ' . $model->property_name;
+
+        try {
+            $sent = self::send($recipients, $subject, 'registration_confirmation', $data);
+            if ($sent) {
+                return array(
+                    'success' => true,
+                    'message' => 'Đã gửi email xác nhận thành công tới: ' . implode(', ', $recipients),
+                    'recipients' => $recipients,
+                );
+            } else {
+                return array('success' => false, 'error' => 'Không thể gửi email. Vui lòng kiểm tra cấu hình SMTP.');
+            }
+        } catch (Exception $e) {
+            Yii::log('sendRegistrationConfirmation error: ' . $e->getMessage(), 'error', 'application.components.EmailHelper');
+            return array('success' => false, 'error' => 'Lỗi gửi mail: ' . $e->getMessage());
+        }
+    }
 }
