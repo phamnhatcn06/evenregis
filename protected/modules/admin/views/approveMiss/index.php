@@ -105,6 +105,9 @@ foreach (array('contest_id', 'property_id', 'status', 'keyword') as $f) {
     <?php foreach ($roundTabs as $i => $tab): ?>
         <div class="tab-pane fade <?php echo $i === $firstActive ? 'show active' : ''; ?>" id="round-<?php echo $tab['id']; ?>" role="tabpanel">
             <div class="mb-3 text-end">
+                <a href="<?php echo $this->createUrl('exportExcel', array_merge(array('round_id' => $tab['id']), $exportFilters)); ?>" class="btn btn-success btn-sm">
+                    <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                </a>
                 <a href="<?php echo $this->createUrl('exportPdf', array_merge(array('round_id' => $tab['id']), $exportFilters)); ?>" target="_blank" class="btn btn-danger btn-sm">
                     <i class="fa fa-file-pdf-o me-1"></i>Xuất PDF
                 </a>
