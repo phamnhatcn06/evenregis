@@ -77,6 +77,13 @@ class ApproveMissController extends AdminController
      */
     public function actionExportExcel($round_id)
     {
+        // Export nạp nhiều record kèm quan hệ + ghi file Excel → nới giới hạn
+        // để tránh lỗi 500 (exhausted memory / timeout) trên server.
+        @ini_set('memory_limit', '512M');
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(300);
+        }
+
         $grouping = $this->buildRoundGrouping(
             isset($_GET['contest_id']) && $_GET['contest_id'] !== '' ? $_GET['contest_id'] : null,
             isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null,
