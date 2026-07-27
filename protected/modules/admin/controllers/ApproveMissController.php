@@ -84,6 +84,14 @@ class ApproveMissController extends AdminController
             @set_time_limit(300);
         }
 
+        // [DEBUG TẠM] Ghi tiến độ ra file để xác định action chết ở bước nào
+        // khi worker bị kill/segfault (PHP error log không ghi được).
+        $dbg = Yii::getPathOfAlias('application.runtime') . DIRECTORY_SEPARATOR . 'export_debug.log';
+        $mark = function ($step) use ($dbg) {
+            @file_put_contents($dbg, date('H:i:s') . " | " . $step . " | mem=" . round(memory_get_usage(true) / 1048576) . "MB\n", FILE_APPEND);
+        };
+        $mark('START round_id=' . $round_id);
+
         $grouping = $this->buildRoundGrouping(
             isset($_GET['contest_id']) && $_GET['contest_id'] !== '' ? $_GET['contest_id'] : null,
             isset($_GET['property_id']) && $_GET['property_id'] !== '' ? $_GET['property_id'] : null,
