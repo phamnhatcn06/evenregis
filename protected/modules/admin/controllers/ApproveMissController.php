@@ -262,8 +262,13 @@ class ApproveMissController extends AdminController
         $mark('BEFORE createWriter');
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $mark('BEFORE save');
-        $objWriter->save('php://output');
-        $mark('AFTER save DONE');
+        try {
+            $objWriter->save('php://output');
+            $mark('AFTER save DONE');
+        } catch (Exception $ex) {
+            $mark('SAVE Exception: ' . get_class($ex) . ' - ' . $ex->getMessage());
+            throw $ex;
+        }
         Yii::app()->end();
     }
 
