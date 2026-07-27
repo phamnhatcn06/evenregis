@@ -283,7 +283,7 @@
     <!-- Section 1b: Đợt 1 - Văn nghệ -->
     <?php if (!empty($talentEntries)): ?>
         <div class="section-header">
-            ĐỢT 1: DANH SÁCH CHI TIẾT TIẾT MỤC VĂN NGHỆ
+            DANH SÁCH CHI TIẾT TIẾT MỤC VĂN NGHỆ
         </div>
         <?php foreach ($talentEntries as $entry): ?>
             <div class="group-title">
