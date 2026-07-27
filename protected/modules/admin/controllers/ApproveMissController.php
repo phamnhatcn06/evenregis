@@ -200,20 +200,20 @@ class ApproveMissController extends AdminController
             $statusText = isset($statusOptions[$c->status]) ? $statusOptions[$c->status] : $c->status;
 
             $sheet->setCellValue('A' . $rowNum, $stt++);
-            $sheet->setCellValue('B' . $rowNum, isset($c->contest_name) ? $c->contest_name : '');
-            $sheet->setCellValue('C' . $rowNum, $roundName);
-            $sheet->setCellValue('D' . $rowNum, $unitName);
-            $sheet->setCellValue('E' . $rowNum, isset($c->department_name) ? $c->department_name : '');
-            $sheet->setCellValue('F' . $rowNum, $attendeeName);
-            $sheet->setCellValueExplicit('G' . $rowNum, $birthDate, PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValue('B' . $rowNum, $this->cleanCell(isset($c->contest_name) ? $c->contest_name : ''));
+            $sheet->setCellValue('C' . $rowNum, $this->cleanCell($roundName));
+            $sheet->setCellValue('D' . $rowNum, $this->cleanCell($unitName));
+            $sheet->setCellValue('E' . $rowNum, $this->cleanCell(isset($c->department_name) ? $c->department_name : ''));
+            $sheet->setCellValue('F' . $rowNum, $this->cleanCell($attendeeName));
+            $sheet->setCellValueExplicit('G' . $rowNum, $this->cleanCell($birthDate), PHPExcel_Cell_DataType::TYPE_STRING);
             $sheet->setCellValue('H' . $rowNum, $age !== null ? $age : '');
             $sheet->setCellValue('I' . $rowNum, $c->height_cm);
             $sheet->setCellValue('J' . $rowNum, $c->weight_kg);
-            $sheet->setCellValueExplicit('K' . $rowNum, $c->measurements, PHPExcel_Cell_DataType::TYPE_STRING);
-            $sheet->setCellValue('L' . $rowNum, $c->talent);
-            $sheet->setCellValue('M' . $rowNum, $c->bio);
-            $sheet->setCellValue('N' . $rowNum, isset($c->personal_email) ? $c->personal_email : '');
-            $sheet->setCellValue('O' . $rowNum, $statusText);
+            $sheet->setCellValueExplicit('K' . $rowNum, $this->cleanCell($c->measurements), PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValue('L' . $rowNum, $this->cleanCell($c->talent));
+            $sheet->setCellValue('M' . $rowNum, $this->cleanCell($c->bio));
+            $sheet->setCellValue('N' . $rowNum, $this->cleanCell(isset($c->personal_email) ? $c->personal_email : ''));
+            $sheet->setCellValue('O' . $rowNum, $this->cleanCell($statusText));
 
             $sheet->getStyle('A' . $rowNum . ':' . $lastCol . $rowNum)->applyFromArray($borderStyle);
             $rowNum++;
