@@ -72,7 +72,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            font-size: 11px;
+            font-size: 11pt;
         }
 
         .summary-table td {
