@@ -11,6 +11,7 @@ class ApproveMissController extends AdminController
         $this->publicActions[] = 'approve';
         $this->publicActions[] = 'reject';
         $this->publicActions[] = 'exportPdf';
+        $this->publicActions[] = 'exportExcel';
     }
 
     public function actionAdmin()
