@@ -401,7 +401,7 @@ class EmailHelper
                     $parts[] = $stats['team_count'] . ' đội';
                 }
                 if ($stats['athlete_count'] > 0) {
-                    $parts[] = $stats['athlete_count'] . ' vdv';
+                    $parts[] = $stats['athlete_count'] . ' VĐV';
                 }
                 if (!empty($parts)) {
                     $line .= ' - ' . implode(' - ', $parts);
