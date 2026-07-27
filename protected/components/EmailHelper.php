@@ -438,13 +438,17 @@ class EmailHelper
 
         // 8. Tạo file PDF đính kèm
         $attachments = array();
+        $pdfError = null;
         try {
             $pdfPath = PdfHelper::generateRegistrationPdf($registrationId, $data);
             if (!empty($pdfPath) && file_exists($pdfPath)) {
                 $attachments[] = $pdfPath;
+            } else {
+                $pdfError = 'File PDF không tồn tại sau khi tạo.';
             }
         } catch (Exception $e) {
-            Yii::log('Generate PDF error: ' . $e->getMessage(), 'warning', 'application.components.EmailHelper');
+            $pdfError = $e->getMessage();
+            Yii::log('Generate PDF error (registration ' . $registrationId . '): ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.components.EmailHelper');
         }
 
         $subject = '[Đại hội Mường Thanh 2026] Xác nhận thông tin đăng ký - ' . $model->property_name;
@@ -452,9 +456,15 @@ class EmailHelper
         try {
             $sent = self::send($recipients, $subject, 'registration_confirmation', $data, $attachments);
             if ($sent) {
+                $hasPdf = !empty($attachments);
+                $message = $hasPdf
+                    ? 'Đã gửi email xác nhận kèm file PDF thành công tới: ' . implode(', ', $recipients)
+                    : 'Đã gửi email xác nhận (KHÔNG có PDF đính kèm) tới: ' . implode(', ', $recipients)
+                        . ($pdfError ? '. Lý do lỗi PDF: ' . $pdfError : '');
                 return array(
                     'success' => true,
-                    'message' => 'Đã gửi email xác nhận và file PDF đính kèm thành công tới: ' . implode(', ', $recipients),
+                    'has_pdf' => $hasPdf,
+                    'message' => $message,
                     'recipients' => $recipients,
                 );
             } else {
