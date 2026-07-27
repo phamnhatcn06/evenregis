@@ -203,7 +203,7 @@ class EmailHelper
 
         // 5. Tải danh sách Thi nghiệp vụ (Đợt 2)
         $competitionRegistrations = array();
-        if ($isDot2 || empty($periodContentCodes) || in_array('competition', $periodContentCodes)) {
+        if ($showCompetition) {
             $compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $registrationId), 200)->getData();
             foreach ($compRegsData as $reg) {
                 $compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
