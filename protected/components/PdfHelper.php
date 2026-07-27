@@ -117,12 +117,17 @@ class PdfHelper
         if (!file_exists($tempDir)) {
             @mkdir($tempDir, 0777, true);
         }
+        if (!is_writable($tempDir)) {
+            throw new Exception('Thư mục runtime không ghi được, không thể tạo file PDF: ' . $tempDir);
+        }
 
         $propCode = !empty($data['model']->property_code) ? MyHelper::toSlug($data['model']->property_code) : 'DONVI';
         $pdfFileName = 'Phieu_Dang_Ky_' . strtoupper($propCode) . '_' . $registrationId . '.pdf';
         $filePath = $tempDir . DIRECTORY_SEPARATOR . $pdfFileName;
 
-        file_put_contents($filePath, $pdfOutput);
+        if (file_put_contents($filePath, $pdfOutput) === false) {
+            throw new Exception('Ghi file PDF thất bại: ' . $filePath);
+        }
 
         return $filePath;
     }
