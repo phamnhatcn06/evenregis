@@ -122,6 +122,8 @@
             border: 1px solid #cbd5e1;
             padding: 5px;
             vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .text-center {
