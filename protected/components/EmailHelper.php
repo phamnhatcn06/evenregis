@@ -357,25 +357,104 @@ class EmailHelper
             });
         }
 
-        // Data truyền sang email view
+        // 7. Tổng hợp Hạng mục đã đăng ký & Nội dung tóm tắt cho Bảng tổng quan
+        $categoriesMap = array();
+        if ($isDot1 || !empty($sportTeamsData)) {
+            $categoriesMap['sports'] = 'Thể thao';
+        }
+        if (in_array('talent', $periodContentCodes)) {
+            $categoriesMap['talent'] = 'Văn nghệ';
+        }
+        if (in_array('miss', $periodContentCodes)) {
+            $categoriesMap['miss'] = 'Miss Mường Thanh';
+        }
+        if ($isDot2 || !empty($competitionRegistrations)) {
+            $categoriesMap['competition'] = 'Thi nghiệp vụ';
+        }
+        $registeredCategories = implode(', ', array_values($categoriesMap));
+        if (empty($registeredCategories)) {
+            $registeredCategories = 'Đăng ký tham dự';
+        }
+
+        // Tổng hợp danh sách các dòng nội dung
+        $contentSummaryLines = array();
+
+        // Thống kê môn thể thao (Đợt 1)
+        if (!empty($sportTeamsData)) {
+            $sportGroups = array();
+            foreach ($sportTeamsData as $team) {
+                $sName = $team['sport_name'];
+                if (!isset($sportGroups[$sName])) {
+                    $sportGroups[$sName] = array(
+                        'team_count' => 0,
+                        'athlete_count' => 0,
+                    );
+                }
+                $sportGroups[$sName]['team_count'] += 1;
+                $sportGroups[$sName]['athlete_count'] += count($team['members']);
+            }
+
+            foreach ($sportGroups as $sName => $stats) {
+                $line = $sName;
+                $parts = array();
+                if ($stats['team_count'] > 0) {
+                    $parts[] = $stats['team_count'] . ' đội';
+                }
+                if ($stats['athlete_count'] > 0) {
+                    $parts[] = $stats['athlete_count'] . ' vdv';
+                }
+                if (!empty($parts)) {
+                    $line .= ' - ' . implode(' - ', $parts);
+                }
+                $contentSummaryLines[] = $line;
+            }
+        }
+
+        // Thống kê thi nghiệp vụ (Đợt 2)
+        if (!empty($competitionRegistrations)) {
+            foreach ($competitionRegistrations as $compData) {
+                $cName = $compData['competition_name'];
+                $cCount = count($compData['attendees']);
+                $line = $cName;
+                if ($cCount > 0) {
+                    $line .= ' - ' . $cCount . ' thí sinh';
+                }
+                $contentSummaryLines[] = $line;
+            }
+        }
+
+        // Data truyền sang email view & PDF view
         $data = array(
             'model' => $model,
             'periodContentCodes' => $periodContentCodes,
             'isDot1' => $isDot1,
             'isDot2' => $isDot2,
+            'registeredCategories' => $registeredCategories,
+            'contentSummaryLines' => $contentSummaryLines,
             'sportTeams' => $sportTeamsData,
             'competitionRegistrations' => $competitionRegistrations,
             'attendeesCount' => count($attendees),
         );
 
+        // 8. Tạo file PDF đính kèm
+        $attachments = array();
+        try {
+            $pdfPath = PdfHelper::generateRegistrationPdf($registrationId, $data);
+            if (!empty($pdfPath) && file_exists($pdfPath)) {
+                $attachments[] = $pdfPath;
+            }
+        } catch (Exception $e) {
+            Yii::log('Generate PDF error: ' . $e->getMessage(), 'warning', 'application.components.EmailHelper');
+        }
+
         $subject = '[Đại hội Mường Thanh 2026] Xác nhận thông tin đăng ký - ' . $model->property_name;
 
         try {
-            $sent = self::send($recipients, $subject, 'registration_confirmation', $data);
+            $sent = self::send($recipients, $subject, 'registration_confirmation', $data, $attachments);
             if ($sent) {
                 return array(
                     'success' => true,
-                    'message' => 'Đã gửi email xác nhận thành công tới: ' . implode(', ', $recipients),
+                    'message' => 'Đã gửi email xác nhận và file PDF đính kèm thành công tới: ' . implode(', ', $recipients),
                     'recipients' => $recipients,
                 );
             } else {
