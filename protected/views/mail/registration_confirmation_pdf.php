@@ -238,10 +238,10 @@
                     <thead>
                         <tr>
                             <th class="text-center col-stt">STT</th>
-                            <th width="190">Họ và tên VĐV</th>
-                            <th width="65" class="text-center">Giới tính</th>
-                            <th width="140">Đơn vị</th>
-                            <th>Chức danh - Bộ phận</th>
+                            <th width="28%">Họ và tên VĐV</th>
+                            <th width="12%" class="text-center">Giới tính</th>
+                            <th width="24%">Đơn vị</th>
+                            <th width="30%">Chức danh - Bộ phận</th>
                         </tr>
                     </thead>
                     <tbody>
