@@ -158,9 +158,11 @@
     <!-- Header Header Top -->
     <table class="header-table">
         <tr>
-            <td style="width:50%; text-align:center; font-size:10px;">
-                <strong>TẬP ĐOÀN MƯỜNG THANH</strong><br>
-                <?php echo CHtml::encode(isset($model->property_name) ? mb_strtoupper($model->property_name) : 'ĐƠN VỊ DỰ THI'); ?>
+            <td style="width:50%; text-align:left; font-size:10px;">
+                <span style="display:inline-block; text-align:center;">
+                    <strong>TẬP ĐOÀN MƯỜNG THANH</strong><br>
+                    <?php echo CHtml::encode(isset($model->property_name) ? mb_strtoupper($model->property_name) : 'ĐƠN VỊ DỰ THI'); ?>
+                </span>
             </td>
             <td style="width:50%; text-align:center; font-size:10px;">
                 <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br>
