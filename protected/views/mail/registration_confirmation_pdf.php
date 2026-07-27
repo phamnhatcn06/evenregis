@@ -280,6 +280,93 @@
         <?php endif; ?>
     <?php endif; ?>
 
+    <!-- Section 1b: Đợt 1 - Văn nghệ -->
+    <?php if (!empty($talentEntries)): ?>
+        <div class="section-header">
+            ĐỢT 1: DANH SÁCH CHI TIẾT TIẾT MỤC VĂN NGHỆ
+        </div>
+        <?php foreach ($talentEntries as $entry): ?>
+            <div class="group-title">
+                <?php echo CHtml::encode(!empty($entry['category_name']) ? $entry['category_name'] : 'Tiết mục'); ?><?php if (!empty($entry['title'])): ?> - <?php echo CHtml::encode($entry['title']); ?><?php endif; ?>
+                (<?php echo count($entry['members']); ?> người)
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="text-center col-stt">STT</th>
+                        <th width="34%">Họ và tên</th>
+                        <th width="12%" class="text-center">Giới tính</th>
+                        <th width="24%">Chức danh</th>
+                        <th width="24%">Bộ phận</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($entry['members'])): ?>
+                        <tr><td colspan="5" class="text-center">Chưa có thành viên.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($entry['members'] as $mIdx => $member): ?>
+                            <tr>
+                                <td class="text-center"><?php echo $mIdx + 1; ?></td>
+                                <td class="text-bold"><?php echo CHtml::encode($member['attendee_name']); ?></td>
+                                <td class="text-center">
+                                    <?php
+                                    $g = isset($member['gender']) ? $member['gender'] : null;
+                                    $gStr = ($g !== null) ? strtolower((string)$g) : '';
+                                    if ($g === 1 || $g === '1' || $gStr === 'male' || $gStr === 'nam') {
+                                        echo '<span class="gender-nam">Nam</span>';
+                                    } elseif ($g === 0 || $g === '0' || $gStr === 'female' || $gStr === 'nữ' || $gStr === 'nu') {
+                                        echo '<span class="gender-nu">Nữ</span>';
+                                    } else {
+                                        echo '-';
+                                    }
+                                    ?>
+                                </td>
+                                <td><?php echo CHtml::encode(!empty($member['position_name']) ? $member['position_name'] : '-'); ?></td>
+                                <td><?php echo CHtml::encode(!empty($member['division_name']) ? $member['division_name'] : '-'); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <!-- Section 1c: Đợt 1 - Miss Mường Thanh -->
+    <?php if (!empty($beautyContestants)): ?>
+        <div class="section-header">
+            ĐỢT 1: DANH SÁCH THÍ SINH MISS MƯỜNG THANH
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="text-center col-stt">STT</th>
+                    <th width="12%" class="text-center">SBD</th>
+                    <th width="32%">Họ và tên thí sinh</th>
+                    <th width="24%">Cuộc thi</th>
+                    <th width="26%">Chức danh - Bộ phận</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($beautyContestants as $cIdx => $contestant): ?>
+                    <tr>
+                        <td class="text-center"><?php echo $cIdx + 1; ?></td>
+                        <td class="text-center"><?php echo CHtml::encode(!empty($contestant['candidate_number']) ? $contestant['candidate_number'] : '-'); ?></td>
+                        <td class="text-bold"><?php echo CHtml::encode($contestant['attendee_name']); ?></td>
+                        <td><?php echo CHtml::encode(!empty($contestant['contest_name']) ? $contestant['contest_name'] : '-'); ?></td>
+                        <td>
+                            <?php
+                            $pos = array();
+                            if (!empty($contestant['position_name'])) $pos[] = CHtml::encode($contestant['position_name']);
+                            if (!empty($contestant['division_name'])) $pos[] = CHtml::encode($contestant['division_name']);
+                            echo !empty($pos) ? implode(' - ', $pos) : '-';
+                            ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
     <!-- Section 2: Đợt 2 - Đăng ký thi nghiệp vụ -->
     <?php if (!empty($isDot2) || !empty($competitionRegistrations)): ?>
         <div class="section-header-green">
