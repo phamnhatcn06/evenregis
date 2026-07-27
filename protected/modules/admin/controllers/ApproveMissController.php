@@ -122,8 +122,10 @@ class ApproveMissController extends AdminController
         $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
         spl_autoload_unregister(array('YiiBase', 'autoload'));
         require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $mark('AFTER require PHPExcel');
         $objPHPExcel = new PHPExcel();
         spl_autoload_register(array('YiiBase', 'autoload'));
+        $mark('AFTER new PHPExcel');
 
         $objPHPExcel->getProperties()->setCreator("System")
             ->setLastModifiedBy("System")
