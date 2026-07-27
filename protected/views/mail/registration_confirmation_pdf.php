@@ -5,13 +5,42 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Phiếu xác nhận đăng ký tham dự</title>
     <style>
+        @font-face {
+            font-family: 'Times New Roman';
+            font-style: normal;
+            font-weight: normal;
+            src: url("<?php echo Yii::getPathOfAlias('application.data.fonts'); ?>/times.ttf") format("truetype");
+        }
+
+        @font-face {
+            font-family: 'Times New Roman';
+            font-style: normal;
+            font-weight: bold;
+            src: url("<?php echo Yii::getPathOfAlias('application.data.fonts'); ?>/timesbd.ttf") format("truetype");
+        }
+
+        @font-face {
+            font-family: 'Times New Roman';
+            font-style: italic;
+            font-weight: normal;
+            src: url("<?php echo Yii::getPathOfAlias('application.data.fonts'); ?>/timesi.ttf") format("truetype");
+        }
+
+        @font-face {
+            font-family: 'Times New Roman';
+            font-style: italic;
+            font-weight: bold;
+            src: url("<?php echo Yii::getPathOfAlias('application.data.fonts'); ?>/timesbi.ttf") format("truetype");
+        }
+
         @page {
+            size: A4 portrait;
             margin: 25px 25px 25px 25px;
         }
 
         body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 11px;
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
             color: #1e293b;
             line-height: 1.5;
         }
