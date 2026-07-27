@@ -215,6 +215,10 @@
             <td class="summary-label">Tổng số người tham dự:</td>
             <td style="font-weight:bold; color:#0d6efd;"><?php echo isset($attendeesCount) ? (int)$attendeesCount : 0; ?> người</td>
         </tr>
+        <tr>
+            <td class="summary-label">Thời gian in xác nhận:</td>
+            <td><?php echo date('d-m-Y H:i'); ?></td>
+        </tr>
     </table>
 
     <!-- Section 1: Đợt 1 - Đăng ký thi đấu thể thao -->
@@ -429,7 +433,7 @@
             </td>
             <td>
                 <strong>BAN TỔ CHỨC ĐẠI HỘI MƯỜNG THANH 2026</strong><br>
-                <span style="font-style:italic; font-size:10px; color:#64748b;">(Xác nhận hệ thống)</span>
+                <span style="font-style:italic; font-size:10px; color:#64748b;">(Ký, ghi rõ họ tên)</span>
             </td>
         </tr>
     </table>
