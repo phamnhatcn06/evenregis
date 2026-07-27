@@ -3,25 +3,25 @@
 class PdfHelper
 {
     /**
-     * Tự động đăng ký autoloader cho Dompdf và các thư viện phụ thuộc
+     * Tự động đăng ký autoloader cho Dompdf và các thư viện phụ thuộc trong application.vendors
      */
     public static function registerAutoloader()
     {
         static $registered = false;
         if ($registered) return;
 
-        $vendorDir = 'E:/even_API/MTRegistrationPortal/vendor';
+        $vendorDir = Yii::getPathOfAlias('application.vendors');
 
         spl_autoload_register(function ($class) use ($vendorDir) {
             if ($class === 'Dompdf\Cpdf' || $class === 'Cpdf') {
-                $cpdfFile = $vendorDir . '/dompdf/dompdf/lib/Cpdf.php';
+                $cpdfFile = $vendorDir . '/dompdf/lib/Cpdf.php';
                 if (file_exists($cpdfFile)) {
                     require_once $cpdfFile;
                     return true;
                 }
             }
             $prefixes = array(
-                'Dompdf\\' => $vendorDir . '/dompdf/dompdf/src/',
+                'Dompdf\\' => $vendorDir . '/dompdf/src/',
                 'FontLib\\' => $vendorDir . '/phenx/php-font-lib/src/FontLib/',
                 'Svg\\' => $vendorDir . '/phenx/php-svg-lib/src/Svg/',
                 'Sabberworm\\CSS\\' => $vendorDir . '/sabberworm/php-css-parser/src/',
@@ -39,7 +39,7 @@ class PdfHelper
                 }
             }
             return false;
-        });
+        }, true, true); // $prepend = true để đăng ký autoloader trước Yii autoloader
 
         $registered = true;
     }
@@ -53,6 +53,10 @@ class PdfHelper
     public static function generateRegistrationPdf($registrationId, $data)
     {
         self::registerAutoloader();
+
+        if (!class_exists('Dompdf\Dompdf')) {
+            throw new Exception('Thư viện Dompdf chưa được tải thành công.');
+        }
 
         $viewPath = Yii::getPathOfAlias('application.views.mail.registration_confirmation_pdf') . '.php';
         if (!file_exists($viewPath)) {
