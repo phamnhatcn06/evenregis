@@ -507,6 +507,8 @@ class EmailHelper
             'registeredCategories' => $registeredCategories,
             'contentSummaryLines' => $contentSummaryLines,
             'sportTeams' => $sportTeamsData,
+            'talentEntries' => $talentEntriesData,
+            'beautyContestants' => $beautyContestantsData,
             'competitionRegistrations' => $competitionRegistrations,
             'attendeesCount' => count($attendees),
         );
