@@ -11,7 +11,7 @@
     <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f9; padding:30px 10px;">
         <tr>
             <td align="center">
-                <table width="680" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e2e8f0;">
+                <table width="780" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e2e8f0;">
 
                     <!-- Header -->
                     <tr>
@@ -41,7 +41,7 @@
                             <!-- Summary Info Box -->
                             <table width="100%" cellpadding="12" cellspacing="0" style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:25px; font-size:14px;">
                                 <tr>
-                                    <td width="35%" style="color:#718096; font-weight:bold; border-bottom:1px solid #edf2f7;">Đơn vị đăng ký:</td>
+                                    <td width="30%" style="color:#718096; font-weight:bold; border-bottom:1px solid #edf2f7;">Đơn vị đăng ký:</td>
                                     <td style="color:#1a202c; font-weight:bold; border-bottom:1px solid #edf2f7;"><?php echo CHtml::encode(isset($model->property_name) ? $model->property_name : '-'); ?></td>
                                 </tr>
                                 <tr>
@@ -85,13 +85,13 @@
                                                         <?php endif; ?>
                                                     </div>
 
-                                                    <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:13px; margin-top:5px;">
+                                                    <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:13px; margin-top:5px; table-layout:fixed;">
                                                         <thead>
                                                             <tr style="background-color:#f1f5f9; color:#475569; text-align:left;">
-                                                                <th width="40" style="border:1px solid #cbd5e1; text-align:center;">STT</th>
-                                                                <th style="border:1px solid #cbd5e1;">Họ và tên VĐV</th>
+                                                                <th width="45" style="border:1px solid #cbd5e1; text-align:center;">STT</th>
+                                                                <th width="220" style="border:1px solid #cbd5e1;">Họ và tên VĐV</th>
                                                                 <th width="80" style="border:1px solid #cbd5e1; text-align:center;">Giới tính</th>
-                                                                <th style="border:1px solid #cbd5e1;">Đơn vị</th>
+                                                                <th width="180" style="border:1px solid #cbd5e1;">Đơn vị</th>
                                                                 <th style="border:1px solid #cbd5e1;">Chức danh - Bộ phận</th>
                                                             </tr>
                                                         </thead>
@@ -99,7 +99,7 @@
                                                             <?php foreach ($team['members'] as $mIdx => $member): ?>
                                                                 <tr style="background-color:<?php echo ($mIdx % 2 == 0) ? '#ffffff' : '#f8fafc'; ?>;">
                                                                     <td style="border:1px solid #cbd5e1; text-align:center; color:#64748b;"><?php echo $mIdx + 1; ?></td>
-                                                                    <td style="border:1px solid #cbd5e1; font-weight:bold; color:#1e293b;"><?php echo CHtml::encode($member['attendee_name']); ?></td>
+                                                                    <td style="border:1px solid #cbd5e1; font-weight:bold; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo CHtml::encode($member['attendee_name']); ?></td>
                                                                     <td style="border:1px solid #cbd5e1; text-align:center;">
                                                                         <?php
                                                                         $g = isset($member['gender']) ? $member['gender'] : null;
@@ -150,12 +150,13 @@
                                                         <span style="font-weight:normal; font-size:13px; color:#64748b;">(<?php echo count($compData['attendees']); ?> thí sinh)</span>
                                                     </div>
 
-                                                    <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:13px; margin-top:5px;">
+                                                    <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:13px; margin-top:5px; table-layout:fixed;">
                                                         <thead>
                                                             <tr style="background-color:#f1f5f9; color:#475569; text-align:left;">
-                                                                <th width="40" style="border:1px solid #cbd5e1; text-align:center;">STT</th>
-                                                                <th style="border:1px solid #cbd5e1;">Họ và tên thí sinh</th>
-                                                                <th style="border:1px solid #cbd5e1;">Chức danh / Vị trí</th>
+                                                                <th width="45" style="border:1px solid #cbd5e1; text-align:center;">STT</th>
+                                                                <th width="220" style="border:1px solid #cbd5e1;">Họ và tên thí sinh</th>
+                                                                <th width="80" style="border:1px solid #cbd5e1; text-align:center;">Giới tính</th>
+                                                                <th width="180" style="border:1px solid #cbd5e1;">Chức danh / Vị trí</th>
                                                                 <th style="border:1px solid #cbd5e1;">Bộ phận / Phòng ban</th>
                                                             </tr>
                                                         </thead>
@@ -163,7 +164,20 @@
                                                             <?php foreach ($compData['attendees'] as $cIdx => $candidate): ?>
                                                                 <tr style="background-color:<?php echo ($cIdx % 2 == 0) ? '#ffffff' : '#f8fafc'; ?>;">
                                                                     <td style="border:1px solid #cbd5e1; text-align:center; color:#64748b;"><?php echo $cIdx + 1; ?></td>
-                                                                    <td style="border:1px solid #cbd5e1; font-weight:bold; color:#1e293b;"><?php echo CHtml::encode($candidate['attendee_name']); ?></td>
+                                                                    <td style="border:1px solid #cbd5e1; font-weight:bold; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><?php echo CHtml::encode($candidate['attendee_name']); ?></td>
+                                                                    <td style="border:1px solid #cbd5e1; text-align:center;">
+                                                                        <?php
+                                                                        $cg = isset($candidate['gender']) ? $candidate['gender'] : null;
+                                                                        $cgStr = ($cg !== null) ? strtolower((string)$cg) : '';
+                                                                        if ($cg === 1 || $cg === '1' || $cgStr === 'male' || $cgStr === 'nam') {
+                                                                            echo '<span style="color:#0284c7; font-weight:bold;">Nam</span>';
+                                                                        } elseif ($cg === 0 || $cg === '0' || $cgStr === 'female' || $cgStr === 'nữ' || $cgStr === 'nu') {
+                                                                            echo '<span style="color:#e11d48; font-weight:bold;">Nữ</span>';
+                                                                        } else {
+                                                                            echo '-';
+                                                                        }
+                                                                        ?>
+                                                                    </td>
                                                                     <td style="border:1px solid #cbd5e1; color:#475569;"><?php echo CHtml::encode(!empty($candidate['position_name']) ? $candidate['position_name'] : '-'); ?></td>
                                                                     <td style="border:1px solid #cbd5e1; color:#475569;"><?php echo CHtml::encode(!empty($candidate['division_name']) ? $candidate['division_name'] : '-'); ?></td>
                                                                 </tr>

@@ -215,6 +215,7 @@ class EmailHelper
                     'id' => isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null),
                     'attendee_id' => $attendeeId,
                     'attendee_name' => isset($attendeeInfo['full_name']) ? $attendeeInfo['full_name'] : '',
+                    'gender' => isset($attendeeInfo['gender']) ? $attendeeInfo['gender'] : null,
                     'position_name' => isset($attendeeInfo['position_name']) ? $attendeeInfo['position_name'] : '',
                     'division_name' => isset($attendeeInfo['division_name']) ? $attendeeInfo['division_name'] : '',
                 );
