@@ -282,7 +282,7 @@
         <?php else: ?>
             <?php foreach ($competitionRegistrations as $compId => $compData): ?>
                 <div class="group-title">
-                    🏅 <?php echo CHtml::encode($compData['competition_name']); ?>
+                    <?php echo CHtml::encode($compData['competition_name']); ?>
                     (<?php echo count($compData['attendees']); ?> thí sinh)
                 </div>
 
