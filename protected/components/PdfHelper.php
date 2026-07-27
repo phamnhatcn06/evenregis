@@ -80,6 +80,11 @@ class PdfHelper
             'isFontSubsettingEnabled' => true,
             'fontDir' => $fontDir,
             'fontCache' => $fontDir,
+            // Cho phép nạp font TTF nằm trong thư mục protected (mặc định chroot chỉ ở vendor dompdf)
+            'chroot' => array(
+                Yii::getPathOfAlias('application'),
+                Yii::getPathOfAlias('application.vendors.dompdf.dompdf'),
+            ),
             'defaultFont' => 'Times New Roman',
         ));
 
