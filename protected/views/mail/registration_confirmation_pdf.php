@@ -139,6 +139,7 @@
             margin-top: 30px;
             border-collapse: collapse;
             page-break-inside: avoid;
+            font-size: 9pt;
         }
 
         .signature-table td {
