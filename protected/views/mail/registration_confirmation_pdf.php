@@ -106,7 +106,7 @@
         }
 
         .col-stt {
-            width: 24px;
+            width: 6%;
         }
 
         .data-table th {
