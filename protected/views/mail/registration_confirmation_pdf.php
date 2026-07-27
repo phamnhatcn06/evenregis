@@ -7,14 +7,18 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 25px 25px 25px 25px;
+            margin: 15mm 12mm 15mm 12mm;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Times New Roman', serif;
             font-size: 11pt;
             color: #1e293b;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         .header-table {
