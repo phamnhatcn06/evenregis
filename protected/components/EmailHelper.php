@@ -462,6 +462,29 @@ class EmailHelper
             }
         }
 
+        // Thống kê Văn nghệ (Đợt 1)
+        if (!empty($talentEntriesData)) {
+            foreach ($talentEntriesData as $te) {
+                $line = 'Văn nghệ';
+                if (!empty($te['category_name'])) {
+                    $line .= ' (' . $te['category_name'] . ')';
+                }
+                if (!empty($te['title'])) {
+                    $line .= ': ' . $te['title'];
+                }
+                $mCount = count($te['members']);
+                if ($mCount > 0) {
+                    $line .= ' - ' . $mCount . ' người';
+                }
+                $contentSummaryLines[] = $line;
+            }
+        }
+
+        // Thống kê Miss (Đợt 1)
+        if (!empty($beautyContestantsData)) {
+            $contentSummaryLines[] = 'Miss Mường Thanh - ' . count($beautyContestantsData) . ' thí sinh';
+        }
+
         // Thống kê thi nghiệp vụ (Đợt 2)
         if (!empty($competitionRegistrations)) {
             foreach ($competitionRegistrations as $compData) {
