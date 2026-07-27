@@ -243,8 +243,11 @@ class ApproveMissController extends AdminController
         header('Cache-Control: max-age=0');
         header('Pragma: public');
 
+        $mark('BEFORE createWriter');
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $mark('BEFORE save');
         $objWriter->save('php://output');
+        $mark('AFTER save DONE');
         Yii::app()->end();
     }
 
