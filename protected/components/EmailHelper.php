@@ -225,6 +225,34 @@ class EmailHelper
         // 6. Tải danh sách Đội thi thể thao & VĐV (Đợt 1)
         $sportTeamsData = array();
         if ($model->event_id && $model->property_id && ($isDot1 || empty($periodContentCodes) || in_array('sports', $periodContentCodes))) {
+            // Lấy danh sách môn thể thao được cấu hình cho sự kiện
+            $eventSportsList = EventSports::getByEventId($model->event_id);
+            $activeEventSportIdsMap = array();
+            foreach ($eventSportsList as $es) {
+                $sId = is_object($es) ? (isset($es->sport_id) ? $es->sport_id : null) : (isset($es['sport_id']) ? $es['sport_id'] : null);
+                if ($sId) {
+                    $activeEventSportIdsMap[$sId] = true;
+                }
+            }
+
+            // Lấy tất cả môn thể thao đang active
+            $allActiveSports = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
+            $sportOrderMap = array(); // sport_id => vị trí sắp xếp
+            $sportNameMap = array();  // sport_id => tên môn thể thao
+            $sportIndex = 0;
+            foreach ($allActiveSports as $sp) {
+                $spId = is_object($sp) ? $sp->id : $sp['id'];
+                $spName = is_object($sp) ? $sp->name : $sp['name'];
+
+                // Chỉ giữ môn thể thao nằm trong cấu hình event_sports của sự kiện (nếu có cấu hình)
+                if (!empty($activeEventSportIdsMap) && !isset($activeEventSportIdsMap[$spId])) {
+                    continue;
+                }
+
+                $sportOrderMap[$spId] = $sportIndex++;
+                $sportNameMap[$spId] = $spName;
+            }
+
             $apiResult = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST_BY_PROPERTY, array(
                 'property_id' => $model->property_id,
                 'event_id' => $model->event_id,
@@ -241,14 +269,22 @@ class EmailHelper
                 $teamId = $isObject ? (isset($team->id) ? $team->id : null) : (isset($team['id']) ? $team['id'] : null);
                 if (!$teamId) continue;
 
-                $sportName = $isObject ? (isset($team->sport_name) ? $team->sport_name : '') : (isset($team['sport_name']) ? $team['sport_name'] : '');
                 $sportId = $isObject ? (isset($team->sport_id) ? $team->sport_id : null) : (isset($team['sport_id']) ? $team['sport_id'] : null);
-                $teamName = $isObject ? (isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : '')) : (isset($team['team_name']) ? $team['team_name'] : (isset($team['name']) ? $team['name'] : ''));
 
-                if (empty($sportName) && $sportId) {
+                // Loại bỏ nếu môn thể thao này không thuộc danh sách môn đang active của sự kiện
+                if (!empty($sportOrderMap) && ($sportId === null || !isset($sportOrderMap[$sportId]))) {
+                    continue;
+                }
+
+                $sportName = $isObject ? (isset($team->sport_name) ? $team->sport_name : '') : (isset($team['sport_name']) ? $team['sport_name'] : '');
+                if (empty($sportName) && $sportId && isset($sportNameMap[$sportId])) {
+                    $sportName = $sportNameMap[$sportId];
+                } elseif (empty($sportName) && $sportId) {
                     $sport = Sports::fetchFromApi($sportId);
                     $sportName = $sport ? $sport->name : '';
                 }
+
+                $teamName = $isObject ? (isset($team->team_name) ? $team->team_name : (isset($team->name) ? $team->name : '')) : (isset($team['team_name']) ? $team['team_name'] : (isset($team['name']) ? $team['name'] : ''));
 
                 $membersData = array();
                 if (isset($team->members) && is_array($team->members)) {
@@ -296,13 +332,29 @@ class EmailHelper
                 }
 
                 $sportTeamsData[] = array(
+                    'sport_id' => $sportId,
                     'sport_name' => $sportName,
+                    'sport_order' => ($sportId && isset($sportOrderMap[$sportId])) ? $sportOrderMap[$sportId] : 999,
                     'team_name' => $teamName,
                     'members' => $enrichedMembers,
                     'alliance_properties' => $allianceProperties,
                     'is_alliance' => !empty($allianceProperties),
                 );
             }
+
+            // Sắp xếp các đội thi đấu theo thứ tự các môn thể thao active của sự kiện
+            usort($sportTeamsData, function ($a, $b) {
+                $orderA = isset($a['sport_order']) ? $a['sport_order'] : 999;
+                $orderB = isset($b['sport_order']) ? $b['sport_order'] : 999;
+                if ($orderA != $orderB) {
+                    return $orderA - $orderB;
+                }
+                $cmpSport = strcmp($a['sport_name'], $b['sport_name']);
+                if ($cmpSport != 0) {
+                    return $cmpSport;
+                }
+                return strcmp($a['team_name'], $b['team_name']);
+            });
         }
 
         // Data truyền sang email view
