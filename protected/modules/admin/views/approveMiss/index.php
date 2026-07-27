@@ -121,6 +121,9 @@ foreach (array('contest_id', 'property_id', 'status', 'keyword') as $f) {
     <?php if ($hasUnassigned): ?>
         <div class="tab-pane fade <?php echo empty($roundTabs) ? 'show active' : ''; ?>" id="round-unassigned" role="tabpanel">
             <div class="mb-3 text-end">
+                <a href="<?php echo $this->createUrl('exportExcel', array_merge(array('round_id' => 'unassigned'), $exportFilters)); ?>" class="btn btn-success btn-sm">
+                    <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                </a>
                 <a href="<?php echo $this->createUrl('exportPdf', array_merge(array('round_id' => 'unassigned'), $exportFilters)); ?>" target="_blank" class="btn btn-danger btn-sm">
                     <i class="fa fa-file-pdf-o me-1"></i>Xuất PDF
                 </a>
