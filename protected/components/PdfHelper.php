@@ -121,8 +121,9 @@ class PdfHelper
             throw new Exception('Thư mục runtime không ghi được, không thể tạo file PDF: ' . $tempDir);
         }
 
-        $propCode = !empty($data['model']->property_code) ? MyHelper::toSlug($data['model']->property_code) : 'DONVI';
-        $pdfFileName = 'Phieu_Xac_Nhan_Dang_Ky_' . strtoupper($propCode) . '_' . $registrationId . '.pdf';
+        // Cấu trúc tên file: Phieu_Xac_Nhan_Dang_Ky_{mã đơn vị (cột prefix)}_{ID phiếu}
+        $unitCode = !empty($data['model']->property_code) ? MyHelper::toSlug($data['model']->property_code) : 'DONVI';
+        $pdfFileName = 'Phieu_Xac_Nhan_Dang_Ky_' . strtoupper($unitCode) . '_' . $registrationId . '.pdf';
         $filePath = $tempDir . DIRECTORY_SEPARATOR . $pdfFileName;
 
         if (file_put_contents($filePath, $pdfOutput) === false) {
