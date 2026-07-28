@@ -424,7 +424,7 @@
     <table class="signature-table">
         <tr>
             <td>
-                <strong>ĐẠI DIỆN ĐƠN VỊ ĐĂNG KÝ</strong><br>
+                <strong>GIÁM ĐỐC ĐƠN VỊ</strong><br>
                 <span style="font-style:italic; font-size:10px; color:#64748b;">(Ký, ghi rõ họ tên)</span>
             </td>
             <td>
