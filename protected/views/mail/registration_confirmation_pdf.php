@@ -239,22 +239,33 @@
             <p style="color:#64748b; font-style:italic;">Chưa có thông tin đăng ký môn thể thao nào.</p>
         <?php else: ?>
             <?php
-            // Đếm số đội theo từng nội dung (bộ môn) để đánh số thứ tự khi có nhiều đội cùng nội dung
+            // Đếm số đội theo từng nội dung để đánh số thứ tự khi có nhiều đội cùng nội dung
             $sportTeamCounts = array();
             foreach ($sportTeams as $t) {
                 $key = !empty($t['sport_id']) ? $t['sport_id'] : $t['sport_name'];
                 $sportTeamCounts[$key] = isset($sportTeamCounts[$key]) ? $sportTeamCounts[$key] + 1 : 1;
             }
             $sportTeamSeq = array();
+            $currentGroupId = null; // theo dõi bộ môn hiện tại để chèn hàng nền phân tách
             ?>
             <?php foreach ($sportTeams as $tIdx => $team): ?>
                 <?php
                 $key = !empty($team['sport_id']) ? $team['sport_id'] : $team['sport_name'];
                 $sportTeamSeq[$key] = isset($sportTeamSeq[$key]) ? $sportTeamSeq[$key] + 1 : 1;
                 $hasMultipleTeams = $sportTeamCounts[$key] > 1;
+
+                // Hàng nền phân tách bộ môn (chỉ in khi chuyển sang bộ môn mới)
+                $groupId = isset($team['group_id']) ? $team['group_id'] : $key;
+                $groupName = isset($team['group_name']) ? $team['group_name'] : $team['sport_name'];
+                // Ẩn tên nội dung trong tiêu đề đội nếu trùng tên bộ môn (tránh lặp)
+                $showSportInItem = ($team['sport_name'] !== $groupName);
                 ?>
+                <?php if ((string)$groupId !== (string)$currentGroupId): ?>
+                    <?php $currentGroupId = $groupId; ?>
+                    <div class="sport-group-header"><?php echo CHtml::encode($groupName); ?></div>
+                <?php endif; ?>
                 <div class="group-title">
-                    <?php echo CHtml::encode($team['sport_name']); ?><?php if ($hasMultipleTeams): ?> - Đội <?php echo $sportTeamSeq[$key]; ?><?php endif; ?><?php if (!empty($team['team_name'])): ?>: <?php echo CHtml::encode($team['team_name']); ?><?php endif; ?>
+                    <?php if ($showSportInItem): ?><?php echo CHtml::encode($team['sport_name']); ?><?php if ($hasMultipleTeams): ?> - Đội <?php echo $sportTeamSeq[$key]; ?><?php endif; ?><?php elseif ($hasMultipleTeams): ?>Đội <?php echo $sportTeamSeq[$key]; ?><?php endif; ?><?php if (!empty($team['team_name'])): ?><?php echo ($showSportInItem || $hasMultipleTeams) ? ': ' : ''; ?><?php echo CHtml::encode($team['team_name']); ?><?php endif; ?>
                     (<?php echo count($team['members']); ?> VĐV)
                     <?php if (!empty($team['is_alliance'])): ?>
                         <span style="color:#c2410c;">[Liên quân: <?php echo CHtml::encode(implode(', ', $team['alliance_properties'])); ?>]</span>
