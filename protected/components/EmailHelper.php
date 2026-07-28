@@ -355,10 +355,22 @@ class EmailHelper
                     }
                 }
 
+                // Xác định bộ môn cha (group). Nếu môn không có cha thì chính nó là bộ môn.
+                $parentId = ($sportId && isset($sportParentMap[$sportId])) ? $sportParentMap[$sportId] : null;
+                if ($parentId && isset($allSportNameMap[$parentId])) {
+                    $groupId = $parentId;
+                    $groupName = $allSportNameMap[$parentId];
+                } else {
+                    $groupId = $sportId;
+                    $groupName = $sportName;
+                }
+
                 $sportTeamsData[] = array(
                     'sport_id' => $sportId,
                     'sport_name' => $sportName,
                     'sport_order' => ($sportId && isset($sportOrderMap[$sportId])) ? $sportOrderMap[$sportId] : 999,
+                    'group_id' => $groupId,
+                    'group_name' => $groupName,
                     'team_name' => $teamName,
                     'members' => $enrichedMembers,
                     'alliance_properties' => $allianceProperties,
@@ -366,8 +378,25 @@ class EmailHelper
                 );
             }
 
-            // Sắp xếp các đội thi đấu theo thứ tự các môn thể thao active của sự kiện
-            usort($sportTeamsData, function ($a, $b) {
+            // Thứ tự của mỗi bộ môn = vị trí nhỏ nhất trong các nội dung thuộc bộ môn đó
+            $groupMinOrder = array();
+            foreach ($sportTeamsData as $t) {
+                $gid = $t['group_id'];
+                if (!isset($groupMinOrder[$gid]) || $t['sport_order'] < $groupMinOrder[$gid]) {
+                    $groupMinOrder[$gid] = $t['sport_order'];
+                }
+            }
+
+            // Sắp xếp: gom theo bộ môn (group) → nội dung (sport) → tên đội, giữ các đội cùng bộ môn liền nhau
+            usort($sportTeamsData, function ($a, $b) use ($groupMinOrder) {
+                $goA = isset($groupMinOrder[$a['group_id']]) ? $groupMinOrder[$a['group_id']] : 999;
+                $goB = isset($groupMinOrder[$b['group_id']]) ? $groupMinOrder[$b['group_id']] : 999;
+                if ($goA != $goB) {
+                    return $goA - $goB;
+                }
+                if ((string)$a['group_id'] !== (string)$b['group_id']) {
+                    return strcmp((string)$a['group_id'], (string)$b['group_id']);
+                }
                 $orderA = isset($a['sport_order']) ? $a['sport_order'] : 999;
                 $orderB = isset($b['sport_order']) ? $b['sport_order'] : 999;
                 if ($orderA != $orderB) {
