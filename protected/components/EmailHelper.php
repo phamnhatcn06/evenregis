@@ -253,12 +253,20 @@ class EmailHelper
 
             // Lấy tất cả môn thể thao đang active
             $allActiveSports = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
-            $sportOrderMap = array(); // sport_id => vị trí sắp xếp
-            $sportNameMap = array();  // sport_id => tên môn thể thao
+            $sportOrderMap = array();   // sport_id => vị trí sắp xếp
+            $sportNameMap = array();    // sport_id => tên môn thể thao (đã lọc theo event)
+            $allSportNameMap = array(); // sport_id => tên (toàn bộ, để tra tên bộ môn cha)
+            $sportParentMap = array();  // sport_id => parent_id (bộ môn cha)
             $sportIndex = 0;
             foreach ($allActiveSports as $sp) {
                 $spId = is_object($sp) ? $sp->id : $sp['id'];
                 $spName = is_object($sp) ? $sp->name : $sp['name'];
+                $spParent = is_object($sp)
+                    ? (isset($sp->parent_id) ? $sp->parent_id : null)
+                    : (isset($sp['parent_id']) ? $sp['parent_id'] : null);
+
+                $allSportNameMap[$spId] = $spName;
+                $sportParentMap[$spId] = $spParent;
 
                 // Chỉ giữ môn thể thao nằm trong cấu hình event_sports của sự kiện (nếu có cấu hình)
                 if (!empty($activeEventSportIdsMap) && !isset($activeEventSportIdsMap[$spId])) {
