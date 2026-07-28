@@ -215,10 +215,6 @@
             <td class="summary-label">Tổng số người tham dự:</td>
             <td style="font-weight:bold; color:#0d6efd;"><?php echo isset($attendeesCount) ? (int)$attendeesCount : 0; ?> người</td>
         </tr>
-        <tr>
-            <td class="summary-label">Thời gian in xác nhận:</td>
-            <td><?php echo date('d-m-Y H:i'); ?></td>
-        </tr>
     </table>
 
     <!-- Section 1: Đợt 1 - Đăng ký thi đấu thể thao -->

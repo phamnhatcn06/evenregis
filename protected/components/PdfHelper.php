@@ -122,7 +122,7 @@ class PdfHelper
         }
 
         $propCode = !empty($data['model']->property_code) ? MyHelper::toSlug($data['model']->property_code) : 'DONVI';
-        $pdfFileName = 'Phieu_Dang_Ky_' . strtoupper($propCode) . '_' . $registrationId . '.pdf';
+        $pdfFileName = 'Phieu_Xac_Nhan_Dang_Ky_' . strtoupper($propCode) . '_' . $registrationId . '.pdf';
         $filePath = $tempDir . DIRECTORY_SEPARATOR . $pdfFileName;
 
         if (file_put_contents($filePath, $pdfOutput) === false) {

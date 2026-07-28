@@ -114,6 +114,8 @@ class EmailHelper
                 if (empty($model->property_name)) {
                     $model->property_name = $property->name;
                 }
+                // Mã đơn vị (cột prefix) — dùng cho tên file PDF đính kèm
+                $model->property_code = !empty($property->prefix) ? $property->prefix : $property->code;
                 if (!empty($property->mail_confirm)) {
                     $propertyMailConfirm = $property->mail_confirm;
                 }
