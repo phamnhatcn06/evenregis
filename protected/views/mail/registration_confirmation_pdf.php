@@ -7,7 +7,7 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 15mm 12mm 15mm 12mm;
+            margin: 14mm 12mm 14mm 12mm;
         }
 
         * {
@@ -16,154 +16,179 @@
 
         body {
             font-family: 'Times New Roman', serif;
-            font-size: 11pt;
-            color: #1e293b;
-            line-height: 1.4;
-        }
-
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-        }
-
-        .header-title {
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 13pt;
             color: #000000;
-            text-transform: uppercase;
-            margin-top: 10px;
-            margin-bottom: 5px;
+            line-height: 1.35;
         }
 
-        .sub-title {
-            text-align: center;
-            font-size: 14px;
+        .page {
+            position: relative;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Nhãn "MẪU SỐ x" ở góc trên bên phải */
+        .form-tag {
+            position: absolute;
+            top: 0;
+            right: 0;
+            border: 1.5px solid #000;
+            padding: 3px 10px;
             font-weight: bold;
-            color: #475569;
-            margin-bottom: 15px;
-        }
-
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
             font-size: 11pt;
         }
 
-        .summary-table td {
-            padding: 7px 10px;
-            border: 1px solid #cbd5e1;
+        .doc-title {
+            text-align: center;
+            font-size: 15pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .doc-subtitle {
+            text-align: center;
+            font-size: 13pt;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .doc-unit {
+            text-align: center;
+            font-size: 13pt;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .info-line {
+            margin: 4px 0;
+        }
+
+        .dotted {
+            border-bottom: 1px dotted #000;
+            display: inline-block;
+            min-width: 55%;
+        }
+
+        .intro-line {
+            font-weight: bold;
+            margin: 10px 0 8px 0;
+        }
+
+        table.grid {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.grid th,
+        table.grid td {
+            border: 1px solid #000;
+            padding: 5px 7px;
             vertical-align: top;
         }
 
-        .summary-label {
-            background-color: #f8fafc;
+        table.grid th {
+            text-align: center;
             font-weight: bold;
-            color: #475569;
-            width: 25%;
-        }
-
-        .section-header {
-            background-color: #0d6efd;
-            color: #ffffff;
-            padding: 7px 10px;
-            font-weight: bold;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-top: 15px;
-            margin-bottom: 8px;
-            border-radius: 3px;
-        }
-
-        .section-header-green {
-            background-color: #198754;
-            color: #ffffff;
-            padding: 7px 10px;
-            font-weight: bold;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-top: 15px;
-            margin-bottom: 8px;
-            border-radius: 3px;
-        }
-
-        .group-title {
-            font-weight: bold;
-            font-size: 11pt;
-            color: #0f172a;
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11pt;
-            margin-bottom: 12px;
-            table-layout: fixed;
-        }
-
-        .col-stt {
-            width: 6%;
-        }
-
-        .data-table th {
-            background-color: #f1f5f9;
-            color: #334155;
-            font-weight: bold;
-            border: 1px solid #94a3b8;
-            padding: 6px 5px;
-            text-align: left;
-        }
-
-        .data-table td {
-            border: 1px solid #cbd5e1;
-            padding: 5px;
-            vertical-align: middle;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            background-color: #eeeeee;
         }
 
         .text-center {
             text-align: center;
         }
 
-        .text-bold {
+        .col-stt {
+            width: 8%;
+            text-align: center;
+        }
+
+        .col-count {
+            width: 24%;
+        }
+
+        .example {
+            font-style: italic;
+            color: #444;
+        }
+
+        /* MẪU SỐ 2 — danh sách VĐV */
+        .sport-block {
+            margin-bottom: 6px;
+        }
+
+        .sport-name {
             font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .athlete {
+            padding-left: 6px;
+        }
+
+        /* Trang xác nhận nhân viên */
+        table.confirm {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        table.confirm td {
+            border: 1px solid #000;
+            vertical-align: top;
+            padding: 0;
+        }
+
+        .photo-box {
+            width: 3cm;
+            height: 4cm;
+            border: 1px solid #000;
+            text-align: center;
+            font-size: 9pt;
+            font-style: italic;
+            color: #555;
+            margin: 6px;
+            padding-top: 8px;
+        }
+
+        .emp-info {
+            padding: 8px 10px;
+            font-size: 12pt;
+        }
+
+        .emp-info div {
+            margin: 3px 0;
         }
 
         .commitment-text {
-            margin-top: 20px;
-            font-size: 11pt;
-            font-style: italic;
+            margin-top: 18px;
+            font-size: 13pt;
             text-align: justify;
             line-height: 1.5;
-            page-break-inside: avoid;
         }
 
-        .signature-table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            page-break-inside: avoid;
-            font-size: 9pt;
+        .signature {
+            margin-top: 22px;
+            text-align: right;
+            padding-right: 40px;
         }
 
-        .signature-table td {
-            width: 50%;
-            text-align: center;
-            vertical-align: top;
+        .signature .role {
+            font-weight: bold;
+        }
+
+        .signature .hint {
+            font-style: italic;
+            font-size: 10pt;
+            color: #555;
         }
 
         .gender-nam {
-            color: #0284c7;
             font-weight: bold;
         }
 
         .gender-nu {
-            color: #e11d48;
             font-weight: bold;
         }
     </style>
@@ -171,285 +196,279 @@
 
 <body>
 
-    <!-- Header Header Top -->
-    <table class="header-table">
-        <tr>
-            <td style="width:50%; text-align:left; font-size:10px;">
-                <span style="display:inline-block; text-align:center;">
-                    <strong>TẬP ĐOÀN MƯỜNG THANH</strong><br>
-                    <?php echo CHtml::encode(isset($model->property_name) ? mb_strtoupper($model->property_name) : 'ĐƠN VỊ DỰ THI'); ?>
-                </span>
-            </td>
-            <td style="width:50%; text-align:center; font-size:10px;">
-                <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br>
-                Độc lập - Tự do - Hạnh phúc
-            </td>
-        </tr>
-    </table>
+    <?php
+    // ===== Chuẩn bị dữ liệu dùng chung =====
+    $eventName = isset($model->event_name) && $model->event_name !== '' ? $model->event_name : 'ĐẠI HỘI MƯỜNG THANH';
+    $propertyName = isset($model->property_name) && $model->property_name !== '' ? $model->property_name : '';
+    $representative = isset($model->submitted_by) && $model->submitted_by !== '' ? $model->submitted_by : '';
+    $contactEmail = $representative;
 
-    <div class="header-title">PHIẾU XÁC NHẬN ĐĂNG KÝ THAM DỰ</div>
-    <div class="sub-title"><?php echo CHtml::encode(isset($model->event_name) ? $model->event_name : 'Đại hội Mường Thanh 2026'); ?></div>
+    $sportTeams = isset($sportTeams) && is_array($sportTeams) ? $sportTeams : array();
+    $competitionRegistrations = isset($competitionRegistrations) && is_array($competitionRegistrations) ? $competitionRegistrations : array();
+    $talentEntries = isset($talentEntries) && is_array($talentEntries) ? $talentEntries : array();
+    $beautyContestants = isset($beautyContestants) && is_array($beautyContestants) ? $beautyContestants : array();
 
-    <!-- Summary Box matching exact user layout -->
-    <table class="summary-table">
-        <tr>
-            <td class="summary-label">Đơn vị đăng ký:</td>
-            <td style="font-weight:bold;"><?php echo CHtml::encode(isset($model->property_name) ? $model->property_name : '-'); ?></td>
-        </tr>
-        <tr>
-            <td class="summary-label">Đợt đăng ký:</td>
-            <td><?php echo CHtml::encode(isset($model->period_name) ? $model->period_name : '-'); ?></td>
-        </tr>
-        <tr>
-            <td class="summary-label">Thời gian nộp:</td>
-            <td><?php echo !empty($model->submitted_at) ? MyHelper::formatDateTime($model->submitted_at) : date('d-m-Y H:i'); ?></td>
-        </tr>
-        <tr>
-            <td class="summary-label">Hạng mục đã đăng ký:</td>
-            <td><?php echo CHtml::encode(!empty($registeredCategories) ? $registeredCategories : '-'); ?></td>
-        </tr>
-        <tr>
-            <td class="summary-label">Nội dung:</td>
-            <td>
-                <?php if (!empty($contentSummaryLines)): ?>
-                    <?php foreach ($contentSummaryLines as $idx => $line): ?>
-                        <div><?php echo CHtml::encode($line); ?><?php echo ($idx < count($contentSummaryLines) - 1) ? ',' : ''; ?></div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    -
-                <?php endif; ?>
-            </td>
-        </tr>
-        <tr>
-            <td class="summary-label">Tổng số người tham dự:</td>
-            <td style="font-weight:bold; color:#0d6efd;"><?php echo isset($attendeesCount) ? (int)$attendeesCount : 0; ?> người</td>
-        </tr>
-    </table>
+    // Hàm chuẩn hoá tên môn để so khớp danh mục cố định
+    if (!function_exists('erNormSport')) {
+        function erNormSport($s)
+        {
+            $s = mb_strtolower(trim((string)$s), 'UTF-8');
+            $s = preg_replace('/\s+/u', ' ', $s);
+            return $s;
+        }
+    }
+    if (!function_exists('erGenderLabel')) {
+        function erGenderLabel($g)
+        {
+            $gStr = ($g !== null) ? strtolower((string)$g) : '';
+            if ($g === 1 || $g === '1' || $gStr === 'male' || $gStr === 'nam') {
+                return '<span class="gender-nam">Nam</span>';
+            }
+            if ($g === 0 || $g === '0' || $gStr === 'female' || $gStr === 'nữ' || $gStr === 'nu') {
+                return '<span class="gender-nu">Nữ</span>';
+            }
+            return '……';
+        }
+    }
 
-    <!-- Section 1: Đợt 1 - Đăng ký thi đấu thể thao -->
-    <?php if (!empty($isDot1) || !empty($sportTeams)): ?>
-        <div class="section-header">
-            DANH SÁCH CHI TIẾT CÁC ĐỘI THI ĐẤU THỂ THAO
-        </div>
+    // Danh mục thi đấu cố định theo MẪU SỐ 1
+    $sportCategories = array(
+        'Bóng đá nam (05 người/đội, 03 dự bị)',
+        'Bóng đá nữ (05 người/đội, 03 dự bị)',
+        'Bóng chuyền nam (06 người/đội, 04 dự bị)',
+        'Bóng chuyền nữ (06 người/đội, 04 dự bị)',
+        'Cầu lông đơn nam',
+        'Cầu lông đơn nữ',
+        'Cầu lông đôi nam',
+        'Cầu lông đôi nữ',
+        'Cầu lông đôi nam nữ',
+        'Bóng bàn đơn nam',
+        'Bóng bàn đơn nữ',
+        'Bóng bàn đôi nam',
+        'Bóng bàn đôi nữ',
+        'Bóng bàn đôi nam nữ',
+        'Tennis đơn nam',
+        'Tennis đơn nữ',
+        'Tennis đôi nam',
+        'Tennis đôi nữ',
+        'Tennis đôi nam nữ',
+        'Cờ tướng Nam',
+        'Cờ tướng Nữ',
+        'Kéo co nam nữ phối hợp (08 người/đội, 02 dự bị)',
+    );
 
-        <?php if (empty($sportTeams)): ?>
-            <p style="color:#64748b; font-style:italic;">Chưa có thông tin đăng ký môn thể thao nào.</p>
-        <?php else: ?>
-            <?php foreach ($sportTeams as $tIdx => $team): ?>
-                <div class="group-title">
-                    <?php echo CHtml::encode($team['sport_name']); ?> - <?php echo CHtml::encode($team['team_name']); ?>
-                    (<?php echo count($team['members']); ?> VĐV)
-                    <?php if (!empty($team['is_alliance'])): ?>
-                        <span style="color:#c2410c;">[Liên quân: <?php echo CHtml::encode(implode(', ', $team['alliance_properties'])); ?>]</span>
-                    <?php endif; ?>
-                </div>
+    // Đếm số đội đã đăng ký theo từng môn (khớp theo phần tên đứng trước dấu ngoặc)
+    $teamCountBySport = array();
+    foreach ($sportTeams as $team) {
+        $key = erNormSport($team['sport_name']);
+        if (!isset($teamCountBySport[$key])) {
+            $teamCountBySport[$key] = 0;
+        }
+        $teamCountBySport[$key] += 1;
+    }
 
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th class="text-center col-stt">STT</th>
-                            <th width="28%">Họ và tên VĐV</th>
-                            <th width="12%" class="text-center">Giới tính</th>
-                            <th width="24%">Đơn vị</th>
-                            <th width="30%">Chức danh - Bộ phận</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($team['members'] as $mIdx => $member): ?>
-                            <tr>
-                                <td class="text-center"><?php echo $mIdx + 1; ?></td>
-                                <td class="text-bold"><?php echo CHtml::encode($member['attendee_name']); ?></td>
-                                <td class="text-center">
-                                    <?php
-                                    $g = isset($member['gender']) ? $member['gender'] : null;
-                                    $gStr = ($g !== null) ? strtolower((string)$g) : '';
-                                    if ($g === 1 || $g === '1' || $gStr === 'male' || $gStr === 'nam') {
-                                        echo '<span class="gender-nam">Nam</span>';
-                                    } elseif ($g === 0 || $g === '0' || $gStr === 'female' || $gStr === 'nữ' || $gStr === 'nu') {
-                                        echo '<span class="gender-nu">Nữ</span>';
-                                    } else {
-                                        echo '-';
-                                    }
-                                    ?>
-                                </td>
-                                <td><?php echo CHtml::encode(!empty($member['property_name']) ? $member['property_name'] : '-'); ?></td>
-                                <td>
-                                    <?php
-                                    $pos = array();
-                                    if (!empty($member['position_name'])) $pos[] = CHtml::encode($member['position_name']);
-                                    if (!empty($member['division_name'])) $pos[] = CHtml::encode($member['division_name']);
-                                    echo !empty($pos) ? implode(' - ', $pos) : '-';
-                                    ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    <?php endif; ?>
+    // Gom danh sách nhân viên tham dự (dùng cho trang xác nhận) từ mọi nội dung
+    $confirmAttendees = array();
+    $addConfirm = function ($name, $gender, $division, $discipline) use (&$confirmAttendees) {
+        $name = trim((string)$name);
+        if ($name === '') {
+            return;
+        }
+        $k = mb_strtolower($name, 'UTF-8');
+        if (!isset($confirmAttendees[$k])) {
+            $confirmAttendees[$k] = array(
+                'name' => $name,
+                'gender' => $gender,
+                'division' => $division,
+                'disciplines' => array(),
+            );
+        }
+        if ($gender !== null && $confirmAttendees[$k]['gender'] === null) {
+            $confirmAttendees[$k]['gender'] = $gender;
+        }
+        if (empty($confirmAttendees[$k]['division']) && !empty($division)) {
+            $confirmAttendees[$k]['division'] = $division;
+        }
+        if (!empty($discipline) && !in_array($discipline, $confirmAttendees[$k]['disciplines'])) {
+            $confirmAttendees[$k]['disciplines'][] = $discipline;
+        }
+    };
+    foreach ($sportTeams as $team) {
+        foreach ($team['members'] as $m) {
+            $addConfirm($m['attendee_name'], isset($m['gender']) ? $m['gender'] : null, isset($m['division_name']) ? $m['division_name'] : '', $team['sport_name']);
+        }
+    }
+    foreach ($competitionRegistrations as $compData) {
+        foreach ($compData['attendees'] as $c) {
+            $addConfirm($c['attendee_name'], isset($c['gender']) ? $c['gender'] : null, isset($c['division_name']) ? $c['division_name'] : '', $compData['competition_name']);
+        }
+    }
+    foreach ($talentEntries as $entry) {
+        $label = 'Văn nghệ' . (!empty($entry['category_name']) ? ' (' . $entry['category_name'] . ')' : '');
+        foreach ($entry['members'] as $m) {
+            $addConfirm($m['attendee_name'], isset($m['gender']) ? $m['gender'] : null, isset($m['division_name']) ? $m['division_name'] : '', $label);
+        }
+    }
+    foreach ($beautyContestants as $c) {
+        $addConfirm($c['attendee_name'], null, isset($c['division_name']) ? $c['division_name'] : '', 'Miss Mường Thanh');
+    }
+    $confirmAttendees = array_values($confirmAttendees);
+    ?>
 
-    <!-- Section 1b: Đợt 1 - Văn nghệ -->
-    <?php if (!empty($talentEntries)): ?>
-        <div class="section-header">
-            DANH SÁCH CHI TIẾT TIẾT MỤC VĂN NGHỆ
-        </div>
-        <?php foreach ($talentEntries as $entry): ?>
-            <div class="group-title">
-                <?php echo CHtml::encode(!empty($entry['category_name']) ? $entry['category_name'] : 'Tiết mục'); ?><?php if (!empty($entry['title'])): ?> - <?php echo CHtml::encode($entry['title']); ?><?php endif; ?>
-                (<?php echo count($entry['members']); ?> người)
+    <!-- ============================ TRANG 1 — MẪU SỐ 1 ============================ -->
+    <div class="page">
+        <div class="form-tag">MẪU SỐ 1</div>
+
+        <div class="doc-title">Đăng ký tham dự các hoạt động thể thao</div>
+        <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
+
+        <div style="margin-top:12px;">
+            <div class="info-line">Tên đơn vị:
+                <span class="dotted"><?php echo CHtml::encode($propertyName); ?></span>
             </div>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th class="text-center col-stt">STT</th>
-                        <th width="34%">Họ và tên</th>
-                        <th width="12%" class="text-center">Giới tính</th>
-                        <th width="24%">Chức danh</th>
-                        <th width="24%">Bộ phận</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($entry['members'])): ?>
-                        <tr><td colspan="5" class="text-center">Chưa có thành viên.</td></tr>
-                    <?php else: ?>
-                        <?php foreach ($entry['members'] as $mIdx => $member): ?>
-                            <tr>
-                                <td class="text-center"><?php echo $mIdx + 1; ?></td>
-                                <td class="text-bold"><?php echo CHtml::encode($member['attendee_name']); ?></td>
-                                <td class="text-center">
-                                    <?php
-                                    $g = isset($member['gender']) ? $member['gender'] : null;
-                                    $gStr = ($g !== null) ? strtolower((string)$g) : '';
-                                    if ($g === 1 || $g === '1' || $gStr === 'male' || $gStr === 'nam') {
-                                        echo '<span class="gender-nam">Nam</span>';
-                                    } elseif ($g === 0 || $g === '0' || $gStr === 'female' || $gStr === 'nữ' || $gStr === 'nu') {
-                                        echo '<span class="gender-nu">Nữ</span>';
-                                    } else {
-                                        echo '-';
-                                    }
-                                    ?>
-                                </td>
-                                <td><?php echo CHtml::encode(!empty($member['position_name']) ? $member['position_name'] : '-'); ?></td>
-                                <td><?php echo CHtml::encode(!empty($member['division_name']) ? $member['division_name'] : '-'); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        <?php endforeach; ?>
-    <?php endif; ?>
-
-    <!-- Section 1c: Đợt 1 - Miss Mường Thanh -->
-    <?php if (!empty($beautyContestants)): ?>
-        <div class="section-header">
-            DANH SÁCH THÍ SINH MISS MƯỜNG THANH
+            <div class="info-line">Đại diện đơn vị:
+                <span class="dotted"><?php echo CHtml::encode($representative); ?></span>
+            </div>
+            <div class="info-line">Số điện thoại liên hệ:
+                <span class="dotted">&nbsp;</span>
+            </div>
+            <div class="info-line">Email:
+                <span class="dotted"><?php echo CHtml::encode($contactEmail); ?></span>
+            </div>
         </div>
-        <table class="data-table">
+
+        <div class="intro-line">Đăng ký tham dự các hoạt động thể thao:</div>
+
+        <table class="grid">
             <thead>
                 <tr>
-                    <th class="text-center col-stt">STT</th>
-                    <th width="12%" class="text-center">SBD</th>
-                    <th width="32%">Họ và tên thí sinh</th>
-                    <th width="24%">Cuộc thi</th>
-                    <th width="26%">Chức danh - Bộ phận</th>
+                    <th class="col-stt">STT</th>
+                    <th>Hạng mục thi đấu</th>
+                    <th class="col-count">Số đội tham dự</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($beautyContestants as $cIdx => $contestant): ?>
+                <?php foreach ($sportCategories as $i => $cat): ?>
+                    <?php
+                    // Khớp số đội đã đăng ký theo phần tên trước dấu "("
+                    $baseName = trim(preg_replace('/\(.*$/u', '', $cat));
+                    $count = null;
+                    foreach ($teamCountBySport as $k => $cnt) {
+                        if ($k === erNormSport($baseName) || strpos($k, erNormSport($baseName)) === 0) {
+                            $count = $cnt;
+                            break;
+                        }
+                    }
+                    ?>
                     <tr>
-                        <td class="text-center"><?php echo $cIdx + 1; ?></td>
-                        <td class="text-center"><?php echo CHtml::encode(!empty($contestant['candidate_number']) ? $contestant['candidate_number'] : '-'); ?></td>
-                        <td class="text-bold"><?php echo CHtml::encode($contestant['attendee_name']); ?></td>
-                        <td><?php echo CHtml::encode(!empty($contestant['contest_name']) ? $contestant['contest_name'] : '-'); ?></td>
-                        <td>
-                            <?php
-                            $pos = array();
-                            if (!empty($contestant['position_name'])) $pos[] = CHtml::encode($contestant['position_name']);
-                            if (!empty($contestant['division_name'])) $pos[] = CHtml::encode($contestant['division_name']);
-                            echo !empty($pos) ? implode(' - ', $pos) : '-';
-                            ?>
-                        </td>
+                        <td class="col-stt"><?php echo $i + 1; ?></td>
+                        <td><?php echo CHtml::encode($cat); ?></td>
+                        <td><?php echo $count !== null ? ('<strong>' . (int)$count . ' đội</strong>') : '&nbsp;'; ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
-    <?php endif; ?>
-
-    <!-- Section 2: Đợt 2 - Đăng ký thi nghiệp vụ -->
-    <?php if (!empty($isDot2) || !empty($competitionRegistrations)): ?>
-        <div class="section-header-green">
-            DANH SÁCH CHI TIẾT THÍ SINH THI NGHIỆP VỤ
-        </div>
-
-        <?php if (empty($competitionRegistrations)): ?>
-            <p style="color:#64748b; font-style:italic;">Chưa có thông tin đăng ký thi nghiệp vụ nào.</p>
-        <?php else: ?>
-            <?php foreach ($competitionRegistrations as $compId => $compData): ?>
-                <div class="group-title">
-                    <?php echo CHtml::encode($compData['competition_name']); ?>
-                    (<?php echo count($compData['attendees']); ?> thí sinh)
-                </div>
-
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th class="text-center col-stt">STT</th>
-                            <th width="30%">Họ và tên thí sinh</th>
-                            <th width="12%" class="text-center">Giới tính</th>
-                            <th width="26%">Chức danh / Vị trí</th>
-                            <th width="26%">Bộ phận / Phòng ban</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($compData['attendees'] as $cIdx => $candidate): ?>
-                            <tr>
-                                <td class="text-center"><?php echo $cIdx + 1; ?></td>
-                                <td class="text-bold"><?php echo CHtml::encode($candidate['attendee_name']); ?></td>
-                                <td class="text-center">
-                                    <?php
-                                    $cg = isset($candidate['gender']) ? $candidate['gender'] : null;
-                                    $cgStr = ($cg !== null) ? strtolower((string)$cg) : '';
-                                    if ($cg === 1 || $cg === '1' || $cgStr === 'male' || $cgStr === 'nam') {
-                                        echo '<span class="gender-nam">Nam</span>';
-                                    } elseif ($cg === 0 || $cg === '0' || $cgStr === 'female' || $cgStr === 'nữ' || $cgStr === 'nu') {
-                                        echo '<span class="gender-nu">Nữ</span>';
-                                    } else {
-                                        echo '-';
-                                    }
-                                    ?>
-                                </td>
-                                <td><?php echo CHtml::encode(!empty($candidate['position_name']) ? $candidate['position_name'] : '-'); ?></td>
-                                <td><?php echo CHtml::encode(!empty($candidate['division_name']) ? $candidate['division_name'] : '-'); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    <?php endif; ?>
-
-    <!-- Commitment Section (theo mẫu văn bản Đại hội) -->
-    <div class="commitment-text">
-        Khách sạn / Công ty xin cam kết đây là nhân viên đã được ký hợp đồng lao động chính thức tính đến thời điểm
-        <strong><?php echo CHtml::encode(isset($model->event_name) ? $model->event_name : 'Đại hội Mường Thanh 2026'); ?></strong> quy định.
-        Chúng tôi xin hoàn toàn chịu trách nhiệm trước Ban lãnh đạo Tập đoàn về độ chính xác, trung thực của những thông tin trên.
     </div>
 
-    <!-- Signature Section -->
-    <table class="signature-table">
-        <tr>
-            <td>
-                <span style="font-style:italic; font-size:10px; color:#64748b;">
-                    <?php echo date('d'); ?> tháng <?php echo date('m'); ?> năm <?php echo date('Y'); ?>
-                </span>
-            </td>
-            <td>
-                <strong>GIÁM ĐỐC KHÁCH SẠN</strong><br>
-                <span style="font-style:italic; font-size:10px; color:#64748b;">(Ký tên, đóng dấu)</span>
-            </td>
-        </tr>
-    </table>
+    <!-- ============================ TRANG 2 — MẪU SỐ 2 ============================ -->
+    <div class="page page-break">
+        <div class="form-tag">MẪU SỐ 2</div>
+
+        <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
+        <div class="doc-unit"><?php echo CHtml::encode($propertyName !== '' ? $propertyName : 'Khách sạn Mường Thanh ………'); ?> (Tên đơn vị)</div>
+        <div class="doc-title">Danh sách các vận động viên tham gia thi đấu vòng loại</div>
+
+        <?php if (empty($sportTeams)): ?>
+            <p style="font-style:italic;">Chưa có thông tin đăng ký môn thể thao nào.</p>
+        <?php else: ?>
+            <table class="grid" style="margin-top:8px;">
+                <tbody>
+                    <?php
+                    $totalTeams = count($sportTeams);
+                    $half = (int)ceil($totalTeams / 2);
+                    $leftCol = array_slice($sportTeams, 0, $half);
+                    $rightCol = array_slice($sportTeams, $half);
+                    $rows = max(count($leftCol), count($rightCol));
+                    for ($r = 0; $r < $rows; $r++):
+                    ?>
+                        <tr>
+                            <?php foreach (array($leftCol, $rightCol) as $col): ?>
+                                <td style="width:50%;">
+                                    <?php if (isset($col[$r])): $team = $col[$r]; ?>
+                                        <div class="sport-block">
+                                            <div class="sport-name"><?php echo CHtml::encode($team['sport_name']); ?></div>
+                                            <?php foreach ($team['members'] as $m): ?>
+                                                <div class="athlete"><?php echo CHtml::encode($m['attendee_name']); ?>
+                                                    <?php if (!empty($m['gender']) || $m['gender'] === 0 || $m['gender'] === '0'): ?>
+                                                        (<?php echo erGenderLabel($m['gender']); ?>)
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        &nbsp;
+                                    <?php endif; ?>
+                                </td>
+                            <?php endforeach; ?>
+                        </tr>
+                    <?php endfor; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    </div>
+
+    <!-- ==================== TRANG 3 — XÁC NHẬN NHÂN VIÊN THAM GIA ==================== -->
+    <div class="page page-break">
+        <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
+        <div class="doc-unit"><?php echo CHtml::encode($propertyName !== '' ? $propertyName : 'Khách sạn Mường Thanh …'); ?> (Tên đơn vị)</div>
+        <div class="doc-title">Xác nhận nhân viên tham gia đại hội</div>
+
+        <?php if (empty($confirmAttendees)): ?>
+            <p style="font-style:italic;">Chưa có nhân viên tham dự.</p>
+        <?php else: ?>
+            <table class="confirm">
+                <tbody>
+                    <?php
+                    $chunks = array_chunk($confirmAttendees, 2);
+                    foreach ($chunks as $pair):
+                    ?>
+                        <tr>
+                            <?php for ($c = 0; $c < 2; $c++): ?>
+                                <?php if (isset($pair[$c])): $emp = $pair[$c]; ?>
+                                    <td style="width:16%;">
+                                        <div class="photo-box">Ảnh 3 x 4<br><br>Đóng dấu xác nhận<br>lên ảnh</div>
+                                    </td>
+                                    <td style="width:34%;">
+                                        <div class="emp-info">
+                                            <div><strong>Tên nhân viên:</strong> <?php echo CHtml::encode($emp['name']); ?></div>
+                                            <div>Nam/nữ: <?php echo erGenderLabel($emp['gender']); ?></div>
+                                            <div>Bộ phận/đơn vị: <?php echo CHtml::encode(!empty($emp['division']) ? $emp['division'] : '……'); ?></div>
+                                            <div>Tham gia thi đấu môn: <?php echo CHtml::encode(!empty($emp['disciplines']) ? implode(', ', $emp['disciplines']) : '……'); ?></div>
+                                            <div>Thời gian bắt đầu làm việc cho TĐ: …/…/…. (… tháng)</div>
+                                        </div>
+                                    </td>
+                                <?php else: ?>
+                                    <td style="width:16%;">&nbsp;</td>
+                                    <td style="width:34%;">&nbsp;</td>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+        <div class="commitment-text">
+            Khách sạn / Công ty xin cam kết đây là nhân viên đã được ký hợp đồng lao động chính thức tính đến thời điểm
+            <strong><?php echo CHtml::encode($eventName); ?></strong> quy định. Chúng tôi xin hoàn toàn chịu trách nhiệm
+            trước Ban lãnh đạo Tập đoàn về độ chính xác, trung thực của những thông tin trên.
+        </div>
+
+        <div class="signature">
+            <div class="role">GIÁM ĐỐC KHÁCH SẠN</div>
+            <div class="hint">(Ký tên, đóng dấu)</div>
+        </div>
+    </div>
 
 </body>
 
