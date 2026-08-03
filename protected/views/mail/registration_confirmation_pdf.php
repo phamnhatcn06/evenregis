@@ -351,12 +351,14 @@
                 <?php endif; ?>
                 <?php foreach ($sportCategories as $i => $cat): ?>
                     <?php
-                    // Khớp số đội đã đăng ký theo phần tên trước dấu "("
+                    // Khớp số đội & số VĐV đã đăng ký theo phần tên trước dấu "("
                     $baseName = trim(preg_replace('/\(.*$/u', '', (string)$cat));
                     $count = null;
+                    $athletes = 0;
                     foreach ($teamCountBySport as $k => $cnt) {
                         if ($k === erNormSport($baseName) || strpos($k, erNormSport($baseName)) === 0) {
                             $count = $cnt;
+                            $athletes = isset($athleteCountBySport[$k]) ? $athleteCountBySport[$k] : 0;
                             break;
                         }
                     }
@@ -365,8 +367,13 @@
                         <td class="col-stt"><?php echo $i + 1; ?></td>
                         <td><?php echo CHtml::encode($cat); ?></td>
                         <td><?php
-                            $unit = erIsSingleSport($cat) ? ' VĐV' : ' đội';
-                            echo $count !== null ? ('<strong>' . (int)$count . $unit . '</strong>') : '&nbsp;';
+                            if ($count === null) {
+                                echo '&nbsp;';
+                            } elseif (erIsSingleSport($cat)) {
+                                echo '<strong>' . (int)$athletes . ' VĐV</strong>';
+                            } else {
+                                echo '<strong>' . (int)$count . ' đội - ' . (int)$athletes . ' VĐV</strong>';
+                            }
                             ?></td>
                     </tr>
                 <?php endforeach; ?>
