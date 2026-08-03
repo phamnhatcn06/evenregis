@@ -152,6 +152,16 @@
             padding-top: 8px;
         }
 
+        .photo-box.has-photo {
+            padding: 0;
+        }
+
+        .photo-box img {
+            width: 3cm;
+            height: 4cm;
+            object-fit: cover;
+        }
+
         .emp-info {
             padding: 8px 10px;
             font-size: 12pt;
