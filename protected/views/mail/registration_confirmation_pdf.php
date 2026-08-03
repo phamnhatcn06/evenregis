@@ -341,7 +341,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php if (empty($sportCategories)): ?>
+                <?php if (empty($sportCategories) && empty($beautyByContest)): ?>
                     <tr>
                         <td colspan="3" class="text-center" style="font-style:italic;">Sự kiện chưa cấu hình môn thể thao.</td>
                     </tr>
