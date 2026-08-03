@@ -344,8 +344,14 @@ class EmailHelper
                         $propName = $model->property_name;
                     }
 
+                    $staffCode = $memberIsObj ? (isset($member->staff_code) ? $member->staff_code : '') : (isset($member['staff_code']) ? $member['staff_code'] : '');
+                    if (empty($staffCode) && !empty($attInfo['staff_code'])) {
+                        $staffCode = $attInfo['staff_code'];
+                    }
+
                     $enrichedMembers[] = array(
                         'attendee_name' => $attName,
+                        'staff_code' => $staffCode,
                         'gender' => $gender,
                         'property_name' => $propName,
                         'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
