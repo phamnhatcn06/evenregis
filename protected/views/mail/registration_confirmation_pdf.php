@@ -97,16 +97,6 @@
 
         .text-center {
             text-align: center;
-            color: #0f172a;
-            padding: 6px 10px;
-            font-weight: bold;
-            font-size: 11.5pt;
-            text-transform: uppercase;
-            border-left: 4px solid #0d6efd;
-            margin-top: 16px;
-            margin-bottom: 6px;
-        }
-
         }
 
         .col-stt {
