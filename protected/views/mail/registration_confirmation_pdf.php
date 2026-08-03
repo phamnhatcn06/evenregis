@@ -571,6 +571,37 @@
                 </table>
             <?php endif; ?>
         <?php endif; ?>
+
+        <?php // Thi nghiệp vụ (Đợt 2) — mẫu số 2 dùng chung: danh sách thí sinh theo từng nghiệp vụ ?>
+        <?php if (!empty($competitionList)): ?>
+            <div class="doc-title" style="margin-top:16px;">Danh sách thí sinh thi nghiệp vụ</div>
+            <?php foreach ($competitionList as $comp): ?>
+                <div class="sport-block">
+                    <div class="sport-name"><?php echo CHtml::encode($comp['competition_name']); ?></div>
+                    <?php foreach ($comp['attendees'] as $idx => $a): ?>
+                        <div class="athlete">
+                            <?php echo ($idx + 1) . '. ' . erNameWithCode(isset($a['staff_code']) ? $a['staff_code'] : '', $a['attendee_name']); ?><?php if (isset($a['gender']) && $a['gender'] !== null && $a['gender'] !== ''): ?> (<?php echo erGenderLabel($a['gender']); ?>)<?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php // Văn nghệ (Đợt 3) — mẫu số 2 dùng chung: danh sách thành viên theo từng tiết mục ?>
+        <?php if (!empty($talentEntries)): ?>
+            <div class="doc-title" style="margin-top:16px;">Danh sách tiết mục văn nghệ</div>
+            <?php foreach ($talentEntries as $entry): ?>
+                <div class="sport-block">
+                    <div class="sport-name"><?php echo CHtml::encode((!empty($entry['category_name']) ? $entry['category_name'] . ' - ' : '') . (!empty($entry['title']) ? $entry['title'] : 'Tiết mục')); ?></div>
+                    <?php foreach ($entry['members'] as $idx => $m): ?>
+                        <div class="athlete">
+                            <?php echo ($idx + 1) . '. ' . erNameWithCode(isset($m['staff_code']) ? $m['staff_code'] : '', $m['attendee_name']); ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
         <?php if (!empty($beautyByContest)): ?>
             <div class="doc-title" style="margin-top:16px;">Danh sách thí sinh dự thi Miss</div>
             <?php foreach ($beautyByContest as $contestName => $contestants): ?>
