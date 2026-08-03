@@ -1,30 +1,16 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác nhận thông tin đăng ký</title>
-</head>
-
-<body style="margin:0; padding:0; font-family: Arial, Helvetica, sans-serif; background-color:#f4f6f9; color:#333333; line-height:1.6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f9; padding:30px 10px;">
-        <tr>
-            <td align="center">
-                <table width="780" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.08); border:1px solid #e2e8f0;">
-
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); padding:30px 25px; text-align:center;">
-                            <h1 style="color:#000000; margin:0 0 8px 0; font-size:24px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px;">
-                                XÁC NHẬN THÔNG TIN ĐĂNG KÝ
-                            </h1>
-                            <p style="color:#000000; margin:0; font-size:15px;">
-                                <?php echo CHtml::encode(isset($model->event_name) ? $model->event_name : 'Đại hội Mường Thanh 2026'); ?>
-                            </p>
-                        </td>
-                    </tr>
-
+<?php
+/**
+ * Email xác nhận thông tin đăng ký (Đợt 1 - Thể thao/Văn nghệ/Miss, Đợt 2 - Thi nghiệp vụ).
+ * Dùng chung khung _email_header / _email_footer với các email hệ thống khác.
+ */
+$emailTitle     = 'Xác nhận thông tin đăng ký';
+$headerTitle    = 'XÁC NHẬN THÔNG TIN ĐĂNG KÝ';
+$headerSubtitle = isset($model->event_name) && $model->event_name !== '' ? $model->event_name : 'Đại hội Mường Thanh 2026';
+$accentFrom     = '#0d6efd';
+$accentTo       = '#0a58ca';
+$containerWidth = 780;
+include __DIR__ . '/_email_header.php';
+?>
                     <!-- Body Content -->
                     <tr>
                         <td style="padding:30px 25px;">
@@ -98,21 +84,4 @@
                             </p>
                         </td>
                     </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color:#f8fafc; padding:20px; text-align:center; border-top:1px solid #e2e8f0;">
-                            <p style="margin:0; font-size:12px; color:#94a3b8;">
-                                Email này được gửi tự động từ hệ thống Quản lý Đăng ký Đại hội Mường Thanh.<br>
-                                Vui lòng không trả lời trực tiếp email này.
-                            </p>
-                        </td>
-                    </tr>
-
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-
-</html>
+<?php include __DIR__ . '/_email_footer.php'; ?>
