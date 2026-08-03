@@ -1,32 +1,16 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mời tham gia Vòng Sơ khảo Miss Mường Thanh 2026</title>
-</head>
-
-<body style="margin:0; padding:0; font-family: 'Segoe UI', Arial, sans-serif; background-color:#f8f4f0;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f4f0; padding:30px 0;">
-        <tr>
-            <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-                    <!-- Header with gradient -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #d4a574 0%, #c9956c 50%, #b8860b 100%); padding:40px 30px; text-align:center;">
-                            <h1 style="color:#ffffff; margin:0; font-size:28px; font-weight:300; letter-spacing:2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">MISS MƯỜNG THANH 2026</h1>
-                            <p style="color:#fff8e7; margin:10px 0 0 0; font-size:16px; font-style:italic; letter-spacing:1px;">"Hương sắc Mường Thanh"</p>
-                        </td>
-                    </tr>
-
-                    <!-- Decorative line -->
-                    <tr>
-                        <td style="padding:0 40px;">
-                            <div style="height:3px; background: linear-gradient(to right, transparent, #d4a574, transparent);"></div>
-                        </td>
-                    </tr>
-
+<?php
+/**
+ * Email mời tham gia Vòng Sơ khảo Miss Mường Thanh 2026.
+ * Dùng chung khung _email_header / _email_footer; giữ tông màu vàng đặc trưng cuộc thi Miss.
+ */
+$emailTitle     = 'Mời tham gia Vòng Sơ khảo Miss Mường Thanh 2026';
+$headerTitle    = 'MISS MƯỜNG THANH 2026';
+$headerSubtitle = 'Hương sắc Mường Thanh';
+$accentFrom     = '#d4a574';
+$accentTo       = '#b8860b';
+$containerWidth = 600;
+include __DIR__ . '/_email_header.php';
+?>
                     <!-- Content -->
                     <tr>
                         <td style="padding:35px 40px;">
@@ -80,42 +64,10 @@
                                 Chúc bạn thật tự tin, tỏa sáng và có những trải nghiệm đáng nhớ cùng <strong>Miss Mường Thanh 2026</strong>.
                             </p>
 
-                            <p style="font-size:15px; color:#333; margin:30px 0 0 0;">
-                                Thân mến,
+                            <p style="font-size:15px; color:#1a202c; margin:30px 0 0 0;">
+                                Trân trọng,<br>
+                                <strong>BAN TỔ CHỨC MISS MƯỜNG THANH 2026</strong>
                             </p>
                         </td>
                     </tr>
-
-                    <!-- Signature -->
-                    <tr>
-                        <td style="padding:0 40px 35px 40px;">
-                            <table width="100%" cellpadding="15" cellspacing="0" style="background: linear-gradient(135deg, #f8f4f0 0%, #f0ebe4 100%); border-radius:8px;">
-                                <tr>
-                                    <td align="center">
-                                        <p style="margin:0; font-size:14px; color:#888; font-weight:bold; letter-spacing:1px;">BAN TỔ CHỨC</p>
-                                        <p style="margin:8px 0 0 0; font-size:16px; color:#b8860b; font-weight:bold; letter-spacing:1px;">MISS MƯỜNG THANH 2026</p>
-                                        <p style="margin:5px 0 0 0; font-size:13px; color:#a07d1c; font-style:italic;">"Hương sắc Mường Thanh"</p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color:#f8f4f0; padding:20px 40px; text-align:center; border-top:1px solid #e8e0d8;">
-                            <p style="margin:0; font-size:12px; color:#999;">
-                                Email này được gửi tự động từ hệ thống. Vui lòng không trả lời trực tiếp.
-                            </p>
-                            <p style="margin:8px 0 0 0; font-size:11px; color:#bbb;">
-                                © 2026 Tập đoàn Mường Thanh. All rights reserved.
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-
-</html>
+<?php include __DIR__ . '/_email_footer.php'; ?>
