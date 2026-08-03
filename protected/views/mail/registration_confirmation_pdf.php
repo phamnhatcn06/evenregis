@@ -152,14 +152,13 @@
             padding-top: 8px;
         }
 
+        /* Ảnh chân dung 3x4: dùng background-size:cover để dompdf giữ đúng tỉ lệ 3x4
+           (dompdf không hỗ trợ object-fit nên không dùng thẻ <img>). */
         .photo-box.has-photo {
             padding: 0;
-        }
-
-        .photo-box img {
-            width: 3cm;
-            height: 4cm;
-            object-fit: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
         }
 
         .emp-info {
