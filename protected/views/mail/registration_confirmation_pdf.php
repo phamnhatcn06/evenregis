@@ -286,7 +286,7 @@
 
     // Gom danh sách nhân viên tham dự (dùng cho trang xác nhận) từ mọi nội dung
     $confirmAttendees = array();
-    $addConfirm = function ($name, $staffCode, $gender, $division, $discipline) use (&$confirmAttendees) {
+    $addConfirm = function ($name, $staffCode, $gender, $division, $discipline, $photo = '') use (&$confirmAttendees) {
         $name = trim((string)$name);
         if ($name === '') {
             return;
@@ -297,6 +297,7 @@
                 'name' => $name,
                 'staff_code' => $staffCode,
                 'gender' => $gender,
+                'photo' => $photo,
                 'division' => $division,
                 'disciplines' => array(),
             );
