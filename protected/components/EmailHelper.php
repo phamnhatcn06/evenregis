@@ -465,6 +465,7 @@ class EmailHelper
                 $info = isset($attendeesMap[$aid]) ? $attendeesMap[$aid] : array();
                 $beautyContestantsData[] = array(
                     'attendee_name' => !empty($c->attendee_name) ? $c->attendee_name : (isset($info['full_name']) ? $info['full_name'] : ''),
+                    'staff_code' => isset($info['staff_code']) ? $info['staff_code'] : '',
                     'candidate_number' => $c->candidate_number,
                     'contest_name' => $c->contest_name,
                     'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
