@@ -553,7 +553,11 @@
                             <?php for ($c = 0; $c < 2; $c++): ?>
                                 <?php if (isset($pair[$c])): $emp = $pair[$c]; ?>
                                     <td style="width:16%;">
-                                        <div class="photo-box">Ảnh 3 x 4<br><br>Đóng dấu xác nhận<br>lên ảnh</div>
+                                        <?php if (!empty($emp['photo'])): ?>
+                                            <div class="photo-box has-photo"><img src="<?php echo CHtml::encode($emp['photo']); ?>" alt="Ảnh 3 x 4"></div>
+                                        <?php else: ?>
+                                            <div class="photo-box">Ảnh 3 x 4<br><br>Đóng dấu xác nhận<br>lên ảnh</div>
+                                        <?php endif; ?>
                                     </td>
                                     <td style="width:34%;">
                                         <div class="emp-info">
