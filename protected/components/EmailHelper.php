@@ -88,6 +88,26 @@ class EmailHelper
     }
 
     /**
+     * Lấy đường dẫn ảnh chân dung của người tham dự để hiển thị trong phiếu xác nhận.
+     * Ưu tiên portrait_path (ảnh chân dung), sau đó photo_full_path, cuối cùng photo_path.
+     *
+     * @param array $attInfo Thông tin người tham dự lấy từ Attendees::getByRegistrationId
+     * @return string Đường dẫn/URL ảnh, hoặc chuỗi rỗng nếu không có
+     */
+    private static function resolveAttendeePhoto($attInfo)
+    {
+        if (empty($attInfo) || !is_array($attInfo)) {
+            return '';
+        }
+        foreach (array('portrait_path', 'photo_full_path', 'photo_path') as $field) {
+            if (!empty($attInfo[$field])) {
+                return $attInfo[$field];
+            }
+        }
+        return '';
+    }
+
+    /**
      * Gửi mail xác nhận phiếu đăng ký (Đợt 1 - Thể thao / Đợt 2 - Thi nghiệp vụ)
      * Tự động lấy danh sách email từ `mail_confirm` của đơn vị (Property), `submitted_by`, và customRecipient.
      *
