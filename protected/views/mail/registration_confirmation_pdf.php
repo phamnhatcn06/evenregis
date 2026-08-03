@@ -393,26 +393,29 @@
     <div class="page">
         <div class="form-tag">MẪU SỐ 1</div>
 
-        <div class="doc-title">Đăng ký tham dự các hoạt động thể thao, miss</div>
+        <div class="doc-title"><?php echo CHtml::encode($mau1Title); ?></div>
         <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
         <div class="doc-subtitle">Đơn vị: <?php echo CHtml::encode($propertyName); ?></div>
-        <div class="intro-line">Đăng ký tham dự các hoạt động thể thao, miss:</div>
+        <div class="intro-line"><?php echo CHtml::encode($mau1Title); ?>:</div>
 
         <table class="grid">
             <thead>
                 <tr>
                     <th class="col-stt">STT</th>
-                    <th>Hạng mục thi đấu</th>
-                    <th class="col-count">Số đội tham dự</th>
+                    <th>Hạng mục đăng ký</th>
+                    <th class="col-count">Số lượng đăng ký</th>
                 </tr>
             </thead>
             <tbody>
-                <?php if (empty($sportCategories) && empty($beautyByContest)): ?>
+                <?php $stt = 0; ?>
+                <?php if (empty($sportCategories) && empty($beautyByContest) && empty($competitionList) && empty($talentByCategory)): ?>
                     <tr>
-                        <td colspan="3" class="text-center" style="font-style:italic;">Sự kiện chưa cấu hình môn thể thao.</td>
+                        <td colspan="3" class="text-center" style="font-style:italic;">Chưa có nội dung đăng ký.</td>
                     </tr>
                 <?php endif; ?>
-                <?php foreach ($sportCategories as $i => $cat): ?>
+
+                <?php // Thể thao (Đợt 1) ?>
+                <?php foreach ($sportCategories as $cat): ?>
                     <?php
                     // Khớp số đội & số VĐV đã đăng ký theo phần tên trước dấu "("
                     $baseName = trim(preg_replace('/\(.*$/u', '', (string)$cat));
@@ -427,7 +430,7 @@
                     }
                     ?>
                     <tr>
-                        <td class="col-stt"><?php echo $i + 1; ?></td>
+                        <td class="col-stt"><?php echo ++$stt; ?></td>
                         <td><?php echo CHtml::encode($cat); ?></td>
                         <td><?php
                             if ($count === null || ((int)$count === 0 && (int)$athletes === 0)) {
@@ -438,7 +441,26 @@
                             ?></td>
                     </tr>
                 <?php endforeach; ?>
-                <?php $stt = count($sportCategories); ?>
+
+                <?php // Thi nghiệp vụ (Đợt 2) — hiển thị tên các nghiệp vụ ?>
+                <?php foreach ($competitionList as $comp): ?>
+                    <tr>
+                        <td class="col-stt"><?php echo ++$stt; ?></td>
+                        <td><?php echo CHtml::encode($comp['competition_name']); ?></td>
+                        <td><strong><?php echo count($comp['attendees']); ?> thí sinh</strong></td>
+                    </tr>
+                <?php endforeach; ?>
+
+                <?php // Văn nghệ (Đợt 3) — gom theo thể loại ?>
+                <?php foreach ($talentByCategory as $catName => $entries): ?>
+                    <tr>
+                        <td class="col-stt"><?php echo ++$stt; ?></td>
+                        <td><?php echo CHtml::encode($catName); ?></td>
+                        <td><strong><?php echo count($entries); ?> tiết mục</strong></td>
+                    </tr>
+                <?php endforeach; ?>
+
+                <?php // Miss (Đợt 1) ?>
                 <?php foreach ($beautyByContest as $contestName => $contestants): ?>
                     <tr>
                         <td class="col-stt"><?php echo ++$stt; ?></td>
