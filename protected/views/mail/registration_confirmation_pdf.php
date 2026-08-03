@@ -553,7 +553,7 @@
                                 <?php if (isset($pair[$c])): $emp = $pair[$c]; ?>
                                     <td style="width:16%;">
                                         <?php if (!empty($emp['photo'])): ?>
-                                            <div class="photo-box has-photo"><img src="<?php echo CHtml::encode($emp['photo']); ?>" alt="Ảnh 3 x 4"></div>
+                                            <div class="photo-box has-photo" style="background-image:url('<?php echo str_replace(array("'", '\\'), array('%27', '/'), $emp['photo']); ?>');"></div>
                                         <?php else: ?>
                                             <div class="photo-box">Ảnh 3 x 4<br><br>Đóng dấu xác nhận<br>lên ảnh</div>
                                         <?php endif; ?>
