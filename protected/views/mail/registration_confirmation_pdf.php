@@ -254,14 +254,17 @@
         return strcmp(erNormSport(isset($a['team_name']) ? $a['team_name'] : ''), erNormSport(isset($b['team_name']) ? $b['team_name'] : ''));
     });
 
-    // Đếm số đội đã đăng ký theo từng môn (khớp theo phần tên đứng trước dấu ngoặc)
+    // Đếm số đội & số VĐV đã đăng ký theo từng môn (khớp theo phần tên đứng trước dấu ngoặc)
     $teamCountBySport = array();
+    $athleteCountBySport = array();
     foreach ($sportTeams as $team) {
         $key = erNormSport($team['sport_name']);
         if (!isset($teamCountBySport[$key])) {
             $teamCountBySport[$key] = 0;
+            $athleteCountBySport[$key] = 0;
         }
         $teamCountBySport[$key] += 1;
+        $athleteCountBySport[$key] += isset($team['members']) && is_array($team['members']) ? count($team['members']) : 0;
     }
 
     // Gom danh sách nhân viên tham dự (dùng cho trang xác nhận) từ mọi nội dung
@@ -446,7 +449,7 @@
     <!-- ==================== TRANG 3 — XÁC NHẬN NHÂN VIÊN THAM GIA ==================== -->
     <div class="page page-break">
         <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
-        <div class="doc-unit"><?php echo CHtml::encode($propertyName !== '' ? $propertyName : 'Khách sạn Mường Thanh …'); ?> (Tên đơn vị)</div>
+        <div class="doc-unit"><?php echo CHtml::encode($propertyName !== '' ? $propertyName : 'Khách sạn Mường Thanh …'); ?></div>
         <div class="doc-title">Xác nhận nhân viên tham gia đại hội</div>
 
         <?php if (empty($confirmAttendees)): ?>
@@ -469,7 +472,7 @@
                                             <div><strong>Tên nhân viên:</strong> <?php echo CHtml::encode($emp['name']); ?></div>
                                             <div>Nam/nữ: <?php echo erGenderLabel($emp['gender']); ?></div>
                                             <div>Bộ phận/đơn vị: <?php echo CHtml::encode(!empty($emp['division']) ? $emp['division'] : '……'); ?></div>
-                                            <div>Tham gia thi đấu môn: <?php echo CHtml::encode(!empty($emp['disciplines']) ? implode(', ', $emp['disciplines']) : '……'); ?></div>
+                                            <div>Nội dung tham gia: <?php echo CHtml::encode(!empty($emp['disciplines']) ? implode(', ', $emp['disciplines']) : '……'); ?></div>
                                             <div>Thời gian bắt đầu làm việc cho TĐ: …/…/…. (… tháng)</div>
                                         </div>
                                     </td>
