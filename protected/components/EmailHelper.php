@@ -266,6 +266,7 @@ class EmailHelper
 
                 $sportOrderMap[$spId] = $sportIndex++;
                 $sportNameMap[$spId] = $spName;
+                $activeSportCategories[] = $spName;
             }
 
             $apiResult = ApiClient::get(ApiEndpoints::SPORT_TEAM_LIST_BY_PROPERTY, array(
