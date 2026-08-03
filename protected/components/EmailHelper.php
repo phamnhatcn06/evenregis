@@ -443,6 +443,7 @@ class EmailHelper
                             'gender' => isset($info['gender']) ? $info['gender'] : null,
                             'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
                             'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
+                            'photo_path' => self::resolveAttendeePhoto($info),
                         );
                     }
                     $talentEntriesData[] = array(
