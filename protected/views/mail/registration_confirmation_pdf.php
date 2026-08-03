@@ -314,25 +314,28 @@
         if (!empty($discipline) && !in_array($discipline, $confirmAttendees[$k]['disciplines'])) {
             $confirmAttendees[$k]['disciplines'][] = $discipline;
         }
+        if (empty($confirmAttendees[$k]['photo']) && !empty($photo)) {
+            $confirmAttendees[$k]['photo'] = $photo;
+        }
     };
     foreach ($sportTeams as $team) {
         foreach ($team['members'] as $m) {
-            $addConfirm($m['attendee_name'], isset($m['staff_code']) ? $m['staff_code'] : '', isset($m['gender']) ? $m['gender'] : null, isset($m['division_name']) ? $m['division_name'] : '', $team['sport_name']);
+            $addConfirm($m['attendee_name'], isset($m['staff_code']) ? $m['staff_code'] : '', isset($m['gender']) ? $m['gender'] : null, isset($m['division_name']) ? $m['division_name'] : '', $team['sport_name'], isset($m['photo_path']) ? $m['photo_path'] : '');
         }
     }
     foreach ($competitionRegistrations as $compData) {
         foreach ($compData['attendees'] as $c) {
-            $addConfirm($c['attendee_name'], isset($c['staff_code']) ? $c['staff_code'] : '', isset($c['gender']) ? $c['gender'] : null, isset($c['division_name']) ? $c['division_name'] : '', $compData['competition_name']);
+            $addConfirm($c['attendee_name'], isset($c['staff_code']) ? $c['staff_code'] : '', isset($c['gender']) ? $c['gender'] : null, isset($c['division_name']) ? $c['division_name'] : '', $compData['competition_name'], isset($c['photo_path']) ? $c['photo_path'] : '');
         }
     }
     foreach ($talentEntries as $entry) {
         $label = 'Văn nghệ' . (!empty($entry['category_name']) ? ' (' . $entry['category_name'] . ')' : '');
         foreach ($entry['members'] as $m) {
-            $addConfirm($m['attendee_name'], isset($m['staff_code']) ? $m['staff_code'] : '', isset($m['gender']) ? $m['gender'] : null, isset($m['division_name']) ? $m['division_name'] : '', $label);
+            $addConfirm($m['attendee_name'], isset($m['staff_code']) ? $m['staff_code'] : '', isset($m['gender']) ? $m['gender'] : null, isset($m['division_name']) ? $m['division_name'] : '', $label, isset($m['photo_path']) ? $m['photo_path'] : '');
         }
     }
     foreach ($beautyContestants as $c) {
-        $addConfirm($c['attendee_name'], isset($c['staff_code']) ? $c['staff_code'] : '', null, isset($c['division_name']) ? $c['division_name'] : '', 'Miss Mường Thanh');
+        $addConfirm($c['attendee_name'], isset($c['staff_code']) ? $c['staff_code'] : '', null, isset($c['division_name']) ? $c['division_name'] : '', 'Miss Mường Thanh', isset($c['photo_path']) ? $c['photo_path'] : '');
     }
     $confirmAttendees = array_values($confirmAttendees);
 
