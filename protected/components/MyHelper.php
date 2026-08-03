@@ -119,6 +119,47 @@ class MyHelper
     }
 
     /**
+     * Tính số tháng làm việc tính từ ngày bắt đầu (end_starting_date) đến hiện tại.
+     * @param mixed $startDate Timestamp hoặc chuỗi ngày
+     * @return int|null Số tháng, hoặc null nếu không xác định được ngày bắt đầu
+     */
+    public static function calculateWorkingMonths($startDate)
+    {
+        if (empty($startDate)) return null;
+        $ts = is_numeric($startDate) ? (int) $startDate : strtotime($startDate);
+        if ($ts === false || $ts <= 0) return null;
+        try {
+            $start = new DateTime('@' . $ts);
+            $now = new DateTime();
+            if ($start > $now) return 0;
+            $diff = $now->diff($start);
+            return (int) ($diff->y * 12 + $diff->m);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Chuỗi hiển thị thời gian bắt đầu làm việc cho Tập đoàn kèm số tháng đã làm.
+     * Ví dụ: "01/03/2020 (65 tháng)". Dùng chung cho các mail template.
+     * @param mixed $startDate Timestamp hoặc chuỗi ngày (end_starting_date)
+     * @return string Chuỗi định dạng, hoặc placeholder "…/…/…. (… tháng)" nếu thiếu dữ liệu
+     */
+    public static function formatWorkingDuration($startDate)
+    {
+        if (empty($startDate)) {
+            return '…/…/…. (… tháng)';
+        }
+        $ts = is_numeric($startDate) ? (int) $startDate : strtotime($startDate);
+        if ($ts === false || $ts <= 0) {
+            return '…/…/…. (… tháng)';
+        }
+        $months = self::calculateWorkingMonths($ts);
+        $monthText = $months === null ? '… tháng' : ($months . ' tháng');
+        return date('d/m/Y', $ts) . ' (' . $monthText . ')';
+    }
+
+    /**
      * Lấy năm sinh (yyyy) từ ngày sinh.
      * @return string Năm sinh, hoặc chuỗi rỗng nếu không xác định được
      */
