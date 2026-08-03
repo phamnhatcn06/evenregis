@@ -225,6 +225,14 @@
             return (strpos($n, 'đơn') !== false) || (strpos($n, 'cờ tướng') !== false);
         }
     }
+    // Môn đồng đội: không phải môn đơn cũng không phải môn đôi (vd bóng đá, bóng chuyền, kéo co)
+    if (!function_exists('erIsTeamSport')) {
+        function erIsTeamSport($name)
+        {
+            $n = erNormSport($name);
+            return (strpos($n, 'đơn') === false) && (strpos($n, 'đôi') === false);
+        }
+    }
     if (!function_exists('erGenderLabel')) {
         function erGenderLabel($g)
         {
