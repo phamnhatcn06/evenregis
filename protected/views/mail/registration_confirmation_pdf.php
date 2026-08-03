@@ -286,7 +286,7 @@
 
     // Gom danh sách nhân viên tham dự (dùng cho trang xác nhận) từ mọi nội dung
     $confirmAttendees = array();
-    $addConfirm = function ($name, $gender, $division, $discipline) use (&$confirmAttendees) {
+    $addConfirm = function ($name, $staffCode, $gender, $division, $discipline) use (&$confirmAttendees) {
         $name = trim((string)$name);
         if ($name === '') {
             return;
@@ -295,10 +295,14 @@
         if (!isset($confirmAttendees[$k])) {
             $confirmAttendees[$k] = array(
                 'name' => $name,
+                'staff_code' => $staffCode,
                 'gender' => $gender,
                 'division' => $division,
                 'disciplines' => array(),
             );
+        }
+        if (empty($confirmAttendees[$k]['staff_code']) && !empty($staffCode)) {
+            $confirmAttendees[$k]['staff_code'] = $staffCode;
         }
         if ($gender !== null && $confirmAttendees[$k]['gender'] === null) {
             $confirmAttendees[$k]['gender'] = $gender;
