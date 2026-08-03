@@ -478,11 +478,13 @@
 
         <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
         <div class="doc-unit"><?php echo CHtml::encode($propertyName !== '' ? $propertyName : 'Khách sạn Mường Thanh ………'); ?></div>
-        <div class="doc-title">Danh sách các vận động viên tham gia thi đấu vòng loại</div>
+        <?php $mau2Empty = empty($sportTeams) && empty($competitionList) && empty($talentEntries) && empty($beautyByContest); ?>
+        <?php if ($mau2Empty): ?>
+            <p style="font-style:italic;">Chưa có thông tin đăng ký.</p>
+        <?php endif; ?>
 
-        <?php if (empty($sportTeams)): ?>
-            <p style="font-style:italic;">Chưa có thông tin đăng ký môn thể thao nào.</p>
-        <?php else: ?>
+        <?php if (!empty($sportTeams)): ?>
+            <div class="doc-title">Danh sách các vận động viên tham gia thi đấu vòng loại</div>
             <?php
             // Tách môn đồng đội và môn đơn/đôi để bố cục bảng đều nhau
             $teamGroup = array();
