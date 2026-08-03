@@ -358,6 +358,7 @@ class EmailHelper
                         'property_name' => $propName,
                         'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
                         'division_name' => isset($attInfo['division_name']) ? $attInfo['division_name'] : '',
+                        'photo_path' => self::resolveAttendeePhoto($attInfo),
                     );
 
                     if (!empty($propName) && $propName !== $model->property_name && !in_array($propName, $allianceProperties)) {
