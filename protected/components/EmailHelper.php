@@ -182,9 +182,10 @@ class EmailHelper
         if (isset($model->mail_confirm) && !empty($model->mail_confirm)) {
             $rawRecipients[] = $model->mail_confirm;
         }
-        if (!empty($model->submitted_by)) {
-            $rawRecipients[] = $model->submitted_by;
-        }
+        // Tạm thời KHÔNG gửi cho submitted_by (người nộp phiếu)
+        // if (!empty($model->submitted_by)) {
+        //     $rawRecipients[] = $model->submitted_by;
+        // }
 
         $recipients = self::parseEmailList($rawRecipients);
 
