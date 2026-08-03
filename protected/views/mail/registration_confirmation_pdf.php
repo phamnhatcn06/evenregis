@@ -134,9 +134,18 @@
             font-weight: bold;
         }
 
+        .commitment-text {
+            margin-top: 20px;
+            font-size: 11pt;
+            font-style: italic;
+            text-align: justify;
+            line-height: 1.5;
+            page-break-inside: avoid;
+        }
+
         .signature-table {
             width: 100%;
-            margin-top: 30px;
+            margin-top: 20px;
             border-collapse: collapse;
             page-break-inside: avoid;
             font-size: 9pt;
