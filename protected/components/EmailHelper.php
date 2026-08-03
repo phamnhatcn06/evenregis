@@ -238,6 +238,7 @@ class EmailHelper
 
         // 6. Tải danh sách Đội thi thể thao & VĐV (Đợt 1)
         $sportTeamsData = array();
+        $activeSportCategories = array(); // Danh sách tên môn thể thao active của sự kiện (theo thứ tự) — dùng cho MẪU SỐ 1
         if ($model->event_id && $model->property_id && $showSports) {
             // Lấy danh sách môn thể thao được cấu hình cho sự kiện
             $eventSportsList = EventSports::getByEventId($model->event_id);
