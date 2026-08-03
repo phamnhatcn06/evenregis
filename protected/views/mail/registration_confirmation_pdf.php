@@ -517,7 +517,7 @@
                                     </td>
                                     <td style="width:34%;">
                                         <div class="emp-info">
-                                            <div><strong>Tên nhân viên:</strong> <?php echo CHtml::encode($emp['name']); ?></div>
+                                            <div><strong>Tên nhân viên:</strong> <?php echo erNameWithCode(isset($emp['staff_code']) ? $emp['staff_code'] : '', $emp['name']); ?></div>
                                             <div>Nam/nữ: <?php echo erGenderLabel($emp['gender']); ?></div>
                                             <div>Bộ phận/đơn vị: <?php echo CHtml::encode(!empty($emp['division']) ? $emp['division'] : '……'); ?></div>
                                             <div>Nội dung tham gia: <?php echo CHtml::encode(!empty($emp['disciplines']) ? implode(', ', $emp['disciplines']) : '……'); ?></div>
