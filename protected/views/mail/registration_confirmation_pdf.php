@@ -390,8 +390,6 @@
                         <td><?php
                             if ($count === null) {
                                 echo '&nbsp;';
-                            } elseif (erIsSingleSport($cat)) {
-                                echo '<strong>' . (int)$athletes . ' VĐV</strong>';
                             } else {
                                 echo '<strong>' . (int)$count . ' đội - ' . (int)$athletes . ' VĐV</strong>';
                             }
@@ -415,7 +413,7 @@
         <div class="form-tag">MẪU SỐ 2</div>
 
         <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
-        <div class="doc-unit"><?php echo CHtml::encode($propertyName !== '' ? $propertyName : 'Khách sạn Mường Thanh ………'); ?> (Tên đơn vị)</div>
+        <div class="doc-unit"><?php echo CHtml::encode($propertyName !== '' ? $propertyName : 'Khách sạn Mường Thanh ………'); ?></div>
         <div class="doc-title">Danh sách các vận động viên tham gia thi đấu vòng loại</div>
 
         <?php if (empty($sportTeams)): ?>
@@ -439,16 +437,16 @@
             // Render một dòng VĐV: "Mã NV - Tên (Giới tính)"
             $renderAthlete = function ($m) {
                 ob_start();
-                ?>
+            ?>
                 <div class="athlete"><?php echo erNameWithCode(isset($m['staff_code']) ? $m['staff_code'] : '', $m['attendee_name']); ?><?php if (!empty($m['gender']) || $m['gender'] === 0 || $m['gender'] === '0'): ?> (<?php echo erGenderLabel($m['gender']); ?>)<?php endif; ?></div>
-                <?php
+            <?php
                 return ob_get_clean();
             };
 
             // Hàm render một khối môn thành ô <td>. $twoCols = true: chia VĐV thành 2 cột.
             $renderSportCell = function ($team, $twoCols = false) use ($renderAthlete) {
                 ob_start();
-                ?>
+            ?>
                 <div class="sport-block">
                     <div class="sport-name"><?php echo CHtml::encode($team['sport_name']); ?></div>
                     <?php if ($twoCols): ?>
@@ -473,12 +471,13 @@
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
-                <?php
+            <?php
                 return ob_get_clean();
             };
             ?>
 
-            <?php // Môn đồng đội: mỗi nội dung 1 hàng - 1 ô (full-width) ?>
+            <?php // Môn đồng đội: mỗi nội dung 1 hàng - 1 ô (full-width) 
+            ?>
             <?php if (!empty($teamGroup)): ?>
                 <table class="grid" style="margin-top:8px;">
                     <tbody>
@@ -491,7 +490,8 @@
                 </table>
             <?php endif; ?>
 
-            <?php // Môn đơn/đôi: 2 ô ngang hàng cho cân đối ?>
+            <?php // Môn đơn/đôi: 2 ô ngang hàng cho cân đối 
+            ?>
             <?php if (!empty($individualGroup)): ?>
                 <table class="grid" style="margin-top:8px;">
                     <tbody>
@@ -543,8 +543,8 @@
                                     </td>
                                     <td style="width:34%;">
                                         <div class="emp-info">
-                                            <div><strong>Tên nhân viên:</strong> <?=  $emp['name'] ?></div>
-                                            <div>Mã nhân viên:</strong> <?= isset($emp['staff_code']) ? $emp['staff_code'] : ''?></div>
+                                            <div><strong>Tên nhân viên:</strong> <?= $emp['name'] ?></div>
+                                            <div>Mã nhân viên:</strong> <?= isset($emp['staff_code']) ? $emp['staff_code'] : '' ?></div>
                                             <div>Nam/nữ: <?php echo erGenderLabel($emp['gender']); ?></div>
                                             <div>Bộ phận/đơn vị: <?php echo CHtml::encode(!empty($emp['division']) ? $emp['division'] : '……'); ?></div>
                                             <div>Nội dung tham gia: <?php echo CHtml::encode(!empty($emp['disciplines']) ? implode(', ', $emp['disciplines']) : '……'); ?></div>
