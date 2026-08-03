@@ -426,7 +426,10 @@
             $teamGroup = array();
             $individualGroup = array();
             foreach ($sportTeams as $team) {
-                if (erIsTeamSport($team['sport_name'])) {
+                $memberCount = isset($team['members']) && is_array($team['members']) ? count($team['members']) : 0;
+                // Chỉ coi là môn đồng đội khi tên là đồng đội VÀ có nhiều hơn 1 VĐV.
+                // Môn cá nhân (bơi, chạy, cờ...) mỗi nội dung chỉ 1 VĐV -> xếp 2 ô/dòng cho cân đối.
+                if (erIsTeamSport($team['sport_name']) && $memberCount > 1) {
                     $teamGroup[] = $team;
                 } else {
                     $individualGroup[] = $team;
