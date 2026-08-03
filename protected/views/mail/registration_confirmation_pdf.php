@@ -433,15 +433,42 @@
                 }
             }
 
-            // Hàm render một khối môn thành ô <td> (VĐV: Mã NV - Tên)
-            $renderSportCell = function ($team) {
+            // Render một dòng VĐV: "Mã NV - Tên (Giới tính)"
+            $renderAthlete = function ($m) {
+                ob_start();
+                ?>
+                <div class="athlete"><?php echo erNameWithCode(isset($m['staff_code']) ? $m['staff_code'] : '', $m['attendee_name']); ?><?php if (!empty($m['gender']) || $m['gender'] === 0 || $m['gender'] === '0'): ?> (<?php echo erGenderLabel($m['gender']); ?>)<?php endif; ?></div>
+                <?php
+                return ob_get_clean();
+            };
+
+            // Hàm render một khối môn thành ô <td>. $twoCols = true: chia VĐV thành 2 cột.
+            $renderSportCell = function ($team, $twoCols = false) use ($renderAthlete) {
                 ob_start();
                 ?>
                 <div class="sport-block">
                     <div class="sport-name"><?php echo CHtml::encode($team['sport_name']); ?></div>
-                    <?php foreach ($team['members'] as $m): ?>
-                        <div class="athlete"><?php echo erNameWithCode(isset($m['staff_code']) ? $m['staff_code'] : '', $m['attendee_name']); ?><?php if (!empty($m['gender']) || $m['gender'] === 0 || $m['gender'] === '0'): ?> (<?php echo erGenderLabel($m['gender']); ?>)<?php endif; ?></div>
-                    <?php endforeach; ?>
+                    <?php if ($twoCols): ?>
+                        <?php
+                        $members = $team['members'];
+                        $half = (int)ceil(count($members) / 2);
+                        $colL = array_slice($members, 0, $half);
+                        $colR = array_slice($members, $half);
+                        $rows = max(count($colL), count($colR));
+                        ?>
+                        <table style="width:100%; border-collapse:collapse;">
+                            <?php for ($r = 0; $r < $rows; $r++): ?>
+                                <tr>
+                                    <td style="width:50%; border:none; padding:0; vertical-align:top;"><?php echo isset($colL[$r]) ? $renderAthlete($colL[$r]) : '&nbsp;'; ?></td>
+                                    <td style="width:50%; border:none; padding:0; vertical-align:top;"><?php echo isset($colR[$r]) ? $renderAthlete($colR[$r]) : '&nbsp;'; ?></td>
+                                </tr>
+                            <?php endfor; ?>
+                        </table>
+                    <?php else: ?>
+                        <?php foreach ($team['members'] as $m): ?>
+                            <?php echo $renderAthlete($m); ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
                 <?php
                 return ob_get_clean();
