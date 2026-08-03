@@ -217,6 +217,14 @@
             return $s;
         }
     }
+    // Môn đơn (cá nhân): mỗi đăng ký là 1 VĐV, không phải 1 đội
+    if (!function_exists('erIsSingleSport')) {
+        function erIsSingleSport($name)
+        {
+            $n = erNormSport($name);
+            return (strpos($n, 'đơn') !== false) || (strpos($n, 'cờ tướng') !== false);
+        }
+    }
     if (!function_exists('erGenderLabel')) {
         function erGenderLabel($g)
         {
