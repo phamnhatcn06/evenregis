@@ -420,16 +420,24 @@
         <?php endif; ?>
     <?php endif; ?>
 
+    <!-- Commitment Section (theo mẫu văn bản Đại hội) -->
+    <div class="commitment-text">
+        Khách sạn / Công ty xin cam kết đây là nhân viên đã được ký hợp đồng lao động chính thức tính đến thời điểm
+        <strong><?php echo CHtml::encode(isset($model->event_name) ? $model->event_name : 'Đại hội Mường Thanh 2026'); ?></strong> quy định.
+        Chúng tôi xin hoàn toàn chịu trách nhiệm trước Ban lãnh đạo Tập đoàn về độ chính xác, trung thực của những thông tin trên.
+    </div>
+
     <!-- Signature Section -->
     <table class="signature-table">
         <tr>
             <td>
-                <strong>ĐẠI DIỆN ĐƠN VỊ ĐĂNG KÝ</strong><br>
-                <span style="font-style:italic; font-size:10px; color:#64748b;">(Ký, ghi rõ họ tên)</span>
+                <span style="font-style:italic; font-size:10px; color:#64748b;">
+                    <?php echo date('d'); ?> tháng <?php echo date('m'); ?> năm <?php echo date('Y'); ?>
+                </span>
             </td>
             <td>
-                <strong>BAN TỔ CHỨC ĐẠI HỘI MƯỜNG THANH 2026</strong><br>
-                <span style="font-style:italic; font-size:10px; color:#64748b;">(Xác nhận hệ thống)</span>
+                <strong>GIÁM ĐỐC KHÁCH SẠN</strong><br>
+                <span style="font-style:italic; font-size:10px; color:#64748b;">(Ký tên, đóng dấu)</span>
             </td>
         </tr>
     </table>
