@@ -405,6 +405,7 @@ class EmailHelper
                         'property_name' => $propName,
                         'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
                         'division_name' => isset($attInfo['division_name']) ? $attInfo['division_name'] : '',
+                        'start_working_date' => isset($attInfo['end_starting_date']) ? $attInfo['end_starting_date'] : '',
                         'photo_path' => self::resolveAttendeePhoto($attInfo),
                     );
 
