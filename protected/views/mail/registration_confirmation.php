@@ -87,6 +87,11 @@
                                 Mọi thắc mắc hoặc yêu cầu hỗ trợ, quý đơn vị vui lòng liên hệ với Ban tổ chức để được giải đáp kịp thời.
                             </p>
 
+                            <!-- Lưu ý điều chỉnh đăng ký -->
+                            <div style="background-color:#fef9c3; border:1px solid #fde047; border-radius:6px; padding:15px 20px; margin-top:20px; color:#854d0e; font-size:14px; line-height:1.6;">
+                                ⚠️ <strong>Lưu ý:</strong> Thời gian điều chỉnh cuối cùng của đăng ký (nếu có) là từ <strong>10-15.08.2026</strong>. Sau ngày <strong>15.08.2026</strong>, các ĐV ký &amp; gửi bản xác nhận cử VĐV thi đấu Vòng Cụm gửi BTC.
+                            </div>
+
                             <p style="font-size:15px; color:#1a202c; margin-top:25px; margin-bottom:0;">
                                 Trân trọng,<br>
                                 <strong>BAN TỔ CHỨC ĐẠI HỘI MƯỜNG THANH 2026</strong>
