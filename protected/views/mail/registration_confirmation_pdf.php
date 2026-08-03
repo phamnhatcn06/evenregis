@@ -502,7 +502,6 @@
                 </table>
             <?php endif; ?>
         <?php endif; ?>
-
         <?php if (!empty($beautyByContest)): ?>
             <div class="doc-title" style="margin-top:16px;">Danh sách thí sinh dự thi Miss</div>
             <?php foreach ($beautyByContest as $contestName => $contestants): ?>
@@ -511,9 +510,6 @@
                     <?php foreach ($contestants as $idx => $c): ?>
                         <div class="athlete">
                             <?php echo ($idx + 1) . '. ' . erNameWithCode(isset($c['staff_code']) ? $c['staff_code'] : '', $c['attendee_name']); ?>
-                            <?php if (!empty($c['candidate_number'])): ?>
-                                (SBD: <?php echo CHtml::encode($c['candidate_number']); ?>)
-                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -544,7 +540,8 @@
                                     </td>
                                     <td style="width:34%;">
                                         <div class="emp-info">
-                                            <div><strong>Tên nhân viên:</strong> <?php echo erNameWithCode(isset($emp['staff_code']) ? $emp['staff_code'] : '', $emp['name']); ?></div>
+                                            <div><strong>Tên nhân viên:</strong> <?=  $emp['name'] ?></div>
+                                            <div>Mã nhân viên:</strong> <?= isset($emp['staff_code']) ? $emp['staff_code'] : ''?></div>
                                             <div>Nam/nữ: <?php echo erGenderLabel($emp['gender']); ?></div>
                                             <div>Bộ phận/đơn vị: <?php echo CHtml::encode(!empty($emp['division']) ? $emp['division'] : '……'); ?></div>
                                             <div>Nội dung tham gia: <?php echo CHtml::encode(!empty($emp['disciplines']) ? implode(', ', $emp['disciplines']) : '……'); ?></div>
