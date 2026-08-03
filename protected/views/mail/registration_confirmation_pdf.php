@@ -367,6 +367,14 @@
                             ?></td>
                     </tr>
                 <?php endforeach; ?>
+                <?php $stt = count($sportCategories); ?>
+                <?php foreach ($beautyByContest as $contestName => $contestants): ?>
+                    <tr>
+                        <td class="col-stt"><?php echo ++$stt; ?></td>
+                        <td><?php echo CHtml::encode($contestName); ?></td>
+                        <td><strong><?php echo count($contestants); ?> thí sinh</strong></td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
