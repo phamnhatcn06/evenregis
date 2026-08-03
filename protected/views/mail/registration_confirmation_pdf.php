@@ -350,7 +350,10 @@
                     <tr>
                         <td class="col-stt"><?php echo $i + 1; ?></td>
                         <td><?php echo CHtml::encode($cat); ?></td>
-                        <td><?php echo $count !== null ? ('<strong>' . (int)$count . ' đội</strong>') : '&nbsp;'; ?></td>
+                        <td><?php
+                                $unit = erIsSingleSport($cat) ? ' VĐV' : ' đội';
+                                echo $count !== null ? ('<strong>' . (int)$count . $unit . '</strong>') : '&nbsp;';
+                                ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
