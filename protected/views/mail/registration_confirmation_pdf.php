@@ -310,6 +310,17 @@
         $addConfirm($c['attendee_name'], null, isset($c['division_name']) ? $c['division_name'] : '', 'Miss Mường Thanh');
     }
     $confirmAttendees = array_values($confirmAttendees);
+
+    // Gom nhóm thí sinh Miss theo cuộc thi (dùng cho MẪU 1 & MẪU 2)
+    $beautyByContest = array();
+    foreach ($beautyContestants as $c) {
+        $cName = !empty($c['contest_name']) ? $c['contest_name'] : 'Miss Mường Thanh';
+        if (!isset($beautyByContest[$cName])) {
+            $beautyByContest[$cName] = array();
+        }
+        $beautyByContest[$cName][] = $c;
+    }
+    ksort($beautyByContest);
     ?>
 
     <!-- ============================ TRANG 1 — MẪU SỐ 1 ============================ -->
@@ -319,7 +330,7 @@
         <div class="doc-title">Đăng ký tham dự các hoạt động thể thao</div>
         <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
         <div class="doc-subtitle">Đơn vị: <?php echo CHtml::encode($propertyName); ?></div>
-        <div class="intro-line">Đăng ký tham dự các hoạt động thể thao:</div>
+        <div class="intro-line">Đăng ký tham dự các hoạt động thể thao, miss:</div>
 
         <table class="grid">
             <thead>
@@ -351,9 +362,9 @@
                         <td class="col-stt"><?php echo $i + 1; ?></td>
                         <td><?php echo CHtml::encode($cat); ?></td>
                         <td><?php
-                                $unit = erIsSingleSport($cat) ? ' VĐV' : ' đội';
-                                echo $count !== null ? ('<strong>' . (int)$count . $unit . '</strong>') : '&nbsp;';
-                                ?></td>
+                            $unit = erIsSingleSport($cat) ? ' VĐV' : ' đội';
+                            echo $count !== null ? ('<strong>' . (int)$count . $unit . '</strong>') : '&nbsp;';
+                            ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
