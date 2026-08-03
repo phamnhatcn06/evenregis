@@ -84,6 +84,8 @@ class PdfHelper
             'chroot' => array(
                 Yii::getPathOfAlias('application'),
                 Yii::getPathOfAlias('application.vendors.dompdf.dompdf'),
+                // Cho phép đọc ảnh chân dung người tham dự lưu trong webroot/uploads
+                Yii::getPathOfAlias('webroot'),
             ),
             'defaultFont' => 'Times New Roman',
         ));
