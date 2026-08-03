@@ -69,8 +69,12 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="color:#475569; font-weight:bold; background-color:#f1f5f9;">Tổng số người tham dự:</td>
-                                    <td style="color:#0d6efd; font-weight:bold; font-size:15px;"><?php echo isset($attendeesCount) ? (int)$attendeesCount : 0; ?> người</td>
+                                    <td style="color:#475569; font-weight:bold; border-bottom:1px solid #e2e8f0; background-color:#f1f5f9;">Tổng số người tham dự:</td>
+                                    <td style="color:#0d6efd; font-weight:bold; font-size:15px; border-bottom:1px solid #e2e8f0;"><?php echo isset($attendeesCount) ? (int)$attendeesCount : 0; ?> người</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#475569; font-weight:bold; background-color:#f1f5f9;">Thời gian in xác nhận:</td>
+                                    <td style="color:#1e293b;"><?php echo date('d/m/Y H:i'); ?></td>
                                 </tr>
                             </table>
 

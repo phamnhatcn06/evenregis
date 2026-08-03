@@ -114,6 +114,8 @@ class EmailHelper
                 if (empty($model->property_name)) {
                     $model->property_name = $property->name;
                 }
+                // Mã đơn vị (cột prefix) — dùng cho tên file PDF đính kèm
+                $model->property_code = !empty($property->prefix) ? $property->prefix : $property->code;
                 if (!empty($property->mail_confirm)) {
                     $propertyMailConfirm = $property->mail_confirm;
                 }
@@ -252,12 +254,20 @@ class EmailHelper
 
             // Lấy tất cả môn thể thao đang active
             $allActiveSports = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
-            $sportOrderMap = array(); // sport_id => vị trí sắp xếp
-            $sportNameMap = array();  // sport_id => tên môn thể thao
+            $sportOrderMap = array();   // sport_id => vị trí sắp xếp
+            $sportNameMap = array();    // sport_id => tên môn thể thao (đã lọc theo event)
+            $allSportNameMap = array(); // sport_id => tên (toàn bộ, để tra tên bộ môn cha)
+            $sportParentMap = array();  // sport_id => parent_id (bộ môn cha)
             $sportIndex = 0;
             foreach ($allActiveSports as $sp) {
                 $spId = is_object($sp) ? $sp->id : $sp['id'];
                 $spName = is_object($sp) ? $sp->name : $sp['name'];
+                $spParent = is_object($sp)
+                    ? (isset($sp->parent_id) ? $sp->parent_id : null)
+                    : (isset($sp['parent_id']) ? $sp['parent_id'] : null);
+
+                $allSportNameMap[$spId] = $spName;
+                $sportParentMap[$spId] = $spParent;
 
                 // Chỉ giữ môn thể thao nằm trong cấu hình event_sports của sự kiện (nếu có cấu hình)
                 if (!empty($activeEventSportIdsMap) && !isset($activeEventSportIdsMap[$spId])) {
@@ -347,10 +357,22 @@ class EmailHelper
                     }
                 }
 
+                // Xác định bộ môn cha (group). Nếu môn không có cha thì chính nó là bộ môn.
+                $parentId = ($sportId && isset($sportParentMap[$sportId])) ? $sportParentMap[$sportId] : null;
+                if ($parentId && isset($allSportNameMap[$parentId])) {
+                    $groupId = $parentId;
+                    $groupName = $allSportNameMap[$parentId];
+                } else {
+                    $groupId = $sportId;
+                    $groupName = $sportName;
+                }
+
                 $sportTeamsData[] = array(
                     'sport_id' => $sportId,
                     'sport_name' => $sportName,
                     'sport_order' => ($sportId && isset($sportOrderMap[$sportId])) ? $sportOrderMap[$sportId] : 999,
+                    'group_id' => $groupId,
+                    'group_name' => $groupName,
                     'team_name' => $teamName,
                     'members' => $enrichedMembers,
                     'alliance_properties' => $allianceProperties,
@@ -358,8 +380,25 @@ class EmailHelper
                 );
             }
 
-            // Sắp xếp các đội thi đấu theo thứ tự các môn thể thao active của sự kiện
-            usort($sportTeamsData, function ($a, $b) {
+            // Thứ tự của mỗi bộ môn = vị trí nhỏ nhất trong các nội dung thuộc bộ môn đó
+            $groupMinOrder = array();
+            foreach ($sportTeamsData as $t) {
+                $gid = $t['group_id'];
+                if (!isset($groupMinOrder[$gid]) || $t['sport_order'] < $groupMinOrder[$gid]) {
+                    $groupMinOrder[$gid] = $t['sport_order'];
+                }
+            }
+
+            // Sắp xếp: gom theo bộ môn (group) → nội dung (sport) → tên đội, giữ các đội cùng bộ môn liền nhau
+            usort($sportTeamsData, function ($a, $b) use ($groupMinOrder) {
+                $goA = isset($groupMinOrder[$a['group_id']]) ? $groupMinOrder[$a['group_id']] : 999;
+                $goB = isset($groupMinOrder[$b['group_id']]) ? $groupMinOrder[$b['group_id']] : 999;
+                if ($goA != $goB) {
+                    return $goA - $goB;
+                }
+                if ((string)$a['group_id'] !== (string)$b['group_id']) {
+                    return strcmp((string)$a['group_id'], (string)$b['group_id']);
+                }
                 $orderA = isset($a['sport_order']) ? $a['sport_order'] : 999;
                 $orderB = isset($b['sport_order']) ? $b['sport_order'] : 999;
                 if ($orderA != $orderB) {

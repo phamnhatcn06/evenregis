@@ -97,6 +97,16 @@
 
         .text-center {
             text-align: center;
+            color: #0f172a;
+            padding: 6px 10px;
+            font-weight: bold;
+            font-size: 11.5pt;
+            text-transform: uppercase;
+            border-left: 4px solid #0d6efd;
+            margin-top: 16px;
+            margin-bottom: 6px;
+        }
+
         }
 
         .col-stt {
@@ -243,6 +253,25 @@
         }
         $teamCountBySport[$key] += 1;
     }
+            }
+            $sportTeamSeq = array();
+            $currentGroupId = null; // theo dõi bộ môn hiện tại để chèn hàng nền phân tách
+            ?>
+                <?php
+                $key = !empty($team['sport_id']) ? $team['sport_id'] : $team['sport_name'];
+                $sportTeamSeq[$key] = isset($sportTeamSeq[$key]) ? $sportTeamSeq[$key] + 1 : 1;
+                $hasMultipleTeams = $sportTeamCounts[$key] > 1;
+
+                // Hàng nền phân tách bộ môn (chỉ in khi chuyển sang bộ môn mới)
+                $groupId = isset($team['group_id']) ? $team['group_id'] : $key;
+                $groupName = isset($team['group_name']) ? $team['group_name'] : $team['sport_name'];
+                // Ẩn tên nội dung trong tiêu đề đội nếu trùng tên bộ môn (tránh lặp)
+                $showSportInItem = ($team['sport_name'] !== $groupName);
+                ?>
+                <?php if ((string)$groupId !== (string)$currentGroupId): ?>
+                    <?php $currentGroupId = $groupId; ?>
+                    <div class="sport-group-header"><?php echo CHtml::encode($groupName); ?></div>
+                <?php endif; ?>
 
     // Gom danh sách nhân viên tham dự (dùng cho trang xác nhận) từ mọi nội dung
     $confirmAttendees = array();
