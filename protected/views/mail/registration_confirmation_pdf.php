@@ -231,31 +231,8 @@
         }
     }
 
-    // Danh mục thi đấu cố định theo MẪU SỐ 1
-    $sportCategories = array(
-        'Bóng đá nam (05 người/đội, 03 dự bị)',
-        'Bóng đá nữ (05 người/đội, 03 dự bị)',
-        'Bóng chuyền nam (06 người/đội, 04 dự bị)',
-        'Bóng chuyền nữ (06 người/đội, 04 dự bị)',
-        'Cầu lông đơn nam',
-        'Cầu lông đơn nữ',
-        'Cầu lông đôi nam',
-        'Cầu lông đôi nữ',
-        'Cầu lông đôi nam nữ',
-        'Bóng bàn đơn nam',
-        'Bóng bàn đơn nữ',
-        'Bóng bàn đôi nam',
-        'Bóng bàn đôi nữ',
-        'Bóng bàn đôi nam nữ',
-        'Tennis đơn nam',
-        'Tennis đơn nữ',
-        'Tennis đôi nam',
-        'Tennis đôi nữ',
-        'Tennis đôi nam nữ',
-        'Cờ tướng Nam',
-        'Cờ tướng Nữ',
-        'Kéo co nam nữ phối hợp (08 người/đội, 02 dự bị)',
-    );
+    // Danh mục thi đấu theo các môn thể thao active của sự kiện (truyền từ controller/EmailHelper)
+    $sportCategories = isset($sportCategories) && is_array($sportCategories) ? $sportCategories : array();
 
     // Đếm số đội đã đăng ký theo từng môn (khớp theo phần tên đứng trước dấu ngoặc)
     $teamCountBySport = array();
