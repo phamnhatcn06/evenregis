@@ -424,6 +424,23 @@
                 </tbody>
             </table>
         <?php endif; ?>
+
+        <?php if (!empty($beautyByContest)): ?>
+            <div class="doc-title" style="margin-top:16px;">Danh sách thí sinh dự thi Miss</div>
+            <?php foreach ($beautyByContest as $contestName => $contestants): ?>
+                <div class="sport-block">
+                    <div class="sport-name"><?php echo CHtml::encode($contestName); ?></div>
+                    <?php foreach ($contestants as $idx => $c): ?>
+                        <div class="athlete">
+                            <?php echo ($idx + 1) . '. ' . CHtml::encode($c['attendee_name']); ?>
+                            <?php if (!empty($c['candidate_number'])): ?>
+                                (SBD: <?php echo CHtml::encode($c['candidate_number']); ?>)
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 
     <!-- ==================== TRANG 3 — XÁC NHẬN NHÂN VIÊN THAM GIA ==================== -->
