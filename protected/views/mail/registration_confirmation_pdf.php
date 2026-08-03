@@ -233,6 +233,15 @@
             return (strpos($n, 'đơn') === false) && (strpos($n, 'đôi') === false);
         }
     }
+    // Ghép "Mã nhân viên - Tên nhân viên" (đã escape HTML)
+    if (!function_exists('erNameWithCode')) {
+        function erNameWithCode($code, $name)
+        {
+            $code = trim((string)$code);
+            $name = CHtml::encode((string)$name);
+            return $code !== '' ? (CHtml::encode($code) . ' - ' . $name) : $name;
+        }
+    }
     if (!function_exists('erGenderLabel')) {
         function erGenderLabel($g)
         {
