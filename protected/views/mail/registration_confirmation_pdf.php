@@ -362,6 +362,31 @@
         $beautyByContest[$cName][] = $c;
     }
     ksort($beautyByContest);
+
+    // Danh sách thi nghiệp vụ (Đợt 2) — chuẩn hoá & sắp xếp theo tên nghiệp vụ
+    $competitionList = array_values($competitionRegistrations);
+    usort($competitionList, function ($a, $b) {
+        return strcmp(erNormSport(isset($a['competition_name']) ? $a['competition_name'] : ''), erNormSport(isset($b['competition_name']) ? $b['competition_name'] : ''));
+    });
+
+    // Tiết mục văn nghệ (Đợt 3) — gom theo thể loại để tổng hợp MẪU SỐ 1
+    $talentByCategory = array();
+    foreach ($talentEntries as $entry) {
+        $cat = !empty($entry['category_name']) ? $entry['category_name'] : 'Văn nghệ';
+        if (!isset($talentByCategory[$cat])) {
+            $talentByCategory[$cat] = array();
+        }
+        $talentByCategory[$cat][] = $entry;
+    }
+    ksort($talentByCategory);
+
+    // Tiêu đề MẪU SỐ 1 thay đổi theo nội dung đăng ký của đợt (thể thao/miss/nghiệp vụ/văn nghệ)
+    $mau1Parts = array();
+    if (!empty($sportCategories) || !empty($sportTeams)) $mau1Parts[] = 'thể thao';
+    if (!empty($beautyByContest)) $mau1Parts[] = 'miss';
+    if (!empty($competitionList)) $mau1Parts[] = 'thi nghiệp vụ';
+    if (!empty($talentByCategory)) $mau1Parts[] = 'văn nghệ';
+    $mau1Title = 'Đăng ký tham dự các hoạt động' . (empty($mau1Parts) ? '' : ' ' . implode(', ', $mau1Parts));
     ?>
 
     <!-- ============================ TRANG 1 — MẪU SỐ 1 ============================ -->
