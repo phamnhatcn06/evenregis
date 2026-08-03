@@ -433,14 +433,14 @@
                 }
             }
 
-            // Hàm render một khối môn thành ô <td>
+            // Hàm render một khối môn thành ô <td> (VĐV: Mã NV - Tên)
             $renderSportCell = function ($team) {
                 ob_start();
                 ?>
                 <div class="sport-block">
                     <div class="sport-name"><?php echo CHtml::encode($team['sport_name']); ?></div>
                     <?php foreach ($team['members'] as $m): ?>
-                        <div class="athlete"><?php echo CHtml::encode($m['attendee_name']); ?><?php if (!empty($m['gender']) || $m['gender'] === 0 || $m['gender'] === '0'): ?> (<?php echo erGenderLabel($m['gender']); ?>)<?php endif; ?></div>
+                        <div class="athlete"><?php echo erNameWithCode(isset($m['staff_code']) ? $m['staff_code'] : '', $m['attendee_name']); ?><?php if (!empty($m['gender']) || $m['gender'] === 0 || $m['gender'] === '0'): ?> (<?php echo erGenderLabel($m['gender']); ?>)<?php endif; ?></div>
                     <?php endforeach; ?>
                 </div>
                 <?php
@@ -448,22 +448,32 @@
             };
             ?>
 
-            <?php // Mỗi nhóm hiển thị 2 ô ngang hàng, đồng đội trước rồi đến đơn/đôi ?>
-            <?php foreach (array($teamGroup, $individualGroup) as $group): ?>
-                <?php if (!empty($group)): ?>
-                    <table class="grid" style="margin-top:8px;">
-                        <tbody>
-                            <?php $chunks = array_chunk($group, 2); ?>
-                            <?php foreach ($chunks as $pair): ?>
-                                <tr>
-                                    <td style="width:50%;"><?php echo $renderSportCell($pair[0]); ?></td>
-                                    <td style="width:50%;"><?php echo isset($pair[1]) ? $renderSportCell($pair[1]) : '&nbsp;'; ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            <?php endforeach; ?>
+            <?php // Môn đồng đội: mỗi nội dung 1 hàng - 1 ô (full-width) ?>
+            <?php if (!empty($teamGroup)): ?>
+                <table class="grid" style="margin-top:8px;">
+                    <tbody>
+                        <?php foreach ($teamGroup as $team): ?>
+                            <tr>
+                                <td><?php echo $renderSportCell($team); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+
+            <?php // Môn đơn/đôi: 2 ô ngang hàng cho cân đối ?>
+            <?php if (!empty($individualGroup)): ?>
+                <table class="grid" style="margin-top:8px;">
+                    <tbody>
+                        <?php foreach (array_chunk($individualGroup, 2) as $pair): ?>
+                            <tr>
+                                <td style="width:50%;"><?php echo $renderSportCell($pair[0]); ?></td>
+                                <td style="width:50%;"><?php echo isset($pair[1]) ? $renderSportCell($pair[1]) : '&nbsp;'; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
         <?php endif; ?>
 
         <?php if (!empty($beautyByContest)): ?>
