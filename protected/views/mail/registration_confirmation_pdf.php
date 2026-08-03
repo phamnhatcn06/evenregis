@@ -351,7 +351,7 @@
     <div class="page">
         <div class="form-tag">MẪU SỐ 1</div>
 
-        <div class="doc-title">Đăng ký tham dự các hoạt động thể thao</div>
+        <div class="doc-title">Đăng ký tham dự các hoạt động thể thao, miss</div>
         <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
         <div class="doc-subtitle">Đơn vị: <?php echo CHtml::encode($propertyName); ?></div>
         <div class="intro-line">Đăng ký tham dự các hoạt động thể thao, miss:</div>
