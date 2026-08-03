@@ -325,10 +325,15 @@
                 </tr>
             </thead>
             <tbody>
+                <?php if (empty($sportCategories)): ?>
+                    <tr>
+                        <td colspan="3" class="text-center" style="font-style:italic;">Sự kiện chưa cấu hình môn thể thao.</td>
+                    </tr>
+                <?php endif; ?>
                 <?php foreach ($sportCategories as $i => $cat): ?>
                     <?php
                     // Khớp số đội đã đăng ký theo phần tên trước dấu "("
-                    $baseName = trim(preg_replace('/\(.*$/u', '', $cat));
+                    $baseName = trim(preg_replace('/\(.*$/u', '', (string)$cat));
                     $count = null;
                     foreach ($teamCountBySport as $k => $cnt) {
                         if ($k === erNormSport($baseName) || strpos($k, erNormSport($baseName)) === 0) {
