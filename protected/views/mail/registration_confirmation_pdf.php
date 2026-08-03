@@ -483,7 +483,7 @@
                     <div class="sport-name"><?php echo CHtml::encode($contestName); ?></div>
                     <?php foreach ($contestants as $idx => $c): ?>
                         <div class="athlete">
-                            <?php echo ($idx + 1) . '. ' . CHtml::encode($c['attendee_name']); ?>
+                            <?php echo ($idx + 1) . '. ' . erNameWithCode(isset($c['staff_code']) ? $c['staff_code'] : '', $c['attendee_name']); ?>
                             <?php if (!empty($c['candidate_number'])): ?>
                                 (SBD: <?php echo CHtml::encode($c['candidate_number']); ?>)
                             <?php endif; ?>
