@@ -569,7 +569,7 @@
                                             <div>Nam/nữ: <?php echo erGenderLabel($emp['gender']); ?></div>
                                             <div>Bộ phận/đơn vị: <?php echo CHtml::encode(!empty($emp['division']) ? $emp['division'] : '……'); ?></div>
                                             <div>Nội dung tham gia: <?php echo CHtml::encode(!empty($emp['disciplines']) ? implode(', ', $emp['disciplines']) : '……'); ?></div>
-                                            <div>Thời gian bắt đầu làm việc cho TĐ: …/…/…. (… tháng)</div>
+                                            <div>Thời gian bắt đầu làm việc cho TĐ: <?php echo CHtml::encode(MyHelper::formatWorkingDuration(isset($emp['start_working_date']) ? $emp['start_working_date'] : '')); ?></div>
                                         </div>
                                     </td>
                                 <?php else: ?>
