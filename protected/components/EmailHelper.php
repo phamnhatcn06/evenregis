@@ -496,6 +496,7 @@ class EmailHelper
                             'gender' => isset($info['gender']) ? $info['gender'] : null,
                             'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
                             'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
+                            'start_working_date' => isset($info['end_starting_date']) ? $info['end_starting_date'] : '',
                             'photo_path' => self::resolveAttendeePhoto($info),
                         );
                     }
