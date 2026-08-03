@@ -408,39 +408,49 @@
         <?php if (empty($sportTeams)): ?>
             <p style="font-style:italic;">Chưa có thông tin đăng ký môn thể thao nào.</p>
         <?php else: ?>
-            <table class="grid" style="margin-top:8px;">
-                <tbody>
-                    <?php
-                    $totalTeams = count($sportTeams);
-                    $half = (int)ceil($totalTeams / 2);
-                    $leftCol = array_slice($sportTeams, 0, $half);
-                    $rightCol = array_slice($sportTeams, $half);
-                    $rows = max(count($leftCol), count($rightCol));
-                    for ($r = 0; $r < $rows; $r++):
-                    ?>
-                        <tr>
-                            <?php foreach (array($leftCol, $rightCol) as $col): ?>
-                                <td style="width:50%;">
-                                    <?php if (isset($col[$r])): $team = $col[$r]; ?>
-                                        <div class="sport-block">
-                                            <div class="sport-name"><?php echo CHtml::encode($team['sport_name']); ?></div>
-                                            <?php foreach ($team['members'] as $m): ?>
-                                                <div class="athlete"><?php echo CHtml::encode($m['attendee_name']); ?>
-                                                    <?php if (!empty($m['gender']) || $m['gender'] === 0 || $m['gender'] === '0'): ?>
-                                                        (<?php echo erGenderLabel($m['gender']); ?>)
-                                                    <?php endif; ?>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    <?php else: ?>
-                                        &nbsp;
-                                    <?php endif; ?>
-                                </td>
+            <?php
+            // Tách môn đồng đội và môn đơn/đôi để bố cục bảng đều nhau
+            $teamGroup = array();
+            $individualGroup = array();
+            foreach ($sportTeams as $team) {
+                if (erIsTeamSport($team['sport_name'])) {
+                    $teamGroup[] = $team;
+                } else {
+                    $individualGroup[] = $team;
+                }
+            }
+
+            // Hàm render một khối môn thành ô <td>
+            $renderSportCell = function ($team) {
+                ob_start();
+                ?>
+                <div class="sport-block">
+                    <div class="sport-name"><?php echo CHtml::encode($team['sport_name']); ?></div>
+                    <?php foreach ($team['members'] as $m): ?>
+                        <div class="athlete"><?php echo CHtml::encode($m['attendee_name']); ?><?php if (!empty($m['gender']) || $m['gender'] === 0 || $m['gender'] === '0'): ?> (<?php echo erGenderLabel($m['gender']); ?>)<?php endif; ?></div>
+                    <?php endforeach; ?>
+                </div>
+                <?php
+                return ob_get_clean();
+            };
+            ?>
+
+            <?php // Mỗi nhóm hiển thị 2 ô ngang hàng, đồng đội trước rồi đến đơn/đôi ?>
+            <?php foreach (array($teamGroup, $individualGroup) as $group): ?>
+                <?php if (!empty($group)): ?>
+                    <table class="grid" style="margin-top:8px;">
+                        <tbody>
+                            <?php $chunks = array_chunk($group, 2); ?>
+                            <?php foreach ($chunks as $pair): ?>
+                                <tr>
+                                    <td style="width:50%;"><?php echo $renderSportCell($pair[0]); ?></td>
+                                    <td style="width:50%;"><?php echo isset($pair[1]) ? $renderSportCell($pair[1]) : '&nbsp;'; ?></td>
+                                </tr>
                             <?php endforeach; ?>
-                        </tr>
-                    <?php endfor; ?>
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            <?php endforeach; ?>
         <?php endif; ?>
 
         <?php if (!empty($beautyByContest)): ?>
