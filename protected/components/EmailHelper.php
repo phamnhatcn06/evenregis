@@ -368,7 +368,13 @@ class EmailHelper
                 foreach ($membersData as $member) {
                     $memberIsObj = is_object($member);
                     $attId = $memberIsObj ? (isset($member->attendee_id) ? $member->attendee_id : null) : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
-                    $attInfo = isset($attendeesMap[$attId]) ? $attendeesMap[$attId] : array();
+
+                    // Chỉ lấy VĐV thuộc đơn vị hiện tại (có trong danh sách người tham dự của phiếu đăng ký này);
+                    // bỏ qua VĐV liên quân đến từ đơn vị khác.
+                    if ($attId === null || !isset($attendeesMap[$attId])) {
+                        continue;
+                    }
+                    $attInfo = $attendeesMap[$attId];
 
                     $attName = $memberIsObj ? (isset($member->attendee_name) ? $member->attendee_name : '') : (isset($member['attendee_name']) ? $member['attendee_name'] : '');
                     if (empty($attName) && !empty($attInfo['full_name'])) {
