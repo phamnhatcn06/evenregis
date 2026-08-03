@@ -437,6 +437,7 @@ class EmailHelper
                         $info = isset($attendeesMap[$aid]) ? $attendeesMap[$aid] : array();
                         $members[] = array(
                             'attendee_name' => !empty($info['full_name']) ? $info['full_name'] : ('#' . $aid),
+                            'staff_code' => isset($info['staff_code']) ? $info['staff_code'] : '',
                             'gender' => isset($info['gender']) ? $info['gender'] : null,
                             'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
                             'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
