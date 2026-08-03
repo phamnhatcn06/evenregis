@@ -234,6 +234,18 @@
     // Danh mục thi đấu theo các môn thể thao active của sự kiện (truyền từ controller/EmailHelper)
     $sportCategories = isset($sportCategories) && is_array($sportCategories) ? $sportCategories : array();
 
+    // Sắp xếp các môn thể thao theo tên (alphabet, chuẩn hoá tiếng Việt)
+    usort($sportCategories, function ($a, $b) {
+        return strcmp(erNormSport($a), erNormSport($b));
+    });
+    usort($sportTeams, function ($a, $b) {
+        $cmp = strcmp(erNormSport($a['sport_name']), erNormSport($b['sport_name']));
+        if ($cmp !== 0) {
+            return $cmp;
+        }
+        return strcmp(erNormSport(isset($a['team_name']) ? $a['team_name'] : ''), erNormSport(isset($b['team_name']) ? $b['team_name'] : ''));
+    });
+
     // Đếm số đội đã đăng ký theo từng môn (khớp theo phần tên đứng trước dấu ngoặc)
     $teamCountBySport = array();
     foreach ($sportTeams as $team) {
@@ -298,22 +310,7 @@
 
         <div class="doc-title">Đăng ký tham dự các hoạt động thể thao</div>
         <div class="doc-subtitle"><?php echo CHtml::encode(mb_strtoupper($eventName, 'UTF-8')); ?></div>
-
-        <div style="margin-top:12px;">
-            <div class="info-line">Tên đơn vị:
-                <span class="dotted"><?php echo CHtml::encode($propertyName); ?></span>
-            </div>
-            <div class="info-line">Đại diện đơn vị:
-                <span class="dotted"><?php echo CHtml::encode($representative); ?></span>
-            </div>
-            <div class="info-line">Số điện thoại liên hệ:
-                <span class="dotted">&nbsp;</span>
-            </div>
-            <div class="info-line">Email:
-                <span class="dotted"><?php echo CHtml::encode($contactEmail); ?></span>
-            </div>
-        </div>
-
+        <div class="doc-subtitle">Đơn vị: <?php echo CHtml::encode($propertyName); ?></div>
         <div class="intro-line">Đăng ký tham dự các hoạt động thể thao:</div>
 
         <table class="grid">
