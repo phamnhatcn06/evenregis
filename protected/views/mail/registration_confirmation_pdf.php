@@ -388,8 +388,8 @@
                         <td class="col-stt"><?php echo $i + 1; ?></td>
                         <td><?php echo CHtml::encode($cat); ?></td>
                         <td><?php
-                            if ($count === null) {
-                                echo '&nbsp;';
+                            if ($count === null || ((int)$count === 0 && (int)$athletes === 0)) {
+                                echo '<em>Không đăng ký</em>';
                             } else {
                                 echo '<strong>' . (int)$count . ' đội - ' . (int)$athletes . ' VĐV</strong>';
                             }
