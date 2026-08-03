@@ -524,6 +524,7 @@ class EmailHelper
             'registeredCategories' => $registeredCategories,
             'contentSummaryLines' => $contentSummaryLines,
             'sportTeams' => $sportTeamsData,
+            'sportCategories' => $activeSportCategories,
             'talentEntries' => $talentEntriesData,
             'beautyContestants' => $beautyContestantsData,
             'competitionRegistrations' => $competitionRegistrations,
