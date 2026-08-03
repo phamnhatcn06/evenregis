@@ -412,6 +412,11 @@ class EmailHelper
                     }
                 }
 
+                // Bỏ qua đội không còn VĐV nào thuộc đơn vị hiện tại (sau khi lọc liên quân).
+                if (empty($enrichedMembers)) {
+                    continue;
+                }
+
                 // Xác định bộ môn cha (group). Nếu môn không có cha thì chính nó là bộ môn.
                 $parentId = ($sportId && isset($sportParentMap[$sportId])) ? $sportParentMap[$sportId] : null;
                 if ($parentId && isset($allSportNameMap[$parentId])) {
