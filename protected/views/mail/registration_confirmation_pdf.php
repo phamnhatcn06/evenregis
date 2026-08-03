@@ -481,7 +481,7 @@
                     <tbody>
                         <?php foreach ($teamGroup as $team): ?>
                             <tr>
-                                <td><?php echo $renderSportCell($team); ?></td>
+                                <td><?php echo $renderSportCell($team, true); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
