@@ -99,11 +99,30 @@ class EmailHelper
         if (empty($attInfo) || !is_array($attInfo)) {
             return '';
         }
+        $raw = '';
         foreach (array('portrait_path', 'photo_full_path', 'photo_path') as $field) {
             if (!empty($attInfo[$field])) {
-                return $attInfo[$field];
+                $raw = $attInfo[$field];
+                break;
             }
         }
+        if ($raw === '') {
+            return '';
+        }
+
+        // Ảnh là URL tuyệt đối → dùng trực tiếp (dompdf đã bật isRemoteEnabled)
+        if (preg_match('#^https?://#i', $raw)) {
+            return $raw;
+        }
+
+        // Ảnh lưu cục bộ (đường dẫn tương đối webroot) → trả về đường dẫn hệ thống tuyệt đối
+        // để dompdf đọc trực tiếp từ ổ đĩa, tránh phụ thuộc mạng.
+        $rel = ltrim($raw, '/');
+        $absolute = Yii::getPathOfAlias('webroot') . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $rel);
+        if (is_file($absolute)) {
+            return $absolute;
+        }
+
         return '';
     }
 
