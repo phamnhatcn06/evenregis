@@ -348,6 +348,25 @@ $columnsAll = array_merge($baseColumns, array($sendMailStatusColumn, $actionColu
                 ));
                 ?>
             </div>
+
+            <!-- Tab Tất cả -->
+            <div class="tab-pane fade" id="all" role="tabpanel">
+                <?php
+                $this->widget('ext.edatatables.EDataTables', array(
+                    'id' => 'all-grid',
+                    'dataProvider' => $dpAll,
+                    'language' => 'vi',
+                    'filter' => false,
+                    'columns' => $columnsAll,
+                    'options' => array(
+                        'pageLength' => 25,
+                        'order' => array(array(4, 'desc')),
+                        'responsive' => true,
+                        'scrollX' => true,
+                    ),
+                ));
+                ?>
+            </div>
         </div>
     </div>
 </div>
