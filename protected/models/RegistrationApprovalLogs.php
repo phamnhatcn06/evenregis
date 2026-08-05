@@ -4,6 +4,9 @@ Yii::import('application.models._base.BaseRegistrationApprovalLogs');
 
 class RegistrationApprovalLogs extends BaseRegistrationApprovalLogs
 {
+    public $updated_at;
+    public $deleted_at;
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
