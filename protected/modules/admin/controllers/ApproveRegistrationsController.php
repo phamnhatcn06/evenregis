@@ -729,7 +729,7 @@ class ApproveRegistrationsController extends AdminController
                 $fullName
             );
 
-            // Tự động gửi email xác nhận cho đơn vị sau khi phê duyệt (lấy mail_confirm từ property API & submitted_by)
+            // Tự động gửi email xác nhận cho đơn vị sau khi phê duyệt (người nhận lấy từ cột mail_confirm của property; submitted_by đang tạm tắt)
             $emailNote = '';
             try {
                 $emailResult = EmailHelper::sendRegistrationConfirmation($registrationId);
