@@ -18,6 +18,9 @@ class Registrations extends BaseRegistrations
 	public $period_name;
 	public $submitted_by_name;
 	public $reviewed_by_name;
+	public $current_approval_index;
+	public $next_approval_index;
+	public $is_sendmail;
 
 	public static function model($className = __CLASS__)
 	{
