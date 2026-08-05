@@ -2,9 +2,9 @@
 
 class EmailHelper
 {
-    public static function send($to, $subject, $view, $data = array(), $attachments = array())
+    public static function send($to, $subject, $view, $data = array(), $attachments = array(), $cc = array(), $bcc = array())
     {
-        return MyHelper::sendMail($to, $subject, $view, $data, $attachments);
+        return MyHelper::sendMail($to, $subject, $view, $data, $attachments, $cc, $bcc);
     }
 
     public static function sendMissInvitation($contestant)
