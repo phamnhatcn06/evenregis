@@ -5,6 +5,7 @@ Yii::import('application.models._base.BaseApprovalWorkflowApprovers');
 class ApprovalWorkflowApprovers extends BaseApprovalWorkflowApprovers
 {
     public $auth_email;
+    public $deleted_at;
 
     public static function model($className = __CLASS__)
     {
