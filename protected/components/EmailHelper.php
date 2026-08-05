@@ -678,6 +678,13 @@ class EmailHelper
         try {
             $sent = self::send($recipients, $subject, 'registration_confirmation', $data, $attachments, $ccList, $bccList);
             if ($sent) {
+                // Đánh dấu đã gửi mail (is_sendmail = 1) cho phiếu đăng ký
+                try {
+                    $model->updateViaApi(array('is_sendmail' => 1));
+                } catch (Exception $e) {
+                    Yii::log('Update is_sendmail failed (registration ' . $registrationId . '): ' . $e->getMessage(), CLogger::LEVEL_WARNING, 'application.components.EmailHelper');
+                }
+
                 $hasPdf = !empty($attachments);
                 $ccNote = !empty($ccList) ? ' | CC: ' . implode(', ', $ccList) : '';
                 $message = $hasPdf
