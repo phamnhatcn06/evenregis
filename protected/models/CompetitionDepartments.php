@@ -4,6 +4,8 @@ Yii::import('application.models._base.BaseCompetitionDepartments');
 
 class CompetitionDepartments extends BaseCompetitionDepartments
 {
+    public $updated_at;
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
