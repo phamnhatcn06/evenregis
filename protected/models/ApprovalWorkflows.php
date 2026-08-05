@@ -4,6 +4,8 @@ Yii::import('application.models._base.BaseApprovalWorkflows');
 
 class ApprovalWorkflows extends BaseApprovalWorkflows
 {
+    public $deleted_at;
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
