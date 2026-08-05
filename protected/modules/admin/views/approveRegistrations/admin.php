@@ -109,9 +109,9 @@ $sendMailStatusColumn = array(
     }
 );
 
-$columnsSubmitted = array_merge($baseColumns, array($actionColumnSubmitted));
-$columnsRejected = array_merge($baseColumns, array($rejectionReasonColumn, $actionColumnOther));
-$columnsApproved = array_merge($baseColumns, array($actionColumnOther));
+$columnsSubmitted = array_merge($baseColumns, array($sendMailStatusColumn, $actionColumnSubmitted));
+$columnsRejected = array_merge($baseColumns, array($rejectionReasonColumn, $sendMailStatusColumn, $actionColumnOther));
+$columnsApproved = array_merge($baseColumns, array($sendMailStatusColumn, $actionColumnOther));
 $columnsAll = array_merge($baseColumns, array($sendMailStatusColumn, $actionColumnOther));
 ?>
 
