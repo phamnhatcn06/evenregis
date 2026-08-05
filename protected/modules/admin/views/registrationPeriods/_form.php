@@ -102,6 +102,16 @@ $selectedContents = isset($selectedContentIds) ? $selectedContentIds : array();
                 <small class="text-muted">Số người tối đa mỗi đơn vị được đăng ký</small>
             </div>
             <div class="form-group mb-3">
+                <label class="form-label" for="RegistrationPeriods_mail_btc">Email Ban tổ chức (CC)</label>
+                <?php echo $form->textField($model, 'mail_btc', array(
+                    'class' => 'form-control',
+                    'maxlength' => 255,
+                    'placeholder' => 'VD: btc@muongthanh.vn, thuky@muongthanh.vn',
+                )); ?>
+                <?php echo $form->error($model, 'mail_btc'); ?>
+                <small class="text-muted">Email BTC sẽ được CC khi gửi mail xác nhận đăng ký. Nhiều email cách nhau bằng dấu phẩy.</small>
+            </div>
+            <div class="form-group mb-3">
                 <?php echo $form->labelEx($model, 'note'); ?>
                 <?php echo $form->textArea($model, 'note', array(
                     'class' => 'form-control',
