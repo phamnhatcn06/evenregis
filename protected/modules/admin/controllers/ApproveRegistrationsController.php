@@ -22,11 +22,13 @@ class ApproveRegistrationsController extends AdminController
         $dpSubmitted = Registrations::getApiDataProvider(array_merge($baseParams, array('status' => Registrations::STATUS_SUBMITTED)));
         $dpRejected = Registrations::getApiDataProvider(array_merge($baseParams, array('status' => Registrations::STATUS_REJECTED)));
         $dpApproved = Registrations::getApiDataProvider(array_merge($baseParams, array('status' => Registrations::STATUS_APPROVED)));
+        $dpAll = Registrations::getApiDataProvider($baseParams);
 
         // Đếm số lượng
         $countSubmitted = $dpSubmitted->getTotalItemCount();
         $countRejected = $dpRejected->getTotalItemCount();
         $countApproved = $dpApproved->getTotalItemCount();
+        $countAll = $dpAll->getTotalItemCount();
 
         // Load dropdown data
         $eventsData = Events::getApiDataProvider(array('is_active' => 1), 100)->getData();
