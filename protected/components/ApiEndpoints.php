@@ -491,6 +491,34 @@ class ApiEndpoints
     const REGISTRATION_APPROVAL_LOG_STORE = '/api/registration-approval-logs/store';
     const REGISTRATION_APPROVAL_LOG_BY_REGISTRATION = '/api/registration-approval-logs/by-registration/{registration_id}';
 
+    // Approve Attendee Log
+    const APPROVE_ATTENDEE_LOG_LIST = '/api/approve-attendee-logs';
+    const APPROVE_ATTENDEE_LOG_STORE = '/api/approve-attendee-logs/store';
+    const APPROVE_ATTENDEE_LOG_DETAIL = '/api/approve-attendee-logs/detail/{id}';
+    const APPROVE_ATTENDEE_LOG_UPDATE = '/api/approve-attendee-logs/update/{id}';
+    const APPROVE_ATTENDEE_LOG_DESTROY = '/api/approve-attendee-logs/destroy/{id}';
+
+    // Approve Registration Log
+    const APPROVE_REGISTRATION_LOG_LIST = '/api/approve-registration-logs';
+    const APPROVE_REGISTRATION_LOG_STORE = '/api/approve-registration-logs/store';
+    const APPROVE_REGISTRATION_LOG_DETAIL = '/api/approve-registration-logs/detail/{id}';
+    const APPROVE_REGISTRATION_LOG_UPDATE = '/api/approve-registration-logs/update/{id}';
+    const APPROVE_REGISTRATION_LOG_DESTROY = '/api/approve-registration-logs/destroy/{id}';
+
+    // Competition Team
+    const COMPETITION_TEAM_LIST = '/api/competition-teams';
+    const COMPETITION_TEAM_STORE = '/api/competition-teams/store';
+    const COMPETITION_TEAM_DETAIL = '/api/competition-teams/detail/{id}';
+    const COMPETITION_TEAM_UPDATE = '/api/competition-teams/update/{id}';
+    const COMPETITION_TEAM_DESTROY = '/api/competition-teams/destroy/{id}';
+
+    // Competition Team Member
+    const COMPETITION_TEAM_MEMBER_LIST = '/api/competition-team-members';
+    const COMPETITION_TEAM_MEMBER_STORE = '/api/competition-team-members/store';
+    const COMPETITION_TEAM_MEMBER_DETAIL = '/api/competition-team-members/detail/{id}';
+    const COMPETITION_TEAM_MEMBER_UPDATE = '/api/competition-team-members/update/{id}';
+    const COMPETITION_TEAM_MEMBER_DESTROY = '/api/competition-team-members/destroy/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
