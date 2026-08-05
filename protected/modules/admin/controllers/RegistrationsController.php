@@ -886,7 +886,7 @@ class RegistrationsController extends AdminController
 				// Cập nhật status tiết mục văn nghệ sang submitted
 				TalentEntries::updateStatusByPropertyId($model->property_id, TalentEntries::STATUS_SUBMITTED);
 
-				// Tự động gửi email xác nhận đăng ký cho đơn vị (lấy mail_confirm từ property API & submitted_by)
+				// Tự động gửi email xác nhận đăng ký cho đơn vị (người nhận lấy từ cột mail_confirm của property; submitted_by đang tạm tắt)
 				try {
 					EmailHelper::sendRegistrationConfirmation($id);
 				} catch (Exception $e) {
