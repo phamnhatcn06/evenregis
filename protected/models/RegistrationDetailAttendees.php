@@ -13,10 +13,11 @@ class RegistrationDetailAttendees extends CModel
     public $note;
     public $created_at;
     public $updated_at;
+    public $deleted_at;
 
     public function attributeNames()
     {
-        return array('id', 'registration_detail_id', 'staff_code', 'status', 'note', 'created_at', 'updated_at');
+        return array('id', 'registration_detail_id', 'staff_code', 'status', 'note', 'created_at', 'updated_at', 'deleted_at');
     }
 
     public function rules()
