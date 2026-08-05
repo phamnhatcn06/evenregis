@@ -240,6 +240,21 @@ class EmailHelper
         $isDot1 = in_array('sports', $periodContentCodes) || ($noCodes && (strpos($periodNameLower, 'đợt 1') !== false || strpos($periodNameLower, 'dot 1') !== false));
         $isDot2 = in_array('competition', $periodContentCodes) || ($noCodes && (strpos($periodNameLower, 'đợt 2') !== false || strpos($periodNameLower, 'dot 2') !== false));
 
+        // CC tới email Ban tổ chức của đợt đăng ký (period.mail_btc) — trừ các địa chỉ đã nằm trong To
+        $ccRaw = self::parseEmailList($periodMailBtc);
+        // CC cố định theo đợt: Đợt 1 → Ban thể thao, Đợt 2 → Ban nghiệp vụ
+        if ($isDot1) {
+            $ccRaw[] = 'daihoi.banthethao@muongthanh.vn';
+        }
+        if ($isDot2) {
+            $ccRaw[] = 'daihoi.bannghiepvu@muongthanh.vn';
+        }
+        $ccList = self::parseEmailList($ccRaw);
+        $ccList = array_values(array_diff($ccList, $recipients));
+
+        // BCC cố định về cswm@muongthanh.vn và citd@muongthanh.vn để lưu vết — bỏ nếu đã có trong To/CC
+        $bccList = array_values(array_diff(array('cswm@muongthanh.vn', 'citd@muongthanh.vn'), $recipients, $ccList));
+
         // Điều kiện hiển thị từng nội dung theo cấu hình period (fallback khi thiếu codes)
         $showSports = in_array('sports', $periodContentCodes) || ($noCodes && $isDot1);
         // Văn nghệ thuộc Đợt 3 — chỉ hiển thị khi period có nội dung 'talent' VÀ không phải Đợt 1
