@@ -651,6 +651,43 @@ class EmailHelper
             }
         }
 
+        // Đếm số người tham dự theo đợt (unique theo staff_code, fallback tên):
+        //   Đợt 1 → thể thao + Miss | Đợt 2 → thi nghiệp vụ | Đợt 3 → văn nghệ
+        $attendeeKeys = array();
+        $collectKey = function ($person) use (&$attendeeKeys) {
+            $code = isset($person['staff_code']) ? trim((string)$person['staff_code']) : '';
+            $name = isset($person['attendee_name']) ? trim((string)$person['attendee_name']) : '';
+            $key = $code !== '' ? 'c:' . $code : ($name !== '' ? 'n:' . mb_strtolower($name) : '');
+            if ($key !== '') {
+                $attendeeKeys[$key] = true;
+            }
+        };
+        if ($isDot1) {
+            foreach ($sportTeamsData as $team) {
+                foreach ($team['members'] as $m) {
+                    $collectKey($m);
+                }
+            }
+            foreach ($beautyContestantsData as $c) {
+                $collectKey($c);
+            }
+        }
+        if ($isDot2) {
+            foreach ($competitionRegistrations as $comp) {
+                foreach ($comp['attendees'] as $a) {
+                    $collectKey($a);
+                }
+            }
+        }
+        if ($showTalent) {
+            foreach ($talentEntriesData as $entry) {
+                foreach ($entry['members'] as $m) {
+                    $collectKey($m);
+                }
+            }
+        }
+        $attendeesCount = count($attendeeKeys);
+
         // Data truyền sang email view & PDF view
         $data = array(
             'model' => $model,
@@ -664,7 +701,7 @@ class EmailHelper
             'talentEntries' => $talentEntriesData,
             'beautyContestants' => $beautyContestantsData,
             'competitionRegistrations' => $competitionRegistrations,
-            'attendeesCount' => count($attendees),
+            'attendeesCount' => $attendeesCount,
         );
 
         // 8. Tạo file PDF đính kèm
