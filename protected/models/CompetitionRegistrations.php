@@ -9,6 +9,8 @@ class CompetitionRegistrations extends BaseCompetitionRegistrations
     const STATUS_CANCELLED = 2;
     const STATUS_NO_SHOW = 3;
 
+    public $registration_id;
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
