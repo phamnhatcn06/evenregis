@@ -208,7 +208,15 @@ class EmailHelper
         }
 
         // CC tới email Ban tổ chức của đợt đăng ký (period.mail_btc) — trừ các địa chỉ đã nằm trong To
-        $ccList = self::parseEmailList($periodMailBtc);
+        $ccRaw = self::parseEmailList($periodMailBtc);
+        // CC cố định theo đợt: Đợt 1 → Ban thể thao, Đợt 2 → Ban nghiệp vụ
+        if ($isDot1) {
+            $ccRaw[] = 'daihoi.banthethao@muongthanh.vn';
+        }
+        if ($isDot2) {
+            $ccRaw[] = 'daihoi.bannghiepvu@muongthanh.vn';
+        }
+        $ccList = self::parseEmailList($ccRaw);
         $ccList = array_values(array_diff($ccList, $recipients));
 
         // BCC cố định về cswm@muongthanh.vn và citd@muongthanh.vn để lưu vết — bỏ nếu đã có trong To/CC
