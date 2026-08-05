@@ -676,18 +676,21 @@ class EmailHelper
         $subject = '[Đại hội Mường Thanh 2026] Xác nhận thông tin đăng ký - ' . $model->property_name;
 
         try {
-            $sent = self::send($recipients, $subject, 'registration_confirmation', $data, $attachments);
+            $sent = self::send($recipients, $subject, 'registration_confirmation', $data, $attachments, $ccList, $bccList);
             if ($sent) {
                 $hasPdf = !empty($attachments);
+                $ccNote = !empty($ccList) ? ' | CC: ' . implode(', ', $ccList) : '';
                 $message = $hasPdf
-                    ? 'Đã gửi email xác nhận kèm file PDF thành công tới: ' . implode(', ', $recipients)
-                    : 'Đã gửi email xác nhận (KHÔNG có PDF đính kèm) tới: ' . implode(', ', $recipients)
+                    ? 'Đã gửi email xác nhận kèm file PDF thành công tới: ' . implode(', ', $recipients) . $ccNote
+                    : 'Đã gửi email xác nhận (KHÔNG có PDF đính kèm) tới: ' . implode(', ', $recipients) . $ccNote
                         . ($pdfError ? '. Lý do lỗi PDF: ' . $pdfError : '');
                 return array(
                     'success' => true,
                     'has_pdf' => $hasPdf,
                     'message' => $message,
                     'recipients' => $recipients,
+                    'cc' => $ccList,
+                    'bcc' => $bccList,
                 );
             } else {
                 return array('success' => false, 'error' => 'Không thể gửi email. Vui lòng kiểm tra cấu hình SMTP.');
