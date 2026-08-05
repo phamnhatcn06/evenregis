@@ -179,6 +179,10 @@ $columnsAll = array_merge($baseColumns, array($sendMailStatusColumn, $actionColu
 .approval-tabs .tab-approved .tab-icon { background: #d4edda; color: #155724; }
 .approval-tabs .tab-approved.active { background: linear-gradient(135deg, #28a745 0%, #48c774 100%); color: #fff; }
 .approval-tabs .tab-approved.active .tab-icon { background: rgba(255,255,255,0.2); color: #fff; }
+/* Tab Tất cả - Info/Blue */
+.approval-tabs .tab-all .tab-icon { background: #cfe2ff; color: #084298; }
+.approval-tabs .tab-all.active { background: linear-gradient(135deg, #0d6efd 0%, #3d8bfd 100%); color: #fff; }
+.approval-tabs .tab-all.active .tab-icon { background: rgba(255,255,255,0.2); color: #fff; }
 
 @media (max-width: 768px) {
     .approval-tabs {
