@@ -103,9 +103,10 @@ $sendMailStatusColumn = array(
     'sortable' => false,
     'value' => function ($data) {
         $sent = isset($data->is_sendmail) && (int)$data->is_sendmail === 1;
-        return $sent
+        $badge = $sent
             ? '<span class="badge bg-success"><i class="fa fa-check me-1"></i>Đã gửi</span>'
             : '<span class="badge bg-secondary">Chưa gửi</span>';
+        return '<span class="send-mail-status" data-reg-id="' . $data->id . '">' . $badge . '</span>';
     }
 );
 
