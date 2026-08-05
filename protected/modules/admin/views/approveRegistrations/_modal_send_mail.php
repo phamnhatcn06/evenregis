@@ -147,6 +147,12 @@ function submitSendMail() {
             var modal = bootstrap.Modal.getInstance(modalEl);
             if (modal) modal.hide();
 
+            // Cập nhật ngay cột trạng thái "Gửi mail" của phiếu vừa gửi (trên mọi tab)
+            var statusCells = document.querySelectorAll('.send-mail-status[data-reg-id="' + regId + '"]');
+            statusCells.forEach(function(cell) {
+                cell.innerHTML = '<span class="badge bg-success"><i class="fa fa-check me-1"></i>Đã gửi</span>';
+            });
+
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'success',
