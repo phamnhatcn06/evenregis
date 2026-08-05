@@ -94,9 +94,25 @@ $rejectionReasonColumn = array(
     'type' => 'raw',
 );
 
+// Cột trạng thái gửi mail
+$sendMailStatusColumn = array(
+    'name' => 'is_sendmail',
+    'header' => 'Gửi mail',
+    'type' => 'raw',
+    'filter' => false,
+    'sortable' => false,
+    'value' => function ($data) {
+        $sent = isset($data->is_sendmail) && (int)$data->is_sendmail === 1;
+        return $sent
+            ? '<span class="badge bg-success"><i class="fa fa-check me-1"></i>Đã gửi</span>'
+            : '<span class="badge bg-secondary">Chưa gửi</span>';
+    }
+);
+
 $columnsSubmitted = array_merge($baseColumns, array($actionColumnSubmitted));
 $columnsRejected = array_merge($baseColumns, array($rejectionReasonColumn, $actionColumnOther));
 $columnsApproved = array_merge($baseColumns, array($actionColumnOther));
+$columnsAll = array_merge($baseColumns, array($sendMailStatusColumn, $actionColumnOther));
 ?>
 
 <style>
