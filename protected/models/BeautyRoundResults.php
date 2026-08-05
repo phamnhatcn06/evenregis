@@ -14,6 +14,7 @@ class BeautyRoundResults extends BaseBeautyRoundResults
     public $photo_portrait;
     public $status;
     public $rank_in_round;
+    public $passed;
 
     public static function model($className = __CLASS__)
     {
