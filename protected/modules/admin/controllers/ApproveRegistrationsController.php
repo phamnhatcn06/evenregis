@@ -928,6 +928,32 @@ class ApproveRegistrationsController extends AdminController
         Yii::app()->end();
     }
 
+    /**
+     * Lấy email người nhận mặc định cho phiếu đăng ký (cột mail_confirm của đơn vị/property).
+     * Dùng để đổ sẵn vào ô email khi mở modal gửi mail.
+     */
+    public function actionGetMailRecipient($registration_id)
+    {
+        header('Content-Type: application/json');
+
+        $model = Registrations::fetchFromApi($registration_id);
+        if ($model === null) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy phiếu đăng ký.'));
+            Yii::app()->end();
+        }
+
+        $email = '';
+        if (!empty($model->property_id)) {
+            $property = Properties::fetchFromApi($model->property_id);
+            if ($property !== null && !empty($property->mail_confirm)) {
+                $email = $property->mail_confirm;
+            }
+        }
+
+        echo CJSON::encode(array('success' => true, 'email' => $email));
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = Registrations::fetchFromApi($id);
