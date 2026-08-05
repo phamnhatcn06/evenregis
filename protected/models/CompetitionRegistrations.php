@@ -21,6 +21,7 @@ class CompetitionRegistrations extends BaseCompetitionRegistrations
         return array(
             'id' => 'ID',
             'competition_id' => 'Cuộc thi',
+            'registration_id' => 'Phiếu đăng ký',
             'attendee_id' => 'Người tham dự',
             'candidate_number' => 'Số báo danh',
             'status' => 'Trạng thái',
