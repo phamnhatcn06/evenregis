@@ -4,6 +4,9 @@ Yii::import('application.models._base.BaseEventContents');
 
 class EventContents extends BaseEventContents
 {
+	public $allow_alliance;
+	public $max_alliance_teams;
+
 	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
