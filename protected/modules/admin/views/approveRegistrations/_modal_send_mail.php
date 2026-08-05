@@ -33,8 +33,9 @@
                         <div>
                             Nội dung mail sẽ tự động kèm theo danh sách chi tiết:
                             <ul class="mb-0 ps-3 mt-1">
-                                <li><strong>Đợt 1</strong>: Bảng các đội thi theo môn thể thao kèm danh sách VĐV, danh sách thí sinh Miss và các tiết mục văn nghệ.</li>
+                                <li><strong>Đợt 1</strong>: Bảng các đội thi theo môn thể thao kèm danh sách VĐV và danh sách thí sinh Miss.</li>
                                 <li><strong>Đợt 2</strong>: Bảng các môn thi nghiệp vụ và danh sách thí sinh dự thi.</li>
+                                <li><strong>Đợt 3</strong>: Danh sách các tiết mục và thông tin văn nghệ.</li>
                             </ul>
                         </div>
                     </div>
