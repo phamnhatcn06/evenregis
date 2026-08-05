@@ -322,7 +322,7 @@ class ApiEndpoints
     const COMPETITION_ROUND_RESULT_DESTROY = '/api/competition-round-results/destroy/{id}';
 
     // Competition Department - Additional
-    const COMPETITION_DEPARTMENT_CHECK_ELIGIBILITY = '/api/competition-departments/check-eligibility';
+    const COMPETITION_DEPARTMENT_CHECK_ELIGIBILITY = '/api/competition-departments/check-eligibility/{competition_id}/{attendee_id}';
 
     // Beauty Registration
     const BEAUTY_REGISTRATION_LIST = '/api/beauty-registrations';
