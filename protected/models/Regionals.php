@@ -20,6 +20,7 @@ class Regionals extends BaseRegionals
 	{
 		return array(
 			'id' => 'ID',
+			'content_id' => 'Nội dung',
 			'code' => 'Mã khu vực',
 			'name' => 'Tên khu vực',
 			'description' => 'Mô tả',
