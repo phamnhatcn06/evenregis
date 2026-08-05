@@ -6,6 +6,7 @@ class TalentScores extends BaseTalentScores
 {
     public $entry_title;
     public $judge_name;
+    public $round_id;
 
     public static function model($className = __CLASS__)
     {
