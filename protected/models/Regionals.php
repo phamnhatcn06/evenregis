@@ -4,6 +4,8 @@ Yii::import('application.models._base.BaseRegionals');
 
 class Regionals extends BaseRegionals
 {
+	public $content_id;
+
 	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
