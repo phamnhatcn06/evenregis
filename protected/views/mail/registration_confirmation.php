@@ -79,8 +79,11 @@ include __DIR__ . '/_email_header.php';
             <div style="color:#dc2626; font-weight:bold; margin-bottom:6px;">⚠️ Lưu ý:</div>
             <div style="color:#dc2626; font-weight:bold; margin-bottom:4px;">- Thời gian điều chỉnh cuối cùng của đăng ký (nếu có) là từ 10-15.08.2026.</div>
             <div style="color:#dc2626; font-weight:bold; margin-bottom:4px;">- Sau ngày 15.08.2026, các ĐV ký &amp; gửi bản xác nhận cử VĐV thi đấu Vòng Cụm gửi BTC.</div>
-            <div style="color:#dc2626; font-weight:bold;">
+            <div style="color:#dc2626; font-weight:bold; margin-bottom:4px;">
                 - Ảnh của các thành viên trong <strong>Bản xác nhận</strong> phải được <strong>đóng dấu giáp lai/xác nhận trên từng ảnh</strong>.
+            </div>
+            <div style="color:#dc2626; font-weight:bold;">
+                - Các trường hợp đã gửi hồ sơ thay đổi người tham dự đang được xử lý và sẽ đưa lên hệ thống sau ngày 10/08/2026.
             </div>
         </div>
 
