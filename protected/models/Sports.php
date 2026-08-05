@@ -4,6 +4,9 @@ Yii::import('application.models._base.BaseSports');
 
 class Sports extends BaseSports
 {
+	public $min_per_team_member;
+	public $max_per_team_member;
+
 	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
