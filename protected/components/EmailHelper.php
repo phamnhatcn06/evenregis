@@ -249,8 +249,8 @@ class EmailHelper
 
         // Điều kiện hiển thị từng nội dung theo cấu hình period (fallback khi thiếu codes)
         $showSports = in_array('sports', $periodContentCodes) || ($noCodes && $isDot1);
-        // Văn nghệ thuộc Đợt 3 — chỉ hiển thị khi period thực sự có nội dung 'talent', không fallback theo Đợt 1
-        $showTalent = in_array('talent', $periodContentCodes);
+        // Văn nghệ thuộc Đợt 3 — chỉ hiển thị khi period có nội dung 'talent' VÀ không phải Đợt 1
+        $showTalent = in_array('talent', $periodContentCodes) && !$isDot1;
         $showMiss = in_array('miss', $periodContentCodes) || ($noCodes && $isDot1);
         $showCompetition = in_array('competition', $periodContentCodes) || ($noCodes && $isDot2);
 
