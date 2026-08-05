@@ -56,11 +56,31 @@
 function openSendMailModal(registrationId, propertyName, submittedByEmail) {
     document.getElementById('send_mail_registration_id').value = registrationId;
     document.getElementById('send_mail_property_display').textContent = propertyName || 'Đơn vị';
-    
+
     var emailInput = document.getElementById('send_mail_recipient_email');
-    // Ưu tiên email nộp nếu hợp lệ, mặc định cswm@muongthanh.vn để gửi test
-    emailInput.value = 'cswm@muongthanh.vn';
-    
+    // Mặc định lấy email cấu hình ở cột mail_confirm của đơn vị (property) trong đăng ký.
+    emailInput.value = '';
+    emailInput.placeholder = 'Đang tải email đơn vị...';
+
+    var url = '<?php echo Yii::app()->createUrl("/admin/approveRegistrations/getMailRecipient"); ?>?registration_id=' + encodeURIComponent(registrationId);
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            emailInput.placeholder = 'Ví dụ: donvi@muongthanh.vn';
+            if (data && data.success && data.email) {
+                emailInput.value = data.email;
+            } else if (submittedByEmail) {
+                // Không có mail_confirm → fallback email người nộp phiếu
+                emailInput.value = submittedByEmail;
+            }
+        })
+        .catch(function() {
+            emailInput.placeholder = 'Ví dụ: donvi@muongthanh.vn';
+            if (submittedByEmail) {
+                emailInput.value = submittedByEmail;
+            }
+        });
+
     var modalEl = document.getElementById('sendMailModal');
     var modal = bootstrap.Modal.getInstance(modalEl);
     if (!modal) {
