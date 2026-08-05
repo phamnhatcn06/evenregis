@@ -18,6 +18,7 @@ class TalentScores extends BaseTalentScores
         return array(
             'id' => 'ID',
             'entry_id' => 'Tiết mục',
+            'round_id' => 'Vòng thi',
             'judge_id' => 'Giám khảo',
             'score' => 'Điểm',
             'criteria' => 'Tiêu chí',
