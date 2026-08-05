@@ -8,6 +8,10 @@ class Staffs extends BaseStaffs
 	public $division_name;
 	public $position_name;
 	public $department_code;
+	public $personal_email;
+	public $contract_type;
+	public $start_date;
+	public $end_date;
 
 	public static function model($className = __CLASS__)
 	{
