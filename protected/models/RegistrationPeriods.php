@@ -13,6 +13,14 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		return parent::model($className);
 	}
 
+	public function rules()
+	{
+		$rules = parent::rules();
+		$rules[] = array('mail_btc', 'length', 'max' => 255);
+		$rules[] = array('mail_btc', 'safe');
+		return $rules;
+	}
+
 	public static function fetchFromApi($id)
 	{
 		$url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_PERIOD_DETAIL, array('id' => $id));
