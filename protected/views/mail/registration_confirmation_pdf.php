@@ -380,12 +380,24 @@
     }
     ksort($talentByCategory);
 
-    // Tiêu đề MẪU SỐ 1 thay đổi theo nội dung đăng ký của đợt (thể thao/miss/nghiệp vụ/văn nghệ)
+    // Tiêu đề MẪU SỐ 1 theo đợt đăng ký (period):
+    //   Đợt 1 → thể thao, miss | Đợt 2 → thi nghiệp vụ | Đợt 3 → văn nghệ
+    $periodContentCodes = isset($periodContentCodes) && is_array($periodContentCodes) ? $periodContentCodes : array();
+    $isDot1 = isset($isDot1) ? $isDot1 : in_array('sports', $periodContentCodes);
+    $isDot2 = isset($isDot2) ? $isDot2 : in_array('competition', $periodContentCodes);
+    $isDot3 = in_array('talent', $periodContentCodes) && !$isDot1;
+
     $mau1Parts = array();
-    if (!empty($sportCategories) || !empty($sportTeams)) $mau1Parts[] = 'thể thao';
-    if (!empty($beautyByContest)) $mau1Parts[] = 'miss';
-    if (!empty($competitionList)) $mau1Parts[] = 'thi nghiệp vụ';
-    if (!empty($talentByCategory)) $mau1Parts[] = 'văn nghệ';
+    if ($isDot1) {
+        $mau1Parts[] = 'thể thao';
+        $mau1Parts[] = 'miss';
+    }
+    if ($isDot2) {
+        $mau1Parts[] = 'thi nghiệp vụ';
+    }
+    if ($isDot3) {
+        $mau1Parts[] = 'văn nghệ';
+    }
     $mau1Title = 'Đăng ký tham dự các hoạt động' . (empty($mau1Parts) ? '' : ' ' . implode(', ', $mau1Parts));
     ?>
 
