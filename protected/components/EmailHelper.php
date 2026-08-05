@@ -170,12 +170,21 @@ class EmailHelper
             $event = Events::fetchFromApi($model->event_id);
             $model->event_name = $event ? $event->name : '';
         }
-        if (empty($model->period_name) && $model->period_id) {
+        // Tải thông tin đợt đăng ký (period) — lấy tên đợt còn thiếu & email BTC (mail_btc) để CC
+        $periodMailBtc = null;
+        if ($model->period_id) {
             $period = RegistrationPeriods::fetchFromApi($model->period_id);
-            $model->period_name = $period ? $period->name : '';
+            if ($period) {
+                if (empty($model->period_name)) {
+                    $model->period_name = $period->name;
+                }
+                if (!empty($period->mail_btc)) {
+                    $periodMailBtc = $period->mail_btc;
+                }
+            }
         }
 
-        // 2. Thu thập và làm sạch danh sách email nhận
+        // 2. Thu thập và làm sạch danh sách email nhận (To)
         $rawRecipients = array();
         if (!empty($customRecipient)) {
             $rawRecipients[] = $customRecipient;
@@ -197,6 +206,13 @@ class EmailHelper
         if (empty($recipients)) {
             $recipients = array('cswm@muongthanh.vn');
         }
+
+        // CC tới email Ban tổ chức của đợt đăng ký (period.mail_btc) — trừ các địa chỉ đã nằm trong To
+        $ccList = self::parseEmailList($periodMailBtc);
+        $ccList = array_values(array_diff($ccList, $recipients));
+
+        // BCC cố định về cswm@muongthanh.vn để lưu vết — bỏ nếu đã có trong To/CC
+        $bccList = array_values(array_diff(array('cswm@muongthanh.vn'), $recipients, $ccList));
 
         // 3. Tải cấu hình đợt đăng ký — lấy content_id của period rồi map sang code qua bảng Contents
         $periodContentCodes = array();
