@@ -306,7 +306,7 @@ class MyHelper
      * @param array $attachments File paths to attach
      * @return bool
      */
-    public static function sendMail($to, $subject, $view, $data = array(), $attachments = array())
+    public static function sendMail($to, $subject, $view, $data = array(), $attachments = array(), $cc = array(), $bcc = array())
     {
         $mail = Yii::app()->mail;
         $params = Yii::app()->params['mail'];
@@ -329,6 +329,12 @@ class MyHelper
         $message->setSubject($subject);
         $message->setFrom(array($params['from_email'] => $params['from_name']));
         $message->setTo($to);
+        if (!empty($cc)) {
+            $message->setCc($cc);
+        }
+        if (!empty($bcc)) {
+            $message->setBcc($bcc);
+        }
         $message->setBody($body, 'text/html');
 
         foreach ($attachments as $attachment) {
