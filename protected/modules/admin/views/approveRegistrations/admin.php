@@ -280,6 +280,15 @@ $columnsAll = array_merge($baseColumns, array($sendMailStatusColumn, $actionColu
                     <span class="tab-count"><?php echo $countApproved; ?></span>
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link tab-all" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                    <div class="tab-info">
+                        <div class="tab-icon"><i class="fa fa-list"></i></div>
+                        <span>Tất cả</span>
+                    </div>
+                    <span class="tab-count"><?php echo $countAll; ?></span>
+                </button>
+            </li>
         </ul>
 
         <div class="tab-content pt-3" id="approvalTabsContent">
