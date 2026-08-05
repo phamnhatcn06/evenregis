@@ -25,7 +25,7 @@
                             <span class="input-group-text"><i class="fa fa-envelope text-muted"></i></span>
                             <input type="email" class="form-control" id="send_mail_recipient_email" name="recipient_email" placeholder="Ví dụ: donvi@muongthanh.vn" required>
                         </div>
-                        <div class="form-text text-muted">Mặc định là email người nộp phiếu đăng ký. Bạn có thể thay đổi địa chỉ email này nếu cần.</div>
+                        <div class="form-text text-muted">Mặc định là email cấu hình của đơn vị (cột mail_confirm). Bạn có thể thay đổi địa chỉ email này nếu cần.</div>
                     </div>
 
                     <div class="alert alert-info d-flex align-items-start mb-0 p-2 text-dark" style="font-size: 13px;">
