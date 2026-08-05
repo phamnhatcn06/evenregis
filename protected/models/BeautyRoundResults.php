@@ -30,6 +30,7 @@ class BeautyRoundResults extends BaseBeautyRoundResults
             'score' => 'Điểm',
             'status' => 'Trạng thái',
             'rank_in_round' => 'Xếp hạng',
+            'passed' => 'Đạt/Vượt qua',
             'note' => 'Ghi chú',
             'created_at' => 'Ngày tạo',
             'updated_at' => 'Ngày cập nhật',
