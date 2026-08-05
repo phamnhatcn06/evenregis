@@ -42,7 +42,7 @@
 
         .doc-title {
             text-align: center;
-            font-size: 15pt;
+            font-size: 14pt;
             font-weight: bold;
             text-transform: uppercase;
             margin-bottom: 2px;
@@ -414,7 +414,8 @@
                     </tr>
                 <?php endif; ?>
 
-                <?php // Thể thao (Đợt 1) ?>
+                <?php // Thể thao (Đợt 1) 
+                ?>
                 <?php foreach ($sportCategories as $cat): ?>
                     <?php
                     // Khớp số đội & số VĐV đã đăng ký theo phần tên trước dấu "("
@@ -442,7 +443,8 @@
                     </tr>
                 <?php endforeach; ?>
 
-                <?php // Thi nghiệp vụ (Đợt 2) — hiển thị tên các nghiệp vụ ?>
+                <?php // Thi nghiệp vụ (Đợt 2) — hiển thị tên các nghiệp vụ 
+                ?>
                 <?php foreach ($competitionList as $comp): ?>
                     <tr>
                         <td class="col-stt"><?php echo ++$stt; ?></td>
@@ -451,7 +453,8 @@
                     </tr>
                 <?php endforeach; ?>
 
-                <?php // Văn nghệ (Đợt 3) — gom theo thể loại ?>
+                <?php // Văn nghệ (Đợt 3) — gom theo thể loại 
+                ?>
                 <?php foreach ($talentByCategory as $catName => $entries): ?>
                     <tr>
                         <td class="col-stt"><?php echo ++$stt; ?></td>
@@ -460,7 +463,8 @@
                     </tr>
                 <?php endforeach; ?>
 
-                <?php // Miss (Đợt 1) ?>
+                <?php // Miss (Đợt 1) 
+                ?>
                 <?php foreach ($beautyByContest as $contestName => $contestants): ?>
                     <tr>
                         <td class="col-stt"><?php echo ++$stt; ?></td>
@@ -572,7 +576,8 @@
             <?php endif; ?>
         <?php endif; ?>
 
-        <?php // Thi nghiệp vụ (Đợt 2) — mẫu số 2 dùng chung: danh sách thí sinh theo từng nghiệp vụ ?>
+        <?php // Thi nghiệp vụ (Đợt 2) — mẫu số 2 dùng chung: danh sách thí sinh theo từng nghiệp vụ 
+        ?>
         <?php if (!empty($competitionList)): ?>
             <div class="doc-title" style="margin-top:16px;">Danh sách thí sinh thi nghiệp vụ</div>
             <?php foreach ($competitionList as $comp): ?>
@@ -587,7 +592,8 @@
             <?php endforeach; ?>
         <?php endif; ?>
 
-        <?php // Văn nghệ (Đợt 3) — mẫu số 2 dùng chung: danh sách thành viên theo từng tiết mục ?>
+        <?php // Văn nghệ (Đợt 3) — mẫu số 2 dùng chung: danh sách thành viên theo từng tiết mục 
+        ?>
         <?php if (!empty($talentEntries)): ?>
             <div class="doc-title" style="margin-top:16px;">Danh sách tiết mục văn nghệ</div>
             <?php foreach ($talentEntries as $entry): ?>
