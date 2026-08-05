@@ -58,7 +58,8 @@ function openSendMailModal(registrationId, propertyName, submittedByEmail) {
     document.getElementById('send_mail_property_display').textContent = propertyName || 'Đơn vị';
 
     var emailInput = document.getElementById('send_mail_recipient_email');
-    // Mặc định lấy email cấu hình ở cột mail_confirm của đơn vị (property) trong đăng ký.
+    // Chỉ lấy danh sách email cấu hình ở cột mail_confirm của đơn vị (property).
+    // KHÔNG dùng email người nộp phiếu (submitted_by) làm người nhận.
     emailInput.value = '';
     emailInput.placeholder = 'Đang tải email đơn vị...';
 
@@ -66,19 +67,17 @@ function openSendMailModal(registrationId, propertyName, submittedByEmail) {
     fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(function(response) { return response.json(); })
         .then(function(data) {
-            emailInput.placeholder = 'Ví dụ: donvi@muongthanh.vn';
             if (data && data.success && data.email) {
                 emailInput.value = data.email;
-            } else if (submittedByEmail) {
-                // Không có mail_confirm → fallback email người nộp phiếu
-                emailInput.value = submittedByEmail;
+                emailInput.placeholder = 'Ví dụ: donvi@muongthanh.vn';
+            } else {
+                emailInput.value = '';
+                emailInput.placeholder = 'Đơn vị chưa cấu hình email nhận (mail_confirm)';
             }
         })
         .catch(function() {
+            emailInput.value = '';
             emailInput.placeholder = 'Ví dụ: donvi@muongthanh.vn';
-            if (submittedByEmail) {
-                emailInput.value = submittedByEmail;
-            }
         });
 
     var modalEl = document.getElementById('sendMailModal');
