@@ -68,20 +68,24 @@ class EmailHelper
         if (empty($raw)) {
             return array();
         }
-        $list = array();
-        if (is_array($raw)) {
-            $list = $raw;
-        } elseif (is_string($raw)) {
-            $split = preg_split('/[\s,;]+/', $raw);
-            if (is_array($split)) {
-                $list = $split;
-            }
-        }
+        // Chuẩn hoá về mảng các phần tử. Mỗi phần tử có thể vẫn là chuỗi nhiều email
+        // (phân cách bằng dấu phẩy, chấm phẩy, khoảng trắng, xuống dòng) nên phải tách tiếp.
+        $items = is_array($raw) ? $raw : array($raw);
         $validEmails = array();
-        foreach ($list as $item) {
-            $email = trim($item);
-            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $validEmails[] = strtolower($email);
+        foreach ($items as $item) {
+            if (is_array($item)) {
+                $parts = $item;
+            } else {
+                $parts = preg_split('/[\s,;]+/', (string) $item);
+            }
+            if (!is_array($parts)) {
+                continue;
+            }
+            foreach ($parts as $part) {
+                $email = trim((string) $part);
+                if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $validEmails[] = strtolower($email);
+                }
             }
         }
         return array_values(array_unique($validEmails));
