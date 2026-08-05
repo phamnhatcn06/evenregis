@@ -36,6 +36,9 @@
                                 <li><strong>Đợt 1</strong>: Bảng các đội thi tương ứng các môn thể thao và danh sách VĐV.</li>
                                 <li><strong>Đợt 2</strong>: Bảng các môn thi nghiệp vụ và danh sách thí sinh dự thi.</li>
                             </ul>
+                            <div class="mt-2 pt-2 border-top">
+                                <strong>Lưu ý:</strong> Các trường hợp đã gửi hồ sơ thay đổi người tham dự đang được xử lý và sẽ đưa lên hệ thống sau ngày 10/08/2026.
+                            </div>
                         </div>
                     </div>
                 </form>
