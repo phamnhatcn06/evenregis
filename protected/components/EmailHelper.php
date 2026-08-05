@@ -559,7 +559,7 @@ class EmailHelper
         if ($isDot1 || !empty($sportTeamsData)) {
             $categoriesMap['sports'] = 'Thể thao';
         }
-        if (in_array('talent', $periodContentCodes) || !empty($talentEntriesData)) {
+        if ($showTalent && !empty($talentEntriesData)) {
             $categoriesMap['talent'] = 'Văn nghệ';
         }
         if (in_array('miss', $periodContentCodes) || !empty($beautyContestantsData)) {
