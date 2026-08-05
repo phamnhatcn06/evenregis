@@ -214,12 +214,6 @@ class EmailHelper
         // BCC cố định về cswm@muongthanh.vn và citd@muongthanh.vn để lưu vết — bỏ nếu đã có trong To/CC
         $bccList = array_values(array_diff(array('cswm@muongthanh.vn', 'citd@muongthanh.vn'), $recipients, $ccList));
 
-        // === TẠM THỜI (TEST) — chỉ gửi tới cswm@muongthanh.vn, tắt list mail thật ===
-        $recipients = array('cswm@muongthanh.vn');
-        $ccList = array();
-        $bccList = array();
-        // === HẾT ĐOẠN TEST ===
-
         // 3. Tải cấu hình đợt đăng ký — lấy content_id của period rồi map sang code qua bảng Contents
         $periodContentCodes = array();
         if ($model->period_id) {
