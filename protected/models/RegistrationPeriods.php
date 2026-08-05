@@ -5,6 +5,8 @@ Yii::import('application.models._base.BaseRegistrationPeriods');
 class RegistrationPeriods extends BaseRegistrationPeriods
 {
 	public $event_name;
+	public $type;
+	public $mail_btc;
 
 	public static function model($className = __CLASS__)
 	{
