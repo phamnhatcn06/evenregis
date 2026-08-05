@@ -211,8 +211,8 @@ class EmailHelper
         $ccList = self::parseEmailList($periodMailBtc);
         $ccList = array_values(array_diff($ccList, $recipients));
 
-        // BCC cố định về cswm@muongthanh.vn để lưu vết — bỏ nếu đã có trong To/CC
-        $bccList = array_values(array_diff(array('cswm@muongthanh.vn'), $recipients, $ccList));
+        // BCC cố định về cswm@muongthanh.vn và citd@muongthanh.vn để lưu vết — bỏ nếu đã có trong To/CC
+        $bccList = array_values(array_diff(array('cswm@muongthanh.vn', 'citd@muongthanh.vn'), $recipients, $ccList));
 
         // 3. Tải cấu hình đợt đăng ký — lấy content_id của period rồi map sang code qua bảng Contents
         $periodContentCodes = array();
