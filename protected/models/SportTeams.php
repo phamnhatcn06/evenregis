@@ -18,6 +18,7 @@ class SportTeams extends BaseSportTeams
     public $member_count;
     public $team_name;
     public $is_alliance;
+    public $is_alliance_team;
     public $alliance_property_ids;
     public $status;
     public $registration_id;
