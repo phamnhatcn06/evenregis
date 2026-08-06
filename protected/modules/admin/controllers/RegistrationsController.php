@@ -533,10 +533,6 @@ class RegistrationsController extends AdminController
 				$isOwner = ($entryPropertyId === $currentPropertyId);
 				$isAlliance = in_array($currentPropertyId, $allianceIdArray, true);
 
-				// Debug log
-				$entryId = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : 'N/A');
-				error_log("Talent Entry ID: {$entryId}, entryPropertyId: {$entryPropertyId}, allianceIds: " . json_encode($allianceIdArray) . ", isOwner: " . ($isOwner ? 'Y' : 'N') . ", isAlliance: " . ($isAlliance ? 'Y' : 'N'));
-
 				if ($isOwner || $isAlliance) {
 					$loadTalentEntry($entry);
 				}
