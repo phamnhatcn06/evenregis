@@ -723,7 +723,17 @@ class EmailHelper
             Yii::log('Generate PDF error (registration ' . $registrationId . '): ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.components.EmailHelper');
         }
 
-        $subject = '[Đại hội Mường Thanh 2026] Xác nhận thông tin đăng ký - ' . $model->property_name;
+        // Tiêu đề email theo từng đợt đăng ký
+        if ($isDot1) {
+            $subjectPrefix = '[ĐHMT2026] Xác nhận đăng ký thể thao, miss';
+        } elseif ($isDot2) {
+            $subjectPrefix = '[ĐHMT2026] Xác nhận đăng ký nghiệp vụ';
+        } elseif ($showTalent) {
+            $subjectPrefix = '[ĐHMT2026] Xác nhận đăng ký văn nghệ';
+        } else {
+            $subjectPrefix = '[ĐHMT2026] Xác nhận đăng ký';
+        }
+        $subject = $subjectPrefix . ' - ' . $model->property_name;
 
         // DEBUG: chỉ gửi đến địa chỉ debug, bỏ toàn bộ CC/BCC thật
         if (self::DEBUG_MODE) {
