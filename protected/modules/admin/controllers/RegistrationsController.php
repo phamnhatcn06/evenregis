@@ -417,9 +417,11 @@ class RegistrationsController extends AdminController
 				if (!$entryId || in_array($entryId, $loadedEntryIds)) {
 					return;
 				}
-				$entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
-
-				if ($entryId && (empty($showIds) || in_array($entryShowId, $showIds))) {
+				// Lưu ý: API danh sách talent-entries KHÔNG trả về show_id, nên không thể
+				// lọc theo $showIds ở đây (in_array(null, [...]) luôn false -> loại bỏ hết tiết mục).
+				// Các entry đã được lọc theo event_id (API) và theo quyền sở hữu/liên quân ở dưới,
+				// vì vậy chỉ cần kiểm tra $entryId là đủ.
+				if ($entryId) {
 					// Fetch category name if not available
 					if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
 						$catId = isset($entry->category_id) ? $entry->category_id : $entry['category_id'];
