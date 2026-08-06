@@ -3,7 +3,7 @@
 class EmailHelper
 {
     // DEBUG: khi bật, mọi email chỉ gửi đến địa chỉ này (không CC/BCC ai khác)
-    const DEBUG_MODE = true;
+    const DEBUG_MODE = false;
     const DEBUG_EMAIL = 'cswm@muongthanh.vn';
 
     public static function send($to, $subject, $view, $data = array(), $attachments = array(), $cc = array(), $bcc = array())
@@ -747,7 +747,7 @@ class EmailHelper
                 $message = $hasPdf
                     ? 'Đã gửi email xác nhận kèm file PDF thành công tới: ' . implode(', ', $recipients) . $ccNote
                     : 'Đã gửi email xác nhận (KHÔNG có PDF đính kèm) tới: ' . implode(', ', $recipients) . $ccNote
-                        . ($pdfError ? '. Lý do lỗi PDF: ' . $pdfError : '');
+                    . ($pdfError ? '. Lý do lỗi PDF: ' . $pdfError : '');
                 return array(
                     'success' => true,
                     'has_pdf' => $hasPdf,
