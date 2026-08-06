@@ -502,11 +502,11 @@
                         <td>
                             <div><strong><?php echo CHtml::encode($catName); ?></strong></div>
                             <?php foreach ($entries as $entry): ?>
-                                <div style="margin-top:4px;padding-left:8px;">
-                                    <div>
+                                <div class="talent-entry">
+                                    <div class="talent-title">
                                         &bull; <strong><?php echo CHtml::encode(!empty($entry['title']) ? $entry['title'] : 'Tiết mục'); ?></strong>
                                         <?php if (!empty($entry['is_alliance'])): ?>
-                                            <span style="font-style:italic;">(Liên quân)</span>
+                                            <span class="talent-alliance">(Liên quân)</span>
                                         <?php endif; ?>
                                     </div>
                                     <?php
@@ -528,11 +528,11 @@
                                     }
                                     ?>
                                     <?php foreach ($infoParts as $ip): ?>
-                                        <div style="padding-left:10px;font-size:11px;"><?php echo CHtml::encode($ip); ?></div>
+                                        <div class="talent-info"><?php echo CHtml::encode($ip); ?></div>
                                     <?php endforeach; ?>
                                     <?php $desc = !empty($entry['content']) ? $entry['content'] : (!empty($entry['description']) ? $entry['description'] : ''); ?>
                                     <?php if (!empty($desc)): ?>
-                                        <div style="padding-left:10px;font-size:11px;">Nội dung: <?php echo CHtml::encode($desc); ?></div>
+                                        <div class="talent-desc">Nội dung: <?php echo CHtml::encode($desc); ?></div>
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
