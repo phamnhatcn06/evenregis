@@ -592,7 +592,11 @@
         ?>
         <?php if (!empty($competitionList)): ?>
             <div class="doc-title" style="margin-top:16px;">Danh sách thí sinh thi nghiệp vụ</div>
-            <?php foreach ($competitionList as $comp): ?>
+            <?php
+            // Render một khối nghiệp vụ thành ô <td> giống phần thể thao
+            $renderCompetitionCell = function ($comp) {
+                ob_start();
+            ?>
                 <div class="sport-block">
                     <div class="sport-name"><?php echo CHtml::encode($comp['competition_name']); ?></div>
                     <?php foreach ($comp['attendees'] as $idx => $a): ?>
@@ -601,7 +605,20 @@
                         </div>
                     <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+            <?php
+                return ob_get_clean();
+            };
+            ?>
+            <table class="grid" style="margin-top:8px;">
+                <tbody>
+                    <?php foreach (array_chunk($competitionList, 2) as $pair): ?>
+                        <tr>
+                            <td style="width:50%;"><?php echo $renderCompetitionCell($pair[0]); ?></td>
+                            <td style="width:50%;"><?php echo isset($pair[1]) ? $renderCompetitionCell($pair[1]) : '&nbsp;'; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         <?php endif; ?>
 
         <?php // Văn nghệ (Đợt 3) — mẫu số 2 dùng chung: danh sách thành viên theo từng tiết mục 
