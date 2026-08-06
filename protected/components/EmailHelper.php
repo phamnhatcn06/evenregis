@@ -725,6 +725,13 @@ class EmailHelper
 
         $subject = '[Đại hội Mường Thanh 2026] Xác nhận thông tin đăng ký - ' . $model->property_name;
 
+        // DEBUG: chỉ gửi đến địa chỉ debug, bỏ toàn bộ CC/BCC thật
+        if (self::DEBUG_MODE) {
+            $recipients = array(self::DEBUG_EMAIL);
+            $ccList = array();
+            $bccList = array();
+        }
+
         try {
             $sent = self::send($recipients, $subject, 'registration_confirmation', $data, $attachments, $ccList, $bccList);
             if ($sent) {
