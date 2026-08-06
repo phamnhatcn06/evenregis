@@ -113,6 +113,35 @@
             color: #444;
         }
 
+        /* MẪU SỐ 1 — thông tin tiết mục văn nghệ */
+        .talent-entry {
+            margin-top: 5px;
+            padding-left: 8px;
+        }
+
+        .talent-title {
+            font-size: 12pt;
+        }
+
+        .talent-alliance {
+            font-style: italic;
+            font-weight: normal;
+            font-size: 11pt;
+        }
+
+        .talent-info {
+            padding-left: 12px;
+            font-size: 11pt;
+            line-height: 1.3;
+        }
+
+        .talent-desc {
+            padding-left: 12px;
+            font-size: 11pt;
+            line-height: 1.3;
+            text-align: justify;
+        }
+
         /* MẪU SỐ 2 — danh sách VĐV */
         .sport-block {
             margin-bottom: 6px;
@@ -661,7 +690,7 @@
         <?php // Văn nghệ (Đợt 3) — mẫu số 2 dùng chung: danh sách thành viên theo từng tiết mục 
         ?>
         <?php if (!empty($talentEntries)): ?>
-            <div class="doc-title" style="margin-top:16px;">Danh sách tiết mục văn nghệ</div>
+            <div class="doc-title" style="margin-top:16px;">Danh sách tham gia tiết mục văn nghệ</div>
             <?php foreach ($talentEntries as $entry): ?>
                 <div class="sport-block">
                     <div class="sport-name"><?php echo CHtml::encode((!empty($entry['category_name']) ? $entry['category_name'] . ' - ' : '') . (!empty($entry['title']) ? $entry['title'] : 'Tiết mục')); ?></div>
