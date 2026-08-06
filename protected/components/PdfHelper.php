@@ -123,9 +123,24 @@ class PdfHelper
             throw new Exception('Thư mục runtime không ghi được, không thể tạo file PDF: ' . $tempDir);
         }
 
-        // Cấu trúc tên file: Phieu_Xac_Nhan_Dang_Ky_{mã đơn vị (cột prefix)}_{ID phiếu}
+        // Phần nội dung theo đợt đăng ký cho tên file
+        $isDot1 = !empty($data['isDot1']);
+        $isDot2 = !empty($data['isDot2']);
+        $periodContentCodes = isset($data['periodContentCodes']) && is_array($data['periodContentCodes']) ? $data['periodContentCodes'] : array();
+        $isDot3 = in_array('talent', $periodContentCodes) && !$isDot1;
+        if ($isDot1) {
+            $contentPart = 'The_Thao_Miss';
+        } elseif ($isDot2) {
+            $contentPart = 'Nghiep_Vu';
+        } elseif ($isDot3) {
+            $contentPart = 'Van_Nghe';
+        } else {
+            $contentPart = 'Chung';
+        }
+
+        // Cấu trúc tên file: Phieu_Xac_Nhan_Dang_Ky_{nội dung đợt}_{mã đơn vị (cột prefix)}_{ID phiếu}
         $unitCode = !empty($data['model']->property_code) ? MyHelper::toSlug($data['model']->property_code) : 'DONVI';
-        $pdfFileName = 'Phieu_Xac_Nhan_Dang_Ky_' . strtoupper($unitCode) . '_' . $registrationId . '.pdf';
+        $pdfFileName = 'Phieu_Xac_Nhan_Dang_Ky_' . $contentPart . '_' . strtoupper($unitCode) . '_' . $registrationId . '.pdf';
         $filePath = $tempDir . DIRECTORY_SEPARATOR . $pdfFileName;
 
         if (file_put_contents($filePath, $pdfOutput) === false) {
