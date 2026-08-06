@@ -465,12 +465,49 @@
                     </tr>
                 <?php endforeach; ?>
 
-                <?php // Văn nghệ (Đợt 3) — gom theo thể loại 
+                <?php // Văn nghệ (Đợt 3) — gom theo thể loại, kèm thông tin từng tiết mục (không kèm link video/audio)
                 ?>
                 <?php foreach ($talentByCategory as $catName => $entries): ?>
                     <tr>
                         <td class="col-stt"><?php echo ++$stt; ?></td>
-                        <td><?php echo CHtml::encode($catName); ?></td>
+                        <td>
+                            <div><strong><?php echo CHtml::encode($catName); ?></strong></div>
+                            <?php foreach ($entries as $entry): ?>
+                                <div style="margin-top:4px;padding-left:8px;">
+                                    <div>
+                                        &bull; <strong><?php echo CHtml::encode(!empty($entry['title']) ? $entry['title'] : 'Tiết mục'); ?></strong>
+                                        <?php if (!empty($entry['is_alliance'])): ?>
+                                            <span style="font-style:italic;">(Liên quân)</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php
+                                    $infoParts = array();
+                                    if (!empty($entry['director'])) {
+                                        $infoParts[] = 'Đạo diễn/Biên đạo: ' . $entry['director'];
+                                    }
+                                    if (!empty($entry['duration_seconds'])) {
+                                        $secs = (int)$entry['duration_seconds'];
+                                        $mm = floor($secs / 60);
+                                        $ss = $secs % 60;
+                                        $infoParts[] = 'Thời lượng: ' . ($mm > 0 ? $mm . ' phút ' : '') . ($ss > 0 ? $ss . ' giây' : ($mm > 0 ? '' : '0 giây'));
+                                    }
+                                    if (!empty($entry['participant_count'])) {
+                                        $infoParts[] = 'Số người tham gia: ' . (int)$entry['participant_count'];
+                                    }
+                                    if (!empty($entry['origin'])) {
+                                        $infoParts[] = 'Nguồn gốc/Xuất xứ: ' . $entry['origin'];
+                                    }
+                                    ?>
+                                    <?php foreach ($infoParts as $ip): ?>
+                                        <div style="padding-left:10px;font-size:11px;"><?php echo CHtml::encode($ip); ?></div>
+                                    <?php endforeach; ?>
+                                    <?php $desc = !empty($entry['content']) ? $entry['content'] : (!empty($entry['description']) ? $entry['description'] : ''); ?>
+                                    <?php if (!empty($desc)): ?>
+                                        <div style="padding-left:10px;font-size:11px;">Nội dung: <?php echo CHtml::encode($desc); ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </td>
                         <td><strong><?php echo count($entries); ?> tiết mục</strong></td>
                     </tr>
                 <?php endforeach; ?>
