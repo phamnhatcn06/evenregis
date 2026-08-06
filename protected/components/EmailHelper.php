@@ -573,6 +573,13 @@ class EmailHelper
                 $talentEntriesData[] = array(
                     'category_name' => $entry->category_name,
                     'title' => $entry->title,
+                    'description' => isset($entry->description) ? $entry->description : '',
+                    'content' => isset($entry->content) ? $entry->content : '',
+                    'duration_seconds' => isset($entry->duration_seconds) ? $entry->duration_seconds : null,
+                    'director' => isset($entry->director) ? $entry->director : '',
+                    'director_phone' => isset($entry->director_phone) ? $entry->director_phone : '',
+                    'origin' => isset($entry->origin) ? $entry->origin : '',
+                    'participant_count' => isset($entry->participant_count) ? $entry->participant_count : null,
                     'members' => $members,
                     'is_alliance' => $isAlliance,
                 );
