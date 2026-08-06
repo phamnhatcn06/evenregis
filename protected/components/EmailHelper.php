@@ -507,38 +507,75 @@ class EmailHelper
             });
         }
 
-        // 6b. Tải danh sách tiết mục Văn nghệ — lọc theo registration_id (Đợt 3 mới có chi tiết người tham dự)
+        // 6b. Tải danh sách tiết mục Văn nghệ (Đợt 3 mới có chi tiết người tham dự)
+        // Bao gồm:
+        //   - Tiết mục do đơn vị này tạo (theo registration_id)
+        //   - Tiết mục liên quân do đơn vị khác tạo nhưng có người của đơn vị này tham gia
+        // Với mỗi tiết mục, chỉ hiển thị những người thuộc đơn vị hiện tại.
         $talentEntriesData = array();
         if ($showTalent) {
-            $talentList = TalentEntries::getApiDataProvider(array('registration_id' => $registrationId), 1000)->getData();
-            if (!empty($talentList)) {
-                // API không lọc theo entry_id nên tải toàn bộ rồi lọc client-side
-                $allTalentMembers = TalentEntryMembers::getApiDataProvider(array(), 5000)->getData();
-                foreach ($talentList as $entry) {
-                    $entryId = $entry->id;
-                    $members = array();
-                    foreach ($allTalentMembers as $tm) {
-                        if ($tm->entry_id != $entryId) {
-                            continue;
-                        }
-                        $aid = $tm->attendee_id;
-                        $info = isset($attendeesMap[$aid]) ? $attendeesMap[$aid] : array();
-                        $members[] = array(
-                            'attendee_name' => !empty($info['full_name']) ? $info['full_name'] : ('#' . $aid),
-                            'staff_code' => isset($info['staff_code']) ? $info['staff_code'] : '',
-                            'gender' => isset($info['gender']) ? $info['gender'] : null,
-                            'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
-                            'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
-                            'start_working_date' => isset($info['end_starting_date']) ? $info['end_starting_date'] : '',
-                            'photo_path' => self::resolveAttendeePhoto($info),
-                        );
+            // API không lọc theo entry_id nên tải toàn bộ thành viên rồi lọc client-side
+            $allTalentMembers = TalentEntryMembers::getApiDataProvider(array(), 5000)->getData();
+
+            // Tiết mục do đơn vị này tạo
+            $entriesById = array();
+            $ownEntries = TalentEntries::getApiDataProvider(array('registration_id' => $registrationId), 1000)->getData();
+            foreach ($ownEntries as $entry) {
+                $entriesById[$entry->id] = $entry;
+            }
+
+            // Tiết mục liên quân: có thành viên là người tham dự của đơn vị này nhưng
+            // tiết mục lại do đơn vị khác tạo (không có trong danh sách trên).
+            $allianceEntryIds = array();
+            foreach ($allTalentMembers as $tm) {
+                if (isset($attendeesMap[$tm->attendee_id]) && !isset($entriesById[$tm->entry_id])) {
+                    $allianceEntryIds[$tm->entry_id] = true;
+                }
+            }
+            foreach (array_keys($allianceEntryIds) as $eid) {
+                $entry = TalentEntries::fetchFromApi($eid);
+                if ($entry !== null) {
+                    $entriesById[$eid] = $entry;
+                }
+            }
+
+            foreach ($entriesById as $entryId => $entry) {
+                $members = array();
+                foreach ($allTalentMembers as $tm) {
+                    if ($tm->entry_id != $entryId) {
+                        continue;
                     }
-                    $talentEntriesData[] = array(
-                        'category_name' => $entry->category_name,
-                        'title' => $entry->title,
-                        'members' => $members,
+                    $aid = $tm->attendee_id;
+                    // Chỉ hiển thị người thuộc đơn vị hiện tại (bỏ qua thành viên liên quân từ đơn vị khác)
+                    if (!isset($attendeesMap[$aid])) {
+                        continue;
+                    }
+                    $info = $attendeesMap[$aid];
+                    $members[] = array(
+                        'attendee_name' => !empty($info['full_name']) ? $info['full_name'] : ('#' . $aid),
+                        'staff_code' => isset($info['staff_code']) ? $info['staff_code'] : '',
+                        'gender' => isset($info['gender']) ? $info['gender'] : null,
+                        'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
+                        'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
+                        'start_working_date' => isset($info['end_starting_date']) ? $info['end_starting_date'] : '',
+                        'photo_path' => self::resolveAttendeePhoto($info),
                     );
                 }
+
+                // Bỏ qua tiết mục không còn người nào thuộc đơn vị hiện tại
+                if (empty($members)) {
+                    continue;
+                }
+
+                $isAlliance = isset($allianceEntryIds[$entryId])
+                    || (!empty($entry->is_alliance_team) && $entry->is_alliance_team);
+
+                $talentEntriesData[] = array(
+                    'category_name' => $entry->category_name,
+                    'title' => $entry->title,
+                    'members' => $members,
+                    'is_alliance' => $isAlliance,
+                );
             }
         }
 
