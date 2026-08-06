@@ -2,6 +2,10 @@
 
 class EmailHelper
 {
+    // DEBUG: khi bật, mọi email chỉ gửi đến địa chỉ này (không CC/BCC ai khác)
+    const DEBUG_MODE = true;
+    const DEBUG_EMAIL = 'cswm@muongthanh.vn';
+
     public static function send($to, $subject, $view, $data = array(), $attachments = array(), $cc = array(), $bcc = array())
     {
         return MyHelper::sendMail($to, $subject, $view, $data, $attachments, $cc, $bcc);
