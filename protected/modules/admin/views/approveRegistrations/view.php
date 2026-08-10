@@ -1301,7 +1301,7 @@ $(document).ready(function() {
 
 $this->renderPartial('_modal_send_mail');
 
-if (PermissionHelper::can('attendee', 'update')) {
+if (PermissionHelper::can('approveregistrations', 'update')) {
     $this->renderPartial('_modal_replace_attendee');
     $this->renderPartial('_modal_withdraw_attendee');
     Yii::app()->clientScript->registerScriptFile(
