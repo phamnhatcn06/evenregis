@@ -209,6 +209,7 @@ class ApiEndpoints
     const REGISTRATION_DETAIL_ATTENDEE_LIST = '/api/registration-detail-attendees';
     const REGISTRATION_DETAIL_ATTENDEE_STORE = '/api/registration-detail-attendees/store';
     const REGISTRATION_DETAIL_ATTENDEE_DETAIL = '/api/registration-detail-attendees/detail/{id}';
+    const REGISTRATION_DETAIL_ATTENDEE_UPDATE = '/api/registration-detail-attendees/update/{id}';
     const REGISTRATION_DETAIL_ATTENDEE_DESTROY = '/api/registration-detail-attendees/destroy/{id}';
 
     // Attendee
