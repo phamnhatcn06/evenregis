@@ -1,9 +1,9 @@
 # TODO: Thay thế / Huỷ tư cách người đăng ký
 
-## Phase 0: Xác nhận phụ thuộc backend (trước khi code Slice 2+)
-- [ ] Xác nhận field đánh dấu huỷ tư cách trên attendee (participation_status hay is_active)
-- [ ] Xác nhận cách cấp số báo danh mới cho 1 competition_registration lẻ
-- [ ] Xác nhận cờ revoke/destroy badge
+## Phase 0: Xác nhận phụ thuộc backend
+- [x] Field đánh dấu huỷ tư cách = `is_active = 0` + set `deleted_at` (thời điểm huỷ)
+- [ ] Cách cấp số báo danh mới cho 1 competition_registration lẻ (xác nhận ở Slice 4)
+- [ ] Cờ revoke/destroy badge (xác nhận ở Slice 5)
 
 ## Phase 1: Bản kê nội dung + nút thao tác (Slice 1)
 - [ ] Model `Attendees::getParticipationSummary()` gom đội/cuộc thi/vai trò
