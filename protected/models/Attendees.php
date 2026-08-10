@@ -477,6 +477,13 @@ class Attendees extends BaseAttendees
             }
 
             $team = SportTeams::fetchFromApi($teamId);
+            $teamMembers = SportTeamMembers::getTeamMemberBriefs($teamId);
+            $otherMembers = array();
+            foreach ($teamMembers as $tm) {
+                if ($tm['attendee_id'] != $attendeeId) {
+                    $otherMembers[] = $tm;
+                }
+            }
 
             $teams[] = array(
                 'member_id' => isset($item['id']) ? $item['id'] : null,
@@ -488,7 +495,8 @@ class Attendees extends BaseAttendees
                 'position' => isset($item['position']) ? $item['position'] : null,
                 'is_captain' => isset($item['is_captain']) ? (int)$item['is_captain'] : 0,
                 'is_alliance' => $team && isset($team->is_alliance) ? (int)$team->is_alliance : 0,
-                'member_count' => SportTeamMembers::countTeamMembers($teamId),
+                'member_count' => count($teamMembers),
+                'other_members' => $otherMembers,
             );
         }
         return $teams;
