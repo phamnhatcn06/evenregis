@@ -113,6 +113,16 @@
         return html;
     }
 
+    // Bản chỉ đọc cho modal thay thế.
+    function renderSummary(summary) {
+        return renderTeamsReadonly(summary.sport_teams || []) + renderCompsRoles(summary);
+    }
+
+    // Bản tương tác cho modal huỷ tư cách.
+    function renderWithdrawContent(summary) {
+        return renderTeamsInteractive(summary.sport_teams || []) + renderCompsRoles(summary);
+    }
+
     function escapeHtml(str) {
         return String(str == null ? '' : str)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
