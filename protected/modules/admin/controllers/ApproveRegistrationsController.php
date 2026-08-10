@@ -1324,6 +1324,10 @@ class ApproveRegistrationsController extends AdminController
         // 5. Đánh dấu người bị thay là huỷ tư cách (đã thay thế)
         Attendees::withdrawViaApi($oldId, 'Đã được thay thế. ' . $reason, $email);
 
+        // 5b. Vô hiệu thẻ/QR của người bị thay (nếu đã in). Người thay (B) là bản ghi
+        // mới chưa có badge nên sẽ tự nằm trong danh sách "cần in".
+        Badges::revokeByAttendee($oldId);
+
         // 6. Ghi lịch sử thay thế (audit + email xác nhận đơn vị)
         $affectedSports = array();
         $cancelledTeams = array();
