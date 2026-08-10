@@ -139,11 +139,66 @@
         showModal('replaceAttendeeModal');
     };
 
-    // Slice 1: chỉ hiển thị (read-only). Logic submit bổ sung ở Slice 2 (huỷ) và Slice 4 (thay thế).
-    ['withdrawAttendeeForm', 'replaceAttendeeForm'].forEach(function (formId) {
-        var form = document.getElementById(formId);
-        if (form) {
-            form.addEventListener('submit', function (e) { e.preventDefault(); });
-        }
-    });
+    // Huỷ tư cách (Slice 2): xác nhận bằng SweetAlert rồi gửi POST.
+    var withdrawForm = document.getElementById('withdrawAttendeeForm');
+    if (withdrawForm) {
+        withdrawForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var reason = document.getElementById('withdraw_reason').value.trim();
+            if (!reason) {
+                Toast.error('Vui lòng nhập lý do huỷ tư cách.');
+                return;
+            }
+            var name = document.getElementById('withdraw_attendee_name').textContent || 'người này';
+            Swal.fire({
+                title: 'Xác nhận huỷ tư cách',
+                html: 'Huỷ tư cách <strong>' + escapeHtml(name) + '</strong> và gỡ khỏi các nội dung tham gia?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Huỷ tư cách',
+                cancelButtonText: 'Đóng'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    submitWithdraw();
+                }
+            });
+        });
+    }
+
+    function submitWithdraw() {
+        var btn = document.getElementById('btn_submit_withdraw');
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang xử lý...';
+
+        var formData = new FormData(document.getElementById('withdrawAttendeeForm'));
+        fetch(withdrawUrl, { method: 'POST', body: formData })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    var modalEl = document.getElementById('withdrawAttendeeModal');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) { modal.hide(); }
+                    Toast.success(data.message || 'Đã huỷ tư cách.');
+                    setTimeout(function () { location.reload(); }, 1200);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    Toast.error(data.error || 'Có lỗi xảy ra.');
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                Toast.error('Lỗi kết nối máy chủ.');
+            });
+    }
+
+    // Thay thế (Slice 4): tạm chặn submit cho tới khi hoàn thiện.
+    var replaceForm = document.getElementById('replaceAttendeeForm');
+    if (replaceForm) {
+        replaceForm.addEventListener('submit', function (e) { e.preventDefault(); });
+    }
 })();
