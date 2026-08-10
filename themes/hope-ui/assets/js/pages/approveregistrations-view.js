@@ -227,12 +227,23 @@
     };
 
     window.openReplaceAttendeeModal = function (attendeeId) {
+        var form = document.getElementById('replaceAttendeeForm');
+        form.reset();
         document.getElementById('replace_attendee_id').value = attendeeId;
-        document.getElementById('replace_reason').value = '';
         document.getElementById('replace_badge_warning').classList.add('d-none');
-        loadSummary(attendeeId, 'replace_summary_container', 'replace_attendee_name', 'replace_badge_warning', 'replace_attendee_position');
+        ['replace_portrait_preview', 'replace_contract_preview', 'replace_cccd_front_preview', 'replace_cccd_back_preview']
+            .forEach(function (id) { var el = document.getElementById(id); if (el) { el.innerHTML = ''; } });
+        loadSummary(attendeeId, 'replace_summary_container', 'replace_attendee_name', 'replace_badge_warning', 'replace_attendee_position', renderReplaceContent);
         showModal('replaceAttendeeModal');
     };
+
+    // Đồng bộ nhân sự SMILE đã chọn vào hidden staff_id.
+    var staffSelect = document.getElementById('replace_staff_select');
+    if (staffSelect) {
+        staffSelect.addEventListener('change', function () {
+            document.getElementById('replace_staff_id').value = this.value;
+        });
+    }
 
     // Huỷ tư cách (Slice 2): xác nhận bằng SweetAlert rồi gửi POST.
     var withdrawForm = document.getElementById('withdrawAttendeeForm');
