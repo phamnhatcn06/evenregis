@@ -15,7 +15,7 @@
                 <h5 class="modal-title"><i class="fa fa-exchange me-2"></i>Thay thế người tham dự</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
-            <form id="replaceAttendeeForm" enctype="multipart/form-data">
+            <form id="replaceAttendeeForm" enctype="multipart/form-data" class="d-flex flex-column overflow-hidden" style="min-height:0;">
                 <div class="modal-body">
                     <input type="hidden" name="attendee_id" id="replace_attendee_id">
                     <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">

@@ -21,7 +21,7 @@ return array(
 
     // External API
     // Test
-    'externalApiUrl' => 'http://evenapi.local:8080',
+    'externalApiUrl' => 'https://dev-portal-registration.muongthanh.vn',
     'externalApiKey' => 'z8H4VaRvLtBGYUuLgasJDIJIWXYgquFgUIy426pkaFKi7Q0PAC44oz2Jy4KLB5Mz',
 
     // Product
