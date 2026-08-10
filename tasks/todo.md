@@ -42,18 +42,20 @@
 
 ## Checkpoint: Luồng thay thế hoàn chỉnh
 
-## Phase 4b: Lịch sử thay đổi + email (Slice 4b)
+## Phase 4b: Lịch sử thay đổi + email (Slice 4b) — XONG (trừ verify)
 - [~] Backend: bảng + endpoint `attendee-replacements` (store + list-by-registration) — FRONTEND đã gọi theo hợp đồng schema; cần backend hiện thực `/api/attendee-replacements/store` + list
 - [x] Model `AttendeeReplacements` (storeViaApi, record, getByRegistrationId) + ApiEndpoints const
 - [x] Ghi log mỗi lần thay thế / huỷ (affected_contents + cancelled_teams + old↔new snapshot + lý do + người thực hiện) trong actionReplaceAttendee & actionWithdrawAttendee
-- [ ] `EmailHelper::sendRegistrationConfirmation` thêm mục "Thay đổi nhân sự" từ lịch sử
-- [ ] Verify: gửi mail xác nhận → thấy đúng danh sách thay/huỷ
+- [x] `AttendeeReplacements::getFormattedByRegistrationId` — parse JSON snapshot → dòng hiển thị
+- [x] `EmailHelper::sendRegistrationConfirmation` truyền `personnelChanges`; email view render mục "🔄 Thay đổi nhân sự" (bảng loại/nhân sự/nội dung+lý do). PDF (biểu mẫu chính thức) giữ nguyên.
+- [ ] Verify: gửi mail xác nhận → thấy đúng danh sách thay/huỷ (chờ backend store/list live)
 
-## Phase 5: Thẻ / QR (Slice 5)
-- [ ] Cảnh báo "thẻ đã in" trong 2 modal
-- [ ] Vô hiệu badge A; đánh dấu B cần sinh badge
+## Phase 5: Thẻ / QR (Slice 5) — XONG (trừ verify)
+- [x] Cảnh báo "thẻ đã in" trong 2 modal (badge_printed từ summary; controller suy ra từ Badges khi API thiếu cờ)
+- [x] Vô hiệu badge A: `Badges::revokeByAttendee` (soft delete BADGE_DESTROY) gọi trong actionWithdrawAttendee & actionReplaceAttendee. B là bản ghi mới chưa có badge → tự nằm trong danh sách "cần in".
+- [ ] Verify trình duyệt: huỷ/thay người đã in thẻ → thẻ cũ bị vô hiệu
 
-## Phase 6: Hoàn thiện (Slice 6)
-- [ ] PermissionHelper check đầu mỗi action
-- [ ] Cập nhật thống kê loại người huỷ/thay
+## Phase 6: Hoàn thiện (Slice 6) — XONG (trừ QA)
+- [x] PermissionHelper check đầu mỗi action mutating (approve/reject/approveAll/rejectAll/return/sendEmail + withdraw/replace/summary đã có)
+- [x] Thống kê đã tự loại người huỷ/thay: `Attendees::countUniqueRegistered` bỏ qua `is_active=0` và `deleted_at` (huỷ tư cách set cả hai)
 - [ ] QA hồi quy toàn luồng
