@@ -993,6 +993,74 @@ class ApproveRegistrationsController extends AdminController
         Yii::app()->end();
     }
 
+    /**
+     * Huỷ tư cách 1 người tham dự: gỡ đăng ký thi nghiệp vụ + vai trò, đánh dấu huỷ.
+     * Xử lý đội thể thao (huỷ đội / captain) sẽ bổ sung ở Slice 3.
+     */
+    public function actionWithdrawAttendee()
+    {
+        header('Content-Type: application/json');
+
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+        if (!PermissionHelper::can('approveregistrations', 'update')) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+            Yii::app()->end();
+        }
+
+        $attendeeId = Yii::app()->request->getPost('attendee_id');
+        $reason = trim(Yii::app()->request->getPost('reason', ''));
+
+        if (!$attendeeId) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin người tham dự.'));
+            Yii::app()->end();
+        }
+        if ($reason === '') {
+            echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng nhập lý do huỷ tư cách.'));
+            Yii::app()->end();
+        }
+
+        $attendee = Attendees::fetchFromApi($attendeeId);
+        if (!$attendee) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+            Yii::app()->end();
+        }
+
+        $ssoUser = AuthHandler::getUser();
+        $email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+        // 1. Gỡ đăng ký thi nghiệp vụ
+        $compRegs = CompetitionRegistrations::getApiDataProvider(array('attendee_id' => $attendeeId), 500)->getData();
+        foreach ($compRegs as $reg) {
+            $regId = isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null);
+            $regAttId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
+            if ($regId && $regAttId == $attendeeId) {
+                CompetitionRegistrations::deleteViaApi($regId);
+            }
+        }
+
+        // 2. Gỡ vai trò
+        foreach (AttendeeRoles::getByAttendeeId($attendeeId) as $role) {
+            if (isset($role['id'])) {
+                AttendeeRoles::deleteViaApi($role['id']);
+            }
+        }
+
+        // 3. Đánh dấu huỷ tư cách
+        $result = Attendees::withdrawViaApi($attendeeId, $reason, $email);
+
+        if (isset($result['success']) && $result['success']) {
+            Yii::log("Huỷ tư cách attendee #{$attendeeId} bởi {$email}. Lý do: {$reason}", 'info', 'application.controllers.ApproveRegistrationsController');
+            echo CJSON::encode(array('success' => true, 'message' => 'Đã huỷ tư cách người tham dự.'));
+        } else {
+            $err = isset($result['error']) ? $result['error'] : (isset($result['message']) ? $result['message'] : 'Không thể huỷ tư cách.');
+            echo CJSON::encode(array('success' => false, 'error' => $err));
+        }
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = Registrations::fetchFromApi($id);
