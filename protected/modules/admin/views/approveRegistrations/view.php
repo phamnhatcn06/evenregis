@@ -140,7 +140,7 @@ $attributes = array(
         <?php endif; ?>
     </div>
     <div class="card-body">
-        <?php $canManageAttendee = PermissionHelper::can('attendee', 'update'); ?>
+        <?php $canManageAttendee = PermissionHelper::can('approveregistrations', 'update'); ?>
         <div id="attendee-actions-config"
              data-summary-url="<?php echo $this->createUrl('participationSummary'); ?>"
              data-replace-url="<?php echo $this->createUrl('replaceAttendee'); ?>"
