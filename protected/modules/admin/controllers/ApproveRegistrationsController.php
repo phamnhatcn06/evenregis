@@ -958,6 +958,41 @@ class ApproveRegistrationsController extends AdminController
         Yii::app()->end();
     }
 
+    /**
+     * Trả về bản kê nội dung (đội thể thao, cuộc thi, vai trò) của 1 người tham dự.
+     * Dùng để dựng modal Thay thế / Huỷ tư cách.
+     */
+    public function actionParticipationSummary($attendee_id)
+    {
+        header('Content-Type: application/json');
+
+        if (!PermissionHelper::can('attendee', 'update')) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+            Yii::app()->end();
+        }
+
+        $attendee = Attendees::fetchFromApi($attendee_id);
+        if (!$attendee) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+            Yii::app()->end();
+        }
+
+        $summary = Attendees::getParticipationSummary($attendee_id);
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'attendee' => array(
+                'id' => $attendee->id,
+                'full_name' => $attendee->full_name,
+                'position_name' => $attendee->position_name,
+                'division_name' => $attendee->division_name,
+                'badge_printed' => isset($attendee->badge_printed) ? (int)$attendee->badge_printed : 0,
+            ),
+            'summary' => $summary,
+        ));
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = Registrations::fetchFromApi($id);
