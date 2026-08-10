@@ -1052,6 +1052,9 @@ class ApproveRegistrationsController extends AdminController
         $ssoUser = AuthHandler::getUser();
         $email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
+        // Chụp snapshot nội dung trước khi gỡ (dùng ghi lịch sử sau khi huỷ)
+        $summary = Attendees::getParticipationSummary($attendeeId);
+
         // 1. Gỡ đăng ký thi nghiệp vụ
         $compRegs = CompetitionRegistrations::getApiDataProvider(array('attendee_id' => $attendeeId), 500)->getData();
         foreach ($compRegs as $reg) {
