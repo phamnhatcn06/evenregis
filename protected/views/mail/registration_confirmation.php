@@ -70,6 +70,50 @@ include __DIR__ . '/_email_header.php';
             📎 <strong>Tệp đính kèm:</strong> Danh sách chi tiết người tham dự các nội dung<?php echo !empty($registeredCategories) ? ' (' . CHtml::encode($registeredCategories) . ')' : ''; ?> được đính kèm trong file PDF kèm theo email này.
         </div>
 
+        <?php if (!empty($personnelChanges)): ?>
+        <!-- Thay đổi nhân sự (thay thế / huỷ tư cách) -->
+        <div style="margin-bottom:25px;">
+            <div style="font-size:15px; font-weight:bold; color:#b45309; margin-bottom:10px;">🔄 Thay đổi nhân sự</div>
+            <table width="100%" cellpadding="10" cellspacing="0" style="border:1px solid #fde68a; border-radius:8px; border-collapse:collapse; font-size:13px; background-color:#fffbeb;">
+                <tr style="background-color:#fef3c7;">
+                    <th style="text-align:left; color:#92400e; border-bottom:1px solid #fde68a; width:14%;">Loại</th>
+                    <th style="text-align:left; color:#92400e; border-bottom:1px solid #fde68a; width:43%;">Nhân sự</th>
+                    <th style="text-align:left; color:#92400e; border-bottom:1px solid #fde68a; width:43%;">Nội dung ảnh hưởng &amp; lý do</th>
+                </tr>
+                <?php foreach ($personnelChanges as $chg): ?>
+                <tr>
+                    <td style="vertical-align:top; border-bottom:1px solid #fef3c7; color:#1e293b;">
+                        <span style="display:inline-block; padding:2px 8px; border-radius:4px; font-weight:bold; color:#ffffff; background-color:<?php echo $chg['action'] === AttendeeReplacements::ACTION_REPLACE ? '#2563eb' : '#dc2626'; ?>;">
+                            <?php echo CHtml::encode($chg['action_label']); ?>
+                        </span>
+                        <?php if (!empty($chg['performed_at'])): ?>
+                            <div style="color:#94a3b8; font-size:11px; margin-top:4px;"><?php echo CHtml::encode($chg['performed_at']); ?></div>
+                        <?php endif; ?>
+                    </td>
+                    <td style="vertical-align:top; border-bottom:1px solid #fef3c7; color:#1e293b; line-height:1.6;">
+                        <div><span style="color:#64748b;">Người cũ:</span> <strong><?php echo CHtml::encode($chg['old_name']); ?></strong><?php echo !empty($chg['old_staff_code']) ? ' (' . CHtml::encode($chg['old_staff_code']) . ')' : ''; ?></div>
+                        <?php if ($chg['action'] === AttendeeReplacements::ACTION_REPLACE && !empty($chg['new_name'])): ?>
+                            <div><span style="color:#64748b;">Người thay:</span> <strong style="color:#16a34a;"><?php echo CHtml::encode($chg['new_name']); ?></strong><?php echo !empty($chg['new_staff_code']) ? ' (' . CHtml::encode($chg['new_staff_code']) . ')' : ''; ?></div>
+                        <?php endif; ?>
+                    </td>
+                    <td style="vertical-align:top; border-bottom:1px solid #fef3c7; color:#1e293b; line-height:1.6;">
+                        <?php if (!empty($chg['content_lines'])): ?>
+                            <?php foreach ($chg['content_lines'] as $line): ?>
+                                <div>• <?php echo CHtml::encode($line); ?></div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div style="color:#94a3b8;">Không có nội dung thi đấu.</div>
+                        <?php endif; ?>
+                        <?php if (!empty($chg['reason'])): ?>
+                            <div style="margin-top:4px; color:#64748b; font-style:italic;">Lý do: <?php echo CHtml::encode($chg['reason']); ?></div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+        <?php endif; ?>
+
         <p style="font-size:14px; color:#4a5568; margin-top:20px; line-height:1.6;">
             Mọi thắc mắc hoặc yêu cầu hỗ trợ, quý đơn vị vui lòng liên hệ với Ban tổ chức để được giải đáp kịp thời.
         </p>
