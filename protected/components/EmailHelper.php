@@ -736,6 +736,9 @@ class EmailHelper
         }
         $attendeesCount = count($attendeeKeys);
 
+        // Lịch sử thay đổi nhân sự (thay thế / huỷ tư cách) — hiển thị mục riêng
+        $personnelChanges = AttendeeReplacements::getFormattedByRegistrationId($registrationId);
+
         // Data truyền sang email view & PDF view
         $data = array(
             'model' => $model,
@@ -750,6 +753,7 @@ class EmailHelper
             'beautyContestants' => $beautyContestantsData,
             'competitionRegistrations' => $competitionRegistrations,
             'attendeesCount' => $attendeesCount,
+            'personnelChanges' => $personnelChanges,
         );
 
         // 8. Tạo file PDF đính kèm
