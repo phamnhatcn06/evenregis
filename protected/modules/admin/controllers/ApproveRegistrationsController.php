@@ -966,7 +966,7 @@ class ApproveRegistrationsController extends AdminController
     {
         header('Content-Type: application/json');
 
-        if (!PermissionHelper::can('attendee', 'update')) {
+        if (!PermissionHelper::can('approveregistrations', 'update')) {
             echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
             Yii::app()->end();
         }
