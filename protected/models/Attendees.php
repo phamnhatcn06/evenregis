@@ -614,7 +614,7 @@ class Attendees extends BaseAttendees
         }
         return ApiClient::post($url, array(
             'is_active' => 0,
-            'deleted_at' => date('Y-m-d H:i:s'),
+            'deleted_at' => time(),
             'note' => implode(' ', $noteParts),
         ));
     }
