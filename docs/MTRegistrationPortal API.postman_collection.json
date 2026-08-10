@@ -10906,6 +10906,371 @@
                             "response": []
                         }
                     ]
+                },
+                {
+                    "name": "Attendee Replacement",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/attendee-replacements?per_page=20&page=1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "attendee-replacements"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "per_page",
+                                            "value": "20"
+                                        },
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "event_id",
+                                            "value": "1",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "property_id",
+                                            "value": "1",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "action",
+                                            "value": "replace",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "old_attendee_id",
+                                            "value": "1",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "new_attendee_id",
+                                            "value": "2",
+                                            "disabled": true
+                                        },
+                                        {
+                                            "key": "keyword",
+                                            "value": "",
+                                            "disabled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Phiếu đăng ký bị tác động (bắt buộc)"
+                                        },
+                                        {
+                                            "key": "event_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Sự kiện ID"
+                                        },
+                                        {
+                                            "key": "property_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Đơn vị ID"
+                                        },
+                                        {
+                                            "key": "action",
+                                            "value": "replace",
+                                            "type": "text",
+                                            "description": "Loại thao tác: replace | withdraw (bắt buộc)"
+                                        },
+                                        {
+                                            "key": "old_attendee_id",
+                                            "value": "10",
+                                            "type": "text",
+                                            "description": "Người bị thay/huỷ"
+                                        },
+                                        {
+                                            "key": "old_attendee_name",
+                                            "value": "Nguyen Van A",
+                                            "type": "text",
+                                            "description": "Tên người bị thay/huỷ (snapshot)"
+                                        },
+                                        {
+                                            "key": "old_staff_code",
+                                            "value": "NV001",
+                                            "type": "text",
+                                            "description": "Mã NV người bị thay/huỷ (snapshot)"
+                                        },
+                                        {
+                                            "key": "new_attendee_id",
+                                            "value": "11",
+                                            "type": "text",
+                                            "description": "Người thay thế (NULL nếu action = withdraw)"
+                                        },
+                                        {
+                                            "key": "new_attendee_name",
+                                            "value": "Tran Van B",
+                                            "type": "text",
+                                            "description": "Tên người thay thế (snapshot)"
+                                        },
+                                        {
+                                            "key": "new_staff_code",
+                                            "value": "NV002",
+                                            "type": "text",
+                                            "description": "Mã NV người thay thế (snapshot)"
+                                        },
+                                        {
+                                            "key": "affected_contents",
+                                            "value": "{\"sports\":[{\"team_id\":12,\"sport_name\":\"Bóng đá nam\",\"team_name\":\"KS A\",\"jersey_number\":9,\"is_captain\":1}],\"competitions\":[{\"competition_id\":5,\"competition_name\":\"Lễ tân\",\"candidate_number\":\"NV012\"}],\"roles\":[{\"role_id\":3,\"role_name\":\"Vận động viên\"}]}",
+                                            "type": "text",
+                                            "description": "Nội dung thể thao/nghiệp vụ/vai trò bị ảnh hưởng (JSON string)"
+                                        },
+                                        {
+                                            "key": "cancelled_teams",
+                                            "value": "[{\"team_id\":12,\"sport_name\":\"Bóng đá nam\",\"team_name\":\"KS A\"}]",
+                                            "type": "text",
+                                            "description": "Các đội bị huỷ do thao tác này (JSON string)"
+                                        },
+                                        {
+                                            "key": "reason",
+                                            "value": "Lý do công tác đột xuất",
+                                            "type": "text",
+                                            "description": "Lý do thay/huỷ"
+                                        },
+                                        {
+                                            "key": "performed_by",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện (từ SSO)"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/attendee-replacements/store",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "attendee-replacements",
+                                        "store"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/attendee-replacements/detail/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "attendee-replacements",
+                                        "detail",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "registration_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Phiếu đăng ký bị tác động"
+                                        },
+                                        {
+                                            "key": "event_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Sự kiện ID"
+                                        },
+                                        {
+                                            "key": "property_id",
+                                            "value": "1",
+                                            "type": "text",
+                                            "description": "Đơn vị ID"
+                                        },
+                                        {
+                                            "key": "action",
+                                            "value": "replace",
+                                            "type": "text",
+                                            "description": "Loại thao tác: replace | withdraw"
+                                        },
+                                        {
+                                            "key": "old_attendee_id",
+                                            "value": "10",
+                                            "type": "text",
+                                            "description": "Người bị thay/huỷ"
+                                        },
+                                        {
+                                            "key": "old_attendee_name",
+                                            "value": "Nguyen Van A",
+                                            "type": "text",
+                                            "description": "Tên người bị thay/huỷ (snapshot)"
+                                        },
+                                        {
+                                            "key": "old_staff_code",
+                                            "value": "NV001",
+                                            "type": "text",
+                                            "description": "Mã NV người bị thay/huỷ (snapshot)"
+                                        },
+                                        {
+                                            "key": "new_attendee_id",
+                                            "value": "11",
+                                            "type": "text",
+                                            "description": "Người thay thế"
+                                        },
+                                        {
+                                            "key": "new_attendee_name",
+                                            "value": "Tran Van B",
+                                            "type": "text",
+                                            "description": "Tên người thay thế (snapshot)"
+                                        },
+                                        {
+                                            "key": "new_staff_code",
+                                            "value": "NV002",
+                                            "type": "text",
+                                            "description": "Mã NV người thay thế (snapshot)"
+                                        },
+                                        {
+                                            "key": "affected_contents",
+                                            "value": "{\"sports\":[{\"team_id\":12,\"sport_name\":\"Bóng đá nam\",\"team_name\":\"KS A\",\"jersey_number\":9,\"is_captain\":1}],\"competitions\":[{\"competition_id\":5,\"competition_name\":\"Lễ tân\",\"candidate_number\":\"NV012\"}],\"roles\":[{\"role_id\":3,\"role_name\":\"Vận động viên\"}]}",
+                                            "type": "text",
+                                            "description": "Nội dung thể thao/nghiệp vụ/vai trò bị ảnh hưởng (JSON string)"
+                                        },
+                                        {
+                                            "key": "cancelled_teams",
+                                            "value": "[{\"team_id\":12,\"sport_name\":\"Bóng đá nam\",\"team_name\":\"KS A\"}]",
+                                            "type": "text",
+                                            "description": "Các đội bị huỷ do thao tác này (JSON string)"
+                                        },
+                                        {
+                                            "key": "reason",
+                                            "value": "Lý do cập nhật",
+                                            "type": "text",
+                                            "description": "Lý do thay/huỷ"
+                                        },
+                                        {
+                                            "key": "performed_by",
+                                            "value": "admin@example.com",
+                                            "type": "text",
+                                            "description": "Email người thực hiện"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/attendee-replacements/update/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "attendee-replacements",
+                                        "update",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [
+                                    {
+                                        "key": "Cookie",
+                                        "value": "XDEBUG_SESSION=PHPSTORM",
+                                        "type": "text"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/attendee-replacements/destroy/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "attendee-replacements",
+                                        "destroy",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
                 }
             ]
         },

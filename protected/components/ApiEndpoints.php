@@ -225,6 +225,9 @@ class ApiEndpoints
     // Attendee Replacement (lịch sử thay thế / huỷ tư cách)
     const ATTENDEE_REPLACEMENT_LIST = '/api/attendee-replacements';
     const ATTENDEE_REPLACEMENT_STORE = '/api/attendee-replacements/store';
+    const ATTENDEE_REPLACEMENT_DETAIL = '/api/attendee-replacements/detail/{id}';
+    const ATTENDEE_REPLACEMENT_UPDATE = '/api/attendee-replacements/update/{id}';
+    const ATTENDEE_REPLACEMENT_DESTROY = '/api/attendee-replacements/destroy/{id}';
 
     // Competition Department
     const COMPETITION_DEPARTMENT_LIST = '/api/competition-departments';
