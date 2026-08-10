@@ -313,6 +313,50 @@ class SportTeamMembers extends BaseSportTeamMembers
     }
 
     /**
+     * Danh sách thành viên rút gọn của 1 đội (id, attendee_id, tên, cờ đội trưởng).
+     * @param int $teamId
+     * @return array
+     */
+    public static function getTeamMemberBriefs($teamId)
+    {
+        if (!$teamId) {
+            return array();
+        }
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'sport_team_id' => $teamId,
+            'per_page' => 500,
+        ));
+        $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
+        if (!is_array($items)) {
+            return array();
+        }
+        $briefs = array();
+        foreach ($items as $item) {
+            if (!isset($item['sport_team_id']) || $item['sport_team_id'] != $teamId) {
+                continue;
+            }
+            $briefs[] = array(
+                'member_id' => isset($item['id']) ? $item['id'] : null,
+                'attendee_id' => isset($item['attendee_id']) ? $item['attendee_id'] : null,
+                'attendee_name' => isset($item['attendee_name']) ? $item['attendee_name'] : (isset($item['full_name']) ? $item['full_name'] : ''),
+                'is_captain' => isset($item['is_captain']) ? (int)$item['is_captain'] : 0,
+            );
+        }
+        return $briefs;
+    }
+
+    /**
+     * Gán đội trưởng mới cho 1 thành viên đội.
+     * @param int $memberId
+     * @return array
+     */
+    public static function assignCaptain($memberId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_TEAM_MEMBER_UPDATE, array('id' => $memberId));
+        return ApiClient::post($url, array('is_captain' => 1));
+    }
+
+    /**
      * Lấy danh sách attendee_id đã đăng ký team của 1 môn thể thao
      * @param int $sportId ID môn thể thao
      * @param int|null $registrationId Lọc theo registration (optional)
