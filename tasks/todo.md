@@ -30,13 +30,15 @@
 
 ## Checkpoint: Luồng huỷ tư cách hoàn chỉnh
 
-## Phase 4: Thay thế + kế thừa (Slice 4)
-- [ ] `actionReplaceAttendee`: tạo B (SMILE/thủ công) approved + ảnh + hồ sơ
-- [ ] Kế thừa đội tích (jersey/position/is_captain), huỷ đội không tích
-- [ ] Kế thừa toàn bộ cuộc thi + cấp số báo danh mới
-- [ ] Copy vai trò; đánh dấu A huỷ; log lịch sử thay thế
-- [ ] Guard: tạo B lỗi → dừng, không đụng A
-- [ ] Modal thay thế đầy đủ (tái sử dụng _modal_edit_attendee)
+## Phase 4: Thay thế + kế thừa (Slice 4) — XONG (trừ log→4b)
+- [x] `actionReplaceAttendee`: tạo B (SMILE/thủ công) approved + ảnh + hồ sơ (upload helper)
+- [x] Kế thừa đội tích (jersey/position/is_captain), huỷ đội không tích
+- [x] Kế thừa toàn bộ cuộc thi; candidate_number để trống → backend cấp số mới
+- [x] Copy vai trò (khi admin không chọn); đánh dấu A huỷ tư cách
+- [x] Guard: tạo B lỗi → dừng, không đụng nội dung A
+- [x] Modal thay thế đầy đủ: tab SMILE / thủ công + vai trò + 4 upload + checkbox kế thừa đội
+- [ ] Ghi lịch sử thay thế → chuyển sang Slice 4b (chờ endpoint backend)
+- [ ] Verify trình duyệt: thay 1 người có đội/cuộc thi → B kế thừa đúng, A bị huỷ
 
 ## Checkpoint: Luồng thay thế hoàn chỉnh
 
