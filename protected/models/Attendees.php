@@ -564,6 +564,32 @@ class Attendees extends BaseAttendees
         return $roles;
     }
 
+    /**
+     * Huỷ tư cách người tham dự: ghi is_active=0 + deleted_at + lý do vào note.
+     * Chỉ gửi các field cần thiết để tránh array_filter làm rơi giá trị 0.
+     *
+     * @param int $id
+     * @param string $reason
+     * @param string|null $email Người thực hiện (để ghi vết)
+     * @return array Kết quả ApiClient
+     */
+    public static function withdrawViaApi($id, $reason, $email = null)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $id));
+        $noteParts = array('[Huỷ tư cách]');
+        if ($reason !== null && $reason !== '') {
+            $noteParts[] = $reason;
+        }
+        if ($email) {
+            $noteParts[] = 'bởi ' . $email;
+        }
+        return ApiClient::post($url, array(
+            'is_active' => 0,
+            'deleted_at' => date('Y-m-d H:i:s'),
+            'note' => implode(' ', $noteParts),
+        ));
+    }
+
     public static function getRoleBadgeClass($roleName)
     {
         $roleNameLower = mb_strtolower(trim($roleName), 'UTF-8');
