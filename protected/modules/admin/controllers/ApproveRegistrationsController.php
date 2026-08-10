@@ -1114,6 +1114,9 @@ class ApproveRegistrationsController extends AdminController
         $result = Attendees::withdrawViaApi($attendeeId, $reason, $email);
 
         if (isset($result['success']) && $result['success']) {
+            // 4b. Vô hiệu thẻ/QR đã cấp cho người này (nếu có) — thẻ không còn giá trị
+            Badges::revokeByAttendee($attendeeId);
+
             // 5. Ghi lịch sử huỷ tư cách (audit + email xác nhận đơn vị)
             $affectedSports = array();
             $withdrawCancelledTeams = array();
