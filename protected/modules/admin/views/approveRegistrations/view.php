@@ -162,6 +162,9 @@ $attributes = array(
                         <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED): ?>
                             <th style="width:150px;">Thao tác</th>
                         <?php endif; ?>
+                        <?php if ($canManageAttendee): ?>
+                            <th style="width:130px;">Thay thế / Huỷ</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
