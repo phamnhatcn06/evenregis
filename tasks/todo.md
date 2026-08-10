@@ -5,13 +5,13 @@
 - [ ] Cách cấp số báo danh mới cho 1 competition_registration lẻ (xác nhận ở Slice 4)
 - [ ] Cờ revoke/destroy badge (xác nhận ở Slice 5)
 
-## Phase 1: Bản kê nội dung + nút thao tác (Slice 1)
-- [ ] Model `Attendees::getParticipationSummary()` gom đội/cuộc thi/vai trò
-- [ ] Controller `actionParticipationSummary($attendee_id)` trả JSON
-- [ ] view.php: thêm nút "Thay thế" + "Huỷ tư cách" mỗi dòng (theo quyền)
-- [ ] Tạo khung `_modal_replace_attendee.php`, `_modal_withdraw_attendee.php`
-- [ ] Tạo `approveregistrations-view.js`, register POS_END
-- [ ] Verify: mở attendee có đội + cuộc thi → summary đúng
+## Phase 1: Bản kê nội dung + nút thao tác (Slice 1) — XONG
+- [x] Model `Attendees::getParticipationSummary()` gom đội/cuộc thi/vai trò (+ `SportTeamMembers::countTeamMembers`)
+- [x] Controller `actionParticipationSummary($attendee_id)` trả JSON (check quyền)
+- [x] view.php: thêm nút "Thay thế" + "Huỷ tư cách" mỗi dòng (cột theo quyền, mọi trạng thái)
+- [x] Tạo khung `_modal_replace_attendee.php`, `_modal_withdraw_attendee.php`
+- [x] Tạo `approveregistrations-view.js`, register POS_END
+- [ ] Verify thủ công trên trình duyệt: mở attendee có đội + cuộc thi → summary đúng
 
 ## Checkpoint: Slice 1 xong
 
