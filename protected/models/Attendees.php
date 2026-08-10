@@ -117,22 +117,40 @@ class Attendees extends BaseAttendees
     public function approveViaApi()
     {
         $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
-        return ApiClient::post($url, array(
+        return ApiClient::post($url, array_merge($this->requiredUpdateFields(), array(
             'approval_status' => self::APPROVAL_APPROVED,
             'approved_by' => $this->approved_by,
             'approved_at' => time(),
-        ));
+        )));
     }
 
     public function rejectViaApi($reason)
     {
         $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
-        return ApiClient::post($url, array(
+        return ApiClient::post($url, array_merge($this->requiredUpdateFields(), array(
             'approval_status' => self::APPROVAL_REJECTED,
             'rejection_reason' => $reason,
             'approved_by' => $this->approved_by,
             'approved_at' => time(),
-        ));
+        )));
+    }
+
+    /**
+     * Các trường backend validate bắt buộc khi update người tham dự.
+     * Mọi lời gọi ATTENDEE_UPDATE phải kèm các trường này, nếu không
+     * backend trả về lỗi "Xác minh dữ liệu thất bại".
+     *
+     * @return array
+     */
+    protected function requiredUpdateFields()
+    {
+        return array(
+            'event_id' => $this->event_id,
+            'registration_id' => $this->registration_id,
+            'property_id' => $this->property_id,
+            'role_id' => $this->role_id,
+            'full_name' => $this->full_name,
+        );
     }
 
     /**
