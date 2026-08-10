@@ -511,7 +511,7 @@ class Attendees extends BaseAttendees
             'attendee_id' => $attendeeId,
             'per_page' => 500,
         ));
-        $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
+        $items = self::extractListData($result);
         if (!is_array($items)) {
             return array();
         }
