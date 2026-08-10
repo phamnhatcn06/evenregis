@@ -436,6 +436,137 @@ class Attendees extends BaseAttendees
         return $count;
     }
 
+    /**
+     * Bản kê nội dung 1 người tham dự đang tham gia: đội thể thao, cuộc thi nghiệp vụ, vai trò.
+     * Dùng cho modal Thay thế / Huỷ tư cách trên màn hình phê duyệt.
+     *
+     * @param int $attendeeId
+     * @return array {sport_teams: [...], competitions: [...], roles: [...]}
+     */
+    public static function getParticipationSummary($attendeeId)
+    {
+        return array(
+            'sport_teams' => self::collectSportTeams($attendeeId),
+            'competitions' => self::collectCompetitions($attendeeId),
+            'roles' => self::collectRoles($attendeeId),
+        );
+    }
+
+    /**
+     * Các đội thể thao mà người này là thành viên (kèm số áo, vị trí, đội trưởng, sĩ số đội, liên quân).
+     */
+    protected static function collectSportTeams($attendeeId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 500,
+        ));
+        $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
+        if (!is_array($items)) {
+            return array();
+        }
+
+        $teams = array();
+        foreach ($items as $item) {
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $teamId = isset($item['sport_team_id']) ? $item['sport_team_id'] : null;
+            if (!$teamId) {
+                continue;
+            }
+
+            $team = SportTeams::fetchFromApi($teamId);
+            $memberIds = SportTeamMembers::getAttendeeIdsBySport(
+                $team ? $team->sport_id : null
+            );
+
+            $teams[] = array(
+                'member_id' => isset($item['id']) ? $item['id'] : null,
+                'sport_team_id' => $teamId,
+                'sport_id' => $team ? $team->sport_id : (isset($item['sport_id']) ? $item['sport_id'] : null),
+                'sport_name' => $team && $team->sport_name ? $team->sport_name : (isset($item['sport_name']) ? $item['sport_name'] : ''),
+                'team_name' => $team ? $team->name : (isset($item['team_name']) ? $item['team_name'] : ''),
+                'jersey_number' => isset($item['jersey_number']) ? $item['jersey_number'] : null,
+                'position' => isset($item['position']) ? $item['position'] : null,
+                'is_captain' => isset($item['is_captain']) ? (int)$item['is_captain'] : 0,
+                'is_alliance' => $team && isset($team->is_alliance) ? (int)$team->is_alliance : 0,
+                'member_count' => SportTeamMembers::countTeamMembers($teamId),
+            );
+        }
+        return $teams;
+    }
+
+    /**
+     * Các cuộc thi nghiệp vụ mà người này đã đăng ký.
+     */
+    protected static function collectCompetitions($attendeeId)
+    {
+        $result = ApiClient::get(ApiEndpoints::COMPETITION_REGISTRATION_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 500,
+        ));
+        $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
+        if (!is_array($items)) {
+            return array();
+        }
+
+        $competitions = array();
+        foreach ($items as $item) {
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $compId = isset($item['competition_id']) ? $item['competition_id'] : null;
+            if (!$compId) {
+                continue;
+            }
+            $name = isset($item['competition_name']) ? $item['competition_name'] : '';
+            if (empty($name)) {
+                $comp = Competitions::fetchFromApi($compId);
+                $name = $comp ? $comp->name : '';
+            }
+            $competitions[] = array(
+                'registration_id' => isset($item['id']) ? $item['id'] : null,
+                'competition_id' => $compId,
+                'competition_name' => $name,
+                'candidate_number' => isset($item['candidate_number']) ? $item['candidate_number'] : '',
+            );
+        }
+        return $competitions;
+    }
+
+    /**
+     * Các vai trò được gán cho người này (attendee_roles).
+     */
+    protected static function collectRoles($attendeeId)
+    {
+        $result = ApiClient::get(ApiEndpoints::ATTENDEE_ROLE_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 500,
+        ));
+        $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
+        if (!is_array($items)) {
+            return array();
+        }
+
+        $roles = array();
+        foreach ($items as $item) {
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $roleId = isset($item['role_id']) ? $item['role_id'] : null;
+            if (!$roleId) {
+                continue;
+            }
+            $roles[] = array(
+                'attendee_role_id' => isset($item['id']) ? $item['id'] : null,
+                'role_id' => $roleId,
+                'role_name' => isset($item['role_name']) ? $item['role_name'] : self::resolveRoleNames((string)$roleId),
+            );
+        }
+        return $roles;
+    }
+
     public static function getRoleBadgeClass($roleName)
     {
         $roleNameLower = mb_strtolower(trim($roleName), 'UTF-8');
