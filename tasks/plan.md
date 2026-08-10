@@ -10,7 +10,7 @@
 - Yii chỉ là **frontend**; mọi dữ liệu đi qua **External API** (`ApiClient` + `ApiEndpoints`). Không có DB trực tiếp, **không có transaction đa-bước** phía frontend.
 - Quyết định: **orchestrate phía controller** bằng các endpoint sẵn có. Để giảm rủi ro dữ liệu nửa vời, áp dụng **thứ tự thao tác an toàn** (tạo mới trước, gỡ cũ sau; nếu bước tạo lỗi thì dừng, không đụng dữ liệu người bị thay) + ghi log mỗi bước.
 - Endpoint tái sử dụng (đã tồn tại): `ATTENDEE_STORE/UPDATE/DETAIL/UPLOAD_DOCUMENTS/BULK_STORE`, `SPORT_TEAM_LIST_BY_PROPERTY`, `SPORT_TEAM_MEMBER_LIST/STORE/DESTROY/COUNT_BY_ATTENDEE`, `SPORT_TEAM_UPDATE/DESTROY`, `COMPETITION_REGISTRATION_LIST/STORE/DESTROY`, `COMPETITION_ASSIGN_NUMBERS`, `ATTENDEE_ROLE_LIST/STORE/DESTROY`, `BADGE_LIST/UPDATE/DESTROY`, `STAFF_LIST/DETAIL/BEFORE_JUNE_2026`.
-- **Chưa có** trạng thái "huỷ tư cách" trên attendee. Cần backend hỗ trợ (xem Rủi ro/Phụ thuộc). Tạm thời dùng `is_active=0` + `note` nếu backend chưa thêm cột `participation_status`.
+- **Huỷ tư cách** (đã chốt) = ghi `is_active = 0` **và** set `deleted_at` (thời điểm huỷ) trên attendee. Không thêm cột `participation_status`.
 
 ## 2. Quyết định nghiệp vụ đã chốt
 
