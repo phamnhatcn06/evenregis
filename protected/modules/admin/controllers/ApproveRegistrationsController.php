@@ -1114,6 +1114,57 @@ class ApproveRegistrationsController extends AdminController
         $result = Attendees::withdrawViaApi($attendeeId, $reason, $email);
 
         if (isset($result['success']) && $result['success']) {
+            // 5. Ghi lịch sử huỷ tư cách (audit + email xác nhận đơn vị)
+            $affectedSports = array();
+            $withdrawCancelledTeams = array();
+            foreach ($summary['sport_teams'] as $t) {
+                $entry = array(
+                    'team_id' => $t['sport_team_id'],
+                    'sport_name' => $t['sport_name'],
+                    'team_name' => $t['team_name'],
+                    'jersey_number' => $t['jersey_number'],
+                    'is_captain' => $t['is_captain'],
+                );
+                if (in_array($t['sport_team_id'], $cancelTeamIds) || in_array((string)$t['sport_team_id'], $cancelTeamIds)) {
+                    $withdrawCancelledTeams[] = $entry;
+                } else {
+                    $affectedSports[] = $entry;
+                }
+            }
+            $affectedCompetitions = array();
+            foreach ($summary['competitions'] as $c) {
+                $affectedCompetitions[] = array(
+                    'competition_id' => $c['competition_id'],
+                    'competition_name' => $c['competition_name'],
+                    'candidate_number' => $c['candidate_number'],
+                );
+            }
+            $affectedRoles = array();
+            foreach ($summary['roles'] as $r) {
+                $affectedRoles[] = array(
+                    'role_id' => $r['role_id'],
+                    'role_name' => $r['role_name'],
+                );
+            }
+
+            AttendeeReplacements::record(array(
+                'registration_id' => $attendee->registration_id,
+                'event_id' => $attendee->event_id,
+                'property_id' => $attendee->property_id,
+                'action' => AttendeeReplacements::ACTION_WITHDRAW,
+                'old_attendee_id' => $attendeeId,
+                'old_attendee_name' => $attendee->full_name,
+                'old_staff_code' => isset($attendee->staff_code) ? $attendee->staff_code : null,
+                'affected_contents' => array(
+                    'sports' => $affectedSports,
+                    'competitions' => $affectedCompetitions,
+                    'roles' => $affectedRoles,
+                ),
+                'cancelled_teams' => $withdrawCancelledTeams,
+                'reason' => $reason,
+                'performed_by' => $email,
+            ));
+
             Yii::log("Huỷ tư cách attendee #{$attendeeId} bởi {$email}. Lý do: {$reason}", 'info', 'application.controllers.ApproveRegistrationsController');
             echo CJSON::encode(array('success' => true, 'message' => 'Đã huỷ tư cách người tham dự.'));
         } else {
