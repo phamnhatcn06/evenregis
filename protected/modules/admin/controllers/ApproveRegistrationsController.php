@@ -142,6 +142,26 @@ class ApproveRegistrationsController extends AdminController
             if ($rId) $roles[$rId] = $rName;
         }
 
+        // Load danh sách nhân sự SMILE của đơn vị (cho form thay thế)
+        $staffList = array();
+        if ($model->property_id) {
+            $staffsData = Staffs::getApiDataProvider(array('property_id' => $model->property_id, 'is_active' => 1), 1000)->getData();
+            foreach ($staffsData as $st) {
+                $stId = isset($st->id) ? $st->id : (isset($st['id']) ? $st['id'] : null);
+                $stName = isset($st->full_name) ? $st->full_name : (isset($st['full_name']) ? $st['full_name'] : '');
+                $stCode = isset($st->staff_code) ? $st->staff_code : (isset($st['staff_code']) ? $st['staff_code'] : '');
+                $stPos = isset($st->position_name) ? $st->position_name : (isset($st['position_name']) ? $st['position_name'] : '');
+                if ($stId) {
+                    $staffList[$stId] = array(
+                        'id' => $stId,
+                        'name' => $stName,
+                        'code' => $stCode,
+                        'position' => $stPos,
+                    );
+                }
+            }
+        }
+
         // Load transports
         $transportsData = Transports::getApiDataProvider(array(), 100)->getData();
         $transports = array();
