@@ -1000,6 +1000,21 @@ class ApproveRegistrationsController extends AdminController
 
         $summary = Attendees::getParticipationSummary($attendee_id);
 
+        // Trạng thái đã in thẻ: ưu tiên cờ từ API, nếu thiếu thì suy ra từ badge
+        // (có badge đang hiệu lực với print_count > 0 = đã in).
+        $badgePrinted = isset($attendee->badge_printed) ? (int)$attendee->badge_printed : 0;
+        if (!$badgePrinted) {
+            foreach (Badges::getByAttendeeId($attendee_id) as $badge) {
+                $printCount = is_array($badge)
+                    ? (isset($badge['print_count']) ? (int)$badge['print_count'] : 0)
+                    : (isset($badge->print_count) ? (int)$badge->print_count : 0);
+                if ($printCount > 0) {
+                    $badgePrinted = 1;
+                    break;
+                }
+            }
+        }
+
         echo CJSON::encode(array(
             'success' => true,
             'attendee' => array(
@@ -1007,7 +1022,7 @@ class ApproveRegistrationsController extends AdminController
                 'full_name' => $attendee->full_name,
                 'position_name' => $attendee->position_name,
                 'division_name' => $attendee->division_name,
-                'badge_printed' => isset($attendee->badge_printed) ? (int)$attendee->badge_printed : 0,
+                'badge_printed' => $badgePrinted,
             ),
             'summary' => $summary,
         ));
