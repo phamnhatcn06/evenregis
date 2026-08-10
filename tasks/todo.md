@@ -21,11 +21,12 @@
 - [x] Modal huỷ: hiển thị tác động + lý do bắt buộc + SweetAlert + Toast
 - [ ] Verify trình duyệt: huỷ 1 người → cuộc thi/vai trò bị gỡ, người bị đánh dấu huỷ
 
-## Phase 3: Xử lý đội khi huỷ (Slice 3)
-- [ ] Checkbox "huỷ cả đội" trong modal huỷ
-- [ ] Đội tích → destroy team; đội không tích → chỉ gỡ member
-- [ ] Captain bị gỡ ở đội giữ lại → chọn captain mới/để trống
-- [ ] Xử lý đội liên quân theo tích/không tích
+## Phase 3: Xử lý đội khi huỷ (Slice 3) — XONG
+- [x] Checkbox "huỷ cả đội" trong modal huỷ (render tương tác)
+- [x] Đội tích → destroy team (+ members); đội không tích → chỉ gỡ member
+- [x] Captain bị gỡ ở đội giữ lại → dropdown chọn captain mới/để trống
+- [x] Đội liên quân hiển thị badge; xử lý theo cùng cơ chế tích/không tích
+- [ ] Verify trình duyệt: huỷ có tích đội → đội mất; không tích → chỉ mất người; captain → gán mới
 
 ## Checkpoint: Luồng huỷ tư cách hoàn chỉnh
 
