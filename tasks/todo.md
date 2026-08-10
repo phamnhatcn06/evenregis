@@ -40,6 +40,13 @@
 
 ## Checkpoint: Luồng thay thế hoàn chỉnh
 
+## Phase 4b: Lịch sử thay đổi + email (Slice 4b)
+- [ ] Backend: bảng + endpoint `attendee-replacements` (store + list-by-registration) — CHỜ XÁC NHẬN
+- [ ] Model `AttendeeReplacements` (storeViaApi, getByRegistrationId)
+- [ ] Ghi log mỗi lần thay thế / huỷ (nội dung ảnh hưởng, đội bị huỷ, người bị thay ↔ người thay, lý do, người thực hiện)
+- [ ] `EmailHelper::sendRegistrationConfirmation` thêm mục "Thay đổi nhân sự" từ lịch sử
+- [ ] Verify: gửi mail xác nhận → thấy đúng danh sách thay/huỷ
+
 ## Phase 5: Thẻ / QR (Slice 5)
 - [ ] Cảnh báo "thẻ đã in" trong 2 modal
 - [ ] Vô hiệu badge A; đánh dấu B cần sinh badge
