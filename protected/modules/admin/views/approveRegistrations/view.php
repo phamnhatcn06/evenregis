@@ -1300,4 +1300,13 @@ $(document).ready(function() {
 ", CClientScript::POS_END);
 
 $this->renderPartial('_modal_send_mail');
+
+if (PermissionHelper::can('attendee', 'update')) {
+    $this->renderPartial('_modal_replace_attendee');
+    $this->renderPartial('_modal_withdraw_attendee');
+    Yii::app()->clientScript->registerScriptFile(
+        $baseUrl . '/assets/js/pages/approveregistrations-view.js',
+        CClientScript::POS_END
+    );
+}
 ?>
