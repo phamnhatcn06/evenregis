@@ -443,6 +443,24 @@ class Attendees extends BaseAttendees
      * @param int $attendeeId
      * @return array {sport_teams: [...], competitions: [...], roles: [...]}
      */
+    /**
+     * Trích danh sách từ response API, hỗ trợ cả 2 kiểu bọc:
+     * data.data (paginated) hoặc data (mảng trực tiếp).
+     */
+    protected static function extractListData($result)
+    {
+        if (!isset($result['success']) || !$result['success']) {
+            return array();
+        }
+        if (isset($result['data']['data']) && is_array($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        if (isset($result['data']) && is_array($result['data'])) {
+            return $result['data'];
+        }
+        return array();
+    }
+
     public static function getParticipationSummary($attendeeId)
     {
         return array(
