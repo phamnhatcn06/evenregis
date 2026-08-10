@@ -140,6 +140,11 @@ $attributes = array(
         <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php $canManageAttendee = PermissionHelper::can('attendee', 'update'); ?>
+        <div id="attendee-actions-config"
+             data-summary-url="<?php echo $this->createUrl('participationSummary'); ?>"
+             data-replace-url="<?php echo $this->createUrl('replaceAttendee'); ?>"
+             data-withdraw-url="<?php echo $this->createUrl('withdrawAttendee'); ?>"></div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-0" id="attendees-table">
                 <thead class="table-light">
