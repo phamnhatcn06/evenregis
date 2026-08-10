@@ -105,13 +105,30 @@ class Attendees extends BaseAttendees
         );
     }
 
-    public static function getByRegistrationId($registrationId)
+    /**
+     * Danh sách người tham dự của một lượt đăng ký.
+     *
+     * Backend không hỗ trợ lọc is_active nên phải loại bỏ người đã huỷ tư cách
+     * (is_active = 0) ở phía PHP, tránh hiển thị họ trong danh sách phê duyệt/báo cáo.
+     *
+     * @param int $registrationId
+     * @param bool $includeWithdrawn Cho phép lấy cả người đã huỷ tư cách
+     * @return array
+     */
+    public static function getByRegistrationId($registrationId, $includeWithdrawn = false)
     {
         $result = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('registration_id' => $registrationId, 'per_page' => 5000));
-        if ($result['success'] && isset($result['data']['data'])) {
-            return $result['data']['data'];
+        if (!$result['success'] || !isset($result['data']['data'])) {
+            return array();
         }
-        return array();
+        $attendees = $result['data']['data'];
+        if ($includeWithdrawn) {
+            return $attendees;
+        }
+        return array_values(array_filter($attendees, function ($att) {
+            $isActive = isset($att['is_active']) ? $att['is_active'] : 1;
+            return (int)$isActive !== 0;
+        }));
     }
 
     public function approveViaApi()
