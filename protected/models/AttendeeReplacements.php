@@ -124,4 +124,117 @@ class AttendeeReplacements extends CFormModel
         }
         return array();
     }
+
+    /**
+     * Lấy giá trị từ bản ghi (mảng hoặc object) theo tên field.
+     */
+    private static function pick($record, $key, $default = null)
+    {
+        if (is_array($record)) {
+            return isset($record[$key]) ? $record[$key] : $default;
+        }
+        if (is_object($record)) {
+            return isset($record->$key) ? $record->$key : $default;
+        }
+        return $default;
+    }
+
+    /**
+     * Chuẩn hoá field JSON (affected_contents / cancelled_teams) về mảng.
+     * Backend có thể trả về chuỗi JSON hoặc mảng đã decode.
+     */
+    private static function toArray($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_object($value)) {
+            return json_decode(json_encode($value), true);
+        }
+        if (is_string($value) && $value !== '') {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : array();
+        }
+        return array();
+    }
+
+    /**
+     * Lịch sử thay đổi nhân sự của 1 phiếu đăng ký, đã format sẵn để hiển thị
+     * trong email/PDF xác nhận. Mỗi phần tử là 1 dòng thay đổi gồm chuỗi mô tả
+     * người cũ/người thay + danh sách nội dung ảnh hưởng đã diễn giải.
+     *
+     * @param int $registrationId
+     * @return array Danh sách các thay đổi (mảng rỗng nếu không có)
+     */
+    public static function getFormattedByRegistrationId($registrationId)
+    {
+        $records = self::getByRegistrationId($registrationId);
+        $rows = array();
+
+        foreach ($records as $rec) {
+            // Bỏ qua bản ghi đã soft delete ở backend
+            if (self::pick($rec, 'deleted_at')) {
+                continue;
+            }
+
+            $action = self::pick($rec, 'action');
+            $affected = self::toArray(self::pick($rec, 'affected_contents'));
+            $cancelledTeams = self::toArray(self::pick($rec, 'cancelled_teams'));
+
+            // Diễn giải nội dung ảnh hưởng thành các cụm ngắn gọn
+            $contentLines = array();
+
+            $sports = isset($affected['sports']) && is_array($affected['sports']) ? $affected['sports'] : array();
+            foreach ($sports as $s) {
+                $label = self::pick($s, 'sport_name');
+                if (!$label) { $label = self::pick($s, 'team_name', 'Đội thể thao'); }
+                $extra = ($action === self::ACTION_REPLACE) ? ' (người thay kế thừa)' : '';
+                $contentLines[] = 'Thể thao: ' . $label . $extra;
+            }
+            foreach ($cancelledTeams as $s) {
+                $label = self::pick($s, 'sport_name');
+                if (!$label) { $label = self::pick($s, 'team_name', 'Đội thể thao'); }
+                $contentLines[] = 'Thể thao: ' . $label . ' (huỷ cả đội)';
+            }
+
+            $competitions = isset($affected['competitions']) && is_array($affected['competitions']) ? $affected['competitions'] : array();
+            foreach ($competitions as $c) {
+                $label = self::pick($c, 'competition_name', 'Thi nghiệp vụ');
+                $extra = ($action === self::ACTION_REPLACE) ? ' (cấp số báo danh mới)' : '';
+                $contentLines[] = 'Thi nghiệp vụ: ' . $label . $extra;
+            }
+
+            $roles = isset($affected['roles']) && is_array($affected['roles']) ? $affected['roles'] : array();
+            $roleNames = array();
+            foreach ($roles as $r) {
+                $rn = self::pick($r, 'role_name');
+                if ($rn) { $roleNames[] = $rn; }
+            }
+            if (!empty($roleNames)) {
+                $contentLines[] = 'Vai trò: ' . implode(', ', $roleNames);
+            }
+
+            $createdAt = self::pick($rec, 'created_at');
+            $performedAt = '';
+            if ($createdAt) {
+                $ts = is_numeric($createdAt) ? (int)$createdAt : strtotime($createdAt);
+                if ($ts) { $performedAt = date('d/m/Y H:i', $ts); }
+            }
+
+            $rows[] = array(
+                'action' => $action,
+                'action_label' => ($action === self::ACTION_REPLACE) ? 'Thay thế' : 'Huỷ tư cách',
+                'old_name' => self::pick($rec, 'old_attendee_name', ''),
+                'old_staff_code' => self::pick($rec, 'old_staff_code', ''),
+                'new_name' => self::pick($rec, 'new_attendee_name', ''),
+                'new_staff_code' => self::pick($rec, 'new_staff_code', ''),
+                'content_lines' => $contentLines,
+                'reason' => self::pick($rec, 'reason', ''),
+                'performed_by' => self::pick($rec, 'performed_by', ''),
+                'performed_at' => $performedAt,
+            );
+        }
+
+        return $rows;
+    }
 }
