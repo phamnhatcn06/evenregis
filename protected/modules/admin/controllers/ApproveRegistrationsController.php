@@ -1267,6 +1267,60 @@ class ApproveRegistrationsController extends AdminController
         // 5. Đánh dấu người bị thay là huỷ tư cách (đã thay thế)
         Attendees::withdrawViaApi($oldId, 'Đã được thay thế. ' . $reason, $email);
 
+        // 6. Ghi lịch sử thay thế (audit + email xác nhận đơn vị)
+        $affectedSports = array();
+        $cancelledTeams = array();
+        foreach ($summary['sport_teams'] as $t) {
+            $entry = array(
+                'team_id' => $t['sport_team_id'],
+                'sport_name' => $t['sport_name'],
+                'team_name' => $t['team_name'],
+                'jersey_number' => $t['jersey_number'],
+                'is_captain' => $t['is_captain'],
+            );
+            if (in_array((string)$t['sport_team_id'], $inheritTeamIds)) {
+                $affectedSports[] = $entry;
+            } else {
+                $cancelledTeams[] = $entry;
+            }
+        }
+        $affectedCompetitions = array();
+        foreach ($summary['competitions'] as $c) {
+            $affectedCompetitions[] = array(
+                'competition_id' => $c['competition_id'],
+                'competition_name' => $c['competition_name'],
+                'candidate_number' => $c['candidate_number'],
+            );
+        }
+        $affectedRoles = array();
+        foreach ($summary['roles'] as $r) {
+            $affectedRoles[] = array(
+                'role_id' => $r['role_id'],
+                'role_name' => $r['role_name'],
+            );
+        }
+
+        AttendeeReplacements::record(array(
+            'registration_id' => $req->getPost('registration_id'),
+            'event_id' => $req->getPost('event_id'),
+            'property_id' => $req->getPost('property_id'),
+            'action' => AttendeeReplacements::ACTION_REPLACE,
+            'old_attendee_id' => $oldId,
+            'old_attendee_name' => $oldAttendee->full_name,
+            'old_staff_code' => isset($oldAttendee->staff_code) ? $oldAttendee->staff_code : null,
+            'new_attendee_id' => $newId,
+            'new_attendee_name' => $fullName,
+            'new_staff_code' => $staffCode,
+            'affected_contents' => array(
+                'sports' => $affectedSports,
+                'competitions' => $affectedCompetitions,
+                'roles' => $affectedRoles,
+            ),
+            'cancelled_teams' => $cancelledTeams,
+            'reason' => $reason,
+            'performed_by' => $email,
+        ));
+
         Yii::log("Thay thế attendee #{$oldId} bằng #{$newId} bởi {$email}. Lý do: {$reason}", 'info', 'application.controllers.ApproveRegistrationsController');
         echo CJSON::encode(array('success' => true, 'message' => 'Đã thay thế người tham dự thành công.'));
         Yii::app()->end();
