@@ -1048,7 +1048,45 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
-        // 3. Đánh dấu huỷ tư cách
+        // 3. Xử lý đội thể thao
+        $cancelTeamIds = Yii::app()->request->getPost('cancel_team_ids', array());
+        if (!is_array($cancelTeamIds)) {
+            $cancelTeamIds = array();
+        }
+        $newCaptains = Yii::app()->request->getPost('new_captain', array());
+        if (!is_array($newCaptains)) {
+            $newCaptains = array();
+        }
+
+        $memberships = SportTeamMembers::getMembershipsByAttendee($attendeeId);
+        $cancelledTeams = array();
+        foreach ($memberships as $m) {
+            $teamId = $m['sport_team_id'];
+            $memberId = $m['member_id'];
+            if (in_array($teamId, $cancelTeamIds) || in_array((string)$teamId, $cancelTeamIds)) {
+                // Huỷ cả đội (một lần)
+                if (!isset($cancelledTeams[$teamId])) {
+                    foreach (SportTeamMembers::getTeamMemberBriefs($teamId) as $tm) {
+                        if (!empty($tm['member_id'])) {
+                            SportTeamMembers::deleteViaApi($tm['member_id']);
+                        }
+                    }
+                    SportTeams::deleteViaApi($teamId);
+                    $cancelledTeams[$teamId] = true;
+                }
+            } else {
+                // Chỉ gỡ người khỏi đội
+                if ($memberId) {
+                    SportTeamMembers::deleteViaApi($memberId);
+                }
+                // Nếu người bị gỡ là đội trưởng và có chỉ định captain mới
+                if (!empty($m['is_captain']) && !empty($newCaptains[$teamId])) {
+                    SportTeamMembers::assignCaptain($newCaptains[$teamId]);
+                }
+            }
+        }
+
+        // 4. Đánh dấu huỷ tư cách
         $result = Attendees::withdrawViaApi($attendeeId, $reason, $email);
 
         if (isset($result['success']) && $result['success']) {
