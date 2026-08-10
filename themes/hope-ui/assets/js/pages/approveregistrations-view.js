@@ -15,19 +15,22 @@
     /**
      * Dựng HTML danh sách nội dung tham gia từ dữ liệu summary.
      */
-    function renderSummary(summary) {
-        var html = '';
+    function teamMetaBadges(t) {
+        var meta = [];
+        if (t.jersey_number) { meta.push('Số áo ' + t.jersey_number); }
+        if (t.position) { meta.push(escapeHtml(t.position)); }
+        if (parseInt(t.is_captain, 10)) { meta.push('<span class="badge bg-warning text-dark">Đội trưởng</span>'); }
+        if (parseInt(t.is_alliance, 10)) { meta.push('<span class="badge bg-info text-dark">Liên quân</span>'); }
+        return meta;
+    }
 
-        var teams = summary.sport_teams || [];
-        html += '<div class="mb-3"><h6 class="mb-1"><i class="fa fa-futbol-o me-1 text-primary"></i>Đội thể thao</h6>';
+    // Đội thể thao — bản chỉ đọc (dùng cho modal thay thế).
+    function renderTeamsReadonly(teams) {
+        var html = '<div class="mb-3"><h6 class="mb-1"><i class="fa fa-futbol-o me-1 text-primary"></i>Đội thể thao</h6>';
         if (teams.length) {
             html += '<ul class="list-group list-group-flush">';
             teams.forEach(function (t) {
-                var meta = [];
-                if (t.jersey_number) { meta.push('Số áo ' + t.jersey_number); }
-                if (t.position) { meta.push(t.position); }
-                if (parseInt(t.is_captain, 10)) { meta.push('<span class="badge bg-warning text-dark">Đội trưởng</span>'); }
-                if (parseInt(t.is_alliance, 10)) { meta.push('<span class="badge bg-info text-dark">Liên quân</span>'); }
+                var meta = teamMetaBadges(t);
                 html += '<li class="list-group-item px-0 py-1">'
                     + '<strong>' + escapeHtml(t.sport_name || t.team_name || '') + '</strong> '
                     + '<small class="text-muted">' + escapeHtml(t.team_name || '') + '</small>'
@@ -38,8 +41,48 @@
         } else {
             html += '<p class="text-muted small mb-0">Không tham gia đội nào.</p>';
         }
-        html += '</div>';
+        return html + '</div>';
+    }
 
+    // Đội thể thao — bản tương tác (modal huỷ): checkbox huỷ cả đội + chọn captain mới.
+    function renderTeamsInteractive(teams) {
+        var html = '<div class="mb-3"><h6 class="mb-1"><i class="fa fa-futbol-o me-1 text-primary"></i>Đội thể thao</h6>';
+        if (!teams.length) {
+            return html + '<p class="text-muted small mb-0">Không tham gia đội nào.</p></div>';
+        }
+        teams.forEach(function (t) {
+            var meta = teamMetaBadges(t);
+            var tid = t.sport_team_id;
+            html += '<div class="border rounded p-2 mb-2">'
+                + '<div class="d-flex justify-content-between align-items-start">'
+                + '<div><strong>' + escapeHtml(t.sport_name || t.team_name || '') + '</strong> '
+                + '<small class="text-muted">' + escapeHtml(t.team_name || '') + '</small>'
+                + '<br><small>' + meta.join(' · ') + ' · ' + (t.member_count || 0) + ' thành viên</small></div>'
+                + '<div class="form-check">'
+                + '<input class="form-check-input withdraw-cancel-team" type="checkbox" name="cancel_team_ids[]" value="' + tid + '" id="cancel_team_' + tid + '">'
+                + '<label class="form-check-label small text-danger" for="cancel_team_' + tid + '">Huỷ cả đội</label>'
+                + '</div></div>';
+
+            // Nếu người này là đội trưởng: cho chọn captain mới (khi không huỷ đội)
+            if (parseInt(t.is_captain, 10)) {
+                var others = t.other_members || [];
+                html += '<div class="mt-2 captain-block" data-team="' + tid + '">'
+                    + '<label class="form-label small mb-1 text-warning"><i class="fa fa-exclamation-triangle"></i> Người này là đội trưởng — chọn đội trưởng mới:</label>'
+                    + '<select class="form-select form-select-sm" name="new_captain[' + tid + ']">'
+                    + '<option value="">-- Để trống (đội tạm không có đội trưởng) --</option>';
+                others.forEach(function (m) {
+                    html += '<option value="' + m.member_id + '">' + escapeHtml(m.attendee_name || ('#' + m.attendee_id)) + '</option>';
+                });
+                html += '</select></div>';
+            }
+            html += '</div>';
+        });
+        return html + '</div>';
+    }
+
+    // Cuộc thi + vai trò (chung cho cả 2 modal).
+    function renderCompsRoles(summary) {
+        var html = '';
         var comps = summary.competitions || [];
         html += '<div class="mb-3"><h6 class="mb-1"><i class="fa fa-trophy me-1 text-warning"></i>Thi nghiệp vụ</h6>';
         if (comps.length) {
