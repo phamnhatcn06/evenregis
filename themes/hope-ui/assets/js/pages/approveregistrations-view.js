@@ -230,6 +230,10 @@
         var form = document.getElementById('replaceAttendeeForm');
         form.reset();
         document.getElementById('replace_attendee_id').value = attendeeId;
+        document.getElementById('replace_staff_id').value = '';
+        if (window.jQuery && jQuery.fn.select2) {
+            jQuery('#replace_staff_select').val('').trigger('change.select2');
+        }
         document.getElementById('replace_badge_warning').classList.add('d-none');
         ['replace_portrait_preview', 'replace_contract_preview', 'replace_cccd_front_preview', 'replace_cccd_back_preview']
             .forEach(function (id) { var el = document.getElementById(id); if (el) { el.innerHTML = ''; } });
