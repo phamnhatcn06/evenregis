@@ -664,8 +664,9 @@ class Attendees extends BaseAttendees
             'property_id' => isset($data['property_id']) ? $data['property_id'] : null,
             'role_id' => isset($data['role_id']) ? $data['role_id'] : null,
             'full_name' => isset($data['full_name']) ? $data['full_name'] : null,
-            // Đánh dấu huỷ tư cách
+            // Đánh dấu huỷ tư cách: is_active = 0 + deleted_at
             'is_active' => 0,
+            'deleted_at' => date('Y-m-d H:i:s'),
             'note' => implode(' ', $noteParts),
         ));
     }
