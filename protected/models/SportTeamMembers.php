@@ -346,6 +346,39 @@ class SportTeamMembers extends BaseSportTeamMembers
     }
 
     /**
+     * Danh sách các đội mà 1 người là thành viên (member_id, sport_team_id, is_captain).
+     * @param int $attendeeId
+     * @return array
+     */
+    public static function getMembershipsByAttendee($attendeeId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 500,
+        ));
+        $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
+        if (!is_array($items)) {
+            return array();
+        }
+        $memberships = array();
+        foreach ($items as $item) {
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $teamId = isset($item['sport_team_id']) ? $item['sport_team_id'] : null;
+            if (!$teamId) {
+                continue;
+            }
+            $memberships[] = array(
+                'member_id' => isset($item['id']) ? $item['id'] : null,
+                'sport_team_id' => $teamId,
+                'is_captain' => isset($item['is_captain']) ? (int)$item['is_captain'] : 0,
+            );
+        }
+        return $memberships;
+    }
+
+    /**
      * Gán đội trưởng mới cho 1 thành viên đội.
      * @param int $memberId
      * @return array
