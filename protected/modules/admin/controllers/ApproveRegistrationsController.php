@@ -573,6 +573,10 @@ class ApproveRegistrationsController extends AdminController
             echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
             Yii::app()->end();
         }
+        if (!PermissionHelper::can('approveregistrations', 'update')) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+            Yii::app()->end();
+        }
 
         $ssoUser = AuthHandler::getUser();
         $approvedBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
