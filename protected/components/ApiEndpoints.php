@@ -488,6 +488,8 @@ class ApiEndpoints
     const REGISTRATION_APPROVAL_LIST = '/api/registration-approvals';
     const REGISTRATION_APPROVAL_STORE = '/api/registration-approvals/store';
     const REGISTRATION_APPROVAL_DETAIL = '/api/registration-approvals/detail/{id}';
+    const REGISTRATION_APPROVAL_UPDATE = '/api/registration-approvals/update/{id}';
+    const REGISTRATION_APPROVAL_DESTROY = '/api/registration-approvals/destroy/{id}';
     const REGISTRATION_APPROVAL_PENDING = '/api/registration-approvals/pending/{portal_user_id}';
     const REGISTRATION_APPROVAL_APPROVE = '/api/registration-approvals/approve/{id}';
     const REGISTRATION_APPROVAL_REJECT = '/api/registration-approvals/reject/{id}';
