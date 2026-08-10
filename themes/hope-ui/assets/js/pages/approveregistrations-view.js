@@ -137,4 +137,12 @@
         loadSummary(attendeeId, 'replace_summary_container', 'replace_attendee_name', 'replace_badge_warning', 'replace_attendee_position');
         showModal('replaceAttendeeModal');
     };
+
+    // Slice 1: chỉ hiển thị (read-only). Logic submit bổ sung ở Slice 2 (huỷ) và Slice 4 (thay thế).
+    ['withdrawAttendeeForm', 'replaceAttendeeForm'].forEach(function (formId) {
+        var form = document.getElementById(formId);
+        if (form) {
+            form.addEventListener('submit', function (e) { e.preventDefault(); });
+        }
+    });
 })();
