@@ -477,9 +477,6 @@ class Attendees extends BaseAttendees
             }
 
             $team = SportTeams::fetchFromApi($teamId);
-            $memberIds = SportTeamMembers::getAttendeeIdsBySport(
-                $team ? $team->sport_id : null
-            );
 
             $teams[] = array(
                 'member_id' => isset($item['id']) ? $item['id'] : null,
