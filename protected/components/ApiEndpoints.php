@@ -286,6 +286,7 @@ class ApiEndpoints
     const TALENT_ENTRY_MEMBER_LIST = '/api/talent-entry-members';
     const TALENT_ENTRY_MEMBER_STORE = '/api/talent-entry-members/store';
     const TALENT_ENTRY_MEMBER_DETAIL = '/api/talent-entry-members/detail/{id}';
+    const TALENT_ENTRY_MEMBER_UPDATE = '/api/talent-entry-members/update/{id}';
     const TALENT_ENTRY_MEMBER_DESTROY = '/api/talent-entry-members/destroy/{id}';
 
     // Talent Round
