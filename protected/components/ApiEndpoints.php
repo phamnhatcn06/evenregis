@@ -233,6 +233,7 @@ class ApiEndpoints
     const COMPETITION_DEPARTMENT_LIST = '/api/competition-departments';
     const COMPETITION_DEPARTMENT_STORE = '/api/competition-departments/store';
     const COMPETITION_DEPARTMENT_DETAIL = '/api/competition-departments/detail/{id}';
+    const COMPETITION_DEPARTMENT_UPDATE = '/api/competition-departments/update/{id}';
     const COMPETITION_DEPARTMENT_DESTROY = '/api/competition-departments/destroy/{id}';
     const COMPETITION_DEPARTMENT_SYNC = '/api/competition-departments/sync/{competition_id}';
 
