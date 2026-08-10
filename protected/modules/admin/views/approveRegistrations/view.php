@@ -1302,7 +1302,12 @@ $(document).ready(function() {
 $this->renderPartial('_modal_send_mail');
 
 if (PermissionHelper::can('approveregistrations', 'update')) {
-    $this->renderPartial('_modal_replace_attendee');
+    $this->renderPartial('_modal_replace_attendee', array(
+        'model' => $model,
+        'roles' => $roles,
+        'transports' => $transports,
+        'staffList' => isset($staffList) ? $staffList : array(),
+    ));
     $this->renderPartial('_modal_withdraw_attendee');
     Yii::app()->clientScript->registerScriptFile(
         $baseUrl . '/assets/js/pages/approveregistrations-view.js',
