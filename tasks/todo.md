@@ -15,10 +15,11 @@
 
 ## Checkpoint: Slice 1 xong
 
-## Phase 2: Huỷ tư cách cơ bản (Slice 2)
-- [ ] `actionWithdrawAttendee` gỡ competition_registrations + attendee_roles
-- [ ] Đánh dấu attendee huỷ tư cách + log
-- [ ] Modal huỷ: hiển thị tác động + lý do bắt buộc + SweetAlert + Toast
+## Phase 2: Huỷ tư cách cơ bản (Slice 2) — XONG
+- [x] `actionWithdrawAttendee` gỡ competition_registrations + attendee_roles
+- [x] Đánh dấu attendee huỷ tư cách (is_active=0 + deleted_at + note) + Yii::log
+- [x] Modal huỷ: hiển thị tác động + lý do bắt buộc + SweetAlert + Toast
+- [ ] Verify trình duyệt: huỷ 1 người → cuộc thi/vai trò bị gỡ, người bị đánh dấu huỷ
 
 ## Phase 3: Xử lý đội khi huỷ (Slice 3)
 - [ ] Checkbox "huỷ cả đội" trong modal huỷ
