@@ -594,8 +594,11 @@ class Attendees extends BaseAttendees
     }
 
     /**
-     * Huỷ tư cách người tham dự: ghi is_active=0 + deleted_at + lý do vào note.
-     * Chỉ gửi các field cần thiết để tránh array_filter làm rơi giá trị 0.
+     * Huỷ tư cách người tham dự: đánh dấu is_active=0 + ghi lý do vào note.
+     *
+     * Endpoint update của backend validate bắt buộc các trường
+     * event_id, registration_id, property_id, role_id, full_name — nên phải
+     * gửi kèm dữ liệu gốc của người tham dự, nếu không sẽ báo "Xác minh dữ liệu thất bại".
      *
      * @param int $id
      * @param string $reason
@@ -604,7 +607,12 @@ class Attendees extends BaseAttendees
      */
     public static function withdrawViaApi($id, $reason, $email = null)
     {
-        $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $id));
+        $detail = ApiClient::get(ApiEndpoints::url(ApiEndpoints::ATTENDEE_DETAIL, array('id' => $id)));
+        if (empty($detail['success'])) {
+            return $detail;
+        }
+        $data = isset($detail['data']['data']) ? $detail['data']['data'] : $detail['data'];
+
         $noteParts = array('[Huỷ tư cách]');
         if ($reason !== null && $reason !== '') {
             $noteParts[] = $reason;
@@ -612,9 +620,17 @@ class Attendees extends BaseAttendees
         if ($email) {
             $noteParts[] = 'bởi ' . $email;
         }
+
+        $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $id));
         return ApiClient::post($url, array(
+            // Các trường bắt buộc — giữ nguyên giá trị gốc
+            'event_id' => isset($data['event_id']) ? $data['event_id'] : null,
+            'registration_id' => isset($data['registration_id']) ? $data['registration_id'] : null,
+            'property_id' => isset($data['property_id']) ? $data['property_id'] : null,
+            'role_id' => isset($data['role_id']) ? $data['role_id'] : null,
+            'full_name' => isset($data['full_name']) ? $data['full_name'] : null,
+            // Đánh dấu huỷ tư cách
             'is_active' => 0,
-            'deleted_at' => time(),
             'note' => implode(' ', $noteParts),
         ));
     }
