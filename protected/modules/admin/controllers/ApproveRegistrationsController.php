@@ -706,6 +706,11 @@ class ApproveRegistrationsController extends AdminController
             Yii::app()->end();
         }
 
+        if (!PermissionHelper::can('approveregistrations', 'update')) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+            Yii::app()->end();
+        }
+
         $registrationId = Yii::app()->request->getPost('registration_id');
         $model = Registrations::fetchFromApi($registrationId);
 
