@@ -11,6 +11,7 @@
     }
     var summaryUrl = config.getAttribute('data-summary-url');
     var withdrawUrl = config.getAttribute('data-withdraw-url');
+    var replaceUrl = config.getAttribute('data-replace-url');
 
     /**
      * Dựng HTML danh sách nội dung tham gia từ dữ liệu summary.
