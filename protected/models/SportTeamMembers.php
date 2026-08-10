@@ -286,6 +286,33 @@ class SportTeamMembers extends BaseSportTeamMembers
     }
 
     /**
+     * Đếm số thành viên hiện tại của 1 đội thể thao.
+     * @param int $teamId
+     * @return int
+     */
+    public static function countTeamMembers($teamId)
+    {
+        if (!$teamId) {
+            return 0;
+        }
+        $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'sport_team_id' => $teamId,
+            'per_page' => 500,
+        ));
+        $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
+        if (!is_array($items)) {
+            return 0;
+        }
+        $count = 0;
+        foreach ($items as $item) {
+            if (isset($item['sport_team_id']) && $item['sport_team_id'] == $teamId) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
      * Lấy danh sách attendee_id đã đăng ký team của 1 môn thể thao
      * @param int $sportId ID môn thể thao
      * @param int|null $registrationId Lọc theo registration (optional)
