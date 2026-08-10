@@ -475,9 +475,12 @@ class Attendees extends BaseAttendees
      */
     protected static function collectSportTeams($attendeeId)
     {
+        // Lưu ý: endpoint sport-team-members KHÔNG lọc theo attendee_id (trả toàn bộ
+        // rồi phân trang). Phải lấy per_page đủ lớn để không rớt các bản ghi cũ
+        // (vd: đội liên quân tạo trước), sau đó lọc attendee_id ở phía client.
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'attendee_id' => $attendeeId,
-            'per_page' => 500,
+            'per_page' => 10000,
         ));
         $items = self::extractListData($result);
         if (!is_array($items)) {
