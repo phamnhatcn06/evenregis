@@ -132,7 +132,7 @@
     /**
      * Tải summary và đổ vào 2 vùng (container + tên + cảnh báo thẻ).
      */
-    function loadSummary(attendeeId, containerId, nameId, badgeWarnId, positionId) {
+    function loadSummary(attendeeId, containerId, nameId, badgeWarnId, positionId, renderFn) {
         var container = document.getElementById(containerId);
         container.innerHTML = '<div class="text-center text-muted py-3"><i class="fa fa-spinner fa-spin me-1"></i>Đang tải...</div>';
 
