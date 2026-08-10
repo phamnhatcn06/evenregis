@@ -162,7 +162,7 @@
                 if (badgeWarnId && parseInt(att.badge_printed, 10)) {
                     document.getElementById(badgeWarnId).classList.remove('d-none');
                 }
-                container.innerHTML = renderSummary(data.summary || {});
+                container.innerHTML = (renderFn || renderSummary)(data.summary || {});
             })
             .catch(function () {
                 container.innerHTML = '<p class="text-danger">Lỗi kết nối máy chủ.</p>';
