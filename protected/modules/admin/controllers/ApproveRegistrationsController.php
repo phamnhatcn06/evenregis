@@ -1120,6 +1120,211 @@ class ApproveRegistrationsController extends AdminController
         Yii::app()->end();
     }
 
+    /**
+     * Thay thế 1 người tham dự bằng người khác (SMILE hoặc thủ công).
+     * Người thay kế thừa approved + đội được tích + toàn bộ cuộc thi (số báo danh mới do backend cấp) + vai trò.
+     * Đội không tích sẽ bị huỷ. Số báo danh cũ không kế thừa.
+     */
+    public function actionReplaceAttendee()
+    {
+        header('Content-Type: application/json');
+
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+        if (!PermissionHelper::can('approveregistrations', 'update')) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+            Yii::app()->end();
+        }
+
+        $req = Yii::app()->request;
+        $oldId = $req->getPost('attendee_id');
+        $reason = trim($req->getPost('reason', ''));
+        $staffId = $req->getPost('staff_id');
+        $fullName = trim($req->getPost('full_name', ''));
+
+        if (!$oldId || $reason === '' || (!$staffId && $fullName === '')) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin bắt buộc (người bị thay, lý do, người thay).'));
+            Yii::app()->end();
+        }
+
+        $oldAttendee = Attendees::fetchFromApi($oldId);
+        if (!$oldAttendee) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người bị thay.'));
+            Yii::app()->end();
+        }
+
+        $ssoUser = AuthHandler::getUser();
+        $email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+        // Thông tin người thay: ưu tiên SMILE
+        $position = trim($req->getPost('position', ''));
+        $idCard = trim($req->getPost('id_card', ''));
+        $staffCode = null;
+        if ($staffId) {
+            $staff = Staffs::fetchFromApi($staffId);
+            if ($staff) {
+                if ($fullName === '') { $fullName = $staff->full_name; }
+                if ($position === '') { $position = isset($staff->position_name) ? $staff->position_name : ''; }
+                $staffCode = isset($staff->staff_code) ? $staff->staff_code : null;
+            }
+        }
+
+        // 1. Tạo người thay (kế thừa approved)
+        $new = new Attendees();
+        $new->event_id = $req->getPost('event_id');
+        $new->registration_id = $req->getPost('registration_id');
+        $new->property_id = $req->getPost('property_id');
+        $new->full_name = $fullName;
+        $new->position = $position;
+        $new->position_name = $position;
+        $new->id_card = $idCard;
+        if ($staffId) { $new->staff_id = $staffId; }
+        if ($staffCode) { $new->staff_code = $staffCode; }
+
+        $postedRoles = $req->getPost('role_id', array());
+        if (is_array($postedRoles)) { $postedRoles = implode(', ', $postedRoles); }
+        $new->role_id = $postedRoles !== '' ? $postedRoles : $oldAttendee->role_id;
+        $new->transport_id = $oldAttendee->transport_id;
+        $new->approval_status = Attendees::APPROVAL_APPROVED;
+        $new->approved_by = $email;
+
+        $uploads = $this->handleReplaceUpload();
+        foreach (array('portrait_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $f) {
+            if (isset($uploads[$f])) { $new->$f = $uploads[$f]; }
+        }
+
+        $storeResult = $new->storeViaApi();
+        $newId = $this->extractNewId($storeResult);
+        if (!$newId) {
+            $err = isset($storeResult['error']) ? $storeResult['error'] : 'Không thể tạo người thay.';
+            echo CJSON::encode(array('success' => false, 'error' => $err));
+            Yii::app()->end();
+        }
+
+        // Kể từ đây người thay đã tồn tại → kế thừa nội dung của người bị thay
+        $summary = Attendees::getParticipationSummary($oldId);
+        $inheritTeamIds = $req->getPost('inherit_team_ids', array());
+        if (!is_array($inheritTeamIds)) { $inheritTeamIds = array(); }
+        $inheritTeamIds = array_map('strval', $inheritTeamIds);
+
+        // 2. Đội thể thao
+        foreach ($summary['sport_teams'] as $t) {
+            $tid = $t['sport_team_id'];
+            if (in_array((string)$tid, $inheritTeamIds)) {
+                // Kế thừa: thêm người thay vào đội, gỡ người cũ
+                $m = new SportTeamMembers();
+                $m->sport_team_id = $tid;
+                $m->attendee_id = $newId;
+                $m->name = $fullName;
+                $m->jersey_number = $t['jersey_number'];
+                $m->position = $t['position'];
+                $m->is_captain = $t['is_captain'];
+                $m->storeViaApi();
+                if (!empty($t['member_id'])) {
+                    SportTeamMembers::deleteViaApi($t['member_id']);
+                }
+            } else {
+                // Không tích: huỷ cả đội
+                foreach (SportTeamMembers::getTeamMemberBriefs($tid) as $tm) {
+                    if (!empty($tm['member_id'])) {
+                        SportTeamMembers::deleteViaApi($tm['member_id']);
+                    }
+                }
+                SportTeams::deleteViaApi($tid);
+            }
+        }
+
+        // 3. Thi nghiệp vụ (kế thừa hết, cấp số báo danh mới → để trống candidate_number)
+        foreach ($summary['competitions'] as $c) {
+            $cr = new CompetitionRegistrations();
+            $cr->competition_id = $c['competition_id'];
+            $cr->registration_id = $req->getPost('registration_id');
+            $cr->attendee_id = $newId;
+            $cr->status = CompetitionRegistrations::STATUS_PENDING;
+            $cr->storeViaApi();
+            if (!empty($c['registration_id'])) {
+                CompetitionRegistrations::deleteViaApi($c['registration_id']);
+            }
+        }
+
+        // 4. Vai trò: nếu admin không chọn thì kế thừa của người cũ
+        if ($postedRoles === '') {
+            foreach ($summary['roles'] as $r) {
+                $ar = new AttendeeRoles();
+                $ar->attendee_id = $newId;
+                $ar->role_id = $r['role_id'];
+                $ar->storeViaApi();
+            }
+        }
+        foreach ($summary['roles'] as $r) {
+            if (!empty($r['attendee_role_id'])) {
+                AttendeeRoles::deleteViaApi($r['attendee_role_id']);
+            }
+        }
+
+        // 5. Đánh dấu người bị thay là huỷ tư cách (đã thay thế)
+        Attendees::withdrawViaApi($oldId, 'Đã được thay thế. ' . $reason, $email);
+
+        Yii::log("Thay thế attendee #{$oldId} bằng #{$newId} bởi {$email}. Lý do: {$reason}", 'info', 'application.controllers.ApproveRegistrationsController');
+        echo CJSON::encode(array('success' => true, 'message' => 'Đã thay thế người tham dự thành công.'));
+        Yii::app()->end();
+    }
+
+    /**
+     * Trích id bản ghi attendee mới từ kết quả ApiClient.
+     */
+    private function extractNewId($result)
+    {
+        if (!isset($result['success']) || !$result['success'] || !isset($result['data'])) {
+            return null;
+        }
+        $data = $result['data'];
+        if (isset($data['data']['id'])) { return $data['data']['id']; }
+        if (isset($data['id'])) { return $data['id']; }
+        return null;
+    }
+
+    /**
+     * Upload ảnh/hồ sơ cho người thay. Trả về map path.
+     */
+    private function handleReplaceUpload()
+    {
+        $result = array();
+        $uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/attendees/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        $fileFields = array(
+            'portrait_file' => 'portrait_path',
+            'cccd_front_file' => 'cccd_front_path',
+            'cccd_back_file' => 'cccd_back_path',
+            'contract_file' => 'contract_path',
+        );
+        $allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
+        $maxSize = 50 * 1024 * 1024;
+
+        foreach ($fileFields as $fieldName => $attrName) {
+            if (!isset($_FILES[$fieldName]) || $_FILES[$fieldName]['error'] === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            if ($_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
+                continue;
+            }
+            $ext = strtolower(pathinfo($_FILES[$fieldName]['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedTypes) || $_FILES[$fieldName]['size'] > $maxSize) {
+                continue;
+            }
+            $filename = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+            $filepath = $uploadDir . $filename;
+            if (move_uploaded_file($_FILES[$fieldName]['tmp_name'], $filepath)) {
+                $result[$attrName] = Yii::app()->baseUrl . '/uploads/attendees/' . $filename;
+            }
+        }
+        return $result;
+    }
+
     protected function loadModelById($id)
     {
         $model = Registrations::fetchFromApi($id);
