@@ -131,7 +131,7 @@ class SportTeamMembers extends BaseSportTeamMembers
     {
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'attendee_id' => $attendeeId,
-            'per_page' => 500,
+            'per_page' => 10000,
         ));
 
         if (!$result['success']) {
@@ -173,7 +173,7 @@ class SportTeamMembers extends BaseSportTeamMembers
     {
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'attendee_id' => $attendeeId,
-            'per_page' => 500,
+            'per_page' => 10000,
         ));
 
         if (!$result['success']) {
@@ -221,7 +221,7 @@ class SportTeamMembers extends BaseSportTeamMembers
 
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'attendee_id' => $attendeeId,
-            'per_page' => 500,
+            'per_page' => 10000,
         ));
 
         if (!$result['success']) {
@@ -297,7 +297,7 @@ class SportTeamMembers extends BaseSportTeamMembers
         }
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'sport_team_id' => $teamId,
-            'per_page' => 500,
+            'per_page' => 10000,
         ));
         $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
         if (!is_array($items)) {
@@ -324,7 +324,7 @@ class SportTeamMembers extends BaseSportTeamMembers
         }
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'sport_team_id' => $teamId,
-            'per_page' => 500,
+            'per_page' => 10000,
         ));
         $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
         if (!is_array($items)) {
@@ -354,7 +354,7 @@ class SportTeamMembers extends BaseSportTeamMembers
     {
         $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'attendee_id' => $attendeeId,
-            'per_page' => 500,
+            'per_page' => 10000,
         ));
         $items = ($result['success'] && isset($result['data']['data'])) ? $result['data']['data'] : array();
         if (!is_array($items)) {
@@ -399,7 +399,7 @@ class SportTeamMembers extends BaseSportTeamMembers
     {
         $params = array(
             'sport_id' => $sportId,
-            'per_page' => 500,
+            'per_page' => 10000,
         );
         if ($registrationId) {
             $params['registration_id'] = $registrationId;
