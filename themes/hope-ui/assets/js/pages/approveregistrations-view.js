@@ -302,9 +302,70 @@
             });
     }
 
-    // Thay thế (Slice 4): tạm chặn submit cho tới khi hoàn thiện.
+    // Thay thế (Slice 4): validate → xác nhận → POST.
     var replaceForm = document.getElementById('replaceAttendeeForm');
     if (replaceForm) {
-        replaceForm.addEventListener('submit', function (e) { e.preventDefault(); });
+        replaceForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var staffId = document.getElementById('replace_staff_id').value;
+            var fullName = document.getElementById('replace_full_name').value.trim();
+            var reason = document.getElementById('replace_reason').value.trim();
+            var portrait = replaceForm.querySelector('input[name="portrait_file"]').files[0];
+
+            if (!staffId && !fullName) {
+                Toast.error('Vui lòng chọn nhân sự SMILE hoặc nhập họ tên người thay.');
+                return;
+            }
+            if (!reason) {
+                Toast.error('Vui lòng nhập lý do thay thế.');
+                return;
+            }
+            if (!portrait) {
+                Toast.error('Vui lòng chọn ảnh chân dung người thay.');
+                return;
+            }
+            Swal.fire({
+                title: 'Xác nhận thay thế',
+                text: 'Thực hiện thay thế người tham dự? Người bị thay sẽ bị huỷ tư cách.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Thực hiện',
+                cancelButtonText: 'Đóng'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    submitReplace();
+                }
+            });
+        });
+    }
+
+    function submitReplace() {
+        var btn = document.getElementById('btn_submit_replace');
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang xử lý...';
+
+        var formData = new FormData(document.getElementById('replaceAttendeeForm'));
+        fetch(replaceUrl, { method: 'POST', body: formData })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('replaceAttendeeModal'));
+                    if (modal) { modal.hide(); }
+                    Toast.success(data.message || 'Đã thay thế người tham dự.');
+                    setTimeout(function () { location.reload(); }, 1200);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    Toast.error(data.error || 'Có lỗi xảy ra.');
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                Toast.error('Lỗi kết nối máy chủ.');
+            });
     }
 })();
