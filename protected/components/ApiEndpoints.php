@@ -222,6 +222,10 @@ class ApiEndpoints
     const ATTENDEE_REJECT = '/api/attendees/reject/{id}';
     const ATTENDEE_BULK_STORE = '/api/attendees/bulk-store';
 
+    // Attendee Replacement (lịch sử thay thế / huỷ tư cách)
+    const ATTENDEE_REPLACEMENT_LIST = '/api/attendee-replacements';
+    const ATTENDEE_REPLACEMENT_STORE = '/api/attendee-replacements/store';
+
     // Competition Department
     const COMPETITION_DEPARTMENT_LIST = '/api/competition-departments';
     const COMPETITION_DEPARTMENT_STORE = '/api/competition-departments/store';
