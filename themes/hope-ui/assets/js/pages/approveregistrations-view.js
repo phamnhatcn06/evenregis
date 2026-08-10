@@ -119,6 +119,47 @@
         return renderTeamsReadonly(summary.sport_teams || []) + renderCompsRoles(summary);
     }
 
+    // Đội thể thao cho modal thay thế: checkbox kế thừa (mặc định tích).
+    function renderTeamsForReplace(teams) {
+        var html = '<div class="mb-3"><h6 class="mb-1"><i class="fa fa-futbol-o me-1 text-primary"></i>Đội thể thao</h6>';
+        if (!teams.length) {
+            return html + '<p class="text-muted small mb-0">Không tham gia đội nào.</p></div>';
+        }
+        teams.forEach(function (t) {
+            var meta = teamMetaBadges(t);
+            var tid = t.sport_team_id;
+            html += '<div class="form-check border rounded p-2 mb-1">'
+                + '<input class="form-check-input" type="checkbox" name="inherit_team_ids[]" value="' + tid + '" id="inherit_team_' + tid + '" checked>'
+                + '<label class="form-check-label" for="inherit_team_' + tid + '">'
+                + '<strong>' + escapeHtml(t.sport_name || t.team_name || '') + '</strong> '
+                + '<small class="text-muted">' + escapeHtml(t.team_name || '') + '</small>'
+                + (meta.length ? '<br><small>' + meta.join(' · ') + '</small>' : '')
+                + '</label></div>';
+        });
+        return html + '<small class="text-muted">Bỏ tích = huỷ cả đội.</small></div>';
+    }
+
+    function renderReplaceContent(summary) {
+        return renderTeamsForReplace(summary.sport_teams || []) + renderCompsRoles(summary);
+    }
+
+    // Preview file cho modal thay thế (dùng cho onchange inline).
+    window.replacePreviewFile = function (input, previewId) {
+        var preview = document.getElementById(previewId);
+        if (!preview || !input.files || !input.files[0]) { return; }
+        var file = input.files[0];
+        var isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        if (isPdf) {
+            preview.innerHTML = '<i class="fa fa-file-pdf-o fa-2x text-danger"></i><div class="small text-muted">' + escapeHtml(file.name) + '</div>';
+        } else {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                preview.innerHTML = '<img src="' + e.target.result + '" style="max-height:60px;border-radius:4px;">';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     // Bản tương tác cho modal huỷ tư cách.
     function renderWithdrawContent(summary) {
         return renderTeamsInteractive(summary.sport_teams || []) + renderCompsRoles(summary);
