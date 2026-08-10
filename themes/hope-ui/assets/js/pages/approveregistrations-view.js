@@ -180,7 +180,7 @@
         document.getElementById('withdraw_attendee_id').value = attendeeId;
         document.getElementById('withdraw_reason').value = '';
         document.getElementById('withdraw_badge_warning').classList.add('d-none');
-        loadSummary(attendeeId, 'withdraw_summary_container', 'withdraw_attendee_name', 'withdraw_badge_warning', null);
+        loadSummary(attendeeId, 'withdraw_summary_container', 'withdraw_attendee_name', 'withdraw_badge_warning', null, renderWithdrawContent);
         showModal('withdrawAttendeeModal');
     };
 
