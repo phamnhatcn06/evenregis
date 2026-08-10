@@ -239,10 +239,29 @@
 
     // Đồng bộ nhân sự SMILE đã chọn vào hidden staff_id.
     var staffSelect = document.getElementById('replace_staff_select');
+    var $staffSelect = null;
     if (staffSelect) {
-        staffSelect.addEventListener('change', function () {
-            document.getElementById('replace_staff_id').value = this.value;
-        });
+        // Select2 cho ô chọn nhân sự (hỗ trợ gõ tìm kiếm) — gắn dropdown vào modal.
+        if (window.jQuery && jQuery.fn.select2) {
+            $staffSelect = jQuery(staffSelect);
+            $staffSelect.select2({
+                dropdownParent: jQuery('#replaceAttendeeModal'),
+                width: '100%',
+                placeholder: '-- Chọn nhân sự --',
+                allowClear: true,
+                language: {
+                    noResults: function () { return 'Không tìm thấy nhân sự'; },
+                    searching: function () { return 'Đang tìm...'; }
+                }
+            });
+            $staffSelect.on('change', function () {
+                document.getElementById('replace_staff_id').value = this.value;
+            });
+        } else {
+            staffSelect.addEventListener('change', function () {
+                document.getElementById('replace_staff_id').value = this.value;
+            });
+        }
     }
 
     // Huỷ tư cách (Slice 2): xác nhận bằng SweetAlert rồi gửi POST.
