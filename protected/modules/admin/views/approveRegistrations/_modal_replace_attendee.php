@@ -16,7 +16,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <form id="replaceAttendeeForm" enctype="multipart/form-data" class="d-flex flex-column overflow-hidden" style="min-height:0;">
-                <div class="modal-body">
+                <div class="modal-body flex-grow-1 overflow-auto" style="min-height:0;">
                     <input type="hidden" name="attendee_id" id="replace_attendee_id">
                     <input type="hidden" name="registration_id" value="<?php echo $model->id; ?>">
                     <input type="hidden" name="event_id" value="<?php echo $model->event_id; ?>">
