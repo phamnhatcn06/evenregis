@@ -145,7 +145,7 @@ class ApproveRegistrationsController extends AdminController
         // Load danh sách nhân sự SMILE của đơn vị (cho form thay thế)
         $staffList = array();
         if ($model->property_id) {
-            $staffsData = Staffs::getApiDataProvider(array('property_id' => $model->property_id, 'is_active' => 1), 1000)->getData();
+            $staffsData = Staffs::getApiDataProvider(array('property_id' => $model->property_id, 'is_active' => 1), 10000)->getData();
             foreach ($staffsData as $st) {
                 $stId = isset($st->id) ? $st->id : (isset($st['id']) ? $st['id'] : null);
                 $stName = isset($st->full_name) ? $st->full_name : (isset($st['full_name']) ? $st['full_name'] : '');
