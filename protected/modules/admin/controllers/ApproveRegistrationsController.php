@@ -1222,6 +1222,87 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
+     * Kiểm tra nhân sự chọn thay thế đã từng đăng ký attendee trước đây chưa.
+     * Trả về thông tin attendee cũ + các đường dẫn file ảnh/hồ sơ đã có để tái sử dụng.
+     */
+    public function actionCheckStaffAttendee()
+    {
+        header('Content-Type: application/json');
+
+        $staffId = Yii::app()->request->getParam('staff_id');
+        $idCard = trim(Yii::app()->request->getParam('id_card', ''));
+        $staffCode = trim(Yii::app()->request->getParam('staff_code', ''));
+
+        if (!$staffId && $idCard === '' && $staffCode === '') {
+            echo CJSON::encode(array('success' => true, 'has_attendee' => false));
+            Yii::app()->end();
+        }
+
+        $params = array('per_page' => 50);
+        if ($staffId) {
+            $params['staff_id'] = $staffId;
+        } elseif ($staffCode !== '') {
+            $params['staff_code'] = $staffCode;
+        } elseif ($idCard !== '') {
+            $params['id_card'] = $idCard;
+        }
+
+        $result = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $params);
+        $attendees = array();
+        if ($result['success'] && isset($result['data'])) {
+            $attendees = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+        }
+
+        $matchedAttendee = null;
+        if (!empty($attendees) && is_array($attendees)) {
+            foreach ($attendees as $att) {
+                $attArr = is_array($att) ? $att : (array)$att;
+                $match = false;
+                if ($staffId && isset($attArr['staff_id']) && (string)$attArr['staff_id'] === (string)$staffId) {
+                    $match = true;
+                } elseif ($staffCode !== '' && isset($attArr['staff_code']) && strtolower(trim($attArr['staff_code'])) === strtolower($staffCode)) {
+                    $match = true;
+                } elseif ($idCard !== '' && isset($attArr['id_card']) && trim($attArr['id_card']) === $idCard) {
+                    $match = true;
+                }
+
+                if ($match) {
+                    $photo = isset($attArr['portrait_path']) ? $attArr['portrait_path'] : (isset($attArr['photo_path']) ? $attArr['photo_path'] : '');
+                    if ($matchedAttendee === null || !empty($photo)) {
+                        $matchedAttendee = $attArr;
+                    }
+                }
+            }
+        }
+
+        if ($matchedAttendee) {
+            $portrait = isset($matchedAttendee['portrait_path']) ? $matchedAttendee['portrait_path'] : (isset($matchedAttendee['photo_path']) ? $matchedAttendee['photo_path'] : '');
+            $cccdFront = isset($matchedAttendee['cccd_front_path']) ? $matchedAttendee['cccd_front_path'] : '';
+            $cccdBack = isset($matchedAttendee['cccd_back_path']) ? $matchedAttendee['cccd_back_path'] : '';
+            $contract = isset($matchedAttendee['contract_path']) ? $matchedAttendee['contract_path'] : '';
+
+            echo CJSON::encode(array(
+                'success' => true,
+                'has_attendee' => true,
+                'attendee' => array(
+                    'id' => isset($matchedAttendee['id']) ? $matchedAttendee['id'] : null,
+                    'full_name' => isset($matchedAttendee['full_name']) ? $matchedAttendee['full_name'] : '',
+                    'position' => isset($matchedAttendee['position_name']) ? $matchedAttendee['position_name'] : (isset($matchedAttendee['position']) ? $matchedAttendee['position'] : ''),
+                    'id_card' => isset($matchedAttendee['id_card']) ? $matchedAttendee['id_card'] : '',
+                    'portrait_path' => $portrait,
+                    'cccd_front_path' => $cccdFront,
+                    'cccd_back_path' => $cccdBack,
+                    'contract_path' => $contract,
+                    'role_id' => isset($matchedAttendee['role_id']) ? $matchedAttendee['role_id'] : '',
+                ),
+            ));
+        } else {
+            echo CJSON::encode(array('success' => true, 'has_attendee' => false));
+        }
+        Yii::app()->end();
+    }
+
+    /**
      * Thay thế 1 người tham dự bằng người khác (SMILE hoặc thủ công).
      * Người thay kế thừa approved + đội được tích + toàn bộ cuộc thi (số báo danh mới do backend cấp) + vai trò.
      * Đội không tích sẽ bị huỷ. Số báo danh cũ không kế thừa.
@@ -1291,9 +1372,49 @@ class ApproveRegistrationsController extends AdminController
         $new->approval_status = Attendees::APPROVAL_APPROVED;
         $new->approved_by = $email;
 
+        // Tìm hồ sơ attendee cũ của nhân sự này (nếu có) để tái sử dụng ảnh/hồ sơ
+        $existingAttendeeId = $req->getPost('existing_attendee_id');
+        $existingAttendee = null;
+        if ($existingAttendeeId) {
+            $existingAttendee = Attendees::fetchFromApi($existingAttendeeId);
+        }
+        if (!$existingAttendee && ($staffId || $idCard !== '' || $staffCode !== '')) {
+            $searchParams = array('per_page' => 10);
+            if ($staffId) { $searchParams['staff_id'] = $staffId; }
+            elseif ($staffCode !== '') { $searchParams['staff_code'] = $staffCode; }
+            elseif ($idCard !== '') { $searchParams['id_card'] = $idCard; }
+
+            $attRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $searchParams);
+            if ($attRes['success'] && isset($attRes['data'])) {
+                $list = isset($attRes['data']['data']) ? $attRes['data']['data'] : $attRes['data'];
+                if (!empty($list) && is_array($list)) {
+                    $first = reset($list);
+                    $foundId = isset($first['id']) ? $first['id'] : null;
+                    if ($foundId) {
+                        $existingAttendee = Attendees::fetchFromApi($foundId);
+                    }
+                }
+            }
+        }
+
         $uploads = $this->handleReplaceUpload();
-        foreach (array('portrait_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $f) {
-            if (isset($uploads[$f])) { $new->$f = $uploads[$f]; }
+        $fileMap = array(
+            'portrait_path' => array('portrait_path', 'photo_path'),
+            'cccd_front_path' => array('cccd_front_path'),
+            'cccd_back_path' => array('cccd_back_path'),
+            'contract_path' => array('contract_path'),
+        );
+        foreach ($fileMap as $targetAttr => $sourceAttrs) {
+            if (isset($uploads[$targetAttr]) && !empty($uploads[$targetAttr])) {
+                $new->$targetAttr = $uploads[$targetAttr];
+            } elseif ($existingAttendee) {
+                foreach ($sourceAttrs as $sAttr) {
+                    if (isset($existingAttendee->$sAttr) && !empty($existingAttendee->$sAttr)) {
+                        $new->$targetAttr = $existingAttendee->$sAttr;
+                        break;
+                    }
+                }
+            }
         }
 
         $storeResult = $new->storeViaApi();

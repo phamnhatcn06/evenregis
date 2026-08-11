@@ -22,6 +22,12 @@
                     <input type="hidden" name="event_id" value="<?php echo $model->event_id; ?>">
                     <input type="hidden" name="property_id" value="<?php echo $model->property_id; ?>">
                     <input type="hidden" name="staff_id" id="replace_staff_id">
+                    <input type="hidden" name="existing_attendee_id" id="replace_existing_attendee_id">
+                    <input type="hidden" id="replace_has_existing_portrait" value="0">
+
+                    <div id="replace_existing_alert" class="alert alert-success py-2 px-3 mb-3 small d-none" role="alert">
+                        <i class="fa fa-check-circle me-1"></i> <strong>Đã tìm thấy hồ sơ người tham dự trước đó!</strong> Các ảnh/tài liệu đã có sẽ được tự động sử dụng lại (không cần upload lại).
+                    </div>
 
                     <div class="row g-3">
                         <!-- Cột trái: người bị thay + nội dung kế thừa -->

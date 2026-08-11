@@ -144,7 +144,8 @@ $attributes = array(
         <div id="attendee-actions-config"
              data-summary-url="<?php echo $this->createUrl('participationSummary'); ?>"
              data-replace-url="<?php echo $this->createUrl('replaceAttendee'); ?>"
-             data-withdraw-url="<?php echo $this->createUrl('withdrawAttendee'); ?>"></div>
+             data-withdraw-url="<?php echo $this->createUrl('withdrawAttendee'); ?>"
+             data-check-staff-url="<?php echo $this->createUrl('checkStaffAttendee'); ?>"></div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-0" id="attendees-table">
                 <thead class="table-light">

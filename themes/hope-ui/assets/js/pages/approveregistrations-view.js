@@ -226,11 +226,79 @@
         showModal('withdrawAttendeeModal');
     };
 
+    var checkStaffUrl = config.getAttribute('data-check-staff-url');
+
+    function checkExistingAttendee(staffId, idCard) {
+        var alertBox = document.getElementById('replace_existing_alert');
+        var existingAttIdEl = document.getElementById('replace_existing_attendee_id');
+        var hasPortraitEl = document.getElementById('replace_has_existing_portrait');
+
+        if (!staffId && (!idCard || !idCard.trim())) {
+            if (alertBox) { alertBox.classList.add('d-none'); }
+            if (existingAttIdEl) { existingAttIdEl.value = ''; }
+            if (hasPortraitEl) { hasPortraitEl.value = '0'; }
+            return;
+        }
+
+        var url = checkStaffUrl + '?staff_id=' + encodeURIComponent(staffId || '') + '&id_card=' + encodeURIComponent(idCard || '');
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success && data.has_attendee && data.attendee) {
+                    var att = data.attendee;
+                    if (existingAttIdEl) { existingAttIdEl.value = att.id || ''; }
+                    if (alertBox) { alertBox.classList.remove('d-none'); }
+
+                    if (att.portrait_path) {
+                        if (hasPortraitEl) { hasPortraitEl.value = '1'; }
+                        var pPreview = document.getElementById('replace_portrait_preview');
+                        if (pPreview) {
+                            pPreview.innerHTML = '<img src="' + escapeHtml(att.portrait_path) + '" style="max-height:60px;border-radius:4px;"><br><span class="badge bg-success mt-1"><i class="fa fa-check"></i> Ảnh từ hồ sơ trước (dùng lại)</span>';
+                        }
+                    } else {
+                        if (hasPortraitEl) { hasPortraitEl.value = '0'; }
+                    }
+
+                    ['cccd_front', 'cccd_back', 'contract'].forEach(function (key) {
+                        var fieldPath = att[key + '_path'];
+                        var previewEl = document.getElementById('replace_' + key + '_preview');
+                        if (fieldPath && previewEl) {
+                            var isPdf = fieldPath.toLowerCase().endsWith('.pdf');
+                            if (isPdf) {
+                                previewEl.innerHTML = '<i class="fa fa-file-pdf-o fa-2x text-danger"></i><br><span class="badge bg-success"><i class="fa fa-check"></i> File từ hồ sơ trước</span>';
+                            } else {
+                                previewEl.innerHTML = '<img src="' + escapeHtml(fieldPath) + '" style="max-height:60px;border-radius:4px;"><br><span class="badge bg-success"><i class="fa fa-check"></i> File từ hồ sơ trước</span>';
+                            }
+                        }
+                    });
+
+                    if (att.id_card) {
+                        var idCardInput = document.getElementById('replace_id_card');
+                        if (idCardInput && !idCardInput.value) { idCardInput.value = att.id_card; }
+                    }
+                } else {
+                    if (alertBox) { alertBox.classList.add('d-none'); }
+                    if (existingAttIdEl) { existingAttIdEl.value = ''; }
+                    if (hasPortraitEl) { hasPortraitEl.value = '0'; }
+                }
+            })
+            .catch(function () {
+                if (alertBox) { alertBox.classList.add('d-none'); }
+            });
+    }
+
     window.openReplaceAttendeeModal = function (attendeeId) {
         var form = document.getElementById('replaceAttendeeForm');
         form.reset();
         document.getElementById('replace_attendee_id').value = attendeeId;
         document.getElementById('replace_staff_id').value = '';
+        var alertBox = document.getElementById('replace_existing_alert');
+        if (alertBox) { alertBox.classList.add('d-none'); }
+        var existingAttIdEl = document.getElementById('replace_existing_attendee_id');
+        if (existingAttIdEl) { existingAttIdEl.value = ''; }
+        var hasPortraitEl = document.getElementById('replace_has_existing_portrait');
+        if (hasPortraitEl) { hasPortraitEl.value = '0'; }
+
         if (window.jQuery && jQuery.fn.select2) {
             jQuery('#replace_staff_select').val('').trigger('change.select2');
         }
@@ -241,7 +309,7 @@
         showModal('replaceAttendeeModal');
     };
 
-    // Đồng bộ nhân sự SMILE đã chọn vào hidden staff_id.
+    // Đồng bộ nhân sự SMILE đã chọn vào hidden staff_id & kiểm tra attendee đã có.
     var staffSelect = document.getElementById('replace_staff_select');
     var $staffSelect = null;
     if (staffSelect) {
@@ -260,12 +328,22 @@
             });
             $staffSelect.on('change', function () {
                 document.getElementById('replace_staff_id').value = this.value;
+                checkExistingAttendee(this.value, document.getElementById('replace_id_card').value);
             });
         } else {
             staffSelect.addEventListener('change', function () {
                 document.getElementById('replace_staff_id').value = this.value;
+                checkExistingAttendee(this.value, document.getElementById('replace_id_card').value);
             });
         }
+    }
+
+    var idCardInput = document.getElementById('replace_id_card');
+    if (idCardInput) {
+        idCardInput.addEventListener('blur', function () {
+            var staffId = document.getElementById('replace_staff_id').value;
+            checkExistingAttendee(staffId, this.value);
+        });
     }
 
     // Huỷ tư cách (Slice 2): xác nhận bằng SweetAlert rồi gửi POST.
@@ -334,6 +412,7 @@
             var fullName = document.getElementById('replace_full_name').value.trim();
             var reason = document.getElementById('replace_reason').value.trim();
             var portrait = replaceForm.querySelector('input[name="portrait_file"]').files[0];
+            var hasExistingPortrait = document.getElementById('replace_has_existing_portrait').value === '1';
 
             if (!staffId && !fullName) {
                 Toast.error('Vui lòng chọn nhân sự SMILE hoặc nhập họ tên người thay.');
@@ -343,7 +422,7 @@
                 Toast.error('Vui lòng nhập lý do thay thế.');
                 return;
             }
-            if (!portrait) {
+            if (!portrait && !hasExistingPortrait) {
                 Toast.error('Vui lòng chọn ảnh chân dung người thay.');
                 return;
             }
