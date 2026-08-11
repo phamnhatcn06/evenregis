@@ -307,7 +307,21 @@ class AttendeesController extends AdminController
             return $list;
         }
 
-        $staffs = Staffs::getApiDataProvider(array('property_id' => $propertyId), 500)->getData();
+        $propertyCode = null;
+        $property = Properties::fetchFromApi($propertyId);
+        if ($property) {
+            $propertyCode = $property->code;
+        } else {
+            $localProp = Properties::model()->findByPk($propertyId);
+            if ($localProp) {
+                $propertyCode = $localProp->code;
+            }
+        }
+
+        $staffs = array();
+        if ($propertyCode) {
+            $staffs = Staffs::getApiDataProvider(array('property_code' => $propertyCode), 500)->getData();
+        }
         foreach ($staffs as $s) {
             $id = isset($s->id) ? $s->id : (isset($s['id']) ? $s['id'] : null);
             $name = isset($s->full_name) ? $s->full_name : (isset($s['full_name']) ? $s['full_name'] : '');

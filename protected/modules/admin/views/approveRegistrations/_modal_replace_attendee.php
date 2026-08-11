@@ -70,6 +70,10 @@
                                                 <?php endforeach; ?>
                                             </select>
                                             <small class="text-muted">Danh sách nhân sự của đơn vị.</small>
+                                            <div id="replace_staff_info" class="d-none mt-2 p-2 border rounded bg-light small">
+                                                <div><i class="fa fa-user me-1 text-primary"></i><strong id="replace_staff_info_name"></strong></div>
+                                                <div class="text-muted" id="replace_staff_info_position"></div>
+                                            </div>
                                         </div>
                                         <div class="tab-pane fade" id="replace_tab_manual">
                                             <div class="mb-2">

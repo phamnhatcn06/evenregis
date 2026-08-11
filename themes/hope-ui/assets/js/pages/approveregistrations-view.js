@@ -247,7 +247,41 @@
                 if (data.success && data.has_attendee && data.attendee) {
                     var att = data.attendee;
                     if (existingAttIdEl) { existingAttIdEl.value = att.id || ''; }
-                    if (alertBox) { alertBox.classList.remove('d-none'); }
+
+                    // Điền thông tin cá nhân vào form (tab thủ công) nếu các ô còn trống
+                    var prefilled = [];
+                    if (att.full_name) {
+                        var fullNameInput = document.getElementById('replace_full_name');
+                        if (fullNameInput && !fullNameInput.value) {
+                            fullNameInput.value = att.full_name;
+                            prefilled.push('họ tên');
+                        }
+                    }
+                    if (att.position) {
+                        var positionInput = document.getElementById('replace_position');
+                        if (positionInput && !positionInput.value) {
+                            positionInput.value = att.position;
+                            prefilled.push('chức danh');
+                        }
+                    }
+                    if (att.id_card) {
+                        var idCardInput = document.getElementById('replace_id_card');
+                        if (idCardInput && !idCardInput.value) {
+                            idCardInput.value = att.id_card;
+                            prefilled.push('CCCD');
+                        }
+                    }
+
+                    // Cập nhật nội dung alert box với thông tin đã điền
+                    if (alertBox) {
+                        var alertMsg = '<i class="fa fa-check-circle me-1"></i> <strong>Đã tìm thấy hồ sơ người tham dự trước đó!</strong>';
+                        if (prefilled.length > 0) {
+                            alertMsg += ' Đã tự động điền: <strong>' + prefilled.join(', ') + '</strong>.';
+                        }
+                        alertMsg += ' Các ảnh/tài liệu đã có sẽ được tự động sử dụng lại (không cần upload lại).';
+                        alertBox.innerHTML = alertMsg;
+                        alertBox.classList.remove('d-none');
+                    }
 
                     if (att.portrait_path) {
                         if (hasPortraitEl) { hasPortraitEl.value = '1'; }
@@ -272,10 +306,6 @@
                         }
                     });
 
-                    if (att.id_card) {
-                        var idCardInput = document.getElementById('replace_id_card');
-                        if (idCardInput && !idCardInput.value) { idCardInput.value = att.id_card; }
-                    }
                 } else {
                     if (alertBox) { alertBox.classList.add('d-none'); }
                     if (existingAttIdEl) { existingAttIdEl.value = ''; }
@@ -299,6 +329,10 @@
         var hasPortraitEl = document.getElementById('replace_has_existing_portrait');
         if (hasPortraitEl) { hasPortraitEl.value = '0'; }
 
+        // Reset staff info preview box
+        var infoBox = document.getElementById('replace_staff_info');
+        if (infoBox) { infoBox.classList.add('d-none'); }
+
         if (window.jQuery && jQuery.fn.select2) {
             jQuery('#replace_staff_select').val('').trigger('change.select2');
         }
@@ -312,6 +346,27 @@
     // Đồng bộ nhân sự SMILE đã chọn vào hidden staff_id & kiểm tra attendee đã có.
     var staffSelect = document.getElementById('replace_staff_select');
     var $staffSelect = null;
+
+    function updateStaffInfoBox(selectEl) {
+        var infoBox = document.getElementById('replace_staff_info');
+        var infoName = document.getElementById('replace_staff_info_name');
+        var infoPos  = document.getElementById('replace_staff_info_position');
+        if (!infoBox) { return; }
+        var val = selectEl.value;
+        if (!val) {
+            infoBox.classList.add('d-none');
+            if (infoName) { infoName.textContent = ''; }
+            if (infoPos)  { infoPos.textContent  = ''; }
+            return;
+        }
+        var opt = selectEl.options[selectEl.selectedIndex];
+        var name = opt ? (opt.getAttribute('data-name') || '') : '';
+        var pos  = opt ? (opt.getAttribute('data-position') || '') : '';
+        if (infoName) { infoName.textContent = name; }
+        if (infoPos)  { infoPos.textContent  = pos; }
+        infoBox.classList.remove('d-none');
+    }
+
     if (staffSelect) {
         // Select2 cho ô chọn nhân sự (hỗ trợ gõ tìm kiếm) — gắn dropdown vào modal.
         if (window.jQuery && jQuery.fn.select2) {
@@ -328,11 +383,13 @@
             });
             $staffSelect.on('change', function () {
                 document.getElementById('replace_staff_id').value = this.value;
+                updateStaffInfoBox(staffSelect);
                 checkExistingAttendee(this.value, document.getElementById('replace_id_card').value);
             });
         } else {
             staffSelect.addEventListener('change', function () {
                 document.getElementById('replace_staff_id').value = this.value;
+                updateStaffInfoBox(staffSelect);
                 checkExistingAttendee(this.value, document.getElementById('replace_id_card').value);
             });
         }
