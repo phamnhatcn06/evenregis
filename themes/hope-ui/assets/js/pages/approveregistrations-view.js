@@ -508,7 +508,8 @@
                 Toast.error('Vui lòng nhập lý do thay thế.');
                 return;
             }
-            if (!portrait && !existingPortraitUrl) {
+            // Ảnh chân dung chỉ bắt buộc khi nhập thủ công (không có staff_id từ SMILE)
+            if (!staffId && !portrait && !existingPortraitUrl) {
                 Toast.error('Vui lòng chọn ảnh chân dung người thay.');
                 return;
             }
