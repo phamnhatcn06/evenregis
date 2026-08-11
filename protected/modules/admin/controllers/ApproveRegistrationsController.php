@@ -87,6 +87,7 @@ class ApproveRegistrationsController extends AdminController
             $event = Events::fetchFromApi($model->event_id);
             $model->event_name = $event ? $event->name : '';
         }
+        $propertyCode = null;
         if ($model->property_id) {
             $property = Properties::fetchFromApi($model->property_id);
             if ($property) {
@@ -94,6 +95,12 @@ class ApproveRegistrationsController extends AdminController
                     $model->property_name = $property->name;
                 }
                 $model->property_code = $property->prefix ? $property->prefix : $property->code;
+                $propertyCode = $property->code;
+            } else {
+                $localProp = Properties::model()->findByPk($model->property_id);
+                if ($localProp) {
+                    $propertyCode = $localProp->code;
+                }
             }
         }
         if (empty($model->period_name) && $model->period_id) {
@@ -144,8 +151,8 @@ class ApproveRegistrationsController extends AdminController
 
         // Load danh sách nhân sự SMILE của đơn vị (cho form thay thế)
         $staffList = array();
-        if ($model->property_id) {
-            $staffsData = Staffs::getApiDataProvider(array('property_id' => $model->property_id, 'is_active' => 1), 10000)->getData();
+        if ($propertyCode) {
+            $staffsData = Staffs::getApiDataProvider(array('property_code' => $propertyCode, 'is_active' => 1), 10000)->getData();
             foreach ($staffsData as $st) {
                 $stId = isset($st->id) ? $st->id : (isset($st['id']) ? $st['id'] : null);
                 $stName = isset($st->full_name) ? $st->full_name : (isset($st['full_name']) ? $st['full_name'] : '');

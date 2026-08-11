@@ -3192,7 +3192,23 @@ class RegistrationsController extends AdminController
 		}
 
 		// Lấy danh sách staffs của property hiện tại
-		$staffsData = Staffs::getApiDataProvider(array('property_id' => $registration->property_id, 'is_active' => 1), 500)->getData();
+		$propertyCode = null;
+		if ($registration && $registration->property_id) {
+			$property = Properties::fetchFromApi($registration->property_id);
+			if ($property) {
+				$propertyCode = $property->code;
+			} else {
+				$localProp = Properties::model()->findByPk($registration->property_id);
+				if ($localProp) {
+					$propertyCode = $localProp->code;
+				}
+			}
+		}
+
+		$staffsData = array();
+		if ($propertyCode) {
+			$staffsData = Staffs::getApiDataProvider(array('property_code' => $propertyCode, 'is_active' => 1), 500)->getData();
+		}
 
 		$result = array();
 		foreach ($staffsData as $staff) {
