@@ -1405,6 +1405,15 @@ class ApproveRegistrationsController extends AdminController
         }
 
         $uploads = $this->handleReplaceUpload();
+
+        // URL file từ hồ sơ cũ được frontend gửi trực tiếp qua hidden inputs
+        $postedFileUrls = array(
+            'portrait_path'   => trim($req->getPost('existing_portrait_url', '')),
+            'cccd_front_path' => trim($req->getPost('existing_cccd_front_url', '')),
+            'cccd_back_path'  => trim($req->getPost('existing_cccd_back_url', '')),
+            'contract_path'   => trim($req->getPost('existing_contract_url', '')),
+        );
+
         $fileMap = array(
             'portrait_path' => array('portrait_path', 'photo_path'),
             'cccd_front_path' => array('cccd_front_path'),
@@ -1413,8 +1422,13 @@ class ApproveRegistrationsController extends AdminController
         );
         foreach ($fileMap as $targetAttr => $sourceAttrs) {
             if (isset($uploads[$targetAttr]) && !empty($uploads[$targetAttr])) {
+                // Ưu tiên 1: file upload mới
                 $new->$targetAttr = $uploads[$targetAttr];
+            } elseif (!empty($postedFileUrls[$targetAttr])) {
+                // Ưu tiên 2: URL từ hồ sơ cũ (gửi qua hidden input)
+                $new->$targetAttr = $postedFileUrls[$targetAttr];
             } elseif ($existingAttendee) {
+                // Ưu tiên 3: copy từ bản ghi attendee cũ qua API
                 foreach ($sourceAttrs as $sAttr) {
                     if (isset($existingAttendee->$sAttr) && !empty($existingAttendee->$sAttr)) {
                         $new->$targetAttr = $existingAttendee->$sAttr;

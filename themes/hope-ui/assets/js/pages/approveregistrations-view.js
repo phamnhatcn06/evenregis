@@ -228,15 +228,46 @@
 
     var checkStaffUrl = config.getAttribute('data-check-staff-url');
 
+    // Danh sách các trường file và ID hidden input tương ứng.
+    var fileUrlFields = [
+        { key: 'portrait',    attr: 'portrait_path',    previewId: 'replace_portrait_preview',    hiddenId: 'replace_existing_portrait_url' },
+        { key: 'cccd_front',  attr: 'cccd_front_path',  previewId: 'replace_cccd_front_preview',  hiddenId: 'replace_existing_cccd_front_url' },
+        { key: 'cccd_back',   attr: 'cccd_back_path',   previewId: 'replace_cccd_back_preview',   hiddenId: 'replace_existing_cccd_back_url' },
+        { key: 'contract',    attr: 'contract_path',    previewId: 'replace_contract_preview',    hiddenId: 'replace_existing_contract_url' },
+    ];
+
+    function clearExistingFilePreviews() {
+        fileUrlFields.forEach(function (f) {
+            var hiddenEl = document.getElementById(f.hiddenId);
+            if (hiddenEl) { hiddenEl.value = ''; }
+            var previewEl = document.getElementById(f.previewId);
+            if (previewEl) { previewEl.innerHTML = ''; }
+        });
+    }
+
+    function applyExistingFileUrl(fileInfo, url) {
+        // Lưu URL vào hidden input để backend nhận
+        var hiddenEl = document.getElementById(fileInfo.hiddenId);
+        if (hiddenEl) { hiddenEl.value = url; }
+        // Hiển thị preview
+        var previewEl = document.getElementById(fileInfo.previewId);
+        if (!previewEl) { return; }
+        var isPdf = url.toLowerCase().endsWith('.pdf');
+        if (isPdf) {
+            previewEl.innerHTML = '<i class="fa fa-file-pdf-o fa-2x text-danger"></i><br><span class="badge bg-success mt-1"><i class="fa fa-check"></i> File từ hồ sơ trước</span>';
+        } else {
+            previewEl.innerHTML = '<img src="' + escapeHtml(url) + '" style="max-height:60px;border-radius:4px;"><br><span class="badge bg-success mt-1"><i class="fa fa-check"></i> File từ hồ sơ trước</span>';
+        }
+    }
+
     function checkExistingAttendee(staffId, idCard) {
         var alertBox = document.getElementById('replace_existing_alert');
         var existingAttIdEl = document.getElementById('replace_existing_attendee_id');
-        var hasPortraitEl = document.getElementById('replace_has_existing_portrait');
 
         if (!staffId && (!idCard || !idCard.trim())) {
             if (alertBox) { alertBox.classList.add('d-none'); }
             if (existingAttIdEl) { existingAttIdEl.value = ''; }
-            if (hasPortraitEl) { hasPortraitEl.value = '0'; }
+            clearExistingFilePreviews();
             return;
         }
 
@@ -265,51 +296,50 @@
                         }
                     }
                     if (att.id_card) {
-                        var idCardInput = document.getElementById('replace_id_card');
-                        if (idCardInput && !idCardInput.value) {
-                            idCardInput.value = att.id_card;
+                        var idCardInputEl = document.getElementById('replace_id_card');
+                        if (idCardInputEl && !idCardInputEl.value) {
+                            idCardInputEl.value = att.id_card;
                             prefilled.push('CCCD');
                         }
                     }
 
-                    // Cập nhật nội dung alert box với thông tin đã điền
+                    // Set URL file vào hidden inputs + hiển thị preview
+                    var filesLoaded = [];
+                    fileUrlFields.forEach(function (f) {
+                        var fileUrl = att[f.attr] || '';
+                        if (fileUrl) {
+                            applyExistingFileUrl(f, fileUrl);
+                            if (f.key === 'portrait') { filesLoaded.push('ảnh chân dung'); }
+                            else if (f.key === 'cccd_front') { filesLoaded.push('CCCD trước'); }
+                            else if (f.key === 'cccd_back')  { filesLoaded.push('CCCD sau'); }
+                            else if (f.key === 'contract')   { filesLoaded.push('hợp đồng'); }
+                        } else {
+                            // Xoá URL cũ nếu attendee mới không có file này
+                            var hiddenEl = document.getElementById(f.hiddenId);
+                            if (hiddenEl) { hiddenEl.value = ''; }
+                        }
+                    });
+
+                    // Cập nhật nội dung alert box
                     if (alertBox) {
                         var alertMsg = '<i class="fa fa-check-circle me-1"></i> <strong>Đã tìm thấy hồ sơ người tham dự trước đó!</strong>';
                         if (prefilled.length > 0) {
                             alertMsg += ' Đã tự động điền: <strong>' + prefilled.join(', ') + '</strong>.';
                         }
-                        alertMsg += ' Các ảnh/tài liệu đã có sẽ được tự động sử dụng lại (không cần upload lại).';
+                        if (filesLoaded.length > 0) {
+                            alertMsg += ' File dùng lại: <strong>' + filesLoaded.join(', ') + '</strong>.';
+                        }
+                        if (prefilled.length === 0 && filesLoaded.length === 0) {
+                            alertMsg += ' Hồ sơ chưa có ảnh/tài liệu đính kèm.';
+                        }
                         alertBox.innerHTML = alertMsg;
                         alertBox.classList.remove('d-none');
                     }
 
-                    if (att.portrait_path) {
-                        if (hasPortraitEl) { hasPortraitEl.value = '1'; }
-                        var pPreview = document.getElementById('replace_portrait_preview');
-                        if (pPreview) {
-                            pPreview.innerHTML = '<img src="' + escapeHtml(att.portrait_path) + '" style="max-height:60px;border-radius:4px;"><br><span class="badge bg-success mt-1"><i class="fa fa-check"></i> Ảnh từ hồ sơ trước (dùng lại)</span>';
-                        }
-                    } else {
-                        if (hasPortraitEl) { hasPortraitEl.value = '0'; }
-                    }
-
-                    ['cccd_front', 'cccd_back', 'contract'].forEach(function (key) {
-                        var fieldPath = att[key + '_path'];
-                        var previewEl = document.getElementById('replace_' + key + '_preview');
-                        if (fieldPath && previewEl) {
-                            var isPdf = fieldPath.toLowerCase().endsWith('.pdf');
-                            if (isPdf) {
-                                previewEl.innerHTML = '<i class="fa fa-file-pdf-o fa-2x text-danger"></i><br><span class="badge bg-success"><i class="fa fa-check"></i> File từ hồ sơ trước</span>';
-                            } else {
-                                previewEl.innerHTML = '<img src="' + escapeHtml(fieldPath) + '" style="max-height:60px;border-radius:4px;"><br><span class="badge bg-success"><i class="fa fa-check"></i> File từ hồ sơ trước</span>';
-                            }
-                        }
-                    });
-
                 } else {
                     if (alertBox) { alertBox.classList.add('d-none'); }
                     if (existingAttIdEl) { existingAttIdEl.value = ''; }
-                    if (hasPortraitEl) { hasPortraitEl.value = '0'; }
+                    clearExistingFilePreviews();
                 }
             })
             .catch(function () {
@@ -326,8 +356,9 @@
         if (alertBox) { alertBox.classList.add('d-none'); }
         var existingAttIdEl = document.getElementById('replace_existing_attendee_id');
         if (existingAttIdEl) { existingAttIdEl.value = ''; }
-        var hasPortraitEl = document.getElementById('replace_has_existing_portrait');
-        if (hasPortraitEl) { hasPortraitEl.value = '0'; }
+
+        // Reset tất cả hidden URL + preview file
+        clearExistingFilePreviews();
 
         // Reset staff info preview box
         var infoBox = document.getElementById('replace_staff_info');
@@ -337,8 +368,6 @@
             jQuery('#replace_staff_select').val('').trigger('change.select2');
         }
         document.getElementById('replace_badge_warning').classList.add('d-none');
-        ['replace_portrait_preview', 'replace_contract_preview', 'replace_cccd_front_preview', 'replace_cccd_back_preview']
-            .forEach(function (id) { var el = document.getElementById(id); if (el) { el.innerHTML = ''; } });
         loadSummary(attendeeId, 'replace_summary_container', 'replace_attendee_name', 'replace_badge_warning', 'replace_attendee_position', renderReplaceContent);
         showModal('replaceAttendeeModal');
     };
@@ -469,7 +498,7 @@
             var fullName = document.getElementById('replace_full_name').value.trim();
             var reason = document.getElementById('replace_reason').value.trim();
             var portrait = replaceForm.querySelector('input[name="portrait_file"]').files[0];
-            var hasExistingPortrait = document.getElementById('replace_has_existing_portrait').value === '1';
+            var existingPortraitUrl = (document.getElementById('replace_existing_portrait_url') || {}).value || '';
 
             if (!staffId && !fullName) {
                 Toast.error('Vui lòng chọn nhân sự SMILE hoặc nhập họ tên người thay.');
@@ -479,7 +508,7 @@
                 Toast.error('Vui lòng nhập lý do thay thế.');
                 return;
             }
-            if (!portrait && !hasExistingPortrait) {
+            if (!portrait && !existingPortraitUrl) {
                 Toast.error('Vui lòng chọn ảnh chân dung người thay.');
                 return;
             }
