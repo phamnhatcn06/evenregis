@@ -1245,6 +1245,168 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
+     * Huỷ 1 hoặc nhiều nội dung THỂ THAO của người tham dự do VĐV đổi ý (không huỷ cả tư cách).
+     * VĐV vẫn giữ các nội dung còn lại. Mặc định chỉ gỡ VĐV khỏi đội; tích "Huỷ cả đội"
+     * mới xoá toàn bộ đội. Nếu sau khi huỷ VĐV không còn bất kỳ nội dung nào (thể thao,
+     * thi NV, Miss, vai trò) → tự động chuyển thành huỷ tư cách (gỡ thẻ/QR).
+     * Bản ghi huỷ được ghi audit và xuất hiện trong email xác nhận.
+     *
+     * Payload:
+     *   attendee_id
+     *   team_ids[]                    các sport_team_id cần huỷ (phải là đội của VĐV này)
+     *   cancel_whole_team[team_id]=1  huỷ cả đội thay vì chỉ gỡ VĐV
+     *   new_captain[team_id]=member_id đội trưởng mới nếu VĐV bị gỡ là đội trưởng
+     *   reason                        lý do (bắt buộc)
+     */
+    public function actionCancelContent()
+    {
+        header('Content-Type: application/json');
+
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+        if (!PermissionHelper::can('approveregistrations', 'update')) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+            Yii::app()->end();
+        }
+
+        $attendeeId = Yii::app()->request->getPost('attendee_id');
+        $reason = trim(Yii::app()->request->getPost('reason', ''));
+        $teamIds = Yii::app()->request->getPost('team_ids', array());
+        if (!is_array($teamIds)) {
+            $teamIds = array();
+        }
+        $wholeTeamFlags = Yii::app()->request->getPost('cancel_whole_team', array());
+        if (!is_array($wholeTeamFlags)) {
+            $wholeTeamFlags = array();
+        }
+        $newCaptains = Yii::app()->request->getPost('new_captain', array());
+        if (!is_array($newCaptains)) {
+            $newCaptains = array();
+        }
+
+        if (!$attendeeId) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin người tham dự.'));
+            Yii::app()->end();
+        }
+        if (empty($teamIds)) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một đội cần huỷ.'));
+            Yii::app()->end();
+        }
+        if ($reason === '') {
+            echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng nhập lý do huỷ nội dung.'));
+            Yii::app()->end();
+        }
+
+        $attendee = Attendees::fetchFromApi($attendeeId);
+        if (!$attendee) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+            Yii::app()->end();
+        }
+
+        $ssoUser = AuthHandler::getUser();
+        $email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+        // Snapshot đội của VĐV trước khi gỡ (để đối chiếu + ghi audit)
+        $summary = Attendees::getParticipationSummary($attendeeId);
+        $teamsById = array();
+        foreach ($summary['sport_teams'] as $t) {
+            $teamsById[(string)$t['sport_team_id']] = $t;
+        }
+
+        $cancelledEntries = array();
+        foreach ($teamIds as $tid) {
+            $tidKey = (string)$tid;
+            // Chỉ xử lý đội mà VĐV đang là thành viên (tránh gỡ nhầm đội không liên quan)
+            if (!isset($teamsById[$tidKey])) {
+                continue;
+            }
+            $t = $teamsById[$tidKey];
+            $isWhole = !empty($wholeTeamFlags[$tid]) || (isset($wholeTeamFlags[$tidKey]) && $wholeTeamFlags[$tidKey]);
+
+            if ($isWhole) {
+                // Huỷ cả đội: gỡ toàn bộ thành viên rồi xoá đội
+                foreach (SportTeamMembers::getTeamMemberBriefs($tid) as $tm) {
+                    if (!empty($tm['member_id'])) {
+                        SportTeamMembers::deleteViaApi($tm['member_id']);
+                    }
+                }
+                SportTeams::deleteViaApi($tid);
+            } else {
+                // Chỉ gỡ VĐV khỏi đội
+                if (!empty($t['member_id'])) {
+                    SportTeamMembers::deleteViaApi($t['member_id']);
+                }
+                // Nếu VĐV bị gỡ là đội trưởng và có chỉ định đội trưởng mới
+                if (!empty($t['is_captain']) && !empty($newCaptains[$tid])) {
+                    SportTeamMembers::assignCaptain($newCaptains[$tid]);
+                }
+            }
+
+            $cancelledEntries[] = array(
+                'team_id' => $t['sport_team_id'],
+                'sport_name' => $t['sport_name'],
+                'team_name' => $t['team_name'],
+                'jersey_number' => $t['jersey_number'],
+                'is_captain' => $t['is_captain'],
+                'whole_team' => $isWhole ? 1 : 0,
+            );
+        }
+
+        if (empty($cancelledEntries)) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không có đội hợp lệ để huỷ.'));
+            Yii::app()->end();
+        }
+
+        // Sau khi gỡ: nếu VĐV không còn nội dung nào → tự động huỷ tư cách
+        $remaining = Attendees::getParticipationSummary($attendeeId);
+        $hasRemaining = !empty($remaining['sport_teams']) || !empty($remaining['competitions'])
+            || !empty($remaining['beauty_contests']) || !empty($remaining['roles']);
+
+        $autoWithdrawn = false;
+        if (!$hasRemaining) {
+            $wres = Attendees::withdrawViaApi($attendeeId, $reason, $email);
+            if (!empty($wres['success'])) {
+                Badges::revokeByAttendee($attendeeId);
+                $autoWithdrawn = true;
+            }
+        }
+
+        AttendeeReplacements::record(array(
+            'registration_id' => $attendee->registration_id,
+            'event_id' => $attendee->event_id,
+            'property_id' => $attendee->property_id,
+            'action' => $autoWithdrawn ? AttendeeReplacements::ACTION_WITHDRAW : AttendeeReplacements::ACTION_CANCEL_CONTENT,
+            'old_attendee_id' => $attendeeId,
+            'old_attendee_name' => $attendee->full_name,
+            'old_staff_code' => isset($attendee->staff_code) ? $attendee->staff_code : null,
+            'affected_contents' => array(
+                'sports' => array(),
+                'competitions' => array(),
+                'beauty_contests' => array(),
+                'roles' => array(),
+            ),
+            'cancelled_teams' => $cancelledEntries,
+            'reason' => $reason,
+            'performed_by' => $email,
+        ));
+
+        Yii::log(
+            "Huỷ nội dung thể thao của attendee #{$attendeeId} bởi {$email}. Lý do: {$reason}"
+                . ($autoWithdrawn ? ' (tự động huỷ tư cách do hết nội dung)' : ''),
+            'info',
+            'application.controllers.ApproveRegistrationsController'
+        );
+
+        $msg = $autoWithdrawn
+            ? 'Đã huỷ nội dung. Người này không còn nội dung nào nên đã tự động huỷ tư cách.'
+            : 'Đã huỷ nội dung đã chọn.';
+        echo CJSON::encode(array('success' => true, 'message' => $msg, 'auto_withdrawn' => $autoWithdrawn));
+        Yii::app()->end();
+    }
+
+    /**
      * Kiểm tra nhân sự chọn thay thế đã từng đăng ký attendee trước đây chưa.
      * Trả về thông tin attendee cũ + các đường dẫn file ảnh/hồ sơ đã có để tái sử dụng.
      */
