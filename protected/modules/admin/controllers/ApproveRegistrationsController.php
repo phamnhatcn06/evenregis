@@ -1116,6 +1116,13 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
+        // 1b. Gỡ đăng ký thi Miss (thí sinh sắc đẹp)
+        foreach ($summary['beauty_contests'] as $bc) {
+            if (!empty($bc['contestant_id'])) {
+                BeautyContestants::deleteViaApi($bc['contestant_id']);
+            }
+        }
+
         // 2. Gỡ vai trò
         foreach (AttendeeRoles::getByAttendeeId($attendeeId) as $role) {
             if (isset($role['id'])) {
