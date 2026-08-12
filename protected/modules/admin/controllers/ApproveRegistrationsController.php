@@ -1254,80 +1254,26 @@ class ApproveRegistrationsController extends AdminController
             $params['id_card'] = $idCard;
         }
 
-        $result = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $params);
-        $attendees = array();
-        if ($result['success'] && isset($result['data'])) {
-            $attendees = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
-        }
+        // Dùng chung logic chọn hồ sơ CÓ ẢNH đầy đủ nhất với luồng thay thế
+        // để modal hiển thị preview đúng với những gì sẽ thực sự được lưu.
+        $detail = $this->resolveExistingProfile(null, $staffId, $staffCode, $idCard, null);
 
-        $matchedAttendee = null;
-        if (!empty($attendees) && is_array($attendees)) {
-            foreach ($attendees as $att) {
-                $attArr = is_array($att) ? $att : (array)$att;
-                $match = false;
-
-                // Mỗi tiêu chí tìm kiếm CHỈ khớp với chính nó,
-                // không fallback sang tiêu chí khác để tránh trả nhầm người.
-                if ($staffId) {
-                    // Tìm theo staff_id → chỉ chấp nhận record có staff_id khớp
-                    if (isset($attArr['staff_id']) && (string)$attArr['staff_id'] === (string)$staffId) {
-                        $match = true;
-                    }
-                } elseif ($staffCode !== '') {
-                    // Tìm theo staff_code
-                    if (isset($attArr['staff_code']) && strtolower(trim($attArr['staff_code'])) === strtolower($staffCode)) {
-                        $match = true;
-                    }
-                } elseif ($idCard !== '') {
-                    // Tìm theo id_card
-                    if (isset($attArr['id_card']) && trim($attArr['id_card']) === $idCard) {
-                        $match = true;
-                    }
-                }
-
-                if ($match) {
-                    $photo = isset($attArr['portrait_path']) ? $attArr['portrait_path'] : (isset($attArr['photo_path']) ? $attArr['photo_path'] : '');
-                    if ($matchedAttendee === null || !empty($photo)) {
-                        $matchedAttendee = $attArr;
-                    }
-                }
-            }
-        }
-
-        if ($matchedAttendee) {
-            // Danh sách (ATTENDEE_LIST) thường chỉ trả về dữ liệu rút gọn (nhiều nhất là photo_path),
-            // KHÔNG có cccd_front_path/cccd_back_path/contract_path. Phải nạp chi tiết để lấy đủ đường dẫn file.
-            $matchedId = isset($matchedAttendee['id']) ? $matchedAttendee['id'] : null;
-            if ($matchedId) {
-                $detail = Attendees::fetchFromApi($matchedId);
-                if ($detail) {
-                    foreach (array('full_name', 'position', 'position_name', 'id_card', 'role_id',
-                                   'portrait_path', 'photo_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $f) {
-                        if (isset($detail->$f) && $detail->$f !== null && $detail->$f !== '') {
-                            $matchedAttendee[$f] = $detail->$f;
-                        }
-                    }
-                }
-            }
-
-            $portrait = isset($matchedAttendee['portrait_path']) && $matchedAttendee['portrait_path'] !== '' ? $matchedAttendee['portrait_path'] : (isset($matchedAttendee['photo_path']) ? $matchedAttendee['photo_path'] : '');
-            $cccdFront = isset($matchedAttendee['cccd_front_path']) ? $matchedAttendee['cccd_front_path'] : '';
-            $cccdBack = isset($matchedAttendee['cccd_back_path']) ? $matchedAttendee['cccd_back_path'] : '';
-            $contract = isset($matchedAttendee['contract_path']) ? $matchedAttendee['contract_path'] : '';
+        if ($detail) {
+            $portrait = (!empty($detail->portrait_path)) ? $detail->portrait_path : (!empty($detail->photo_path) ? $detail->photo_path : '');
 
             echo CJSON::encode(array(
                 'success' => true,
                 'has_attendee' => true,
                 'attendee' => array(
-                    'id' => isset($matchedAttendee['id']) ? $matchedAttendee['id'] : null,
-                    'full_name' => isset($matchedAttendee['full_name']) ? $matchedAttendee['full_name'] : '',
-                    'position' => isset($matchedAttendee['position_name']) ? $matchedAttendee['position_name'] : (isset($matchedAttendee['position']) ? $matchedAttendee['position'] : ''),
-                    'id_card' => isset($matchedAttendee['id_card']) ? $matchedAttendee['id_card'] : '',
+                    'id' => $detail->id,
+                    'full_name' => isset($detail->full_name) ? $detail->full_name : '',
+                    'position' => !empty($detail->position_name) ? $detail->position_name : (isset($detail->position) ? $detail->position : ''),
+                    'id_card' => isset($detail->id_card) ? $detail->id_card : '',
                     'portrait_path' => $portrait,
-                    'cccd_front_path' => $cccdFront,
-                    'cccd_back_path' => $cccdBack,
-                    'contract_path' => $contract,
-                    'role_id' => isset($matchedAttendee['role_id']) ? $matchedAttendee['role_id'] : '',
+                    'cccd_front_path' => isset($detail->cccd_front_path) ? $detail->cccd_front_path : '',
+                    'cccd_back_path' => isset($detail->cccd_back_path) ? $detail->cccd_back_path : '',
+                    'contract_path' => isset($detail->contract_path) ? $detail->contract_path : '',
+                    'role_id' => isset($detail->role_id) ? $detail->role_id : '',
                 ),
             ));
         } else {
