@@ -440,10 +440,17 @@
                 }
 
                 if (alertBox) {
-                    var msg = '<i class="fa fa-check-circle me-1"></i><strong>Đã tìm thấy hồ sơ cũ.</strong>';
-                    if (prefilled.length) { msg += ' Điền: ' + prefilled.join(', ') + '.'; }
-                    if (filesLoaded.length) { msg += ' Ảnh dùng lại: ' + filesLoaded.join(', ') + '.'; }
-                    alertBox.innerHTML = msg;
+                    if (data.in_registration) {
+                        alertBox.className = 'alert alert-warning py-1 px-2 mt-1 small rsub-alert';
+                        alertBox.innerHTML = '<i class="fa fa-info-circle me-1"></i><strong>Người này đã có trong đăng ký.</strong> '
+                            + 'Sẽ dùng lại bản ghi hiện có và chỉ gán thêm nội dung (không tạo bản ghi mới; ảnh/vai trò nhập ở đây sẽ bỏ qua).';
+                    } else {
+                        alertBox.className = 'alert alert-success py-1 px-2 mt-1 small rsub-alert';
+                        var msg = '<i class="fa fa-check-circle me-1"></i><strong>Đã tìm thấy hồ sơ cũ.</strong>';
+                        if (prefilled.length) { msg += ' Điền: ' + prefilled.join(', ') + '.'; }
+                        if (filesLoaded.length) { msg += ' Ảnh dùng lại: ' + filesLoaded.join(', ') + '.'; }
+                        alertBox.innerHTML = msg;
+                    }
                     alertBox.classList.remove('d-none');
                 }
                 refreshAssignOptions();
