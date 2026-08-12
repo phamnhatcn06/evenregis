@@ -453,6 +453,19 @@
             });
     }
 
+    // Đổi nhân sự SMILE: xoá dữ liệu tự điền cũ để lần tra mới điền lại đúng người.
+    function onStaffChange(card) {
+        clearCardProfile(card);
+        ['.rsub-name', '.rsub-pos', '.rsub-idcard'].forEach(function (sel) {
+            var el = card.querySelector(sel);
+            if (el) { el.value = ''; }
+        });
+        var roleSel = card.querySelector('.rsub-roles');
+        if (roleSel) { Array.prototype.forEach.call(roleSel.options, function (o) { o.selected = false; }); }
+        refreshAssignOptions();
+        lookupExisting(card);
+    }
+
     function wireCard(card) {
         var staff = card.querySelector('.rsub-staff');
         if (staff) {
@@ -463,21 +476,9 @@
                     width: '100%',
                     placeholder: '-- Chọn nhân sự SMILE --',
                     allowClear: true
-                }).on('change', function () {
-                    clearCardProfile(card);
-                    var nameInput = card.querySelector('.rsub-name');
-                    if (nameInput) { nameInput.value = ''; }
-                    refreshAssignOptions();
-                    lookupExisting(card);
-                });
+                }).on('change', function () { onStaffChange(card); });
             } else {
-                staff.addEventListener('change', function () {
-                    clearCardProfile(card);
-                    var nameInput = card.querySelector('.rsub-name');
-                    if (nameInput) { nameInput.value = ''; }
-                    refreshAssignOptions();
-                    lookupExisting(card);
-                });
+                staff.addEventListener('change', function () { onStaffChange(card); });
             }
         }
         var nameInput = card.querySelector('.rsub-name');
