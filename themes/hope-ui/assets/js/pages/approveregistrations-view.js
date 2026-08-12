@@ -15,6 +15,7 @@
     var summaryUrl = config.getAttribute('data-summary-url');
     var withdrawUrl = config.getAttribute('data-withdraw-url');
     var replaceUrl = config.getAttribute('data-replace-url');
+    var cancelContentUrl = config.getAttribute('data-cancel-content-url');
     var checkStaffUrl = config.getAttribute('data-check-staff-url');
 
     function escapeHtml(str) {
