@@ -1548,11 +1548,13 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
-     * Chọn hồ sơ attendee cũ có ẢNH/HỒ SƠ đầy đủ nhất để tái sử dụng khi thay thế.
+     * Chọn hồ sơ attendee cũ CỦA ĐÚNG NHÂN SỰ, có ẢNH/HỒ SƠ đầy đủ nhất để tái sử dụng khi thay thế.
      *
-     * Một nhân sự thường có nhiều bản ghi attendee (nháp, bản thay thế trước...),
-     * chỉ một số bản có ảnh. Hàm này duyệt các ứng viên và chọn bản có nhiều
-     * đường dẫn ảnh/hồ sơ nhất, thay vì lấy bừa bản ghi đầu tiên.
+     * Một nhân sự có thể có nhiều bản ghi attendee (nháp, bản thay thế trước...),
+     * chỉ một số bản có ảnh. Hàm chọn bản CÓ NHIỀU ẢNH nhất — nhưng CHỈ trong số các
+     * bản ghi ĐÚNG danh tính (staff_code / staff_id / id_card). Bộ lọc staff_id của API
+     * không đáng tin, nên phải tự xác thực từng ứng viên để tránh lấy nhầm người khác
+     * (người tình cờ có nhiều ảnh hơn).
      *
      * @param mixed  $preferredId  id gợi ý từ frontend (existing_attendee_id)
      * @param mixed  $staffId
@@ -1563,69 +1565,117 @@ class ApproveRegistrationsController extends AdminController
      */
     private function resolveExistingProfile($preferredId, $staffId, $staffCode, $idCard, $excludeId)
     {
-        // 1. Thu thập danh sách id ứng viên: ưu tiên id do frontend gợi ý.
-        $candidates = array(); // id => hintScore (điểm gợi ý từ danh sách)
-        if ($preferredId) {
-            $candidates[(string)$preferredId] = 100; // gợi ý trực tiếp → ưu tiên cao nhất
-        }
-
-        if ($staffId || $staffCode !== '' || $idCard !== '') {
-            $searchParams = array('per_page' => 20);
-            if ($staffId) { $searchParams['staff_id'] = $staffId; }
-            elseif ($staffCode !== '') { $searchParams['staff_code'] = $staffCode; }
-            elseif ($idCard !== '') { $searchParams['id_card'] = $idCard; }
-
-            $attRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $searchParams);
-            if ($attRes['success'] && isset($attRes['data'])) {
-                $list = isset($attRes['data']['data']) ? $attRes['data']['data'] : $attRes['data'];
-                if (!empty($list) && is_array($list)) {
-                    foreach ($list as $it) {
-                        $itArr = is_array($it) ? $it : (array)$it;
-                        if (!isset($itArr['id'])) { continue; }
-                        $id = (string)$itArr['id'];
-                        // Điểm gợi ý sơ bộ từ dữ liệu danh sách (danh sách thường chỉ có photo_path).
-                        $hint = 0;
-                        if (!empty($itArr['photo_path']) || !empty($itArr['portrait_path'])) { $hint = 1; }
-                        if (!isset($candidates[$id]) || $hint > $candidates[$id]) {
-                            $candidates[$id] = $hint;
-                        }
-                    }
-                }
+        // Nếu chỉ có staff_id, tra staff_code từ SMILE — API tìm attendee theo staff_code ổn định hơn.
+        if ($staffCode === '' && $staffId) {
+            $staff = Staffs::fetchFromApi($staffId);
+            if ($staff && !empty($staff->staff_code)) {
+                $staffCode = (string)$staff->staff_code;
             }
         }
 
-        if (empty($candidates)) {
+        // Không có tiêu chí danh tính nào → không thể xác thực an toàn.
+        if (!$staffId && $staffCode === '' && $idCard === '') {
             return null;
         }
 
-        // 2. Sắp xếp ứng viên theo điểm gợi ý giảm dần → nạp chi tiết bản triển vọng trước.
-        arsort($candidates);
+        // 1. Thu thập id ứng viên (ưu tiên id frontend gợi ý), tìm theo staff_code trước.
+        $candidateIds = array();
+        if ($preferredId) { $candidateIds[] = (string)$preferredId; }
 
-        // 3. Nạp chi tiết từng ứng viên, chấm điểm theo số trường ảnh/hồ sơ thực có,
-        //    giữ lại bản tốt nhất. Dừng sớm khi gặp bản đủ 4 loại. Giới hạn số lần gọi API.
+        $searchParams = array('per_page' => 50);
+        if ($staffCode !== '') { $searchParams['staff_code'] = $staffCode; }
+        elseif ($staffId) { $searchParams['staff_id'] = $staffId; }
+        elseif ($idCard !== '') { $searchParams['id_card'] = $idCard; }
+
+        $attRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $searchParams);
+        if ($attRes['success'] && isset($attRes['data'])) {
+            $list = isset($attRes['data']['data']) ? $attRes['data']['data'] : $attRes['data'];
+            if (!empty($list) && is_array($list)) {
+                foreach ($list as $it) {
+                    $itArr = is_array($it) ? $it : (array)$it;
+                    if (!isset($itArr['id'])) { continue; }
+                    // Nếu danh sách có sẵn trường danh tính → lọc ngay để khỏi nạp chi tiết nhầm người.
+                    $hasIdentityFields = isset($itArr['staff_code']) || isset($itArr['staff_id']) || isset($itArr['id_card']);
+                    if ($hasIdentityFields && !$this->attendeeIdentityMatches($itArr, $staffId, $staffCode, $idCard)) {
+                        continue;
+                    }
+                    $candidateIds[] = (string)$itArr['id'];
+                }
+            }
+        }
+        $candidateIds = array_values(array_unique(array_filter($candidateIds)));
+
+        if (empty($candidateIds)) {
+            return null;
+        }
+
+        // 2. Nạp chi tiết từng ứng viên, XÁC THỰC danh tính (nguồn chuẩn), chấm điểm theo số
+        //    trường ảnh/hồ sơ thực có, giữ bản tốt nhất. Dừng sớm khi đủ 4 loại.
         $best = null;
         $bestScore = -1;
         $fetched = 0;
-        $maxFetch = 8;
-        foreach ($candidates as $cid => $hint) {
+        $maxFetch = 15;
+        foreach ($candidateIds as $cid) {
             if ((string)$cid === (string)$excludeId) { continue; }
             if ($fetched >= $maxFetch) { break; }
             $cand = Attendees::fetchFromApi($cid);
             $fetched++;
             if (!$cand) { continue; }
 
+            // Chỉ chấp nhận bản ghi ĐÚNG người.
+            if (!$this->attendeeIdentityMatches($cand, $staffId, $staffCode, $idCard)) {
+                continue;
+            }
+
             $score = 0;
             foreach (array('portrait_path', 'photo_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $pf) {
-                if (isset($cand->$pf) && !empty($cand->$pf)) { $score++; }
+                if (!empty($cand->$pf)) { $score++; }
             }
             if ($score > $bestScore) {
                 $bestScore = $score;
                 $best = $cand;
             }
-            if ($bestScore >= 4) { break; } // đã đủ ảnh chân dung + 2 CCCD + hợp đồng
+            if ($bestScore >= 4) { break; } // đủ ảnh chân dung + 2 CCCD + hợp đồng
         }
 
         return $best;
+    }
+
+    /**
+     * Kiểm tra một bản ghi attendee (mảng từ danh sách HOẶC model chi tiết) có ĐÚNG danh tính
+     * mục tiêu không. Khớp theo bất kỳ tiêu chí nào có: staff_code / staff_id / id_card.
+     *
+     * @param array|Attendees $att
+     * @return bool
+     */
+    private function attendeeIdentityMatches($att, $staffId, $staffCode, $idCard)
+    {
+        $get = function ($key) use ($att) {
+            if (is_array($att)) {
+                return isset($att[$key]) ? $att[$key] : null;
+            }
+            return isset($att->$key) ? $att->$key : null;
+        };
+
+        if ($staffCode !== '') {
+            $c = $get('staff_code');
+            if ($c !== null && $c !== '' && strtolower(trim((string)$c)) === strtolower(trim((string)$staffCode))) {
+                return true;
+            }
+        }
+        if ($staffId) {
+            $s = $get('staff_id');
+            if ($s !== null && $s !== '' && (string)$s === (string)$staffId) {
+                return true;
+            }
+        }
+        if ($idCard !== '') {
+            $ic = $get('id_card');
+            if ($ic !== null && $ic !== '' && trim((string)$ic) === trim((string)$idCard)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
