@@ -1265,12 +1265,24 @@ class ApproveRegistrationsController extends AdminController
             foreach ($attendees as $att) {
                 $attArr = is_array($att) ? $att : (array)$att;
                 $match = false;
-                if ($staffId && isset($attArr['staff_id']) && (string)$attArr['staff_id'] === (string)$staffId) {
-                    $match = true;
-                } elseif ($staffCode !== '' && isset($attArr['staff_code']) && strtolower(trim($attArr['staff_code'])) === strtolower($staffCode)) {
-                    $match = true;
-                } elseif ($idCard !== '' && isset($attArr['id_card']) && trim($attArr['id_card']) === $idCard) {
-                    $match = true;
+
+                // Mỗi tiêu chí tìm kiếm CHỈ khớp với chính nó,
+                // không fallback sang tiêu chí khác để tránh trả nhầm người.
+                if ($staffId) {
+                    // Tìm theo staff_id → chỉ chấp nhận record có staff_id khớp
+                    if (isset($attArr['staff_id']) && (string)$attArr['staff_id'] === (string)$staffId) {
+                        $match = true;
+                    }
+                } elseif ($staffCode !== '') {
+                    // Tìm theo staff_code
+                    if (isset($attArr['staff_code']) && strtolower(trim($attArr['staff_code'])) === strtolower($staffCode)) {
+                        $match = true;
+                    }
+                } elseif ($idCard !== '') {
+                    // Tìm theo id_card
+                    if (isset($attArr['id_card']) && trim($attArr['id_card']) === $idCard) {
+                        $match = true;
+                    }
                 }
 
                 if ($match) {
@@ -1595,7 +1607,11 @@ class ApproveRegistrationsController extends AdminController
         $result = array();
         $uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/attendees/';
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            if (!@mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+                Yii::log("Không thể tạo thư mục upload: {$uploadDir}", 'error', 'application.controllers.ApproveRegistrationsController');
+                echo CJSON::encode(array('success' => false, 'error' => 'Không thể tạo thư mục lưu ảnh trên máy chủ. Vui lòng liên hệ quản trị viên.'));
+                Yii::app()->end();
+            }
         }
         $fileFields = array(
             'portrait_file' => 'portrait_path',

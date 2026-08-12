@@ -397,7 +397,21 @@
     }
 
     if (staffSelect) {
-        // Select2 cho ô chọn nhân sự (hỗ trợ gõ tìm kiếm) — gắn dropdown vào modal.
+    // Xoá các trường đã tự điền từ lần chọn trước để tránh rọc nhầm dữ liệu.
+    function clearAutofilledFields() {
+        var fields = ['replace_full_name', 'replace_position', 'replace_id_card'];
+        fields.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) { el.value = ''; }
+        });
+        clearExistingFilePreviews();
+        var existingAttIdEl = document.getElementById('replace_existing_attendee_id');
+        if (existingAttIdEl) { existingAttIdEl.value = ''; }
+        var alertBox = document.getElementById('replace_existing_alert');
+        if (alertBox) { alertBox.classList.add('d-none'); }
+    }
+
+    // Select2 cho ô chọn nhân sự (hỗ trợ gõ tìm kiếm) — gắn dropdown vào modal.
         if (window.jQuery && jQuery.fn.select2) {
             $staffSelect = jQuery(staffSelect);
             $staffSelect.select2({
@@ -413,13 +427,15 @@
             $staffSelect.on('change', function () {
                 document.getElementById('replace_staff_id').value = this.value;
                 updateStaffInfoBox(staffSelect);
-                checkExistingAttendee(this.value, document.getElementById('replace_id_card').value);
+                clearAutofilledFields(); // xóa dữ liệu cũ trước khi tra cứu mới
+                checkExistingAttendee(this.value, '');
             });
         } else {
             staffSelect.addEventListener('change', function () {
                 document.getElementById('replace_staff_id').value = this.value;
                 updateStaffInfoBox(staffSelect);
-                checkExistingAttendee(this.value, document.getElementById('replace_id_card').value);
+                clearAutofilledFields(); // xóa dữ liệu cũ trước khi tra cứu mới
+                checkExistingAttendee(this.value, '');
             });
         }
     }
