@@ -1227,6 +1227,7 @@ class ApproveRegistrationsController extends AdminController
                 'affected_contents' => array(
                     'sports' => $affectedSports,
                     'competitions' => $affectedCompetitions,
+                    'beauty_contests' => $affectedBeautyContests,
                     'roles' => $affectedRoles,
                 ),
                 'cancelled_teams' => $withdrawCancelledTeams,
