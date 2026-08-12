@@ -1406,30 +1406,12 @@ class ApproveRegistrationsController extends AdminController
         $new->approval_status = Attendees::APPROVAL_APPROVED;
         $new->approved_by = $email;
 
-        // Tìm hồ sơ attendee cũ của nhân sự này (nếu có) để tái sử dụng ảnh/hồ sơ
+        // Tìm hồ sơ attendee cũ của nhân sự này (nếu có) để tái sử dụng ảnh/hồ sơ.
+        // LƯU Ý: một nhân sự có thể có NHIỀU bản ghi attendee (bản nháp, bản thay thế cũ...),
+        // trong đó chỉ một số bản có ảnh/hồ sơ. Phải chọn bản CÓ ẢNH nhiều nhất,
+        // KHÔNG lấy bừa bản ghi đầu tiên (dễ trúng bản rỗng → attendee mới bị thiếu ảnh).
         $existingAttendeeId = $req->getPost('existing_attendee_id');
-        $existingAttendee = null;
-        if ($existingAttendeeId) {
-            $existingAttendee = Attendees::fetchFromApi($existingAttendeeId);
-        }
-        if (!$existingAttendee && ($staffId || $idCard !== '' || $staffCode !== '')) {
-            $searchParams = array('per_page' => 10);
-            if ($staffId) { $searchParams['staff_id'] = $staffId; }
-            elseif ($staffCode !== '') { $searchParams['staff_code'] = $staffCode; }
-            elseif ($idCard !== '') { $searchParams['id_card'] = $idCard; }
-
-            $attRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $searchParams);
-            if ($attRes['success'] && isset($attRes['data'])) {
-                $list = isset($attRes['data']['data']) ? $attRes['data']['data'] : $attRes['data'];
-                if (!empty($list) && is_array($list)) {
-                    $first = reset($list);
-                    $foundId = isset($first['id']) ? $first['id'] : null;
-                    if ($foundId) {
-                        $existingAttendee = Attendees::fetchFromApi($foundId);
-                    }
-                }
-            }
-        }
+        $existingAttendee = $this->resolveExistingProfile($existingAttendeeId, $staffId, $staffCode, $idCard, $oldId);
 
         $uploads = $this->handleReplaceUpload();
 
