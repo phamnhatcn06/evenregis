@@ -1580,12 +1580,18 @@ class ApproveRegistrationsController extends AdminController
             return null;
         }
 
-        // 1. Lọc ứng viên ĐÚNG danh tính (loại người đang bị thay). Ghi nhận có ảnh (theo danh sách).
+        // 1. Lọc ứng viên ĐÚNG danh tính. Loại người đang bị thay, và loại các bản ghi thuộc
+        //    CHÍNH đăng ký đang thao tác — chức năng là tái sử dụng hồ sơ từ ĐĂNG KÝ KHÁC,
+        //    đồng thời tránh vòng lặp lấy nhầm chính bản ghi vừa tạo trong đăng ký này.
         $candidates = array(); // id => hasPhoto(bool)
         foreach ($all as $a) {
             $aArr = is_array($a) ? $a : (array)$a;
             $aid = isset($aArr['id']) ? (string)$aArr['id'] : '';
             if ($aid === '' || $aid === (string)$excludeId) { continue; }
+            if ($excludeRegistrationId !== null && isset($aArr['registration_id'])
+                && (string)$aArr['registration_id'] === (string)$excludeRegistrationId) {
+                continue;
+            }
             if (!$this->attendeeIdentityMatches($aArr, $staffId, $staffCode, $idCard)) { continue; }
             $candidates[$aid] = !empty($aArr['photo_path']) || !empty($aArr['portrait_path']);
         }
