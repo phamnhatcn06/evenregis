@@ -1295,7 +1295,22 @@ class ApproveRegistrationsController extends AdminController
         }
 
         if ($matchedAttendee) {
-            $portrait = isset($matchedAttendee['portrait_path']) ? $matchedAttendee['portrait_path'] : (isset($matchedAttendee['photo_path']) ? $matchedAttendee['photo_path'] : '');
+            // Danh sách (ATTENDEE_LIST) thường chỉ trả về dữ liệu rút gọn (nhiều nhất là photo_path),
+            // KHÔNG có cccd_front_path/cccd_back_path/contract_path. Phải nạp chi tiết để lấy đủ đường dẫn file.
+            $matchedId = isset($matchedAttendee['id']) ? $matchedAttendee['id'] : null;
+            if ($matchedId) {
+                $detail = Attendees::fetchFromApi($matchedId);
+                if ($detail) {
+                    foreach (array('full_name', 'position', 'position_name', 'id_card', 'role_id',
+                                   'portrait_path', 'photo_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $f) {
+                        if (isset($detail->$f) && $detail->$f !== null && $detail->$f !== '') {
+                            $matchedAttendee[$f] = $detail->$f;
+                        }
+                    }
+                }
+            }
+
+            $portrait = isset($matchedAttendee['portrait_path']) && $matchedAttendee['portrait_path'] !== '' ? $matchedAttendee['portrait_path'] : (isset($matchedAttendee['photo_path']) ? $matchedAttendee['photo_path'] : '');
             $cccdFront = isset($matchedAttendee['cccd_front_path']) ? $matchedAttendee['cccd_front_path'] : '';
             $cccdBack = isset($matchedAttendee['cccd_back_path']) ? $matchedAttendee['cccd_back_path'] : '';
             $contract = isset($matchedAttendee['contract_path']) ? $matchedAttendee['contract_path'] : '';
