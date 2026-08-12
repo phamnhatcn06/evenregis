@@ -1525,12 +1525,15 @@ class ApproveRegistrationsController extends AdminController
             $v = isset($assignComp[$cid]) ? $assignComp[$cid] : 'cancel';
             if (preg_match('/^s(\d+)$/', (string)$v, $mm) && isset($subMap[$mm[1]])) {
                 $j = $mm[1];
-                $cr = new CompetitionRegistrations();
-                $cr->competition_id = $c['competition_id'];
-                $cr->registration_id = $registrationId;
-                $cr->attendee_id = $subMap[$j];
-                $cr->status = CompetitionRegistrations::STATUS_PENDING;
-                $cr->storeViaApi();
+                // Người thay tái sử dụng đã đăng ký cuộc thi này → không thêm trùng, chỉ gỡ người cũ.
+                if (!isset($subReuseSkip[$j]['comps'][$cid])) {
+                    $cr = new CompetitionRegistrations();
+                    $cr->competition_id = $c['competition_id'];
+                    $cr->registration_id = $registrationId;
+                    $cr->attendee_id = $subMap[$j];
+                    $cr->status = CompetitionRegistrations::STATUS_PENDING;
+                    $cr->storeViaApi();
+                }
                 if (!empty($c['registration_id'])) {
                     CompetitionRegistrations::deleteViaApi($c['registration_id']);
                 }
