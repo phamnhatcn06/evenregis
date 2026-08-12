@@ -204,6 +204,13 @@ class AttendeeReplacements extends CFormModel
                 $contentLines[] = 'Thi nghiệp vụ: ' . $label . $extra;
             }
 
+            // Thi Miss: cả thay thế lẫn huỷ tư cách đều chỉ huỷ đăng ký (không kế thừa)
+            $beautyContests = isset($affected['beauty_contests']) && is_array($affected['beauty_contests']) ? $affected['beauty_contests'] : array();
+            foreach ($beautyContests as $bc) {
+                $label = self::pick($bc, 'contest_name', 'Thi Miss');
+                $contentLines[] = 'Thi Miss: ' . $label . ' (huỷ)';
+            }
+
             $roles = isset($affected['roles']) && is_array($affected['roles']) ? $affected['roles'] : array();
             $roleNames = array();
             foreach ($roles as $r) {
