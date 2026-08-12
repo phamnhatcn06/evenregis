@@ -42,7 +42,7 @@ class AttendeeReplacements extends CFormModel
         return array(
             array('registration_id, action', 'required'),
             array('registration_id, event_id, property_id, old_attendee_id, new_attendee_id', 'numerical', 'integerOnly' => true),
-            array('action', 'in', 'range' => array(self::ACTION_REPLACE, self::ACTION_WITHDRAW)),
+            array('action', 'in', 'range' => array(self::ACTION_REPLACE, self::ACTION_WITHDRAW, self::ACTION_CANCEL_CONTENT)),
             array('old_attendee_name, old_staff_code, new_attendee_name, new_staff_code', 'length', 'max' => 255),
             array('reason, performed_by, affected_contents, cancelled_teams', 'safe'),
         );
