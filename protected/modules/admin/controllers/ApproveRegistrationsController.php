@@ -1382,6 +1382,18 @@ class ApproveRegistrationsController extends AdminController
                 Yii::app()->end();
             }
 
+            // Nếu người thay đã là attendee ĐANG hoạt động trong chính đăng ký này,
+            // dùng lại bản ghi đó (chỉ gán thêm nội dung) thay vì tạo bản ghi trùng người.
+            $existingInReg = $this->findActiveAttendeeInRegistration($registrationId, $staffId, $staffCode, $idCard, $oldId);
+            if ($existingInReg) {
+                $subMap[$j] = $existingInReg['id'];
+                $subInfo[$j] = array(
+                    'name' => !empty($existingInReg['full_name']) ? $existingInReg['full_name'] : $fullName,
+                    'staff_code' => !empty($existingInReg['staff_code']) ? $existingInReg['staff_code'] : $staffCode,
+                );
+                continue;
+            }
+
             $new = new Attendees();
             $new->event_id = $eventId;
             $new->registration_id = $registrationId;
