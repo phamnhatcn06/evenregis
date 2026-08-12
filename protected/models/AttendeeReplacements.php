@@ -14,6 +14,7 @@ class AttendeeReplacements extends CFormModel
 {
     const ACTION_REPLACE = 'replace';
     const ACTION_WITHDRAW = 'withdraw';
+    const ACTION_CANCEL_CONTENT = 'cancel_content';
 
     public $registration_id;
     public $event_id;

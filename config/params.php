@@ -25,8 +25,8 @@ return array(
     // 'externalApiKey' => 'z8H4VaRvLtBGYUuLgasJDIJIWXYgquFgUIy426pkaFKi7Q0PAC44oz2Jy4KLB5Mz',
 
     // Product
-    'externalApiUrl' => 'https://portal-registration.muongthanh.vn',
-    'externalApiKey' => 'XkufRQtY0evNxRyG0YvEXsq5Vg8hypjWDEaYqJlfTsc9qv8r8gYT9XqOlB8YLoQp',
+    // 'externalApiUrl' => 'https://portal-registration.muongthanh.vn',
+    // 'externalApiKey' => 'XkufRQtY0evNxRyG0YvEXsq5Vg8hypjWDEaYqJlfTsc9qv8r8gYT9XqOlB8YLoQp',
 
     // Session Configuration
     'session' => array(
