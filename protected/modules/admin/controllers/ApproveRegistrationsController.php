@@ -1722,7 +1722,7 @@ class ApproveRegistrationsController extends AdminController
     /**
      * Upload ảnh/hồ sơ cho người thay. Trả về map path.
      */
-    private function handleReplaceUpload()
+    private function handleReplaceUpload($index = 0)
     {
         $result = array();
         $uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/attendees/';
@@ -1734,10 +1734,10 @@ class ApproveRegistrationsController extends AdminController
             }
         }
         $fileFields = array(
-            'portrait_file' => 'portrait_path',
-            'cccd_front_file' => 'cccd_front_path',
-            'cccd_back_file' => 'cccd_back_path',
-            'contract_file' => 'contract_path',
+            'sub_portrait_file_' . $index => 'portrait_path',
+            'sub_cccd_front_file_' . $index => 'cccd_front_path',
+            'sub_cccd_back_file_' . $index => 'cccd_back_path',
+            'sub_contract_file_' . $index => 'contract_path',
         );
         $allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
         $maxSize = 50 * 1024 * 1024;
