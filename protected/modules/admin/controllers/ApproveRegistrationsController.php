@@ -1472,14 +1472,18 @@ class ApproveRegistrationsController extends AdminController
             $v = isset($assignTeam[$tid]) ? $assignTeam[$tid] : 'cancel';
             if (preg_match('/^s(\d+)$/', (string)$v, $mm) && isset($subMap[$mm[1]])) {
                 $j = $mm[1];
-                $mem = new SportTeamMembers();
-                $mem->sport_team_id = $t['sport_team_id'];
-                $mem->attendee_id = $subMap[$j];
-                $mem->name = $subInfo[$j]['name'];
-                $mem->jersey_number = $t['jersey_number'];
-                $mem->position = $t['position'];
-                $mem->is_captain = $t['is_captain'];
-                $mem->storeViaApi();
+                // Người thay tái sử dụng đã có sẵn trong đội này → không thêm trùng, chỉ gỡ người cũ.
+                $alreadyMember = isset($subReuseSkip[$j]['teams'][$tid]);
+                if (!$alreadyMember) {
+                    $mem = new SportTeamMembers();
+                    $mem->sport_team_id = $t['sport_team_id'];
+                    $mem->attendee_id = $subMap[$j];
+                    $mem->name = $subInfo[$j]['name'];
+                    $mem->jersey_number = $t['jersey_number'];
+                    $mem->position = $t['position'];
+                    $mem->is_captain = $t['is_captain'];
+                    $mem->storeViaApi();
+                }
                 if (!empty($t['member_id'])) {
                     SportTeamMembers::deleteViaApi($t['member_id']);
                 }
