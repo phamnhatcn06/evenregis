@@ -1245,15 +1245,6 @@ class ApproveRegistrationsController extends AdminController
             Yii::app()->end();
         }
 
-        $params = array('per_page' => 50);
-        if ($staffId) {
-            $params['staff_id'] = $staffId;
-        } elseif ($staffCode !== '') {
-            $params['staff_code'] = $staffCode;
-        } elseif ($idCard !== '') {
-            $params['id_card'] = $idCard;
-        }
-
         // Dùng chung logic chọn hồ sơ CÓ ẢNH đầy đủ nhất với luồng thay thế
         // để modal hiển thị preview đúng với những gì sẽ thực sự được lưu.
         $detail = $this->resolveExistingProfile(null, $staffId, $staffCode, $idCard, null);
