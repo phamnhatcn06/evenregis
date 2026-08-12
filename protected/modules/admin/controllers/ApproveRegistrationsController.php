@@ -1320,11 +1320,21 @@ class ApproveRegistrationsController extends AdminController
         $req = Yii::app()->request;
         $oldId = $req->getPost('attendee_id');
         $reason = trim($req->getPost('reason', ''));
-        $staffId = $req->getPost('staff_id');
-        $fullName = trim($req->getPost('full_name', ''));
+        $registrationId = $req->getPost('registration_id');
+        $eventId = $req->getPost('event_id');
+        $propertyId = $req->getPost('property_id');
 
-        if (!$oldId || $reason === '' || (!$staffId && $fullName === '')) {
-            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin bắt buộc (người bị thay, lý do, người thay).'));
+        $subs = $req->getPost('sub', array());
+        $assignTeam = $req->getPost('assign_team', array());
+        $assignComp = $req->getPost('assign_comp', array());
+        $cancelWholeTeam = $req->getPost('cancel_whole_team', array());
+        if (!is_array($subs)) { $subs = array(); }
+        if (!is_array($assignTeam)) { $assignTeam = array(); }
+        if (!is_array($assignComp)) { $assignComp = array(); }
+        if (!is_array($cancelWholeTeam)) { $cancelWholeTeam = array(); }
+
+        if (!$oldId || $reason === '') {
+            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin bắt buộc (người bị thay, lý do).'));
             Yii::app()->end();
         }
 
@@ -1337,164 +1347,200 @@ class ApproveRegistrationsController extends AdminController
         $ssoUser = AuthHandler::getUser();
         $email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
-        // Thông tin người thay: ưu tiên SMILE
-        $position = trim($req->getPost('position', ''));
-        $idCard = trim($req->getPost('id_card', ''));
-        $staffCode = null;
-        if ($staffId) {
-            $staff = Staffs::fetchFromApi($staffId);
-            if ($staff) {
-                if ($fullName === '') { $fullName = $staff->full_name; }
-                if ($position === '') { $position = isset($staff->position_name) ? $staff->position_name : ''; }
-                $staffCode = isset($staff->staff_code) ? $staff->staff_code : null;
-            }
+        $summary = Attendees::getParticipationSummary($oldId);
+
+        // Xác định các người thay được gán ít nhất 1 nội dung (chỉ tạo những người này).
+        $referenced = array();
+        foreach (array_merge(array_values($assignTeam), array_values($assignComp)) as $v) {
+            if (preg_match('/^s(\d+)$/', (string)$v, $mm)) { $referenced[$mm[1]] = true; }
         }
-
-        // 1. Tạo người thay (kế thừa approved)
-        $new = new Attendees();
-        $new->event_id = $req->getPost('event_id');
-        $new->registration_id = $req->getPost('registration_id');
-        $new->property_id = $req->getPost('property_id');
-        $new->full_name = $fullName;
-        $new->position = $position;
-        $new->position_name = $position;
-        $new->id_card = $idCard;
-        if ($staffId) { $new->staff_id = $staffId; }
-        if ($staffCode) { $new->staff_code = $staffCode; }
-
-        $postedRoles = $req->getPost('role_id', array());
-        if (is_array($postedRoles)) { $postedRoles = implode(', ', $postedRoles); }
-        $new->role_id = $postedRoles !== '' ? $postedRoles : $oldAttendee->role_id;
-        $new->transport_id = $oldAttendee->transport_id;
-        $new->approval_status = Attendees::APPROVAL_APPROVED;
-        $new->approved_by = $email;
-
-        // Tìm hồ sơ attendee cũ của nhân sự này (nếu có) để tái sử dụng ảnh/hồ sơ.
-        // LƯU Ý: một nhân sự có thể có NHIỀU bản ghi attendee (bản nháp, bản thay thế cũ...),
-        // trong đó chỉ một số bản có ảnh/hồ sơ. Phải chọn bản CÓ ẢNH nhiều nhất,
-        // KHÔNG lấy bừa bản ghi đầu tiên (dễ trúng bản rỗng → attendee mới bị thiếu ảnh).
-        $existingAttendeeId = $req->getPost('existing_attendee_id');
-        $existingAttendee = $this->resolveExistingProfile($existingAttendeeId, $staffId, $staffCode, $idCard, $oldId, $req->getPost('registration_id'));
-
-        $uploads = $this->handleReplaceUpload();
-
-        // URL file từ hồ sơ cũ được frontend gửi trực tiếp qua hidden inputs
-        $postedFileUrls = array(
-            'portrait_path'   => trim($req->getPost('existing_portrait_url', '')),
-            'cccd_front_path' => trim($req->getPost('existing_cccd_front_url', '')),
-            'cccd_back_path'  => trim($req->getPost('existing_cccd_back_url', '')),
-            'contract_path'   => trim($req->getPost('existing_contract_url', '')),
-        );
-
-        $fileMap = array(
-            'portrait_path' => array('portrait_path', 'photo_path'),
-            'cccd_front_path' => array('cccd_front_path'),
-            'cccd_back_path' => array('cccd_back_path'),
-            'contract_path' => array('contract_path'),
-        );
-        foreach ($fileMap as $targetAttr => $sourceAttrs) {
-            if (isset($uploads[$targetAttr]) && !empty($uploads[$targetAttr])) {
-                // Ưu tiên 1: file upload mới
-                $new->$targetAttr = $uploads[$targetAttr];
-            } elseif (!empty($postedFileUrls[$targetAttr])) {
-                // Ưu tiên 2: URL từ hồ sơ cũ (gửi qua hidden input)
-                $new->$targetAttr = $postedFileUrls[$targetAttr];
-            } elseif ($existingAttendee) {
-                // Ưu tiên 3: copy từ bản ghi attendee cũ qua API
-                foreach ($sourceAttrs as $sAttr) {
-                    if (isset($existingAttendee->$sAttr) && !empty($existingAttendee->$sAttr)) {
-                        $new->$targetAttr = $existingAttendee->$sAttr;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // DEBUG: ghi lại quá trình resolve ảnh/hồ sơ để chẩn đoán vì sao attendee mới thiếu ảnh.
-        Yii::log(sprintf(
-            "[REPLACE] existing_attendee_id=%s | existingAttendee=%s | uploads=[%s] | postedUrls=[%s] | resolved: portrait=%s cccd_front=%s cccd_back=%s contract=%s",
-            $existingAttendeeId ?: '(none)',
-            $existingAttendee ? ('#' . $existingAttendee->id) : 'NULL',
-            implode(',', array_keys($uploads)),
-            implode(',', array_keys(array_filter($postedFileUrls, function ($v) { return $v !== ''; }))),
-            $new->portrait_path ?: '-',
-            $new->cccd_front_path ?: '-',
-            $new->cccd_back_path ?: '-',
-            $new->contract_path ?: '-'
-        ), 'info', 'application.controllers.ApproveRegistrationsController');
-
-        $storeResult = $new->storeViaApi();
-        Yii::log('[REPLACE] storeResult=' . CJSON::encode($storeResult), 'info', 'application.controllers.ApproveRegistrationsController');
-        $newId = $this->extractNewId($storeResult);
-        if (!$newId) {
-            $err = isset($storeResult['error']) ? $storeResult['error'] : 'Không thể tạo người thay.';
-            echo CJSON::encode(array('success' => false, 'error' => $err));
+        if (empty($referenced)) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Chưa gán nội dung nào cho người thay.'));
             Yii::app()->end();
         }
 
-        // Kể từ đây người thay đã tồn tại → kế thừa nội dung của người bị thay
-        $summary = Attendees::getParticipationSummary($oldId);
-        $inheritTeamIds = $req->getPost('inherit_team_ids', array());
-        if (!is_array($inheritTeamIds)) { $inheritTeamIds = array(); }
-        $inheritTeamIds = array_map('strval', $inheritTeamIds);
+        // 1. Tạo từng người thay được tham chiếu.
+        $subMap = array();   // j => newAttendeeId
+        $subInfo = array();  // j => array(name, staff_code)
+        foreach (array_keys($referenced) as $j) {
+            $s = isset($subs[$j]) && is_array($subs[$j]) ? $subs[$j] : array();
+            $staffId = isset($s['staff_id']) ? trim($s['staff_id']) : '';
+            $fullName = isset($s['full_name']) ? trim($s['full_name']) : '';
+            $position = isset($s['position']) ? trim($s['position']) : '';
+            $idCard = isset($s['id_card']) ? trim($s['id_card']) : '';
+            $staffCode = null;
+            if ($staffId) {
+                $staff = Staffs::fetchFromApi($staffId);
+                if ($staff) {
+                    if ($fullName === '') { $fullName = $staff->full_name; }
+                    if ($position === '') { $position = isset($staff->position_name) ? $staff->position_name : ''; }
+                    $staffCode = isset($staff->staff_code) ? $staff->staff_code : null;
+                }
+            }
+            if (!$staffId && $fullName === '') {
+                echo CJSON::encode(array('success' => false, 'error' => 'Một người thay được gán nội dung nhưng chưa có thông tin (SMILE hoặc họ tên).'));
+                Yii::app()->end();
+            }
 
-        // 2. Đội thể thao
+            $new = new Attendees();
+            $new->event_id = $eventId;
+            $new->registration_id = $registrationId;
+            $new->property_id = $propertyId;
+            $new->full_name = $fullName;
+            $new->position = $position;
+            $new->position_name = $position;
+            $new->id_card = $idCard;
+            if ($staffId) { $new->staff_id = $staffId; }
+            if ($staffCode) { $new->staff_code = $staffCode; }
+            $roleStr = isset($s['role_id']) ? trim($s['role_id']) : '';
+            $new->role_id = $roleStr;
+            $new->approval_status = Attendees::APPROVAL_APPROVED;
+            $new->approved_by = $email;
+
+            // Ảnh/hồ sơ: file upload mới → URL hồ sơ cũ (frontend gửi) → copy từ bản ghi cũ.
+            $existingAttendeeId = isset($s['existing_attendee_id']) ? $s['existing_attendee_id'] : null;
+            $existingAttendee = $this->resolveExistingProfile($existingAttendeeId, $staffId, $staffCode, $idCard, $oldId, $registrationId);
+            $uploads = $this->handleReplaceUpload($j);
+            $postedFileUrls = array(
+                'portrait_path'   => isset($s['existing_portrait_url']) ? trim($s['existing_portrait_url']) : '',
+                'cccd_front_path' => isset($s['existing_cccd_front_url']) ? trim($s['existing_cccd_front_url']) : '',
+                'cccd_back_path'  => isset($s['existing_cccd_back_url']) ? trim($s['existing_cccd_back_url']) : '',
+                'contract_path'   => isset($s['existing_contract_url']) ? trim($s['existing_contract_url']) : '',
+            );
+            $fileMap = array(
+                'portrait_path' => array('portrait_path', 'photo_path'),
+                'cccd_front_path' => array('cccd_front_path'),
+                'cccd_back_path' => array('cccd_back_path'),
+                'contract_path' => array('contract_path'),
+            );
+            foreach ($fileMap as $targetAttr => $sourceAttrs) {
+                if (isset($uploads[$targetAttr]) && !empty($uploads[$targetAttr])) {
+                    $new->$targetAttr = $uploads[$targetAttr];
+                } elseif (!empty($postedFileUrls[$targetAttr])) {
+                    $new->$targetAttr = $postedFileUrls[$targetAttr];
+                } elseif ($existingAttendee) {
+                    foreach ($sourceAttrs as $sAttr) {
+                        if (isset($existingAttendee->$sAttr) && !empty($existingAttendee->$sAttr)) {
+                            $new->$targetAttr = $existingAttendee->$sAttr;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $storeResult = $new->storeViaApi();
+            $newId = $this->extractNewId($storeResult);
+            if (!$newId) {
+                $err = isset($storeResult['error']) ? $storeResult['error'] : 'Không thể tạo người thay.';
+                echo CJSON::encode(array('success' => false, 'error' => $err));
+                Yii::app()->end();
+            }
+            $subMap[$j] = $newId;
+            $subInfo[$j] = array('name' => $fullName, 'staff_code' => $staffCode);
+        }
+
+        // Chuẩn bị audit theo từng người thay.
+        $auditPerSub = array();
+        foreach (array_keys($subMap) as $j) {
+            $auditPerSub[$j] = array('sports' => array(), 'competitions' => array());
+        }
+
+        // 2. Đội thể thao: gán → thêm người thay + gỡ người cũ; huỷ → gỡ người cũ (hoặc xoá cả đội).
+        $cancelledTeams = array();
         foreach ($summary['sport_teams'] as $t) {
-            $tid = $t['sport_team_id'];
-            if (in_array((string)$tid, $inheritTeamIds)) {
-                // Kế thừa: thêm người thay vào đội, gỡ người cũ
-                $m = new SportTeamMembers();
-                $m->sport_team_id = $tid;
-                $m->attendee_id = $newId;
-                $m->name = $fullName;
-                $m->jersey_number = $t['jersey_number'];
-                $m->position = $t['position'];
-                $m->is_captain = $t['is_captain'];
-                $m->storeViaApi();
+            $tid = (string)$t['sport_team_id'];
+            $v = isset($assignTeam[$tid]) ? $assignTeam[$tid] : 'cancel';
+            if (preg_match('/^s(\d+)$/', (string)$v, $mm) && isset($subMap[$mm[1]])) {
+                $j = $mm[1];
+                $mem = new SportTeamMembers();
+                $mem->sport_team_id = $t['sport_team_id'];
+                $mem->attendee_id = $subMap[$j];
+                $mem->name = $subInfo[$j]['name'];
+                $mem->jersey_number = $t['jersey_number'];
+                $mem->position = $t['position'];
+                $mem->is_captain = $t['is_captain'];
+                $mem->storeViaApi();
                 if (!empty($t['member_id'])) {
                     SportTeamMembers::deleteViaApi($t['member_id']);
                 }
+                $auditPerSub[$j]['sports'][] = array(
+                    'team_id' => $t['sport_team_id'],
+                    'sport_name' => $t['sport_name'],
+                    'team_name' => $t['team_name'],
+                    'jersey_number' => $t['jersey_number'],
+                    'is_captain' => $t['is_captain'],
+                );
             } else {
-                // Không tích: huỷ cả đội
-                foreach (SportTeamMembers::getTeamMemberBriefs($tid) as $tm) {
-                    if (!empty($tm['member_id'])) {
-                        SportTeamMembers::deleteViaApi($tm['member_id']);
+                // Huỷ: mặc định chỉ gỡ người bị thay; tích "Huỷ cả đội" mới xoá toàn đội.
+                $whole = !empty($cancelWholeTeam[$tid]);
+                if ($whole) {
+                    foreach (SportTeamMembers::getTeamMemberBriefs($t['sport_team_id']) as $tm) {
+                        if (!empty($tm['member_id'])) {
+                            SportTeamMembers::deleteViaApi($tm['member_id']);
+                        }
                     }
+                    SportTeams::deleteViaApi($t['sport_team_id']);
+                } elseif (!empty($t['member_id'])) {
+                    SportTeamMembers::deleteViaApi($t['member_id']);
                 }
-                SportTeams::deleteViaApi($tid);
+                $cancelledTeams[] = array(
+                    'team_id' => $t['sport_team_id'],
+                    'sport_name' => $t['sport_name'],
+                    'team_name' => $t['team_name'],
+                    'jersey_number' => $t['jersey_number'],
+                    'is_captain' => $t['is_captain'],
+                    'whole' => $whole ? 1 : 0,
+                );
             }
         }
 
-        // 3. Thi nghiệp vụ (kế thừa hết, cấp số báo danh mới → để trống candidate_number)
+        // 3. Thi nghiệp vụ: gán theo từng cuộc thi (số báo danh mới do backend cấp).
+        $cancelledComps = array();
         foreach ($summary['competitions'] as $c) {
-            $cr = new CompetitionRegistrations();
-            $cr->competition_id = $c['competition_id'];
-            $cr->registration_id = $req->getPost('registration_id');
-            $cr->attendee_id = $newId;
-            $cr->status = CompetitionRegistrations::STATUS_PENDING;
-            $cr->storeViaApi();
-            if (!empty($c['registration_id'])) {
-                CompetitionRegistrations::deleteViaApi($c['registration_id']);
+            $cid = (string)$c['competition_id'];
+            $v = isset($assignComp[$cid]) ? $assignComp[$cid] : 'cancel';
+            if (preg_match('/^s(\d+)$/', (string)$v, $mm) && isset($subMap[$mm[1]])) {
+                $j = $mm[1];
+                $cr = new CompetitionRegistrations();
+                $cr->competition_id = $c['competition_id'];
+                $cr->registration_id = $registrationId;
+                $cr->attendee_id = $subMap[$j];
+                $cr->status = CompetitionRegistrations::STATUS_PENDING;
+                $cr->storeViaApi();
+                if (!empty($c['registration_id'])) {
+                    CompetitionRegistrations::deleteViaApi($c['registration_id']);
+                }
+                $auditPerSub[$j]['competitions'][] = array(
+                    'competition_id' => $c['competition_id'],
+                    'competition_name' => $c['competition_name'],
+                    'candidate_number' => $c['candidate_number'],
+                );
+            } else {
+                if (!empty($c['registration_id'])) {
+                    CompetitionRegistrations::deleteViaApi($c['registration_id']);
+                }
+                $cancelledComps[] = array(
+                    'competition_id' => $c['competition_id'],
+                    'competition_name' => $c['competition_name'],
+                    'candidate_number' => $c['candidate_number'],
+                );
             }
         }
 
-        // 3b. Thi Miss: chỉ huỷ đăng ký của người cũ, KHÔNG kế thừa cho người thay
-        // (hồ sơ thí sinh gồm nhân trắc/ảnh mang tính cá nhân, không chuyển được).
+        // 4. Thi Miss: luôn huỷ đăng ký của người bị thay (không kế thừa).
+        $cancelledBeauty = array();
         foreach ($summary['beauty_contests'] as $bc) {
             if (!empty($bc['contestant_id'])) {
                 BeautyContestants::deleteViaApi($bc['contestant_id']);
             }
+            $cancelledBeauty[] = array(
+                'contest_id' => $bc['contest_id'],
+                'contest_name' => $bc['contest_name'],
+                'candidate_number' => $bc['candidate_number'],
+            );
         }
 
-        // 4. Vai trò: nếu admin không chọn thì kế thừa của người cũ
-        if ($postedRoles === '') {
-            foreach ($summary['roles'] as $r) {
-                $ar = new AttendeeRoles();
-                $ar->attendee_id = $newId;
-                $ar->role_id = $r['role_id'];
-                $ar->storeViaApi();
-            }
-        }
+        // 5. Gỡ toàn bộ vai trò của người bị thay (mỗi người thay đã có vai trò riêng).
         foreach ($summary['roles'] as $r) {
             if (!empty($r['attendee_role_id'])) {
                 AttendeeRoles::deleteViaApi($r['attendee_role_id']);
