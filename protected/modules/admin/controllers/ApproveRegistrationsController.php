@@ -1392,6 +1392,13 @@ class ApproveRegistrationsController extends AdminController
                     'name' => !empty($existingInReg['full_name']) ? $existingInReg['full_name'] : $fullName,
                     'staff_code' => !empty($existingInReg['staff_code']) ? $existingInReg['staff_code'] : $staffCode,
                 );
+                // Ghi lại nội dung người này ĐÃ có để không thêm trùng khi gán.
+                $reuseSum = Attendees::getParticipationSummary($existingInReg['id']);
+                $teamSet = array();
+                foreach ($reuseSum['sport_teams'] as $rt) { $teamSet[(string)$rt['sport_team_id']] = true; }
+                $compSet = array();
+                foreach ($reuseSum['competitions'] as $rc) { $compSet[(string)$rc['competition_id']] = true; }
+                $subReuseSkip[$j] = array('teams' => $teamSet, 'comps' => $compSet);
                 continue;
             }
 
