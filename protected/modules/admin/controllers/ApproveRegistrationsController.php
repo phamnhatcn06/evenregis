@@ -1360,8 +1360,9 @@ class ApproveRegistrationsController extends AdminController
         }
 
         // 1. Tạo từng người thay được tham chiếu.
-        $subMap = array();   // j => newAttendeeId
-        $subInfo = array();  // j => array(name, staff_code)
+        $subMap = array();        // j => newAttendeeId
+        $subInfo = array();       // j => array(name, staff_code)
+        $subReuseSkip = array();  // j => array('teams'=>set, 'comps'=>set) — nội dung người thay ĐÃ có sẵn
         foreach (array_keys($referenced) as $j) {
             $s = isset($subs[$j]) && is_array($subs[$j]) ? $subs[$j] : array();
             $staffId = isset($s['staff_id']) ? trim($s['staff_id']) : '';
