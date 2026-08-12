@@ -273,6 +273,7 @@
         STAFF_LIST.forEach(function (st) {
             html += '<option value="' + escapeHtml(st.id) + '"'
                 + ' data-name="' + escapeHtml(st.name) + '"'
+                + ' data-code="' + escapeHtml(st.code) + '"'
                 + ' data-position="' + escapeHtml(st.position) + '">'
                 + escapeHtml(st.name + (st.code ? ' (' + st.code + ')' : '')) + '</option>';
         });
