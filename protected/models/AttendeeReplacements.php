@@ -198,6 +198,13 @@ class AttendeeReplacements extends CFormModel
             $affected = self::toArray(self::pick($rec, 'affected_contents'));
             $cancelledTeams = self::toArray(self::pick($rec, 'cancelled_teams'));
 
+            // Loại thao tác thật có thể được nhúng trong affected_contents._kind
+            // (vì cột action ở External API chỉ nhận replace|withdraw). Khôi phục để
+            // hiển thị đúng nhãn "Huỷ nội dung".
+            if (!empty($affected['_kind'])) {
+                $action = $affected['_kind'];
+            }
+
             // Diễn giải nội dung ảnh hưởng thành các cụm ngắn gọn
             $contentLines = array();
 
