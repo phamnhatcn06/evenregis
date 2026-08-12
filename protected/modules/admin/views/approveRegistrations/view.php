@@ -260,6 +260,11 @@ $attributes = array(
                                                 title="Thay thế người này">
                                             <i class="fa fa-exchange"></i>
                                         </button>
+                                        <button type="button" class="btn btn-sm btn-outline-warning me-1"
+                                                onclick="openCancelContentModal(<?php echo $attId; ?>)"
+                                                title="Huỷ nội dung thi đấu">
+                                            <i class="fa fa-minus-circle"></i>
+                                        </button>
                                         <button type="button" class="btn btn-sm btn-outline-danger"
                                                 onclick="openWithdrawAttendeeModal(<?php echo $attId; ?>)"
                                                 title="Huỷ tư cách">
