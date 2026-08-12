@@ -598,6 +598,46 @@ class Attendees extends BaseAttendees
     }
 
     /**
+     * Các cuộc thi sắc đẹp (Miss) mà người này đã đăng ký làm thí sinh.
+     */
+    protected static function collectBeautyContests($attendeeId)
+    {
+        // Endpoint beauty-contestants có thể không lọc chắc chắn theo attendee_id,
+        // nên lấy per_page đủ lớn rồi lọc lại ở phía client (giống collectCompetitions).
+        $result = ApiClient::get(ApiEndpoints::BEAUTY_CONTESTANT_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 500,
+        ));
+        $items = self::extractListData($result);
+        if (!is_array($items)) {
+            return array();
+        }
+
+        $contests = array();
+        foreach ($items as $item) {
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $contestId = isset($item['contest_id']) ? $item['contest_id'] : null;
+            if (!$contestId) {
+                continue;
+            }
+            $name = isset($item['contest_name']) ? $item['contest_name'] : '';
+            if (empty($name)) {
+                $contest = BeautyContests::fetchFromApi($contestId);
+                $name = $contest ? $contest->name : '';
+            }
+            $contests[] = array(
+                'contestant_id' => isset($item['id']) ? $item['id'] : null,
+                'contest_id' => $contestId,
+                'contest_name' => $name,
+                'candidate_number' => isset($item['candidate_number']) ? $item['candidate_number'] : '',
+            );
+        }
+        return $contests;
+    }
+
+    /**
      * Các vai trò được gán cho người này (attendee_roles).
      */
     protected static function collectRoles($attendeeId)
