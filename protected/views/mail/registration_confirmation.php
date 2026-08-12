@@ -83,7 +83,16 @@ include __DIR__ . '/_email_header.php';
                 <?php foreach ($personnelChanges as $chg): ?>
                 <tr>
                     <td style="vertical-align:top; border-bottom:1px solid #fef3c7; color:#1e293b;">
-                        <span style="display:inline-block; padding:2px 8px; border-radius:4px; font-weight:bold; color:#ffffff; background-color:<?php echo $chg['action'] === AttendeeReplacements::ACTION_REPLACE ? '#2563eb' : '#dc2626'; ?>;">
+                        <?php
+                        if ($chg['action'] === AttendeeReplacements::ACTION_REPLACE) {
+                            $badgeColor = '#2563eb'; // xanh — thay thế
+                        } elseif ($chg['action'] === AttendeeReplacements::ACTION_CANCEL_CONTENT) {
+                            $badgeColor = '#f59e0b'; // hổ phách — huỷ nội dung
+                        } else {
+                            $badgeColor = '#dc2626'; // đỏ — huỷ tư cách
+                        }
+                        ?>
+                        <span style="display:inline-block; padding:2px 8px; border-radius:4px; font-weight:bold; color:#ffffff; background-color:<?php echo $badgeColor; ?>;">
                             <?php echo CHtml::encode($chg['action_label']); ?>
                         </span>
                         <?php if (!empty($chg['performed_at'])): ?>
