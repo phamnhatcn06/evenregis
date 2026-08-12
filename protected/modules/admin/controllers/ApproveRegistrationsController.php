@@ -1200,6 +1200,14 @@ class ApproveRegistrationsController extends AdminController
                     'candidate_number' => $c['candidate_number'],
                 );
             }
+            $affectedBeautyContests = array();
+            foreach ($summary['beauty_contests'] as $bc) {
+                $affectedBeautyContests[] = array(
+                    'contest_id' => $bc['contest_id'],
+                    'contest_name' => $bc['contest_name'],
+                    'candidate_number' => $bc['candidate_number'],
+                );
+            }
             $affectedRoles = array();
             foreach ($summary['roles'] as $r) {
                 $affectedRoles[] = array(
