@@ -248,6 +248,126 @@
     }
 
     // =====================================================================
+    // HUỶ NỘI DUNG THI ĐẤU (thể thao) — giữ tư cách VĐV
+    // =====================================================================
+
+    function renderCancelTeams(teams) {
+        var html = '<div class="mb-2"><h6 class="mb-2"><i class="fa fa-futbol-o me-1 text-primary"></i>Đội thi đấu đã đăng ký</h6>';
+        if (!teams.length) {
+            return html + '<p class="text-muted small mb-0">Người này không tham gia đội thể thao nào.</p></div>';
+        }
+        teams.forEach(function (t) {
+            var meta = teamMetaBadges(t);
+            var tid = t.sport_team_id;
+            html += '<div class="border rounded p-2 mb-2">'
+                + '<div class="form-check">'
+                + '<input class="form-check-input cancel-team-select" type="checkbox" name="team_ids[]" value="' + tid + '" id="cancel_content_team_' + tid + '">'
+                + '<label class="form-check-label" for="cancel_content_team_' + tid + '">'
+                + '<strong>' + escapeHtml(t.sport_name || t.team_name || '') + '</strong> '
+                + '<small class="text-muted">' + escapeHtml(t.team_name || '') + '</small>'
+                + '<br><small>' + meta.join(' · ') + ' · ' + (t.member_count || 0) + ' thành viên</small>'
+                + '</label></div>';
+
+            html += '<div class="ms-4 mt-1 cancel-team-options d-none" data-team="' + tid + '">'
+                + '<div class="form-check">'
+                + '<input class="form-check-input" type="checkbox" name="cancel_whole_team[' + tid + ']" value="1" id="cancel_whole_' + tid + '">'
+                + '<label class="form-check-label small text-danger" for="cancel_whole_' + tid + '">Huỷ cả đội (gỡ toàn bộ thành viên &amp; xoá đội)</label>'
+                + '</div>';
+
+            if (parseInt(t.is_captain, 10)) {
+                var others = t.other_members || [];
+                html += '<div class="mt-1">'
+                    + '<label class="form-label small mb-1 text-warning"><i class="fa fa-exclamation-triangle"></i> Người này là đội trưởng — chọn đội trưởng mới:</label>'
+                    + '<select class="form-select form-select-sm" name="new_captain[' + tid + ']">'
+                    + '<option value="">-- Để trống (đội tạm không có đội trưởng) --</option>';
+                others.forEach(function (m) {
+                    html += '<option value="' + m.member_id + '">' + escapeHtml(m.attendee_name || ('#' + m.attendee_id)) + '</option>';
+                });
+                html += '</select></div>';
+            }
+            html += '</div></div>';
+        });
+        return html + '</div>';
+    }
+
+    // Chỉ hiện tuỳ chọn (huỷ cả đội / đội trưởng mới) khi đội được tick huỷ.
+    document.addEventListener('change', function (e) {
+        if (!e.target.classList || !e.target.classList.contains('cancel-team-select')) { return; }
+        var options = e.target.closest('.border').querySelector('.cancel-team-options');
+        if (options) { options.classList.toggle('d-none', !e.target.checked); }
+    });
+
+    window.openCancelContentModal = function (attendeeId) {
+        document.getElementById('cancel_content_attendee_id').value = attendeeId;
+        document.getElementById('cancel_content_reason').value = '';
+        document.getElementById('cancel_content_badge_warning').classList.add('d-none');
+        loadSummary(attendeeId, 'cancel_content_container', 'cancel_content_attendee_name', 'cancel_content_badge_warning', null, function (summary) {
+            return renderCancelTeams(summary.sport_teams || []);
+        });
+        showModal('cancelContentModal');
+    };
+
+    var cancelContentForm = document.getElementById('cancelContentForm');
+    if (cancelContentForm) {
+        cancelContentForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var selected = cancelContentForm.querySelectorAll('.cancel-team-select:checked');
+            if (!selected.length) {
+                Toast.error('Vui lòng chọn ít nhất một đội cần huỷ.');
+                return;
+            }
+            var reason = document.getElementById('cancel_content_reason').value.trim();
+            if (!reason) {
+                Toast.error('Vui lòng nhập lý do huỷ nội dung.');
+                return;
+            }
+            var name = document.getElementById('cancel_content_attendee_name').textContent || 'người này';
+            Swal.fire({
+                title: 'Xác nhận huỷ nội dung',
+                html: 'Huỷ <strong>' + selected.length + '</strong> nội dung thi đấu của <strong>' + escapeHtml(name) + '</strong>?'
+                    + '<br><small class="text-muted">Nếu hết nội dung, VĐV sẽ tự động bị huỷ tư cách.</small>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f0ad4e',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Huỷ nội dung',
+                cancelButtonText: 'Đóng'
+            }).then(function (result) {
+                if (result.isConfirmed) { submitCancelContent(); }
+            });
+        });
+    }
+
+    function submitCancelContent() {
+        var btn = document.getElementById('btn_submit_cancel_content');
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang xử lý...';
+
+        var formData = new FormData(document.getElementById('cancelContentForm'));
+        fetch(cancelContentUrl, { method: 'POST', body: formData })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    var modalEl = document.getElementById('cancelContentModal');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) { modal.hide(); }
+                    Toast.success(data.message || 'Đã huỷ nội dung.');
+                    setTimeout(function () { location.reload(); }, 1400);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    Toast.error(data.error || 'Có lỗi xảy ra.');
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                Toast.error('Lỗi kết nối máy chủ.');
+            });
+    }
+
+    // =====================================================================
     // THAY THẾ ĐA NỘI DUNG
     // =====================================================================
 
