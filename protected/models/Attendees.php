@@ -501,6 +501,7 @@ class Attendees extends BaseAttendees
         return array(
             'sport_teams' => self::collectSportTeams($attendeeId),
             'competitions' => self::collectCompetitions($attendeeId),
+            'beauty_contests' => self::collectBeautyContests($attendeeId),
             'roles' => self::collectRoles($attendeeId),
         );
     }
