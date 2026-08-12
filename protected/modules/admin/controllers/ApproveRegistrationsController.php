@@ -1611,6 +1611,87 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
+     * Chọn hồ sơ attendee cũ có ẢNH/HỒ SƠ đầy đủ nhất để tái sử dụng khi thay thế.
+     *
+     * Một nhân sự thường có nhiều bản ghi attendee (nháp, bản thay thế trước...),
+     * chỉ một số bản có ảnh. Hàm này duyệt các ứng viên và chọn bản có nhiều
+     * đường dẫn ảnh/hồ sơ nhất, thay vì lấy bừa bản ghi đầu tiên.
+     *
+     * @param mixed  $preferredId  id gợi ý từ frontend (existing_attendee_id)
+     * @param mixed  $staffId
+     * @param string $staffCode
+     * @param string $idCard
+     * @param mixed  $excludeId    id người đang bị thay (không tự chọn lại)
+     * @return Attendees|null       bản ghi chi tiết tốt nhất, hoặc null
+     */
+    private function resolveExistingProfile($preferredId, $staffId, $staffCode, $idCard, $excludeId)
+    {
+        // 1. Thu thập danh sách id ứng viên: ưu tiên id do frontend gợi ý.
+        $candidates = array(); // id => hintScore (điểm gợi ý từ danh sách)
+        if ($preferredId) {
+            $candidates[(string)$preferredId] = 100; // gợi ý trực tiếp → ưu tiên cao nhất
+        }
+
+        if ($staffId || $staffCode !== '' || $idCard !== '') {
+            $searchParams = array('per_page' => 20);
+            if ($staffId) { $searchParams['staff_id'] = $staffId; }
+            elseif ($staffCode !== '') { $searchParams['staff_code'] = $staffCode; }
+            elseif ($idCard !== '') { $searchParams['id_card'] = $idCard; }
+
+            $attRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $searchParams);
+            if ($attRes['success'] && isset($attRes['data'])) {
+                $list = isset($attRes['data']['data']) ? $attRes['data']['data'] : $attRes['data'];
+                if (!empty($list) && is_array($list)) {
+                    foreach ($list as $it) {
+                        $itArr = is_array($it) ? $it : (array)$it;
+                        if (!isset($itArr['id'])) { continue; }
+                        $id = (string)$itArr['id'];
+                        // Điểm gợi ý sơ bộ từ dữ liệu danh sách (danh sách thường chỉ có photo_path).
+                        $hint = 0;
+                        if (!empty($itArr['photo_path']) || !empty($itArr['portrait_path'])) { $hint = 1; }
+                        if (!isset($candidates[$id]) || $hint > $candidates[$id]) {
+                            $candidates[$id] = $hint;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (empty($candidates)) {
+            return null;
+        }
+
+        // 2. Sắp xếp ứng viên theo điểm gợi ý giảm dần → nạp chi tiết bản triển vọng trước.
+        arsort($candidates);
+
+        // 3. Nạp chi tiết từng ứng viên, chấm điểm theo số trường ảnh/hồ sơ thực có,
+        //    giữ lại bản tốt nhất. Dừng sớm khi gặp bản đủ 4 loại. Giới hạn số lần gọi API.
+        $best = null;
+        $bestScore = -1;
+        $fetched = 0;
+        $maxFetch = 8;
+        foreach ($candidates as $cid => $hint) {
+            if ((string)$cid === (string)$excludeId) { continue; }
+            if ($fetched >= $maxFetch) { break; }
+            $cand = Attendees::fetchFromApi($cid);
+            $fetched++;
+            if (!$cand) { continue; }
+
+            $score = 0;
+            foreach (array('portrait_path', 'photo_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $pf) {
+                if (isset($cand->$pf) && !empty($cand->$pf)) { $score++; }
+            }
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $best = $cand;
+            }
+            if ($bestScore >= 4) { break; } // đã đủ ảnh chân dung + 2 CCCD + hợp đồng
+        }
+
+        return $best;
+    }
+
+    /**
      * Upload ảnh/hồ sơ cho người thay. Trả về map path.
      */
     private function handleReplaceUpload()
