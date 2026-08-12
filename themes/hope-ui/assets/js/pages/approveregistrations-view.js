@@ -271,7 +271,12 @@
             return;
         }
 
-        var url = checkStaffUrl + '?staff_id=' + encodeURIComponent(staffId || '') + '&id_card=' + encodeURIComponent(idCard || '');
+        // Gửi kèm registration_id để backend loại các bản ghi thuộc chính đăng ký đang thao tác.
+        var regInput = document.querySelector('#replaceAttendeeForm input[name="registration_id"]');
+        var regId = regInput ? regInput.value : '';
+        var url = checkStaffUrl + '?staff_id=' + encodeURIComponent(staffId || '') +
+                  '&id_card=' + encodeURIComponent(idCard || '') +
+                  '&registration_id=' + encodeURIComponent(regId || '');
         fetch(url, { headers: { 'Accept': 'application/json' } })
             .then(function (res) { return res.json(); })
             .then(function (data) {
