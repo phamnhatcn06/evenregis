@@ -364,19 +364,27 @@
 
     // Tra hồ sơ attendee đã có (theo staff/CCCD) để dùng lại ảnh + tự điền.
     function lookupExisting(card) {
-        var staffId = (card.querySelector('.rsub-staff') || {}).value || '';
+        var staffSel = card.querySelector('.rsub-staff');
+        var staffId = staffSel ? staffSel.value : '';
+        var staffCode = '';
+        if (staffSel && staffSel.value) {
+            var selOpt = staffSel.options[staffSel.selectedIndex];
+            staffCode = selOpt ? (selOpt.getAttribute('data-code') || '') : '';
+        }
         var idCard = (card.querySelector('.rsub-idcard') || {}).value || '';
         var alertBox = card.querySelector('.rsub-alert');
         var eid = card.querySelector('.rsub-existing-id');
 
-        if (!staffId && (!idCard || !idCard.trim())) {
+        if (!staffId && staffCode === '' && (!idCard || !idCard.trim())) {
             if (alertBox) { alertBox.classList.add('d-none'); }
             if (eid) { eid.value = ''; }
             return;
         }
         var regInput = document.querySelector('#replaceAttendeeForm input[name="registration_id"]');
         var regId = regInput ? regInput.value : '';
+        // Ưu tiên khớp theo staff_code (đáng tin hơn staff_id trên bản ghi cũ).
         var url = checkStaffUrl + '?staff_id=' + encodeURIComponent(staffId || '')
+            + '&staff_code=' + encodeURIComponent(staffCode || '')
             + '&id_card=' + encodeURIComponent(idCard || '')
             + '&registration_id=' + encodeURIComponent(regId || '');
 
