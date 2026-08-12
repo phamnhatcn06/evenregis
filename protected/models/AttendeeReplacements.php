@@ -127,6 +127,22 @@ class AttendeeReplacements extends CFormModel
     }
 
     /**
+     * Nhãn hiển thị cho từng loại thao tác.
+     */
+    public static function actionLabel($action)
+    {
+        switch ($action) {
+            case self::ACTION_REPLACE:
+                return 'Thay thế';
+            case self::ACTION_CANCEL_CONTENT:
+                return 'Huỷ nội dung';
+            case self::ACTION_WITHDRAW:
+            default:
+                return 'Huỷ tư cách';
+        }
+    }
+
+    /**
      * Lấy giá trị từ bản ghi (mảng hoặc object) theo tên field.
      */
     private static function pick($record, $key, $default = null)
