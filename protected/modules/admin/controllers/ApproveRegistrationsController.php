@@ -1239,6 +1239,7 @@ class ApproveRegistrationsController extends AdminController
         $staffId = Yii::app()->request->getParam('staff_id');
         $idCard = trim(Yii::app()->request->getParam('id_card', ''));
         $staffCode = trim(Yii::app()->request->getParam('staff_code', ''));
+        $registrationId = Yii::app()->request->getParam('registration_id');
 
         if (!$staffId && $idCard === '' && $staffCode === '') {
             echo CJSON::encode(array('success' => true, 'has_attendee' => false));
@@ -1247,7 +1248,8 @@ class ApproveRegistrationsController extends AdminController
 
         // Dùng chung logic chọn hồ sơ CÓ ẢNH đầy đủ nhất với luồng thay thế
         // để modal hiển thị preview đúng với những gì sẽ thực sự được lưu.
-        $detail = $this->resolveExistingProfile(null, $staffId, $staffCode, $idCard, null);
+        // Loại các bản ghi thuộc chính đăng ký đang thao tác (chỉ lấy từ đăng ký khác).
+        $detail = $this->resolveExistingProfile(null, $staffId, $staffCode, $idCard, null, $registrationId);
 
         if ($detail) {
             $portrait = (!empty($detail->portrait_path)) ? $detail->portrait_path : (!empty($detail->photo_path) ? $detail->photo_path : '');
