@@ -1373,20 +1373,29 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
+        // External API chỉ chấp nhận action = replace|withdraw (VARCHAR enum, không đổi được).
+        // Với huỷ nội dung lẻ (không auto huỷ tư cách) → gửi action='withdraw' cho backend,
+        // nhúng loại thật vào affected_contents._kind (giống pattern _batch_id đã dùng) để
+        // khôi phục nhãn "Huỷ nội dung" khi hiển thị/gửi email.
+        $affectedContents = array(
+            'sports' => array(),
+            'competitions' => array(),
+            'beauty_contests' => array(),
+            'roles' => array(),
+        );
+        if (!$autoWithdrawn) {
+            $affectedContents['_kind'] = AttendeeReplacements::ACTION_CANCEL_CONTENT;
+        }
+
         AttendeeReplacements::record(array(
             'registration_id' => $attendee->registration_id,
             'event_id' => $attendee->event_id,
             'property_id' => $attendee->property_id,
-            'action' => $autoWithdrawn ? AttendeeReplacements::ACTION_WITHDRAW : AttendeeReplacements::ACTION_CANCEL_CONTENT,
+            'action' => AttendeeReplacements::ACTION_WITHDRAW,
             'old_attendee_id' => $attendeeId,
             'old_attendee_name' => $attendee->full_name,
             'old_staff_code' => isset($attendee->staff_code) ? $attendee->staff_code : null,
-            'affected_contents' => array(
-                'sports' => array(),
-                'competitions' => array(),
-                'beauty_contests' => array(),
-                'roles' => array(),
-            ),
+            'affected_contents' => $affectedContents,
             'cancelled_teams' => $cancelledEntries,
             'reason' => $reason,
             'performed_by' => $email,
