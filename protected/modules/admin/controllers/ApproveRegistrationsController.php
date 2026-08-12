@@ -1563,7 +1563,7 @@ class ApproveRegistrationsController extends AdminController
      * @param mixed  $excludeId    id người đang bị thay (không tự chọn lại)
      * @return Attendees|null       bản ghi chi tiết tốt nhất, hoặc null
      */
-    private function resolveExistingProfile($preferredId, $staffId, $staffCode, $idCard, $excludeId)
+    private function resolveExistingProfile($preferredId, $staffId, $staffCode, $idCard, $excludeId, $excludeRegistrationId = null)
     {
         // Không có tiêu chí danh tính nào → không thể xác thực an toàn.
         if (!$staffId && $staffCode === '' && $idCard === '') {
