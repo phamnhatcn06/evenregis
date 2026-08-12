@@ -1547,77 +1547,59 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
-        // 5. Đánh dấu người bị thay là huỷ tư cách (đã thay thế)
+        // 6. Huỷ tư cách người bị thay + thu hồi thẻ/QR.
         Attendees::withdrawViaApi($oldId, 'Đã được thay thế. ' . $reason, $email);
-
-        // 5b. Vô hiệu thẻ/QR của người bị thay (nếu đã in). Người thay (B) là bản ghi
-        // mới chưa có badge nên sẽ tự nằm trong danh sách "cần in".
         Badges::revokeByAttendee($oldId);
 
-        // 6. Ghi lịch sử thay thế (audit + email xác nhận đơn vị)
-        $affectedSports = array();
-        $cancelledTeams = array();
-        foreach ($summary['sport_teams'] as $t) {
-            $entry = array(
-                'team_id' => $t['sport_team_id'],
-                'sport_name' => $t['sport_name'],
-                'team_name' => $t['team_name'],
-                'jersey_number' => $t['jersey_number'],
-                'is_captain' => $t['is_captain'],
-            );
-            if (in_array((string)$t['sport_team_id'], $inheritTeamIds)) {
-                $affectedSports[] = $entry;
-            } else {
-                $cancelledTeams[] = $entry;
-            }
+        // 7. Ghi lịch sử: mỗi người thay 1 bản ghi (cùng batch); phần huỷ ghi 1 bản ghi riêng.
+        $batchId = 'RPL' . time() . substr(uniqid(), -5);
+        foreach ($subMap as $j => $newId) {
+            AttendeeReplacements::record(array(
+                'registration_id' => $registrationId,
+                'event_id' => $eventId,
+                'property_id' => $propertyId,
+                'action' => AttendeeReplacements::ACTION_REPLACE,
+                'old_attendee_id' => $oldId,
+                'old_attendee_name' => $oldAttendee->full_name,
+                'old_staff_code' => isset($oldAttendee->staff_code) ? $oldAttendee->staff_code : null,
+                'new_attendee_id' => $newId,
+                'new_attendee_name' => $subInfo[$j]['name'],
+                'new_staff_code' => $subInfo[$j]['staff_code'],
+                'affected_contents' => array(
+                    'sports' => $auditPerSub[$j]['sports'],
+                    'competitions' => $auditPerSub[$j]['competitions'],
+                    'roles' => array(),
+                    '_batch_id' => $batchId,
+                ),
+                'cancelled_teams' => array(),
+                'reason' => $reason,
+                'performed_by' => $email,
+            ));
         }
-        $affectedCompetitions = array();
-        foreach ($summary['competitions'] as $c) {
-            $affectedCompetitions[] = array(
-                'competition_id' => $c['competition_id'],
-                'competition_name' => $c['competition_name'],
-                'candidate_number' => $c['candidate_number'],
-            );
-        }
-        $affectedBeautyContests = array();
-        foreach ($summary['beauty_contests'] as $bc) {
-            $affectedBeautyContests[] = array(
-                'contest_id' => $bc['contest_id'],
-                'contest_name' => $bc['contest_name'],
-                'candidate_number' => $bc['candidate_number'],
-            );
-        }
-        $affectedRoles = array();
-        foreach ($summary['roles'] as $r) {
-            $affectedRoles[] = array(
-                'role_id' => $r['role_id'],
-                'role_name' => $r['role_name'],
-            );
+        if (!empty($cancelledTeams) || !empty($cancelledComps) || !empty($cancelledBeauty)) {
+            AttendeeReplacements::record(array(
+                'registration_id' => $registrationId,
+                'event_id' => $eventId,
+                'property_id' => $propertyId,
+                'action' => AttendeeReplacements::ACTION_WITHDRAW,
+                'old_attendee_id' => $oldId,
+                'old_attendee_name' => $oldAttendee->full_name,
+                'old_staff_code' => isset($oldAttendee->staff_code) ? $oldAttendee->staff_code : null,
+                'new_attendee_id' => null,
+                'new_attendee_name' => null,
+                'new_staff_code' => null,
+                'affected_contents' => array(
+                    'competitions' => $cancelledComps,
+                    'beauty_contests' => $cancelledBeauty,
+                    '_batch_id' => $batchId,
+                ),
+                'cancelled_teams' => $cancelledTeams,
+                'reason' => $reason,
+                'performed_by' => $email,
+            ));
         }
 
-        AttendeeReplacements::record(array(
-            'registration_id' => $req->getPost('registration_id'),
-            'event_id' => $req->getPost('event_id'),
-            'property_id' => $req->getPost('property_id'),
-            'action' => AttendeeReplacements::ACTION_REPLACE,
-            'old_attendee_id' => $oldId,
-            'old_attendee_name' => $oldAttendee->full_name,
-            'old_staff_code' => isset($oldAttendee->staff_code) ? $oldAttendee->staff_code : null,
-            'new_attendee_id' => $newId,
-            'new_attendee_name' => $fullName,
-            'new_staff_code' => $staffCode,
-            'affected_contents' => array(
-                'sports' => $affectedSports,
-                'competitions' => $affectedCompetitions,
-                'beauty_contests' => $affectedBeautyContests,
-                'roles' => $affectedRoles,
-            ),
-            'cancelled_teams' => $cancelledTeams,
-            'reason' => $reason,
-            'performed_by' => $email,
-        ));
-
-        Yii::log("Thay thế attendee #{$oldId} bằng #{$newId} bởi {$email}. Lý do: {$reason}", 'info', 'application.controllers.ApproveRegistrationsController');
+        Yii::log("Thay thế đa nội dung attendee #{$oldId} → [" . implode(',', array_values($subMap)) . "] bởi {$email}. Batch {$batchId}. Lý do: {$reason}", 'info', 'application.controllers.ApproveRegistrationsController');
         echo CJSON::encode(array('success' => true, 'message' => 'Đã thay thế người tham dự thành công.'));
         Yii::app()->end();
     }
