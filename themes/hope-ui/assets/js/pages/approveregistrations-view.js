@@ -426,6 +426,19 @@
                     }
                 });
 
+                // Vai trò: tự chọn theo hồ sơ cũ nếu người dùng chưa chọn.
+                var roleSel = card.querySelector('.rsub-roles');
+                if (roleSel && att.role_id) {
+                    var hasSel = Array.prototype.some.call(roleSel.options, function (o) { return o.selected; });
+                    if (!hasSel) {
+                        var ids = String(att.role_id).split(',').map(function (x) { return x.trim(); });
+                        Array.prototype.forEach.call(roleSel.options, function (o) {
+                            if (ids.indexOf(o.value) >= 0) { o.selected = true; }
+                        });
+                        prefilled.push('vai trò');
+                    }
+                }
+
                 if (alertBox) {
                     var msg = '<i class="fa fa-check-circle me-1"></i><strong>Đã tìm thấy hồ sơ cũ.</strong>';
                     if (prefilled.length) { msg += ' Điền: ' + prefilled.join(', ') + '.'; }
