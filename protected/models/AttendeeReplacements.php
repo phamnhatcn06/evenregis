@@ -195,7 +195,11 @@ class AttendeeReplacements extends CFormModel
             foreach ($cancelledTeams as $s) {
                 $label = self::pick($s, 'sport_name');
                 if (!$label) { $label = self::pick($s, 'team_name', 'Đội thể thao'); }
-                $contentLines[] = 'Thể thao: ' . $label . ' (huỷ cả đội)';
+                // whole_team mặc định = 1 (tương thích bản ghi huỷ tư cách cũ vốn luôn huỷ cả đội).
+                // whole_team = 0 nghĩa là chỉ gỡ VĐV khỏi đội (huỷ nội dung, đội vẫn còn).
+                $wholeTeam = (int)self::pick($s, 'whole_team', 1);
+                $note = $wholeTeam ? ' (huỷ cả đội)' : ' (rời đội — huỷ nội dung)';
+                $contentLines[] = 'Thể thao: ' . $label . $note;
             }
 
             $competitions = isset($affected['competitions']) && is_array($affected['competitions']) ? $affected['competitions'] : array();
