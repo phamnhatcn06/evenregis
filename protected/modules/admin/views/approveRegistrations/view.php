@@ -1316,6 +1316,7 @@ if (PermissionHelper::can('approveregistrations', 'update')) {
         'staffList' => isset($staffList) ? $staffList : array(),
     ));
     $this->renderPartial('_modal_withdraw_attendee');
+    $this->renderPartial('_modal_cancel_content');
     Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/select2/css/select2.min.css');
     Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
     Yii::app()->clientScript->registerScriptFile(
