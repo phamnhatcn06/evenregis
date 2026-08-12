@@ -1715,6 +1715,33 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
+     * Tìm attendee ĐANG hoạt động trong 1 đăng ký, khớp danh tính (staff_code / staff_id / id_card),
+     * loại người đang bị thay. Dùng để tái sử dụng bản ghi có sẵn thay vì tạo trùng người thay.
+     *
+     * @param mixed  $registrationId
+     * @param mixed  $staffId
+     * @param string $staffCode
+     * @param string $idCard
+     * @param mixed  $excludeId  id người đang bị thay (không tự chọn lại)
+     * @return array|null bản ghi attendee (mảng thô) hoặc null
+     */
+    private function findActiveAttendeeInRegistration($registrationId, $staffId, $staffCode, $idCard, $excludeId)
+    {
+        if (!$staffId && (string)$staffCode === '' && (string)$idCard === '') {
+            return null;
+        }
+        foreach (Attendees::getByRegistrationId($registrationId) as $att) {
+            $aArr = is_array($att) ? $att : (array)$att;
+            $aid = isset($aArr['id']) ? (string)$aArr['id'] : '';
+            if ($aid === '' || $aid === (string)$excludeId) { continue; }
+            if ($this->attendeeIdentityMatches($aArr, $staffId, $staffCode, $idCard)) {
+                return $aArr;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Tải TOÀN BỘ danh sách attendee (raw array). Dùng khi cần tự lọc phía PHP vì API
      * không hỗ trợ lọc. Lấy per_page theo tổng số bản ghi (meta.total) trong 1 lần gọi.
      *
