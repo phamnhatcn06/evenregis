@@ -1359,6 +1359,53 @@ class ApproveRegistrationsController extends AdminController
             Yii::app()->end();
         }
 
+        // 0. Kiểm tra quy định: mỗi VĐV không được tham gia quá 3 môn thể thao.
+        // Tính theo môn (sport_id) sau thao tác = môn đã có sẵn (nếu dùng lại người có sẵn) + môn được gán.
+        // Chạy TRƯỚC khi tạo/sửa để không áp dụng dở dang.
+        $maxSports = 3;
+        $teamSportKey = array(); // team_id => sport_key
+        foreach ($summary['sport_teams'] as $t) {
+            $tk = (string)$t['sport_team_id'];
+            $teamSportKey[$tk] = !empty($t['sport_id']) ? ('s' . $t['sport_id']) : ('t' . $tk);
+        }
+        $assignedSports = array(); // j => set(sport_key) được gán
+        foreach ($assignTeam as $tKey => $vv) {
+            if (preg_match('/^s(\d+)$/', (string)$vv, $am) && isset($teamSportKey[(string)$tKey])) {
+                $aj = $am[1];
+                if (!isset($assignedSports[$aj])) { $assignedSports[$aj] = array(); }
+                $assignedSports[$aj][$teamSportKey[(string)$tKey]] = true;
+            }
+        }
+        foreach (array_keys($referenced) as $vj) {
+            $vs = isset($subs[$vj]) && is_array($subs[$vj]) ? $subs[$vj] : array();
+            $vStaffId = isset($vs['staff_id']) ? trim($vs['staff_id']) : '';
+            $vIdCard = isset($vs['id_card']) ? trim($vs['id_card']) : '';
+            $vName = isset($vs['full_name']) ? trim($vs['full_name']) : '';
+            $vStaffCode = '';
+            if ($vStaffId) {
+                $vStaff = Staffs::fetchFromApi($vStaffId);
+                if ($vStaff) {
+                    if ($vName === '') { $vName = $vStaff->full_name; }
+                    $vStaffCode = isset($vStaff->staff_code) ? $vStaff->staff_code : '';
+                }
+            }
+            $sportKeys = isset($assignedSports[$vj]) ? $assignedSports[$vj] : array();
+            $vExisting = $this->findActiveAttendeeInRegistration($registrationId, $vStaffId, $vStaffCode, $vIdCard, $oldId);
+            if ($vExisting) {
+                if ($vName === '' && !empty($vExisting['full_name'])) { $vName = $vExisting['full_name']; }
+                $vExSum = Attendees::getParticipationSummary($vExisting['id']);
+                foreach ($vExSum['sport_teams'] as $et) {
+                    $etk = (string)$et['sport_team_id'];
+                    $sportKeys[!empty($et['sport_id']) ? ('s' . $et['sport_id']) : ('t' . $etk)] = true;
+                }
+            }
+            if (count($sportKeys) > $maxSports) {
+                $who = $vName !== '' ? ('"' . $vName . '"') : ('người thay #' . ((int)$vj + 1));
+                echo CJSON::encode(array('success' => false, 'error' => 'Người thay ' . $who . ' sẽ tham gia ' . count($sportKeys) . ' môn thể thao, vượt quá quy định tối đa ' . $maxSports . ' môn.'));
+                Yii::app()->end();
+            }
+        }
+
         // 1. Tạo từng người thay được tham chiếu.
         $subMap = array();        // j => newAttendeeId
         $subInfo = array();       // j => array(name, staff_code)
