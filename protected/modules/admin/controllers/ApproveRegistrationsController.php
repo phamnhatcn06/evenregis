@@ -1465,7 +1465,21 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
+        // DEBUG: ghi lại quá trình resolve ảnh/hồ sơ để chẩn đoán vì sao attendee mới thiếu ảnh.
+        Yii::log(sprintf(
+            "[REPLACE] existing_attendee_id=%s | existingAttendee=%s | uploads=[%s] | postedUrls=[%s] | resolved: portrait=%s cccd_front=%s cccd_back=%s contract=%s",
+            $existingAttendeeId ?: '(none)',
+            $existingAttendee ? ('#' . $existingAttendee->id) : 'NULL',
+            implode(',', array_keys($uploads)),
+            implode(',', array_keys(array_filter($postedFileUrls, function ($v) { return $v !== ''; }))),
+            $new->portrait_path ?: '-',
+            $new->cccd_front_path ?: '-',
+            $new->cccd_back_path ?: '-',
+            $new->contract_path ?: '-'
+        ), 'info', 'application.controllers.ApproveRegistrationsController');
+
         $storeResult = $new->storeViaApi();
+        Yii::log('[REPLACE] storeResult=' . CJSON::encode($storeResult), 'info', 'application.controllers.ApproveRegistrationsController');
         $newId = $this->extractNewId($storeResult);
         if (!$newId) {
             $err = isset($storeResult['error']) ? $storeResult['error'] : 'Không thể tạo người thay.';
