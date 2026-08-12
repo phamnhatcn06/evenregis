@@ -1292,9 +1292,17 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
-     * Thay thế 1 người tham dự bằng người khác (SMILE hoặc thủ công).
-     * Người thay kế thừa approved + đội được tích + toàn bộ cuộc thi (số báo danh mới do backend cấp) + vai trò.
-     * Đội không tích sẽ bị huỷ. Số báo danh cũ không kế thừa.
+     * Thay thế người tham dự (đa nội dung).
+     * Cho phép nhiều người thay trong 1 thao tác; mỗi nội dung (đội thể thao / cuộc thi)
+     * được gán cho một người thay cụ thể hoặc đánh dấu huỷ. Thi Miss luôn huỷ.
+     * Vai trò nhập riêng cho từng người thay. Huỷ đội mặc định chỉ gỡ người bị thay;
+     * tích "Huỷ cả đội" mới xoá toàn đội.
+     *
+     * Payload:
+     *   sub[j][staff_id|full_name|position|id_card|role_id|existing_attendee_id|existing_*_url]
+     *   sub_{field}_file_{j}                    ảnh/hồ sơ từng người thay
+     *   assign_team[team_id] = s{j} | cancel    (+ cancel_whole_team[team_id]=1)
+     *   assign_comp[comp_id] = s{j} | cancel
      */
     public function actionReplaceAttendee()
     {
