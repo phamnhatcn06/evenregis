@@ -235,7 +235,7 @@ class AttendeeReplacements extends CFormModel
 
             $rows[] = array(
                 'action' => $action,
-                'action_label' => ($action === self::ACTION_REPLACE) ? 'Thay thế' : 'Huỷ tư cách',
+                'action_label' => self::actionLabel($action),
                 'old_name' => self::pick($rec, 'old_attendee_name', ''),
                 'old_staff_code' => self::pick($rec, 'old_staff_code', ''),
                 'new_name' => self::pick($rec, 'new_attendee_name', ''),
