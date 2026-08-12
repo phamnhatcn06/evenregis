@@ -1470,6 +1470,14 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
+        // 3b. Thi Miss: chỉ huỷ đăng ký của người cũ, KHÔNG kế thừa cho người thay
+        // (hồ sơ thí sinh gồm nhân trắc/ảnh mang tính cá nhân, không chuyển được).
+        foreach ($summary['beauty_contests'] as $bc) {
+            if (!empty($bc['contestant_id'])) {
+                BeautyContestants::deleteViaApi($bc['contestant_id']);
+            }
+        }
+
         // 4. Vai trò: nếu admin không chọn thì kế thừa của người cũ
         if ($postedRoles === '') {
             foreach ($summary['roles'] as $r) {
