@@ -4,6 +4,7 @@ defined('YII_DEBUG') or define('YII_DEBUG', true);
 $yii = dirname(__FILE__) . '/framework/yii.php';
 require_once($yii);
 $config = require(dirname(__FILE__) . '/protected/config/console.php');
+$config['params'] = require(dirname(__FILE__) . '/protected/config/params.php');
 Yii::createConsoleApplication($config);
 
 function dumpAtt($id) {
