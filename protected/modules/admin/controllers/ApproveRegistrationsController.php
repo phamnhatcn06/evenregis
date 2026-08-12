@@ -1348,7 +1348,7 @@ class ApproveRegistrationsController extends AdminController
         // trong đó chỉ một số bản có ảnh/hồ sơ. Phải chọn bản CÓ ẢNH nhiều nhất,
         // KHÔNG lấy bừa bản ghi đầu tiên (dễ trúng bản rỗng → attendee mới bị thiếu ảnh).
         $existingAttendeeId = $req->getPost('existing_attendee_id');
-        $existingAttendee = $this->resolveExistingProfile($existingAttendeeId, $staffId, $staffCode, $idCard, $oldId);
+        $existingAttendee = $this->resolveExistingProfile($existingAttendeeId, $staffId, $staffCode, $idCard, $oldId, $req->getPost('registration_id'));
 
         $uploads = $this->handleReplaceUpload();
 
