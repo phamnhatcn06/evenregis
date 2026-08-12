@@ -1565,67 +1565,51 @@ class ApproveRegistrationsController extends AdminController
      */
     private function resolveExistingProfile($preferredId, $staffId, $staffCode, $idCard, $excludeId)
     {
-        // Nếu chỉ có staff_id, tra staff_code từ SMILE — API tìm attendee theo staff_code ổn định hơn.
-        if ($staffCode === '' && $staffId) {
-            $staff = Staffs::fetchFromApi($staffId);
-            if ($staff && !empty($staff->staff_code)) {
-                $staffCode = (string)$staff->staff_code;
-            }
-        }
-
         // Không có tiêu chí danh tính nào → không thể xác thực an toàn.
         if (!$staffId && $staffCode === '' && $idCard === '') {
             return null;
         }
 
-        // 1. Thu thập id ứng viên (ưu tiên id frontend gợi ý), tìm theo staff_code trước.
-        $candidateIds = array();
-        if ($preferredId) { $candidateIds[] = (string)$preferredId; }
-
-        $searchParams = array('per_page' => 50);
-        if ($staffCode !== '') { $searchParams['staff_code'] = $staffCode; }
-        elseif ($staffId) { $searchParams['staff_id'] = $staffId; }
-        elseif ($idCard !== '') { $searchParams['id_card'] = $idCard; }
-
-        $attRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, $searchParams);
-        if ($attRes['success'] && isset($attRes['data'])) {
-            $list = isset($attRes['data']['data']) ? $attRes['data']['data'] : $attRes['data'];
-            if (!empty($list) && is_array($list)) {
-                foreach ($list as $it) {
-                    $itArr = is_array($it) ? $it : (array)$it;
-                    if (!isset($itArr['id'])) { continue; }
-                    // Nếu danh sách có sẵn trường danh tính → lọc ngay để khỏi nạp chi tiết nhầm người.
-                    $hasIdentityFields = isset($itArr['staff_code']) || isset($itArr['staff_id']) || isset($itArr['id_card']);
-                    if ($hasIdentityFields && !$this->attendeeIdentityMatches($itArr, $staffId, $staffCode, $idCard)) {
-                        continue;
-                    }
-                    $candidateIds[] = (string)$itArr['id'];
-                }
-            }
-        }
-        $candidateIds = array_values(array_unique(array_filter($candidateIds)));
-
-        if (empty($candidateIds)) {
+        // LƯU Ý QUAN TRỌNG: API danh sách attendee KHÔNG lọc theo staff_id/staff_code/id_card
+        // (mọi tham số lọc bị bỏ qua, luôn trả về toàn bộ). Vì vậy phải tải TOÀN BỘ danh sách
+        // rồi tự lọc theo danh tính ở phía PHP. May mắn là danh sách có sẵn staff_id/staff_code/
+        // id_card/photo_path cho từng bản ghi nên lọc được ngay, chỉ cần nạp chi tiết cho vài
+        // ứng viên triển vọng (để lấy thêm cccd/contract).
+        $all = $this->fetchAllAttendeesRaw();
+        if (empty($all)) {
             return null;
         }
 
-        // 2. Nạp chi tiết từng ứng viên, XÁC THỰC danh tính (nguồn chuẩn), chấm điểm theo số
-        //    trường ảnh/hồ sơ thực có, giữ bản tốt nhất. Dừng sớm khi đủ 4 loại.
+        // 1. Lọc ứng viên ĐÚNG danh tính (loại người đang bị thay). Ghi nhận có ảnh (theo danh sách).
+        $candidates = array(); // id => hasPhoto(bool)
+        foreach ($all as $a) {
+            $aArr = is_array($a) ? $a : (array)$a;
+            $aid = isset($aArr['id']) ? (string)$aArr['id'] : '';
+            if ($aid === '' || $aid === (string)$excludeId) { continue; }
+            if (!$this->attendeeIdentityMatches($aArr, $staffId, $staffCode, $idCard)) { continue; }
+            $candidates[$aid] = !empty($aArr['photo_path']) || !empty($aArr['portrait_path']);
+        }
+        if (empty($candidates)) {
+            return null;
+        }
+
+        // 2. Ưu tiên bản CÓ ẢNH, sau đó tới bản mới hơn (id lớn hơn).
+        uksort($candidates, function ($x, $y) use ($candidates) {
+            if ($candidates[$x] !== $candidates[$y]) { return $candidates[$x] ? -1 : 1; }
+            return ((int)$y) - ((int)$x);
+        });
+
+        // 3. Nạp chi tiết vài ứng viên hàng đầu (để có cccd/contract), chọn bản nhiều hồ sơ nhất.
         $best = null;
         $bestScore = -1;
         $fetched = 0;
-        $maxFetch = 15;
-        foreach ($candidateIds as $cid) {
-            if ((string)$cid === (string)$excludeId) { continue; }
+        $maxFetch = 6;
+        foreach (array_keys($candidates) as $cid) {
             if ($fetched >= $maxFetch) { break; }
             $cand = Attendees::fetchFromApi($cid);
             $fetched++;
             if (!$cand) { continue; }
-
-            // Chỉ chấp nhận bản ghi ĐÚNG người.
-            if (!$this->attendeeIdentityMatches($cand, $staffId, $staffCode, $idCard)) {
-                continue;
-            }
+            if (!$this->attendeeIdentityMatches($cand, $staffId, $staffCode, $idCard)) { continue; }
 
             $score = 0;
             foreach (array('portrait_path', 'photo_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $pf) {
@@ -1639,6 +1623,22 @@ class ApproveRegistrationsController extends AdminController
         }
 
         return $best;
+    }
+
+    /**
+     * Tải TOÀN BỘ danh sách attendee (raw array). Dùng khi cần tự lọc phía PHP vì API
+     * không hỗ trợ lọc. Lấy per_page theo tổng số bản ghi (meta.total) trong 1 lần gọi.
+     *
+     * @return array
+     */
+    private function fetchAllAttendeesRaw()
+    {
+        $res = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('per_page' => 5000));
+        if (!$res['success'] || !isset($res['data'])) {
+            return array();
+        }
+        $list = isset($res['data']['data']) ? $res['data']['data'] : $res['data'];
+        return is_array($list) ? $list : array();
     }
 
     /**
