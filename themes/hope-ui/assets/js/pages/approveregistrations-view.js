@@ -100,6 +100,24 @@
         }
         html += '</div>';
 
+        // Thi Miss (sắc đẹp) — chỉ đọc; khi huỷ/thay thế sẽ tự động huỷ đăng ký này.
+        var contests = summary.beauty_contests || [];
+        html += '<div class="mb-3"><h6 class="mb-1"><i class="fa fa-star me-1 text-danger"></i>Thi Miss</h6>';
+        if (contests.length) {
+            html += '<ul class="list-group list-group-flush">';
+            contests.forEach(function (c) {
+                html += '<li class="list-group-item px-0 py-1">'
+                    + escapeHtml(c.contest_name || '')
+                    + (c.candidate_number ? ' <span class="badge bg-secondary">SBD ' + escapeHtml(c.candidate_number) + '</span>' : '')
+                    + ' <span class="badge bg-danger">Sẽ huỷ</span>'
+                    + '</li>';
+            });
+            html += '</ul>';
+        } else {
+            html += '<p class="text-muted small mb-0">Không đăng ký thi Miss.</p>';
+        }
+        html += '</div>';
+
         var roles = summary.roles || [];
         html += '<div><h6 class="mb-1"><i class="fa fa-id-badge me-1 text-success"></i>Vai trò</h6>';
         if (roles.length) {
