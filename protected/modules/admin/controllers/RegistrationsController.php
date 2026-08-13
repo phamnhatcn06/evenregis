@@ -4333,6 +4333,168 @@ class RegistrationsController extends AdminController
 		return $result;
 	}
 
+	/**
+	 * Nếu người tham dự đang thêm (từ SMILE hoặc thủ công có CCCD) đã từng có hồ sơ attendee
+	 * ở nơi khác, tái sử dụng các file ảnh/PDF đã có (chân dung, CCCD trước/sau, hợp đồng) và
+	 * kế thừa luôn trạng thái duyệt của bản ghi cũ.
+	 *
+	 * Chỉ điền vào những trường file chưa được upload thủ công trong lần thêm này.
+	 *
+	 * @param Attendees $attendee     bản ghi đang chuẩn bị lưu (sẽ được cập nhật tại chỗ)
+	 * @param array     $uploadedFiles map các file vừa upload (giữ nguyên, không đè)
+	 */
+	protected function applyExistingAttendeeProfile($attendee, $uploadedFiles)
+	{
+		$staffId = isset($attendee->staff_id) ? $attendee->staff_id : null;
+		$staffCode = isset($attendee->staff_code) ? trim((string)$attendee->staff_code) : '';
+		$idCard = isset($attendee->id_card) ? trim((string)$attendee->id_card) : '';
+
+		$existing = $this->resolveExistingProfile($staffId, $staffCode, $idCard);
+		if (!$existing) {
+			return;
+		}
+
+		// Ảnh/hồ sơ: chỉ lấy từ hồ sơ cũ nếu lần thêm này KHÔNG upload file tương ứng.
+		$fileMap = array(
+			'portrait_path' => array('portrait_path', 'photo_path'),
+			'cccd_front_path' => array('cccd_front_path'),
+			'cccd_back_path' => array('cccd_back_path'),
+			'contract_path' => array('contract_path'),
+		);
+		foreach ($fileMap as $targetAttr => $sourceAttrs) {
+			if (isset($uploadedFiles[$targetAttr]) && !empty($uploadedFiles[$targetAttr])) {
+				continue; // đã upload file mới, không ghi đè
+			}
+			foreach ($sourceAttrs as $sAttr) {
+				if (isset($existing->$sAttr) && !empty($existing->$sAttr)) {
+					$attendee->$targetAttr = $existing->$sAttr;
+					break;
+				}
+			}
+		}
+
+		// Kế thừa trạng thái duyệt của người đã tồn tại.
+		if (isset($existing->approval_status) && $existing->approval_status !== null && $existing->approval_status !== '') {
+			$attendee->approval_status = $existing->approval_status;
+		}
+	}
+
+	/**
+	 * Chọn hồ sơ attendee cũ CỦA ĐÚNG NHÂN SỰ, có ẢNH/HỒ SƠ đầy đủ nhất để tái sử dụng.
+	 * Một nhân sự có thể có nhiều bản ghi attendee, chỉ một số có ảnh. Hàm chọn bản CÓ NHIỀU
+	 * hồ sơ nhất — nhưng CHỈ trong số các bản ghi ĐÚNG danh tính (staff_code / staff_id / id_card).
+	 *
+	 * @return Attendees|null bản ghi chi tiết tốt nhất, hoặc null
+	 */
+	protected function resolveExistingProfile($staffId, $staffCode, $idCard)
+	{
+		if (!$staffId && (string)$staffCode === '' && (string)$idCard === '') {
+			return null;
+		}
+
+		$all = $this->fetchAllAttendeesRaw();
+		if (empty($all)) {
+			return null;
+		}
+
+		// 1. Lọc ứng viên ĐÚNG danh tính, ghi nhận bản có ảnh để ưu tiên.
+		$candidates = array(); // id => hasPhoto(bool)
+		foreach ($all as $a) {
+			$aArr = is_array($a) ? $a : (array)$a;
+			$aid = isset($aArr['id']) ? (string)$aArr['id'] : '';
+			if ($aid === '') { continue; }
+			if (!$this->attendeeIdentityMatches($aArr, $staffId, $staffCode, $idCard)) { continue; }
+			$candidates[$aid] = !empty($aArr['photo_path']) || !empty($aArr['portrait_path']);
+		}
+		if (empty($candidates)) {
+			return null;
+		}
+
+		// 2. Ưu tiên bản CÓ ẢNH, sau đó tới bản mới hơn (id lớn hơn).
+		uksort($candidates, function ($x, $y) use ($candidates) {
+			if ($candidates[$x] !== $candidates[$y]) { return $candidates[$x] ? -1 : 1; }
+			return ((int)$y) - ((int)$x);
+		});
+
+		// 3. Nạp chi tiết vài ứng viên hàng đầu, chọn bản nhiều hồ sơ nhất.
+		$best = null;
+		$bestScore = -1;
+		$fetched = 0;
+		$maxFetch = 6;
+		foreach (array_keys($candidates) as $cid) {
+			if ($fetched >= $maxFetch) { break; }
+			$cand = Attendees::fetchFromApi($cid);
+			$fetched++;
+			if (!$cand) { continue; }
+			if (!$this->attendeeIdentityMatches($cand, $staffId, $staffCode, $idCard)) { continue; }
+
+			$score = 0;
+			foreach (array('portrait_path', 'photo_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $pf) {
+				if (!empty($cand->$pf)) { $score++; }
+			}
+			if ($score > $bestScore) {
+				$bestScore = $score;
+				$best = $cand;
+			}
+			if ($bestScore >= 4) { break; }
+		}
+
+		return $best;
+	}
+
+	/**
+	 * Tải TOÀN BỘ danh sách attendee (raw array) để tự lọc phía PHP vì API không hỗ trợ lọc
+	 * theo staff_id/staff_code/id_card.
+	 *
+	 * @return array
+	 */
+	protected function fetchAllAttendeesRaw()
+	{
+		$res = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('per_page' => 5000));
+		if (!$res['success'] || !isset($res['data'])) {
+			return array();
+		}
+		$list = isset($res['data']['data']) ? $res['data']['data'] : $res['data'];
+		return is_array($list) ? $list : array();
+	}
+
+	/**
+	 * Kiểm tra một bản ghi attendee có ĐÚNG danh tính mục tiêu không.
+	 * Khớp theo bất kỳ tiêu chí nào có: staff_code / staff_id / id_card.
+	 *
+	 * @param array|Attendees $att
+	 * @return bool
+	 */
+	protected function attendeeIdentityMatches($att, $staffId, $staffCode, $idCard)
+	{
+		$get = function ($key) use ($att) {
+			if (is_array($att)) {
+				return isset($att[$key]) ? $att[$key] : null;
+			}
+			return isset($att->$key) ? $att->$key : null;
+		};
+
+		if ((string)$staffCode !== '') {
+			$c = $get('staff_code');
+			if ($c !== null && $c !== '' && strtolower(trim((string)$c)) === strtolower(trim((string)$staffCode))) {
+				return true;
+			}
+		}
+		if ($staffId) {
+			$s = $get('staff_id');
+			if ($s !== null && $s !== '' && (string)$s === (string)$staffId) {
+				return true;
+			}
+		}
+		if ((string)$idCard !== '') {
+			$ic = $get('id_card');
+			if ($ic !== null && $ic !== '' && trim((string)$ic) === trim((string)$idCard)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public function actionDeleteAttendee($id, $registration_id)
 	{
 		$this->checkRegistrationAccess($registration_id);
