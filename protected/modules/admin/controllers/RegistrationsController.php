@@ -4266,6 +4266,9 @@ class RegistrationsController extends AdminController
 			$attendee->contract_path = $uploadedFiles['contract_path'];
 		}
 
+		// Thêm thủ công có điền CCCD: nếu đã có hồ sơ attendee, tái sử dụng file ảnh/PDF + kế thừa trạng thái.
+		$this->applyExistingAttendeeProfile($attendee, is_array($uploadedFiles) ? $uploadedFiles : array());
+
 		$result = $attendee->storeViaApi();
 
 		// AJAX request - trả về JSON
