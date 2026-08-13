@@ -3956,6 +3956,10 @@ class RegistrationsController extends AdminController
 			if (isset($uploadedFiles['contract_path'])) {
 				$attendee->contract_path = $uploadedFiles['contract_path'];
 			}
+
+			// Nếu người này đã có hồ sơ attendee ở nơi khác: tái sử dụng file ảnh/PDF + kế thừa trạng thái.
+			$this->applyExistingAttendeeProfile($attendee, is_array($uploadedFiles) ? $uploadedFiles : array());
+
 			$result = $attendee->storeViaApi();
 			if ($result['success']) {
 				$successCount++;
