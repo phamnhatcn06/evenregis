@@ -568,7 +568,7 @@ class Attendees extends BaseAttendees
                 'other_members' => $otherMembers,
             );
         }
-        return $teams;
+        return array_values($teams);
     }
 
     /**
