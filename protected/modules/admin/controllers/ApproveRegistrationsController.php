@@ -1543,10 +1543,41 @@ class ApproveRegistrationsController extends AdminController
         // Tính theo môn (sport_id) sau thao tác = môn đã có sẵn (nếu dùng lại người có sẵn) + môn được gán.
         // Chạy TRƯỚC khi tạo/sửa để không áp dụng dở dang.
         $maxSports = 3;
-        $teamSportKey = array(); // team_id => sport_key
+
+        // Chuẩn hoá về MÔN gốc: các nội dung con (vd: Cầu lông đôi nữ, Cầu lông
+        // đôi nam-nữ) đều thuộc cùng một môn (Cầu lông) nên phải quy về sport gốc
+        // trước khi đếm, tránh đếm nội dung con thành nhiều môn.
+        $rootSportCache = array();
+        $resolveRootSport = function ($sportId) use (&$rootSportCache) {
+            if (empty($sportId)) {
+                return null;
+            }
+            if (isset($rootSportCache[$sportId])) {
+                return $rootSportCache[$sportId];
+            }
+            $cur = $sportId;
+            $rootId = $sportId;
+            $seen = array();
+            while ($cur && !isset($seen[$cur])) {
+                $seen[$cur] = true;
+                $sp = Sports::fetchFromApi($cur);
+                if ($sp && !empty($sp->parent_id)) {
+                    $rootId = $sp->parent_id;
+                    $cur = $sp->parent_id;
+                } else {
+                    $rootId = $cur;
+                    break;
+                }
+            }
+            $rootSportCache[$sportId] = $rootId;
+            return $rootId;
+        };
+
+        $teamSportKey = array(); // team_id => sport_key (theo môn gốc)
         foreach ($summary['sport_teams'] as $t) {
             $tk = (string)$t['sport_team_id'];
-            $teamSportKey[$tk] = !empty($t['sport_id']) ? ('s' . $t['sport_id']) : ('t' . $tk);
+            $rootId = !empty($t['sport_id']) ? $resolveRootSport($t['sport_id']) : null;
+            $teamSportKey[$tk] = $rootId ? ('s' . $rootId) : ('t' . $tk);
         }
         $assignedSports = array(); // j => set(sport_key) được gán
         foreach ($assignTeam as $tKey => $vv) {
