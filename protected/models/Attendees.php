@@ -532,8 +532,20 @@ class Attendees extends BaseAttendees
             if (!$teamId) {
                 continue;
             }
+            // Khử trùng lặp: cùng một đội chỉ hiện một lần dù có nhiều dòng membership.
+            if (isset($teams[$teamId])) {
+                continue;
+            }
 
             $team = SportTeams::fetchFromApi($teamId);
+            // Ẩn hẳn đội đã bị xoá / dữ liệu rác (không còn team record và cũng
+            // không có tên fallback) — tránh hiện block dropdown trống tiêu đề.
+            $sportName = $team && $team->sport_name ? $team->sport_name : (isset($item['sport_name']) ? $item['sport_name'] : '');
+            $teamName = $team ? $team->name : (isset($item['team_name']) ? $item['team_name'] : '');
+            if (!$team && $sportName === '' && $teamName === '') {
+                continue;
+            }
+
             $teamMembers = SportTeamMembers::getTeamMemberBriefs($teamId);
             $otherMembers = array();
             foreach ($teamMembers as $tm) {
@@ -542,7 +554,7 @@ class Attendees extends BaseAttendees
                 }
             }
 
-            $teams[] = array(
+            $teams[$teamId] = array(
                 'member_id' => isset($item['id']) ? $item['id'] : null,
                 'sport_team_id' => $teamId,
                 'sport_id' => $team ? $team->sport_id : (isset($item['sport_id']) ? $item['sport_id'] : null),
