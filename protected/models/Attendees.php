@@ -542,11 +542,12 @@ class Attendees extends BaseAttendees
             if ($team && !empty($team->deleted_at)) {
                 continue;
             }
-            // Ẩn hẳn đội đã bị xoá / dữ liệu rác (không còn team record và cũng
-            // không có tên fallback) — tránh hiện block dropdown trống tiêu đề.
+            // Ẩn hẳn đội không xác định được tên (team đã xoá, dữ liệu rác, hoặc
+            // team tồn tại nhưng cả name lẫn sport_name đều rỗng) — tránh hiện
+            // block dropdown trống tiêu đề mà người duyệt không biết là đội nào.
             $sportName = $team && $team->sport_name ? $team->sport_name : (isset($item['sport_name']) ? $item['sport_name'] : '');
-            $teamName = $team ? $team->name : (isset($item['team_name']) ? $item['team_name'] : '');
-            if (!$team && $sportName === '' && $teamName === '') {
+            $teamName = $team && $team->name ? $team->name : (isset($item['team_name']) ? $item['team_name'] : '');
+            if (trim((string)$sportName) === '' && trim((string)$teamName) === '') {
                 continue;
             }
 
