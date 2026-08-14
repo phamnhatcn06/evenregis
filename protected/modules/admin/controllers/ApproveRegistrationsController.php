@@ -1607,7 +1607,8 @@ class ApproveRegistrationsController extends AdminController
                 $vExSum = Attendees::getParticipationSummary($vExisting['id']);
                 foreach ($vExSum['sport_teams'] as $et) {
                     $etk = (string)$et['sport_team_id'];
-                    $sportKeys[!empty($et['sport_id']) ? ('s' . $et['sport_id']) : ('t' . $etk)] = true;
+                    $etRoot = !empty($et['sport_id']) ? $resolveRootSport($et['sport_id']) : null;
+                    $sportKeys[$etRoot ? ('s' . $etRoot) : ('t' . $etk)] = true;
                 }
             }
             if (count($sportKeys) > $maxSports) {
