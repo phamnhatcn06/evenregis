@@ -538,6 +538,10 @@ class Attendees extends BaseAttendees
             }
 
             $team = SportTeams::fetchFromApi($teamId);
+            // Ẩn hẳn đội đã bị xoá mềm (deleted_at) — dữ liệu không còn hiệu lực.
+            if ($team && !empty($team->deleted_at)) {
+                continue;
+            }
             // Ẩn hẳn đội đã bị xoá / dữ liệu rác (không còn team record và cũng
             // không có tên fallback) — tránh hiện block dropdown trống tiêu đề.
             $sportName = $team && $team->sport_name ? $team->sport_name : (isset($item['sport_name']) ? $item['sport_name'] : '');
