@@ -463,8 +463,12 @@
                     $baseName = trim(preg_replace('/\(.*$/u', '', (string)$cat));
                     $count = null;
                     $athletes = 0;
+                    $nBase = erNormSport($baseName);
                     foreach ($teamCountBySport as $k => $cnt) {
-                        if ($k === erNormSport($baseName) || strpos($k, erNormSport($baseName)) === 0) {
+                        // Chỉ khớp chính xác, hoặc khớp phần tên trước dấu ngoặc "tên (...)".
+                        // KHÔNG dùng strpos === 0 thuần vì sẽ khớp nhầm các biến thể cùng tiền tố
+                        // (vd danh mục "Pickleball đôi nam" khớp nhầm đội "Pickleball đôi nam - nữ").
+                        if ($k === $nBase || strpos($k, $nBase . ' (') === 0) {
                             $count = $cnt;
                             $athletes = isset($athleteCountBySport[$k]) ? $athleteCountBySport[$k] : 0;
                             break;
