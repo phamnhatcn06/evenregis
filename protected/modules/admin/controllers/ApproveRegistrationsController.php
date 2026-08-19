@@ -1516,6 +1516,44 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
+     * Lấy hồ sơ chi tiết của một attendee theo id (ảnh chân dung, CCCD, HĐLĐ, vai trò)
+     * để dùng lại khi chọn "người thay từ đăng ký khác" trong form thay thế.
+     */
+    public function actionAttendeeProfile()
+    {
+        header('Content-Type: application/json');
+
+        $attendeeId = Yii::app()->request->getParam('attendee_id');
+        if (!$attendeeId) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu mã người tham dự.'));
+            Yii::app()->end();
+        }
+
+        $detail = Attendees::fetchFromApi($attendeeId);
+        if (!$detail) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+            Yii::app()->end();
+        }
+
+        $portrait = (!empty($detail->portrait_path)) ? $detail->portrait_path : (!empty($detail->photo_path) ? $detail->photo_path : '');
+        echo CJSON::encode(array(
+            'success' => true,
+            'attendee' => array(
+                'id' => $detail->id,
+                'full_name' => isset($detail->full_name) ? $detail->full_name : '',
+                'position' => !empty($detail->position_name) ? $detail->position_name : (isset($detail->position) ? $detail->position : ''),
+                'id_card' => isset($detail->id_card) ? $detail->id_card : '',
+                'portrait_path' => $portrait,
+                'cccd_front_path' => isset($detail->cccd_front_path) ? $detail->cccd_front_path : '',
+                'cccd_back_path' => isset($detail->cccd_back_path) ? $detail->cccd_back_path : '',
+                'contract_path' => isset($detail->contract_path) ? $detail->contract_path : '',
+                'role_id' => isset($detail->role_id) ? $detail->role_id : '',
+            ),
+        ));
+        Yii::app()->end();
+    }
+
+    /**
      * Thay thế người tham dự (đa nội dung).
      * Cho phép nhiều người thay trong 1 thao tác; mỗi nội dung (đội thể thao / cuộc thi)
      * được gán cho một người thay cụ thể hoặc đánh dấu huỷ. Thi Miss luôn huỷ.
