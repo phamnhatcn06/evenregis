@@ -378,6 +378,7 @@
         try { return JSON.parse(el.textContent || 'null'); } catch (e) { return null; }
     }
     var STAFF_LIST = readJson('replace_staff_list') || [];
+    var OTHER_ATTENDEES = readJson('replace_other_attendees_list') || [];
     var ROLES_MAP = readJson('replace_roles_list') || {};
 
     var currentSummary = null;   // summary người bị thay đang mở
