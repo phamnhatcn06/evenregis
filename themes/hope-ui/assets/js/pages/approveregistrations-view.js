@@ -479,7 +479,7 @@
             + (OTHER_ATTENDEES.length
                 ? '<div class="mb-2">'
                     + '<select class="form-select form-select-sm rsub-other" id="rsub_other_' + idx + '">' + otherAttendeeOptionsHtml() + '</select>'
-                    + '<small class="text-muted">Chọn người tham dự có sẵn ở đăng ký khác của đơn vị.</small>'
+                    + '<small class="text-muted">Chọn người tham dự có sẵn của đơn vị (đăng ký hiện tại hoặc đăng ký khác). Người ở đăng ký hiện tại sẽ được dùng lại, không tạo bản ghi mới.</small>'
                     + '</div>'
                 : '')
             + '<div class="row g-2 mb-2">'
