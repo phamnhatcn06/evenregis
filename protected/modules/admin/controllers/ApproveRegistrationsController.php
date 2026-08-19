@@ -600,6 +600,7 @@ class ApproveRegistrationsController extends AdminController
             'roles' => $roles,
             'transports' => $transports,
             'staffList' => $staffList,
+            'otherAttendees' => $otherAttendees,
             'competitionRegistrations' => $competitionRegistrations,
             'sportTeams' => $sportTeams,
             'sportTeamMembers' => $sportTeamMembers,
