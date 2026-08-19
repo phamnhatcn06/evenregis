@@ -11,6 +11,7 @@
  * @var array $roles      role_id => role_name
  * @var array $transports
  * @var array $staffList  [ [id,name,position,code], ... ]
+ * @var array $otherAttendees [ [id,name,position,id_card], ... ] người tham dự ở các đăng ký khác của đơn vị
  */
 ?>
 <div class="modal fade" id="replaceAttendeeModal" tabindex="-1" aria-hidden="true">
