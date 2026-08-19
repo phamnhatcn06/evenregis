@@ -617,6 +617,87 @@
         lookupExisting(card);
     }
 
+    // Điền hồ sơ (ảnh chân dung, CCCD, HĐLĐ, vai trò) vào card từ 1 attendee đã có.
+    function applyProfileToCard(card, att) {
+        var idx = card.getAttribute('data-sub');
+        var eid = card.querySelector('.rsub-existing-id');
+        if (eid) { eid.value = att.id || ''; }
+
+        FILE_FIELDS.forEach(function (f) {
+            var fileUrl = att[f.path] || (f.k === 'portrait' ? att.photo_path : '') || '';
+            var hidden = document.getElementById('rsub_url_' + f.k + '_' + idx);
+            var prev = document.getElementById('rsub_prev_' + f.k + '_' + idx);
+            if (fileUrl) {
+                if (hidden) { hidden.value = fileUrl; }
+                if (prev) {
+                    var isPdf = String(fileUrl).toLowerCase().endsWith('.pdf');
+                    prev.innerHTML = isPdf
+                        ? '<i class="fa fa-file-pdf-o fa-lg text-danger"></i><br><span class="badge bg-success">Hồ sơ cũ</span>'
+                        : '<img src="' + escapeHtml(fileUrl) + '" style="max-height:44px;border-radius:4px;"><br><span class="badge bg-success">Hồ sơ cũ</span>';
+                }
+            } else if (hidden) {
+                hidden.value = '';
+            }
+        });
+
+        var roleSel = card.querySelector('.rsub-roles');
+        if (roleSel && att.role_id) {
+            var ids = String(att.role_id).split(',').map(function (x) { return x.trim(); });
+            Array.prototype.forEach.call(roleSel.options, function (o) {
+                o.selected = ids.indexOf(o.value) >= 0;
+            });
+        }
+    }
+
+    // Chọn người thay từ đăng ký khác: điền họ tên/chức danh/CCCD ngay, rồi tải hồ sơ (ảnh, CCCD, HĐLĐ).
+    function onOtherChange(card) {
+        var sel = card.querySelector('.rsub-other');
+        var val = sel ? sel.value : '';
+
+        // Reset dữ liệu tự điền cũ.
+        clearCardProfile(card);
+        ['.rsub-name', '.rsub-pos', '.rsub-idcard'].forEach(function (s) {
+            var el = card.querySelector(s); if (el) { el.value = ''; }
+        });
+        var roleSel = card.querySelector('.rsub-roles');
+        if (roleSel) { Array.prototype.forEach.call(roleSel.options, function (o) { o.selected = false; }); }
+
+        if (!val) { refreshAssignOptions(); return; }
+
+        // Bỏ chọn nhân sự SMILE (hai nguồn loại trừ nhau).
+        var staffSel = card.querySelector('.rsub-staff');
+        if (staffSel && staffSel.value) {
+            if (window.jQuery && jQuery.fn.select2) { jQuery(staffSel).val('').trigger('change.select2'); }
+            else { staffSel.value = ''; }
+        }
+
+        var opt = sel.options[sel.selectedIndex];
+        var nameInput = card.querySelector('.rsub-name');
+        if (nameInput) { nameInput.value = opt.getAttribute('data-name') || ''; }
+        var posInput = card.querySelector('.rsub-pos');
+        if (posInput) { posInput.value = opt.getAttribute('data-position') || ''; }
+        var idInput = card.querySelector('.rsub-idcard');
+        if (idInput) { idInput.value = opt.getAttribute('data-idcard') || ''; }
+
+        var alertBox = card.querySelector('.rsub-alert');
+        refreshAssignOptions();
+
+        if (!attendeeProfileUrl) { return; }
+        fetch(attendeeProfileUrl + '?attendee_id=' + encodeURIComponent(val), { headers: { 'Accept': 'application/json' } })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!(data.success && data.attendee)) { return; }
+                applyProfileToCard(card, data.attendee);
+                if (alertBox) {
+                    alertBox.className = 'alert alert-success py-1 px-2 mt-1 small rsub-alert';
+                    alertBox.innerHTML = '<i class="fa fa-check-circle me-1"></i><strong>Đã lấy hồ sơ từ đăng ký khác.</strong> Ảnh chân dung, CCCD, HĐLĐ được dùng lại.';
+                    alertBox.classList.remove('d-none');
+                }
+                refreshAssignOptions();
+            })
+            .catch(function () {});
+    }
+
     function wireCard(card) {
         var staff = card.querySelector('.rsub-staff');
         if (staff) {
