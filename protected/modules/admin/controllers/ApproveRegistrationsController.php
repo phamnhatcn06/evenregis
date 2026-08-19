@@ -169,8 +169,10 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
-        // Load danh sách người tham dự ở CÁC ĐĂNG KÝ KHÁC của cùng đơn vị (cho form thay thế).
-        // Cho phép chọn nhanh một attendee đã có ở đăng ký khác để tái sử dụng hồ sơ (ảnh, CCCD, HĐLĐ).
+        // Load danh sách người tham dự của cùng đơn vị (cho form thay thế) — bao gồm cả người
+        // ở CHÍNH đăng ký này và ở các đăng ký KHÁC. Cho phép chọn nhanh một attendee đã có để
+        // tái sử dụng hồ sơ (ảnh, CCCD, HĐLĐ). Nếu người được chọn đã ở đăng ký hiện tại thì
+        // backend sẽ dùng lại bản ghi đó (chỉ gán thêm nội dung), không tạo attendee mới.
         $otherAttendees = array();
         if ($model->property_id) {
             $seenIdentity = array();
@@ -180,7 +182,7 @@ class ApproveRegistrationsController extends AdminController
                 if ($aid === '') {
                     continue;
                 }
-                // Chỉ lấy người của đúng đơn vị này, còn hoạt động, và KHÔNG thuộc chính đăng ký đang xem.
+                // Chỉ lấy người của đúng đơn vị này và còn hoạt động.
                 $aPropId = isset($aArr['property_id']) ? (string)$aArr['property_id'] : '';
                 if ($aPropId !== (string)$model->property_id) {
                     continue;
@@ -189,27 +191,32 @@ class ApproveRegistrationsController extends AdminController
                 if ($isActive === 0) {
                     continue;
                 }
-                if (isset($aArr['registration_id']) && (string)$aArr['registration_id'] === (string)$id) {
-                    continue;
-                }
+                $inCurrentReg = isset($aArr['registration_id']) && (string)$aArr['registration_id'] === (string)$id;
                 $aName = isset($aArr['full_name']) ? $aArr['full_name'] : '';
                 $aPos = isset($aArr['position_name']) && $aArr['position_name'] !== ''
                     ? $aArr['position_name']
                     : (isset($aArr['position']) ? $aArr['position'] : '');
                 $aIdCard = isset($aArr['id_card']) ? $aArr['id_card'] : '';
-                // Khử trùng lặp cùng một người xuất hiện ở nhiều đăng ký (ưu tiên bản đầu tiên gặp).
+                // Khử trùng lặp cùng một người xuất hiện ở nhiều đăng ký. Ưu tiên giữ bản thuộc
+                // đăng ký hiện tại (để chọn sẽ dùng lại thay vì tạo mới).
                 $identityKey = strtolower(trim($aName)) . '|' . trim((string)$aIdCard);
                 if (isset($seenIdentity[$identityKey])) {
+                    if ($inCurrentReg && isset($otherAttendees[$seenIdentity[$identityKey]])) {
+                        $otherAttendees[$seenIdentity[$identityKey]]['id'] = $aid;
+                        $otherAttendees[$seenIdentity[$identityKey]]['in_current'] = 1;
+                    }
                     continue;
                 }
-                $seenIdentity[$identityKey] = true;
+                $seenIdentity[$identityKey] = count($otherAttendees);
                 $otherAttendees[] = array(
                     'id' => $aid,
                     'name' => $aName,
                     'position' => $aPos,
                     'id_card' => $aIdCard,
+                    'in_current' => $inCurrentReg ? 1 : 0,
                 );
             }
+            $otherAttendees = array_values($otherAttendees);
         }
 
         // Load transports
