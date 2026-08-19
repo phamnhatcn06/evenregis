@@ -471,6 +471,12 @@
             + '<div class="mb-2">'
             + '<select class="form-select form-select-sm rsub-staff" id="rsub_staff_' + idx + '">' + staffOptionsHtml() + '</select>'
             + '</div>'
+            + (OTHER_ATTENDEES.length
+                ? '<div class="mb-2">'
+                    + '<select class="form-select form-select-sm rsub-other" id="rsub_other_' + idx + '">' + otherAttendeeOptionsHtml() + '</select>'
+                    + '<small class="text-muted">Chọn người tham dự có sẵn ở đăng ký khác của đơn vị.</small>'
+                    + '</div>'
+                : '')
             + '<div class="row g-2 mb-2">'
             + '<div class="col-12"><input type="text" class="form-control form-control-sm rsub-name" placeholder="Hoặc nhập họ tên (thủ công)"></div>'
             + '<div class="col-6"><input type="text" class="form-control form-control-sm rsub-pos" placeholder="Chức danh"></div>'
