@@ -939,6 +939,8 @@
         activeCards().forEach(function (card) {
             var staff = card.querySelector('.rsub-staff');
             if (staff && window.jQuery && jQuery.fn.select2) { try { jQuery(staff).select2('destroy'); } catch (e) {} }
+            var other = card.querySelector('.rsub-other');
+            if (other && window.jQuery && jQuery.fn.select2) { try { jQuery(other).select2('destroy'); } catch (e) {} }
         });
         subsContainer.innerHTML = '';
         subSeq = 0;
