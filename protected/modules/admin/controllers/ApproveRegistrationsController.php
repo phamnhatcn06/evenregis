@@ -169,6 +169,49 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
+        // Load danh sách người tham dự ở CÁC ĐĂNG KÝ KHÁC của cùng đơn vị (cho form thay thế).
+        // Cho phép chọn nhanh một attendee đã có ở đăng ký khác để tái sử dụng hồ sơ (ảnh, CCCD, HĐLĐ).
+        $otherAttendees = array();
+        if ($model->property_id) {
+            $seenIdentity = array();
+            foreach ($this->fetchAllAttendeesRaw() as $a) {
+                $aArr = is_array($a) ? $a : (array)$a;
+                $aid = isset($aArr['id']) ? (string)$aArr['id'] : '';
+                if ($aid === '') {
+                    continue;
+                }
+                // Chỉ lấy người của đúng đơn vị này, còn hoạt động, và KHÔNG thuộc chính đăng ký đang xem.
+                $aPropId = isset($aArr['property_id']) ? (string)$aArr['property_id'] : '';
+                if ($aPropId !== (string)$model->property_id) {
+                    continue;
+                }
+                $isActive = isset($aArr['is_active']) ? (int)$aArr['is_active'] : 1;
+                if ($isActive === 0) {
+                    continue;
+                }
+                if (isset($aArr['registration_id']) && (string)$aArr['registration_id'] === (string)$id) {
+                    continue;
+                }
+                $aName = isset($aArr['full_name']) ? $aArr['full_name'] : '';
+                $aPos = isset($aArr['position_name']) && $aArr['position_name'] !== ''
+                    ? $aArr['position_name']
+                    : (isset($aArr['position']) ? $aArr['position'] : '');
+                $aIdCard = isset($aArr['id_card']) ? $aArr['id_card'] : '';
+                // Khử trùng lặp cùng một người xuất hiện ở nhiều đăng ký (ưu tiên bản đầu tiên gặp).
+                $identityKey = strtolower(trim($aName)) . '|' . trim((string)$aIdCard);
+                if (isset($seenIdentity[$identityKey])) {
+                    continue;
+                }
+                $seenIdentity[$identityKey] = true;
+                $otherAttendees[] = array(
+                    'id' => $aid,
+                    'name' => $aName,
+                    'position' => $aPos,
+                    'id_card' => $aIdCard,
+                );
+            }
+        }
+
         // Load transports
         $transportsData = Transports::getApiDataProvider(array(), 100)->getData();
         $transports = array();
