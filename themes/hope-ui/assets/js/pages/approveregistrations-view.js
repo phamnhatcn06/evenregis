@@ -700,8 +700,15 @@
                 if (!(data.success && data.attendee)) { return; }
                 applyProfileToCard(card, data.attendee);
                 if (alertBox) {
-                    alertBox.className = 'alert alert-success py-1 px-2 mt-1 small rsub-alert';
-                    alertBox.innerHTML = '<i class="fa fa-check-circle me-1"></i><strong>Đã lấy hồ sơ từ đăng ký khác.</strong> Ảnh chân dung, CCCD, HĐLĐ được dùng lại.';
+                    var inCurrent = opt.getAttribute('data-incurrent') === '1';
+                    if (inCurrent) {
+                        alertBox.className = 'alert alert-warning py-1 px-2 mt-1 small rsub-alert';
+                        alertBox.innerHTML = '<i class="fa fa-info-circle me-1"></i><strong>Người này đã có trong đăng ký hiện tại.</strong> '
+                            + 'Sẽ dùng lại bản ghi hiện có và chỉ gán thêm nội dung (không tạo bản ghi mới).';
+                    } else {
+                        alertBox.className = 'alert alert-success py-1 px-2 mt-1 small rsub-alert';
+                        alertBox.innerHTML = '<i class="fa fa-check-circle me-1"></i><strong>Đã lấy hồ sơ từ đăng ký khác.</strong> Ảnh chân dung, CCCD, HĐLĐ được dùng lại.';
+                    }
                     alertBox.classList.remove('d-none');
                 }
                 refreshAssignOptions();
