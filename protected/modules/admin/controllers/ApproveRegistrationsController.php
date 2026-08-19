@@ -1733,7 +1733,25 @@ class ApproveRegistrationsController extends AdminController
 
             // Nếu người thay đã là attendee ĐANG hoạt động trong chính đăng ký này,
             // dùng lại bản ghi đó (chỉ gán thêm nội dung) thay vì tạo bản ghi trùng người.
-            $existingInReg = $this->findActiveAttendeeInRegistration($registrationId, $staffId, $staffCode, $idCard, $oldId);
+            // Ưu tiên existing_attendee_id do frontend gửi (khi chọn trực tiếp từ danh sách),
+            // sau đó mới khớp theo danh tính (staff/CCCD).
+            $existingInReg = null;
+            $postedExistingId = isset($s['existing_attendee_id']) ? trim($s['existing_attendee_id']) : '';
+            if ($postedExistingId !== '' && (string)$postedExistingId !== (string)$oldId) {
+                $cand = Attendees::fetchFromApi($postedExistingId);
+                if ($cand
+                    && (string)$cand->registration_id === (string)$registrationId
+                    && (int)(isset($cand->is_active) ? $cand->is_active : 1) !== 0) {
+                    $existingInReg = array(
+                        'id' => $cand->id,
+                        'full_name' => isset($cand->full_name) ? $cand->full_name : '',
+                        'staff_code' => isset($cand->staff_code) ? $cand->staff_code : null,
+                    );
+                }
+            }
+            if (!$existingInReg) {
+                $existingInReg = $this->findActiveAttendeeInRegistration($registrationId, $staffId, $staffCode, $idCard, $oldId);
+            }
             if ($existingInReg) {
                 $subMap[$j] = $existingInReg['id'];
                 $subInfo[$j] = array(
