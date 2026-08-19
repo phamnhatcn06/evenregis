@@ -92,4 +92,7 @@
     }
     echo CJSON::encode($staffJson);
 ?></script>
+<script type="application/json" id="replace_other_attendees_list"><?php
+    echo CJSON::encode(isset($otherAttendees) && is_array($otherAttendees) ? array_values($otherAttendees) : array());
+?></script>
 <script type="application/json" id="replace_roles_list"><?php echo CJSON::encode($roles); ?></script>
