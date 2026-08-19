@@ -1315,6 +1315,7 @@ if (PermissionHelper::can('approveregistrations', 'update')) {
         'roles' => $roles,
         'transports' => $transports,
         'staffList' => isset($staffList) ? $staffList : array(),
+        'otherAttendees' => isset($otherAttendees) ? $otherAttendees : array(),
     ));
     $this->renderPartial('_modal_withdraw_attendee');
     $this->renderPartial('_modal_cancel_content');
