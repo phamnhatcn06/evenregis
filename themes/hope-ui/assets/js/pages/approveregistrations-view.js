@@ -613,6 +613,12 @@
         });
         var roleSel = card.querySelector('.rsub-roles');
         if (roleSel) { Array.prototype.forEach.call(roleSel.options, function (o) { o.selected = false; }); }
+        // Bỏ chọn nguồn "đăng ký khác" (hai nguồn loại trừ nhau).
+        var otherSel = card.querySelector('.rsub-other');
+        if (otherSel && otherSel.value) {
+            if (window.jQuery && jQuery.fn.select2) { jQuery(otherSel).val('').trigger('change.select2'); }
+            else { otherSel.value = ''; }
+        }
         refreshAssignOptions();
         lookupExisting(card);
     }
