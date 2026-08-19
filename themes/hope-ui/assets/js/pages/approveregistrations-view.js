@@ -403,6 +403,21 @@
         return html;
     }
 
+    function otherAttendeeOptionsHtml() {
+        var html = '<option value="">-- Chọn từ đăng ký khác --</option>';
+        OTHER_ATTENDEES.forEach(function (a) {
+            var label = a.name || ('#' + a.id);
+            if (a.position) { label += ' · ' + a.position; }
+            if (a.id_card) { label += ' · CCCD ' + a.id_card; }
+            html += '<option value="' + escapeHtml(a.id) + '"'
+                + ' data-name="' + escapeHtml(a.name || '') + '"'
+                + ' data-position="' + escapeHtml(a.position || '') + '"'
+                + ' data-idcard="' + escapeHtml(a.id_card || '') + '">'
+                + escapeHtml(label) + '</option>';
+        });
+        return html;
+    }
+
     function rolesOptionsHtml() {
         var html = '';
         Object.keys(ROLES_MAP).forEach(function (rid) {
