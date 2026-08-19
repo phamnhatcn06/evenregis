@@ -146,7 +146,8 @@ $attributes = array(
              data-replace-url="<?php echo $this->createUrl('replaceAttendee'); ?>"
              data-withdraw-url="<?php echo $this->createUrl('withdrawAttendee'); ?>"
              data-cancel-content-url="<?php echo $this->createUrl('cancelContent'); ?>"
-             data-check-staff-url="<?php echo $this->createUrl('checkStaffAttendee'); ?>"></div>
+             data-check-staff-url="<?php echo $this->createUrl('checkStaffAttendee'); ?>"
+             data-attendee-profile-url="<?php echo $this->createUrl('attendeeProfile'); ?>"></div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-0" id="attendees-table">
                 <thead class="table-light">
