@@ -719,6 +719,19 @@
                 staff.addEventListener('change', function () { onStaffChange(card); });
             }
         }
+        var other = card.querySelector('.rsub-other');
+        if (other) {
+            if (window.jQuery && jQuery.fn.select2) {
+                jQuery(other).select2({
+                    dropdownParent: jQuery('#replaceAttendeeModal'),
+                    width: '100%',
+                    placeholder: '-- Chọn từ đăng ký khác --',
+                    allowClear: true
+                }).on('change', function () { onOtherChange(card); });
+            } else {
+                other.addEventListener('change', function () { onOtherChange(card); });
+            }
+        }
         var nameInput = card.querySelector('.rsub-name');
         if (nameInput) { nameInput.addEventListener('input', refreshAssignOptions); }
         var idInput = card.querySelector('.rsub-idcard');
