@@ -404,15 +404,20 @@
     }
 
     function otherAttendeeOptionsHtml() {
-        var html = '<option value="">-- Chọn từ đăng ký khác --</option>';
+        // Không cho chọn chính người đang bị thay.
+        var oldId = (document.getElementById('replace_attendee_id') || {}).value || '';
+        var html = '<option value="">-- Chọn người đã có trong danh sách --</option>';
         OTHER_ATTENDEES.forEach(function (a) {
+            if (String(a.id) === String(oldId)) { return; }
             var label = a.name || ('#' + a.id);
             if (a.position) { label += ' · ' + a.position; }
             if (a.id_card) { label += ' · CCCD ' + a.id_card; }
+            if (parseInt(a.in_current, 10)) { label += ' · (đăng ký hiện tại)'; }
             html += '<option value="' + escapeHtml(a.id) + '"'
                 + ' data-name="' + escapeHtml(a.name || '') + '"'
                 + ' data-position="' + escapeHtml(a.position || '') + '"'
-                + ' data-idcard="' + escapeHtml(a.id_card || '') + '">'
+                + ' data-idcard="' + escapeHtml(a.id_card || '') + '"'
+                + ' data-incurrent="' + (parseInt(a.in_current, 10) ? '1' : '0') + '">'
                 + escapeHtml(label) + '</option>';
         });
         return html;
