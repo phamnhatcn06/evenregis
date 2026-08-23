@@ -631,6 +631,25 @@ foreach ($eventContents as $ec) {
                                         <form method="post" action="<?php echo $this->createUrl('deleteAttendee', array('id' => $attId, 'registration_id' => $model->id)); ?>" id="delete-attendee-form-<?php echo $attId; ?>" style="display:none;"></form>
                                     </td>
                                 <?php endif; ?>
+                                <?php if ($canManageAttendee): ?>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-primary me-1 mb-1"
+                                                onclick="openReplaceAttendeeModal(<?php echo $attId; ?>)"
+                                                title="Thay thế người này">
+                                            <i class="fa fa-exchange"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-warning me-1 mb-1"
+                                                onclick="openCancelContentModal(<?php echo $attId; ?>)"
+                                                title="Huỷ nội dung thi đấu">
+                                            <i class="fa fa-minus-circle"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger mb-1"
+                                                onclick="openWithdrawAttendeeModal(<?php echo $attId; ?>)"
+                                                title="Huỷ tư cách">
+                                            <i class="fa fa-user-times"></i>
+                                        </button>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
