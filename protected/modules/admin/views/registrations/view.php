@@ -487,6 +487,15 @@ foreach ($eventContents as $ec) {
         <?php endif; ?>
     </div>
     <div class="card-body">
+        <?php if ($canManageAttendee): ?>
+            <div id="attendee-actions-config"
+                 data-summary-url="<?php echo $this->createUrl('participationSummary'); ?>"
+                 data-replace-url="<?php echo $this->createUrl('replaceAttendee'); ?>"
+                 data-withdraw-url="<?php echo $this->createUrl('withdrawAttendee'); ?>"
+                 data-cancel-content-url="<?php echo $this->createUrl('cancelContent'); ?>"
+                 data-check-staff-url="<?php echo $this->createUrl('checkStaffAttendee'); ?>"
+                 data-attendee-profile-url="<?php echo $this->createUrl('attendeeProfile'); ?>"></div>
+        <?php endif; ?>
         <!-- Filter -->
         <div class="row mb-3 g-2">
             <div class="col-md-3">
