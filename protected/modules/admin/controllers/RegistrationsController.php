@@ -6350,7 +6350,7 @@ class RegistrationsController extends AdminController
 			if ($detail) { $inRegistration = true; }
 		}
 		if (!$detail) {
-			$detail = $this->resolveExistingProfile(null, $staffId, $staffCode, $idCard, null, $registrationId);
+			$detail = $this->resolveReplacementProfile(null, $staffId, $staffCode, $idCard, null, $registrationId);
 		}
 
 		if ($detail) {
@@ -6616,7 +6616,7 @@ class RegistrationsController extends AdminController
 			$new->approved_by = $email;
 
 			$existingAttendeeId = isset($s['existing_attendee_id']) ? $s['existing_attendee_id'] : null;
-			$existingAttendee = $this->resolveExistingProfile($existingAttendeeId, $staffId, $staffCode, $idCard, $oldId, $registrationId);
+			$existingAttendee = $this->resolveReplacementProfile($existingAttendeeId, $staffId, $staffCode, $idCard, $oldId, $registrationId);
 			$uploads = $this->handleReplaceUpload($j);
 			$postedFileUrls = array(
 				'portrait_path'   => isset($s['existing_portrait_url']) ? trim($s['existing_portrait_url']) : '',
