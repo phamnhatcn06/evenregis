@@ -6912,52 +6912,6 @@ class RegistrationsController extends AdminController
 	}
 
 	/**
-	 * Tải TOÀN BỘ danh sách attendee (raw array) để tự lọc phía PHP vì API không hỗ trợ lọc.
-	 */
-	private function fetchAllAttendeesRaw()
-	{
-		$res = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('per_page' => 5000));
-		if (!$res['success'] || !isset($res['data'])) {
-			return array();
-		}
-		$list = isset($res['data']['data']) ? $res['data']['data'] : $res['data'];
-		return is_array($list) ? $list : array();
-	}
-
-	/**
-	 * Kiểm tra một bản ghi attendee có ĐÚNG danh tính mục tiêu không.
-	 */
-	private function attendeeIdentityMatches($att, $staffId, $staffCode, $idCard)
-	{
-		$get = function ($key) use ($att) {
-			if (is_array($att)) {
-				return isset($att[$key]) ? $att[$key] : null;
-			}
-			return isset($att->$key) ? $att->$key : null;
-		};
-
-		if ($staffCode !== '') {
-			$c = $get('staff_code');
-			if ($c !== null && $c !== '' && strtolower(trim((string)$c)) === strtolower(trim((string)$staffCode))) {
-				return true;
-			}
-		}
-		if ($staffId) {
-			$s = $get('staff_id');
-			if ($s !== null && $s !== '' && (string)$s === (string)$staffId) {
-				return true;
-			}
-		}
-		if ($idCard !== '') {
-			$ic = $get('id_card');
-			if ($ic !== null && $ic !== '' && trim((string)$ic) === trim((string)$idCard)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Upload ảnh/hồ sơ cho người thay. Trả về map path.
 	 */
 	private function handleReplaceUpload($index = 0)
