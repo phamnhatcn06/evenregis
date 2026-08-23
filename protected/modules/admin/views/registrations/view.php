@@ -374,6 +374,72 @@ foreach ($transportsData as $t) {
     if ($tId) $transports[$tId] = $tName;
 }
 
+// Quyền thay thế / huỷ tư cách người tham dự (độc lập với trạng thái editable của phiếu)
+$canManageAttendee = PermissionHelper::can('registrations', 'update');
+
+// Dữ liệu cho form thay thế người tham dự
+$staffList = array();
+$otherAttendees = array();
+if ($canManageAttendee) {
+    // Danh sách nhân sự SMILE của đơn vị
+    $propertyCode = $property ? $property->code : null;
+    if ($propertyCode) {
+        $staffsData = Staffs::getApiDataProvider(array('property_code' => $propertyCode, 'is_active' => 1), 10000)->getData();
+        foreach ($staffsData as $st) {
+            $stId = isset($st->id) ? $st->id : (isset($st['id']) ? $st['id'] : null);
+            if (!$stId) continue;
+            $staffList[$stId] = array(
+                'id' => $stId,
+                'name' => isset($st->full_name) ? $st->full_name : (isset($st['full_name']) ? $st['full_name'] : ''),
+                'code' => isset($st->staff_code) ? $st->staff_code : (isset($st['staff_code']) ? $st['staff_code'] : ''),
+                'position' => isset($st->position_name) ? $st->position_name : (isset($st['position_name']) ? $st['position_name'] : ''),
+            );
+        }
+    }
+
+    // Danh sách người tham dự của cùng đơn vị (bao gồm đăng ký khác) để tái sử dụng hồ sơ
+    if ($model->property_id) {
+        $allAttRes = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('per_page' => 5000));
+        $allAttList = array();
+        if ($allAttRes['success'] && isset($allAttRes['data'])) {
+            $allAttList = isset($allAttRes['data']['data']) ? $allAttRes['data']['data'] : $allAttRes['data'];
+        }
+        $seenIdentity = array();
+        foreach ((is_array($allAttList) ? $allAttList : array()) as $a) {
+            $aArr = is_array($a) ? $a : (array)$a;
+            $aid = isset($aArr['id']) ? (string)$aArr['id'] : '';
+            if ($aid === '') continue;
+            $aPropId = isset($aArr['property_id']) ? (string)$aArr['property_id'] : '';
+            if ($aPropId !== (string)$model->property_id) continue;
+            $isActive = isset($aArr['is_active']) ? (int)$aArr['is_active'] : 1;
+            if ($isActive === 0) continue;
+            $inCurrentReg = isset($aArr['registration_id']) && (string)$aArr['registration_id'] === (string)$model->id;
+            $aName = isset($aArr['full_name']) ? $aArr['full_name'] : '';
+            $aPos = isset($aArr['position_name']) && $aArr['position_name'] !== ''
+                ? $aArr['position_name']
+                : (isset($aArr['position']) ? $aArr['position'] : '');
+            $aIdCard = isset($aArr['id_card']) ? $aArr['id_card'] : '';
+            $identityKey = strtolower(trim($aName)) . '|' . trim((string)$aIdCard);
+            if (isset($seenIdentity[$identityKey])) {
+                if ($inCurrentReg && isset($otherAttendees[$seenIdentity[$identityKey]])) {
+                    $otherAttendees[$seenIdentity[$identityKey]]['id'] = $aid;
+                    $otherAttendees[$seenIdentity[$identityKey]]['in_current'] = 1;
+                }
+                continue;
+            }
+            $seenIdentity[$identityKey] = count($otherAttendees);
+            $otherAttendees[] = array(
+                'id' => $aid,
+                'name' => $aName,
+                'position' => $aPos,
+                'id_card' => $aIdCard,
+                'in_current' => $inCurrentReg ? 1 : 0,
+            );
+        }
+        $otherAttendees = array_values($otherAttendees);
+    }
+}
+
 // Load event contents để lấy event_content_id cho từng loại nội dung
 // Gọi API trực tiếp để lấy raw data
 $ecResult = ApiClient::get(ApiEndpoints::EVENT_CONTENT_LIST, array('event_id' => $model->event_id));
