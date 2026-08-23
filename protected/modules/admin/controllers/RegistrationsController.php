@@ -5948,4 +5948,1055 @@ class RegistrationsController extends AdminController
 		echo CJSON::encode(array('success' => false, 'error' => 'Invalid action'));
 		Yii::app()->end();
 	}
+
+	// ============================================================================
+	// THAY THẾ / HUỶ TƯ CÁCH / HUỶ NỘI DUNG NGƯỜI THAM DỰ
+	// (chuyển từ màn hình duyệt sang màn hình phiếu đăng ký để dùng lại)
+	// ============================================================================
+
+	/**
+	 * Tóm tắt nội dung tham gia của 1 người (đội thể thao, thi NV, Miss, vai trò)
+	 * + trạng thái đã in thẻ. Dùng để nạp động vào các modal thay thế/huỷ.
+	 */
+	public function actionParticipationSummary($attendee_id)
+	{
+		header('Content-Type: application/json');
+
+		if (!PermissionHelper::can('registrations', 'update')) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+			Yii::app()->end();
+		}
+
+		$attendee = Attendees::fetchFromApi($attendee_id);
+		if (!$attendee) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$summary = Attendees::getParticipationSummary($attendee_id);
+
+		$badgePrinted = isset($attendee->badge_printed) ? (int)$attendee->badge_printed : 0;
+		if (!$badgePrinted) {
+			foreach (Badges::getByAttendeeId($attendee_id) as $badge) {
+				$printCount = is_array($badge)
+					? (isset($badge['print_count']) ? (int)$badge['print_count'] : 0)
+					: (isset($badge->print_count) ? (int)$badge->print_count : 0);
+				if ($printCount > 0) {
+					$badgePrinted = 1;
+					break;
+				}
+			}
+		}
+
+		echo CJSON::encode(array(
+			'success' => true,
+			'attendee' => array(
+				'id' => $attendee->id,
+				'full_name' => $attendee->full_name,
+				'position_name' => $attendee->position_name,
+				'division_name' => $attendee->division_name,
+				'badge_printed' => $badgePrinted,
+			),
+			'summary' => $summary,
+		));
+		Yii::app()->end();
+	}
+
+	/**
+	 * Huỷ tư cách 1 người tham dự: gỡ đăng ký thi NV + Miss + vai trò, xử lý đội thể thao,
+	 * đánh dấu huỷ + thu hồi thẻ, ghi lịch sử.
+	 */
+	public function actionWithdrawAttendee()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->request->isPostRequest) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+		if (!PermissionHelper::can('registrations', 'update')) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+			Yii::app()->end();
+		}
+
+		$attendeeId = Yii::app()->request->getPost('attendee_id');
+		$reason = trim(Yii::app()->request->getPost('reason', ''));
+
+		if (!$attendeeId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin người tham dự.'));
+			Yii::app()->end();
+		}
+		if ($reason === '') {
+			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng nhập lý do huỷ tư cách.'));
+			Yii::app()->end();
+		}
+
+		$attendee = Attendees::fetchFromApi($attendeeId);
+		if (!$attendee) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$ssoUser = AuthHandler::getUser();
+		$email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+		$summary = Attendees::getParticipationSummary($attendeeId);
+
+		// 1. Gỡ đăng ký thi nghiệp vụ
+		$compRegs = CompetitionRegistrations::getApiDataProvider(array('attendee_id' => $attendeeId), 500)->getData();
+		foreach ($compRegs as $reg) {
+			$regId = isset($reg->id) ? $reg->id : (isset($reg['id']) ? $reg['id'] : null);
+			$regAttId = isset($reg->attendee_id) ? $reg->attendee_id : (isset($reg['attendee_id']) ? $reg['attendee_id'] : null);
+			if ($regId && $regAttId == $attendeeId) {
+				CompetitionRegistrations::deleteViaApi($regId);
+			}
+		}
+
+		// 1b. Gỡ đăng ký thi Miss
+		foreach ($summary['beauty_contests'] as $bc) {
+			if (!empty($bc['contestant_id'])) {
+				BeautyContestants::deleteViaApi($bc['contestant_id']);
+			}
+		}
+
+		// 2. Gỡ vai trò
+		foreach (AttendeeRoles::getByAttendeeId($attendeeId) as $role) {
+			if (isset($role['id'])) {
+				AttendeeRoles::deleteViaApi($role['id']);
+			}
+		}
+
+		// 3. Xử lý đội thể thao
+		$cancelTeamIds = Yii::app()->request->getPost('cancel_team_ids', array());
+		if (!is_array($cancelTeamIds)) {
+			$cancelTeamIds = array();
+		}
+		$newCaptains = Yii::app()->request->getPost('new_captain', array());
+		if (!is_array($newCaptains)) {
+			$newCaptains = array();
+		}
+
+		$memberships = SportTeamMembers::getMembershipsByAttendee($attendeeId);
+		$cancelledTeams = array();
+		foreach ($memberships as $m) {
+			$teamId = $m['sport_team_id'];
+			$memberId = $m['member_id'];
+			if (in_array($teamId, $cancelTeamIds) || in_array((string)$teamId, $cancelTeamIds)) {
+				if (!isset($cancelledTeams[$teamId])) {
+					foreach (SportTeamMembers::getTeamMemberBriefs($teamId) as $tm) {
+						if (!empty($tm['member_id'])) {
+							SportTeamMembers::deleteViaApi($tm['member_id']);
+						}
+					}
+					SportTeams::deleteViaApi($teamId);
+					$cancelledTeams[$teamId] = true;
+				}
+			} else {
+				if ($memberId) {
+					SportTeamMembers::deleteViaApi($memberId);
+				}
+				if (!empty($m['is_captain']) && !empty($newCaptains[$teamId])) {
+					SportTeamMembers::assignCaptain($newCaptains[$teamId]);
+				}
+			}
+		}
+
+		// 4. Đánh dấu huỷ tư cách
+		$result = Attendees::withdrawViaApi($attendeeId, $reason, $email);
+
+		if (isset($result['success']) && $result['success']) {
+			Badges::revokeByAttendee($attendeeId);
+
+			$affectedSports = array();
+			$withdrawCancelledTeams = array();
+			foreach ($summary['sport_teams'] as $t) {
+				$entry = array(
+					'team_id' => $t['sport_team_id'],
+					'sport_name' => $t['sport_name'],
+					'team_name' => $t['team_name'],
+					'jersey_number' => $t['jersey_number'],
+					'is_captain' => $t['is_captain'],
+				);
+				if (in_array($t['sport_team_id'], $cancelTeamIds) || in_array((string)$t['sport_team_id'], $cancelTeamIds)) {
+					$withdrawCancelledTeams[] = $entry;
+				} else {
+					$affectedSports[] = $entry;
+				}
+			}
+			$affectedCompetitions = array();
+			foreach ($summary['competitions'] as $c) {
+				$affectedCompetitions[] = array(
+					'competition_id' => $c['competition_id'],
+					'competition_name' => $c['competition_name'],
+					'candidate_number' => $c['candidate_number'],
+				);
+			}
+			$affectedBeautyContests = array();
+			foreach ($summary['beauty_contests'] as $bc) {
+				$affectedBeautyContests[] = array(
+					'contest_id' => $bc['contest_id'],
+					'contest_name' => $bc['contest_name'],
+					'candidate_number' => $bc['candidate_number'],
+				);
+			}
+			$affectedRoles = array();
+			foreach ($summary['roles'] as $r) {
+				$affectedRoles[] = array(
+					'role_id' => $r['role_id'],
+					'role_name' => $r['role_name'],
+				);
+			}
+
+			AttendeeReplacements::record(array(
+				'registration_id' => $attendee->registration_id,
+				'event_id' => $attendee->event_id,
+				'property_id' => $attendee->property_id,
+				'action' => AttendeeReplacements::ACTION_WITHDRAW,
+				'old_attendee_id' => $attendeeId,
+				'old_attendee_name' => $attendee->full_name,
+				'old_staff_code' => isset($attendee->staff_code) ? $attendee->staff_code : null,
+				'affected_contents' => array(
+					'sports' => $affectedSports,
+					'competitions' => $affectedCompetitions,
+					'beauty_contests' => $affectedBeautyContests,
+					'roles' => $affectedRoles,
+				),
+				'cancelled_teams' => $withdrawCancelledTeams,
+				'reason' => $reason,
+				'performed_by' => $email,
+			));
+
+			Yii::log("Huỷ tư cách attendee #{$attendeeId} bởi {$email}. Lý do: {$reason}", 'info', 'application.controllers.RegistrationsController');
+			echo CJSON::encode(array('success' => true, 'message' => 'Đã huỷ tư cách người tham dự.'));
+		} else {
+			$err = isset($result['error']) ? $result['error'] : (isset($result['message']) ? $result['message'] : 'Không thể huỷ tư cách.');
+			echo CJSON::encode(array('success' => false, 'error' => $err));
+		}
+		Yii::app()->end();
+	}
+
+	/**
+	 * Huỷ 1 hoặc nhiều nội dung THỂ THAO của người tham dự (không huỷ cả tư cách).
+	 */
+	public function actionCancelContent()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->request->isPostRequest) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+		if (!PermissionHelper::can('registrations', 'update')) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+			Yii::app()->end();
+		}
+
+		$attendeeId = Yii::app()->request->getPost('attendee_id');
+		$reason = trim(Yii::app()->request->getPost('reason', ''));
+		$teamIds = Yii::app()->request->getPost('team_ids', array());
+		if (!is_array($teamIds)) {
+			$teamIds = array();
+		}
+		$wholeTeamFlags = Yii::app()->request->getPost('cancel_whole_team', array());
+		if (!is_array($wholeTeamFlags)) {
+			$wholeTeamFlags = array();
+		}
+		$newCaptains = Yii::app()->request->getPost('new_captain', array());
+		if (!is_array($newCaptains)) {
+			$newCaptains = array();
+		}
+
+		if (!$attendeeId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin người tham dự.'));
+			Yii::app()->end();
+		}
+		if (empty($teamIds)) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng chọn ít nhất một đội cần huỷ.'));
+			Yii::app()->end();
+		}
+		if ($reason === '') {
+			echo CJSON::encode(array('success' => false, 'error' => 'Vui lòng nhập lý do huỷ nội dung.'));
+			Yii::app()->end();
+		}
+
+		$attendee = Attendees::fetchFromApi($attendeeId);
+		if (!$attendee) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$ssoUser = AuthHandler::getUser();
+		$email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+		$summary = Attendees::getParticipationSummary($attendeeId);
+		$teamsById = array();
+		foreach ($summary['sport_teams'] as $t) {
+			$teamsById[(string)$t['sport_team_id']] = $t;
+		}
+
+		$cancelledEntries = array();
+		foreach ($teamIds as $tid) {
+			$tidKey = (string)$tid;
+			if (!isset($teamsById[$tidKey])) {
+				continue;
+			}
+			$t = $teamsById[$tidKey];
+			$isWhole = !empty($wholeTeamFlags[$tid]) || (isset($wholeTeamFlags[$tidKey]) && $wholeTeamFlags[$tidKey]);
+
+			if ($isWhole) {
+				foreach (SportTeamMembers::getTeamMemberBriefs($tid) as $tm) {
+					if (!empty($tm['member_id'])) {
+						SportTeamMembers::deleteViaApi($tm['member_id']);
+					}
+				}
+				SportTeams::deleteViaApi($tid);
+			} else {
+				if (!empty($t['member_id'])) {
+					SportTeamMembers::deleteViaApi($t['member_id']);
+				}
+				if (!empty($t['is_captain']) && !empty($newCaptains[$tid])) {
+					SportTeamMembers::assignCaptain($newCaptains[$tid]);
+				}
+			}
+
+			$cancelledEntries[] = array(
+				'team_id' => $t['sport_team_id'],
+				'sport_name' => $t['sport_name'],
+				'team_name' => $t['team_name'],
+				'jersey_number' => $t['jersey_number'],
+				'is_captain' => $t['is_captain'],
+				'whole_team' => $isWhole ? 1 : 0,
+			);
+		}
+
+		if (empty($cancelledEntries)) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không có đội hợp lệ để huỷ.'));
+			Yii::app()->end();
+		}
+
+		$remaining = Attendees::getParticipationSummary($attendeeId);
+		$hasRemaining = !empty($remaining['sport_teams']) || !empty($remaining['competitions'])
+			|| !empty($remaining['beauty_contests']) || !empty($remaining['roles']);
+
+		$autoWithdrawn = false;
+		if (!$hasRemaining) {
+			$wres = Attendees::withdrawViaApi($attendeeId, $reason, $email);
+			if (!empty($wres['success'])) {
+				Badges::revokeByAttendee($attendeeId);
+				$autoWithdrawn = true;
+			}
+		}
+
+		$affectedContents = array(
+			'sports' => array(),
+			'competitions' => array(),
+			'beauty_contests' => array(),
+			'roles' => array(),
+		);
+		if (!$autoWithdrawn) {
+			$affectedContents['_kind'] = AttendeeReplacements::ACTION_CANCEL_CONTENT;
+		}
+
+		AttendeeReplacements::record(array(
+			'registration_id' => $attendee->registration_id,
+			'event_id' => $attendee->event_id,
+			'property_id' => $attendee->property_id,
+			'action' => AttendeeReplacements::ACTION_WITHDRAW,
+			'old_attendee_id' => $attendeeId,
+			'old_attendee_name' => $attendee->full_name,
+			'old_staff_code' => isset($attendee->staff_code) ? $attendee->staff_code : null,
+			'affected_contents' => $affectedContents,
+			'cancelled_teams' => $cancelledEntries,
+			'reason' => $reason,
+			'performed_by' => $email,
+		));
+
+		Yii::log(
+			"Huỷ nội dung thể thao của attendee #{$attendeeId} bởi {$email}. Lý do: {$reason}"
+				. ($autoWithdrawn ? ' (tự động huỷ tư cách do hết nội dung)' : ''),
+			'info',
+			'application.controllers.RegistrationsController'
+		);
+
+		$msg = $autoWithdrawn
+			? 'Đã huỷ nội dung. Người này không còn nội dung nào nên đã tự động huỷ tư cách.'
+			: 'Đã huỷ nội dung đã chọn.';
+		echo CJSON::encode(array('success' => true, 'message' => $msg, 'auto_withdrawn' => $autoWithdrawn));
+		Yii::app()->end();
+	}
+
+	/**
+	 * Kiểm tra nhân sự chọn thay thế đã từng đăng ký attendee trước đây chưa.
+	 */
+	public function actionCheckStaffAttendee()
+	{
+		header('Content-Type: application/json');
+
+		$staffId = Yii::app()->request->getParam('staff_id');
+		$idCard = trim(Yii::app()->request->getParam('id_card', ''));
+		$staffCode = trim(Yii::app()->request->getParam('staff_code', ''));
+		$registrationId = Yii::app()->request->getParam('registration_id');
+
+		if (!$staffId && $idCard === '' && $staffCode === '') {
+			echo CJSON::encode(array('success' => true, 'has_attendee' => false));
+			Yii::app()->end();
+		}
+
+		$inRegistration = false;
+		$detail = null;
+		$inReg = $this->findActiveAttendeeInRegistration($registrationId, $staffId, $staffCode, $idCard, null);
+		if ($inReg && isset($inReg['id'])) {
+			$detail = Attendees::fetchFromApi($inReg['id']);
+			if ($detail) { $inRegistration = true; }
+		}
+		if (!$detail) {
+			$detail = $this->resolveExistingProfile(null, $staffId, $staffCode, $idCard, null, $registrationId);
+		}
+
+		if ($detail) {
+			$portrait = (!empty($detail->portrait_path)) ? $detail->portrait_path : (!empty($detail->photo_path) ? $detail->photo_path : '');
+
+			echo CJSON::encode(array(
+				'success' => true,
+				'has_attendee' => true,
+				'in_registration' => $inRegistration,
+				'attendee' => array(
+					'id' => $detail->id,
+					'full_name' => isset($detail->full_name) ? $detail->full_name : '',
+					'position' => !empty($detail->position_name) ? $detail->position_name : (isset($detail->position) ? $detail->position : ''),
+					'id_card' => isset($detail->id_card) ? $detail->id_card : '',
+					'portrait_path' => $portrait,
+					'cccd_front_path' => isset($detail->cccd_front_path) ? $detail->cccd_front_path : '',
+					'cccd_back_path' => isset($detail->cccd_back_path) ? $detail->cccd_back_path : '',
+					'contract_path' => isset($detail->contract_path) ? $detail->contract_path : '',
+					'role_id' => isset($detail->role_id) ? $detail->role_id : '',
+				),
+			));
+		} else {
+			echo CJSON::encode(array('success' => true, 'has_attendee' => false));
+		}
+		Yii::app()->end();
+	}
+
+	/**
+	 * Lấy hồ sơ chi tiết của một attendee theo id để tái sử dụng khi thay thế.
+	 */
+	public function actionAttendeeProfile()
+	{
+		header('Content-Type: application/json');
+
+		$attendeeId = Yii::app()->request->getParam('attendee_id');
+		if (!$attendeeId) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu mã người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$detail = Attendees::fetchFromApi($attendeeId);
+		if (!$detail) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người tham dự.'));
+			Yii::app()->end();
+		}
+
+		$portrait = (!empty($detail->portrait_path)) ? $detail->portrait_path : (!empty($detail->photo_path) ? $detail->photo_path : '');
+		echo CJSON::encode(array(
+			'success' => true,
+			'attendee' => array(
+				'id' => $detail->id,
+				'full_name' => isset($detail->full_name) ? $detail->full_name : '',
+				'position' => !empty($detail->position_name) ? $detail->position_name : (isset($detail->position) ? $detail->position : ''),
+				'id_card' => isset($detail->id_card) ? $detail->id_card : '',
+				'portrait_path' => $portrait,
+				'cccd_front_path' => isset($detail->cccd_front_path) ? $detail->cccd_front_path : '',
+				'cccd_back_path' => isset($detail->cccd_back_path) ? $detail->cccd_back_path : '',
+				'contract_path' => isset($detail->contract_path) ? $detail->contract_path : '',
+				'role_id' => isset($detail->role_id) ? $detail->role_id : '',
+			),
+		));
+		Yii::app()->end();
+	}
+
+	/**
+	 * Thay thế người tham dự (đa nội dung).
+	 */
+	public function actionReplaceAttendee()
+	{
+		header('Content-Type: application/json');
+
+		if (!Yii::app()->request->isPostRequest) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+			Yii::app()->end();
+		}
+		if (!PermissionHelper::can('registrations', 'update')) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không có quyền thực hiện.'));
+			Yii::app()->end();
+		}
+
+		$req = Yii::app()->request;
+		$oldId = $req->getPost('attendee_id');
+		$reason = trim($req->getPost('reason', ''));
+		$registrationId = $req->getPost('registration_id');
+		$eventId = $req->getPost('event_id');
+		$propertyId = $req->getPost('property_id');
+
+		$subs = $req->getPost('sub', array());
+		$assignTeam = $req->getPost('assign_team', array());
+		$assignComp = $req->getPost('assign_comp', array());
+		$cancelWholeTeam = $req->getPost('cancel_whole_team', array());
+		if (!is_array($subs)) { $subs = array(); }
+		if (!is_array($assignTeam)) { $assignTeam = array(); }
+		if (!is_array($assignComp)) { $assignComp = array(); }
+		if (!is_array($cancelWholeTeam)) { $cancelWholeTeam = array(); }
+
+		if (!$oldId || $reason === '') {
+			echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin bắt buộc (người bị thay, lý do).'));
+			Yii::app()->end();
+		}
+
+		$oldAttendee = Attendees::fetchFromApi($oldId);
+		if (!$oldAttendee) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy người bị thay.'));
+			Yii::app()->end();
+		}
+
+		$ssoUser = AuthHandler::getUser();
+		$email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+		$summary = Attendees::getParticipationSummary($oldId);
+
+		$referenced = array();
+		foreach (array_merge(array_values($assignTeam), array_values($assignComp)) as $v) {
+			if (preg_match('/^s(\d+)$/', (string)$v, $mm)) { $referenced[$mm[1]] = true; }
+		}
+		if (empty($referenced)) {
+			echo CJSON::encode(array('success' => false, 'error' => 'Chưa gán nội dung nào cho người thay.'));
+			Yii::app()->end();
+		}
+
+		$maxSports = 3;
+
+		$rootSportCache = array();
+		$resolveRootSport = function ($sportId) use (&$rootSportCache) {
+			if (empty($sportId)) {
+				return null;
+			}
+			if (isset($rootSportCache[$sportId])) {
+				return $rootSportCache[$sportId];
+			}
+			$cur = $sportId;
+			$rootId = $sportId;
+			$seen = array();
+			while ($cur && !isset($seen[$cur])) {
+				$seen[$cur] = true;
+				$sp = Sports::fetchFromApi($cur);
+				if ($sp && !empty($sp->parent_id)) {
+					$rootId = $sp->parent_id;
+					$cur = $sp->parent_id;
+				} else {
+					$rootId = $cur;
+					break;
+				}
+			}
+			$rootSportCache[$sportId] = $rootId;
+			return $rootId;
+		};
+
+		$teamSportKey = array();
+		foreach ($summary['sport_teams'] as $t) {
+			$tk = (string)$t['sport_team_id'];
+			$rootId = !empty($t['sport_id']) ? $resolveRootSport($t['sport_id']) : null;
+			$teamSportKey[$tk] = $rootId ? ('s' . $rootId) : ('t' . $tk);
+		}
+		$assignedSports = array();
+		foreach ($assignTeam as $tKey => $vv) {
+			if (preg_match('/^s(\d+)$/', (string)$vv, $am) && isset($teamSportKey[(string)$tKey])) {
+				$aj = $am[1];
+				if (!isset($assignedSports[$aj])) { $assignedSports[$aj] = array(); }
+				$assignedSports[$aj][$teamSportKey[(string)$tKey]] = true;
+			}
+		}
+		foreach (array_keys($referenced) as $vj) {
+			$vs = isset($subs[$vj]) && is_array($subs[$vj]) ? $subs[$vj] : array();
+			$vStaffId = isset($vs['staff_id']) ? trim($vs['staff_id']) : '';
+			$vIdCard = isset($vs['id_card']) ? trim($vs['id_card']) : '';
+			$vName = isset($vs['full_name']) ? trim($vs['full_name']) : '';
+			$vStaffCode = '';
+			if ($vStaffId) {
+				$vStaff = Staffs::fetchFromApi($vStaffId);
+				if ($vStaff) {
+					if ($vName === '') { $vName = $vStaff->full_name; }
+					$vStaffCode = isset($vStaff->staff_code) ? $vStaff->staff_code : '';
+				}
+			}
+			$sportKeys = isset($assignedSports[$vj]) ? $assignedSports[$vj] : array();
+			$vExisting = $this->findActiveAttendeeInRegistration($registrationId, $vStaffId, $vStaffCode, $vIdCard, $oldId);
+			if ($vExisting) {
+				if ($vName === '' && !empty($vExisting['full_name'])) { $vName = $vExisting['full_name']; }
+				$vExSum = Attendees::getParticipationSummary($vExisting['id']);
+				foreach ($vExSum['sport_teams'] as $et) {
+					$etk = (string)$et['sport_team_id'];
+					$etRoot = !empty($et['sport_id']) ? $resolveRootSport($et['sport_id']) : null;
+					$sportKeys[$etRoot ? ('s' . $etRoot) : ('t' . $etk)] = true;
+				}
+			}
+			if (count($sportKeys) > $maxSports) {
+				$who = $vName !== '' ? ('"' . $vName . '"') : ('người thay #' . ((int)$vj + 1));
+				echo CJSON::encode(array('success' => false, 'error' => 'Người thay ' . $who . ' sẽ tham gia ' . count($sportKeys) . ' môn thể thao, vượt quá quy định tối đa ' . $maxSports . ' môn.'));
+				Yii::app()->end();
+			}
+		}
+
+		$subMap = array();
+		$subInfo = array();
+		$subReuseSkip = array();
+		foreach (array_keys($referenced) as $j) {
+			$s = isset($subs[$j]) && is_array($subs[$j]) ? $subs[$j] : array();
+			$staffId = isset($s['staff_id']) ? trim($s['staff_id']) : '';
+			$fullName = isset($s['full_name']) ? trim($s['full_name']) : '';
+			$position = isset($s['position']) ? trim($s['position']) : '';
+			$idCard = isset($s['id_card']) ? trim($s['id_card']) : '';
+			$staffCode = null;
+			if ($staffId) {
+				$staff = Staffs::fetchFromApi($staffId);
+				if ($staff) {
+					if ($fullName === '') { $fullName = $staff->full_name; }
+					if ($position === '') { $position = isset($staff->position_name) ? $staff->position_name : ''; }
+					$staffCode = isset($staff->staff_code) ? $staff->staff_code : null;
+				}
+			}
+			if (!$staffId && $fullName === '') {
+				echo CJSON::encode(array('success' => false, 'error' => 'Một người thay được gán nội dung nhưng chưa có thông tin (SMILE hoặc họ tên).'));
+				Yii::app()->end();
+			}
+
+			$existingInReg = null;
+			$postedExistingId = isset($s['existing_attendee_id']) ? trim($s['existing_attendee_id']) : '';
+			if ($postedExistingId !== '' && (string)$postedExistingId !== (string)$oldId) {
+				$cand = Attendees::fetchFromApi($postedExistingId);
+				if ($cand
+					&& (string)$cand->registration_id === (string)$registrationId
+					&& (int)(isset($cand->is_active) ? $cand->is_active : 1) !== 0) {
+					$existingInReg = array(
+						'id' => $cand->id,
+						'full_name' => isset($cand->full_name) ? $cand->full_name : '',
+						'staff_code' => isset($cand->staff_code) ? $cand->staff_code : null,
+					);
+				}
+			}
+			if (!$existingInReg) {
+				$existingInReg = $this->findActiveAttendeeInRegistration($registrationId, $staffId, $staffCode, $idCard, $oldId);
+			}
+			if ($existingInReg) {
+				$subMap[$j] = $existingInReg['id'];
+				$subInfo[$j] = array(
+					'name' => !empty($existingInReg['full_name']) ? $existingInReg['full_name'] : $fullName,
+					'staff_code' => !empty($existingInReg['staff_code']) ? $existingInReg['staff_code'] : $staffCode,
+				);
+				$reuseSum = Attendees::getParticipationSummary($existingInReg['id']);
+				$teamSet = array();
+				foreach ($reuseSum['sport_teams'] as $rt) { $teamSet[(string)$rt['sport_team_id']] = true; }
+				$compSet = array();
+				foreach ($reuseSum['competitions'] as $rc) { $compSet[(string)$rc['competition_id']] = true; }
+				$subReuseSkip[$j] = array('teams' => $teamSet, 'comps' => $compSet);
+				continue;
+			}
+
+			$new = new Attendees();
+			$new->event_id = $eventId;
+			$new->registration_id = $registrationId;
+			$new->property_id = $propertyId;
+			$new->full_name = $fullName;
+			$new->position = $position;
+			$new->position_name = $position;
+			$new->id_card = $idCard;
+			if ($staffId) { $new->staff_id = $staffId; }
+			if ($staffCode) { $new->staff_code = $staffCode; }
+			$roleStr = isset($s['role_id']) ? trim($s['role_id']) : '';
+			$new->role_id = $roleStr;
+			$new->approval_status = Attendees::APPROVAL_APPROVED;
+			$new->approved_by = $email;
+
+			$existingAttendeeId = isset($s['existing_attendee_id']) ? $s['existing_attendee_id'] : null;
+			$existingAttendee = $this->resolveExistingProfile($existingAttendeeId, $staffId, $staffCode, $idCard, $oldId, $registrationId);
+			$uploads = $this->handleReplaceUpload($j);
+			$postedFileUrls = array(
+				'portrait_path'   => isset($s['existing_portrait_url']) ? trim($s['existing_portrait_url']) : '',
+				'cccd_front_path' => isset($s['existing_cccd_front_url']) ? trim($s['existing_cccd_front_url']) : '',
+				'cccd_back_path'  => isset($s['existing_cccd_back_url']) ? trim($s['existing_cccd_back_url']) : '',
+				'contract_path'   => isset($s['existing_contract_url']) ? trim($s['existing_contract_url']) : '',
+			);
+			$fileMap = array(
+				'portrait_path' => array('portrait_path', 'photo_path'),
+				'cccd_front_path' => array('cccd_front_path'),
+				'cccd_back_path' => array('cccd_back_path'),
+				'contract_path' => array('contract_path'),
+			);
+			foreach ($fileMap as $targetAttr => $sourceAttrs) {
+				if (isset($uploads[$targetAttr]) && !empty($uploads[$targetAttr])) {
+					$new->$targetAttr = $uploads[$targetAttr];
+				} elseif (!empty($postedFileUrls[$targetAttr])) {
+					$new->$targetAttr = $postedFileUrls[$targetAttr];
+				} elseif ($existingAttendee) {
+					foreach ($sourceAttrs as $sAttr) {
+						if (isset($existingAttendee->$sAttr) && !empty($existingAttendee->$sAttr)) {
+							$new->$targetAttr = $existingAttendee->$sAttr;
+							break;
+						}
+					}
+				}
+			}
+
+			$storeResult = $new->storeViaApi();
+			$newId = $this->extractNewId($storeResult);
+			if (!$newId) {
+				$err = isset($storeResult['error']) ? $storeResult['error'] : 'Không thể tạo người thay.';
+				echo CJSON::encode(array('success' => false, 'error' => $err));
+				Yii::app()->end();
+			}
+			$subMap[$j] = $newId;
+			$subInfo[$j] = array('name' => $fullName, 'staff_code' => $staffCode);
+		}
+
+		$auditPerSub = array();
+		foreach (array_keys($subMap) as $j) {
+			$auditPerSub[$j] = array('sports' => array(), 'competitions' => array());
+		}
+
+		$cancelledTeams = array();
+		foreach ($summary['sport_teams'] as $t) {
+			$tid = (string)$t['sport_team_id'];
+			$v = isset($assignTeam[$tid]) ? $assignTeam[$tid] : 'cancel';
+			if (preg_match('/^s(\d+)$/', (string)$v, $mm) && isset($subMap[$mm[1]])) {
+				$j = $mm[1];
+				$alreadyMember = isset($subReuseSkip[$j]['teams'][$tid]);
+				if (!$alreadyMember) {
+					$mem = new SportTeamMembers();
+					$mem->sport_team_id = $t['sport_team_id'];
+					$mem->attendee_id = $subMap[$j];
+					$mem->name = $subInfo[$j]['name'];
+					$mem->jersey_number = $t['jersey_number'];
+					$mem->position = $t['position'];
+					$mem->is_captain = $t['is_captain'];
+					$mem->storeViaApi();
+				}
+				if (!empty($t['member_id'])) {
+					SportTeamMembers::deleteViaApi($t['member_id']);
+				}
+				$auditPerSub[$j]['sports'][] = array(
+					'team_id' => $t['sport_team_id'],
+					'sport_name' => $t['sport_name'],
+					'team_name' => $t['team_name'],
+					'jersey_number' => $t['jersey_number'],
+					'is_captain' => $t['is_captain'],
+				);
+			} else {
+				$whole = !empty($cancelWholeTeam[$tid]);
+				if ($whole) {
+					foreach (SportTeamMembers::getTeamMemberBriefs($t['sport_team_id']) as $tm) {
+						if (!empty($tm['member_id'])) {
+							SportTeamMembers::deleteViaApi($tm['member_id']);
+						}
+					}
+					SportTeams::deleteViaApi($t['sport_team_id']);
+				} elseif (!empty($t['member_id'])) {
+					SportTeamMembers::deleteViaApi($t['member_id']);
+				}
+				$cancelledTeams[] = array(
+					'team_id' => $t['sport_team_id'],
+					'sport_name' => $t['sport_name'],
+					'team_name' => $t['team_name'],
+					'jersey_number' => $t['jersey_number'],
+					'is_captain' => $t['is_captain'],
+					'whole' => $whole ? 1 : 0,
+				);
+			}
+		}
+
+		$cancelledComps = array();
+		foreach ($summary['competitions'] as $c) {
+			$cid = (string)$c['competition_id'];
+			$v = isset($assignComp[$cid]) ? $assignComp[$cid] : 'cancel';
+			if (preg_match('/^s(\d+)$/', (string)$v, $mm) && isset($subMap[$mm[1]])) {
+				$j = $mm[1];
+				if (!isset($subReuseSkip[$j]['comps'][$cid])) {
+					$cr = new CompetitionRegistrations();
+					$cr->competition_id = $c['competition_id'];
+					$cr->registration_id = $registrationId;
+					$cr->attendee_id = $subMap[$j];
+					$cr->status = CompetitionRegistrations::STATUS_PENDING;
+					$cr->storeViaApi();
+				}
+				if (!empty($c['registration_id'])) {
+					CompetitionRegistrations::deleteViaApi($c['registration_id']);
+				}
+				$auditPerSub[$j]['competitions'][] = array(
+					'competition_id' => $c['competition_id'],
+					'competition_name' => $c['competition_name'],
+					'candidate_number' => $c['candidate_number'],
+				);
+			} else {
+				if (!empty($c['registration_id'])) {
+					CompetitionRegistrations::deleteViaApi($c['registration_id']);
+				}
+				$cancelledComps[] = array(
+					'competition_id' => $c['competition_id'],
+					'competition_name' => $c['competition_name'],
+					'candidate_number' => $c['candidate_number'],
+				);
+			}
+		}
+
+		$cancelledBeauty = array();
+		foreach ($summary['beauty_contests'] as $bc) {
+			if (!empty($bc['contestant_id'])) {
+				BeautyContestants::deleteViaApi($bc['contestant_id']);
+			}
+			$cancelledBeauty[] = array(
+				'contest_id' => $bc['contest_id'],
+				'contest_name' => $bc['contest_name'],
+				'candidate_number' => $bc['candidate_number'],
+			);
+		}
+
+		foreach ($summary['roles'] as $r) {
+			if (!empty($r['attendee_role_id'])) {
+				AttendeeRoles::deleteViaApi($r['attendee_role_id']);
+			}
+		}
+
+		Attendees::withdrawViaApi($oldId, 'Đã được thay thế. ' . $reason, $email);
+		Badges::revokeByAttendee($oldId);
+
+		$batchId = 'RPL' . time() . substr(uniqid(), -5);
+		foreach ($subMap as $j => $newId) {
+			AttendeeReplacements::record(array(
+				'registration_id' => $registrationId,
+				'event_id' => $eventId,
+				'property_id' => $propertyId,
+				'action' => AttendeeReplacements::ACTION_REPLACE,
+				'old_attendee_id' => $oldId,
+				'old_attendee_name' => $oldAttendee->full_name,
+				'old_staff_code' => isset($oldAttendee->staff_code) ? $oldAttendee->staff_code : null,
+				'new_attendee_id' => $newId,
+				'new_attendee_name' => $subInfo[$j]['name'],
+				'new_staff_code' => $subInfo[$j]['staff_code'],
+				'affected_contents' => array(
+					'sports' => $auditPerSub[$j]['sports'],
+					'competitions' => $auditPerSub[$j]['competitions'],
+					'roles' => array(),
+					'_batch_id' => $batchId,
+				),
+				'cancelled_teams' => array(),
+				'reason' => $reason,
+				'performed_by' => $email,
+			));
+		}
+		if (!empty($cancelledTeams) || !empty($cancelledComps) || !empty($cancelledBeauty)) {
+			AttendeeReplacements::record(array(
+				'registration_id' => $registrationId,
+				'event_id' => $eventId,
+				'property_id' => $propertyId,
+				'action' => AttendeeReplacements::ACTION_WITHDRAW,
+				'old_attendee_id' => $oldId,
+				'old_attendee_name' => $oldAttendee->full_name,
+				'old_staff_code' => isset($oldAttendee->staff_code) ? $oldAttendee->staff_code : null,
+				'new_attendee_id' => null,
+				'new_attendee_name' => null,
+				'new_staff_code' => null,
+				'affected_contents' => array(
+					'competitions' => $cancelledComps,
+					'beauty_contests' => $cancelledBeauty,
+					'_batch_id' => $batchId,
+				),
+				'cancelled_teams' => $cancelledTeams,
+				'reason' => $reason,
+				'performed_by' => $email,
+			));
+		}
+
+		Yii::log("Thay thế đa nội dung attendee #{$oldId} → [" . implode(',', array_values($subMap)) . "] bởi {$email}. Batch {$batchId}. Lý do: {$reason}", 'info', 'application.controllers.RegistrationsController');
+		echo CJSON::encode(array('success' => true, 'message' => 'Đã thay thế người tham dự thành công.'));
+		Yii::app()->end();
+	}
+
+	/**
+	 * Trích id bản ghi attendee mới từ kết quả ApiClient.
+	 */
+	private function extractNewId($result)
+	{
+		if (!isset($result['success']) || !$result['success'] || !isset($result['data'])) {
+			return null;
+		}
+		$data = $result['data'];
+		if (isset($data['data']['id'])) { return $data['data']['id']; }
+		if (isset($data['id'])) { return $data['id']; }
+		return null;
+	}
+
+	/**
+	 * Chọn hồ sơ attendee cũ CỦA ĐÚNG NHÂN SỰ, có ẢNH/HỒ SƠ đầy đủ nhất để tái sử dụng khi thay thế.
+	 */
+	private function resolveExistingProfile($preferredId, $staffId, $staffCode, $idCard, $excludeId, $excludeRegistrationId = null)
+	{
+		if (!$staffId && $staffCode === '' && $idCard === '') {
+			return null;
+		}
+
+		$all = $this->fetchAllAttendeesRaw();
+		if (empty($all)) {
+			return null;
+		}
+
+		$candidates = array();
+		foreach ($all as $a) {
+			$aArr = is_array($a) ? $a : (array)$a;
+			$aid = isset($aArr['id']) ? (string)$aArr['id'] : '';
+			if ($aid === '' || $aid === (string)$excludeId) { continue; }
+			if ($excludeRegistrationId !== null && isset($aArr['registration_id'])
+				&& (string)$aArr['registration_id'] === (string)$excludeRegistrationId) {
+				continue;
+			}
+			if (!$this->attendeeIdentityMatches($aArr, $staffId, $staffCode, $idCard)) { continue; }
+			$candidates[$aid] = !empty($aArr['photo_path']) || !empty($aArr['portrait_path']);
+		}
+		if (empty($candidates)) {
+			return null;
+		}
+
+		uksort($candidates, function ($x, $y) use ($candidates) {
+			if ($candidates[$x] !== $candidates[$y]) { return $candidates[$x] ? -1 : 1; }
+			return ((int)$y) - ((int)$x);
+		});
+
+		$best = null;
+		$bestScore = -1;
+		$fetched = 0;
+		$maxFetch = 6;
+		foreach (array_keys($candidates) as $cid) {
+			if ($fetched >= $maxFetch) { break; }
+			$cand = Attendees::fetchFromApi($cid);
+			$fetched++;
+			if (!$cand) { continue; }
+			if (!$this->attendeeIdentityMatches($cand, $staffId, $staffCode, $idCard)) { continue; }
+
+			$score = 0;
+			foreach (array('portrait_path', 'photo_path', 'cccd_front_path', 'cccd_back_path', 'contract_path') as $pf) {
+				if (!empty($cand->$pf)) { $score++; }
+			}
+			if ($score > $bestScore) {
+				$bestScore = $score;
+				$best = $cand;
+			}
+			if ($bestScore >= 4) { break; }
+		}
+
+		return $best;
+	}
+
+	/**
+	 * Tìm attendee ĐANG hoạt động trong 1 đăng ký, khớp danh tính, loại người đang bị thay.
+	 */
+	private function findActiveAttendeeInRegistration($registrationId, $staffId, $staffCode, $idCard, $excludeId)
+	{
+		if (!$staffId && (string)$staffCode === '' && (string)$idCard === '') {
+			return null;
+		}
+		foreach (Attendees::getByRegistrationId($registrationId) as $att) {
+			$aArr = is_array($att) ? $att : (array)$att;
+			$aid = isset($aArr['id']) ? (string)$aArr['id'] : '';
+			if ($aid === '' || $aid === (string)$excludeId) { continue; }
+			if ($this->attendeeIdentityMatches($aArr, $staffId, $staffCode, $idCard)) {
+				return $aArr;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Tải TOÀN BỘ danh sách attendee (raw array) để tự lọc phía PHP vì API không hỗ trợ lọc.
+	 */
+	private function fetchAllAttendeesRaw()
+	{
+		$res = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('per_page' => 5000));
+		if (!$res['success'] || !isset($res['data'])) {
+			return array();
+		}
+		$list = isset($res['data']['data']) ? $res['data']['data'] : $res['data'];
+		return is_array($list) ? $list : array();
+	}
+
+	/**
+	 * Kiểm tra một bản ghi attendee có ĐÚNG danh tính mục tiêu không.
+	 */
+	private function attendeeIdentityMatches($att, $staffId, $staffCode, $idCard)
+	{
+		$get = function ($key) use ($att) {
+			if (is_array($att)) {
+				return isset($att[$key]) ? $att[$key] : null;
+			}
+			return isset($att->$key) ? $att->$key : null;
+		};
+
+		if ($staffCode !== '') {
+			$c = $get('staff_code');
+			if ($c !== null && $c !== '' && strtolower(trim((string)$c)) === strtolower(trim((string)$staffCode))) {
+				return true;
+			}
+		}
+		if ($staffId) {
+			$s = $get('staff_id');
+			if ($s !== null && $s !== '' && (string)$s === (string)$staffId) {
+				return true;
+			}
+		}
+		if ($idCard !== '') {
+			$ic = $get('id_card');
+			if ($ic !== null && $ic !== '' && trim((string)$ic) === trim((string)$idCard)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Upload ảnh/hồ sơ cho người thay. Trả về map path.
+	 */
+	private function handleReplaceUpload($index = 0)
+	{
+		$result = array();
+		$uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/attendees/';
+		if (!is_dir($uploadDir)) {
+			if (!@mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+				Yii::log("Không thể tạo thư mục upload: {$uploadDir}", 'error', 'application.controllers.RegistrationsController');
+				echo CJSON::encode(array('success' => false, 'error' => 'Không thể tạo thư mục lưu ảnh trên máy chủ. Vui lòng liên hệ quản trị viên.'));
+				Yii::app()->end();
+			}
+		}
+		$fileFields = array(
+			'sub_portrait_file_' . $index => 'portrait_path',
+			'sub_cccd_front_file_' . $index => 'cccd_front_path',
+			'sub_cccd_back_file_' . $index => 'cccd_back_path',
+			'sub_contract_file_' . $index => 'contract_path',
+		);
+		$allowedTypes = array('jpg', 'jpeg', 'png', 'gif', 'pdf');
+		$maxSize = 50 * 1024 * 1024;
+
+		foreach ($fileFields as $fieldName => $attrName) {
+			if (!isset($_FILES[$fieldName]) || $_FILES[$fieldName]['error'] === UPLOAD_ERR_NO_FILE) {
+				continue;
+			}
+			if ($_FILES[$fieldName]['error'] !== UPLOAD_ERR_OK) {
+				continue;
+			}
+			$ext = strtolower(pathinfo($_FILES[$fieldName]['name'], PATHINFO_EXTENSION));
+			if (!in_array($ext, $allowedTypes) || $_FILES[$fieldName]['size'] > $maxSize) {
+				continue;
+			}
+			$filename = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+			$filepath = $uploadDir . $filename;
+			if (move_uploaded_file($_FILES[$fieldName]['tmp_name'], $filepath)) {
+				$result[$attrName] = Yii::app()->baseUrl . '/uploads/attendees/' . $filename;
+			}
+		}
+		return $result;
+	}
 }
