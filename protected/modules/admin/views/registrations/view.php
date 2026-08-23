@@ -548,6 +548,9 @@ foreach ($eventContents as $ec) {
                         <?php if ($canEdit): ?>
                             <th style="width:70px;"></th>
                         <?php endif; ?>
+                        <?php if ($canManageAttendee): ?>
+                            <th style="width:110px;">Thay thế / Huỷ</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
