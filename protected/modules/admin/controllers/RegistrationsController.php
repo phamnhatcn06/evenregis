@@ -6835,7 +6835,7 @@ class RegistrationsController extends AdminController
 	/**
 	 * Chọn hồ sơ attendee cũ CỦA ĐÚNG NHÂN SỰ, có ẢNH/HỒ SƠ đầy đủ nhất để tái sử dụng khi thay thế.
 	 */
-	private function resolveExistingProfile($preferredId, $staffId, $staffCode, $idCard, $excludeId, $excludeRegistrationId = null)
+	private function resolveReplacementProfile($preferredId, $staffId, $staffCode, $idCard, $excludeId, $excludeRegistrationId = null)
 	{
 		if (!$staffId && $staffCode === '' && $idCard === '') {
 			return null;
