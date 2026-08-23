@@ -1297,6 +1297,25 @@ Yii::app()->clientScript->registerScriptFile(
     CClientScript::POS_END
 );
 
+// Thay thế / Huỷ tư cách / Huỷ nội dung người tham dự
+if ($canManageAttendee) {
+    $this->renderPartial('_modal_replace_attendee', array(
+        'model' => $model,
+        'roles' => $roles,
+        'transports' => $transports,
+        'staffList' => $staffList,
+        'otherAttendees' => $otherAttendees,
+    ));
+    $this->renderPartial('_modal_withdraw_attendee');
+    $this->renderPartial('_modal_cancel_content');
+    Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/select2/css/select2.min.css');
+    Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
+    Yii::app()->clientScript->registerScriptFile(
+        $baseUrl . '/assets/js/pages/approveregistrations-view.js',
+        CClientScript::POS_END
+    );
+}
+
 // Prepare config data
 $sportIds = array();
 $competitionIds = array();
