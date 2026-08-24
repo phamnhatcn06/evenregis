@@ -255,7 +255,7 @@ class EmailHelper
         }
         // Đợt 3 (văn nghệ) → Ban sự kiện văn nghệ
         if (in_array('talent', $periodContentCodes) && !$isDot1) {
-            $ccRaw[] = 'daihoi.bansukienvanghe@muongthanh.vn';
+            $ccRaw[] = 'daihoi.bansukientruyenthong@muongthanh.vn';
         }
         // CC cố định cho mọi email (khi không ở chế độ debug): Ban Hành chính - Logistic
         if (!self::DEBUG_MODE) {
