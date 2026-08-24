@@ -6773,6 +6773,19 @@ class RegistrationsController extends AdminController
 			);
 		}
 
+		// Văn nghệ: gỡ người bị thay khỏi các tiết mục (giữ tiết mục cho thành viên còn lại).
+		$cancelledTalents = array();
+		foreach ($summary['talent_entries'] as $te) {
+			if (!empty($te['member_id'])) {
+				TalentEntryMembers::deleteViaApi($te['member_id']);
+			}
+			$cancelledTalents[] = array(
+				'entry_id' => $te['entry_id'],
+				'entry_title' => $te['entry_title'],
+				'category_name' => $te['category_name'],
+			);
+		}
+
 		foreach ($summary['roles'] as $r) {
 			if (!empty($r['attendee_role_id'])) {
 				AttendeeRoles::deleteViaApi($r['attendee_role_id']);
