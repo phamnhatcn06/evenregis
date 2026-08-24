@@ -687,37 +687,35 @@ $attributes = array(
                             <!-- Danh sách người tham gia theo đơn vị -->
                             <h6 class="fw-bold mb-2"><i class="fa fa-users me-1 text-info"></i>Danh sách người biểu diễn (<?php echo count($members); ?>)</h6>
                             <?php if (!empty($members)): ?>
-                                <?php
-                                $membersByProperty = array();
-                                foreach ($members as $member) {
-                                    $propName = isset($member['property_name']) ? $member['property_name'] : 'Không xác định';
-                                    if (!isset($membersByProperty[$propName])) {
-                                        $membersByProperty[$propName] = array();
-                                    }
-                                    $membersByProperty[$propName][] = $member;
-                                }
-                                ?>
-                                <?php foreach ($membersByProperty as $propName => $propMembers): ?>
-                                    <div class="mb-2">
-                                        <span class="badge bg-primary mb-1"><?php echo CHtml::encode($propName); ?> (<?php echo count($propMembers); ?>)</span>
-                                        <div class="ms-3">
-                                            <?php foreach ($propMembers as $idx => $member):
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-sm mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width:50px;" class="text-center">STT</th>
+                                                <th>Họ tên</th>
+                                                <th>Chức danh</th>
+                                                <th>Bộ phận</th>
+                                                <th>Đơn vị</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($members as $idx => $member):
                                                 $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
                                                 $pos = isset($member['position_name']) ? $member['position_name'] : '';
                                                 $div = isset($member['division_name']) ? $member['division_name'] : '';
-                                                $nameInfo = CHtml::encode($name);
-                                                $details = array();
-                                                if ($pos) $details[] = CHtml::encode($pos);
-                                                if ($div) $details[] = 'Bộ phận: ' . CHtml::encode($div);
-                                                if (!empty($details)) {
-                                                    $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
-                                                }
+                                                $propName = isset($member['property_name']) ? $member['property_name'] : '';
                                             ?>
-                                                <div class="mb-1"><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
+                                                <tr>
+                                                    <td class="text-center"><?php echo $idx + 1; ?></td>
+                                                    <td><?php echo CHtml::encode($name); ?></td>
+                                                    <td><?php echo $pos ? CHtml::encode($pos) : '-'; ?></td>
+                                                    <td><?php echo $div ? CHtml::encode($div) : '-'; ?></td>
+                                                    <td><?php echo $propName ? CHtml::encode($propName) : '-'; ?></td>
+                                                </tr>
                                             <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
                             <?php else: ?>
                                 <p class="text-muted mb-0">Chưa có người biểu diễn</p>
                             <?php endif; ?>
