@@ -1096,6 +1096,8 @@
                 if (out === 'cancel' && cw && cw.checked) { fd.append('cancel_whole_team[' + id + ']', '1'); }
             } else if (kind === 'comp') {
                 fd.append('assign_comp[' + id + ']', out);
+            } else if (kind === 'talent') {
+                fd.append('assign_talent[' + id + ']', out);
             }
         });
 
