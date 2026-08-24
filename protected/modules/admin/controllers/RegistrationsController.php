@@ -6458,10 +6458,12 @@ class RegistrationsController extends AdminController
 		$subs = $req->getPost('sub', array());
 		$assignTeam = $req->getPost('assign_team', array());
 		$assignComp = $req->getPost('assign_comp', array());
+		$assignTalent = $req->getPost('assign_talent', array());
 		$cancelWholeTeam = $req->getPost('cancel_whole_team', array());
 		if (!is_array($subs)) { $subs = array(); }
 		if (!is_array($assignTeam)) { $assignTeam = array(); }
 		if (!is_array($assignComp)) { $assignComp = array(); }
+		if (!is_array($assignTalent)) { $assignTalent = array(); }
 		if (!is_array($cancelWholeTeam)) { $cancelWholeTeam = array(); }
 
 		if (!$oldId || $reason === '') {
