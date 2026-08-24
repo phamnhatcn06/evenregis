@@ -858,9 +858,11 @@
         html += '<div class="mb-2"><h6 class="mb-1"><i class="fa fa-music me-1 text-info"></i>Văn nghệ</h6>';
         if (talents.length) {
             talents.forEach(function (te) {
-                html += '<div class="small mb-1">' + escapeHtml(te.entry_title || '')
-                    + (te.category_name ? ' <span class="badge bg-secondary">' + escapeHtml(te.category_name) + '</span>' : '')
-                    + ' <span class="badge bg-danger">Sẽ huỷ</span></div>';
+                html += '<div class="border rounded p-2 mb-1">'
+                    + '<div>' + escapeHtml(te.entry_title || '')
+                    + (te.category_name ? ' <span class="badge bg-secondary">' + escapeHtml(te.category_name) + '</span>' : '') + '</div>'
+                    + '<select class="form-select form-select-sm assign-select mt-1" data-kind="talent" data-id="' + te.entry_id + '"></select>'
+                    + '</div>';
             });
         } else {
             html += '<p class="text-muted small mb-0">Không đăng ký tiết mục văn nghệ.</p>';
