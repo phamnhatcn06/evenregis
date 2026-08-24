@@ -1181,6 +1181,13 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
+        // 2b. Gỡ khỏi các tiết mục văn nghệ (chỉ gỡ người này, giữ tiết mục cho các thành viên còn lại)
+        foreach ($summary['talent_entries'] as $te) {
+            if (!empty($te['member_id'])) {
+                TalentEntryMembers::deleteViaApi($te['member_id']);
+            }
+        }
+
         // 3. Xử lý đội thể thao
         $cancelTeamIds = Yii::app()->request->getPost('cancel_team_ids', array());
         if (!is_array($cancelTeamIds)) {
