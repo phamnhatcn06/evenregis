@@ -1954,17 +1954,38 @@ class ApproveRegistrationsController extends AdminController
             );
         }
 
-        // 4b. Văn nghệ: gỡ người bị thay khỏi các tiết mục (giữ tiết mục cho thành viên còn lại).
+        // 4b. Văn nghệ: gán → thêm người thay vào tiết mục (kế thừa vai trò) + gỡ người cũ; huỷ → gỡ người cũ.
         $cancelledTalents = array();
         foreach ($summary['talent_entries'] as $te) {
-            if (!empty($te['member_id'])) {
-                TalentEntryMembers::deleteViaApi($te['member_id']);
+            $eid = (string)$te['entry_id'];
+            $v = isset($assignTalent[$eid]) ? $assignTalent[$eid] : 'cancel';
+            if (preg_match('/^s(\d+)$/', (string)$v, $mm) && isset($subMap[$mm[1]])) {
+                $j = $mm[1];
+                if (!isset($subReuseSkip[$j]['talents'][$eid])) {
+                    $tm = new TalentEntryMembers();
+                    $tm->entry_id = $te['entry_id'];
+                    $tm->attendee_id = $subMap[$j];
+                    if (!empty($te['role'])) { $tm->role = $te['role']; }
+                    $tm->storeViaApi();
+                }
+                if (!empty($te['member_id'])) {
+                    TalentEntryMembers::deleteViaApi($te['member_id']);
+                }
+                $auditPerSub[$j]['talents'][] = array(
+                    'entry_id' => $te['entry_id'],
+                    'entry_title' => $te['entry_title'],
+                    'category_name' => $te['category_name'],
+                );
+            } else {
+                if (!empty($te['member_id'])) {
+                    TalentEntryMembers::deleteViaApi($te['member_id']);
+                }
+                $cancelledTalents[] = array(
+                    'entry_id' => $te['entry_id'],
+                    'entry_title' => $te['entry_title'],
+                    'category_name' => $te['category_name'],
+                );
             }
-            $cancelledTalents[] = array(
-                'entry_id' => $te['entry_id'],
-                'entry_title' => $te['entry_title'],
-                'category_name' => $te['category_name'],
-            );
         }
 
         // 5. Gỡ toàn bộ vai trò của người bị thay (mỗi người thay đã có vai trò riêng).
