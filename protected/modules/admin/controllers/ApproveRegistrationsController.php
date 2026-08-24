@@ -1783,7 +1783,9 @@ class ApproveRegistrationsController extends AdminController
                 foreach ($reuseSum['sport_teams'] as $rt) { $teamSet[(string)$rt['sport_team_id']] = true; }
                 $compSet = array();
                 foreach ($reuseSum['competitions'] as $rc) { $compSet[(string)$rc['competition_id']] = true; }
-                $subReuseSkip[$j] = array('teams' => $teamSet, 'comps' => $compSet);
+                $talentSet = array();
+                foreach ($reuseSum['talent_entries'] as $rt) { $talentSet[(string)$rt['entry_id']] = true; }
+                $subReuseSkip[$j] = array('teams' => $teamSet, 'comps' => $compSet, 'talents' => $talentSet);
                 continue;
             }
 
