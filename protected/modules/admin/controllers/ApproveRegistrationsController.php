@@ -2016,6 +2016,7 @@ class ApproveRegistrationsController extends AdminController
                 'affected_contents' => array(
                     'sports' => $auditPerSub[$j]['sports'],
                     'competitions' => $auditPerSub[$j]['competitions'],
+                    'talents' => $auditPerSub[$j]['talents'],
                     'roles' => array(),
                     '_batch_id' => $batchId,
                 ),
