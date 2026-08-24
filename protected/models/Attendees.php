@@ -502,8 +502,63 @@ class Attendees extends BaseAttendees
             'sport_teams' => self::collectSportTeams($attendeeId),
             'competitions' => self::collectCompetitions($attendeeId),
             'beauty_contests' => self::collectBeautyContests($attendeeId),
+            'talent_entries' => self::collectTalentEntries($attendeeId),
             'roles' => self::collectRoles($attendeeId),
         );
+    }
+
+    /**
+     * Các tiết mục văn nghệ mà người này tham gia (thành viên talent_entry_members).
+     */
+    protected static function collectTalentEntries($attendeeId)
+    {
+        $result = ApiClient::get(ApiEndpoints::TALENT_ENTRY_MEMBER_LIST, array(
+            'attendee_id' => $attendeeId,
+            'per_page' => 500,
+        ));
+        $items = self::extractListData($result);
+        if (!is_array($items)) {
+            return array();
+        }
+
+        $entries = array();
+        foreach ($items as $item) {
+            if (!isset($item['attendee_id']) || $item['attendee_id'] != $attendeeId) {
+                continue;
+            }
+            $entryId = isset($item['entry_id']) ? $item['entry_id'] : (isset($item['talent_entry_id']) ? $item['talent_entry_id'] : null);
+            if (!$entryId) {
+                continue;
+            }
+            // Khử trùng lặp cùng một tiết mục.
+            if (isset($entries[$entryId])) {
+                continue;
+            }
+            $title = isset($item['entry_title']) ? $item['entry_title'] : (isset($item['title']) ? $item['title'] : '');
+            $categoryName = isset($item['category_name']) ? $item['category_name'] : '';
+            if ($title === '' || $categoryName === '') {
+                $entry = TalentEntries::fetchFromApi($entryId);
+                if ($entry) {
+                    if ($title === '') {
+                        $title = isset($entry->title) ? $entry->title : '';
+                    }
+                    if ($categoryName === '') {
+                        $categoryName = isset($entry->category_name) ? $entry->category_name : '';
+                        if ($categoryName === '' && !empty($entry->category_id)) {
+                            $cat = TalentCategories::fetchFromApi($entry->category_id);
+                            $categoryName = $cat ? $cat->name : '';
+                        }
+                    }
+                }
+            }
+            $entries[$entryId] = array(
+                'member_id' => isset($item['id']) ? $item['id'] : null,
+                'entry_id' => $entryId,
+                'entry_title' => $title,
+                'category_name' => $categoryName,
+            );
+        }
+        return array_values($entries);
     }
 
     /**
