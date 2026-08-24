@@ -1429,7 +1429,8 @@ class ApproveRegistrationsController extends AdminController
         // Sau khi gỡ: nếu VĐV không còn nội dung nào → tự động huỷ tư cách
         $remaining = Attendees::getParticipationSummary($attendeeId);
         $hasRemaining = !empty($remaining['sport_teams']) || !empty($remaining['competitions'])
-            || !empty($remaining['beauty_contests']) || !empty($remaining['roles']);
+            || !empty($remaining['beauty_contests']) || !empty($remaining['talent_entries'])
+            || !empty($remaining['roles']);
 
         $autoWithdrawn = false;
         if (!$hasRemaining) {
