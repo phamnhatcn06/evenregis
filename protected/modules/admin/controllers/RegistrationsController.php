@@ -6153,6 +6153,14 @@ class RegistrationsController extends AdminController
 					'role_name' => $r['role_name'],
 				);
 			}
+			$affectedTalents = array();
+			foreach ($summary['talent_entries'] as $te) {
+				$affectedTalents[] = array(
+					'entry_id' => $te['entry_id'],
+					'entry_title' => $te['entry_title'],
+					'category_name' => $te['category_name'],
+				);
+			}
 
 			AttendeeReplacements::record(array(
 				'registration_id' => $attendee->registration_id,
@@ -6166,6 +6174,7 @@ class RegistrationsController extends AdminController
 					'sports' => $affectedSports,
 					'competitions' => $affectedCompetitions,
 					'beauty_contests' => $affectedBeautyContests,
+					'talents' => $affectedTalents,
 					'roles' => $affectedRoles,
 				),
 				'cancelled_teams' => $withdrawCancelledTeams,
