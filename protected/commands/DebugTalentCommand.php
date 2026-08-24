@@ -5,6 +5,14 @@ class DebugTalentCommand extends CConsoleCommand
     {
         $eventId = 3;
         $currentPropertyId = '42';
+        echo "API URL param: " . Yii::app()->params['externalApiUrl'] . "\n";
+        $raw = ApiClient::get(ApiEndpoints::TALENT_ENTRY_LIST, array('event_id' => $eventId, 'page' => 1, 'per_page' => 200));
+        echo "ApiClient success=" . var_export($raw['success'], true) . " error=" . var_export(isset($raw['error']) ? $raw['error'] : null, true) . "\n";
+        if (isset($raw['data'])) {
+            $dd = isset($raw['data']['data']) ? $raw['data']['data'] : $raw['data'];
+            echo "ApiClient data count=" . (is_array($dd) ? count($dd) : gettype($dd)) . "\n";
+        }
+        echo "TALENT_ENTRY_LIST const = " . ApiEndpoints::TALENT_ENTRY_LIST . "\n";
         $allEntriesData = TalentEntries::getApiDataProvider(array('event_id' => $eventId), 200)->getData();
         echo "Total entries loaded: " . count($allEntriesData) . "\n";
         $loaded = array();
