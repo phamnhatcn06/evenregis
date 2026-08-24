@@ -263,6 +263,9 @@ class Attendees extends BaseAttendees
             if (isset($data['division'])) {
                 $model->division = $data['division'];
             }
+            if (isset($data['property_name'])) {
+                $model->property_name = $data['property_name'];
+            }
             $model->id = $id;
             return $model;
         }
