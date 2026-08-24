@@ -253,6 +253,10 @@ class EmailHelper
         if ($isDot2) {
             $ccRaw[] = 'daihoi.bannghiepvu@muongthanh.vn';
         }
+        // Đợt 3 → Ban sự kiện văn nghệ
+        if ($showTalent) {
+            $ccRaw[] = 'daihoi.bansukienvanghe@muongthanh.vn';
+        }
         // CC cố định cho mọi email (khi không ở chế độ debug): Ban Hành chính - Logistic
         if (!self::DEBUG_MODE) {
             $ccRaw[] = 'daihoi.banhanhchinhlogistic@muongthanh.vn';
