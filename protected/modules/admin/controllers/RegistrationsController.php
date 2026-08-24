@@ -6679,7 +6679,7 @@ class RegistrationsController extends AdminController
 
 		$auditPerSub = array();
 		foreach (array_keys($subMap) as $j) {
-			$auditPerSub[$j] = array('sports' => array(), 'competitions' => array());
+			$auditPerSub[$j] = array('sports' => array(), 'competitions' => array(), 'talents' => array());
 		}
 
 		$cancelledTeams = array();
