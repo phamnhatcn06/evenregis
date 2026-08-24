@@ -1849,7 +1849,7 @@ class ApproveRegistrationsController extends AdminController
         // Chuẩn bị audit theo từng người thay.
         $auditPerSub = array();
         foreach (array_keys($subMap) as $j) {
-            $auditPerSub[$j] = array('sports' => array(), 'competitions' => array());
+            $auditPerSub[$j] = array('sports' => array(), 'competitions' => array(), 'talents' => array());
         }
 
         // 2. Đội thể thao: gán → thêm người thay + gỡ người cũ; huỷ → gỡ người cũ (hoặc xoá cả đội).
