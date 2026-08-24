@@ -5,6 +5,8 @@ class DebugTalentCommand extends CConsoleCommand
     {
         $eventId = 3;
         $currentPropertyId = '42';
+        $p = require(dirname(__FILE__) . '/../config/params.php');
+        Yii::app()->params->mergeWith($p['params']);
         echo "API URL param: " . Yii::app()->params['externalApiUrl'] . "\n";
         $raw = ApiClient::get(ApiEndpoints::TALENT_ENTRY_LIST, array('event_id' => $eventId, 'page' => 1, 'per_page' => 200));
         echo "ApiClient success=" . var_export($raw['success'], true) . " error=" . var_export(isset($raw['error']) ? $raw['error'] : null, true) . "\n";
