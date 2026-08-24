@@ -516,57 +516,46 @@ $attributes = array(
                             <h6 class="fw-bold mb-2"><i class="fa fa-users me-1 text-info"></i>Danh sách người biểu diễn (<?php echo count($members); ?>)</h6>
                             <?php if (!empty($members)): ?>
                                 <?php
-                                $membersByProperty = array();
+                                // Có nhiều hơn 1 đơn vị (liên quân) thì hiển thị thêm cột Đơn vị
+                                $memberPropNames = array();
                                 foreach ($members as $member) {
-                                    $propName = isset($member['property_name']) ? $member['property_name'] : 'Không xác định';
-                                    if (!isset($membersByProperty[$propName])) {
-                                        $membersByProperty[$propName] = array();
-                                    }
-                                    $membersByProperty[$propName][] = $member;
+                                    $memberPropNames[isset($member['property_name']) ? $member['property_name'] : ''] = true;
                                 }
+                                $showPropertyColumn = count($memberPropNames) > 1;
                                 ?>
-                                <?php if (count($membersByProperty) > 1): ?>
-                                    <!-- Nhiều đơn vị - hiển thị theo từng đơn vị -->
-                                    <?php foreach ($membersByProperty as $propName => $propMembers): ?>
-                                        <div class="mb-2">
-                                            <span class="badge bg-primary mb-1"><?php echo CHtml::encode($propName); ?> (<?php echo count($propMembers); ?>)</span>
-                                            <div class="ms-3">
-                                                <?php foreach ($propMembers as $idx => $member):
-                                                    $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
-                                                    $pos = isset($member['position_name']) ? $member['position_name'] : '';
-                                                    $div = isset($member['division_name']) ? $member['division_name'] : '';
-                                                    $nameInfo = CHtml::encode($name);
-                                                    $details = array();
-                                                    if ($pos) $details[] = CHtml::encode($pos);
-                                                    if ($div) $details[] = 'Bộ phận: ' . CHtml::encode($div);
-                                                    if (!empty($details)) {
-                                                        $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
-                                                    }
-                                                ?>
-                                                    <div class="mb-1"><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <!-- Một đơn vị - hiển thị bình thường -->
-                                    <div class="row">
-                                        <?php foreach ($members as $idx => $member):
-                                            $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
-                                            $pos = isset($member['position_name']) ? $member['position_name'] : '';
-                                            $div = isset($member['division_name']) ? $member['division_name'] : '';
-                                            $nameInfo = CHtml::encode($name);
-                                            $details = array();
-                                            if ($pos) $details[] = CHtml::encode($pos);
-                                            if ($div) $details[] = 'Bộ phận: ' . CHtml::encode($div);
-                                            if (!empty($details)) {
-                                                $nameInfo .= ' <small class="text-muted">(' . implode(' - ', $details) . ')</small>';
-                                            }
-                                        ?>
-                                            <div class="col-md-6 mb-1"><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-sm mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width:50px;" class="text-center">STT</th>
+                                                <th>Họ tên</th>
+                                                <th>Chức danh</th>
+                                                <th>Bộ phận</th>
+                                                <?php if ($showPropertyColumn): ?>
+                                                    <th>Đơn vị</th>
+                                                <?php endif; ?>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($members as $idx => $member):
+                                                $name = isset($member['attendee_name']) ? $member['attendee_name'] : '';
+                                                $pos = isset($member['position_name']) ? $member['position_name'] : '';
+                                                $div = isset($member['division_name']) ? $member['division_name'] : '';
+                                                $propName = isset($member['property_name']) ? $member['property_name'] : '';
+                                            ?>
+                                                <tr>
+                                                    <td class="text-center"><?php echo $idx + 1; ?></td>
+                                                    <td><?php echo CHtml::encode($name); ?></td>
+                                                    <td><?php echo $pos ? CHtml::encode($pos) : '-'; ?></td>
+                                                    <td><?php echo $div ? CHtml::encode($div) : '-'; ?></td>
+                                                    <?php if ($showPropertyColumn): ?>
+                                                        <td><?php echo $propName ? CHtml::encode($propName) : '-'; ?></td>
+                                                    <?php endif; ?>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
                             <?php else: ?>
                                 <p class="text-muted mb-0">Chưa chọn người biểu diễn</p>
                             <?php endif; ?>
