@@ -423,8 +423,11 @@ class ApproveRegistrationsController extends AdminController
                 $entryShowId = isset($entry->show_id) ? $entry->show_id : (isset($entry['show_id']) ? $entry['show_id'] : null);
                 $entryPropertyId = isset($entry->property_id) ? (string)$entry->property_id : (isset($entry['property_id']) ? (string)$entry['property_id'] : '');
 
-                // Chỉ lấy entries của đơn vị hiện tại (owner)
-                if ($entryId && $entryPropertyId === $currentPropertyId && (empty($showIds) || in_array($entryShowId, $showIds))) {
+                // Chỉ lấy entries của đơn vị hiện tại (owner).
+                // LƯU Ý: API danh sách talent-entries KHÔNG trả về show_id (luôn null), nên KHÔNG
+                // được lọc theo $showIds — in_array(null, [...]) luôn false sẽ loại bỏ hết tiết mục.
+                // Entry đã được lọc theo event_id (API) + property owner, đủ để hiển thị đúng.
+                if ($entryId && $entryPropertyId === $currentPropertyId) {
                     $processedEntryIds[] = $entryId;
                     // Fetch category name if not available
                     if (empty($entry->category_name) && (isset($entry->category_id) || isset($entry['category_id']))) {
