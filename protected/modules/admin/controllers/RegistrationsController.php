@@ -6483,7 +6483,7 @@ class RegistrationsController extends AdminController
 		$summary = Attendees::getParticipationSummary($oldId);
 
 		$referenced = array();
-		foreach (array_merge(array_values($assignTeam), array_values($assignComp)) as $v) {
+		foreach (array_merge(array_values($assignTeam), array_values($assignComp), array_values($assignTalent)) as $v) {
 			if (preg_match('/^s(\d+)$/', (string)$v, $mm)) { $referenced[$mm[1]] = true; }
 		}
 		if (empty($referenced)) {
