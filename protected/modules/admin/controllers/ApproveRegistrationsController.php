@@ -1639,7 +1639,7 @@ class ApproveRegistrationsController extends AdminController
 
         // Xác định các người thay được gán ít nhất 1 nội dung (chỉ tạo những người này).
         $referenced = array();
-        foreach (array_merge(array_values($assignTeam), array_values($assignComp)) as $v) {
+        foreach (array_merge(array_values($assignTeam), array_values($assignComp), array_values($assignTalent)) as $v) {
             if (preg_match('/^s(\d+)$/', (string)$v, $mm)) { $referenced[$mm[1]] = true; }
         }
         if (empty($referenced)) {
