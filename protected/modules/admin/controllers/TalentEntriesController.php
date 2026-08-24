@@ -16,7 +16,7 @@ class TalentEntriesController extends AdminController
     public function actionView($id)
     {
         $model = $this->loadModelById($id);
-        $members = TalentEntryMembers::getApiDataProvider(array('entry_id' => $id), 100)->getData();
+        $members = TalentEntryMembers::getMembersByEntry($id);
 
         $this->render('view', array(
             'model' => $model,
