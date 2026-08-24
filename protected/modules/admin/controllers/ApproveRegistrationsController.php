@@ -1999,7 +1999,7 @@ class ApproveRegistrationsController extends AdminController
                 'performed_by' => $email,
             ));
         }
-        if (!empty($cancelledTeams) || !empty($cancelledComps) || !empty($cancelledBeauty)) {
+        if (!empty($cancelledTeams) || !empty($cancelledComps) || !empty($cancelledBeauty) || !empty($cancelledTalents)) {
             AttendeeReplacements::record(array(
                 'registration_id' => $registrationId,
                 'event_id' => $eventId,
@@ -2014,6 +2014,7 @@ class ApproveRegistrationsController extends AdminController
                 'affected_contents' => array(
                     'competitions' => $cancelledComps,
                     'beauty_contests' => $cancelledBeauty,
+                    'talents' => $cancelledTalents,
                     '_batch_id' => $batchId,
                 ),
                 'cancelled_teams' => $cancelledTeams,
