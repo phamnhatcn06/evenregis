@@ -63,6 +63,25 @@ class TalentEntryMembers extends BaseTalentEntryMembers
     }
 
     /**
+     * Lấy danh sách thành viên của một tiết mục, kèm tên người tham gia.
+     * API talent-entry-members không trả về attendee_name nên phải resolve
+     * qua Attendees::fetchFromApi theo từng attendee_id.
+     */
+    public static function getMembersByEntry($entryId)
+    {
+        $members = self::getApiDataProvider(array('entry_id' => $entryId), 500)->getData();
+
+        foreach ($members as $member) {
+            if (!empty($member->attendee_id)) {
+                $attendee = Attendees::fetchFromApi($member->attendee_id);
+                $member->attendee_name = $attendee ? $attendee->full_name : ('#' . $member->attendee_id);
+            }
+        }
+
+        return $members;
+    }
+
+    /**
      * Lấy danh sách raw thành viên tiết mục văn nghệ theo sự kiện (dạng mảng từ API)
      */
     public static function getRawListByEvent($eventId, $perPage = 10000)
