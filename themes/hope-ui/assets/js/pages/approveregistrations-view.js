@@ -132,6 +132,23 @@
         }
         html += '</div>';
 
+        var talents = summary.talent_entries || [];
+        html += '<div class="mb-3"><h6 class="mb-1"><i class="fa fa-music me-1 text-info"></i>Văn nghệ</h6>';
+        if (talents.length) {
+            html += '<ul class="list-group list-group-flush">';
+            talents.forEach(function (te) {
+                html += '<li class="list-group-item px-0 py-1">'
+                    + escapeHtml(te.entry_title || '')
+                    + (te.category_name ? ' <span class="badge bg-secondary">' + escapeHtml(te.category_name) + '</span>' : '')
+                    + ' <span class="badge bg-danger">Sẽ huỷ</span>'
+                    + '</li>';
+            });
+            html += '</ul>';
+        } else {
+            html += '<p class="text-muted small mb-0">Không đăng ký tiết mục văn nghệ.</p>';
+        }
+        html += '</div>';
+
         var roles = summary.roles || [];
         html += '<div><h6 class="mb-1"><i class="fa fa-id-badge me-1 text-success"></i>Vai trò</h6>';
         if (roles.length) {
