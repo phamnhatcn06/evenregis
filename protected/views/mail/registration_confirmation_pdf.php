@@ -501,11 +501,17 @@
                 <?php // Văn nghệ (Đợt 3) — gom theo thể loại, kèm thông tin từng tiết mục (không kèm link video/audio)
                 ?>
                 <?php foreach ($talentByCategory as $catName => $entries): ?>
+                    <?php // Hàng tiêu đề thể loại — ngắn, luôn ngắt trang được giữa các hàng ?>
                     <tr>
                         <td class="col-stt"><?php echo ++$stt; ?></td>
-                        <td>
-                            <div><strong><?php echo CHtml::encode($catName); ?></strong></div>
-                            <?php foreach ($entries as $entry): ?>
+                        <td><strong><?php echo CHtml::encode($catName); ?></strong></td>
+                        <td><strong><?php echo count($entries); ?> tiết mục</strong></td>
+                    </tr>
+                    <?php // Mỗi tiết mục là một hàng riêng để dompdf có chỗ ngắt trang ?>
+                    <?php foreach ($entries as $entry): ?>
+                        <tr>
+                            <td class="col-stt">&nbsp;</td>
+                            <td colspan="2">
                                 <div class="talent-entry">
                                     <div class="talent-title">
                                         &bull; <strong><?php echo CHtml::encode(!empty($entry['title']) ? $entry['title'] : 'Tiết mục'); ?></strong>
@@ -539,10 +545,9 @@
                                         <div class="talent-desc">Nội dung: <?php echo CHtml::encode($desc); ?></div>
                                     <?php endif; ?>
                                 </div>
-                            <?php endforeach; ?>
-                        </td>
-                        <td><strong><?php echo count($entries); ?> tiết mục</strong></td>
-                    </tr>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 <?php endforeach; ?>
 
                 <?php // Miss (Đợt 1) 
