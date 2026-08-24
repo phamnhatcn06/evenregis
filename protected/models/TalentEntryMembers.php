@@ -75,6 +75,7 @@ class TalentEntryMembers extends BaseTalentEntryMembers
             if (!empty($member->attendee_id)) {
                 $attendee = Attendees::fetchFromApi($member->attendee_id);
                 $member->attendee_name = $attendee ? $attendee->full_name : ('#' . $member->attendee_id);
+                $member->property_name = $attendee ? $attendee->property_name : '';
             }
         }
 
