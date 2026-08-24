@@ -233,6 +233,9 @@ $this->Tabletitle = 'Chi tiết tiết mục: ' . CHtml::encode($model->title);
                                 <div>
                                     <span class="badge bg-secondary me-2"><?php echo $index + 1; ?></span>
                                     <strong><?php echo CHtml::encode($member->attendee_name); ?></strong>
+                                    <?php if (!empty($member->property_name)): ?>
+                                        <br><small class="text-muted ms-4"><i class="fa fa-building-o me-1"></i><?php echo CHtml::encode($member->property_name); ?></small>
+                                    <?php endif; ?>
                                     <?php if (!empty($member->role)): ?>
                                         <br><small class="text-muted ms-4"><?php echo CHtml::encode($member->role); ?></small>
                                     <?php endif; ?>
