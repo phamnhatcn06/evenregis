@@ -556,6 +556,7 @@ class Attendees extends BaseAttendees
                 'entry_id' => $entryId,
                 'entry_title' => $title,
                 'category_name' => $categoryName,
+                'role' => isset($item['role']) ? $item['role'] : '',
             );
         }
         return array_values($entries);
