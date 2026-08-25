@@ -501,13 +501,15 @@
                 <?php // Văn nghệ (Đợt 3) — gom theo thể loại, kèm thông tin từng tiết mục (không kèm link video/audio)
                 ?>
                 <?php foreach ($talentByCategory as $catName => $entries): ?>
-                    <?php // Hàng tiêu đề thể loại — ngắn, luôn ngắt trang được giữa các hàng ?>
+                    <?php // Hàng tiêu đề thể loại — ngắn, luôn ngắt trang được giữa các hàng 
+                    ?>
                     <tr>
                         <td class="col-stt"><?php echo ++$stt; ?></td>
                         <td><strong><?php echo CHtml::encode($catName); ?></strong></td>
                         <td><strong><?php echo count($entries); ?> tiết mục</strong></td>
                     </tr>
-                    <?php // Mỗi tiết mục là một hàng riêng để dompdf có chỗ ngắt trang ?>
+                    <?php // Mỗi tiết mục là một hàng riêng để dompdf có chỗ ngắt trang 
+                    ?>
                     <?php foreach ($entries as $entry): ?>
                         <tr>
                             <td class="col-stt">&nbsp;</td>
@@ -780,7 +782,7 @@
         </div>
 
         <div class="signature">
-            <div class="role">GIÁM ĐỐC KHÁCH SẠN</div>
+            <div class="role">GIÁM ĐỐC ĐƠN VỊ</div>
             <div class="hint">(Ký tên, đóng dấu)</div>
         </div>
     </div>
