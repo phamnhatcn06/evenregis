@@ -81,6 +81,21 @@ class ApiEndpoints
     const BEAUTY_CONTESTANT_BY_TOKEN = '/api/beauty-contestants/by-token/{token}';
     const BEAUTY_CONTESTANT_SUBMIT_BY_TOKEN = '/api/beauty-contestants/submit-by-token';
 
+    // News (Daihoi Admin - REST style)
+    const NEWS_LIST = '/api/admin/news';
+    const NEWS_STORE = '/api/admin/news';
+    const NEWS_DETAIL = '/api/admin/news/{id}';
+    const NEWS_UPDATE = '/api/admin/news/{id}';
+    const NEWS_DESTROY = '/api/admin/news/{id}';
+
+    // News Categories (Daihoi Admin - REST style)
+    const NEWS_CATEGORY_LIST = '/api/admin/news-categories';
+    const NEWS_CATEGORY_STORE = '/api/admin/news-categories';
+    const NEWS_CATEGORY_DETAIL = '/api/admin/news-categories/{id}';
+    const NEWS_CATEGORY_UPDATE = '/api/admin/news-categories/{id}';
+    const NEWS_CATEGORY_DESTROY = '/api/admin/news-categories/{id}';
+    const NEWS_CATEGORY_REORDER = '/api/admin/news-categories/reorder';
+
     // Event
     const EVENT_LIST = '/api/events';
     const EVENT_STORE = '/api/events/store';

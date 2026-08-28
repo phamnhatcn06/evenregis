@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: localhost:3306
--- Thời gian đã tạo: Th8 05, 2026 lúc 04:37 AM
+-- Thời gian đã tạo: Th8 28, 2026 lúc 04:17 AM
 -- Phiên bản máy phục vụ: 8.0.46-0ubuntu0.22.04.3
 -- Phiên bản PHP: 8.2.30
 
@@ -38,8 +38,8 @@ CREATE TABLE `alliances` (
   `confirmed_at` int UNSIGNED DEFAULT NULL,
   `dissolved_at` int UNSIGNED DEFAULT NULL,
   `dissolved_by` int UNSIGNED DEFAULT NULL,
-  `dissolved_reason` text COLLATE utf8mb4_unicode_ci,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `dissolved_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -64,8 +64,8 @@ CREATE TABLE `alliance_requests` (
   `requested_at` datetime DEFAULT NULL,
   `reviewed_by` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'unit_accounts.id hoặc users.id',
   `reviewed_at` datetime DEFAULT NULL,
-  `rejection_reason` text COLLATE utf8mb4_unicode_ci,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `rejection_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -94,9 +94,9 @@ CREATE TABLE `alliance_team_orgs` (
 
 CREATE TABLE `approval_workflows` (
   `id` int UNSIGNED NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã workflow',
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tên workflow',
-  `description` text COLLATE utf8mb4_unicode_ci COMMENT 'Mô tả',
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã workflow',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tên workflow',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'Mô tả',
   `total_steps` tinyint UNSIGNED NOT NULL DEFAULT '1' COMMENT 'Tổng số bước duyệt',
   `is_default` tinyint NOT NULL DEFAULT '0' COMMENT '0: không mặc định, 1: mặc định',
   `is_active` tinyint NOT NULL DEFAULT '1' COMMENT '0: không kích hoạt, 1: kích hoạt',
@@ -116,10 +116,10 @@ CREATE TABLE `approval_workflow_approvers` (
   `id` int UNSIGNED NOT NULL,
   `workflow_id` int UNSIGNED NOT NULL COMMENT 'approval_workflows.id',
   `step_index` tinyint UNSIGNED NOT NULL COMMENT 'Thứ tự bước',
-  `step_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tên bước',
+  `step_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Tên bước',
   `portal_user_id` int UNSIGNED NOT NULL COMMENT 'ID người duyệt',
-  `portal_user_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên người duyệt',
-  `portal_user_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Email người duyệt',
+  `portal_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên người duyệt',
+  `portal_user_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Email người duyệt',
   `organization_id` int UNSIGNED DEFAULT NULL COMMENT 'ID tổ chức',
   `is_active` tinyint NOT NULL DEFAULT '1' COMMENT '0: không kích hoạt, 1: kích hoạt',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -137,11 +137,11 @@ CREATE TABLE `approve_attendee_logs` (
   `id` bigint UNSIGNED NOT NULL,
   `attendee_id` bigint UNSIGNED NOT NULL,
   `status_approve` tinyint NOT NULL DEFAULT '0' COMMENT '0: pending, 1: approved, 2: rejected',
-  `reject_reason` text COLLATE utf8mb4_unicode_ci,
+  `reject_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `auth_mail` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Email người duyệt',
+  `auth_mail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Email người duyệt',
   `old_data` json DEFAULT NULL COMMENT 'Dữ liệu cũ',
   `new_data` json DEFAULT NULL COMMENT 'Dữ liệu mới'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -156,8 +156,8 @@ CREATE TABLE `approve_registration_logs` (
   `id` bigint UNSIGNED NOT NULL,
   `registration_id` bigint UNSIGNED NOT NULL,
   `status_approve` tinyint NOT NULL DEFAULT '0' COMMENT '0: Pending, 1: Approved, 2: Rejected',
-  `reject_reason` text COLLATE utf8mb4_unicode_ci,
-  `auth_mail` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Email người duyệt',
+  `reject_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `auth_mail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Email người duyệt',
   `old_data` json DEFAULT NULL COMMENT 'Dữ liệu cũ',
   `new_data` json DEFAULT NULL COMMENT 'Dữ liệu mới',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -177,22 +177,22 @@ CREATE TABLE `attendees` (
   `registration_id` bigint UNSIGNED NOT NULL,
   `property_id` bigint UNSIGNED NOT NULL,
   `staff_id` bigint UNSIGNED DEFAULT NULL,
-  `role_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `full_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_card` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CMND/CCCD/Passport',
-  `position` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `full_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_card` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'CMND/CCCD/Passport',
+  `position` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `gender` int DEFAULT NULL COMMENT '0: Man, 1: Woman, 2: Other',
   `birthday` date DEFAULT NULL,
-  `phone_number` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `unit_label` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `photo_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `photo_full_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cccd_front_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh mặt trước CCCD',
-  `cccd_back_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh mặt sau CCCD',
-  `portrait_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh chân dung 530x530px',
-  `contract_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'File scan hợp đồng lao động',
-  `qr_token` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `badge_number` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `unit_label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `photo_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `photo_full_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cccd_front_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh mặt trước CCCD',
+  `cccd_back_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh mặt sau CCCD',
+  `portrait_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh chân dung 530x530px',
+  `contract_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'File scan hợp đồng lao động',
+  `qr_token` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `badge_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `badge_generated` tinyint NOT NULL DEFAULT '0',
   `badge_printed` tinyint NOT NULL DEFAULT '0',
   `transport_id` bigint UNSIGNED DEFAULT NULL,
@@ -203,7 +203,7 @@ CREATE TABLE `attendees` (
   `sort_order` int NOT NULL DEFAULT '0',
   `approved_by` bigint UNSIGNED DEFAULT NULL,
   `approved_at` bigint UNSIGNED DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -212,12 +212,39 @@ CREATE TABLE `attendees` (
   `end_date` datetime DEFAULT NULL,
   `current_approval_index` int DEFAULT NULL COMMENT 'Index duyệt hiện tại',
   `next_approval_index` int DEFAULT NULL COMMENT 'Index duyệt tiếp theo',
-  `staff_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `position_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `position_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `department_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `department_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `staff_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `position_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `position_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `department_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `department_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `end_starting_date` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `attendee_replacements`
+--
+
+CREATE TABLE `attendee_replacements` (
+  `id` bigint UNSIGNED NOT NULL,
+  `registration_id` bigint UNSIGNED NOT NULL COMMENT 'Phiếu đăng ký bị tác động',
+  `event_id` bigint UNSIGNED DEFAULT NULL COMMENT 'Sự kiện',
+  `property_id` bigint UNSIGNED DEFAULT NULL COMMENT 'Đơn vị',
+  `action` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'replace | withdraw',
+  `old_attendee_id` bigint UNSIGNED DEFAULT NULL COMMENT 'Người bị thay/huỷ',
+  `old_attendee_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên tại thời điểm thao tác (snapshot)',
+  `old_staff_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Mã NV người bị thay/huỷ (snapshot)',
+  `new_attendee_id` bigint UNSIGNED DEFAULT NULL COMMENT 'Người thay thế',
+  `new_attendee_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên người thay (snapshot)',
+  `new_staff_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Mã NV người thay (snapshot)',
+  `affected_contents` json DEFAULT NULL COMMENT 'Nội dung thể thao/nghiệp vụ/vai trò bị ảnh hưởng',
+  `cancelled_teams` json DEFAULT NULL COMMENT 'Các đội bị huỷ do thao tác này',
+  `reason` text COLLATE utf8mb4_unicode_ci COMMENT 'Lý do thay/huỷ',
+  `performed_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Email người thực hiện (từ SSO)',
+  `created_at` int UNSIGNED DEFAULT NULL COMMENT 'Unix timestamp tạo',
+  `updated_at` int UNSIGNED DEFAULT NULL COMMENT 'Unix timestamp cập nhật',
+  `deleted_at` int UNSIGNED DEFAULT NULL COMMENT 'Soft delete (unix timestamp)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -246,16 +273,16 @@ CREATE TABLE `attendee_roles` (
 CREATE TABLE `audit_logs` (
   `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
-  `auth_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `module` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `action` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `target_table` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `auth_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `action` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `target_table` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `target_id` bigint UNSIGNED DEFAULT NULL,
   `old_values` json DEFAULT NULL,
   `new_values` json DEFAULT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` int UNSIGNED DEFAULT NULL
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -268,7 +295,7 @@ CREATE TABLE `badges` (
   `id` bigint UNSIGNED NOT NULL,
   `attendee_id` bigint UNSIGNED NOT NULL,
   `template_id` bigint UNSIGNED DEFAULT NULL,
-  `generated_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `generated_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `width_mm` decimal(6,2) NOT NULL DEFAULT '85.60',
   `height_mm` decimal(6,2) NOT NULL DEFAULT '53.98',
   `dpi` int NOT NULL DEFAULT '300',
@@ -288,13 +315,13 @@ CREATE TABLE `badges` (
 
 CREATE TABLE `banquet_events` (
   `id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `event_time` datetime NOT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `total_tables` int NOT NULL,
   `seats_per_table` int NOT NULL,
-  `layout_description` text COLLATE utf8mb4_unicode_ci,
-  `layout_image_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `layout_description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `layout_image_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `canvas_width` int NOT NULL,
   `canvas_height` int NOT NULL,
   `is_active` tinyint NOT NULL DEFAULT '1',
@@ -331,12 +358,12 @@ CREATE TABLE `banquet_tables` (
   `id` bigint UNSIGNED NOT NULL,
   `event_id` bigint UNSIGNED NOT NULL,
   `table_number` int NOT NULL,
-  `label` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `capacity` int NOT NULL DEFAULT '10',
   `pos_x` int NOT NULL DEFAULT '0',
   `pos_y` int NOT NULL DEFAULT '0',
-  `shape` enum('circle','rectangle') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'circle',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `shape` enum('circle','rectangle') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'circle',
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -351,8 +378,8 @@ CREATE TABLE `banquet_tables` (
 CREATE TABLE `beauty_competitions` (
   `id` bigint UNSIGNED NOT NULL,
   `event_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -369,20 +396,20 @@ CREATE TABLE `beauty_contestants` (
   `contest_id` bigint UNSIGNED NOT NULL,
   `registration_id` bigint UNSIGNED DEFAULT NULL,
   `attendee_id` bigint UNSIGNED NOT NULL,
-  `candidate_number` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `personal_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `candidate_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `personal_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `height_cm` double(8,2) DEFAULT NULL,
   `weight_kg` double(8,2) DEFAULT NULL,
-  `measurements` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `talent` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bio` text COLLATE utf8mb4_unicode_ci,
-  `photo_portrait` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `photo_portrait_2` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh chân dung 2',
-  `photo_full_body` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `photo_full_body_2` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh toàn thân 2',
-  `video_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Video dự thi (max 4 phút)',
+  `measurements` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `talent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bio` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `photo_portrait` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `photo_portrait_2` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh chân dung 2',
+  `photo_full_body` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `photo_full_body_2` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Ảnh toàn thân 2',
+  `video_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Video dự thi (max 4 phút)',
   `submitted_at` datetime DEFAULT NULL COMMENT 'Thời điểm thí sinh tự submit',
-  `award` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `award` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `final_rank` int DEFAULT NULL,
   `registered_at` datetime DEFAULT NULL,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '0: registered, 1: confirmed, 2: withdrawn, 3: disqualified',
@@ -400,16 +427,16 @@ CREATE TABLE `beauty_contestants` (
 CREATE TABLE `beauty_contests` (
   `id` bigint UNSIGNED NOT NULL,
   `event_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `gender` enum('female') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'female',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `gender` enum('female') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'female',
   `age_min` int NOT NULL,
   `age_max` int NOT NULL,
   `registration_open_at` datetime DEFAULT NULL,
   `registration_close_at` datetime DEFAULT NULL,
   `contest_date` date DEFAULT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `candidate_prefix` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `candidate_prefix` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `candidate_start` int NOT NULL,
   `max_per_org` int DEFAULT NULL,
   `is_active` tinyint NOT NULL DEFAULT '1',
@@ -428,7 +455,7 @@ CREATE TABLE `beauty_registrations` (
   `id` bigint UNSIGNED NOT NULL,
   `competition_id` bigint UNSIGNED NOT NULL,
   `attendee_id` bigint UNSIGNED NOT NULL,
-  `candidate_number` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `candidate_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -443,14 +470,14 @@ CREATE TABLE `beauty_registrations` (
 CREATE TABLE `beauty_rounds` (
   `id` bigint UNSIGNED NOT NULL,
   `contest_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `round_type` enum('ao_dai','bikini','talent','qa','final') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `round_type` enum('ao_dai','bikini','talent','qa','final') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `round_order` int NOT NULL DEFAULT '1',
   `max_score` double(8,2) NOT NULL DEFAULT '10.00',
   `weight` double(8,2) NOT NULL DEFAULT '1.00',
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -468,7 +495,7 @@ CREATE TABLE `beauty_round_results` (
   `round_id` bigint UNSIGNED NOT NULL,
   `score` decimal(8,2) DEFAULT NULL,
   `passed` tinyint DEFAULT '0' COMMENT '0: Chưa đạt, 1: Đạt/Vượt qua',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -486,7 +513,7 @@ CREATE TABLE `beauty_scores` (
   `contestant_id` bigint UNSIGNED NOT NULL,
   `judge_id` bigint UNSIGNED NOT NULL,
   `score` decimal(8,2) NOT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `scored_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -502,7 +529,7 @@ CREATE TABLE `beauty_scores` (
 CREATE TABLE `beauty_submission_tokens` (
   `id` int UNSIGNED NOT NULL,
   `contestant_id` bigint UNSIGNED NOT NULL,
-  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Unique secure token',
+  `token` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Unique secure token',
   `expires_at` int UNSIGNED NOT NULL COMMENT 'Unix timestamp',
   `used_at` int UNSIGNED DEFAULT NULL COMMENT 'Khi submit thành công',
   `created_at` int UNSIGNED NOT NULL
@@ -516,11 +543,11 @@ CREATE TABLE `beauty_submission_tokens` (
 
 CREATE TABLE `competitions` (
   `id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `registration_open_at` datetime DEFAULT NULL,
   `registration_close_at` datetime DEFAULT NULL,
-  `candidate_number_prefix` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `candidate_number_prefix` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `candidate_number_start` int NOT NULL DEFAULT '1',
   `candidate_number_pad` int NOT NULL DEFAULT '3',
   `max_per_org` int DEFAULT NULL,
@@ -542,7 +569,7 @@ CREATE TABLE `competitions` (
 CREATE TABLE `competition_departments` (
   `id` bigint UNSIGNED NOT NULL,
   `competition_id` bigint UNSIGNED NOT NULL,
-  `department_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã phòng ban được phép thi',
+  `department_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã phòng ban được phép thi',
   `created_at` int UNSIGNED DEFAULT NULL,
   `updated_at` int UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -558,12 +585,12 @@ CREATE TABLE `competition_registrations` (
   `competition_id` bigint UNSIGNED NOT NULL,
   `attendee_id` bigint UNSIGNED NOT NULL,
   `registration_id` bigint UNSIGNED DEFAULT NULL COMMENT 'Liên kết với bảng registrations',
-  `candidate_number` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `candidate_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` tinyint NOT NULL DEFAULT '1',
   `registered_at` datetime DEFAULT NULL,
   `confirmed_by` bigint UNSIGNED DEFAULT NULL,
   `confirmed_at` datetime DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -578,12 +605,12 @@ CREATE TABLE `competition_registrations` (
 CREATE TABLE `competition_rounds` (
   `id` bigint UNSIGNED NOT NULL,
   `competition_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `round_order` int NOT NULL DEFAULT '1',
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `start_time` int UNSIGNED DEFAULT NULL,
   `end_time` int UNSIGNED DEFAULT NULL,
-  `instructions` text COLLATE utf8mb4_unicode_ci,
+  `instructions` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -602,8 +629,8 @@ CREATE TABLE `competition_round_results` (
   `score` decimal(8,2) DEFAULT NULL,
   `rank` int DEFAULT NULL,
   `passed` tinyint NOT NULL DEFAULT '0',
-  `entry_type` enum('qualification','direct') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'qualification',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `entry_type` enum('qualification','direct') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'qualification',
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `scored_by` bigint UNSIGNED DEFAULT NULL,
   `scored_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -622,13 +649,13 @@ CREATE TABLE `competition_teams` (
   `competition_id` bigint UNSIGNED NOT NULL,
   `registration_id` bigint UNSIGNED DEFAULT NULL COMMENT 'registrations.id',
   `candidate_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Số báo danh của đội',
-  `team_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên đội (optional)',
+  `team_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên đội (optional)',
   `captain_id` bigint UNSIGNED DEFAULT NULL COMMENT 'attendees.id - đội trưởng',
   `status` tinyint NOT NULL DEFAULT '1' COMMENT '1:registered, 2:confirmed, 3:withdrawn',
   `registered_at` datetime DEFAULT NULL,
   `confirmed_by` bigint UNSIGNED DEFAULT NULL,
   `confirmed_at` datetime DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -644,7 +671,7 @@ CREATE TABLE `competition_team_members` (
   `id` bigint UNSIGNED NOT NULL,
   `team_id` bigint UNSIGNED NOT NULL COMMENT 'competition_teams.id',
   `attendee_id` bigint UNSIGNED NOT NULL,
-  `role` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Vai trò trong đội',
+  `role` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Vai trò trong đội',
   `is_captain` tinyint NOT NULL DEFAULT '0',
   `sort_order` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -660,9 +687,9 @@ CREATE TABLE `competition_team_members` (
 
 CREATE TABLE `contents` (
   `id` bigint UNSIGNED NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1',
   `sort_order` int NOT NULL DEFAULT '0',
   `allow_alliance` tinyint DEFAULT '0' COMMENT '0: No, 1: Yes',
@@ -681,10 +708,10 @@ CREATE TABLE `contents` (
 CREATE TABLE `content_rounds` (
   `id` bigint UNSIGNED NOT NULL,
   `content_id` bigint UNSIGNED DEFAULT NULL,
-  `content_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `content_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `sort_order` int NOT NULL DEFAULT '0',
   `status` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -701,12 +728,12 @@ CREATE TABLE `content_rounds` (
 CREATE TABLE `database_connections` (
   `id` bigint UNSIGNED NOT NULL,
   `property_id` bigint NOT NULL,
-  `db_connection` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `db_host` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `db_port` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `db_database` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `db_username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `db_password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `db_connection` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `db_host` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `db_port` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `db_database` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `db_username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `db_password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` tinyint NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -721,13 +748,13 @@ CREATE TABLE `database_connections` (
 
 CREATE TABLE `departments` (
   `id` bigint UNSIGNED NOT NULL,
-  `property_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `division_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `unique_code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `property_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `division_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `unique_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_member` int DEFAULT NULL,
-  `notes` text COLLATE utf8mb4_unicode_ci,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1' COMMENT ' 1: Active, 2: Inactive',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -742,12 +769,12 @@ CREATE TABLE `departments` (
 
 CREATE TABLE `divisions` (
   `id` bigint UNSIGNED NOT NULL,
-  `property_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `unique_code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `property_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `unique_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_staff` int NOT NULL DEFAULT '0',
-  `notes` text COLLATE utf8mb4_unicode_ci,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1' COMMENT ' 1: Active, 2: Inactive',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -762,12 +789,12 @@ CREATE TABLE `divisions` (
 
 CREATE TABLE `events` (
   `id` bigint UNSIGNED NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `from_date` date NOT NULL,
   `to_date` date NOT NULL,
   `max_sports_per_attendee` int NOT NULL DEFAULT '3' COMMENT 'Số môn thể thao tối đa mỗi người (tính root sports)',
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '0: draft, 1: active, 2: completed, 3: cancelled',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -782,12 +809,12 @@ CREATE TABLE `events` (
 
 CREATE TABLE `event_agenda` (
   `id` bigint UNSIGNED NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime DEFAULT NULL,
-  `type` enum('plenary','break','workshop','ceremony','other') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'plenary',
+  `type` enum('plenary','break','workshop','ceremony','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'plenary',
   `is_public` tinyint NOT NULL DEFAULT '1',
   `sort_order` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -837,9 +864,9 @@ CREATE TABLE `event_contents` (
 
 CREATE TABLE `event_roles` (
   `id` bigint UNSIGNED NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `sort_order` int NOT NULL DEFAULT '0',
   `status` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -890,10 +917,54 @@ CREATE TABLE `event_units` (
   `event_id` bigint UNSIGNED NOT NULL,
   `property_id` bigint UNSIGNED NOT NULL,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '0: invited, 1: confirmed, 2: declined',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `led_screens`
+--
+
+CREATE TABLE `led_screens` (
+  `id` bigint UNSIGNED NOT NULL,
+  `event_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `resolution` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1920x1080',
+  `current_mode` enum('welcome','schedule','results','ranking','gallery','custom') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'welcome',
+  `auto_rotate` tinyint(1) NOT NULL DEFAULT '1',
+  `rotate_interval` int UNSIGNED NOT NULL DEFAULT '10',
+  `show_ticker` tinyint(1) NOT NULL DEFAULT '1',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `last_ping_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `led_slides`
+--
+
+CREATE TABLE `led_slides` (
+  `id` bigint UNSIGNED NOT NULL,
+  `screen_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subtitle` text COLLATE utf8mb4_unicode_ci,
+  `background_type` enum('gradient','image','video') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'gradient',
+  `background_value` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `content_type` enum('welcome','match_live','ranking','schedule','custom') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'welcome',
+  `content_data` json DEFAULT NULL,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT '0',
+  `duration` int UNSIGNED NOT NULL DEFAULT '10',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -904,12 +975,12 @@ CREATE TABLE `event_units` (
 
 CREATE TABLE `logs` (
   `id` bigint UNSIGNED NOT NULL,
-  `module` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint NOT NULL,
   `model_id` bigint DEFAULT NULL,
-  `action` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `old_data` text COLLATE utf8mb4_unicode_ci,
-  `new_data` text COLLATE utf8mb4_unicode_ci,
+  `action` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `old_data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `new_data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -924,14 +995,14 @@ CREATE TABLE `logs` (
 CREATE TABLE `meals` (
   `id` bigint UNSIGNED NOT NULL,
   `event_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `meal_date` date NOT NULL,
-  `meal_type` enum('breakfast','lunch','dinner','snack','banquet') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `meal_type` enum('breakfast','lunch','dinner','snack','banquet') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `serving_time` datetime NOT NULL,
   `cutoff_deadline` datetime NOT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `total_count` int DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `is_active` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -950,7 +1021,7 @@ CREATE TABLE `meal_attendees` (
   `attendee_id` bigint UNSIGNED NOT NULL,
   `table_id` bigint UNSIGNED NOT NULL,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '0: registered, 1: confirmed, 2: cancelled',
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -984,7 +1055,7 @@ CREATE TABLE `meal_cutoffs` (
   `meal_id` bigint UNSIGNED NOT NULL,
   `attendee_id` bigint UNSIGNED NOT NULL,
   `is_cutoff` tinyint NOT NULL DEFAULT '0',
-  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `reported_by` bigint UNSIGNED NOT NULL,
   `reported_at` datetime DEFAULT NULL,
   `approved_by` bigint UNSIGNED DEFAULT NULL,
@@ -1003,7 +1074,7 @@ CREATE TABLE `meal_cutoffs` (
 CREATE TABLE `meal_tables` (
   `id` bigint UNSIGNED NOT NULL,
   `meal_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `capacity` int NOT NULL DEFAULT '10',
   `status` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1019,8 +1090,74 @@ CREATE TABLE `meal_tables` (
 
 CREATE TABLE `migrations` (
   `id` int UNSIGNED NOT NULL,
-  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `news`
+--
+
+CREATE TABLE `news` (
+  `id` bigint UNSIGNED NOT NULL,
+  `event_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `excerpt` text COLLATE utf8mb4_unicode_ci,
+  `content` longtext COLLATE utf8mb4_unicode_ci,
+  `thumbnail` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `category_id` bigint UNSIGNED DEFAULT NULL,
+  `category` enum('announcement','sports','competition','beauty','talent','general') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general',
+  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `is_published` tinyint(1) NOT NULL DEFAULT '0',
+  `published_at` timestamp NULL DEFAULT NULL,
+  `view_count` int UNSIGNED NOT NULL DEFAULT '0',
+  `created_by` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `news_categories`
+--
+
+CREATE TABLE `news_categories` (
+  `id` bigint UNSIGNED NOT NULL,
+  `event_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icon` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` bigint UNSIGNED NOT NULL,
+  `event_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci,
+  `type` enum('important','info','warning','schedule') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'info',
+  `target_type` enum('all','organization','role') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'all',
+  `target_ids` json DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_by` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1031,15 +1168,15 @@ CREATE TABLE `migrations` (
 
 CREATE TABLE `positions` (
   `id` bigint UNSIGNED NOT NULL,
-  `unique_code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `property_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `division_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `department_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `unique_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `property_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `division_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `department_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `level` int NOT NULL,
-  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `amount` int DEFAULT '0',
-  `notes` text COLLATE utf8mb4_unicode_ci,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1' COMMENT ' 1: Active, 2: Inactive',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1055,14 +1192,14 @@ CREATE TABLE `positions` (
 CREATE TABLE `properties` (
   `id` bigint UNSIGNED NOT NULL,
   `region_id` bigint UNSIGNED DEFAULT NULL,
-  `prefix` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `prefix` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `smile_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `active_date` date DEFAULT NULL,
   `status` tinyint DEFAULT NULL,
   `has_golf` tinyint NOT NULL DEFAULT '0',
-  `mail_confirm` text COLLATE utf8mb4_unicode_ci,
+  `mail_confirm` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -1077,9 +1214,9 @@ CREATE TABLE `properties` (
 CREATE TABLE `regionals` (
   `id` bigint UNSIGNED NOT NULL,
   `content_id` bigint UNSIGNED DEFAULT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1098,14 +1235,14 @@ CREATE TABLE `registrations` (
   `property_id` bigint UNSIGNED NOT NULL,
   `relation_property_id` bigint UNSIGNED DEFAULT NULL,
   `period_id` bigint UNSIGNED NOT NULL,
-  `submitted_by` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `submitted_by` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '0: draft, 1: submitted, 2: approved, 3: rejected',
   `document` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `submitted_at` timestamp NULL DEFAULT NULL,
   `reviewed_by` int UNSIGNED DEFAULT NULL,
   `reviewed_at` datetime DEFAULT NULL,
-  `rejection_reason` text COLLATE utf8mb4_unicode_ci,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `rejection_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -1144,11 +1281,11 @@ CREATE TABLE `registration_approval_logs` (
   `id` int UNSIGNED NOT NULL,
   `registration_id` int UNSIGNED NOT NULL COMMENT 'registrations.id',
   `step_index` tinyint UNSIGNED NOT NULL COMMENT 'Bước thực hiện',
-  `step_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên bước',
+  `step_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên bước',
   `action` tinyint UNSIGNED NOT NULL COMMENT '1=approved, 2=rejected, 3=revision, 4=submitted, 5=resubmitted',
   `approver_portal_id` int UNSIGNED DEFAULT NULL COMMENT 'ID người thực hiện',
-  `approver_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên người thực hiện',
-  `comment` text COLLATE utf8mb4_unicode_ci COMMENT 'Nhận xét',
+  `approver_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên người thực hiện',
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'Nhận xét',
   `acted_at` datetime DEFAULT NULL COMMENT 'Thời gian thực hiện',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1164,13 +1301,13 @@ CREATE TABLE `registration_approval_logs` (
 CREATE TABLE `registration_details` (
   `id` bigint UNSIGNED NOT NULL,
   `registration_id` bigint UNSIGNED NOT NULL,
-  `registration_type` enum('quantity','detailed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'quantity' COMMENT 'quantity=số lượng đội, detailed=danh sách cụ thể',
+  `registration_type` enum('quantity','detailed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'quantity' COMMENT 'quantity=số lượng đội, detailed=danh sách cụ thể',
   `role_id` bigint UNSIGNED DEFAULT NULL,
   `content_id` bigint UNSIGNED DEFAULT NULL,
   `sport_id` bigint UNSIGNED DEFAULT NULL,
   `competition_id` bigint UNSIGNED DEFAULT NULL,
   `quantity` int NOT NULL DEFAULT '1',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1186,8 +1323,8 @@ CREATE TABLE `registration_details` (
 CREATE TABLE `registration_detail_attendees` (
   `id` bigint UNSIGNED NOT NULL,
   `registration_detail_id` bigint UNSIGNED NOT NULL,
-  `staff_code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `staff_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -1202,13 +1339,13 @@ CREATE TABLE `registration_detail_attendees` (
 CREATE TABLE `registration_periods` (
   `id` bigint UNSIGNED NOT NULL,
   `event_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime NOT NULL,
   `max_per_org` int DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general' COMMENT 'general: đăng ký chính | talent: văn nghệ | sport: thể thao',
-  `mail_btc` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general' COMMENT 'general: đăng ký chính | talent: văn nghệ | sport: thể thao',
+  `mail_btc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `note` tinyint(1) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1237,12 +1374,12 @@ CREATE TABLE `registration_period_contents` (
 CREATE TABLE `roles` (
   `id` bigint UNSIGNED NOT NULL,
   `event_id` bigint UNSIGNED DEFAULT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `color` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `icon` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `icon` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sort_order` int NOT NULL DEFAULT '0',
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -1256,14 +1393,14 @@ CREATE TABLE `roles` (
 
 CREATE TABLE `sports` (
   `id` bigint UNSIGNED NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `parent_id` bigint UNSIGNED DEFAULT NULL,
-  `type` enum('team','individual') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'team',
+  `type` enum('team','individual') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'team',
   `min_per_team_member` int DEFAULT NULL,
   `max_per_team_member` int DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `document` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `document` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint NOT NULL DEFAULT '1',
   `sort_order` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1282,17 +1419,17 @@ CREATE TABLE `sport_matches` (
   `event_id` bigint UNSIGNED DEFAULT NULL,
   `sport_id` bigint UNSIGNED NOT NULL,
   `stage_id` bigint UNSIGNED NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `round` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `match_type` enum('group','knockout','playoff','final') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'group',
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `round` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `match_type` enum('group','knockout','playoff','final') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'group',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `match_order` int DEFAULT NULL,
   `team_a_id` bigint UNSIGNED DEFAULT NULL,
   `team_b_id` bigint UNSIGNED DEFAULT NULL,
   `match_time` datetime DEFAULT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `final_score` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `final_score` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '0: scheduled, 1: ongoing, 2: completed, 3: cancelled',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1308,12 +1445,12 @@ CREATE TABLE `sport_matches` (
 CREATE TABLE `sport_match_results` (
   `id` bigint UNSIGNED NOT NULL,
   `match_id` bigint UNSIGNED NOT NULL,
-  `score_a` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `score_b` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `score_a` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `score_b` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `winner_team_id` bigint UNSIGNED DEFAULT NULL,
   `is_draw` tinyint NOT NULL DEFAULT '0',
-  `detail` text COLLATE utf8mb4_unicode_ci,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `detail` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1',
   `recorded_by` bigint UNSIGNED DEFAULT NULL,
   `recorded_at` datetime DEFAULT NULL,
@@ -1332,13 +1469,13 @@ CREATE TABLE `sport_stages` (
   `id` bigint UNSIGNED NOT NULL,
   `event_id` bigint UNSIGNED DEFAULT NULL,
   `sport_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `stage_type` enum('qualification','playoff','final') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'qualification',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `stage_type` enum('qualification','playoff','final') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'qualification',
   `stage_order` int NOT NULL DEFAULT '1',
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `rules` text COLLATE utf8mb4_unicode_ci,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rules` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '0: upcoming, 1: ongoing, 2: completed',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1355,12 +1492,12 @@ CREATE TABLE `sport_stage_teams` (
   `id` bigint UNSIGNED NOT NULL,
   `stage_id` bigint UNSIGNED NOT NULL,
   `team_id` bigint UNSIGNED NOT NULL,
-  `entry_type` enum('registered','promoted','playoff_winner') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'registered',
+  `entry_type` enum('registered','promoted','playoff_winner') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'registered',
   `qualified_from` bigint UNSIGNED DEFAULT NULL,
   `seed` int DEFAULT NULL,
   `final_rank` int DEFAULT NULL,
   `status` tinyint NOT NULL DEFAULT '0' COMMENT '0: active, 1: eliminated, 2: withdrawn',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -1398,17 +1535,17 @@ CREATE TABLE `sport_standings` (
 
 CREATE TABLE `sport_teams` (
   `id` bigint UNSIGNED NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `event_id` bigint UNSIGNED DEFAULT NULL,
   `registration_id` bigint UNSIGNED DEFAULT NULL,
   `sport_id` bigint UNSIGNED NOT NULL,
   `property_id` bigint UNSIGNED DEFAULT NULL,
   `is_alliance` tinyint NOT NULL DEFAULT '0' COMMENT 'Đội liên quân: 0=đội đơn vị, 1=đội liên quân',
-  `alliance_org_ids` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `alliance_org_ids` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_alliance_team` tinyint NOT NULL DEFAULT '0' COMMENT 'Cờ đội liên quân: 0=không, 1=có',
-  `short_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `color` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `short_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1425,13 +1562,13 @@ CREATE TABLE `sport_team_members` (
   `id` bigint UNSIGNED NOT NULL,
   `sport_team_id` bigint UNSIGNED NOT NULL,
   `attendee_id` bigint UNSIGNED NOT NULL,
-  `code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `image` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `jersey_number` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `position` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `jersey_number` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `position` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_captain` tinyint NOT NULL DEFAULT '0',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1446,37 +1583,37 @@ CREATE TABLE `sport_team_members` (
 
 CREATE TABLE `staffs` (
   `id` bigint UNSIGNED NOT NULL,
-  `unique_code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `department_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_card` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `rank_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `position_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `property_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `division_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `unique_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `department_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_card` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rank_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `position_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `property_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `division_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_lecturer` tinyint NOT NULL DEFAULT '2',
   `curren_job_id` tinyint NOT NULL,
   `lecturer_type` bigint DEFAULT NULL,
-  `first_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `last_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `full_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `personal_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `full_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `personal_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `birthday` date DEFAULT NULL,
   `terminate_date` date DEFAULT NULL,
   `join_hotel_date` date DEFAULT NULL,
   `end_testing_date` date DEFAULT NULL,
   `married` tinyint(1) DEFAULT NULL,
   `gender` int DEFAULT NULL COMMENT '0: Man, 1: Woman, 2: Other',
-  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `notes` text COLLATE utf8mb4_unicode_ci,
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1' COMMENT ' 1: Active, 2: Inactive',
-  `staff_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'internal' COMMENT 'smile, internal, external',
+  `staff_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'internal' COMMENT 'smile, internal, external',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `contract_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contract_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `start_date` datetime DEFAULT NULL,
   `end_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1489,13 +1626,13 @@ CREATE TABLE `staffs` (
 
 CREATE TABLE `talent_categories` (
   `id` bigint UNSIGNED NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` enum('solo','group') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solo',
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` enum('solo','group') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solo',
   `min_members` int NOT NULL,
   `max_members` int NOT NULL,
   `max_duration_seconds` int DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `sort_order` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1513,27 +1650,27 @@ CREATE TABLE `talent_entries` (
   `registration_id` bigint UNSIGNED NOT NULL,
   `category_id` bigint UNSIGNED NOT NULL,
   `property_id` bigint UNSIGNED NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `duration_seconds` int DEFAULT NULL,
-  `music_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `video_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `music_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `video_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `performance_order` int DEFAULT NULL,
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1=draft, 2=submitted, 3=approved, 4=rejected, 5=performed',
   `round_id` bigint UNSIGNED DEFAULT NULL COMMENT 'Vòng thi hiện tại của tiết mục, set khi duyệt (approve)',
   `final_score` double(8,2) DEFAULT NULL,
   `final_rank` int DEFAULT NULL,
-  `award` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
-  `document` text COLLATE utf8mb4_unicode_ci COMMENT 'JSON danh sách tệp đính kèm',
-  `content` text COLLATE utf8mb4_unicode_ci COMMENT 'Nội dung tiết mục',
-  `director` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Người chịu trách nhiệm',
-  `director_phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Số điện thoại người chịu trách nhiệm',
-  `origin` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Xuất xứ tiết mục',
+  `award` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `document` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'JSON danh sách tệp đính kèm',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'Nội dung tiết mục',
+  `director` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Người chịu trách nhiệm',
+  `director_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Số điện thoại người chịu trách nhiệm',
+  `origin` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Xuất xứ tiết mục',
   `is_alliance_team` tinyint DEFAULT '0' COMMENT 'Cờ đội liên quân: 0=không, 1=có',
-  `alliance_org_ids` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Danh sách property_id liên quân, phân cách bởi dấu phẩy: 1,2,3',
+  `alliance_org_ids` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Danh sách property_id liên quân, phân cách bởi dấu phẩy: 1,2,3',
   `submitted_at` datetime DEFAULT NULL,
-  `approved_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `approved_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `approved_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1550,7 +1687,7 @@ CREATE TABLE `talent_entry_members` (
   `id` bigint UNSIGNED NOT NULL,
   `entry_id` bigint UNSIGNED NOT NULL,
   `attendee_id` bigint UNSIGNED NOT NULL,
-  `role` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_lead` tinyint NOT NULL DEFAULT '0',
   `sort_order` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1567,14 +1704,14 @@ CREATE TABLE `talent_entry_members` (
 CREATE TABLE `talent_rounds` (
   `id` bigint UNSIGNED NOT NULL,
   `talent_show_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `round_type` enum('qualification','semi_final','final') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'qualification',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `round_type` enum('qualification','semi_final','final') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'qualification',
   `round_order` int NOT NULL DEFAULT '1',
   `max_score` decimal(8,2) NOT NULL DEFAULT '10.00',
   `weight` decimal(8,2) NOT NULL DEFAULT '1.00',
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -1593,8 +1730,8 @@ CREATE TABLE `talent_round_results` (
   `score` decimal(8,2) DEFAULT NULL,
   `rank` int DEFAULT NULL,
   `passed` tinyint NOT NULL DEFAULT '0',
-  `entry_type` enum('qualification','direct') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'qualification',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `entry_type` enum('qualification','direct') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'qualification',
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
@@ -1612,8 +1749,8 @@ CREATE TABLE `talent_scores` (
   `round_id` bigint UNSIGNED DEFAULT NULL COMMENT 'Vòng thi mà điểm này được chấm',
   `judge_id` bigint UNSIGNED NOT NULL,
   `score` double(8,2) NOT NULL,
-  `criteria` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `criteria` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `scored_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1629,12 +1766,12 @@ CREATE TABLE `talent_scores` (
 CREATE TABLE `talent_shows` (
   `id` bigint UNSIGNED NOT NULL,
   `event_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `registration_open_at` datetime DEFAULT NULL,
   `registration_close_at` datetime DEFAULT NULL,
   `show_date` date DEFAULT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `max_entries_per_org` int DEFAULT NULL,
   `is_active` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1650,9 +1787,9 @@ CREATE TABLE `talent_shows` (
 
 CREATE TABLE `transports` (
   `id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1668,9 +1805,9 @@ CREATE TABLE `transports` (
 CREATE TABLE `unit_accounts` (
   `id` bigint UNSIGNED NOT NULL,
   `department_id` bigint UNSIGNED NOT NULL,
-  `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` tinyint NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -1684,11 +1821,11 @@ CREATE TABLE `unit_accounts` (
 
 CREATE TABLE `users` (
   `id` bigint UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1770,6 +1907,19 @@ ALTER TABLE `attendees`
   ADD KEY `idx_attendees_team_lead` (`is_team_lead`),
   ADD KEY `attendees_role_id_foreign` (`role_id`),
   ADD KEY `attendees_transport_id_foreign` (`transport_id`);
+
+--
+-- Chỉ mục cho bảng `attendee_replacements`
+--
+ALTER TABLE `attendee_replacements`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_attendee_replacements_registration_id` (`registration_id`),
+  ADD KEY `idx_attendee_replacements_event_id` (`event_id`),
+  ADD KEY `idx_attendee_replacements_property_id` (`property_id`),
+  ADD KEY `idx_attendee_replacements_action` (`action`),
+  ADD KEY `idx_attendee_replacements_old_attendee_id` (`old_attendee_id`),
+  ADD KEY `idx_attendee_replacements_new_attendee_id` (`new_attendee_id`),
+  ADD KEY `idx_attendee_replacements_created_at` (`created_at`);
 
 --
 -- Chỉ mục cho bảng `attendee_roles`
@@ -2040,6 +2190,20 @@ ALTER TABLE `event_units`
   ADD KEY `event_units_property_id_foreign` (`property_id`);
 
 --
+-- Chỉ mục cho bảng `led_screens`
+--
+ALTER TABLE `led_screens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `led_screens_event_id_is_active_index` (`event_id`,`is_active`);
+
+--
+-- Chỉ mục cho bảng `led_slides`
+--
+ALTER TABLE `led_slides`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `led_slides_screen_id_is_active_sort_order_index` (`screen_id`,`is_active`,`sort_order`);
+
+--
 -- Chỉ mục cho bảng `logs`
 --
 ALTER TABLE `logs`
@@ -2090,6 +2254,33 @@ ALTER TABLE `meal_tables`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Chỉ mục cho bảng `news`
+--
+ALTER TABLE `news`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `news_slug_unique` (`slug`),
+  ADD KEY `news_event_id_index` (`event_id`),
+  ADD KEY `news_is_published_published_at_index` (`is_published`,`published_at`),
+  ADD KEY `news_category_index` (`category`),
+  ADD KEY `news_category_id_index` (`category_id`);
+
+--
+-- Chỉ mục cho bảng `news_categories`
+--
+ALTER TABLE `news_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `news_categories_event_id_slug_unique` (`event_id`,`slug`),
+  ADD KEY `news_categories_event_id_is_active_sort_order_index` (`event_id`,`is_active`,`sort_order`);
+
+--
+-- Chỉ mục cho bảng `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `notifications_event_id_index` (`event_id`),
+  ADD KEY `notifications_is_active_created_at_index` (`is_active`,`created_at`);
 
 --
 -- Chỉ mục cho bảng `positions`
@@ -2408,6 +2599,12 @@ ALTER TABLE `attendees`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT cho bảng `attendee_replacements`
+--
+ALTER TABLE `attendee_replacements`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT cho bảng `attendee_roles`
 --
 ALTER TABLE `attendee_roles`
@@ -2612,6 +2809,18 @@ ALTER TABLE `event_units`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT cho bảng `led_screens`
+--
+ALTER TABLE `led_screens`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `led_slides`
+--
+ALTER TABLE `led_slides`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT cho bảng `logs`
 --
 ALTER TABLE `logs`
@@ -2652,6 +2861,24 @@ ALTER TABLE `meal_tables`
 --
 ALTER TABLE `migrations`
   MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `news`
+--
+ALTER TABLE `news`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `news_categories`
+--
+ALTER TABLE `news_categories`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT cho bảng `positions`
@@ -2878,6 +3105,12 @@ ALTER TABLE `attendees`
   ADD CONSTRAINT `attendees_transport_id_foreign` FOREIGN KEY (`transport_id`) REFERENCES `transports` (`id`);
 
 --
+-- Các ràng buộc cho bảng `attendee_replacements`
+--
+ALTER TABLE `attendee_replacements`
+  ADD CONSTRAINT `fk_attendee_replacements_registrations` FOREIGN KEY (`registration_id`) REFERENCES `registrations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Các ràng buộc cho bảng `attendee_roles`
 --
 ALTER TABLE `attendee_roles`
@@ -3018,6 +3251,12 @@ ALTER TABLE `event_sport_alliance_config`
 ALTER TABLE `event_units`
   ADD CONSTRAINT `event_units_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `event_units_property_id_foreign` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `led_slides`
+--
+ALTER TABLE `led_slides`
+  ADD CONSTRAINT `led_slides_screen_id_foreign` FOREIGN KEY (`screen_id`) REFERENCES `led_screens` (`id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `meals`

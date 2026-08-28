@@ -14460,6 +14460,740 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "Daihoi Public",
+            "item": [
+                {
+                    "name": "Get Event Info",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/event",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "event"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Countdown",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/countdown",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "countdown"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Stats",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/stats",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "stats"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Contents",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/contents",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "contents"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Agenda",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/agenda",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "agenda"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Live Matches",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/matches/live",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "matches", "live"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Recent Matches",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/matches/recent",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "matches", "recent"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Rankings",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/rankings?limit=10",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "rankings"],
+                            "query": [{ "key": "limit", "value": "10" }]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get News List",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/news?limit=10",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "news"],
+                            "query": [
+                                { "key": "limit", "value": "10" },
+                                { "key": "category", "value": "sports", "disabled": true },
+                                { "key": "featured", "value": "true", "disabled": true }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get News Detail",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/news/sample-slug",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "news", "sample-slug"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get News Categories",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/daihoi/news-categories",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "daihoi", "news-categories"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Daihoi Portal",
+            "item": [
+                {
+                    "name": "Get Dashboard",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/portal/dashboard",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "portal", "dashboard"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get My Schedule",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/portal/my-schedule",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "portal", "my-schedule"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get My Organization",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/portal/my-organization",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "portal", "my-organization"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get My Matches",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/portal/my-matches",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "portal", "my-matches"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Notifications",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/portal/notifications",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "portal", "notifications"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Daihoi Display",
+            "item": [
+                {
+                    "name": "Get Screen Config",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/display/screen/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "display", "screen", "1"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Current Slide",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/display/current/1?index=0",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "display", "current", "1"],
+                            "query": [{ "key": "index", "value": "0" }]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Ticker",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/display/ticker",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "display", "ticker"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Ping Screen",
+                    "request": {
+                        "auth": { "type": "noauth" },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/display/ping/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "display", "ping", "1"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Daihoi Admin",
+            "item": [
+                {
+                    "name": "News",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news?per_page=15",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news"],
+                                    "query": [
+                                        { "key": "per_page", "value": "15" },
+                                        { "key": "event_id", "value": "1", "disabled": true },
+                                        { "key": "category", "value": "sports", "disabled": true },
+                                        { "key": "is_published", "value": "true", "disabled": true }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"title\": \"Tin tức mới\",\n    \"excerpt\": \"Tóm tắt tin tức\",\n    \"content\": \"<p>Nội dung chi tiết</p>\",\n    \"category\": \"announcement\",\n    \"is_featured\": false,\n    \"is_published\": true\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news", "1"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"title\": \"Tin tức đã cập nhật\",\n    \"is_published\": true\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news", "1"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news", "1"]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "News Categories",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news-categories?event_id=1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news-categories"],
+                                    "query": [
+                                        { "key": "event_id", "value": "1", "disabled": true },
+                                        { "key": "is_active", "value": "true", "disabled": true }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Thể thao\",\n    \"icon\": \"fa-futbol\",\n    \"color\": \"#1c6ee8\",\n    \"description\": \"Tin tức về các môn thể thao\",\n    \"is_active\": true\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news-categories",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news-categories"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news-categories/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news-categories", "1"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Thể thao (Updated)\",\n    \"color\": \"#16bfd4\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news-categories/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news-categories", "1"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Reorder",
+                            "request": {
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"categories\": [\n        { \"id\": 1, \"sort_order\": 0 },\n        { \"id\": 2, \"sort_order\": 1 },\n        { \"id\": 3, \"sort_order\": 2 }\n    ]\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news-categories/reorder",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news-categories", "reorder"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/news-categories/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "news-categories", "1"]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Notifications",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/notifications?per_page=15",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "notifications"],
+                                    "query": [
+                                        { "key": "per_page", "value": "15" },
+                                        { "key": "event_id", "value": "1", "disabled": true },
+                                        { "key": "type", "value": "important", "disabled": true }
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"title\": \"Thông báo quan trọng\",\n    \"content\": \"Nội dung thông báo\",\n    \"type\": \"important\",\n    \"target_type\": \"all\",\n    \"is_active\": true\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/notifications",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "notifications"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"title\": \"Thông báo đã cập nhật\",\n    \"is_active\": false\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/notifications/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "notifications", "1"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/notifications/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "notifications", "1"]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "LED Screens",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-screens?event_id=1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-screens"],
+                                    "query": [{ "key": "event_id", "value": "1", "disabled": true }]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"event_id\": 1,\n    \"name\": \"Sảnh chính\",\n    \"location\": \"Tầng 1 - Lobby\",\n    \"resolution\": \"1920x1080\",\n    \"current_mode\": \"welcome\",\n    \"auto_rotate\": true,\n    \"rotate_interval\": 10,\n    \"show_ticker\": true\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-screens",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-screens"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Detail",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-screens/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-screens", "1"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"name\": \"Sảnh chính (Updated)\",\n    \"auto_rotate\": false\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-screens/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-screens", "1"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Set Mode",
+                            "request": {
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"mode\": \"results\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-screens/1/mode",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-screens", "1", "mode"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-screens/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-screens", "1"]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "LED Slides",
+                    "item": [
+                        {
+                            "name": "Get List",
+                            "request": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-slides?screen_id=1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-slides"],
+                                    "query": [{ "key": "screen_id", "value": "1" }]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create",
+                            "request": {
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"screen_id\": 1,\n    \"title\": \"Chào mừng Đại hội\",\n    \"subtitle\": \"Hội tụ bản sắc - Dẫn dắt tương lai\",\n    \"background_type\": \"gradient\",\n    \"background_value\": \"linear-gradient(135deg, #1c6ee8, #16bfd4)\",\n    \"content_type\": \"welcome\",\n    \"duration\": 10,\n    \"is_active\": true\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-slides",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-slides"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update",
+                            "request": {
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"title\": \"Slide Updated\",\n    \"duration\": 15\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-slides/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-slides", "1"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Reorder",
+                            "request": {
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"slides\": [\n        { \"id\": 1, \"sort_order\": 0 },\n        { \"id\": 2, \"sort_order\": 1 },\n        { \"id\": 3, \"sort_order\": 2 }\n    ]\n}"
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-slides/reorder",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-slides", "reorder"]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete",
+                            "request": {
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/admin/led-slides/1",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["api", "admin", "led-slides", "1"]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "auth": {
