@@ -90,7 +90,6 @@ class NewsCategoriesController extends AdminController
 	public function actionAdmin()
 	{
 		$model = new NewsCategories('search');
-		$model->unsetAttributes();
 
 		if (isset($_GET['NewsCategories'])) {
 			$model->setAttributes($_GET['NewsCategories']);
