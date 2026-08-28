@@ -3609,6 +3609,19 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		// Nếu đơn vị không có dữ liệu phòng ban (tất cả attendee đều thiếu division_code)
+		// thì bỏ qua bộ lọc phòng ban và hiển thị toàn bộ attendee đã đăng ký
+		$hasDepartmentData = false;
+		foreach ($attendees as $att) {
+			if (!empty($att['division_code'])) {
+				$hasDepartmentData = true;
+				break;
+			}
+		}
+		if (!$hasDepartmentData) {
+			$allowedDepartments = array();
+		}
+
 		foreach ($attendees as $att) {
 			$id = isset($att['id']) ? $att['id'] : null;
 			$fullName = isset($att['full_name']) ? $att['full_name'] : '';
