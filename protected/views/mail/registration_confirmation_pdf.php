@@ -427,7 +427,7 @@
     if ($isDot3) {
         $mau1Parts[] = 'văn nghệ';
     }
-    $mau1Title = 'Đăng ký tham dự các hoạt động \r\n ' . (empty($mau1Parts) ? '' : ' ' . implode(', ', $mau1Parts));
+    $mau1Title = 'Đăng ký tham dự ' . (empty($mau1Parts) ? '' : ' ' . implode(', ', $mau1Parts));
     ?>
 
     <!-- ============================ TRANG 1 — MẪU SỐ 1 ============================ -->
