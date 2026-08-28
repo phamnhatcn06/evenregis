@@ -782,7 +782,7 @@
         </div>
 
         <div class="signature">
-            <div class="role">TỔNG GIÁM ĐỐC</div>
+            <div class="role">GIÁM ĐỐC KHÁCH SẠN</div>
             <div class="hint">(Ký tên, đóng dấu)</div>
         </div>
     </div>
