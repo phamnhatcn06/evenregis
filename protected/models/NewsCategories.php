@@ -1,15 +1,65 @@
 <?php
 
-Yii::import('application.models._base.BaseNewsCategories');
-
-class NewsCategories extends BaseNewsCategories
+/**
+ * NewsCategories — Danh mục tin tức.
+ *
+ * Bảng `news_categories` được quản lý qua External API (không có trong DB local),
+ * nên model này là CFormModel giữ attribute + gọi ApiClient theo ApiEndpoints.
+ * Thuộc tính bám theo cấu trúc bảng `news_categories` trong docs/mt_registration_portal_struct.sql.
+ *
+ * Hợp đồng API (xem docs/MTRegistrationPortal API.postman_collection.json — Daihoi Admin):
+ *   - GET    /api/admin/news-categories
+ *   - POST   /api/admin/news-categories
+ *   - GET    /api/admin/news-categories/{id}
+ *   - PUT    /api/admin/news-categories/{id}
+ *   - DELETE /api/admin/news-categories/{id}
+ *   - POST   /api/admin/news-categories/reorder
+ */
+class NewsCategories extends CFormModel
 {
 	const IS_ACTIVE = 1;
 	const IS_INACTIVE = 0;
 
-	public static function model($className = __CLASS__)
+	public $id;
+	public $event_id;
+	public $name;
+	public $slug;
+	public $icon;
+	public $color;
+	public $description;
+	public $sort_order = 0;
+	public $is_active = 1;
+	public $created_at;
+	public $updated_at;
+
+	public function rules()
 	{
-		return parent::model($className);
+		return array(
+			array('event_id, name', 'required'),
+			array('event_id, sort_order, is_active', 'numerical', 'integerOnly' => true),
+			array('name', 'length', 'max' => 100),
+			array('slug', 'length', 'max' => 100),
+			array('icon', 'length', 'max' => 50),
+			array('color', 'length', 'max' => 20),
+			array('id, description, created_at, updated_at', 'safe'),
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'id' => 'ID',
+			'event_id' => 'Sự kiện',
+			'name' => 'Tên danh mục',
+			'slug' => 'Đường dẫn (slug)',
+			'icon' => 'Biểu tượng',
+			'color' => 'Màu sắc',
+			'description' => 'Mô tả',
+			'sort_order' => 'Thứ tự',
+			'is_active' => 'Kích hoạt',
+			'created_at' => 'Ngày tạo',
+			'updated_at' => 'Ngày cập nhật',
+		);
 	}
 
 	public static function getActiveLabel($isActive)
@@ -23,7 +73,7 @@ class NewsCategories extends BaseNewsCategories
 	{
 		$url = ApiEndpoints::url(ApiEndpoints::NEWS_CATEGORY_DETAIL, array('id' => $id));
 		$result = ApiClient::get($url);
-		if ($result['success'] && isset($result['data'])) {
+		if (!empty($result['success']) && isset($result['data'])) {
 			$data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
 			$model = new self;
 			$model->setAttributes($data, false);
@@ -35,7 +85,7 @@ class NewsCategories extends BaseNewsCategories
 
 	public function storeViaApi()
 	{
-		$data = array_filter($this->attributes, function ($value) {
+		$data = array_filter($this->getAttributes(), function ($value) {
 			return $value !== null && $value !== '';
 		});
 		return ApiClient::post(ApiEndpoints::NEWS_CATEGORY_STORE, $data);
@@ -43,7 +93,7 @@ class NewsCategories extends BaseNewsCategories
 
 	public function updateViaApi()
 	{
-		$data = array_filter($this->attributes, function ($value) {
+		$data = array_filter($this->getAttributes(), function ($value) {
 			return $value !== null && $value !== '';
 		});
 		$url = ApiEndpoints::url(ApiEndpoints::NEWS_CATEGORY_UPDATE, array('id' => $this->id));
@@ -78,13 +128,15 @@ class NewsCategories extends BaseNewsCategories
 	public static function getActiveList($eventId = null)
 	{
 		$params = array('is_active' => 1);
-		if ($eventId !== null) {
+		if ($eventId !== null && $eventId !== '') {
 			$params['event_id'] = $eventId;
 		}
 		$provider = self::getApiDataProvider($params);
 		$list = array();
 		foreach ($provider->getData() as $item) {
-			$list[$item->id] = $item->name;
+			$id = is_object($item) ? $item->id : $item['id'];
+			$name = is_object($item) ? $item->name : $item['name'];
+			$list[$id] = $name;
 		}
 		return $list;
 	}
