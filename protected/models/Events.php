@@ -57,6 +57,16 @@ class Events extends BaseEvents
 			$data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
 			$model = new self;
 			$model->setAttributes($data, false);
+			$extraFields = array(
+				'max_sports_per_attendee', 'slogan', 'destination',
+				'duration_days', 'duration_nights', 'organizer',
+				'hero_description', 'cover_image', 'mascot_image', 'mascot_link',
+			);
+			foreach ($extraFields as $field) {
+				if (array_key_exists($field, $data)) {
+					$model->$field = $data[$field];
+				}
+			}
 			$model->id = $id;
 			return $model;
 		}
