@@ -47,9 +47,37 @@ $this->Tabletitle = Yii::t('app', 'View') . ' ' . $model->label() . ': ' . $mode
 $attributes = array(
     array('label' => $model->getAttributeLabel('code'), 'value' => $model->code),
     array('label' => $model->getAttributeLabel('name'), 'value' => $model->name),
+    array('label' => $model->getAttributeLabel('slogan'), 'value' => $model->slogan),
+    array('label' => $model->getAttributeLabel('destination'), 'value' => $model->destination),
+    array('label' => $model->getAttributeLabel('organizer'), 'value' => $model->organizer),
     array('label' => $model->getAttributeLabel('from_date'), 'value' => MyHelper::formatDate($model->from_date)),
     array('label' => $model->getAttributeLabel('to_date'), 'value' => MyHelper::formatDate($model->to_date)),
+    array('label' => $model->getAttributeLabel('duration_days'), 'value' => $model->duration_days),
+    array('label' => $model->getAttributeLabel('duration_nights'), 'value' => $model->duration_nights),
+    array('label' => $model->getAttributeLabel('max_sports_per_attendee'), 'value' => $model->max_sports_per_attendee),
+    array('label' => $model->getAttributeLabel('hero_description'), 'value' => $model->hero_description),
     array('label' => $model->getAttributeLabel('description'), 'value' => $model->description),
+    array(
+        'label' => $model->getAttributeLabel('cover_image'),
+        'value' => $model->cover_image
+            ? CHtml::image($model->cover_image, 'cover', array('style' => 'max-height:80px;', 'onerror' => "this.style.display='none'"))
+            : '<span class="text-muted">—</span>',
+        'raw' => true
+    ),
+    array(
+        'label' => $model->getAttributeLabel('mascot_image'),
+        'value' => $model->mascot_image
+            ? CHtml::image($model->mascot_image, 'mascot', array('style' => 'max-height:80px;', 'onerror' => "this.style.display='none'"))
+            : '<span class="text-muted">—</span>',
+        'raw' => true
+    ),
+    array(
+        'label' => $model->getAttributeLabel('mascot_link'),
+        'value' => $model->mascot_link
+            ? CHtml::link(CHtml::encode($model->mascot_link), $model->mascot_link, array('target' => '_blank'))
+            : '<span class="text-muted">—</span>',
+        'raw' => true
+    ),
     array(
         'label' => $model->getAttributeLabel('status'),
         'value' => $model->status == 1
