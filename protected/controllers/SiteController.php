@@ -64,7 +64,9 @@ class SiteController extends Controller
                 Yii::app()->user->setFlash('success', 'Đăng nhập thành công. Xin chào ' . $userData['full_name']);
                 $this->render('callback', array(
                     'userProfile' => $userProfile,
-                    'redirectUrl' => Yii::app()->createUrl('/admin/default/index'),
+                    // Sau khi lưu profile/permissions vào localStorage → về TRANG CHỦ,
+                    // KHÔNG vào thẳng admin. Trang chủ sẽ hiển thị nút "Đăng nhập admin".
+                    'redirectUrl' => Yii::app()->createUrl('/site/index'),
                 ));
                 return;
             } else {
