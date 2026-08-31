@@ -14465,7 +14465,7 @@
             "name": "Daihoi Public",
             "item": [
                 {
-                    "name": "Get Event Info",
+                    "name": "Get Event Info (Landing Page)",
                     "request": {
                         "auth": { "type": "noauth" },
                         "method": "GET",
@@ -14474,9 +14474,18 @@
                             "raw": "{{base_url}}/api/daihoi/event",
                             "host": ["{{base_url}}"],
                             "path": ["api", "daihoi", "event"]
-                        }
+                        },
+                        "description": "Lấy thông tin sự kiện cho Landing Page.\n\nResponse fields:\n- id, code, name, year\n- slogan: Khẩu hiệu\n- destination: Điểm đến (Ninh Bình)\n- duration_days, duration_nights, duration_text\n- organizer: Đơn vị tổ chức\n- hero_description: Mô tả ngắn\n- cover_image, mascot_image, mascot_link\n- from_date, to_date, event_month\n- countdown_seconds: Số giây đếm ngược"
                     },
-                    "response": []
+                    "response": [
+                        {
+                            "name": "Success",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1,\n        \"code\": \"DH2026\",\n        \"name\": \"ĐẠI HỘI MƯỜNG THANH 2026\",\n        \"year\": 2026,\n        \"slogan\": \"HỘI TỤ BẢN SẮC – DẪN DẮT TƯƠNG LAI\",\n        \"destination\": \"Ninh Bình\",\n        \"duration_days\": 4,\n        \"duration_nights\": 3,\n        \"duration_text\": \"04 ngày 03 đêm\",\n        \"organizer\": \"Hệ thống Mường Thanh Hospitality\",\n        \"hero_description\": \"Hành trình kết nối bản sắc, con người và những giá trị bền vững.\",\n        \"cover_image\": \"https://api.example.com/storage/events/cover.jpg\",\n        \"mascot_image\": \"https://api.example.com/storage/events/mascot.png\",\n        \"mascot_link\": \"https://shop.muongthanh.vn/linh-vat\",\n        \"from_date\": \"2026-10-15\",\n        \"to_date\": \"2026-10-18\",\n        \"event_month\": \"10/2026\",\n        \"countdown_seconds\": 3932417\n    }\n}"
+                        }
+                    ]
                 },
                 {
                     "name": "Get Countdown",
@@ -14488,9 +14497,25 @@
                             "raw": "{{base_url}}/api/daihoi/countdown",
                             "host": ["{{base_url}}"],
                             "path": ["api", "daihoi", "countdown"]
-                        }
+                        },
+                        "description": "Đếm ngược tới ngày khai mạc sự kiện."
                     },
-                    "response": []
+                    "response": [
+                        {
+                            "name": "Before Event",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"success\": true,\n    \"data\": {\n        \"days\": 45,\n        \"hours\": 21,\n        \"minutes\": 35,\n        \"seconds\": 17,\n        \"is_started\": false,\n        \"target_date\": \"2026-10-15T00:00:00+07:00\"\n    }\n}"
+                        },
+                        {
+                            "name": "After Event Started",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"success\": true,\n    \"data\": {\n        \"days\": 0,\n        \"hours\": 0,\n        \"minutes\": 0,\n        \"seconds\": 0,\n        \"is_started\": true,\n        \"current_day\": 2\n    }\n}"
+                        }
+                    ]
                 },
                 {
                     "name": "Get Stats",
@@ -14502,9 +14527,18 @@
                             "raw": "{{base_url}}/api/daihoi/stats",
                             "host": ["{{base_url}}"],
                             "path": ["api", "daihoi", "stats"]
-                        }
+                        },
+                        "description": "Thống kê tổng quan sự kiện."
                     },
-                    "response": []
+                    "response": [
+                        {
+                            "name": "Success",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"success\": true,\n    \"data\": {\n        \"days\": 4,\n        \"contents\": 5,\n        \"sports\": 8,\n        \"organizations\": 62,\n        \"attendees\": 1248\n    }\n}"
+                        }
+                    ]
                 },
                 {
                     "name": "Get Contents",

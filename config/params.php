@@ -21,8 +21,8 @@ return array(
 
     // External API
     // Test
-    // 'externalApiUrl' => 'https://dev-portal-registration.muongthanh.vn',
-    // 'externalApiKey' => 'z8H4VaRvLtBGYUuLgasJDIJIWXYgquFgUIy426pkaFKi7Q0PAC44oz2Jy4KLB5Mz',
+    'externalApiUrl' => 'https://dev-portal-registration.muongthanh.vn',
+    'externalApiKey' => 'z8H4VaRvLtBGYUuLgasJDIJIWXYgquFgUIy426pkaFKi7Q0PAC44oz2Jy4KLB5Mz',
 
     // Product
     // 'externalApiUrl' => 'https://portal-registration.muongthanh.vn',

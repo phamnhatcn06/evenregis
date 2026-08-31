@@ -28,15 +28,30 @@ $e = function ($s) {
     return CHtml::encode($s);
 };
 
-// ----- Thông tin sự kiện (query thẳng từ /api/events) -----
+// ----- Thông tin sự kiện -----
+// Nguồn: /api/events. Field fallback hỗ trợ thêm cấu trúc landing /api/daihoi/event
+// (slogan, destination, duration_text, hero_description, cover_image, mascot_image...).
 $eventName = $val($event, array('name', 'title'), 'ĐẠI HỘI MƯỜNG THANH 2026');
-$eventSlogan = $val($event, array('slogan', 'subtitle', 'description'), 'HỘI TỤ BẢN SẮC – DẪN DẮT TƯƠNG LAI');
-$eventLocation = $val($event, array('location', 'venue', 'place'), 'Ninh Bình · Việt Nam');
+$eventSlogan = $val($event, array('slogan', 'subtitle'), 'HỘI TỤ BẢN SẮC – DẪN DẮT TƯƠNG LAI');
+$eventDestination = $val($event, array('destination', 'location', 'venue', 'place', 'city'), 'Ninh Bình');
+$eventLocation = $val($event, array('location', 'venue', 'place'), $eventDestination . ' · Việt Nam');
+$heroDesc = $val($event, array('hero_description', 'description'), 'Hành trình kết nối bản sắc, con người và những giá trị bền vững.');
+$organizer = $val($event, array('organizer'), 'Hệ thống Mường Thanh Hospitality');
+$coverImage = $val($event, array('cover_image', 'cover', 'banner'), '');
+$mascotImage = $val($event, array('mascot_image', 'mascot'), '');
+$mascotLink = $val($event, array('mascot_link'), '');
 $fromDate = $val($event, array('from_date', 'start_date', 'starts_at'), '');
 $toDate = $val($event, array('to_date', 'end_date', 'ends_at'), '');
 
-// Thời lượng: tính số ngày/đêm từ from_date - to_date
-$eventDuration = $val($event, array('duration', 'duration_text'), '');
+// Thời lượng: ưu tiên duration_text, nếu không có thì tính từ from_date - to_date
+$eventDuration = $val($event, array('duration_text', 'duration'), '');
+if ($eventDuration === '') {
+    $dDays = (int) $val($event, array('duration_days'), 0);
+    $dNights = (int) $val($event, array('duration_nights'), 0);
+    if ($dDays > 0) {
+        $eventDuration = sprintf('%02d ngày %02d đêm', $dDays, $dNights);
+    }
+}
 if ($eventDuration === '' && $fromDate !== '' && $toDate !== '') {
     $d1 = strtotime($fromDate);
     $d2 = strtotime($toDate);
