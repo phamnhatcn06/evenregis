@@ -5,6 +5,15 @@ Yii::import('application.models._base.BaseEvents');
 class Events extends BaseEvents
 {
     public $max_sports_per_attendee;
+    public $slogan;
+    public $destination;
+    public $duration_days;
+    public $duration_nights;
+    public $organizer;
+    public $hero_description;
+    public $cover_image;
+    public $mascot_image;
+    public $mascot_link;
 
     public static function model($className = __CLASS__)
     {
@@ -14,8 +23,13 @@ class Events extends BaseEvents
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('max_sports_per_attendee', 'numerical', 'integerOnly' => true, 'min' => 1);
+        $rules[] = array('max_sports_per_attendee, duration_days, duration_nights', 'numerical', 'integerOnly' => true, 'min' => 0);
         $rules[] = array('max_sports_per_attendee', 'default', 'setOnEmpty' => true, 'value' => 3);
+        $rules[] = array('duration_days', 'default', 'setOnEmpty' => true, 'value' => 1);
+        $rules[] = array('duration_nights', 'default', 'setOnEmpty' => true, 'value' => 0);
+        $rules[] = array('slogan, destination, organizer, cover_image, mascot_image, mascot_link', 'length', 'max' => 255);
+        $rules[] = array('destination', 'length', 'max' => 100);
+        $rules[] = array('slogan, destination, duration_days, duration_nights, organizer, hero_description, cover_image, mascot_image, mascot_link', 'safe');
         return $rules;
     }
 
@@ -23,6 +37,15 @@ class Events extends BaseEvents
     {
         $labels = parent::attributeLabels();
         $labels['max_sports_per_attendee'] = Yii::t('app', 'Số môn thể thao tối đa/người');
+        $labels['slogan'] = Yii::t('app', 'Khẩu hiệu sự kiện');
+        $labels['destination'] = Yii::t('app', 'Điểm đến');
+        $labels['duration_days'] = Yii::t('app', 'Số ngày');
+        $labels['duration_nights'] = Yii::t('app', 'Số đêm');
+        $labels['organizer'] = Yii::t('app', 'Đơn vị tổ chức');
+        $labels['hero_description'] = Yii::t('app', 'Mô tả ngắn (Hero)');
+        $labels['cover_image'] = Yii::t('app', 'Ảnh bìa sự kiện');
+        $labels['mascot_image'] = Yii::t('app', 'Ảnh linh vật');
+        $labels['mascot_link'] = Yii::t('app', 'Link đặt linh vật');
         return $labels;
     }
 
