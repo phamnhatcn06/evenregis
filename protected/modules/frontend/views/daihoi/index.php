@@ -4,7 +4,6 @@
  * Dữ liệu lấy qua API (/api/daihoi/*), truyền từ DaihoiController.
  *
  * @var array $event
- * @var array $countdown
  * @var array $stats
  * @var array $contents
  * @var array $agenda
