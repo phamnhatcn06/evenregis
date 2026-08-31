@@ -1,7 +1,8 @@
 <?php
 /**
  * Trang Website công khai Đại hội Mường Thanh.
- * Dữ liệu lấy qua API (/api/daihoi/*), truyền từ DaihoiController.
+ * Dữ liệu lấy qua API: event (/api/events), news (/api/admin/news),
+ * các khối tổng hợp/realtime (/api/daihoi/*) - truyền từ DaihoiController.
  *
  * @var array $event
  * @var array $stats
@@ -101,7 +102,7 @@ if ($fromDate !== '' && ctype_digit((string) $fromDate)) {
           <h1 class="hero-title">
             ĐẠI HỘI<br>
             <span class="gradient-text">MƯỜNG THANH</span><br>
-            <?php echo $e($val($event, array('year'), '2026')); ?>
+            <?php echo $e($eventYear); ?>
           </h1>
 
           <p class="hero-slogan"><?php echo $e($eventSlogan); ?></p>
@@ -131,7 +132,7 @@ if ($fromDate !== '' && ctype_digit((string) $fromDate)) {
           <div class="visual-card">
             <div class="visual-top">
               <span class="visual-event-code">Official Event Portal</span>
-              <span class="visual-year"><?php echo $e($val($event, array('year'), '2026')); ?></span>
+              <span class="visual-year"><?php echo $e($eventYear); ?></span>
             </div>
             <div class="mascot-placeholder">Đặt linh vật chính thức tại đây</div>
             <div class="visual-content">
