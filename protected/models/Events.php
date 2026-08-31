@@ -63,9 +63,26 @@ class Events extends BaseEvents
 		return null;
 	}
 
+	/**
+	 * Các trường ảo (không nằm trong bảng local) cần gửi kèm lên API.
+	 */
+	protected function getApiPayload()
+	{
+		$extraFields = array(
+			'max_sports_per_attendee', 'slogan', 'destination',
+			'duration_days', 'duration_nights', 'organizer',
+			'hero_description', 'cover_image', 'mascot_image', 'mascot_link',
+		);
+		$data = $this->attributes;
+		foreach ($extraFields as $field) {
+			$data[$field] = $this->$field;
+		}
+		return $data;
+	}
+
 	public function storeViaApi()
 	{
-		$data = array_filter($this->attributes, function ($value) {
+		$data = array_filter($this->getApiPayload(), function ($value) {
 			return $value !== null && $value !== '';
 		});
 		return ApiClient::post(ApiEndpoints::EVENT_STORE, $data);
@@ -74,7 +91,7 @@ class Events extends BaseEvents
 	public function updateViaApi()
 	{
 		$url = ApiEndpoints::url(ApiEndpoints::EVENT_UPDATE, array('id' => $this->id));
-		return ApiClient::post($url, $this->attributes);
+		return ApiClient::post($url, $this->getApiPayload());
 	}
 
 	public static function deleteViaApi($id)
