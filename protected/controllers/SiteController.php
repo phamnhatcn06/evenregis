@@ -106,9 +106,9 @@ class SiteController extends Controller
             $this->redirect(array('/site/index', 'sso_token' => $ssoToken));
             return;
         }
-        // If already authenticated, go to dashboard
+        // Nếu đã đăng nhập → về trang chủ (không vào thẳng admin)
         if (AuthHandler::isAuthenticated()) {
-            $this->redirect(array('/admin/default/index'));
+            $this->redirect(array('/site/index'));
             return;
         }
         // Render login page with Portal redirect button
