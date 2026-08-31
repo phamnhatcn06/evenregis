@@ -178,7 +178,7 @@ if ($countdownSeconds > 0) {
           </div>
           <div class="floating-card float-two">
             <small>Điểm đến</small>
-            <strong><?php echo $e($val($event, array('city'), 'Ninh Bình')); ?></strong>
+            <strong><?php echo $e($eventDestination); ?></strong>
           </div>
         </div>
       </div>
