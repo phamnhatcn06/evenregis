@@ -66,6 +66,12 @@ if ($eventDuration === '') {
 
 // Năm sự kiện
 $eventYear = $val($event, array('year'), '');
+if ($eventYear === '') {
+    $month = $val($event, array('event_month'), '');
+    if ($month !== '' && preg_match('/(\d{4})/', $month, $mm)) {
+        $eventYear = $mm[1];
+    }
+}
 if ($eventYear === '' && $fromDate !== '') {
     $eventYear = date('Y', strtotime($fromDate));
 }
@@ -73,8 +79,13 @@ if ($eventYear === '') {
     $eventYear = '2026';
 }
 
-// ----- Mốc đếm ngược (suy từ ngày khai mạc của sự kiện) -----
-if ($fromDate !== '' && ctype_digit((string) $fromDate)) {
+// ----- Mốc đếm ngược -----
+// Ưu tiên countdown_seconds (API landing) -> mốc = now + seconds.
+// Nếu không có thì suy từ ngày khai mạc (from_date).
+$countdownSeconds = (int) $val($event, array('countdown_seconds'), 0);
+if ($countdownSeconds > 0) {
+    $target = date('c', time() + $countdownSeconds);
+} elseif ($fromDate !== '' && ctype_digit((string) $fromDate)) {
     $target = date('c', (int) $fromDate);
 } elseif ($fromDate !== '') {
     $ts = strtotime($fromDate);
