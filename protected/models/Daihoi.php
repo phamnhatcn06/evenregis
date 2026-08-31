@@ -34,21 +34,20 @@ class Daihoi
     }
 
     /**
-     * Thông tin sự kiện Đại hội (tên, slogan, địa điểm, thời gian...).
+     * Thông tin sự kiện Đại hội - query thẳng từ /api/events, lấy sự kiện mới nhất.
      * @return array
      */
     public static function getEvent()
     {
-        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_EVENT), array());
-    }
-
-    /**
-     * Mốc đếm ngược khai mạc (thường trả về start_time / target timestamp).
-     * @return array
-     */
-    public static function getCountdown()
-    {
-        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_COUNTDOWN), array());
+        $list = self::unwrap(
+            ApiClient::get(ApiEndpoints::EVENT_LIST, array('per_page' => 1, 'page' => 1)),
+            array()
+        );
+        // Danh sách phân trang -> lấy phần tử đầu
+        if (isset($list[0]) && is_array($list[0])) {
+            return $list[0];
+        }
+        return is_array($list) ? $list : array();
     }
 
     /**
