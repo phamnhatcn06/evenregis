@@ -155,15 +155,21 @@ if ($countdownSeconds > 0) {
         </div>
 
         <div class="hero-visual">
-          <div class="visual-card">
+          <div class="visual-card"<?php echo $coverImage ? ' style="background-image:linear-gradient(145deg, rgba(28,110,232,.82), rgba(116,88,234,.78)), url(\'' . $e($coverImage) . '\');background-size:cover;background-position:center;"' : ''; ?>>
             <div class="visual-top">
               <span class="visual-event-code">Official Event Portal</span>
               <span class="visual-year"><?php echo $e($eventYear); ?></span>
             </div>
-            <div class="mascot-placeholder">Đặt linh vật chính thức tại đây</div>
+            <?php if ($mascotImage): ?>
+              <?php if ($mascotLink): ?><a href="<?php echo $e($mascotLink); ?>" target="_blank" rel="noopener"><?php endif; ?>
+              <img class="mascot-placeholder" src="<?php echo $e($mascotImage); ?>" alt="Linh vật Đại hội" style="object-fit:contain;background:transparent;border:0;" />
+              <?php if ($mascotLink): ?></a><?php endif; ?>
+            <?php else: ?>
+              <div class="mascot-placeholder">Đặt linh vật chính thức tại đây</div>
+            <?php endif; ?>
             <div class="visual-content">
-              <h2>Ninh Bình<br>miền di sản</h2>
-              <p>Hành trình kết nối bản sắc, con người và những giá trị bền vững.</p>
+              <h2><?php echo nl2br($e($eventDestination)); ?><br>miền di sản</h2>
+              <p><?php echo $e($heroDesc); ?></p>
             </div>
           </div>
           <div class="floating-card float-one">
