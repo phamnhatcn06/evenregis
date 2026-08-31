@@ -6,6 +6,8 @@
     )); ?>
 
     <?php echo $form->errorSummary($model); ?>
+
+    <h6 class="fw-semibold text-primary mb-3"><i class="fa fa-info-circle me-1"></i>Thông tin chung</h6>
     <div class="form-group mb-3">
         <?php echo $form->labelEx($model, 'name'); ?>
         <?php echo $form->textField($model, 'name', array(
@@ -16,21 +18,90 @@
     </div>
 
     <div class="form-group mb-3">
-        <?php echo $form->labelEx($model, 'from_date'); ?>
-        <?php echo $form->textField($model, 'from_date', array(
+        <?php echo $form->labelEx($model, 'slogan'); ?>
+        <?php echo $form->textField($model, 'slogan', array(
             'class' => 'form-control',
-            'placeholder' => 'Chọn ngày bắt đầu',
+            'maxlength' => 255,
+            'placeholder' => 'Khẩu hiệu sự kiện',
         )); ?>
-        <?php echo $form->error($model, 'from_date'); ?>
+        <?php echo $form->error($model, 'slogan'); ?>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-group mb-3">
+            <?php echo $form->labelEx($model, 'destination'); ?>
+            <?php echo $form->textField($model, 'destination', array(
+                'class' => 'form-control',
+                'maxlength' => 100,
+                'placeholder' => 'Ninh Bình, Đà Nẵng...',
+            )); ?>
+            <?php echo $form->error($model, 'destination'); ?>
+        </div>
+        <div class="col-md-6 form-group mb-3">
+            <?php echo $form->labelEx($model, 'organizer'); ?>
+            <?php echo $form->textField($model, 'organizer', array(
+                'class' => 'form-control',
+                'maxlength' => 255,
+                'placeholder' => 'Đơn vị tổ chức',
+            )); ?>
+            <?php echo $form->error($model, 'organizer'); ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-group mb-3">
+            <?php echo $form->labelEx($model, 'from_date'); ?>
+            <?php echo $form->textField($model, 'from_date', array(
+                'class' => 'form-control',
+                'placeholder' => 'Chọn ngày bắt đầu',
+            )); ?>
+            <?php echo $form->error($model, 'from_date'); ?>
+        </div>
+        <div class="col-md-6 form-group mb-3">
+            <?php echo $form->labelEx($model, 'to_date'); ?>
+            <?php echo $form->textField($model, 'to_date', array(
+                'class' => 'form-control',
+                'placeholder' => 'Chọn ngày kết thúc',
+            )); ?>
+            <?php echo $form->error($model, 'to_date'); ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 form-group mb-3">
+            <?php echo $form->labelEx($model, 'duration_days'); ?>
+            <?php echo $form->numberField($model, 'duration_days', array(
+                'class' => 'form-control',
+                'min' => 1,
+            )); ?>
+            <?php echo $form->error($model, 'duration_days'); ?>
+        </div>
+        <div class="col-md-4 form-group mb-3">
+            <?php echo $form->labelEx($model, 'duration_nights'); ?>
+            <?php echo $form->numberField($model, 'duration_nights', array(
+                'class' => 'form-control',
+                'min' => 0,
+            )); ?>
+            <?php echo $form->error($model, 'duration_nights'); ?>
+        </div>
+        <div class="col-md-4 form-group mb-3">
+            <?php echo $form->labelEx($model, 'max_sports_per_attendee'); ?>
+            <?php echo $form->numberField($model, 'max_sports_per_attendee', array(
+                'class' => 'form-control',
+                'min' => 1,
+            )); ?>
+            <?php echo $form->error($model, 'max_sports_per_attendee'); ?>
+        </div>
     </div>
 
     <div class="form-group mb-3">
-        <?php echo $form->labelEx($model, 'to_date'); ?>
-        <?php echo $form->textField($model, 'to_date', array(
+        <?php echo $form->labelEx($model, 'hero_description'); ?>
+        <?php echo $form->textArea($model, 'hero_description', array(
             'class' => 'form-control',
-            'placeholder' => 'Chọn ngày kết thúc',
+            'rows' => 2,
+            'placeholder' => 'Mô tả ngắn cho hero section',
         )); ?>
-        <?php echo $form->error($model, 'to_date'); ?>
+        <?php echo $form->error($model, 'hero_description'); ?>
     </div>
 
     <div class="form-group mb-3">
@@ -40,6 +111,39 @@
             'rows' => 5,
         )); ?>
         <?php echo $form->error($model, 'description'); ?>
+    </div>
+
+    <hr />
+    <h6 class="fw-semibold text-primary mb-3"><i class="fa fa-image me-1"></i>Hình ảnh & Linh vật</h6>
+    <div class="row">
+        <div class="col-md-6 form-group mb-3">
+            <?php echo $form->labelEx($model, 'cover_image'); ?>
+            <?php echo $form->textField($model, 'cover_image', array(
+                'class' => 'form-control',
+                'maxlength' => 255,
+                'placeholder' => 'Đường dẫn ảnh bìa',
+            )); ?>
+            <?php echo $form->error($model, 'cover_image'); ?>
+        </div>
+        <div class="col-md-6 form-group mb-3">
+            <?php echo $form->labelEx($model, 'mascot_image'); ?>
+            <?php echo $form->textField($model, 'mascot_image', array(
+                'class' => 'form-control',
+                'maxlength' => 255,
+                'placeholder' => 'Đường dẫn ảnh linh vật',
+            )); ?>
+            <?php echo $form->error($model, 'mascot_image'); ?>
+        </div>
+    </div>
+
+    <div class="form-group mb-3">
+        <?php echo $form->labelEx($model, 'mascot_link'); ?>
+        <?php echo $form->textField($model, 'mascot_link', array(
+            'class' => 'form-control',
+            'maxlength' => 255,
+            'placeholder' => 'Link đặt linh vật',
+        )); ?>
+        <?php echo $form->error($model, 'mascot_link'); ?>
     </div>
 
     <hr />
