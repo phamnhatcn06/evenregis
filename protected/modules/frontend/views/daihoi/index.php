@@ -359,16 +359,17 @@ if ($fromDate !== '' && ctype_digit((string) $fromDate)) {
         <div class="news-grid">
           <?php if (!empty($news)): ?>
             <?php foreach ($news as $n):
-              $thumb = $val($n, array('thumbnail', 'image', 'cover'), '');
-              $slug = $val($n, array('slug'), '');
+              $thumb = $val($n, array('thumbnail', 'image', 'cover', 'thumbnail_url'), '');
+              $newsId = $val($n, array('id'), '');
+              $href = $newsId !== '' ? $base . '/daihoi/index#tin-' . $e($newsId) : '#';
             ?>
-            <article class="news-card">
+            <a class="news-card" href="<?php echo $href; ?>">
               <div class="news-thumb"<?php echo $thumb ? ' style="background-image:url(\'' . $e($thumb) . '\');background-size:cover;background-position:center;"' : ''; ?>></div>
               <div class="news-copy">
                 <small><?php echo $e($val($n, array('category_name', 'category'), 'Tin tức')); ?></small>
                 <h3><?php echo $e($val($n, array('title', 'name'), '')); ?></h3>
               </div>
-            </article>
+            </a>
             <?php endforeach; ?>
           <?php else: ?>
             <article class="news-card"><div class="news-thumb"></div><div class="news-copy"><small>Thông báo BTC</small><h3>Sẵn sàng cho hành trình hội tụ tại miền di sản Ninh Bình</h3></div></article>
