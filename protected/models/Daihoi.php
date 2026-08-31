@@ -109,35 +109,26 @@ class Daihoi
     }
 
     /**
-     * Danh sách tin tức Đại hội.
+     * Danh sách tin tức - query thẳng từ /api/admin/news (list news).
      * @param int $limit
      * @return array
      */
     public static function getNews($limit = 10)
     {
         return self::unwrap(
-            ApiClient::get(ApiEndpoints::DAIHOI_NEWS, array('limit' => $limit)),
+            ApiClient::get(ApiEndpoints::NEWS_LIST, array('per_page' => $limit, 'page' => 1)),
             array()
         );
     }
 
     /**
-     * Chi tiết một bài tin theo slug.
-     * @param string $slug
+     * Chi tiết một bài tin theo id.
+     * @param int $id
      * @return array
      */
-    public static function getNewsDetail($slug)
+    public static function getNewsDetail($id)
     {
-        $url = ApiEndpoints::url(ApiEndpoints::DAIHOI_NEWS_DETAIL, array('slug' => $slug));
+        $url = ApiEndpoints::url(ApiEndpoints::NEWS_DETAIL, array('id' => $id));
         return self::unwrap(ApiClient::get($url), array());
-    }
-
-    /**
-     * Danh mục tin tức.
-     * @return array
-     */
-    public static function getNewsCategories()
-    {
-        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_NEWS_CATEGORIES), array());
     }
 }
