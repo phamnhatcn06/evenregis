@@ -193,10 +193,14 @@ if ($countdownSeconds > 0) {
                 $statItems[] = array($val($s, array('value', 'count'), ''), $val($s, array('label', 'name'), ''));
             }
         } else {
+            // Cấu trúc /api/daihoi/stats: {days, contents, sports, organizations, attendees}
             $statItems[] = array($val($stats, array('days', 'total_days'), '04'), 'Ngày hội tụ toàn hệ thống');
             $statItems[] = array($val($stats, array('contents', 'total_contents'), '05'), 'Nội dung trọng điểm');
             $statItems[] = array($val($stats, array('sports', 'total_sports'), '08'), 'Môn thể thao thi đấu');
-            $statItems[] = array($val($stats, array('units', 'total_units'), '62'), 'Đơn vị tham gia');
+            $statItems[] = array($val($stats, array('organizations', 'units', 'total_units'), '62'), 'Đơn vị tham gia');
+            if ($val($stats, array('attendees'), '') !== '') {
+                $statItems[] = array($val($stats, array('attendees'), ''), 'Người tham dự');
+            }
         }
     }
     if (empty($statItems)) {
