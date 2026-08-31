@@ -59,11 +59,6 @@ class DaihoiController extends FrontEndController
         $this->renderJson(Daihoi::getRankings($limit));
     }
 
-    public function actionJsonCountdown()
-    {
-        $this->renderJson(Daihoi::getCountdown());
-    }
-
     private function renderJson($data)
     {
         header('Content-Type: application/json; charset=utf-8');
