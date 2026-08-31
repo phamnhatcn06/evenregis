@@ -117,6 +117,31 @@ class PermissionHelper
     }
 
     /**
+     * Kiểm tra user có bất kỳ quyền nào (dù chỉ 1 thao tác) hay không.
+     * Dùng để quyết định hiển thị nút "Đăng nhập admin" ở trang chủ.
+     * @return bool
+     */
+    public static function hasAnyPermission()
+    {
+        $permissions = AuthHandler::getPermissions();
+        if (empty($permissions)) {
+            return false;
+        }
+
+        if (isset($permissions['*'])) {
+            return true;
+        }
+
+        foreach ($permissions as $permString) {
+            if ($permString === '*' || strpos($permString, '1') !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get all permissions for current user
      * @return array
      */
