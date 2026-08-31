@@ -33,7 +33,6 @@ class DaihoiController extends FrontEndController
     {
         $this->render('index', array(
             'event' => Daihoi::getEvent(),
-            'countdown' => Daihoi::getCountdown(),
             'stats' => Daihoi::getStats(),
             'contents' => Daihoi::getContents(),
             'agenda' => Daihoi::getAgenda(),
