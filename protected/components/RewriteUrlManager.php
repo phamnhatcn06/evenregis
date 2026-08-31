@@ -18,7 +18,7 @@ class RewriteUrlManager extends CUrlManager
             '<controller:\w+>/<id:\d+>' => '<controller>/view',
             '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
             '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
-            'login' => 'admin/users/login',
+            'login' => 'site/login',
         );
 
         $this->rules = array_merge($defaultRules, is_array($this->rules) ? $this->rules : array());
