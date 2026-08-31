@@ -96,18 +96,13 @@ class ApiEndpoints
     const NEWS_CATEGORY_DESTROY = '/api/admin/news-categories/{id}';
     const NEWS_CATEGORY_REORDER = '/api/admin/news-categories/reorder';
 
-    // Daihoi (Public website - Đại hội)
-    const DAIHOI_EVENT = '/api/daihoi/event';
-    const DAIHOI_COUNTDOWN = '/api/daihoi/countdown';
+    // Daihoi (Public website - Đại hội) - các khối realtime/tổng hợp
     const DAIHOI_STATS = '/api/daihoi/stats';
     const DAIHOI_CONTENTS = '/api/daihoi/contents';
     const DAIHOI_AGENDA = '/api/daihoi/agenda';
     const DAIHOI_MATCHES_LIVE = '/api/daihoi/matches/live';
     const DAIHOI_MATCHES_RECENT = '/api/daihoi/matches/recent';
     const DAIHOI_RANKINGS = '/api/daihoi/rankings';
-    const DAIHOI_NEWS = '/api/daihoi/news';
-    const DAIHOI_NEWS_DETAIL = '/api/daihoi/news/{slug}';
-    const DAIHOI_NEWS_CATEGORIES = '/api/daihoi/news-categories';
 
     // Event
     const EVENT_LIST = '/api/events';
