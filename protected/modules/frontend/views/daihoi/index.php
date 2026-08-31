@@ -27,22 +27,44 @@ $e = function ($s) {
     return CHtml::encode($s);
 };
 
-// ----- Thông tin sự kiện -----
+// ----- Thông tin sự kiện (query thẳng từ /api/events) -----
 $eventName = $val($event, array('name', 'title'), 'ĐẠI HỘI MƯỜNG THANH 2026');
-$eventSlogan = $val($event, array('slogan', 'subtitle'), 'HỘI TỤ BẢN SẮC – DẪN DẮT TƯƠNG LAI');
+$eventSlogan = $val($event, array('slogan', 'subtitle', 'description'), 'HỘI TỤ BẢN SẮC – DẪN DẮT TƯƠNG LAI');
 $eventLocation = $val($event, array('location', 'venue', 'place'), 'Ninh Bình · Việt Nam');
-$eventDuration = $val($event, array('duration', 'duration_text'), '04 ngày 03 đêm');
+$fromDate = $val($event, array('from_date', 'start_date', 'starts_at'), '');
+$toDate = $val($event, array('to_date', 'end_date', 'ends_at'), '');
 
-// ----- Mốc đếm ngược -----
-$target = $val($countdown, array('target', 'start_time', 'starts_at', 'target_time'), '');
-if ($target === '') {
-    $target = $val($event, array('start_date', 'start_time', 'starts_at'), '');
+// Thời lượng: tính số ngày/đêm từ from_date - to_date
+$eventDuration = $val($event, array('duration', 'duration_text'), '');
+if ($eventDuration === '' && $fromDate !== '' && $toDate !== '') {
+    $d1 = strtotime($fromDate);
+    $d2 = strtotime($toDate);
+    if ($d1 && $d2 && $d2 >= $d1) {
+        $days = (int) round(($d2 - $d1) / 86400) + 1;
+        $eventDuration = sprintf('%02d ngày %02d đêm', $days, max(0, $days - 1));
+    }
 }
-if ($target !== '' && ctype_digit((string) $target)) {
-    // Unix timestamp -> ISO 8601
-    $target = date('c', (int) $target);
+if ($eventDuration === '') {
+    $eventDuration = '04 ngày 03 đêm';
 }
-if ($target === '') {
+
+// Năm sự kiện
+$eventYear = $val($event, array('year'), '');
+if ($eventYear === '' && $fromDate !== '') {
+    $eventYear = date('Y', strtotime($fromDate));
+}
+if ($eventYear === '') {
+    $eventYear = '2026';
+}
+
+// ----- Mốc đếm ngược (suy từ ngày khai mạc của sự kiện) -----
+if ($fromDate !== '' && ctype_digit((string) $fromDate)) {
+    $target = date('c', (int) $fromDate);
+} elseif ($fromDate !== '') {
+    $ts = strtotime($fromDate);
+    // Nếu chỉ có ngày (không giờ) thì mặc định 08:00
+    $target = date('Y-m-d\TH:i:s', $ts ? $ts + (date('H', $ts) == 0 ? 8 * 3600 : 0) : strtotime('2026-10-16 08:00:00'));
+} else {
     $target = '2026-10-16T08:00:00';
 }
 ?>
