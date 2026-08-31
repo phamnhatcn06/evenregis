@@ -77,9 +77,14 @@ class SiteController extends Controller
             }
         }
 
-        // Nếu đã đăng nhập sẵn (session còn hiệu lực) → vào thẳng dashboard
+        // Đã đăng nhập (session còn hiệu lực) → hiển thị TRANG CHỦ.
+        // Trang chủ có nút "Đăng nhập admin" (nếu có quyền) để vào thẳng
+        // chức năng admin, KHÔNG check đăng nhập lại.
         if (AuthHandler::isAuthenticated()) {
-            $this->redirect(array('/admin/default/index'));
+            $this->render('home', array(
+                'user' => AuthHandler::getUser(),
+                'hasAdminAccess' => PermissionHelper::hasAnyPermission(),
+            ));
             return;
         }
 
