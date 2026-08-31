@@ -75,14 +75,17 @@ class SiteController extends Controller
             }
         }
 
-        // Check if already authenticated
+        // Nếu đã đăng nhập sẵn (session còn hiệu lực) → vào thẳng dashboard
         if (AuthHandler::isAuthenticated()) {
             $this->redirect(array('/admin/default/index'));
             return;
         }
 
-        // Redirect to login
-        $this->redirect(array('/site/login'));
+        // Chưa đăng nhập: hiển thị trang landing công khai.
+        // KHÔNG check token / KHÔNG ép đăng nhập ở bước này.
+        // Token chỉ được kiểm tra khi người dùng bấm nút "Đăng nhập nội bộ"
+        // và Portal redirect về kèm sso_token (xử lý ở đầu action này).
+        $this->render('login');
     }
 
     /**
