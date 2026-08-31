@@ -135,7 +135,7 @@ if ($countdownSeconds > 0) {
 
           <div class="hero-meta">
             <span><?php echo $e($eventDuration); ?></span>
-            <span>Hệ thống Mường Thanh Hospitality</span>
+            <span><?php echo $e($organizer); ?></span>
             <span><?php echo $e($eventLocation); ?></span>
           </div>
 
