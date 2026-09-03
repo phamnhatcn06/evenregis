@@ -27,8 +27,15 @@ class AdminController extends Controller
     {
         parent::init();
 
-        // Check SSO authentication
+        // Check SSO authentication (session)
         if (!AuthHandler::isAuthenticated()) {
+            Yii::app()->user->setFlash('error', 'Vui lòng đăng nhập.');
+            $this->redirect(array('/site/login'));
+            return;
+        }
+
+        // Mỗi khi load trang admin → gọi Portal kiểm tra token còn hiệu lực
+        if (!AuthHandler::validateWithPortal()) {
             Yii::app()->user->setFlash('error', 'Phiên đăng nhập đã hết hạn.');
             $this->redirect(array('/site/login'));
             return;
