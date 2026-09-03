@@ -118,20 +118,32 @@
     <div class="row">
         <div class="col-md-6 form-group mb-3">
             <?php echo $form->labelEx($model, 'cover_image'); ?>
-            <?php echo $form->textField($model, 'cover_image', array(
+            <?php if (!empty($model->cover_image)): ?>
+                <div class="mb-2">
+                    <img src="<?php echo CHtml::encode($model->cover_image); ?>" alt="Ảnh bìa" class="img-thumbnail" style="max-height:120px;" />
+                </div>
+            <?php endif; ?>
+            <?php echo CHtml::activeHiddenField($model, 'cover_image'); ?>
+            <?php echo CHtml::fileField('cover_image_file', '', array(
                 'class' => 'form-control',
-                'maxlength' => 255,
-                'placeholder' => 'Đường dẫn ảnh bìa',
+                'accept' => 'image/*',
             )); ?>
+            <small class="text-muted">Chọn ảnh để tải lên (JPG, PNG). Để trống nếu giữ ảnh hiện tại.</small>
             <?php echo $form->error($model, 'cover_image'); ?>
         </div>
         <div class="col-md-6 form-group mb-3">
             <?php echo $form->labelEx($model, 'mascot_image'); ?>
-            <?php echo $form->textField($model, 'mascot_image', array(
+            <?php if (!empty($model->mascot_image)): ?>
+                <div class="mb-2">
+                    <img src="<?php echo CHtml::encode($model->mascot_image); ?>" alt="Ảnh linh vật" class="img-thumbnail" style="max-height:120px;" />
+                </div>
+            <?php endif; ?>
+            <?php echo CHtml::activeHiddenField($model, 'mascot_image'); ?>
+            <?php echo CHtml::fileField('mascot_image_file', '', array(
                 'class' => 'form-control',
-                'maxlength' => 255,
-                'placeholder' => 'Đường dẫn ảnh linh vật',
+                'accept' => 'image/*',
             )); ?>
+            <small class="text-muted">Chọn ảnh để tải lên (JPG, PNG). Để trống nếu giữ ảnh hiện tại.</small>
             <?php echo $form->error($model, 'mascot_image'); ?>
         </div>
     </div>
