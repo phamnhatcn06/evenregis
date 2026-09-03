@@ -226,9 +226,12 @@ class AuthHandler extends CApplicationComponent
         // đá người dùng ra ngoài khi Portal chập chờn.
         if ($error || $httpCode !== 200) {
             Yii::log('Portal validate transient error: ' . ($error ?: 'HTTP ' . $httpCode) . ' → keep session', CLogger::LEVEL_WARNING, 'auth');
+            // Không cập nhật mốc check để lần load sau vẫn thử lại Portal.
             return $result = true;
         }
 
+        // Validate thành công → ghi nhận mốc thời gian để cache trong PORTAL_CHECK_TTL giây.
+        $session[self::SESSION_PORTAL_CHECK_KEY] = time();
         return $result = true;
     }
 
