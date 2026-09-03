@@ -305,6 +305,7 @@ class AuthHandler extends CApplicationComponent
         unset($session[self::SESSION_PERMISSIONS_KEY]);
         unset($session[self::SESSION_TOKEN_KEY]);
         unset($session[self::SESSION_LAST_ACTIVITY_KEY]);
+        unset($session[self::SESSION_PORTAL_CHECK_KEY]);
     }
 
     /**
