@@ -293,6 +293,47 @@ class EventsController extends AdminController
 		}
 	}
 
+	/**
+	 * Xử lý upload ảnh bìa và ảnh linh vật cho sự kiện.
+	 * Nếu có file mới được chọn, lưu vào /uploads/events/Y/m và gán đường dẫn vào model.
+	 * Nếu không, giữ nguyên giá trị hiện tại (từ hidden field).
+	 */
+	protected function handleImageUploads($model)
+	{
+		$uploadDir = Yii::getPathOfAlias('webroot') . '/uploads/events/' . date('Y/m');
+		if (!is_dir($uploadDir)) {
+			mkdir($uploadDir, 0755, true);
+		}
+
+		$imageFields = array(
+			'cover_image' => 'cover_image_file',
+			'mascot_image' => 'mascot_image_file',
+		);
+
+		$allowedExt = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+
+		foreach ($imageFields as $attribute => $fileKey) {
+			if (isset($_FILES[$fileKey]) && $_FILES[$fileKey]['error'] === UPLOAD_ERR_OK) {
+				$file = $_FILES[$fileKey];
+				$ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+				if (!in_array($ext, $allowedExt)) {
+					$model->addError($attribute, 'Định dạng ảnh không hợp lệ (chỉ JPG, PNG, GIF, WEBP).');
+					continue;
+				}
+
+				$filename = $attribute . '_' . uniqid() . '.' . $ext;
+				$targetPath = $uploadDir . '/' . $filename;
+
+				if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+					$model->{$attribute} = '/uploads/events/' . date('Y/m') . '/' . $filename;
+				} else {
+					$model->addError($attribute, 'Không thể lưu ảnh.');
+				}
+			}
+		}
+	}
+
 	protected function loadModelById($id)
 	{
 		$model = Events::fetchFromApi($id);
