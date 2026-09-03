@@ -188,6 +188,13 @@ class AuthHandler extends CApplicationComponent
             return $result = false;
         }
 
+        // Cache theo session: nếu đã validate thành công trong vòng PORTAL_CHECK_TTL giây
+        // thì bỏ qua, không gọi Portal lại ở mỗi lần load trang.
+        $lastCheck = isset($session[self::SESSION_PORTAL_CHECK_KEY]) ? $session[self::SESSION_PORTAL_CHECK_KEY] : 0;
+        if (time() - $lastCheck < self::PORTAL_CHECK_TTL) {
+            return $result = true;
+        }
+
         $params = self::getParams();
         $url = rtrim($params['portal']['api_url'], '/') . $params['portal']['sso_me_endpoint'];
 
