@@ -95,10 +95,10 @@ class SiteController extends Controller
             $this->redirect(array('/site/index', 'sso_token' => $ssoToken));
             return;
         }
-        // Ưu tiên session hiện có: nếu còn hợp lệ thì vào thẳng trang chủ,
+        // Ưu tiên session hiện có: nếu còn hợp lệ thì vào thẳng khu vực admin,
         // KHÔNG redirect ra Portal nữa (dùng lại token đã lưu trong session).
         if (AuthHandler::isAuthenticated() && AuthHandler::validateWithPortal()) {
-            $this->redirect(array('/site/index'));
+            $this->redirect(array('/admin/default/index'));
             return;
         }
 
