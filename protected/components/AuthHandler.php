@@ -156,26 +156,69 @@ class AuthHandler extends CApplicationComponent
             return false;
         }
 
-        // Check session timeout
-        $params = self::getParams();
-        $timeout = $params['session']['timeout'];
-        $lastActivity = isset($session[self::SESSION_LAST_ACTIVITY_KEY]) ? $session[self::SESSION_LAST_ACTIVITY_KEY] : 0;
-
-        if (time() - $lastActivity > $timeout) {
-            self::logout();
-            return false;
-        }
-
-        // Check token expiration
-        if (isset($userData['exp']) && $userData['exp'] < time()) {
-            self::logout();
-            return false;
-        }
-
-        // Update last activity
+        // KHÔNG check thời hạn hết hạn của token cục bộ (exp/timeout).
+        // Việc xác thực token còn hiệu lực hay không được giao cho Portal
+        // qua validateWithPortal(), gọi mỗi khi load trang.
         $session[self::SESSION_LAST_ACTIVITY_KEY] = time();
 
         return true;
+    }
+
+    /**
+     * Gọi Portal để kiểm tra token trong session còn hiệu lực hay không.
+     * Chỉ nên gọi khi load trang (không gọi trong vòng lặp / view).
+     * Kết quả được cache trong phạm vi 1 request để tránh gọi API nhiều lần.
+     *
+     * @return bool true nếu còn hiệu lực; false nếu Portal từ chối (đã logout).
+     */
+    public static function validateWithPortal()
+    {
+        static $result = null;
+        if ($result !== null) {
+            return $result;
+        }
+
+        $session = Yii::app()->session;
+        $token = isset($session[self::SESSION_TOKEN_KEY]) ? $session[self::SESSION_TOKEN_KEY] : null;
+        if (!$token) {
+            return $result = false;
+        }
+
+        $params = self::getParams();
+        $url = rtrim($params['portal']['api_url'], '/') . $params['portal']['sso_me_endpoint'];
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . $token,
+                'Accept: application/json',
+            ),
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ));
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        // Portal từ chối token → hết phiên, logout
+        if ($httpCode === 401 || $httpCode === 403) {
+            Yii::log('Portal rejected token (HTTP ' . $httpCode . '), logging out', CLogger::LEVEL_INFO, 'auth');
+            self::logout();
+            return $result = false;
+        }
+
+        // Lỗi mạng / lỗi tạm thời khác → fail-open (giữ phiên) để tránh
+        // đá người dùng ra ngoài khi Portal chập chờn.
+        if ($error || $httpCode !== 200) {
+            Yii::log('Portal validate transient error: ' . ($error ?: 'HTTP ' . $httpCode) . ' → keep session', CLogger::LEVEL_WARNING, 'auth');
+            return $result = true;
+        }
+
+        return $result = true;
     }
 
     /**
