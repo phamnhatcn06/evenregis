@@ -78,9 +78,13 @@ class SiteController extends Controller
         }
 
         // Đã đăng nhập (session còn hiệu lực) → hiển thị TRANG CHỦ.
-        // Trang chủ có nút "Đăng nhập admin" (nếu có quyền) để vào thẳng
-        // chức năng admin, KHÔNG check đăng nhập lại.
+        // Load trang → gọi Portal kiểm tra token; nếu hết hiệu lực thì về landing.
         if (AuthHandler::isAuthenticated()) {
+            if (!AuthHandler::validateWithPortal()) {
+                Yii::app()->user->setFlash('error', 'Phiên đăng nhập đã hết hạn.');
+                $this->render('login');
+                return;
+            }
             $this->render('home', array(
                 'user' => AuthHandler::getUser(),
                 'hasAdminAccess' => PermissionHelper::hasAnyPermission(),
