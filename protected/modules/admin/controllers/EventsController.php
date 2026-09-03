@@ -221,6 +221,7 @@ class EventsController extends AdminController
 
 		if (isset($_POST['Events'])) {
 			$model->setAttributes($_POST['Events']);
+			$this->handleImageUploads($model);
 			if ($model->validate()) {
 				$model->status = 1;
 				$result = $model->storeViaApi();
