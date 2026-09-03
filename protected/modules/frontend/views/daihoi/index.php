@@ -116,7 +116,11 @@ if ($countdownSeconds > 0) {
           <a href="#tin-tuc">Tin tức</a>
         </nav>
 
-        <a class="btn btn-light" href="<?php echo $base; ?>/login">Đăng nhập nội bộ</a>
+        <?php if (!empty($hasAdminAccess)): ?>
+          <a class="btn btn-light" href="<?php echo $base; ?>/admin/default/index">Vào quản trị</a>
+        <?php else: ?>
+          <a class="btn btn-light" href="<?php echo $base; ?>/login">Đăng nhập nội bộ</a>
+        <?php endif; ?>
       </div>
     </header>
 
