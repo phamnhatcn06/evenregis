@@ -38,43 +38,28 @@ class SiteController extends Controller
     {
         $ssoToken = Yii::app()->request->getParam('sso_token');
         if ($ssoToken) {
-            // Debug: show token processing
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-
             // Clear old session before processing new token
             AuthHandler::logout();
             $userData = AuthHandler::handleCallback($ssoToken);
 
-            // Debug: show result
             if (!$userData) {
-                echo '<pre>Token decode failed. Debug info:</pre>';
-                echo '<pre>' . print_r(AuthHandler::debugToken($ssoToken), true) . '</pre>';
-                die();
-            }
-            if ($userData) {
-                // Fetch permissions from SSO API
-                $permiss = AuthHandler::fetchPermissions($ssoToken);
-                // Fetch full user profile from SSO API
-                $userProfile = AuthHandler::fetchUserProfile($ssoToken);
-
-                // Update session with profile data (property_code, property_id, etc.)
-                AuthHandler::updateSessionWithProfile($userProfile);
-                // Render callback page to save profile to localStorage
-                Yii::app()->user->setFlash('success', 'Đăng nhập thành công. Xin chào ' . $userData['full_name']);
-                $this->render('callback', array(
-                    'userProfile' => $userProfile,
-                    // Sau khi lưu profile/permissions vào localStorage → về TRANG CHỦ,
-                    // KHÔNG vào thẳng admin. Trang chủ sẽ hiển thị nút "Đăng nhập admin".
-                    'redirectUrl' => Yii::app()->createUrl('/site/index'),
-                ));
-                return;
-            } else {
-                // Login failed
+                // Token không hợp lệ / hết hạn → về landing
                 Yii::app()->user->setFlash('error', 'Token không hợp lệ hoặc đã hết hạn.');
                 $this->redirect(array('/site/login'));
                 return;
             }
+
+            // Lưu quyền + profile vào SESSION (menu permissions sẽ được layout admin
+            // tự sync xuống localStorage ở mỗi lần load trang).
+            AuthHandler::fetchPermissions($ssoToken);
+            $userProfile = AuthHandler::fetchUserProfile($ssoToken);
+            AuthHandler::updateSessionWithProfile($userProfile);
+
+            Yii::app()->user->setFlash('success', 'Đăng nhập thành công. Xin chào ' . $userData['full_name']);
+
+            // Redirect PHÍA SERVER (302) → token biến mất khỏi URL ngay lập tức.
+            $this->redirect(array('/site/index'));
+            return;
         }
 
         // Đã đăng nhập (session còn hiệu lực) → hiển thị TRANG CHỦ.
