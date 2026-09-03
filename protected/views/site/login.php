@@ -5,10 +5,9 @@
  */
 $this->pageTitle = 'Đăng nhập - ' . Yii::app()->name;
 
-$params = require Yii::getPathOfAlias('application.config') . '/params.php';
-$portalUrl = $params['portal']['url'];
-$returnUrl = Yii::app()->request->hostInfo . Yii::app()->request->baseUrl;
-$loginUrl = $portalUrl . '/login?redirect=' . urlencode($returnUrl);
+// Nút trỏ vào action site/login: action này sẽ kiểm tra session trước,
+// còn hợp lệ thì vào thẳng trang chủ, chưa có mới redirect ra Portal SSO.
+$loginUrl = Yii::app()->createUrl('/site/login');
 ?>
 
 <!DOCTYPE html>
