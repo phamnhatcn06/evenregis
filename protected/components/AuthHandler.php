@@ -25,6 +25,10 @@ class AuthHandler extends CApplicationComponent
     const SESSION_PERMISSIONS_KEY = 'sso_permissions';
     const SESSION_TOKEN_KEY = 'sso_token';
     const SESSION_LAST_ACTIVITY_KEY = 'sso_last_activity';
+    const SESSION_PORTAL_CHECK_KEY = 'sso_portal_checked_at';
+
+    /** Khoảng thời gian (giây) cache kết quả validate Portal để tránh gọi mỗi request */
+    const PORTAL_CHECK_TTL = 60;
 
     /**
      * Handle SSO callback with JWT token
