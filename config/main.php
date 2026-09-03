@@ -12,7 +12,7 @@ return array(
     'sourceLanguage' => 'en',
     'language' => 'vi',
     'timeZone' => 'Asia/Ho_Chi_Minh',
-    'defaultController' => 'site',
+    'defaultController' => 'admin/default',
     // preloading 'log' component
     'preload' => array('log', 'chartjs'),
     // autoloading model and component classes
