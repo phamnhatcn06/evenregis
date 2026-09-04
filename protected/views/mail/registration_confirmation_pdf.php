@@ -781,8 +781,18 @@
             trước Ban lãnh đạo Tập đoàn về độ chính xác, trung thực của những thông tin trên.
         </div>
 
+        <?php
+        // Xác định chức danh ký tên theo đơn vị:
+        // - Code 9999, prefix VPTD hoặc CIENCO => Tổng giám đốc
+        // - Các đơn vị khác => Giám đốc khách sạn
+        $signatureCode = isset($model->property_code) ? mb_strtoupper(trim((string)$model->property_code), 'UTF-8') : '';
+        $isHeadOffice = ($signatureCode === '9999')
+            || ($signatureCode === 'VPTD')
+            || (strpos($signatureCode, 'CIENCO') !== false);
+        $signatureRole = $isHeadOffice ? 'TỔNG GIÁM ĐỐC' : 'GIÁM ĐỐC KHÁCH SẠN';
+        ?>
         <div class="signature">
-            <div class="role">TỔNG GIÁM ĐỐC</div>
+            <div class="role"><?php echo $signatureRole; ?></div>
             <div class="hint">(Ký tên, đóng dấu)</div>
         </div>
     </div>
