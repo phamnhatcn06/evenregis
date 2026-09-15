@@ -11,6 +11,12 @@ $this->menu = array(
         'color' => 'secondary',
         'icon' => 'fa-arrow-left',
     ),
+    array(
+        'label' => 'Xuất Excel',
+        'url' => $this->createUrl('exportBySport', array('event_id' => $eventId, 'sport_id' => $sportId)),
+        'color' => 'success',
+        'icon' => 'fa-file-excel-o',
+    ),
 );
 $this->Tabletitle = 'Đội thể thao theo bộ môn: ' . CHtml::encode($sportName);
 ?>
