@@ -1540,12 +1540,14 @@ class CompetitionRegistrationsController extends AdminController
         $data = array();
         foreach (CompetitionRegistrations::getFinalists($competitionId) as $f) {
             $ref = isset($f['registration_id']) ? $f['registration_id'] : null;
+            $reg = isset($f['registration']) && is_array($f['registration']) ? $f['registration'] : array();
+            $code = isset($reg['candidate_number']) ? $reg['candidate_number'] : (isset($f['candidate_number']) ? $f['candidate_number'] : '');
             $data[] = array(
                 'id' => isset($f['id']) ? $f['id'] : $ref,
                 'ref' => $ref,
-                'code' => isset($f['candidate_number']) ? $f['candidate_number'] : '',
-                'name' => $this->pickName($f, 'Thí sinh #' . $ref),
-                'sub' => $this->pickProperty($f),
+                'code' => $code,
+                'name' => $this->pickName($reg, 'Thí sinh #' . $ref),
+                'sub' => $this->pickProperty($reg),
             );
         }
 
