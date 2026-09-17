@@ -1434,7 +1434,9 @@ class SportTeamsController extends AdminController
         foreach (SportTeams::getFinalists($eventId, $sportId) as $f) {
             $ref = isset($f['team_id']) ? $f['team_id'] : null;
             $team = isset($f['team']) && is_array($f['team']) ? $f['team'] : array();
-            $name = !empty($team['name']) ? $team['name'] : ('Đội #' . $ref);
+            $isAlliance = !empty($team['is_alliance']) || !empty($team['is_alliance_team']);
+            $teamNameRaw = isset($team['name']) ? $team['name'] : null;
+            $name = $this->buildTeamDisplayName($teamNameRaw, isset($team['team_name']) ? $team['team_name'] : null, $ref, $isAlliance);
             $rank = isset($f['final_rank']) ? $f['final_rank'] : null;
             $sub = '';
             if (isset($team['members']) && is_array($team['members'])) {
