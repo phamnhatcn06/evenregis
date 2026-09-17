@@ -6,6 +6,13 @@ $this->breadcrumbs = array(
 
 $this->menu = array(
     array(
+        'label' => 'Chọn vào chung kết',
+        'url' => $this->createUrl('final'),
+        'color' => 'warning',
+        'icon' => 'fa-trophy',
+        'id' => 'btn_final',
+    ),
+    array(
         'label' => 'Tổng quan',
         'url' => $this->createUrl('overview'),
         'color' => 'info',
