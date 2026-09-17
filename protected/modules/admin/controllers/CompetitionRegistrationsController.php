@@ -1484,6 +1484,145 @@ class CompetitionRegistrationsController extends AdminController
         require_once $phpExcelPath . '/PHPExcel.php';
     }
 
+    // ==================== VÒNG CHUNG KẾT ====================
+
+    /**
+     * Màn hình chọn thí sinh vào vòng chung kết (theo cuộc thi nghiệp vụ).
+     */
+    public function actionFinal()
+    {
+        $competitions = Competitions::getActiveList();
+        $this->render('final', array(
+            'competitions' => $competitions,
+        ));
+    }
+
+    /**
+     * AJAX: danh sách thí sinh đủ điều kiện (chưa vào chung kết).
+     */
+    public function actionFinalCandidates()
+    {
+        $competitionId = Yii::app()->request->getQuery('id');
+        if (empty($competitionId)) {
+            $this->renderJson(array('success' => true, 'data' => array()));
+        }
+
+        $excluded = $this->getFinalExcludeSet($competitionId);
+
+        $rows = CompetitionRegistrations::getRawList(array('competition_id' => $competitionId));
+        $data = array();
+        foreach ($rows as $row) {
+            $regId = isset($row['id']) ? $row['id'] : null;
+            if ($regId === null || isset($excluded[$regId])) {
+                continue;
+            }
+            $data[] = array(
+                'id' => $regId,
+                'code' => isset($row['candidate_number']) ? $row['candidate_number'] : '',
+                'name' => $this->pickName($row, 'Thí sinh #' . (isset($row['attendee_id']) ? $row['attendee_id'] : $regId)),
+                'sub' => isset($row['property_name']) ? $row['property_name'] : '',
+            );
+        }
+
+        $this->renderJson(array('success' => true, 'data' => $data));
+    }
+
+    /**
+     * AJAX: danh sách thí sinh đã vào chung kết.
+     */
+    public function actionFinalList()
+    {
+        $competitionId = Yii::app()->request->getQuery('id');
+        if (empty($competitionId)) {
+            $this->renderJson(array('success' => true, 'data' => array()));
+        }
+
+        $data = array();
+        foreach (CompetitionRegistrations::getFinalists($competitionId) as $f) {
+            $ref = isset($f['registration_id']) ? $f['registration_id'] : null;
+            $data[] = array(
+                'id' => isset($f['id']) ? $f['id'] : $ref,
+                'ref' => $ref,
+                'code' => isset($f['candidate_number']) ? $f['candidate_number'] : '',
+                'name' => $this->pickName($f, 'Thí sinh #' . $ref),
+                'sub' => isset($f['property_name']) ? $f['property_name'] : '',
+            );
+        }
+
+        $this->renderJson(array('success' => true, 'data' => $data));
+    }
+
+    /**
+     * AJAX: thêm các thí sinh đã chọn vào chung kết.
+     */
+    public function actionFinalAdd()
+    {
+        $competitionId = Yii::app()->request->getPost('id');
+        $ids = Yii::app()->request->getPost('ids', array());
+        if (empty($competitionId) || empty($ids)) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu dữ liệu bắt buộc.'));
+        }
+        $result = CompetitionRegistrations::addToFinal($competitionId, $ids);
+        $this->renderFinalResult($result, 'Đã thêm ' . count($ids) . ' thí sinh vào chung kết.');
+    }
+
+    /**
+     * AJAX: gỡ một thí sinh khỏi chung kết.
+     */
+    public function actionFinalRemove()
+    {
+        $id = Yii::app()->request->getPost('id');
+        if (empty($id)) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu ID.'));
+        }
+        $result = CompetitionRegistrations::removeFromFinal($id);
+        $this->renderFinalResult($result, 'Đã gỡ thí sinh khỏi chung kết.');
+    }
+
+    /**
+     * Tập id đăng ký đã có trong chung kết (để loại khỏi danh sách ứng viên).
+     */
+    protected function getFinalExcludeSet($competitionId)
+    {
+        $excluded = array();
+        foreach (CompetitionRegistrations::getFinalists($competitionId) as $f) {
+            $ref = isset($f['registration_id']) ? $f['registration_id'] : null;
+            if ($ref !== null) {
+                $excluded[$ref] = true;
+            }
+        }
+        return $excluded;
+    }
+
+    /**
+     * Lấy tên hiển thị từ nhiều key khả dĩ của API.
+     */
+    protected function pickName($row, $fallback)
+    {
+        foreach (array('attendee_name', 'full_name', 'name') as $key) {
+            if (!empty($row[$key])) {
+                return $row[$key];
+            }
+        }
+        return $fallback;
+    }
+
+    protected function renderJson($payload)
+    {
+        header('Content-Type: application/json');
+        echo CJSON::encode($payload);
+        Yii::app()->end();
+    }
+
+    protected function renderFinalResult($result, $successMessage)
+    {
+        if (isset($result['success']) && $result['success']) {
+            $this->renderJson(array('success' => true, 'message' => $successMessage));
+        }
+        $message = isset($result['error']) && $result['error'] ? $result['error'] : 'Có lỗi xảy ra.';
+        $this->renderJson(array('success' => false, 'message' => $message));
+    }
+
     protected function loadModelById($id)
     {
         $model = CompetitionRegistrations::fetchFromApi($id);
