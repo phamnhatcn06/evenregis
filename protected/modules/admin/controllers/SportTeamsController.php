@@ -1356,6 +1356,127 @@ class SportTeamsController extends AdminController
         }
     }
 
+    // ==================== VÒNG CHUNG KẾT ====================
+
+    /**
+     * Màn hình chọn đội vào vòng chung kết (theo sự kiện + môn thi).
+     */
+    public function actionFinal()
+    {
+        $events = Events::getActiveList();
+        $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
+
+        $this->render('final', array(
+            'events' => $events,
+            'sports' => $sports,
+        ));
+    }
+
+    /**
+     * AJAX: danh sách đội đủ điều kiện (đã xác nhận, chưa vào chung kết).
+     */
+    public function actionFinalCandidates()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        $sportId = Yii::app()->request->getQuery('sport_id');
+        if (empty($eventId) || empty($sportId)) {
+            $this->renderJson(array('success' => true, 'data' => array()));
+        }
+
+        $excluded = array();
+        foreach (SportTeams::getFinalists($eventId, $sportId) as $f) {
+            $ref = isset($f['team_id']) ? $f['team_id'] : (isset($f['id']) ? $f['id'] : null);
+            if ($ref !== null) {
+                $excluded[$ref] = true;
+            }
+        }
+
+        $teams = SportTeams::getApiDataProvider(array(
+            'event_id' => $eventId,
+            'sport_id' => $sportId,
+        ), 10000)->getData();
+
+        $data = array();
+        foreach ($teams as $team) {
+            if ((string)$team->status !== (string)SportTeams::STATUS_CONFIRMED) {
+                continue;
+            }
+            if (isset($excluded[$team->id])) {
+                continue;
+            }
+            $sub = trim($team->property_name);
+            if (!empty($team->member_count)) {
+                $sub .= ($sub ? ' · ' : '') . $team->member_count . ' thành viên';
+            }
+            $data[] = array(
+                'id' => $team->id,
+                'code' => '',
+                'name' => !empty($team->team_name) ? $team->team_name : ('Đội #' . $team->id),
+                'sub' => $sub,
+            );
+        }
+
+        $this->renderJson(array('success' => true, 'data' => $data));
+    }
+
+    /**
+     * AJAX: danh sách đội đã vào chung kết.
+     */
+    public function actionFinalList()
+    {
+        $eventId = Yii::app()->request->getQuery('event_id');
+        $sportId = Yii::app()->request->getQuery('sport_id');
+        if (empty($eventId) || empty($sportId)) {
+            $this->renderJson(array('success' => true, 'data' => array()));
+        }
+
+        $data = array();
+        foreach (SportTeams::getFinalists($eventId, $sportId) as $f) {
+            $ref = isset($f['team_id']) ? $f['team_id'] : null;
+            $name = isset($f['team_name']) ? $f['team_name'] : (isset($f['name']) ? $f['name'] : ('Đội #' . $ref));
+            $rank = isset($f['final_rank']) ? $f['final_rank'] : null;
+            $data[] = array(
+                'id' => isset($f['id']) ? $f['id'] : $ref,
+                'ref' => $ref,
+                'code' => $rank ? ('Hạng ' . $rank) : '',
+                'name' => $name,
+                'sub' => isset($f['property_name']) ? $f['property_name'] : '',
+            );
+        }
+
+        $this->renderJson(array('success' => true, 'data' => $data));
+    }
+
+    /**
+     * AJAX: thêm các đội đã chọn vào chung kết.
+     */
+    public function actionFinalAdd()
+    {
+        $eventId = Yii::app()->request->getPost('event_id');
+        $sportId = Yii::app()->request->getPost('sport_id');
+        $ids = Yii::app()->request->getPost('ids', array());
+
+        if (empty($eventId) || empty($sportId) || empty($ids)) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu dữ liệu bắt buộc.'));
+        }
+
+        $result = SportTeams::addToFinal($eventId, $sportId, $ids);
+        $this->renderFinalResult($result, 'Đã thêm ' . count($ids) . ' đội vào chung kết.');
+    }
+
+    /**
+     * AJAX: gỡ một đội khỏi chung kết.
+     */
+    public function actionFinalRemove()
+    {
+        $id = Yii::app()->request->getPost('id');
+        if (empty($id)) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu ID.'));
+        }
+        $result = SportTeams::removeFromFinal($id);
+        $this->renderFinalResult($result, 'Đã gỡ đội khỏi chung kết.');
+    }
+
     protected function loadModelById($id)
     {
         $model = SportTeams::fetchFromApi($id);
@@ -1363,6 +1484,28 @@ class SportTeamsController extends AdminController
             throw new CHttpException(404, 'Không tìm thấy đội thể thao.');
         }
         return $model;
+    }
+
+    /**
+     * Trả JSON và kết thúc request.
+     */
+    protected function renderJson($payload)
+    {
+        header('Content-Type: application/json');
+        echo CJSON::encode($payload);
+        Yii::app()->end();
+    }
+
+    /**
+     * Chuẩn hoá kết quả gọi Finals API thành JSON cho client.
+     */
+    protected function renderFinalResult($result, $successMessage)
+    {
+        if (isset($result['success']) && $result['success']) {
+            $this->renderJson(array('success' => true, 'message' => $successMessage));
+        }
+        $message = isset($result['error']) && $result['error'] ? $result['error'] : 'Có lỗi xảy ra.';
+        $this->renderJson(array('success' => false, 'message' => $message));
     }
 
     /**
