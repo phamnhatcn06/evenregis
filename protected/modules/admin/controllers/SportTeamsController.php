@@ -1396,6 +1396,8 @@ class SportTeamsController extends AdminController
             'sport_id' => $sportId,
         ), 10000)->getData();
 
+        $membersByTeam = $this->getMemberNamesByTeam($eventId);
+
         $data = array();
         foreach ($teams as $team) {
             if ((string)$team->status === (string)SportTeams::STATUS_CANCELLED) {
@@ -1404,14 +1406,23 @@ class SportTeamsController extends AdminController
             if (isset($excluded[$team->id])) {
                 continue;
             }
+            $members = isset($membersByTeam[$team->id]) ? $membersByTeam[$team->id] : array();
+            $count = count($members);
+
+            $name = $this->buildTeamDisplayName($team->name, $team->team_name, $team->id, ($team->is_alliance || $team->is_alliance_team));
+            // Nội dung đơn (đội chỉ 1 VĐV): hiển thị luôn tên VĐV kèm tên đội.
+            if ($count === 1) {
+                $name .= ' — ' . $members[0];
+            }
+
             $sub = trim($team->property_name);
-            if (!empty($team->member_count)) {
-                $sub .= ($sub ? ' · ' : '') . $team->member_count . ' thành viên';
+            if ($count > 0) {
+                $sub .= ($sub ? ' · ' : '') . $count . ' VĐV';
             }
             $data[] = array(
                 'id' => $team->id,
                 'code' => '',
-                'name' => $this->buildTeamDisplayName($team->name, $team->team_name, $team->id, ($team->is_alliance || $team->is_alliance_team)),
+                'name' => $name,
                 'sub' => $sub,
             );
         }
