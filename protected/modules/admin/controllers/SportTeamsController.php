@@ -1411,7 +1411,7 @@ class SportTeamsController extends AdminController
             $data[] = array(
                 'id' => $team->id,
                 'code' => '',
-                'name' => !empty($team->team_name) ? $team->team_name : ('Đội #' . $team->id),
+                'name' => $this->buildTeamDisplayName($team->name, $team->team_name, $team->id, ($team->is_alliance || $team->is_alliance_team)),
                 'sub' => $sub,
             );
         }
