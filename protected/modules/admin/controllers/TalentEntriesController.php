@@ -410,6 +410,132 @@ class TalentEntriesController extends AdminController
         return $list;
     }
 
+    // ==================== VÒNG CHUNG KẾT ====================
+
+    /**
+     * Màn hình chọn tiết mục vào vòng chung kết (theo hội diễn văn nghệ).
+     */
+    public function actionFinal()
+    {
+        $shows = TalentShows::getListForDropdown();
+        $this->render('final', array(
+            'shows' => $shows,
+        ));
+    }
+
+    /**
+     * AJAX: danh sách tiết mục đủ điều kiện (đã duyệt, chưa vào chung kết).
+     */
+    public function actionFinalCandidates()
+    {
+        $showId = Yii::app()->request->getQuery('id');
+        if (empty($showId)) {
+            $this->renderJson(array('success' => true, 'data' => array()));
+        }
+
+        $excluded = array();
+        foreach (TalentEntries::getFinalists($showId) as $f) {
+            $ref = isset($f['entry_id']) ? $f['entry_id'] : null;
+            if ($ref !== null) {
+                $excluded[$ref] = true;
+            }
+        }
+
+        $rows = TalentEntries::getRawList(array('show_id' => $showId));
+        $data = array();
+        foreach ($rows as $row) {
+            $entryId = isset($row['id']) ? $row['id'] : null;
+            if ($entryId === null || isset($excluded[$entryId])) {
+                continue;
+            }
+            // Chỉ nhận tiết mục đã duyệt.
+            if (isset($row['status']) && (string)$row['status'] !== (string)TalentEntries::STATUS_APPROVED) {
+                continue;
+            }
+            $sub = isset($row['property_name']) ? $row['property_name'] : '';
+            if (!empty($row['category_name'])) {
+                $sub .= ($sub ? ' · ' : '') . $row['category_name'];
+            }
+            $data[] = array(
+                'id' => $entryId,
+                'code' => '',
+                'name' => isset($row['title']) ? $row['title'] : ('Tiết mục #' . $entryId),
+                'sub' => $sub,
+            );
+        }
+
+        $this->renderJson(array('success' => true, 'data' => $data));
+    }
+
+    /**
+     * AJAX: danh sách tiết mục đã vào chung kết.
+     */
+    public function actionFinalList()
+    {
+        $showId = Yii::app()->request->getQuery('id');
+        if (empty($showId)) {
+            $this->renderJson(array('success' => true, 'data' => array()));
+        }
+
+        $data = array();
+        foreach (TalentEntries::getFinalists($showId) as $f) {
+            $ref = isset($f['entry_id']) ? $f['entry_id'] : null;
+            $order = isset($f['performance_order']) ? $f['performance_order'] : null;
+            $data[] = array(
+                'id' => isset($f['id']) ? $f['id'] : $ref,
+                'ref' => $ref,
+                'code' => $order ? ('STT ' . $order) : '',
+                'name' => isset($f['title']) ? $f['title'] : ('Tiết mục #' . $ref),
+                'sub' => isset($f['property_name']) ? $f['property_name'] : '',
+            );
+        }
+
+        $this->renderJson(array('success' => true, 'data' => $data));
+    }
+
+    /**
+     * AJAX: thêm các tiết mục đã chọn vào chung kết.
+     */
+    public function actionFinalAdd()
+    {
+        $showId = Yii::app()->request->getPost('id');
+        $ids = Yii::app()->request->getPost('ids', array());
+        if (empty($showId) || empty($ids)) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu dữ liệu bắt buộc.'));
+        }
+        $result = TalentEntries::addToFinal($showId, $ids);
+        $this->renderFinalResult($result, 'Đã thêm ' . count($ids) . ' tiết mục vào chung kết.');
+    }
+
+    /**
+     * AJAX: gỡ một tiết mục khỏi chung kết.
+     */
+    public function actionFinalRemove()
+    {
+        $id = Yii::app()->request->getPost('id');
+        if (empty($id)) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu ID.'));
+        }
+        $result = TalentEntries::removeFromFinal($id);
+        $this->renderFinalResult($result, 'Đã gỡ tiết mục khỏi chung kết.');
+    }
+
+    protected function renderJson($payload)
+    {
+        header('Content-Type: application/json');
+        echo CJSON::encode($payload);
+        Yii::app()->end();
+    }
+
+    protected function renderFinalResult($result, $successMessage)
+    {
+        if (isset($result['success']) && $result['success']) {
+            $this->renderJson(array('success' => true, 'message' => $successMessage));
+        }
+        $message = isset($result['error']) && $result['error'] ? $result['error'] : 'Có lỗi xảy ra.';
+        $this->renderJson(array('success' => false, 'message' => $message));
+    }
+
     protected function loadModelById($id)
     {
         $model = TalentEntries::fetchFromApi($id);
