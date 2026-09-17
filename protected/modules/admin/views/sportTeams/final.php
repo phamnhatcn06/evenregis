@@ -1,7 +1,9 @@
 <?php
 /* @var $this SportTeamsController */
 /* @var $events array id=>name */
-/* @var $sports SportTeams[]|array danh sách môn thể thao */
+/* @var $sportsItems array danh sách môn thi đã sắp theo cây cha-con */
+/* @var $levelMap array id môn => cấp độ trong cây */
+/* @var $hasChildren array id môn cha => true */
 
 $this->breadcrumbs = array(
     'Thể thao' => array('admin'),
