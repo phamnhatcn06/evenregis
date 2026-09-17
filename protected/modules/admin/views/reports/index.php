@@ -555,9 +555,14 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/asse
                                 ?>
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
                                     <h5 class="fw-bold mb-0 text-dark"><i class="fa fa-table text-primary me-2"></i>Tổng hợp đăng ký thể thao theo cụm và đơn vị</h5>
-                                    <a href="<?php echo Yii::app()->createUrl('/admin/reports/exportSports', array('event_id' => $selectedEventId)); ?>" class="btn btn-success">
-                                        <i class="fa fa-file-excel-o me-1"></i> Xuất báo cáo Excel
-                                    </a>
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <a href="<?php echo Yii::app()->createUrl('/admin/reports/exportSports', array('event_id' => $selectedEventId)); ?>" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o me-1"></i> Xuất báo cáo Excel
+                                        </a>
+                                        <a href="<?php echo Yii::app()->createUrl('/admin/reports/exportTeamsByUnit', array('event_id' => $selectedEventId)); ?>" class="btn btn-primary">
+                                            <i class="fa fa-users me-1"></i> Đội &amp; VĐV theo đơn vị
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <?php if (empty($activeSportsForReport)): ?>
