@@ -1545,7 +1545,7 @@ class CompetitionRegistrationsController extends AdminController
                 'ref' => $ref,
                 'code' => isset($f['candidate_number']) ? $f['candidate_number'] : '',
                 'name' => $this->pickName($f, 'Thí sinh #' . $ref),
-                'sub' => isset($f['property_name']) ? $f['property_name'] : '',
+                'sub' => $this->pickProperty($f),
             );
         }
 
