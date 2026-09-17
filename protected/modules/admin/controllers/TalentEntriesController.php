@@ -448,8 +448,8 @@ class TalentEntriesController extends AdminController
             if ($entryId === null || isset($excluded[$entryId])) {
                 continue;
             }
-            // Chỉ nhận tiết mục đã duyệt.
-            if (isset($row['status']) && (string)$row['status'] !== (string)TalentEntries::STATUS_APPROVED) {
+            // Bỏ tiết mục đã bị từ chối; các trạng thái khác đều cho chọn.
+            if (isset($row['status']) && (string)$row['status'] === (string)TalentEntries::STATUS_REJECTED) {
                 continue;
             }
             $sub = isset($row['property_name']) ? $row['property_name'] : '';
