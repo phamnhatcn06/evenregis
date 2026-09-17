@@ -281,4 +281,47 @@ class BeautyContestants extends BaseBeautyContestants
 
         return '';
     }
+
+    // ===== Vòng chung kết =====
+
+    /**
+     * Thêm các thí sinh vào vòng chung kết của cuộc thi sắc đẹp.
+     * @param int $contestId
+     * @param array $contestantIds beauty_contestants.id
+     * @return array
+     */
+    public static function addToFinal($contestId, $contestantIds)
+    {
+        return ApiClient::post(ApiEndpoints::BEAUTY_FINAL_ADD, array(
+            'contest_id' => $contestId,
+            'contestant_ids' => array_values($contestantIds),
+        ));
+    }
+
+    /**
+     * Danh sách thí sinh đã vào chung kết của cuộc thi.
+     * @param int $contestId
+     * @return array
+     */
+    public static function getFinalists($contestId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_FINAL_LIST, array('id' => $contestId));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            return is_array($data) ? $data : array();
+        }
+        return array();
+    }
+
+    /**
+     * Gỡ một thí sinh khỏi vòng chung kết.
+     * @param int $finalistId id bản ghi chung kết (beauty_round_results.id)
+     * @return array
+     */
+    public static function removeFromFinal($finalistId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_FINAL_REMOVE, array('id' => $finalistId));
+        return ApiClient::delete($url);
+    }
 }
