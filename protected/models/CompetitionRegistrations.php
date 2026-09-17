@@ -137,4 +137,47 @@ class CompetitionRegistrations extends BaseCompetitionRegistrations
         }
         return array();
     }
+
+    // ===== Vòng chung kết =====
+
+    /**
+     * Thêm các thí sinh (đăng ký) vào vòng chung kết của cuộc thi nghiệp vụ.
+     * @param int $competitionId
+     * @param array $registrationIds competition_registrations.id
+     * @return array
+     */
+    public static function addToFinal($competitionId, $registrationIds)
+    {
+        return ApiClient::post(ApiEndpoints::COMPETITION_FINAL_ADD, array(
+            'competition_id' => $competitionId,
+            'registration_ids' => array_values($registrationIds),
+        ));
+    }
+
+    /**
+     * Danh sách thí sinh đã vào chung kết của cuộc thi.
+     * @param int $competitionId
+     * @return array
+     */
+    public static function getFinalists($competitionId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::COMPETITION_FINAL_LIST, array('id' => $competitionId));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            return is_array($data) ? $data : array();
+        }
+        return array();
+    }
+
+    /**
+     * Gỡ một thí sinh khỏi vòng chung kết.
+     * @param int $finalistId id bản ghi chung kết (competition_round_results.id)
+     * @return array
+     */
+    public static function removeFromFinal($finalistId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::COMPETITION_FINAL_REMOVE, array('id' => $finalistId));
+        return ApiClient::delete($url);
+    }
 }
