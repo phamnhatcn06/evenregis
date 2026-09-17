@@ -545,13 +545,15 @@ class BeautyContestantsController extends AdminController
         $data = array();
         foreach (BeautyContestants::getFinalists($contestId) as $f) {
             $ref = isset($f['contestant_id']) ? $f['contestant_id'] : null;
+            $c = isset($f['contestant']) && is_array($f['contestant']) ? $f['contestant'] : array();
             $rank = isset($f['rank']) ? $f['rank'] : (isset($f['final_rank']) ? $f['final_rank'] : null);
+            $fallbackName = 'Thí sinh #' . (isset($c['attendee_id']) ? $c['attendee_id'] : $ref);
             $data[] = array(
                 'id' => isset($f['id']) ? $f['id'] : $ref,
                 'ref' => $ref,
-                'code' => $rank ? ('Hạng ' . $rank) : $this->pickCode($f),
-                'name' => $this->pickName($f, 'Thí sinh #' . $ref),
-                'sub' => isset($f['property_name']) ? $f['property_name'] : '',
+                'code' => $rank ? ('Hạng ' . $rank) : $this->pickCode($c),
+                'name' => $this->pickName($c, $fallbackName),
+                'sub' => isset($c['property_name']) ? $c['property_name'] : '',
             );
         }
 
