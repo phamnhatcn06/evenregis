@@ -1494,6 +1494,19 @@ class SportTeamsController extends AdminController
     }
 
     /**
+     * Dựng tên hiển thị của đội: ưu tiên name, rồi team_name, cuối cùng "Đội #id".
+     * Kèm nhãn "(Liên quân)" cho đội liên quân để phân biệt.
+     */
+    protected function buildTeamDisplayName($name, $teamName, $teamId, $isAlliance = false)
+    {
+        $label = !empty($name) ? $name : (!empty($teamName) ? $teamName : ('Đội #' . $teamId));
+        if ($isAlliance) {
+            $label .= ' (Liên quân)';
+        }
+        return $label;
+    }
+
+    /**
      * Trả JSON và kết thúc request.
      */
     protected function renderJson($payload)
