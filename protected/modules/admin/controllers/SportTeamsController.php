@@ -1398,7 +1398,7 @@ class SportTeamsController extends AdminController
 
         $data = array();
         foreach ($teams as $team) {
-            if ((string)$team->status !== (string)SportTeams::STATUS_CONFIRMED) {
+            if ((string)$team->status === (string)SportTeams::STATUS_CANCELLED) {
                 continue;
             }
             if (isset($excluded[$team->id])) {
