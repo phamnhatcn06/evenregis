@@ -31,8 +31,20 @@ Yii::app()->clientScript->registerScriptFile(
                 <label class="form-label">Môn thi <span class="text-danger">*</span></label>
                 <select id="finals-sport" class="form-select">
                     <option value="">-- Chọn môn thi --</option>
-                    <?php foreach ($sports as $sport): ?>
-                        <option value="<?php echo $sport->id; ?>"><?php echo CHtml::encode($sport->name); ?></option>
+                    <?php foreach ($sportsItems as $s):
+                        $sId = is_object($s) ? $s->id : (isset($s['id']) ? $s['id'] : null);
+                        $sName = is_object($s) ? $s->name : (isset($s['name']) ? $s['name'] : '');
+                        $sActive = is_object($s) ? $s->is_active : (isset($s['is_active']) ? $s['is_active'] : 1);
+                        if (!$sId || !$sActive) continue;
+                        $level = isset($levelMap[$sId]) ? $levelMap[$sId] : 0;
+                        $prefix = $level > 0 ? str_repeat('—', $level) . ' ' : '';
+                        $isGroup = isset($hasChildren[$sId]);
+                    ?>
+                        <?php if ($isGroup): ?>
+                            <option value="" disabled style="font-weight:bold;background:#f0f0f0;"><?php echo CHtml::encode($prefix . $sName); ?></option>
+                        <?php else: ?>
+                            <option value="<?php echo $sId; ?>"><?php echo CHtml::encode($prefix . $sName); ?></option>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
             </div>
