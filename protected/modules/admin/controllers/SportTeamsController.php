@@ -1527,11 +1527,15 @@ class SportTeamsController extends AdminController
 
     /**
      * Lấy danh sách tên VĐV theo từng đội của sự kiện.
+     * Chỉ tính VĐV hợp lệ: attendee đang active và có registration đang hoạt
+     * động tương ứng với sự kiện.
      * @param int $eventId
      * @return array map sport_team_id => [tên VĐV, ...]
      */
     protected function getMemberNamesByTeam($eventId)
     {
+        $activeAttendeeIds = $this->getActiveAttendeeIds($eventId);
+
         $map = array();
         $res = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
             'event_id' => $eventId,
@@ -1545,6 +1549,11 @@ class SportTeamsController extends AdminController
                     if (!$tid) {
                         continue;
                     }
+                    // Chỉ lấy VĐV có attendee active + registration hợp lệ.
+                    $attId = isset($m['attendee_id']) ? $m['attendee_id'] : null;
+                    if (!$attId || !isset($activeAttendeeIds[$attId])) {
+                        continue;
+                    }
                     $memberName = isset($m['name']) ? $m['name']
                         : (isset($m['attendee_name']) ? $m['attendee_name'] : '');
                     if ($memberName !== '') {
@@ -1554,6 +1563,40 @@ class SportTeamsController extends AdminController
             }
         }
         return $map;
+    }
+
+    /**
+     * Tập id attendee hợp lệ của sự kiện: attendee chưa bị xoá (active) và thuộc
+     * registration đang hoạt động (không phải nháp, chưa bị xoá) của sự kiện.
+     * @param int $eventId
+     * @return array set attendee_id => true
+     */
+    protected function getActiveAttendeeIds($eventId)
+    {
+        $activeReg = array();
+        foreach (Registrations::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 1000), 1000)->getData() as $r) {
+            if (!empty($r->deleted_at)) {
+                continue;
+            }
+            if ((int)$r->status === Registrations::STATUS_DRAFT) {
+                continue;
+            }
+            if (!empty($r->id)) {
+                $activeReg[$r->id] = true;
+            }
+        }
+
+        $ids = array();
+        foreach (Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 5000), 5000)->getData() as $a) {
+            if (!empty($a->deleted_at)) {
+                continue;
+            }
+            $regId = isset($a->registration_id) ? $a->registration_id : null;
+            if ($regId && isset($activeReg[$regId]) && !empty($a->id)) {
+                $ids[$a->id] = true;
+            }
+        }
+        return $ids;
     }
 
     /**
