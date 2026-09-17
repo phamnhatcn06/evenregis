@@ -40,9 +40,36 @@ Yii::app()->clientScript->registerScriptFile(
     </div>
 </div>
 
-<?php $this->renderPartial('//sportTeams/_final_board', array(
-    'candidatesTitle' => 'Đội đủ điều kiện (đã xác nhận)',
-    'finalistsTitle' => 'Đội đã vào chung kết',
-    'mode' => 'sport',
-    'controllerId' => 'sportTeams',
-)); ?>
+<div id="finals-app"
+     data-mode="sport"
+     data-candidates-url="<?php echo $this->createUrl('/admin/sportTeams/finalCandidates'); ?>"
+     data-list-url="<?php echo $this->createUrl('/admin/sportTeams/finalList'); ?>"
+     data-add-url="<?php echo $this->createUrl('/admin/sportTeams/finalAdd'); ?>"
+     data-remove-url="<?php echo $this->createUrl('/admin/sportTeams/finalRemove'); ?>">
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Đội đủ điều kiện</h5>
+                    <button type="button" id="finals-add-btn" class="btn btn-primary btn-sm" disabled>
+                        <i class="fa fa-arrow-right me-1"></i>Thêm vào chung kết
+                    </button>
+                </div>
+                <div class="card-body">
+                    <input type="text" id="finals-search" class="form-control mb-3" placeholder="Tìm kiếm...">
+                    <div id="finals-candidates" style="max-height: 60vh; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Đã vào chung kết <span class="badge bg-success" id="finals-count">0</span></h5>
+                </div>
+                <div class="card-body">
+                    <div id="finals-finalists" style="max-height: 66vh; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
