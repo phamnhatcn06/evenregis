@@ -1364,11 +1364,26 @@ class SportTeamsController extends AdminController
     public function actionFinal()
     {
         $events = Events::getActiveList();
-        $sports = Sports::getApiDataProvider(array('is_active' => 1), 100)->getData();
+
+        // Danh sách môn thi dạng cây cha-con (bộ môn → nội dung) để hiển thị trong filter.
+        $treeData = Sports::buildTreeData();
+        $sportsItems = isset($treeData['items']) ? $treeData['items'] : array();
+        $levelMap = isset($treeData['levelMap']) ? $treeData['levelMap'] : array();
+
+        // Đánh dấu môn nào có con (là bộ môn cha) để hiển thị dạng nhóm.
+        $hasChildren = array();
+        foreach ($sportsItems as $s) {
+            $parentId = is_object($s) ? $s->parent_id : (isset($s['parent_id']) ? $s['parent_id'] : null);
+            if (!empty($parentId)) {
+                $hasChildren[$parentId] = true;
+            }
+        }
 
         $this->render('final', array(
             'events' => $events,
-            'sports' => $sports,
+            'sportsItems' => $sportsItems,
+            'levelMap' => $levelMap,
+            'hasChildren' => $hasChildren,
         ));
     }
 
