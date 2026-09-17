@@ -229,7 +229,13 @@
         function filterCandidates() {
             var term = (searchInput.value || '').toLowerCase();
             candidatesBox.querySelectorAll('.list-group-item').forEach(function (row) {
-                row.style.display = row.textContent.toLowerCase().indexOf(term) !== -1 ? '' : 'none';
+                // Dùng !important vì hàng có class .d-flex (display:flex !important)
+                // sẽ đè lên style inline thường -> phải set/xoá theo !important.
+                if (row.textContent.toLowerCase().indexOf(term) !== -1) {
+                    row.style.removeProperty('display');
+                } else {
+                    row.style.setProperty('display', 'none', 'important');
+                }
             });
         }
 
