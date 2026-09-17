@@ -555,6 +555,23 @@ class ApiEndpoints
     const COMPETITION_TEAM_MEMBER_UPDATE = '/api/competition-team-members/update/{id}';
     const COMPETITION_TEAM_MEMBER_DESTROY = '/api/competition-team-members/destroy/{id}';
 
+    // Finals — Đưa danh sách vào vòng chung kết
+    const SPORT_FINAL_ADD = '/api/sport-finals/add';
+    const SPORT_FINAL_LIST = '/api/sport-finals/list';
+    const SPORT_FINAL_REMOVE = '/api/sport-finals/remove/{id}';
+
+    const COMPETITION_FINAL_ADD = '/api/competition-finals/add';
+    const COMPETITION_FINAL_LIST = '/api/competition-finals/list/{id}';
+    const COMPETITION_FINAL_REMOVE = '/api/competition-finals/remove/{id}';
+
+    const BEAUTY_FINAL_ADD = '/api/beauty-finals/add';
+    const BEAUTY_FINAL_LIST = '/api/beauty-finals/list/{id}';
+    const BEAUTY_FINAL_REMOVE = '/api/beauty-finals/remove/{id}';
+
+    const TALENT_FINAL_ADD = '/api/talent-finals/add';
+    const TALENT_FINAL_LIST = '/api/talent-finals/list/{id}';
+    const TALENT_FINAL_REMOVE = '/api/talent-finals/remove/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
