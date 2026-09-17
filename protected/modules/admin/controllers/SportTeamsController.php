@@ -1449,10 +1449,18 @@ class SportTeamsController extends AdminController
             $teamNameRaw = isset($team['name']) ? $team['name'] : null;
             $name = $this->buildTeamDisplayName($teamNameRaw, isset($team['team_name']) ? $team['team_name'] : null, $ref, $isAlliance);
             $rank = isset($f['final_rank']) ? $f['final_rank'] : null;
-            $sub = '';
-            if (isset($team['members']) && is_array($team['members'])) {
-                $sub = count($team['members']) . ' thành viên';
+
+            $members = (isset($team['members']) && is_array($team['members'])) ? $team['members'] : array();
+            $count = count($members);
+            // Nội dung đơn: hiển thị tên VĐV kèm tên đội.
+            if ($count === 1) {
+                $memberName = isset($members[0]['name']) ? $members[0]['name']
+                    : (isset($members[0]['attendee_name']) ? $members[0]['attendee_name'] : '');
+                if ($memberName !== '') {
+                    $name .= ' — ' . $memberName;
+                }
             }
+            $sub = $count > 0 ? ($count . ' VĐV') : '';
             $data[] = array(
                 'id' => isset($f['id']) ? $f['id'] : $ref,
                 'ref' => $ref,
