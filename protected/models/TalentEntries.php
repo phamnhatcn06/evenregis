@@ -244,6 +244,25 @@ class TalentEntries extends BaseTalentEntries
         );
     }
 
+    /**
+     * Lấy danh sách tiết mục dạng mảng thô (giữ nguyên field từ API).
+     * @param array $params
+     * @param int $perPage
+     * @return array
+     */
+    public static function getRawList($params = array(), $perPage = 10000)
+    {
+        $params['per_page'] = $perPage;
+        $result = ApiClient::get(ApiEndpoints::TALENT_ENTRY_LIST, $params);
+        if ($result['success']) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+        return array();
+    }
+
     // ===== Vòng chung kết =====
 
     /**
