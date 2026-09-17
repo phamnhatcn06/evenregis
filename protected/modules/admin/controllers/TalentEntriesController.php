@@ -480,13 +480,20 @@ class TalentEntriesController extends AdminController
         $data = array();
         foreach (TalentEntries::getFinalists($showId) as $f) {
             $ref = isset($f['entry_id']) ? $f['entry_id'] : null;
-            $order = isset($f['performance_order']) ? $f['performance_order'] : null;
+            $entry = isset($f['entry']) && is_array($f['entry']) ? $f['entry'] : array();
+            $rank = isset($f['rank']) ? $f['rank'] : null;
+            $order = isset($entry['performance_order']) ? $entry['performance_order'] : null;
+            $code = $rank ? ('Hạng ' . $rank) : ($order ? ('STT ' . $order) : '');
+            $sub = '';
+            if (isset($entry['members']) && is_array($entry['members'])) {
+                $sub = count($entry['members']) . ' thành viên';
+            }
             $data[] = array(
                 'id' => isset($f['id']) ? $f['id'] : $ref,
                 'ref' => $ref,
-                'code' => $order ? ('STT ' . $order) : '',
-                'name' => isset($f['title']) ? $f['title'] : ('Tiết mục #' . $ref),
-                'sub' => isset($f['property_name']) ? $f['property_name'] : '',
+                'code' => $code,
+                'name' => !empty($entry['title']) ? $entry['title'] : ('Tiết mục #' . $ref),
+                'sub' => $sub,
             );
         }
 
