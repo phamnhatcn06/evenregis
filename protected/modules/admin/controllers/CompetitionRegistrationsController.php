@@ -1595,7 +1595,7 @@ class CompetitionRegistrationsController extends AdminController
     }
 
     /**
-     * Lấy tên hiển thị từ nhiều key khả dĩ của API.
+     * Lấy tên hiển thị từ nhiều key khả dĩ của API (kể cả object attendee lồng nhau).
      */
     protected function pickName($row, $fallback)
     {
@@ -1604,7 +1604,24 @@ class CompetitionRegistrationsController extends AdminController
                 return $row[$key];
             }
         }
+        if (isset($row['attendee']['full_name']) && $row['attendee']['full_name'] !== '') {
+            return $row['attendee']['full_name'];
+        }
         return $fallback;
+    }
+
+    /**
+     * Lấy tên đơn vị từ field phẳng hoặc object attendee lồng nhau.
+     */
+    protected function pickProperty($row)
+    {
+        if (!empty($row['property_name'])) {
+            return $row['property_name'];
+        }
+        if (isset($row['attendee']['property']['name'])) {
+            return $row['attendee']['property']['name'];
+        }
+        return '';
     }
 
     protected function renderJson($payload)
