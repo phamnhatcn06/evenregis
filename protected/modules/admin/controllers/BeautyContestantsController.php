@@ -483,6 +483,144 @@ class BeautyContestantsController extends AdminController
         Yii::app()->end();
     }
 
+    // ==================== VÒNG CHUNG KẾT ====================
+
+    /**
+     * Màn hình chọn thí sinh vào vòng chung kết (theo cuộc thi sắc đẹp).
+     */
+    public function actionFinal()
+    {
+        $contests = BeautyContests::getListForDropdown();
+        $this->render('final', array(
+            'contests' => $contests,
+        ));
+    }
+
+    /**
+     * AJAX: danh sách thí sinh đủ điều kiện (chưa vào chung kết).
+     */
+    public function actionFinalCandidates()
+    {
+        $contestId = Yii::app()->request->getQuery('id');
+        if (empty($contestId)) {
+            $this->renderJson(array('success' => true, 'data' => array()));
+        }
+
+        $excluded = array();
+        foreach (BeautyContestants::getFinalists($contestId) as $f) {
+            $ref = isset($f['contestant_id']) ? $f['contestant_id'] : null;
+            if ($ref !== null) {
+                $excluded[$ref] = true;
+            }
+        }
+
+        $rows = BeautyContestants::getRawList(array('contest_id' => $contestId));
+        $data = array();
+        foreach ($rows as $row) {
+            $cid = isset($row['id']) ? $row['id'] : null;
+            if ($cid === null || isset($excluded[$cid])) {
+                continue;
+            }
+            $data[] = array(
+                'id' => $cid,
+                'code' => $this->pickCode($row),
+                'name' => $this->pickName($row, 'Thí sinh #' . $cid),
+                'sub' => isset($row['property_name']) ? $row['property_name'] : '',
+            );
+        }
+
+        $this->renderJson(array('success' => true, 'data' => $data));
+    }
+
+    /**
+     * AJAX: danh sách thí sinh đã vào chung kết.
+     */
+    public function actionFinalList()
+    {
+        $contestId = Yii::app()->request->getQuery('id');
+        if (empty($contestId)) {
+            $this->renderJson(array('success' => true, 'data' => array()));
+        }
+
+        $data = array();
+        foreach (BeautyContestants::getFinalists($contestId) as $f) {
+            $ref = isset($f['contestant_id']) ? $f['contestant_id'] : null;
+            $rank = isset($f['rank']) ? $f['rank'] : (isset($f['final_rank']) ? $f['final_rank'] : null);
+            $data[] = array(
+                'id' => isset($f['id']) ? $f['id'] : $ref,
+                'ref' => $ref,
+                'code' => $rank ? ('Hạng ' . $rank) : $this->pickCode($f),
+                'name' => $this->pickName($f, 'Thí sinh #' . $ref),
+                'sub' => isset($f['property_name']) ? $f['property_name'] : '',
+            );
+        }
+
+        $this->renderJson(array('success' => true, 'data' => $data));
+    }
+
+    /**
+     * AJAX: thêm các thí sinh đã chọn vào chung kết.
+     */
+    public function actionFinalAdd()
+    {
+        $contestId = Yii::app()->request->getPost('id');
+        $ids = Yii::app()->request->getPost('ids', array());
+        if (empty($contestId) || empty($ids)) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu dữ liệu bắt buộc.'));
+        }
+        $result = BeautyContestants::addToFinal($contestId, $ids);
+        $this->renderFinalResult($result, 'Đã thêm ' . count($ids) . ' thí sinh vào chung kết.');
+    }
+
+    /**
+     * AJAX: gỡ một thí sinh khỏi chung kết.
+     */
+    public function actionFinalRemove()
+    {
+        $id = Yii::app()->request->getPost('id');
+        if (empty($id)) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu ID.'));
+        }
+        $result = BeautyContestants::removeFromFinal($id);
+        $this->renderFinalResult($result, 'Đã gỡ thí sinh khỏi chung kết.');
+    }
+
+    protected function pickCode($row)
+    {
+        foreach (array('contestant_number', 'candidate_number') as $key) {
+            if (!empty($row[$key])) {
+                return $row[$key];
+            }
+        }
+        return '';
+    }
+
+    protected function pickName($row, $fallback)
+    {
+        foreach (array('attendee_name', 'full_name', 'name') as $key) {
+            if (!empty($row[$key])) {
+                return $row[$key];
+            }
+        }
+        return $fallback;
+    }
+
+    protected function renderJson($payload)
+    {
+        header('Content-Type: application/json');
+        echo CJSON::encode($payload);
+        Yii::app()->end();
+    }
+
+    protected function renderFinalResult($result, $successMessage)
+    {
+        if (isset($result['success']) && $result['success']) {
+            $this->renderJson(array('success' => true, 'message' => $successMessage));
+        }
+        $message = isset($result['error']) && $result['error'] ? $result['error'] : 'Có lỗi xảy ra.';
+        $this->renderJson(array('success' => false, 'message' => $message));
+    }
+
     protected function loadModelById($id)
     {
         $model = BeautyContestants::fetchFromApi($id);
