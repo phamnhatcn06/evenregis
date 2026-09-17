@@ -138,4 +138,52 @@ class SportTeams extends BaseSportTeams
             self::STATUS_CANCELLED => 'Đã hủy',
         );
     }
+
+    // ===== Vòng chung kết =====
+
+    /**
+     * Thêm các đội vào vòng chung kết của môn thi (event + sport).
+     * @param int $eventId
+     * @param int $sportId
+     * @param array $teamIds
+     * @return array
+     */
+    public static function addToFinal($eventId, $sportId, $teamIds)
+    {
+        return ApiClient::post(ApiEndpoints::SPORT_FINAL_ADD, array(
+            'event_id' => $eventId,
+            'sport_id' => $sportId,
+            'team_ids' => array_values($teamIds),
+        ));
+    }
+
+    /**
+     * Danh sách đội đã vào chung kết của môn thi.
+     * @param int $eventId
+     * @param int $sportId
+     * @return array danh sách mảng thô từ API
+     */
+    public static function getFinalists($eventId, $sportId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SPORT_FINAL_LIST, array(
+            'event_id' => $eventId,
+            'sport_id' => $sportId,
+        ));
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            return is_array($data) ? $data : array();
+        }
+        return array();
+    }
+
+    /**
+     * Gỡ một đội khỏi vòng chung kết.
+     * @param int $finalistId id bản ghi chung kết (sport_stage_teams.id)
+     * @return array
+     */
+    public static function removeFromFinal($finalistId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_FINAL_REMOVE, array('id' => $finalistId));
+        return ApiClient::delete($url);
+    }
 }
