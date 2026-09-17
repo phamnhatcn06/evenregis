@@ -1526,6 +1526,37 @@ class SportTeamsController extends AdminController
     }
 
     /**
+     * Lấy danh sách tên VĐV theo từng đội của sự kiện.
+     * @param int $eventId
+     * @return array map sport_team_id => [tên VĐV, ...]
+     */
+    protected function getMemberNamesByTeam($eventId)
+    {
+        $map = array();
+        $res = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'event_id' => $eventId,
+            'per_page' => 5000,
+        ));
+        if (!empty($res['success'])) {
+            $rows = isset($res['data']['data']) ? $res['data']['data'] : $res['data'];
+            if (is_array($rows)) {
+                foreach ($rows as $m) {
+                    $tid = isset($m['sport_team_id']) ? $m['sport_team_id'] : null;
+                    if (!$tid) {
+                        continue;
+                    }
+                    $memberName = isset($m['name']) ? $m['name']
+                        : (isset($m['attendee_name']) ? $m['attendee_name'] : '');
+                    if ($memberName !== '') {
+                        $map[$tid][] = $memberName;
+                    }
+                }
+            }
+        }
+        return $map;
+    }
+
+    /**
      * Trả JSON và kết thúc request.
      */
     protected function renderJson($payload)
