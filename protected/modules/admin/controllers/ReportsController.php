@@ -2594,6 +2594,351 @@ class ReportsController extends AdminController
     }
 
     /**
+     * Xuất Excel: toàn bộ danh sách đội thi (kèm VĐV chi tiết) group theo từng
+     * ĐƠN VỊ. Mỗi đơn vị một sheet, trong sheet chia theo Bộ môn (môn cha) →
+     * Nội dung (môn con) → Đội → VĐV.
+     */
+    public function actionExportTeamsByUnit($event_id = null)
+    {
+        $user = AuthHandler::getUser();
+        if (!$user) {
+            throw new CHttpException(403, 'Bạn cần đăng nhập để xuất báo cáo.');
+        }
+
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+        $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
+        $userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+        $selectedEventId = $event_id;
+        $eventName = '';
+        if ($selectedEventId) {
+            $event = Events::fetchFromApi($selectedEventId);
+            $eventName = $event ? $event->name : '';
+        }
+
+        // 1. Danh sách đơn vị (đơn vị = property)
+        $properties = array();
+        if ($isHO) {
+            $properties = Properties::getApiDataProvider(array('is_active' => 1), 1000)->getData();
+        } else if ($userPropertyId) {
+            $prop = Properties::fetchFromApi($userPropertyId);
+            if ($prop) $properties = array($prop);
+        }
+        $propertyInfoMap = array();
+        foreach ($properties as $prop) {
+            $propId = isset($prop->id) ? $prop->id : null;
+            if ($propId) {
+                $propertyInfoMap[$propId] = array(
+                    'name' => isset($prop->name) ? $prop->name : ('Đơn vị #' . $propId),
+                    'code' => isset($prop->code) ? $prop->code : '',
+                );
+            }
+        }
+
+        // 2. Đăng ký hợp lệ (không tính nháp/đã xoá)
+        $regParams = array('event_id' => $selectedEventId, 'per_page' => 1000);
+        if (!$isHO && $userPropertyId) $regParams['property_id'] = $userPropertyId;
+        $activeRegistrationIds = array();
+        foreach (Registrations::getApiDataProvider($regParams, 1000)->getData() as $reg) {
+            if (!empty($reg->deleted_at)) continue;
+            if ((int)$reg->status === Registrations::STATUS_DRAFT) continue;
+            if (!empty($reg->id)) $activeRegistrationIds[$reg->id] = true;
+        }
+
+        // 3. Người tham dự (VĐV) → map theo id
+        $attParams = array('event_id' => $selectedEventId, 'per_page' => 5000);
+        if (!$isHO && $userPropertyId) $attParams['property_id'] = $userPropertyId;
+        $attendeeMap = array();
+        foreach (Attendees::getApiDataProvider($attParams, 5000)->getData() as $att) {
+            if (!empty($att->deleted_at)) continue;
+            if (!empty($att->id)) $attendeeMap[$att->id] = $att;
+        }
+
+        // 4. Môn thể thao (kèm parent_id để tách Bộ môn / Nội dung)
+        $eventSportsList = EventSports::getByEventId($selectedEventId);
+        $activeSportIds = array();
+        foreach ($eventSportsList as $es) {
+            if (!empty($es['sport_id'])) $activeSportIds[$es['sport_id']] = true;
+        }
+        $sportMap = array();
+        foreach (Sports::getApiDataProvider(array('is_active' => 1), 500)->getData() as $sp) {
+            if (empty($sp->id)) continue;
+            $sportMap[$sp->id] = array(
+                'name' => isset($sp->name) ? $sp->name : ('Môn #' . $sp->id),
+                'parent_id' => !empty($sp->parent_id) ? $sp->parent_id : 0,
+            );
+        }
+
+        // 5. Đội thi (lọc theo đăng ký hợp lệ, bỏ đội huỷ) → group theo đơn vị
+        $teamParams = array('event_id' => $selectedEventId, 'per_page' => 1000);
+        if (!$isHO && $userPropertyId) $teamParams['property_id'] = $userPropertyId;
+        $rawTeams = SportTeams::getApiDataProvider($teamParams, 1000)->getData();
+
+        // 6. Thành viên đội → map theo sport_team_id
+        $membersByTeam = array();
+        $membersRes = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+            'event_id' => $selectedEventId,
+            'per_page' => 5000,
+        ));
+        if ($membersRes['success']) {
+            $rawMembers = isset($membersRes['data']['data']) ? $membersRes['data']['data'] : $membersRes['data'];
+            if (is_array($rawMembers)) {
+                foreach ($rawMembers as $m) {
+                    $tid = isset($m['sport_team_id']) ? $m['sport_team_id'] : null;
+                    if ($tid) $membersByTeam[$tid][] = $m;
+                }
+            }
+        }
+
+        // 7. Dựng cây: đơn vị → bộ môn → nội dung → đội → VĐV
+        $byUnit = array();
+        foreach ($rawTeams as $team) {
+            if (!empty($team->deleted_at)) continue;
+            if ((int)$team->status === SportTeams::STATUS_CANCELLED) continue;
+            $regId = isset($team->registration_id) ? $team->registration_id : null;
+            if (!$regId || !isset($activeRegistrationIds[$regId])) continue;
+
+            $sportId = isset($team->sport_id) ? $team->sport_id : null;
+            if (!$sportId || !isset($sportMap[$sportId])) continue;
+            if (!empty($activeSportIds) && !isset($activeSportIds[$sportId])) continue;
+
+            $propId = isset($team->property_id) ? $team->property_id : 0;
+            if (!$propId) continue;
+            if (!isset($propertyInfoMap[$propId])) {
+                // Vẫn xuất kể cả đơn vị chưa có trong danh sách (đội liên quân...)
+                $propertyInfoMap[$propId] = array(
+                    'name' => isset($team->property_name) ? $team->property_name : ('Đơn vị #' . $propId),
+                    'code' => '',
+                );
+            }
+
+            $parentId = $sportMap[$sportId]['parent_id'];
+            $bomonKey = $parentId ? $parentId : $sportId;
+            $bomonName = $parentId && isset($sportMap[$parentId])
+                ? $sportMap[$parentId]['name']
+                : $sportMap[$sportId]['name'];
+            $noidungName = $parentId ? $sportMap[$sportId]['name'] : '';
+
+            if (!isset($byUnit[$propId])) {
+                $byUnit[$propId] = array('info' => $propertyInfoMap[$propId], 'bomon' => array());
+            }
+            if (!isset($byUnit[$propId]['bomon'][$bomonKey])) {
+                $byUnit[$propId]['bomon'][$bomonKey] = array('name' => $bomonName, 'contents' => array());
+            }
+            if (!isset($byUnit[$propId]['bomon'][$bomonKey]['contents'][$sportId])) {
+                $byUnit[$propId]['bomon'][$bomonKey]['contents'][$sportId] = array(
+                    'name' => $noidungName,
+                    'teams' => array(),
+                );
+            }
+
+            $memberList = array();
+            $rawTeamMembers = isset($membersByTeam[$team->id]) ? $membersByTeam[$team->id] : array();
+            foreach ($rawTeamMembers as $m) {
+                $attId = isset($m['attendee_id']) ? $m['attendee_id'] : null;
+                $att = ($attId && isset($attendeeMap[$attId])) ? $attendeeMap[$attId] : null;
+
+                $fullName = $att && !empty($att->full_name) ? $att->full_name
+                    : (isset($m['attendee_name']) ? $m['attendee_name'] : '');
+                $gender = $att && isset($att->gender) ? $att->gender : (isset($m['gender']) ? $m['gender'] : '');
+                $genderText = '';
+                if ($gender === 'male' || $gender === 1 || $gender === '1') $genderText = 'Nam';
+                elseif ($gender === 'female' || $gender === 2 || $gender === '2') $genderText = 'Nữ';
+
+                $division = $att && !empty($att->division_name) ? $att->division_name : '';
+                $position = '';
+                if ($att) {
+                    $position = !empty($att->position_name) ? $att->position_name
+                        : (!empty($att->position) ? $att->position : '');
+                }
+                if (empty($position) && isset($m['attendee_position'])) $position = $m['attendee_position'];
+
+                $memberList[] = array(
+                    'full_name' => $fullName,
+                    'gender' => $genderText,
+                    'jersey' => isset($m['jersey_number']) ? $m['jersey_number'] : '',
+                    'is_captain' => !empty($m['is_captain']),
+                    'division' => $division,
+                    'position' => $position,
+                );
+            }
+
+            $byUnit[$propId]['bomon'][$bomonKey]['contents'][$sportId]['teams'][$team->id] = array(
+                'team_name' => !empty($team->team_name) ? $team->team_name
+                    : (isset($team->name) ? $team->name : ('Đội #' . $team->id)),
+                'is_alliance' => !empty($team->is_alliance),
+                'members' => $memberList,
+            );
+        }
+
+        // Sắp xếp đơn vị theo tên
+        uasort($byUnit, function ($a, $b) {
+            return strnatcasecmp($a['info']['name'], $b['info']['name']);
+        });
+
+        // 8. Xuất Excel — mỗi đơn vị 1 sheet
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $objPHPExcel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        $objPHPExcel->getProperties()->setCreator('System')
+            ->setTitle('Danh sach doi thi theo don vi');
+
+        $titleStyle = array('font' => array('bold' => true, 'size' => 13, 'color' => array('rgb' => '3A57E8')));
+        $headerStyle = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF'), 'size' => 11),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '3A57E8')),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'CCCCCC'))),
+        );
+        $bomonStyle = array(
+            'font' => array('bold' => true, 'size' => 11, 'color' => array('rgb' => '664D03')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'FFF3CD')),
+        );
+        $noidungStyle = array(
+            'font' => array('bold' => true, 'size' => 10, 'color' => array('rgb' => '084298')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'CFE2FF')),
+        );
+        $teamStyle = array(
+            'font' => array('bold' => true, 'size' => 10),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D1FAE5')),
+        );
+        $borderStyle = array(
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN, 'color' => array('rgb' => 'E9ECEF'))),
+        );
+
+        $headers = array('STT', 'Tên VĐV', 'Giới tính', 'Số áo', 'Vai trò', 'Phòng ban', 'Chức danh');
+        $lastCol = 'G';
+        $usedSheetNames = array();
+        $sheetIndex = 0;
+
+        foreach ($byUnit as $propId => $unit) {
+            $sheet = ($sheetIndex === 0) ? $objPHPExcel->setActiveSheetIndex(0) : $objPHPExcel->createSheet($sheetIndex);
+
+            // Tên sheet: mã hoặc tên đơn vị, đảm bảo hợp lệ + không trùng
+            $baseName = $unit['info']['code'] ? $unit['info']['code'] : $unit['info']['name'];
+            $sheetName = mb_substr(preg_replace('/[^A-Za-z0-9\x{0080}-\x{FFFF}\s\-_]/u', '', $baseName), 0, 28);
+            if ($sheetName === '') $sheetName = 'DonVi_' . $propId;
+            $suffix = 1;
+            $tryName = $sheetName;
+            while (isset($usedSheetNames[$tryName])) {
+                $tryName = mb_substr($sheetName, 0, 25) . '_' . (++$suffix);
+            }
+            $usedSheetNames[$tryName] = true;
+            $sheet->setTitle($tryName);
+
+            $sheet->setCellValue('A1', 'DANH SÁCH ĐỘI THI - ' . mb_strtoupper($unit['info']['name'], 'UTF-8'));
+            $sheet->mergeCells('A1:' . $lastCol . '1');
+            $sheet->getStyle('A1')->applyFromArray($titleStyle);
+            if ($eventName) {
+                $sheet->setCellValue('A2', 'Sự kiện: ' . $eventName);
+                $sheet->mergeCells('A2:' . $lastCol . '2');
+            }
+
+            $row = 4;
+            ksort($unit['bomon']);
+            foreach ($unit['bomon'] as $bomon) {
+                $sheet->setCellValue('A' . $row, 'BỘ MÔN: ' . mb_strtoupper($bomon['name'], 'UTF-8'));
+                $sheet->mergeCells('A' . $row . ':' . $lastCol . $row);
+                $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($bomonStyle);
+                $row++;
+
+                foreach ($bomon['contents'] as $content) {
+                    if ($content['name'] !== '') {
+                        $sheet->setCellValue('A' . $row, 'Nội dung: ' . $content['name']);
+                        $sheet->mergeCells('A' . $row . ':' . $lastCol . $row);
+                        $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($noidungStyle);
+                        $row++;
+                    }
+
+                    foreach ($content['teams'] as $team) {
+                        $teamLabel = $team['team_name'] . ($team['is_alliance'] ? ' (Liên quân)' : '')
+                            . ' — ' . count($team['members']) . ' VĐV';
+                        $sheet->setCellValue('A' . $row, $teamLabel);
+                        $sheet->mergeCells('A' . $row . ':' . $lastCol . $row);
+                        $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($teamStyle);
+                        $row++;
+
+                        $col = 'A';
+                        foreach ($headers as $h) {
+                            $sheet->setCellValue($col . $row, $h);
+                            $sheet->getStyle($col . $row)->applyFromArray($headerStyle);
+                            $col++;
+                        }
+                        $row++;
+
+                        if (empty($team['members'])) {
+                            $sheet->setCellValue('A' . $row, '(Chưa có VĐV)');
+                            $sheet->mergeCells('A' . $row . ':' . $lastCol . $row);
+                            $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($borderStyle);
+                            $row++;
+                        } else {
+                            $stt = 1;
+                            foreach ($team['members'] as $mem) {
+                                $sheet->setCellValue('A' . $row, $stt++);
+                                $sheet->setCellValue('B' . $row, $mem['full_name']);
+                                $sheet->setCellValue('C' . $row, $mem['gender']);
+                                $sheet->setCellValue('D' . $row, $mem['jersey']);
+                                $sheet->setCellValue('E' . $row, $mem['is_captain'] ? 'Đội trưởng' : '');
+                                $sheet->setCellValue('F' . $row, $mem['division']);
+                                $sheet->setCellValue('G' . $row, $mem['position']);
+                                $sheet->getStyle('A' . $row . ':' . $lastCol . $row)->applyFromArray($borderStyle);
+                                $row++;
+                            }
+                        }
+                        $row++; // dòng trống ngăn cách đội
+                    }
+                }
+            }
+
+            if ($row <= 4) {
+                $sheet->setCellValue('A4', 'Đơn vị này chưa có đội thi nào.');
+            }
+
+            $sheet->getColumnDimension('A')->setWidth(6);
+            $sheet->getColumnDimension('B')->setWidth(28);
+            $sheet->getColumnDimension('C')->setWidth(10);
+            $sheet->getColumnDimension('D')->setWidth(8);
+            $sheet->getColumnDimension('E')->setWidth(14);
+            $sheet->getColumnDimension('F')->setWidth(24);
+            $sheet->getColumnDimension('G')->setWidth(24);
+
+            $sheetIndex++;
+        }
+
+        if ($sheetIndex === 0) {
+            $sheet = $objPHPExcel->setActiveSheetIndex(0);
+            $sheet->setTitle('Khong_co_du_lieu');
+            $sheet->setCellValue('A1', 'Không có đội thi nào phù hợp.');
+        }
+
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        $safeName = preg_replace('/[^A-Za-z0-9]/', '_', UrlTransliterate::cleanString($eventName ?: 'Event', '_'));
+        $filename = 'DS_Doi_thi_theo_don_vi_' . $safeName . '_' . date('Ymd') . '.xlsx';
+
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        Yii::app()->end();
+    }
+
+    /**
      * Xuất danh sách VĐV theo cụm: mỗi VĐV một dòng, các cột nội dung thể thao
      * active theo sự kiện, đánh dấu "x" nếu VĐV tham gia nội dung đó.
      */
