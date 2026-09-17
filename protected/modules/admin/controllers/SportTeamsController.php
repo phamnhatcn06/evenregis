@@ -1433,14 +1433,19 @@ class SportTeamsController extends AdminController
         $data = array();
         foreach (SportTeams::getFinalists($eventId, $sportId) as $f) {
             $ref = isset($f['team_id']) ? $f['team_id'] : null;
-            $name = isset($f['team_name']) ? $f['team_name'] : (isset($f['name']) ? $f['name'] : ('Đội #' . $ref));
+            $team = isset($f['team']) && is_array($f['team']) ? $f['team'] : array();
+            $name = !empty($team['name']) ? $team['name'] : ('Đội #' . $ref);
             $rank = isset($f['final_rank']) ? $f['final_rank'] : null;
+            $sub = '';
+            if (isset($team['members']) && is_array($team['members'])) {
+                $sub = count($team['members']) . ' thành viên';
+            }
             $data[] = array(
                 'id' => isset($f['id']) ? $f['id'] : $ref,
                 'ref' => $ref,
                 'code' => $rank ? ('Hạng ' . $rank) : '',
                 'name' => $name,
-                'sub' => isset($f['property_name']) ? $f['property_name'] : '',
+                'sub' => $sub,
             );
         }
 
