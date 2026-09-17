@@ -243,4 +243,47 @@ class TalentEntries extends BaseTalentEntries
             'message' => empty($errors) ? 'Cập nhật thành công' : 'Lỗi cập nhật: ' . implode(', ', $errors),
         );
     }
+
+    // ===== Vòng chung kết =====
+
+    /**
+     * Thêm các tiết mục vào vòng chung kết của hội diễn văn nghệ.
+     * @param int $showId talent_shows.id
+     * @param array $entryIds talent_entries.id
+     * @return array
+     */
+    public static function addToFinal($showId, $entryIds)
+    {
+        return ApiClient::post(ApiEndpoints::TALENT_FINAL_ADD, array(
+            'talent_show_id' => $showId,
+            'entry_ids' => array_values($entryIds),
+        ));
+    }
+
+    /**
+     * Danh sách tiết mục đã vào chung kết của hội diễn.
+     * @param int $showId
+     * @return array
+     */
+    public static function getFinalists($showId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::TALENT_FINAL_LIST, array('id' => $showId));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            return is_array($data) ? $data : array();
+        }
+        return array();
+    }
+
+    /**
+     * Gỡ một tiết mục khỏi vòng chung kết.
+     * @param int $finalistId id bản ghi chung kết (talent_round_entries.id)
+     * @return array
+     */
+    public static function removeFromFinal($finalistId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::TALENT_FINAL_REMOVE, array('id' => $finalistId));
+        return ApiClient::delete($url);
+    }
 }
