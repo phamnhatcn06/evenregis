@@ -2150,7 +2150,9 @@ class ReportAttendeeStatsController extends AdminController
 
             $sheet = ($sheetIndex === 0) ? $excel->getActiveSheet() : $excel->createSheet();
             $sheetIndex++;
-            $sheet->setTitle($this->buildSheetTitle($info['property_name'], $usedTitles));
+            // Tên sheet dùng mã đơn vị (prefix) cho ngắn gọn, fallback về tên nếu trống
+            $sheetName = $info['property_code'] !== '' ? $info['property_code'] : $info['property_name'];
+            $sheet->setTitle($this->buildSheetTitle($sheetName, $usedTitles));
 
             // Tiêu đề
             $title = 'DANH SÁCH VÀO CHUNG KẾT - ' . mb_strtoupper($info['property_name'], 'UTF-8')
