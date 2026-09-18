@@ -1425,9 +1425,9 @@ class SportTeamsController extends AdminController
             $count = count($members);
 
             $name = $this->buildTeamDisplayName($team->name, $team->team_name, $team->id, ($team->is_alliance || $team->is_alliance_team));
-            // Nội dung đơn (đội chỉ 1 VĐV): hiển thị luôn tên VĐV kèm tên đội.
-            if ($count === 1) {
-                $name .= ' — ' . $members[0];
+            // Nội dung đơn/đôi (đội ≤ 2 VĐV): hiển thị tên VĐV kèm tên đội (A + B).
+            if ($count >= 1 && $count <= 2) {
+                $name .= ' — ' . implode(' + ', $members);
             }
 
             $sub = trim($team->property_name);
