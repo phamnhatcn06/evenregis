@@ -1990,32 +1990,63 @@ class ReportAttendeeStatsController extends AdminController
             if ($compId && isset($competitionNameMap[$compId])) $activeCompIds[$compId] = true;
         }
 
-        // participants[canonicalAttId] = thông tin + đánh dấu nội dung chung kết
+        // Helper: lấy giá trị đầu tiên khác rỗng từ nhiều key khả dĩ (mảng lồng nhau)
+        $pick = function ($row, $keys) {
+            foreach ($keys as $k) {
+                if (isset($row[$k]) && $row[$k] !== '' && $row[$k] !== null) return $row[$k];
+            }
+            return null;
+        };
+
+        // participants[key] = thông tin + đánh dấu nội dung chung kết.
+        // Nếu có attendee_id (khớp attendeeMap) -> lấy đầy đủ thông tin cá nhân.
+        // Nếu không -> vẫn đưa vào bằng tên + đơn vị lấy trực tiếp từ dữ liệu chung kết.
         $participants = array();
-        $ensureParticipant = function ($attId) use (&$participants, $attendeeMap, $propertyMap, $regionalMap) {
-            if (isset($participants[$attId])) return true;
-            if (!isset($attendeeMap[$attId])) return false;
-            $info = $attendeeMap[$attId];
-            $propId = $info['property_id'];
-            $propInfo = ($propId && isset($propertyMap[$propId])) ? $propertyMap[$propId] : null;
-            $regionId = ($propInfo && $propInfo['region_id'] && isset($regionalMap[$propInfo['region_id']]))
-                ? $propInfo['region_id'] : 0;
-            $participants[$attId] = array(
-                'property_id' => $propId,
-                'property_code' => $propInfo ? $propInfo['code'] : '',
-                'property_name' => !empty($info['property_name']) ? $info['property_name'] : ($propInfo ? $propInfo['name'] : ''),
-                'region_name' => isset($regionalMap[$regionId]) ? $regionalMap[$regionId]['name'] : 'Chưa phân cụm',
-                'full_name' => $info['full_name'],
-                'gender' => $info['gender'],
-                'staff_code' => $info['staff_code'],
-                'position' => $info['position'],
-                'department_name' => $info['department_name'],
-                'sports' => array(),
-                'competitions' => array(),
-                'talent' => false,
-                'miss' => false,
-            );
-            return true;
+        $addParticipant = function ($attId, $fallback) use (&$participants, $attendeeMap, $attendeeAlias, $propertyMap, $propByName, $regionalMap) {
+            $canonId = ($attId && isset($attendeeAlias[$attId])) ? $attendeeAlias[$attId] : $attId;
+            $info = ($canonId && isset($attendeeMap[$canonId])) ? $attendeeMap[$canonId] : null;
+
+            if ($info) {
+                $key = 'a' . $canonId;
+            } else {
+                $nm = mb_strtolower(trim((string)(isset($fallback['full_name']) ? $fallback['full_name'] : '')), 'UTF-8');
+                if ($nm === '') return null; // không có danh tính -> bỏ
+                $pn = mb_strtolower(trim((string)(isset($fallback['property_name']) ? $fallback['property_name'] : '')), 'UTF-8');
+                $key = 'n:' . $nm . '|' . $pn;
+            }
+
+            if (!isset($participants[$key])) {
+                $propId = $info ? $info['property_id'] : null;
+                $propInfo = ($propId && isset($propertyMap[$propId])) ? $propertyMap[$propId] : null;
+                $propName = $info && !empty($info['property_name']) ? $info['property_name']
+                    : (isset($fallback['property_name']) ? $fallback['property_name'] : '');
+                // Nếu chưa xác định được đơn vị theo id, thử khớp theo tên
+                if (!$propInfo && $propName !== '') {
+                    $nk = mb_strtolower(trim((string)$propName), 'UTF-8');
+                    if (isset($propByName[$nk])) {
+                        $propInfo = $propByName[$nk];
+                        $propId = $propInfo['id'];
+                    }
+                }
+                $regionId = ($propInfo && $propInfo['region_id'] && isset($regionalMap[$propInfo['region_id']]))
+                    ? $propInfo['region_id'] : 0;
+                $participants[$key] = array(
+                    'property_id' => $propId,
+                    'property_code' => $propInfo ? $propInfo['code'] : '',
+                    'property_name' => $propName !== '' ? $propName : ($propInfo ? $propInfo['name'] : ''),
+                    'region_name' => isset($regionalMap[$regionId]) ? $regionalMap[$regionId]['name'] : 'Chưa phân cụm',
+                    'full_name' => $info ? $info['full_name'] : $fallback['full_name'],
+                    'gender' => $info ? $info['gender'] : (isset($fallback['gender']) ? $fallback['gender'] : null),
+                    'staff_code' => $info ? $info['staff_code'] : '',
+                    'position' => $info ? $info['position'] : (isset($fallback['position']) ? $fallback['position'] : ''),
+                    'department_name' => $info ? $info['department_name'] : '',
+                    'sports' => array(),
+                    'competitions' => array(),
+                    'talent' => false,
+                    'miss' => false,
+                );
+            }
+            return $key;
         };
 
         // --- THỂ THAO: đội vào chung kết -> mở rộng thành viên qua sport_team_members ---
@@ -2033,11 +2064,16 @@ class ReportAttendeeStatsController extends AdminController
                 $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
                 if ($teamId === null || !isset($finalTeamSport[$teamId])) continue;
                 $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
-                if (!$attId) continue;
-                $attId = $canon($attId);
-                if (!$ensureParticipant($attId)) continue;
+                $fallback = array(
+                    'full_name' => $pick($sm, array('attendee_name', 'full_name', 'name')),
+                    'property_name' => $pick($sm, array('property_name')),
+                    'position' => $pick($sm, array('attendee_position', 'position')),
+                    'gender' => $pick($sm, array('gender')),
+                );
+                $key = $addParticipant($attId, $fallback);
+                if ($key === null) continue;
                 $spId = $finalTeamSport[$teamId];
-                $participants[$attId]['sports'][$spId] = true;
+                $participants[$key]['sports'][$spId] = true;
                 $usedSportIds[$spId] = true;
             }
         }
@@ -2047,12 +2083,21 @@ class ReportAttendeeStatsController extends AdminController
         foreach (array_keys($activeCompIds) as $compId) {
             foreach (CompetitionRegistrations::getFinalists($compId) as $f) {
                 $reg = isset($f['registration']) && is_array($f['registration']) ? $f['registration'] : array();
-                $attId = isset($reg['attendee_id']) ? $reg['attendee_id']
-                    : (isset($f['attendee_id']) ? $f['attendee_id'] : null);
-                if (!$attId) continue;
-                $attId = $canon($attId);
-                if (!$ensureParticipant($attId)) continue;
-                $participants[$attId]['competitions'][$compId] = true;
+                $att = isset($reg['attendee']) && is_array($reg['attendee']) ? $reg['attendee'] : array();
+                $attId = $pick($reg, array('attendee_id'));
+                if (!$attId) $attId = $pick($f, array('attendee_id'));
+                if (!$attId) $attId = $pick($att, array('id'));
+                $prop = isset($att['property']) && is_array($att['property']) ? $att['property'] : array();
+                $fallback = array(
+                    'full_name' => $pick($reg, array('attendee_name', 'full_name', 'name'))
+                        ?: $pick($att, array('full_name', 'name')),
+                    'property_name' => $pick($reg, array('property_name')) ?: $pick($prop, array('name')),
+                    'position' => $pick($reg, array('position')) ?: $pick($att, array('position')),
+                    'gender' => $pick($att, array('gender')),
+                );
+                $key = $addParticipant($attId, $fallback);
+                if ($key === null) continue;
+                $participants[$key]['competitions'][$compId] = true;
                 $usedCompIds[$compId] = true;
             }
         }
@@ -2074,10 +2119,15 @@ class ReportAttendeeStatsController extends AdminController
                 $entryId = isset($tm['entry_id']) ? $tm['entry_id'] : null;
                 if ($entryId === null || !isset($finalEntryIds[$entryId])) continue;
                 $attId = isset($tm['attendee_id']) ? $tm['attendee_id'] : null;
-                if (!$attId) continue;
-                $attId = $canon($attId);
-                if (!$ensureParticipant($attId)) continue;
-                $participants[$attId]['talent'] = true;
+                $fallback = array(
+                    'full_name' => $pick($tm, array('attendee_name', 'full_name', 'name')),
+                    'property_name' => $pick($tm, array('property_name')),
+                    'position' => $pick($tm, array('attendee_position', 'position')),
+                    'gender' => $pick($tm, array('gender')),
+                );
+                $key = $addParticipant($attId, $fallback);
+                if ($key === null) continue;
+                $participants[$key]['talent'] = true;
             }
         }
         $hasTalent = !empty($finalEntryIds);
@@ -2090,12 +2140,21 @@ class ReportAttendeeStatsController extends AdminController
             if (!$contestId) continue;
             foreach (BeautyContestants::getFinalists($contestId) as $f) {
                 $c = isset($f['contestant']) && is_array($f['contestant']) ? $f['contestant'] : array();
-                $attId = isset($c['attendee_id']) ? $c['attendee_id']
-                    : (isset($f['attendee_id']) ? $f['attendee_id'] : null);
-                if (!$attId) continue;
-                $attId = $canon($attId);
-                if (!$ensureParticipant($attId)) continue;
-                $participants[$attId]['miss'] = true;
+                $att = isset($c['attendee']) && is_array($c['attendee']) ? $c['attendee'] : array();
+                $attId = $pick($c, array('attendee_id'));
+                if (!$attId) $attId = $pick($f, array('attendee_id'));
+                if (!$attId) $attId = $pick($att, array('id'));
+                $prop = isset($att['property']) && is_array($att['property']) ? $att['property'] : array();
+                $fallback = array(
+                    'full_name' => $pick($c, array('attendee_name', 'full_name', 'name'))
+                        ?: $pick($att, array('full_name', 'name')),
+                    'property_name' => $pick($c, array('property_name')) ?: $pick($prop, array('name')),
+                    'position' => $pick($c, array('position')) ?: $pick($att, array('position')),
+                    'gender' => $pick($c, array('gender')) ?: $pick($att, array('gender')),
+                );
+                $key = $addParticipant($attId, $fallback);
+                if ($key === null) continue;
+                $participants[$key]['miss'] = true;
                 $hasMiss = true;
             }
         }
