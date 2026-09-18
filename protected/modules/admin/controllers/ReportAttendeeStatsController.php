@@ -2237,6 +2237,11 @@ class ReportAttendeeStatsController extends AdminController
 
         $excel->setActiveSheetIndex(0);
 
+        // Dọn mọi output buffer để tránh hỏng file Excel
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
         // Output
         $filename = 'danh_sach_chung_ket_theo_don_vi.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
