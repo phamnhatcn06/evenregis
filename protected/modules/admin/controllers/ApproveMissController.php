@@ -381,9 +381,11 @@ class ApproveMissController extends AdminController
             ), 1000)->getData();
 
             foreach ($results as $res) {
-                if (isset($contestantMap[$res->registration_id])) {
-                    $latestRoundOf[$res->registration_id] = $round->id;
-                    $assignedIds[$res->registration_id] = true;
+                // beauty_round_results dùng contestant_id (đã đổi từ registration_id).
+                $cid = isset($res->contestant_id) && $res->contestant_id ? $res->contestant_id : $res->registration_id;
+                if (isset($contestantMap[$cid])) {
+                    $latestRoundOf[$cid] = $round->id;
+                    $assignedIds[$cid] = true;
                 }
             }
         }
