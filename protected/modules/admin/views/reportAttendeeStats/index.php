@@ -138,6 +138,9 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
                     <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportAthletesByRegional', array('event_id' => $selectedEventId)); ?>" class="btn btn-success btn-sm">
                         <i class="fa fa-file-excel-o me-1"></i> Xuất DS VĐV theo cụm
                     </a>
+                    <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportFinalistByProperty', array('event_id' => $selectedEventId)); ?>" class="btn btn-warning btn-sm">
+                        <i class="fa fa-file-excel-o me-1"></i> Xuất DS chung kết theo đơn vị
+                    </a>
                     <a href="<?php echo $this->createUrl('/admin/reports/admin'); ?>" class="btn btn-outline-secondary btn-sm">
                         <i class="fa fa-arrow-left me-1"></i> Quay lại báo cáo chung
                     </a>
