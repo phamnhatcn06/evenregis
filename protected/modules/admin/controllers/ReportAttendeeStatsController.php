@@ -1914,6 +1914,14 @@ class ReportAttendeeStatsController extends AdminController
                 );
             }
         }
+        // Tra cứu đơn vị theo tên (dùng khi dữ liệu chung kết chỉ có property_name)
+        $propByName = array();
+        foreach ($propertyMap as $pId => $pInfo) {
+            $nk = mb_strtolower(trim((string)$pInfo['name']), 'UTF-8');
+            if ($nk !== '' && !isset($propByName[$nk])) {
+                $propByName[$nk] = array('id' => $pId) + $pInfo;
+            }
+        }
 
         // Người tham dự (map tra cứu) - dùng để lấy đơn vị và thông tin cá nhân
         $attendeeMap = array();
