@@ -1871,6 +1871,384 @@ class ReportAttendeeStatsController extends AdminController
     }
 
     /**
+     * Xuất Excel danh sách VÀO CHUNG KẾT theo đơn vị.
+     * Mỗi đơn vị là 1 sheet; mỗi sheet liệt kê người của đơn vị đã vào chung kết,
+     * đánh dấu 'x' theo từng nội dung: thể thao, nghiệp vụ, văn nghệ, miss.
+     * Làm theo mẫu actionExportAttendeeDetail.
+     */
+    public function actionExportFinalistByProperty()
+    {
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $eventId = Yii::app()->request->getParam('event_id');
+        if (!$eventId) {
+            throw new CHttpException(400, 'Thiếu tham số sự kiện.');
+        }
+
+        $event = Events::fetchFromApi($eventId);
+        $eventName = ($event && !empty($event->name)) ? $event->name : '';
+
+        // Cụm
+        $regionalMap = array();
+        $regionals = Regionals::getApiDataProvider(array('is_active' => 1), 100)->getData();
+        foreach ($regionals as $r) {
+            $rId = isset($r->id) ? $r->id : null;
+            if ($rId) {
+                $regionalMap[$rId] = array(
+                    'name' => isset($r->name) ? $r->name : '',
+                    'code' => isset($r->code) ? $r->code : '',
+                );
+            }
+        }
+
+        // Đơn vị (Mã ĐV lấy từ prefix, fallback về code nếu trống)
+        $propertyMap = array();
+        $properties = Properties::getApiDataProvider(array('is_active' => 1), 1000)->getData();
+        foreach ($properties as $p) {
+            $pId = isset($p->id) ? $p->id : null;
+            if ($pId) {
+                $propertyMap[$pId] = array(
+                    'name' => isset($p->name) ? $p->name : '',
+                    'code' => !empty($p->prefix) ? $p->prefix : (isset($p->code) ? $p->code : ''),
+                    'region_id' => isset($p->region_id) ? $p->region_id : null,
+                );
+            }
+        }
+
+        // Người tham dự (map tra cứu) - dùng để lấy đơn vị và thông tin cá nhân
+        $attendeeMap = array();
+        $rawAttendees = Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData();
+        foreach ($rawAttendees as $att) {
+            $attId = isset($att->id) ? $att->id : null;
+            if (!$attId) continue;
+            $attDeletedAt = isset($att->deleted_at) ? $att->deleted_at : null;
+            if ($attDeletedAt) continue;
+            $attendeeMap[$attId] = array(
+                'full_name' => isset($att->full_name) ? $att->full_name : '',
+                'gender' => isset($att->gender) ? $att->gender : null,
+                'staff_code' => isset($att->staff_code) ? $att->staff_code : '',
+                'id_card' => isset($att->id_card) ? $att->id_card : '',
+                'position' => isset($att->position) ? $att->position : '',
+                'department_name' => isset($att->department_name) ? $att->department_name : '',
+                'property_id' => isset($att->property_id) ? $att->property_id : null,
+                'property_name' => isset($att->property_name) ? $att->property_name : '',
+            );
+        }
+
+        // Gộp attendee trùng (cùng mã NV hoặc CCCD) về 1 người đại diện
+        $attendeeAlias = array();
+        $staffCodeIndex = array();
+        $idCardIndex = array();
+        foreach ($attendeeMap as $attId => $info) {
+            $staffCode = mb_strtoupper(trim((string)$info['staff_code']), 'UTF-8');
+            $idCard = trim((string)$info['id_card']);
+            $canonicalId = null;
+            if ($staffCode !== '' && isset($staffCodeIndex[$staffCode])) {
+                $canonicalId = $staffCodeIndex[$staffCode];
+            } elseif ($idCard !== '' && isset($idCardIndex[$idCard])) {
+                $canonicalId = $idCardIndex[$idCard];
+            }
+            if ($canonicalId === null) $canonicalId = $attId;
+            $attendeeAlias[$attId] = $canonicalId;
+            if ($staffCode !== '') $staffCodeIndex[$staffCode] = $canonicalId;
+            if ($idCard !== '') $idCardIndex[$idCard] = $canonicalId;
+        }
+        $canon = function ($attId) use ($attendeeAlias) {
+            return isset($attendeeAlias[$attId]) ? $attendeeAlias[$attId] : $attId;
+        };
+
+        // Môn thể thao active của sự kiện
+        $sportsList = Sports::getApiDataProvider(array('is_active' => 1), 500)->getData();
+        $sportNameMap = array();
+        foreach ($sportsList as $sp) {
+            $spId = isset($sp->id) ? $sp->id : null;
+            if ($spId) $sportNameMap[$spId] = isset($sp->name) ? $sp->name : '';
+        }
+        $activeSportIds = array();
+        foreach (EventSports::getByEventId($eventId) as $es) {
+            $spId = isset($es['sport_id']) ? $es['sport_id'] : null;
+            if ($spId && isset($sportNameMap[$spId])) $activeSportIds[$spId] = true;
+        }
+
+        // Cuộc thi nghiệp vụ active của sự kiện
+        $competitionNameMap = array();
+        foreach (Competitions::getApiDataProvider(array('is_active' => 1), 500)->getData() as $comp) {
+            $compId = isset($comp->id) ? $comp->id : null;
+            if ($compId) $competitionNameMap[$compId] = isset($comp->name) ? $comp->name : '';
+        }
+        $activeCompIds = array();
+        foreach (EventCompetitions::getByEventId($eventId) as $ec) {
+            $compId = isset($ec['competition_id']) ? $ec['competition_id'] : null;
+            if ($compId && isset($competitionNameMap[$compId])) $activeCompIds[$compId] = true;
+        }
+
+        // participants[canonicalAttId] = thông tin + đánh dấu nội dung chung kết
+        $participants = array();
+        $ensureParticipant = function ($attId) use (&$participants, $attendeeMap, $propertyMap, $regionalMap) {
+            if (isset($participants[$attId])) return true;
+            if (!isset($attendeeMap[$attId])) return false;
+            $info = $attendeeMap[$attId];
+            $propId = $info['property_id'];
+            $propInfo = ($propId && isset($propertyMap[$propId])) ? $propertyMap[$propId] : null;
+            $regionId = ($propInfo && $propInfo['region_id'] && isset($regionalMap[$propInfo['region_id']]))
+                ? $propInfo['region_id'] : 0;
+            $participants[$attId] = array(
+                'property_id' => $propId,
+                'property_code' => $propInfo ? $propInfo['code'] : '',
+                'property_name' => !empty($info['property_name']) ? $info['property_name'] : ($propInfo ? $propInfo['name'] : ''),
+                'region_name' => isset($regionalMap[$regionId]) ? $regionalMap[$regionId]['name'] : 'Chưa phân cụm',
+                'full_name' => $info['full_name'],
+                'gender' => $info['gender'],
+                'staff_code' => $info['staff_code'],
+                'position' => $info['position'],
+                'department_name' => $info['department_name'],
+                'sports' => array(),
+                'competitions' => array(),
+                'talent' => false,
+                'miss' => false,
+            );
+            return true;
+        };
+
+        // --- THỂ THAO: đội vào chung kết -> mở rộng thành viên qua sport_team_members ---
+        $finalTeamSport = array(); // team_id => sport_id
+        $usedSportIds = array();
+        foreach (array_keys($activeSportIds) as $spId) {
+            foreach (SportTeams::getFinalists($eventId, $spId) as $f) {
+                $teamId = isset($f['team_id']) ? $f['team_id'] : null;
+                if ($teamId !== null) $finalTeamSport[$teamId] = $spId;
+            }
+        }
+        if (!empty($finalTeamSport)) {
+            foreach (SportTeamMembers::getRawListByEvent($eventId) as $sm) {
+                if (!empty($sm['deleted_at'])) continue;
+                $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
+                if ($teamId === null || !isset($finalTeamSport[$teamId])) continue;
+                $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
+                if (!$attId) continue;
+                $attId = $canon($attId);
+                if (!$ensureParticipant($attId)) continue;
+                $spId = $finalTeamSport[$teamId];
+                $participants[$attId]['sports'][$spId] = true;
+                $usedSportIds[$spId] = true;
+            }
+        }
+
+        // --- NGHIỆP VỤ: thí sinh vào chung kết ---
+        $usedCompIds = array();
+        foreach (array_keys($activeCompIds) as $compId) {
+            foreach (CompetitionRegistrations::getFinalists($compId) as $f) {
+                $reg = isset($f['registration']) && is_array($f['registration']) ? $f['registration'] : array();
+                $attId = isset($reg['attendee_id']) ? $reg['attendee_id']
+                    : (isset($f['attendee_id']) ? $f['attendee_id'] : null);
+                if (!$attId) continue;
+                $attId = $canon($attId);
+                if (!$ensureParticipant($attId)) continue;
+                $participants[$attId]['competitions'][$compId] = true;
+                $usedCompIds[$compId] = true;
+            }
+        }
+
+        // --- VĂN NGHỆ: tiết mục vào chung kết -> mở rộng thành viên ---
+        $finalEntryIds = array();
+        $talentShows = TalentShows::getApiDataProvider(array('event_id' => $eventId), 200)->getData();
+        foreach ($talentShows as $show) {
+            $showId = isset($show->id) ? $show->id : null;
+            if (!$showId) continue;
+            foreach (TalentEntries::getFinalists($showId) as $f) {
+                $entryId = isset($f['entry_id']) ? $f['entry_id'] : null;
+                if ($entryId !== null) $finalEntryIds[$entryId] = true;
+            }
+        }
+        if (!empty($finalEntryIds)) {
+            foreach (TalentEntryMembers::getRawListByEvent($eventId) as $tm) {
+                if (!empty($tm['deleted_at'])) continue;
+                $entryId = isset($tm['entry_id']) ? $tm['entry_id'] : null;
+                if ($entryId === null || !isset($finalEntryIds[$entryId])) continue;
+                $attId = isset($tm['attendee_id']) ? $tm['attendee_id'] : null;
+                if (!$attId) continue;
+                $attId = $canon($attId);
+                if (!$ensureParticipant($attId)) continue;
+                $participants[$attId]['talent'] = true;
+            }
+        }
+        $hasTalent = !empty($finalEntryIds);
+
+        // --- MISS: thí sinh vào chung kết ---
+        $hasMiss = false;
+        $beautyContests = BeautyContests::getApiDataProvider(array('event_id' => $eventId), 100)->getData();
+        foreach ($beautyContests as $contest) {
+            $contestId = isset($contest->id) ? $contest->id : null;
+            if (!$contestId) continue;
+            foreach (BeautyContestants::getFinalists($contestId) as $f) {
+                $c = isset($f['contestant']) && is_array($f['contestant']) ? $f['contestant'] : array();
+                $attId = isset($c['attendee_id']) ? $c['attendee_id']
+                    : (isset($f['attendee_id']) ? $f['attendee_id'] : null);
+                if (!$attId) continue;
+                $attId = $canon($attId);
+                if (!$ensureParticipant($attId)) continue;
+                $participants[$attId]['miss'] = true;
+                $hasMiss = true;
+            }
+        }
+
+        // Cột nội dung: chỉ giữ môn/cuộc thi có người vào chung kết
+        $sportColumns = array();
+        foreach (array_keys($usedSportIds) as $spId) {
+            $sportColumns[] = array('sport_id' => $spId, 'name' => $sportNameMap[$spId]);
+        }
+        usort($sportColumns, function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+        $compColumns = array();
+        foreach (array_keys($usedCompIds) as $compId) {
+            $compColumns[] = array('competition_id' => $compId, 'name' => $competitionNameMap[$compId]);
+        }
+        usort($compColumns, function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
+        // Nhóm người theo đơn vị (mỗi đơn vị 1 sheet)
+        $byProperty = array();
+        foreach ($participants as $p) {
+            $key = $p['property_id'] !== null ? 'p' . $p['property_id'] : 'name:' . $p['property_name'];
+            $byProperty[$key]['info'] = array(
+                'property_code' => $p['property_code'],
+                'property_name' => $p['property_name'] !== '' ? $p['property_name'] : 'Không xác định',
+                'region_name' => $p['region_name'],
+            );
+            $byProperty[$key]['people'][] = $p;
+        }
+        // Sắp xếp đơn vị theo mã, người theo tên
+        uasort($byProperty, function ($a, $b) {
+            return strnatcasecmp($a['info']['property_code'], $b['info']['property_code']);
+        });
+
+        // Build Excel
+        $excel = $this->createPhpExcel();
+        $fixedHeaders = array('STT', 'Họ và tên', 'Giới tính', 'Mã NV', 'Chức danh', 'Bộ phận');
+        $fixedCount = count($fixedHeaders);
+        $extraCols = count($sportColumns) + count($compColumns) + ($hasTalent ? 1 : 0) + ($hasMiss ? 1 : 0);
+        $totalCols = $fixedCount + $extraCols;
+        $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalCols - 1);
+
+        $usedTitles = array();
+        $sheetIndex = 0;
+
+        if (empty($byProperty)) {
+            $sheet = $excel->getActiveSheet();
+            $sheet->setTitle('Không có dữ liệu');
+            $sheet->setCellValue('A1', 'Chưa có danh sách vào chung kết cho sự kiện này.');
+        }
+
+        foreach ($byProperty as $group) {
+            $info = $group['info'];
+            $people = isset($group['people']) ? $group['people'] : array();
+            usort($people, function ($a, $b) {
+                return strnatcasecmp($a['full_name'], $b['full_name']);
+            });
+
+            $sheet = ($sheetIndex === 0) ? $excel->getActiveSheet() : $excel->createSheet();
+            $sheetIndex++;
+            $sheet->setTitle($this->buildSheetTitle($info['property_name'], $usedTitles));
+
+            // Tiêu đề
+            $title = 'DANH SÁCH VÀO CHUNG KẾT - ' . mb_strtoupper($info['property_name'], 'UTF-8')
+                . ($eventName !== '' ? ' (' . $eventName . ')' : '');
+            $sheet->setCellValue('A1', $title);
+            $sheet->mergeCells('A1:' . $lastColLetter . '1');
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+            // Header cột
+            $headerRow = 2;
+            $colIndex = 0;
+            foreach ($fixedHeaders as $h) {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $h);
+            }
+            foreach ($sportColumns as $sc) {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $sc['name']);
+            }
+            foreach ($compColumns as $cc) {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $cc['name']);
+            }
+            if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Văn nghệ');
+            if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Miss');
+
+            $sheet->getStyle('A' . $headerRow . ':' . $lastColLetter . $headerRow)->applyFromArray(array(
+                'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
+                'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '2563EB')),
+                'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+                'alignment' => array(
+                    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                    'wrap' => true,
+                ),
+            ));
+            $sheet->getRowDimension($headerRow)->setRowHeight(45);
+
+            // Dữ liệu
+            $row = $headerRow + 1;
+            $stt = 1;
+            foreach ($people as $p) {
+                $colIndex = 0;
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $stt++);
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['full_name']);
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $this->formatGender($p['gender']));
+                $sheet->setCellValueExplicitByColumnAndRow($colIndex++, $row, $p['staff_code'], PHPExcel_Cell_DataType::TYPE_STRING);
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['position']);
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['department_name']);
+                foreach ($sportColumns as $sc) {
+                    $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['sports'][$sc['sport_id']]) ? 'x' : '');
+                }
+                foreach ($compColumns as $cc) {
+                    $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['competitions'][$cc['competition_id']]) ? 'x' : '');
+                }
+                if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['talent'] ? 'x' : '');
+                if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['miss'] ? 'x' : '');
+
+                $sheet->getStyle('A' . $row . ':' . $lastColLetter . $row)->applyFromArray(array(
+                    'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+                ));
+                $row++;
+            }
+
+            $lastDataRow = max($headerRow + 1, $row - 1);
+            // Căn giữa STT, giới tính và các cột đánh dấu
+            $sheet->getStyle('A3:A' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('C3:C' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            if ($totalCols > $fixedCount) {
+                $firstMarkCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
+                $sheet->getStyle($firstMarkCol . '3:' . $lastColLetter . $lastDataRow)
+                    ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            }
+
+            // Độ rộng cột
+            $fixedWidths = array(6, 28, 9, 12, 32, 26);
+            foreach ($fixedWidths as $i => $width) {
+                $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth($width);
+            }
+            for ($i = $fixedCount; $i < $totalCols; $i++) {
+                $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth(14);
+            }
+
+            $sheet->freezePane(PHPExcel_Cell::stringFromColumnIndex($fixedCount) . ($headerRow + 1));
+        }
+
+        $excel->setActiveSheetIndex(0);
+
+        // Output
+        $filename = 'danh_sach_chung_ket_theo_don_vi.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save('php://output');
+        Yii::app()->end();
+    }
+
+    /**
      * Hiển thị giới tính: 1 = Nam, 0 = Nữ
      */
     protected function formatGender($gender)
