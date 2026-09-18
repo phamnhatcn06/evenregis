@@ -1467,12 +1467,18 @@ class SportTeamsController extends AdminController
 
             $members = (isset($team['members']) && is_array($team['members'])) ? $team['members'] : array();
             $count = count($members);
-            // Nội dung đơn: hiển thị tên VĐV kèm tên đội.
-            if ($count === 1) {
-                $memberName = isset($members[0]['name']) ? $members[0]['name']
-                    : (isset($members[0]['attendee_name']) ? $members[0]['attendee_name'] : '');
-                if ($memberName !== '') {
-                    $name .= ' — ' . $memberName;
+            // Nội dung đơn/đôi (đội ≤ 2 VĐV): hiển thị tên VĐV kèm tên đội (A + B).
+            if ($count >= 1 && $count <= 2) {
+                $names = array();
+                foreach ($members as $mm) {
+                    $nm = isset($mm['name']) ? $mm['name']
+                        : (isset($mm['attendee_name']) ? $mm['attendee_name'] : '');
+                    if ($nm !== '') {
+                        $names[] = $nm;
+                    }
+                }
+                if (!empty($names)) {
+                    $name .= ' — ' . implode(' + ', $names);
                 }
             }
             $sub = $count > 0 ? ($count . ' VĐV') : '';
