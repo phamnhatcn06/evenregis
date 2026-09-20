@@ -2274,11 +2274,18 @@ class ReportAttendeeStatsController extends AdminController
         $totalCols = $fixedCount + $extraCols;
         $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalCols - 1);
 
-        // Tiêu đề
+        // Tiêu đề - nền xanh lá, chữ đen đậm, căn giữa (theo mẫu)
         $sheet->setCellValue('A1', $titleText);
         $sheet->mergeCells('A1:' . $lastColLetter . '1');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:' . $lastColLetter . '1')->applyFromArray(array(
+            'font' => array('bold' => true, 'size' => 11, 'color' => array('rgb' => '000000')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '92D050')),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+        ));
 
         // Header cột
         $headerRow = 2;
