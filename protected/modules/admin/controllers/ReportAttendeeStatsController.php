@@ -2327,7 +2327,34 @@ class ReportAttendeeStatsController extends AdminController
         // Dữ liệu
         $row = $headerRow + 1;
         $stt = 1;
+        $groupRows = array();
+
+        // Đếm số người theo đơn vị (dùng cho hàng tiêu đề đơn vị ở sheet tổng hợp)
+        $unitCounts = array();
+        if ($listContents) {
+            foreach ($people as $p) {
+                $uk = $p['property_code'] . '|' . $p['property_name'];
+                $unitCounts[$uk] = (isset($unitCounts[$uk]) ? $unitCounts[$uk] : 0) + 1;
+            }
+        }
+
+        $curUnit = null;
         foreach ($people as $p) {
+            // Sheet tổng hợp: chèn 1 hàng tên đơn vị + tổng số người mỗi khi đổi đơn vị
+            if ($listContents) {
+                $uk = $p['property_code'] . '|' . $p['property_name'];
+                if ($uk !== $curUnit) {
+                    $curUnit = $uk;
+                    $unitLabel = trim(($p['property_code'] !== '' ? $p['property_code'] . ' - ' : '')
+                        . ($p['property_name'] !== '' ? $p['property_name'] : 'Không xác định'));
+                    $sheet->setCellValueByColumnAndRow(0, $row, $unitLabel . '  —  Tổng số người tham dự: ' . $unitCounts[$uk]);
+                    $sheet->mergeCellsByColumnAndRow(0, $row, $totalCols - 1, $row);
+                    $groupRows[] = $row;
+                    $row++;
+                    $stt = 1;
+                }
+            }
+
             $colIndex = 0;
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $stt++);
             if ($includeUnitCols) {
