@@ -2364,6 +2364,28 @@ class ReportAttendeeStatsController extends AdminController
         }
 
         $sheet->freezePane(PHPExcel_Cell::stringFromColumnIndex($fixedCount) . ($headerRow + 1));
+
+        // Thiết lập in ấn: khổ A4 dọc, vừa chiều rộng 1 trang
+        $pageSetup = $sheet->getPageSetup();
+        $pageSetup->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT);
+        $pageSetup->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4);
+        $pageSetup->setFitToWidth(1);
+        $pageSetup->setFitToHeight(0); // 0 = không giới hạn số trang theo chiều dọc
+        $pageSetup->setHorizontalCentered(true);
+        // Lặp lại tiêu đề + header cột ở đầu mỗi trang in
+        $pageSetup->setRowsToRepeatAtTopByStartAndEnd(1, $headerRow);
+
+        // Lề trang (inch)
+        $margins = $sheet->getPageMargins();
+        $margins->setTop(0.5);
+        $margins->setBottom(0.5);
+        $margins->setLeft(0.3);
+        $margins->setRight(0.3);
+        $margins->setHeader(0.2);
+        $margins->setFooter(0.2);
+
+        // Số trang ở chân trang
+        $sheet->getHeaderFooter()->setOddFooter('&C&P/&N');
     }
 
     /**
