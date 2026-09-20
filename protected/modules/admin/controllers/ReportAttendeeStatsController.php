@@ -2274,21 +2274,24 @@ class ReportAttendeeStatsController extends AdminController
         $totalCols = $fixedCount + $extraCols;
         $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalCols - 1);
 
-        // Tiêu đề - nền xanh lá, chữ đen đậm, căn giữa (theo mẫu)
-        $sheet->setCellValue('A1', $titleText);
+        // Dòng 1: Tên tập đoàn
+        $sheet->setCellValue('A1', 'TẬP ĐOÀN MƯỜNG THANH');
         $sheet->mergeCells('A1:' . $lastColLetter . '1');
-        $sheet->getStyle('A1:' . $lastColLetter . '1')->applyFromArray(array(
-            'font' => array('bold' => true, 'size' => 11, 'color' => array('rgb' => '000000')),
-            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '92D050')),
-            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
-            'alignment' => array(
-                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-            ),
+        $sheet->getStyle('A1')->applyFromArray(array(
+            'font' => array('bold' => true, 'size' => 12),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER),
         ));
 
-        // Header cột
-        $headerRow = 2;
+        // Dòng 2: trắng | Dòng 3: tiêu đề báo cáo
+        $sheet->setCellValue('A3', $titleText);
+        $sheet->mergeCells('A3:' . $lastColLetter . '3');
+        $sheet->getStyle('A3')->applyFromArray(array(
+            'font' => array('bold' => true, 'size' => 11),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER),
+        ));
+
+        // Dòng 4: trắng | Dòng 5: tiêu đề bảng (header cột)
+        $headerRow = 5;
         $colIndex = 0;
         foreach ($fixedHeaders as $h) {
             $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $h);
