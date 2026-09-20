@@ -2215,7 +2215,7 @@ class ReportAttendeeStatsController extends AdminController
             $summary->setCellValue('A1', 'Chưa có danh sách vào chung kết cho sự kiện này.');
         } else {
             $summaryTitle = 'DANH SÁCH VÀO CHUNG KẾT' . ($eventName !== '' ? ' - ' . mb_strtoupper($eventName, 'UTF-8') : '');
-            $this->writeFinalistSheet($summary, $summaryTitle, $allPeople, $sportColumns, $compColumns, $hasTalent, $hasMiss, true);
+            $this->writeFinalistSheet($summary, $summaryTitle, $allPeople, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true);
         }
 
         // Các sheet tiếp theo: mỗi đơn vị 1 sheet
