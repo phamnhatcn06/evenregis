@@ -2258,7 +2258,7 @@ class ReportAttendeeStatsController extends AdminController
      * Ghi 1 sheet danh sách vào chung kết.
      * @param bool $includeUnitCols true = kèm cột Mã ĐV + Đơn vị (dùng cho sheet tổng hợp)
      */
-    protected function writeFinalistSheet($sheet, $titleText, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, $includeUnitCols)
+    protected function writeFinalistSheet($sheet, $titleText, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, $includeUnitCols, $listContents = false)
     {
         if ($includeUnitCols) {
             $fixedHeaders = array('STT', 'Mã ĐV', 'Đơn vị', 'Họ và tên', 'Giới tính', 'Mã NV', 'Chức danh', 'Bộ phận');
@@ -2270,7 +2270,11 @@ class ReportAttendeeStatsController extends AdminController
             $genderCol = 2;
         }
         $fixedCount = count($fixedHeaders);
-        $extraCols = count($sportColumns) + count($compColumns) + ($hasTalent ? 1 : 0) + ($hasMiss ? 1 : 0);
+        if ($listContents) {
+            $extraCols = 1; // cột "Nội dung" gộp
+        } else {
+            $extraCols = count($sportColumns) + count($compColumns) + ($hasTalent ? 1 : 0) + ($hasMiss ? 1 : 0);
+        }
         $totalCols = $fixedCount + $extraCols;
         $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalCols - 1);
 
