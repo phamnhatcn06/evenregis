@@ -2370,10 +2370,16 @@ class ReportAttendeeStatsController extends AdminController
         $sheet->getStyle('A' . $dataStart . ':A' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $gLetter = PHPExcel_Cell::stringFromColumnIndex($genderCol);
         $sheet->getStyle($gLetter . $dataStart . ':' . $gLetter . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        if ($totalCols > $fixedCount) {
+        if (!$listContents && $totalCols > $fixedCount) {
+            // Chế độ ma trận: căn giữa các cột đánh dấu
             $firstMarkCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
             $sheet->getStyle($firstMarkCol . $dataStart . ':' . $lastColLetter . $lastDataRow)
                 ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        } elseif ($listContents) {
+            // Cột "Nội dung": căn trái, cho xuống dòng
+            $contentCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
+            $sheet->getStyle($contentCol . $dataStart . ':' . $contentCol . $lastDataRow)
+                ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setWrapText(true);
         }
 
         // Border cho bảng: cột ngăn nhau nét liền mảnh, dòng ngăn nhau dotted,
