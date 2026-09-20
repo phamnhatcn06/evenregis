@@ -2428,6 +2428,18 @@ class ReportAttendeeStatsController extends AdminController
             'borders' => array('outline' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)),
         ));
 
+        // Hàng tiêu đề đơn vị (sheet tổng hợp): in đậm, căn trái, nền nhạt
+        foreach ($groupRows as $gr) {
+            $sheet->getStyle('A' . $gr . ':' . $lastColLetter . $gr)->applyFromArray(array(
+                'font' => array('bold' => true),
+                'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'F2F2F2')),
+                'alignment' => array(
+                    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                ),
+            ));
+        }
+
         // Độ rộng cột
         foreach ($fixedWidths as $i => $width) {
             $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth($width);
