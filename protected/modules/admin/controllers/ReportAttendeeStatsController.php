@@ -2340,23 +2340,40 @@ class ReportAttendeeStatsController extends AdminController
             }
             if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['talent'] ? 'x' : '');
             if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['miss'] ? 'x' : '');
-
-            $sheet->getStyle('A' . $row . ':' . $lastColLetter . $row)->applyFromArray(array(
-                'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
-            ));
             $row++;
         }
 
-        $lastDataRow = max($headerRow + 1, $row - 1);
+        $dataStart = $headerRow + 1;
+        $lastDataRow = max($dataStart, $row - 1);
+
         // Căn giữa STT, giới tính và các cột đánh dấu
-        $sheet->getStyle('A3:A' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A' . $dataStart . ':A' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $gLetter = PHPExcel_Cell::stringFromColumnIndex($genderCol);
-        $sheet->getStyle($gLetter . '3:' . $gLetter . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($gLetter . $dataStart . ':' . $gLetter . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         if ($totalCols > $fixedCount) {
             $firstMarkCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
-            $sheet->getStyle($firstMarkCol . '3:' . $lastColLetter . $lastDataRow)
+            $sheet->getStyle($firstMarkCol . $dataStart . ':' . $lastColLetter . $lastDataRow)
                 ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         }
+
+        // Border cho bảng: cột ngăn nhau nét liền mảnh, dòng ngăn nhau dotted,
+        // tiêu đề bảng nét liền mảnh, viền ngoài toàn bảng đậm.
+        $tableRange = 'A' . $headerRow . ':' . $lastColLetter . $lastDataRow;
+        // 1) Inside: dọc (cột) = thin, ngang (dòng) = dotted
+        $sheet->getStyle($tableRange)->applyFromArray(array(
+            'borders' => array(
+                'vertical' => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+                'horizontal' => array('style' => PHPExcel_Style_Border::BORDER_DOTTED),
+            ),
+        ));
+        // 2) Tiêu đề bảng: viền quanh nét liền mảnh
+        $sheet->getStyle('A' . $headerRow . ':' . $lastColLetter . $headerRow)->applyFromArray(array(
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+        ));
+        // 3) Viền ngoài toàn bảng: đậm
+        $sheet->getStyle($tableRange)->applyFromArray(array(
+            'borders' => array('outline' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)),
+        ));
 
         // Độ rộng cột
         foreach ($fixedWidths as $i => $width) {
