@@ -2405,8 +2405,12 @@ class ReportAttendeeStatsController extends AdminController
         foreach ($fixedWidths as $i => $width) {
             $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth($width);
         }
-        for ($i = $fixedCount; $i < $totalCols; $i++) {
-            $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth(14);
+        if ($listContents) {
+            $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($fixedCount))->setWidth(55);
+        } else {
+            for ($i = $fixedCount; $i < $totalCols; $i++) {
+                $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth(14);
+            }
         }
 
         $sheet->freezePane(PHPExcel_Cell::stringFromColumnIndex($fixedCount) . ($headerRow + 1));
