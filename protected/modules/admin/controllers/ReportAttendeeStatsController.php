@@ -2274,12 +2274,11 @@ class ReportAttendeeStatsController extends AdminController
         $totalCols = $fixedCount + $extraCols;
         $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalCols - 1);
 
-        // Dòng 1: Tên tập đoàn
+        // Dòng 1: Tên tập đoàn - căn trái, không merge
         $sheet->setCellValue('A1', 'TẬP ĐOÀN MƯỜNG THANH');
-        $sheet->mergeCells('A1:' . $lastColLetter . '1');
         $sheet->getStyle('A1')->applyFromArray(array(
             'font' => array('bold' => true, 'size' => 12),
-            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT),
         ));
 
         // Dòng 2: trắng | Dòng 3: tiêu đề báo cáo
