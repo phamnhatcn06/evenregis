@@ -2299,14 +2299,18 @@ class ReportAttendeeStatsController extends AdminController
         foreach ($fixedHeaders as $h) {
             $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $h);
         }
-        foreach ($sportColumns as $sc) {
-            $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $sc['name']);
+        if ($listContents) {
+            $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Nội dung');
+        } else {
+            foreach ($sportColumns as $sc) {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $sc['name']);
+            }
+            foreach ($compColumns as $cc) {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $cc['name']);
+            }
+            if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Văn nghệ');
+            if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Miss');
         }
-        foreach ($compColumns as $cc) {
-            $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $cc['name']);
-        }
-        if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Văn nghệ');
-        if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Miss');
 
         $sheet->getStyle('A' . $headerRow . ':' . $lastColLetter . $headerRow)->applyFromArray(array(
             'font' => array('bold' => true, 'color' => array('rgb' => '000000')),
