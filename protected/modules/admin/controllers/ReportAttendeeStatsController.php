@@ -2303,8 +2303,8 @@ class ReportAttendeeStatsController extends AdminController
         if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Miss');
 
         $sheet->getStyle('A' . $headerRow . ':' . $lastColLetter . $headerRow)->applyFromArray(array(
-            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
-            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '2563EB')),
+            'font' => array('bold' => true, 'color' => array('rgb' => '000000')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D9D9D9')),
             'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
             'alignment' => array(
                 'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
