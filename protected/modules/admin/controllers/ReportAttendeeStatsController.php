@@ -2339,14 +2339,27 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setCellValueExplicitByColumnAndRow($colIndex++, $row, $p['staff_code'], PHPExcel_Cell_DataType::TYPE_STRING);
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['position']);
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['department_name']);
-            foreach ($sportColumns as $sc) {
-                $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['sports'][$sc['sport_id']]) ? 'x' : '');
+            if ($listContents) {
+                $items = array();
+                foreach ($sportColumns as $sc) {
+                    if (isset($p['sports'][$sc['sport_id']])) $items[] = $sc['name'];
+                }
+                foreach ($compColumns as $cc) {
+                    if (isset($p['competitions'][$cc['competition_id']])) $items[] = $cc['name'];
+                }
+                if ($hasTalent && $p['talent']) $items[] = 'Văn nghệ';
+                if ($hasMiss && $p['miss']) $items[] = 'Miss';
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, implode(', ', $items));
+            } else {
+                foreach ($sportColumns as $sc) {
+                    $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['sports'][$sc['sport_id']]) ? 'x' : '');
+                }
+                foreach ($compColumns as $cc) {
+                    $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['competitions'][$cc['competition_id']]) ? 'x' : '');
+                }
+                if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['talent'] ? 'x' : '');
+                if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['miss'] ? 'x' : '');
             }
-            foreach ($compColumns as $cc) {
-                $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['competitions'][$cc['competition_id']]) ? 'x' : '');
-            }
-            if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['talent'] ? 'x' : '');
-            if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['miss'] ? 'x' : '');
             $row++;
         }
 
