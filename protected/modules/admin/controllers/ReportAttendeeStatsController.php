@@ -2255,6 +2255,111 @@ class ReportAttendeeStatsController extends AdminController
     }
 
     /**
+     * Ghi 1 sheet danh sách vào chung kết.
+     * @param bool $includeUnitCols true = kèm cột Mã ĐV + Đơn vị (dùng cho sheet tổng hợp)
+     */
+    protected function writeFinalistSheet($sheet, $titleText, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, $includeUnitCols)
+    {
+        if ($includeUnitCols) {
+            $fixedHeaders = array('STT', 'Mã ĐV', 'Đơn vị', 'Họ và tên', 'Giới tính', 'Mã NV', 'Chức danh', 'Bộ phận');
+            $fixedWidths = array(6, 10, 30, 26, 9, 12, 30, 24);
+            $genderCol = 4;
+        } else {
+            $fixedHeaders = array('STT', 'Họ và tên', 'Giới tính', 'Mã NV', 'Chức danh', 'Bộ phận');
+            $fixedWidths = array(6, 28, 9, 12, 32, 26);
+            $genderCol = 2;
+        }
+        $fixedCount = count($fixedHeaders);
+        $extraCols = count($sportColumns) + count($compColumns) + ($hasTalent ? 1 : 0) + ($hasMiss ? 1 : 0);
+        $totalCols = $fixedCount + $extraCols;
+        $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalCols - 1);
+
+        // Tiêu đề
+        $sheet->setCellValue('A1', $titleText);
+        $sheet->mergeCells('A1:' . $lastColLetter . '1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        // Header cột
+        $headerRow = 2;
+        $colIndex = 0;
+        foreach ($fixedHeaders as $h) {
+            $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $h);
+        }
+        foreach ($sportColumns as $sc) {
+            $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $sc['name']);
+        }
+        foreach ($compColumns as $cc) {
+            $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $cc['name']);
+        }
+        if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Văn nghệ');
+        if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Miss');
+
+        $sheet->getStyle('A' . $headerRow . ':' . $lastColLetter . $headerRow)->applyFromArray(array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '2563EB')),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                'wrap' => true,
+            ),
+        ));
+        $sheet->getRowDimension($headerRow)->setRowHeight(45);
+
+        // Dữ liệu
+        $row = $headerRow + 1;
+        $stt = 1;
+        foreach ($people as $p) {
+            $colIndex = 0;
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $stt++);
+            if ($includeUnitCols) {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['property_code']);
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['property_name']);
+            }
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['full_name']);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $this->formatGender($p['gender']));
+            $sheet->setCellValueExplicitByColumnAndRow($colIndex++, $row, $p['staff_code'], PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['position']);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['department_name']);
+            foreach ($sportColumns as $sc) {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['sports'][$sc['sport_id']]) ? 'x' : '');
+            }
+            foreach ($compColumns as $cc) {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['competitions'][$cc['competition_id']]) ? 'x' : '');
+            }
+            if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['talent'] ? 'x' : '');
+            if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['miss'] ? 'x' : '');
+
+            $sheet->getStyle('A' . $row . ':' . $lastColLetter . $row)->applyFromArray(array(
+                'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+            ));
+            $row++;
+        }
+
+        $lastDataRow = max($headerRow + 1, $row - 1);
+        // Căn giữa STT, giới tính và các cột đánh dấu
+        $sheet->getStyle('A3:A' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $gLetter = PHPExcel_Cell::stringFromColumnIndex($genderCol);
+        $sheet->getStyle($gLetter . '3:' . $gLetter . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        if ($totalCols > $fixedCount) {
+            $firstMarkCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
+            $sheet->getStyle($firstMarkCol . '3:' . $lastColLetter . $lastDataRow)
+                ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        }
+
+        // Độ rộng cột
+        foreach ($fixedWidths as $i => $width) {
+            $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth($width);
+        }
+        for ($i = $fixedCount; $i < $totalCols; $i++) {
+            $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth(14);
+        }
+
+        $sheet->freezePane(PHPExcel_Cell::stringFromColumnIndex($fixedCount) . ($headerRow + 1));
+    }
+
+    /**
      * Hiển thị giới tính: 1 = Nam, 0 = Nữ
      */
     protected function formatGender($gender)
