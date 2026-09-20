@@ -2193,21 +2193,32 @@ class ReportAttendeeStatsController extends AdminController
 
         // Build Excel
         $excel = $this->createPhpExcel();
-        $fixedHeaders = array('STT', 'Họ và tên', 'Giới tính', 'Mã NV', 'Chức danh', 'Bộ phận');
-        $fixedCount = count($fixedHeaders);
-        $extraCols = count($sportColumns) + count($compColumns) + ($hasTalent ? 1 : 0) + ($hasMiss ? 1 : 0);
-        $totalCols = $fixedCount + $extraCols;
-        $lastColLetter = PHPExcel_Cell::stringFromColumnIndex($totalCols - 1);
+        // Font mặc định toàn workbook: Arial Narrow, size 10
+        $excel->getDefaultStyle()->getFont()->setName('Arial Narrow')->setSize(10);
 
         $usedTitles = array();
-        $sheetIndex = 0;
 
-        if (empty($byProperty)) {
-            $sheet = $excel->getActiveSheet();
-            $sheet->setTitle('Không có dữ liệu');
-            $sheet->setCellValue('A1', 'Chưa có danh sách vào chung kết cho sự kiện này.');
+        // Danh sách toàn bộ người vào chung kết, sắp theo đơn vị (mã) rồi tên
+        $allPeople = array_values($participants);
+        usort($allPeople, function ($a, $b) {
+            $c = strnatcasecmp($a['property_code'], $b['property_code']);
+            if ($c !== 0) return $c;
+            $c = strnatcasecmp($a['property_name'], $b['property_name']);
+            if ($c !== 0) return $c;
+            return strnatcasecmp($a['full_name'], $b['full_name']);
+        });
+
+        // Sheet 1: TỔNG HỢP - toàn bộ người tham dự chung kết, kèm cột đơn vị
+        $summary = $excel->getActiveSheet();
+        $summary->setTitle($this->buildSheetTitle('Tổng hợp', $usedTitles));
+        if (empty($allPeople)) {
+            $summary->setCellValue('A1', 'Chưa có danh sách vào chung kết cho sự kiện này.');
+        } else {
+            $summaryTitle = 'DANH SÁCH VÀO CHUNG KẾT' . ($eventName !== '' ? ' - ' . mb_strtoupper($eventName, 'UTF-8') : '');
+            $this->writeFinalistSheet($summary, $summaryTitle, $allPeople, $sportColumns, $compColumns, $hasTalent, $hasMiss, true);
         }
 
+        // Các sheet tiếp theo: mỗi đơn vị 1 sheet
         foreach ($byProperty as $group) {
             $info = $group['info'];
             $people = isset($group['people']) ? $group['people'] : array();
@@ -2215,93 +2226,14 @@ class ReportAttendeeStatsController extends AdminController
                 return strnatcasecmp($a['full_name'], $b['full_name']);
             });
 
-            $sheet = ($sheetIndex === 0) ? $excel->getActiveSheet() : $excel->createSheet();
-            $sheetIndex++;
+            $sheet = $excel->createSheet();
             // Tên sheet dùng mã đơn vị (prefix) cho ngắn gọn, fallback về tên nếu trống
             $sheetName = $info['property_code'] !== '' ? $info['property_code'] : $info['property_name'];
             $sheet->setTitle($this->buildSheetTitle($sheetName, $usedTitles));
 
-            // Tiêu đề
             $title = 'DANH SÁCH VÀO CHUNG KẾT - ' . mb_strtoupper($info['property_name'], 'UTF-8')
                 . ($eventName !== '' ? ' (' . $eventName . ')' : '');
-            $sheet->setCellValue('A1', $title);
-            $sheet->mergeCells('A1:' . $lastColLetter . '1');
-            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
-            $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-
-            // Header cột
-            $headerRow = 2;
-            $colIndex = 0;
-            foreach ($fixedHeaders as $h) {
-                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $h);
-            }
-            foreach ($sportColumns as $sc) {
-                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $sc['name']);
-            }
-            foreach ($compColumns as $cc) {
-                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $cc['name']);
-            }
-            if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Văn nghệ');
-            if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Miss');
-
-            $sheet->getStyle('A' . $headerRow . ':' . $lastColLetter . $headerRow)->applyFromArray(array(
-                'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
-                'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '2563EB')),
-                'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
-                'alignment' => array(
-                    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-                    'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-                    'wrap' => true,
-                ),
-            ));
-            $sheet->getRowDimension($headerRow)->setRowHeight(45);
-
-            // Dữ liệu
-            $row = $headerRow + 1;
-            $stt = 1;
-            foreach ($people as $p) {
-                $colIndex = 0;
-                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $stt++);
-                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['full_name']);
-                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $this->formatGender($p['gender']));
-                $sheet->setCellValueExplicitByColumnAndRow($colIndex++, $row, $p['staff_code'], PHPExcel_Cell_DataType::TYPE_STRING);
-                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['position']);
-                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['department_name']);
-                foreach ($sportColumns as $sc) {
-                    $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['sports'][$sc['sport_id']]) ? 'x' : '');
-                }
-                foreach ($compColumns as $cc) {
-                    $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['competitions'][$cc['competition_id']]) ? 'x' : '');
-                }
-                if ($hasTalent) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['talent'] ? 'x' : '');
-                if ($hasMiss) $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['miss'] ? 'x' : '');
-
-                $sheet->getStyle('A' . $row . ':' . $lastColLetter . $row)->applyFromArray(array(
-                    'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
-                ));
-                $row++;
-            }
-
-            $lastDataRow = max($headerRow + 1, $row - 1);
-            // Căn giữa STT, giới tính và các cột đánh dấu
-            $sheet->getStyle('A3:A' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('C3:C' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            if ($totalCols > $fixedCount) {
-                $firstMarkCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
-                $sheet->getStyle($firstMarkCol . '3:' . $lastColLetter . $lastDataRow)
-                    ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            }
-
-            // Độ rộng cột
-            $fixedWidths = array(6, 28, 9, 12, 32, 26);
-            foreach ($fixedWidths as $i => $width) {
-                $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth($width);
-            }
-            for ($i = $fixedCount; $i < $totalCols; $i++) {
-                $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth(14);
-            }
-
-            $sheet->freezePane(PHPExcel_Cell::stringFromColumnIndex($fixedCount) . ($headerRow + 1));
+            $this->writeFinalistSheet($sheet, $title, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, false);
         }
 
         $excel->setActiveSheetIndex(0);
