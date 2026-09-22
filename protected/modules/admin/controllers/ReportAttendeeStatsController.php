@@ -2240,21 +2240,25 @@ class ReportAttendeeStatsController extends AdminController
                 'name' => 'Thể thao',
                 'title' => 'DANH SÁCH VÀO CHUNG KẾT THỂ THAO',
                 'filter' => function ($p) { return !empty($p['sports']); },
+                'content' => array('sports'),
             ),
             array(
                 'name' => 'Văn nghệ',
                 'title' => 'DANH SÁCH VÀO CHUNG KẾT VĂN NGHỆ',
                 'filter' => function ($p) { return !empty($p['talent']); },
+                'content' => array('talent'),
             ),
             array(
                 'name' => 'Miss',
                 'title' => 'DANH SÁCH VÀO CHUNG KẾT MISS',
                 'filter' => function ($p) { return !empty($p['miss']); },
+                'content' => array('miss'),
             ),
             array(
                 'name' => 'Nghiệp vụ',
                 'title' => 'DANH SÁCH VÀO CHUNG KẾT NGHIỆP VỤ',
                 'filter' => function ($p) { return !empty($p['competitions']); },
+                'content' => array('competitions'),
             ),
         );
         foreach ($contentSheets as $cs) {
@@ -2265,7 +2269,7 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setTitle($this->buildSheetTitle($cs['name'], $usedTitles));
 
             $title = $cs['title'] . ($eventName !== '' ? ' - ' . mb_strtoupper($eventName, 'UTF-8') : '');
-            $this->writeFinalistSheet($sheet, $title, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true);
+            $this->writeFinalistSheet($sheet, $title, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true, $cs['content']);
         }
 
         // Các sheet tiếp theo: mỗi đơn vị 1 sheet
