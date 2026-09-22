@@ -2109,13 +2109,20 @@ class ReportAttendeeStatsController extends AdminController
 
         // --- VĂN NGHỆ: tiết mục vào chung kết -> mở rộng thành viên ---
         $finalEntryIds = array();
+        $finalEntryInfo = array(); // entry_id => array('title', 'is_alliance_team')
         $talentShows = TalentShows::getApiDataProvider(array('event_id' => $eventId), 200)->getData();
         foreach ($talentShows as $show) {
             $showId = isset($show->id) ? $show->id : null;
             if (!$showId) continue;
             foreach (TalentEntries::getFinalists($showId) as $f) {
                 $entryId = isset($f['entry_id']) ? $f['entry_id'] : null;
-                if ($entryId !== null) $finalEntryIds[$entryId] = true;
+                if ($entryId === null) continue;
+                $finalEntryIds[$entryId] = true;
+                $entry = isset($f['entry']) && is_array($f['entry']) ? $f['entry'] : array();
+                $finalEntryInfo[$entryId] = array(
+                    'title' => $pick($entry, array('title', 'name')),
+                    'is_alliance_team' => !empty($entry['is_alliance_team']),
+                );
             }
         }
         if (!empty($finalEntryIds)) {
@@ -2132,6 +2139,9 @@ class ReportAttendeeStatsController extends AdminController
                 );
                 $key = $addParticipant($attId, $fallback);
                 if ($key === null) continue;
+                if (isset($finalEntryInfo[$entryId])) {
+                    $participants[$key]['talent_entries'][$entryId] = $finalEntryInfo[$entryId];
+                }
                 $participants[$key]['talent'] = true;
             }
         }
