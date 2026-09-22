@@ -2253,6 +2253,7 @@ class ReportAttendeeStatsController extends AdminController
                 'title' => 'DANH SÁCH VÀO CHUNG KẾT MISS',
                 'filter' => function ($p) { return !empty($p['miss']); },
                 'content' => array('miss'),
+                'group' => false,
             ),
             array(
                 'name' => 'Nghiệp vụ',
