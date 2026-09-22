@@ -2423,13 +2423,17 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['department_name']);
             if ($listContents) {
                 $items = array();
-                foreach ($sportColumns as $sc) {
-                    if (isset($p['sports'][$sc['sport_id']])) $items[] = $sc['name'];
+                if ($allowContent('sports')) {
+                    foreach ($sportColumns as $sc) {
+                        if (isset($p['sports'][$sc['sport_id']])) $items[] = $sc['name'];
+                    }
                 }
-                foreach ($compColumns as $cc) {
-                    if (isset($p['competitions'][$cc['competition_id']])) $items[] = $cc['name'];
+                if ($allowContent('competitions')) {
+                    foreach ($compColumns as $cc) {
+                        if (isset($p['competitions'][$cc['competition_id']])) $items[] = $cc['name'];
+                    }
                 }
-                if ($hasTalent && $p['talent']) {
+                if ($allowContent('talent') && $hasTalent && $p['talent']) {
                     if (!empty($p['talent_entries'])) {
                         foreach ($p['talent_entries'] as $te) {
                             $label = 'Văn nghệ - ' . (isset($te['title']) && $te['title'] !== '' ? $te['title'] : 'Chưa đặt tên');
