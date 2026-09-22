@@ -2223,6 +2223,40 @@ class ReportAttendeeStatsController extends AdminController
             $this->writeFinalistSheet($summary, $summaryTitle, $allPeople, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true);
         }
 
+        // Các sheet theo từng nội dung (cùng số cột với sheet tổng hợp)
+        $contentSheets = array(
+            array(
+                'name' => 'Thể thao',
+                'title' => 'DANH SÁCH VÀO CHUNG KẾT THỂ THAO',
+                'filter' => function ($p) { return !empty($p['sports']); },
+            ),
+            array(
+                'name' => 'Văn nghệ',
+                'title' => 'DANH SÁCH VÀO CHUNG KẾT VĂN NGHỆ',
+                'filter' => function ($p) { return !empty($p['talent']); },
+            ),
+            array(
+                'name' => 'Miss',
+                'title' => 'DANH SÁCH VÀO CHUNG KẾT MISS',
+                'filter' => function ($p) { return !empty($p['miss']); },
+            ),
+            array(
+                'name' => 'Nghiệp vụ',
+                'title' => 'DANH SÁCH VÀO CHUNG KẾT NGHIỆP VỤ',
+                'filter' => function ($p) { return !empty($p['competitions']); },
+            ),
+        );
+        foreach ($contentSheets as $cs) {
+            $people = array_values(array_filter($allPeople, $cs['filter']));
+            if (empty($people)) continue;
+
+            $sheet = $excel->createSheet();
+            $sheet->setTitle($this->buildSheetTitle($cs['name'], $usedTitles));
+
+            $title = $cs['title'] . ($eventName !== '' ? ' - ' . mb_strtoupper($eventName, 'UTF-8') : '');
+            $this->writeFinalistSheet($sheet, $title, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true);
+        }
+
         // Các sheet tiếp theo: mỗi đơn vị 1 sheet
         foreach ($byProperty as $group) {
             $info = $group['info'];
