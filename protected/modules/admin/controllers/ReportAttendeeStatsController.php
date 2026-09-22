@@ -2048,6 +2048,7 @@ class ReportAttendeeStatsController extends AdminController
                     'sports' => array(),
                     'competitions' => array(),
                     'talent' => false,
+                    'talent_entries' => array(),
                     'miss' => false,
                 );
             }
