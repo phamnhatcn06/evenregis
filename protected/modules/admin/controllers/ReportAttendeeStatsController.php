@@ -2424,7 +2424,17 @@ class ReportAttendeeStatsController extends AdminController
                 foreach ($compColumns as $cc) {
                     if (isset($p['competitions'][$cc['competition_id']])) $items[] = $cc['name'];
                 }
-                if ($hasTalent && $p['talent']) $items[] = 'Văn nghệ';
+                if ($hasTalent && $p['talent']) {
+                    if (!empty($p['talent_entries'])) {
+                        foreach ($p['talent_entries'] as $te) {
+                            $label = 'Văn nghệ - ' . (isset($te['title']) && $te['title'] !== '' ? $te['title'] : 'Chưa đặt tên');
+                            if (!empty($te['is_alliance_team'])) $label .= ' (Liên quân)';
+                            $items[] = $label;
+                        }
+                    } else {
+                        $items[] = 'Văn nghệ';
+                    }
+                }
                 if ($hasMiss && $p['miss']) $items[] = 'Miss';
                 $sheet->setCellValueByColumnAndRow($colIndex++, $row, implode(', ', $items));
             } else {
