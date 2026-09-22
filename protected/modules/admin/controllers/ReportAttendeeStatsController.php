@@ -2312,10 +2312,12 @@ class ReportAttendeeStatsController extends AdminController
      * Ghi 1 sheet danh sách vào chung kết.
      * @param bool $includeUnitCols true = kèm cột Mã ĐV + Đơn vị (dùng cho sheet tổng hợp)
      */
-    protected function writeFinalistSheet($sheet, $titleText, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, $includeUnitCols, $listContents = false, $contentFilter = null)
+    protected function writeFinalistSheet($sheet, $titleText, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, $includeUnitCols, $listContents = false, $contentFilter = null, $groupByUnit = true)
     {
         // $contentFilter: null = liệt kê mọi nội dung; hoặc mảng loại được phép
         // ('sports', 'competitions', 'talent', 'miss') cho cột "Nội dung".
+        // $groupByUnit: false = danh sách phẳng, không chèn hàng tiêu đề đơn vị.
+        $groupByUnit = $listContents && $groupByUnit;
         $allowContent = function ($type) use ($contentFilter) {
             return $contentFilter === null || in_array($type, $contentFilter, true);
         };
