@@ -2444,7 +2444,7 @@ class ReportAttendeeStatsController extends AdminController
                         $items[] = 'Văn nghệ';
                     }
                 }
-                if ($hasMiss && $p['miss']) $items[] = 'Miss';
+                if ($allowContent('miss') && $hasMiss && $p['miss']) $items[] = 'Miss';
                 $sheet->setCellValueByColumnAndRow($colIndex++, $row, implode(', ', $items));
             } else {
                 foreach ($sportColumns as $sc) {
