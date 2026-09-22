@@ -2270,7 +2270,8 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setTitle($this->buildSheetTitle($cs['name'], $usedTitles));
 
             $title = $cs['title'] . ($eventName !== '' ? ' - ' . mb_strtoupper($eventName, 'UTF-8') : '');
-            $this->writeFinalistSheet($sheet, $title, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true, $cs['content']);
+            $groupByUnit = !isset($cs['group']) || $cs['group'] !== false;
+            $this->writeFinalistSheet($sheet, $title, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true, $cs['content'], $groupByUnit);
         }
 
         // Các sheet tiếp theo: mỗi đơn vị 1 sheet
