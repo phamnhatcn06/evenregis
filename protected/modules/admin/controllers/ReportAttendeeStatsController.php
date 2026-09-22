@@ -2392,7 +2392,7 @@ class ReportAttendeeStatsController extends AdminController
 
         // Đếm số người theo đơn vị (dùng cho hàng tiêu đề đơn vị ở sheet tổng hợp)
         $unitCounts = array();
-        if ($listContents) {
+        if ($groupByUnit) {
             foreach ($people as $p) {
                 $uk = $p['property_code'] . '|' . $p['property_name'];
                 $unitCounts[$uk] = (isset($unitCounts[$uk]) ? $unitCounts[$uk] : 0) + 1;
@@ -2402,7 +2402,7 @@ class ReportAttendeeStatsController extends AdminController
         $curUnit = null;
         foreach ($people as $p) {
             // Sheet tổng hợp: chèn 1 hàng tên đơn vị + tổng số người mỗi khi đổi đơn vị
-            if ($listContents) {
+            if ($groupByUnit) {
                 $uk = $p['property_code'] . '|' . $p['property_name'];
                 if ($uk !== $curUnit) {
                     $curUnit = $uk;
