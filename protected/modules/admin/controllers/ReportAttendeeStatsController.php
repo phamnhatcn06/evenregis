@@ -1950,6 +1950,11 @@ class ReportAttendeeStatsController extends AdminController
         foreach ($attendeeMap as $attId => $info) {
             $staffCode = mb_strtoupper(trim((string)$info['staff_code']), 'UTF-8');
             $idCard = trim((string)$info['id_card']);
+            // Chỉ dùng CCCD/CMND làm khoá gộp khi đúng định dạng số (9-12 chữ số).
+            // Dữ liệu id_card có thể bị nhập lẫn tên phòng ban -> gộp nhầm người khác nhau.
+            if (!preg_match('/^\d{9,12}$/', $idCard)) {
+                $idCard = '';
+            }
             $canonicalId = null;
             if ($staffCode !== '' && isset($staffCodeIndex[$staffCode])) {
                 $canonicalId = $staffCodeIndex[$staffCode];
