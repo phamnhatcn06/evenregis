@@ -4,13 +4,13 @@ Yii::import('application.models._base.BaseRegistrationPeriods');
 
 class RegistrationPeriods extends BaseRegistrationPeriods
 {
-	const TYPE_REGULAR = 'regular';
-	const TYPE_FINAL = 'final';
+	const KIND_REGULAR = 0;
+	const KIND_FINAL = 1;
 
 	public $event_name;
 	public $type;
 	public $mail_btc;
-	public $period_type;
+	public $is_final;
 
 	public static function model($className = __CLASS__)
 	{
@@ -22,28 +22,28 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		$rules = parent::rules();
 		$rules[] = array('mail_btc', 'length', 'max' => 255);
 		$rules[] = array('mail_btc', 'safe');
-		$rules[] = array('period_type', 'in', 'range' => array(self::TYPE_REGULAR, self::TYPE_FINAL));
-		$rules[] = array('period_type', 'safe');
+		$rules[] = array('is_final', 'boolean');
+		$rules[] = array('is_final', 'safe');
 		return $rules;
 	}
 
 	/**
-	 * Danh mục loại đợt đăng ký (dùng cho dropdown).
+	 * Danh mục loại đợt đăng ký (dùng cho dropdown, key = giá trị is_final).
 	 */
-	public static function getTypeOptions()
+	public static function getKindOptions()
 	{
 		return array(
-			self::TYPE_REGULAR => 'Vòng loại',
-			self::TYPE_FINAL => 'Chung kết (VCK)',
+			self::KIND_REGULAR => 'Vòng loại',
+			self::KIND_FINAL => 'Chung kết (VCK)',
 		);
 	}
 
 	/**
 	 * Badge hiển thị loại đợt.
 	 */
-	public static function getTypeBadge($type)
+	public static function getKindBadge($isFinal)
 	{
-		if ($type === self::TYPE_FINAL) {
+		if ($isFinal) {
 			return '<span class="badge bg-warning text-dark"><i class="fa fa-trophy me-1"></i>Chung kết</span>';
 		}
 		return '<span class="badge bg-light text-dark"><i class="fa fa-list me-1"></i>Vòng loại</span>';
@@ -51,7 +51,7 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 
 	public function isFinal()
 	{
-		return $this->period_type === self::TYPE_FINAL;
+		return (int) $this->is_final === self::KIND_FINAL;
 	}
 
 	public static function fetchFromApi($id)
