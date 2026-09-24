@@ -65,6 +65,51 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		));
 	}
 
+	/**
+	 * Danh sách attendee VCK của đợt (tùy chọn lọc theo đơn vị).
+	 */
+	public static function getFinalAttendees($periodId, $propertyId = null)
+	{
+		$params = array('period_id' => (int) $periodId);
+		if ($propertyId) {
+			$params['property_id'] = (int) $propertyId;
+		}
+		$result = ApiClient::get(ApiEndpoints::REGISTRATION_FINAL_ATTENDEES, $params);
+		if (!empty($result['success']) && isset($result['data'])) {
+			return isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+		}
+		return array();
+	}
+
+	/**
+	 * Danh sách nhân sự đủ điều kiện làm giám đốc (phòng ban 610) của đơn vị.
+	 */
+	public static function getDirectorCandidates($propertyId)
+	{
+		$result = ApiClient::get(ApiEndpoints::REGISTRATION_FINAL_DIRECTOR_CANDIDATES, array('property_id' => (int) $propertyId));
+		if (!empty($result['success']) && isset($result['data'])) {
+			return isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+		}
+		return array();
+	}
+
+	/**
+	 * Cập nhật attendee VCK (chỉ ảnh + chức danh).
+	 */
+	public static function updateFinalAttendee($attendeeId, $data)
+	{
+		$url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_FINAL_ATTENDEE_UPDATE, array('id' => $attendeeId));
+		return ApiClient::post($url, $data);
+	}
+
+	/**
+	 * Thêm giám đốc / lái xe vào đợt VCK của đơn vị.
+	 */
+	public static function addSupportAttendee($data)
+	{
+		return ApiClient::post(ApiEndpoints::REGISTRATION_FINAL_ADD_SUPPORT, $data);
+	}
+
 	public static function fetchFromApi($id)
 	{
 		$url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_PERIOD_DETAIL, array('id' => $id));
