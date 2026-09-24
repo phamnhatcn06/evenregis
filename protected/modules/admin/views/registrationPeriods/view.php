@@ -118,10 +118,15 @@ $perColumn = ceil($totalAttrs / $columns);
 <div class="card mb-3 border-warning">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-trophy me-2 text-warning"></i>Vòng chung kết (VCK)</h5>
-        <button type="button" id="btn-build-final" class="btn btn-sm btn-warning"
-            data-url="<?php echo $this->createUrl('buildFinal', array('id' => $model->id)); ?>">
-            <i class="fa fa-magic me-1"></i>Tổng hợp finalist vào VCK
-        </button>
+        <div>
+            <a href="<?php echo $this->createUrl('finalList', array('id' => $model->id)); ?>" class="btn btn-sm btn-outline-warning">
+                <i class="fa fa-users me-1"></i>Danh sách VCK
+            </a>
+            <button type="button" id="btn-build-final" class="btn btn-sm btn-warning"
+                data-url="<?php echo $this->createUrl('buildFinal', array('id' => $model->id)); ?>">
+                <i class="fa fa-magic me-1"></i>Tổng hợp finalist vào VCK
+            </button>
+        </div>
     </div>
     <div class="card-body">
         <p class="text-muted mb-2">
