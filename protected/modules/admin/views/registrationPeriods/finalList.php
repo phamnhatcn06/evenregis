@@ -137,6 +137,7 @@ Yii::app()->clientScript->registerScript('final-list-config', 'window.FINAL_LIST
     'updateUrl' => $this->createUrl('finalUpdateAttendee', array('id' => '__ID__')),
     'candidatesUrl' => $this->createUrl('finalDirectorCandidates'),
     'addSupportUrl' => $this->createUrl('finalAddSupport', array('id' => $model->id)),
+    'uploadPhotoUrl' => $this->createUrl('finalUploadPhoto'),
 )) . ';', CClientScript::POS_HEAD);
 
 Yii::app()->clientScript->registerScriptFile(
