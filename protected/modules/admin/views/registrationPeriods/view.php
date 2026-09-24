@@ -62,7 +62,7 @@ $attributes = array(
     array('label' => 'ID', 'value' => $model->id),
     array('label' => 'Sự kiện', 'value' => isset($model->event_name) ? $model->event_name : ''),
     array('label' => 'Tên đợt', 'value' => $model->name),
-    array('label' => 'Loại đợt', 'value' => RegistrationPeriods::getTypeBadge($model->period_type), 'raw' => true),
+    array('label' => 'Loại đợt', 'value' => RegistrationPeriods::getKindBadge($model->is_final), 'raw' => true),
     array('label' => 'Thời gian bắt đầu', 'value' => $model->start_time ? MyHelper::formatDateTime($model->start_time) : '-'),
     array('label' => 'Thời gian kết thúc', 'value' => $model->end_time ? MyHelper::formatDateTime($model->end_time) : '-'),
     array('label' => 'Tối đa/đơn vị', 'value' => $model->max_per_org ?: 'Không giới hạn'),
