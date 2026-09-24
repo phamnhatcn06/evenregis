@@ -172,6 +172,10 @@ class ApiEndpoints
     // Registration Finals (Vòng chung kết - VCK)
     const REGISTRATION_FINAL_BUILD = '/api/registration-finals/build';
     const REGISTRATION_FINAL_PREVIEW = '/api/registration-finals/preview';
+    const REGISTRATION_FINAL_ATTENDEES = '/api/registration-finals/attendees';
+    const REGISTRATION_FINAL_ATTENDEE_UPDATE = '/api/registration-finals/attendee/update/{id}';
+    const REGISTRATION_FINAL_DIRECTOR_CANDIDATES = '/api/registration-finals/director-candidates';
+    const REGISTRATION_FINAL_ADD_SUPPORT = '/api/registration-finals/add-support';
 
     // Registration Period Content
     const REGISTRATION_PERIOD_CONTENT_LIST = '/api/registration-period-contents';
