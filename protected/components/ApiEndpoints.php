@@ -169,6 +169,10 @@ class ApiEndpoints
     const REGISTRATION_PERIOD_UPDATE = '/api/registration-periods/update/{id}';
     const REGISTRATION_PERIOD_DESTROY = '/api/registration-periods/destroy/{id}';
 
+    // Registration Finals (Vòng chung kết - VCK)
+    const REGISTRATION_FINAL_BUILD = '/api/registration-finals/build';
+    const REGISTRATION_FINAL_PREVIEW = '/api/registration-finals/preview';
+
     // Registration Period Content
     const REGISTRATION_PERIOD_CONTENT_LIST = '/api/registration-period-contents';
     const REGISTRATION_PERIOD_CONTENT_STORE = '/api/registration-period-contents/store';
