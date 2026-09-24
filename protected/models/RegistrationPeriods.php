@@ -54,6 +54,17 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		return (int) $this->is_final === self::KIND_FINAL;
 	}
 
+	/**
+	 * Gọi API tổng hợp finalist 4 module vào đợt VCK này.
+	 */
+	public function buildFinalViaApi()
+	{
+		return ApiClient::post(ApiEndpoints::REGISTRATION_FINAL_BUILD, array(
+			'event_id' => (int) $this->event_id,
+			'period_id' => (int) $this->id,
+		));
+	}
+
 	public static function fetchFromApi($id)
 	{
 		$url = ApiEndpoints::url(ApiEndpoints::REGISTRATION_PERIOD_DETAIL, array('id' => $id));
