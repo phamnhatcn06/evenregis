@@ -55,6 +55,20 @@ $selectedContents = isset($selectedContentIds) ? $selectedContentIds : array();
     <div class="row">
         <div class="col-md-6">
             <div class="form-group mb-3">
+                <label class="form-label" for="RegistrationPeriods_period_type">Loại đợt <span class="text-danger">*</span></label>
+                <?php echo $form->dropDownList($model, 'period_type', RegistrationPeriods::getTypeOptions(), array(
+                    'class' => 'form-select',
+                    'id' => 'RegistrationPeriods_period_type',
+                )); ?>
+                <?php echo $form->error($model, 'period_type'); ?>
+                <small class="text-muted">Chọn "Chung kết (VCK)" để tổng hợp thí sinh/VĐV đã lọt vào vòng chung kết.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
                 <?php echo $form->labelEx($model, 'start_time'); ?>
                 <?php
                 $startValue = '';
