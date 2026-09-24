@@ -115,26 +115,10 @@ $perColumn = ceil($totalAttrs / $columns);
 </div>
 
 <?php if ($model->isFinal()): ?>
-<div class="card mb-3 border-warning">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fa fa-trophy me-2 text-warning"></i>Vòng chung kết (VCK)</h5>
-        <div>
-            <a href="<?php echo $this->createUrl('finalList', array('id' => $model->id)); ?>" class="btn btn-sm btn-outline-warning">
-                <i class="fa fa-users me-1"></i>Danh sách VCK
-            </a>
-            <button type="button" id="btn-build-final" class="btn btn-sm btn-warning"
-                data-url="<?php echo $this->createUrl('buildFinal', array('id' => $model->id)); ?>">
-                <i class="fa fa-magic me-1"></i>Tổng hợp finalist vào VCK
-            </button>
-        </div>
-    </div>
-    <div class="card-body">
-        <p class="text-muted mb-2">
-            <i class="fa fa-info-circle me-1"></i>Tổng hợp toàn bộ VĐV/thí sinh đã lọt vào vòng chung kết
-            (thể thao, nghiệp vụ, sắc đẹp, văn nghệ) vào đợt đăng ký này, nhóm theo đơn vị. Thao tác có thể chạy lại nhiều lần.
-        </p>
-        <div id="build-final-result"></div>
-    </div>
+<div class="alert alert-warning">
+    <i class="fa fa-trophy me-1"></i>
+    Đây là <strong>đợt Vòng chung kết (VCK)</strong>. Khi mỗi đơn vị tạo phiếu đăng ký cho đợt này,
+    hệ thống sẽ <strong>tự động thêm sẵn</strong> những người của đơn vị đã lọt vào chung kết (không được xoá, chỉ sửa ảnh/chức danh).
 </div>
 <?php endif; ?>
 
