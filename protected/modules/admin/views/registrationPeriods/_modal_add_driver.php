@@ -20,8 +20,12 @@
                         <input type="text" class="form-control" name="position" id="driver_position" maxlength="255" placeholder="VD: Lái xe">
                     </div>
                     <div class="form-group mb-0">
-                        <label class="form-label">Đường dẫn ảnh (tùy chọn)</label>
-                        <input type="text" class="form-control" name="photo_path" id="driver_photo_path" maxlength="255">
+                        <label class="form-label">Ảnh (tùy chọn)</label>
+                        <input type="file" class="form-control photo-file-input" accept="image/jpeg,image/png"
+                            data-target="driver_photo_path" data-preview="driver_photo_preview">
+                        <input type="hidden" name="photo_path" id="driver_photo_path">
+                        <small class="text-muted d-block photo-upload-status"></small>
+                        <img id="driver_photo_preview" src="" alt="" class="img-thumbnail mt-2 d-none" style="max-height:120px">
                     </div>
                 </div>
                 <div class="modal-footer">
