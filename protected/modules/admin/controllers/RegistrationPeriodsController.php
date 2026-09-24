@@ -277,12 +277,14 @@ class RegistrationPeriodsController extends AdminController
 		}
 
 		$result = $model->buildFinalViaApi();
+		// ApiClient trả $result['data'] = body API {code, message, data:{summary}}
+		$body = isset($result['data']) && is_array($result['data']) ? $result['data'] : array();
 		if (!empty($result['success'])) {
-			$data = isset($result['data']) ? $result['data'] : array();
-			$message = isset($result['message']) ? $result['message'] : 'Tổng hợp finalist thành công.';
-			echo CJSON::encode(array('success' => true, 'message' => $message, 'data' => $data));
+			$summary = isset($body['data']) ? $body['data'] : array();
+			$message = isset($body['message']) ? $body['message'] : 'Tổng hợp finalist thành công.';
+			echo CJSON::encode(array('success' => true, 'message' => $message, 'data' => $summary));
 		} else {
-			$message = isset($result['error']) ? $result['error'] : 'Không thể tổng hợp finalist.';
+			$message = isset($result['error']) ? $result['error'] : (isset($body['message']) ? $body['message'] : 'Không thể tổng hợp finalist.');
 			echo CJSON::encode(array('success' => false, 'message' => $message));
 		}
 		Yii::app()->end();
