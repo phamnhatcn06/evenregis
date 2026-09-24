@@ -111,6 +111,103 @@ class RegistrationPeriodsController extends AdminController
 	}
 
 	/**
+	 * Màn hình danh sách người tham dự Vòng chung kết (VCK) của đợt.
+	 */
+	public function actionFinalList($id)
+	{
+		$model = $this->loadModelById($id);
+		if (!$model->isFinal()) {
+			throw new CHttpException(400, 'Đợt đăng ký không phải loại Vòng chung kết (VCK).');
+		}
+
+		$attendees = RegistrationPeriods::getFinalAttendees($id);
+
+		// Map tên đơn vị
+		$propertyNames = array();
+		$properties = Properties::getApiDataProvider(array(), 1000)->getData();
+		foreach ($properties as $p) {
+			$pid = is_array($p) ? (isset($p['id']) ? $p['id'] : null) : (isset($p->id) ? $p->id : null);
+			$pname = is_array($p) ? (isset($p['name']) ? $p['name'] : '') : (isset($p->name) ? $p->name : '');
+			if ($pid) {
+				$propertyNames[$pid] = $pname;
+			}
+		}
+
+		$this->render('finalList', array(
+			'model' => $model,
+			'attendees' => $attendees,
+			'propertyNames' => $propertyNames,
+		));
+	}
+
+	/**
+	 * AJAX: cập nhật attendee VCK (chỉ ảnh + chức danh).
+	 */
+	public function actionFinalUpdateAttendee($id)
+	{
+		$this->requirePostJson();
+		$data = array(
+			'position' => isset($_POST['position']) ? $_POST['position'] : null,
+			'photo_path' => isset($_POST['photo_path']) ? $_POST['photo_path'] : null,
+		);
+		$result = RegistrationPeriods::updateFinalAttendee($id, $data);
+		$this->echoApiResult($result, 'Cập nhật thành công.');
+	}
+
+	/**
+	 * AJAX: danh sách giám đốc đủ điều kiện của đơn vị.
+	 */
+	public function actionFinalDirectorCandidates()
+	{
+		header('Content-Type: application/json');
+		$propertyId = isset($_GET['property_id']) ? (int) $_GET['property_id'] : 0;
+		$rows = RegistrationPeriods::getDirectorCandidates($propertyId);
+		echo CJSON::encode(array('success' => true, 'data' => $rows));
+		Yii::app()->end();
+	}
+
+	/**
+	 * AJAX: thêm giám đốc / lái xe vào đợt VCK.
+	 */
+	public function actionFinalAddSupport($id)
+	{
+		$this->requirePostJson();
+		$model = $this->loadModelById($id);
+		$data = array(
+			'event_id' => (int) $model->event_id,
+			'period_id' => (int) $model->id,
+			'property_id' => isset($_POST['property_id']) ? (int) $_POST['property_id'] : 0,
+			'type' => isset($_POST['type']) ? $_POST['type'] : '',
+			'staff_id' => isset($_POST['staff_id']) && $_POST['staff_id'] !== '' ? (int) $_POST['staff_id'] : null,
+			'full_name' => isset($_POST['full_name']) ? $_POST['full_name'] : null,
+			'position' => isset($_POST['position']) ? $_POST['position'] : null,
+			'photo_path' => isset($_POST['photo_path']) ? $_POST['photo_path'] : null,
+		);
+		$result = RegistrationPeriods::addSupportAttendee($data);
+		$this->echoApiResult($result, 'Thêm thành công.');
+	}
+
+	private function requirePostJson()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+		header('Content-Type: application/json');
+	}
+
+	private function echoApiResult($result, $successMessage)
+	{
+		if (!empty($result['success'])) {
+			$message = isset($result['message']) ? $result['message'] : $successMessage;
+			echo CJSON::encode(array('success' => true, 'message' => $message, 'data' => isset($result['data']) ? $result['data'] : null));
+		} else {
+			$message = isset($result['error']) ? $result['error'] : 'Có lỗi xảy ra.';
+			echo CJSON::encode(array('success' => false, 'message' => $message));
+		}
+		Yii::app()->end();
+	}
+
+	/**
 	 * Tổng hợp finalist 4 module vào đợt VCK (AJAX, trả JSON).
 	 */
 	public function actionBuildFinal($id)
