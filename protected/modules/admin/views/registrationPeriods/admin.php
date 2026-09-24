@@ -31,6 +31,12 @@ $this->Tabletitle = 'Quản lý đợt đăng ký';
                 ),
                 'name',
                 array(
+                    'header' => 'Loại đợt',
+                    'type' => 'raw',
+                    'value' => 'RegistrationPeriods::getTypeBadge($data->period_type)',
+                    'headerHtmlOptions' => array('style' => 'width:110px'),
+                ),
+                array(
                     'name' => 'event_name',
                     'header' => 'Sự kiện',
                     'value' => 'isset($data->event_name) ? $data->event_name : ""',
