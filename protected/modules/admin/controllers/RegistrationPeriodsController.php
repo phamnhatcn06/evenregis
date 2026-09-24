@@ -246,11 +246,14 @@ class RegistrationPeriodsController extends AdminController
 
 	private function echoApiResult($result, $successMessage)
 	{
+		// ApiClient trả $result['data'] = toàn bộ body API {code, message, data}
+		$body = isset($result['data']) && is_array($result['data']) ? $result['data'] : array();
 		if (!empty($result['success'])) {
-			$message = isset($result['message']) ? $result['message'] : $successMessage;
-			echo CJSON::encode(array('success' => true, 'message' => $message, 'data' => isset($result['data']) ? $result['data'] : null));
+			$message = isset($body['message']) ? $body['message'] : $successMessage;
+			$payload = isset($body['data']) ? $body['data'] : null;
+			echo CJSON::encode(array('success' => true, 'message' => $message, 'data' => $payload));
 		} else {
-			$message = isset($result['error']) ? $result['error'] : 'Có lỗi xảy ra.';
+			$message = isset($result['error']) ? $result['error'] : (isset($body['message']) ? $body['message'] : 'Có lỗi xảy ra.');
 			echo CJSON::encode(array('success' => false, 'message' => $message));
 		}
 		Yii::app()->end();
