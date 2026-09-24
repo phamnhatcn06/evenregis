@@ -187,6 +187,55 @@ class RegistrationPeriodsController extends AdminController
 		$this->echoApiResult($result, 'Thêm thành công.');
 	}
 
+	/**
+	 * AJAX: upload ảnh ở phía frontend, trả về đường dẫn (không upload lên API).
+	 */
+	public function actionFinalUploadPhoto()
+	{
+		$this->requirePostJson();
+
+		if (!isset($_FILES['photo']) || empty($_FILES['photo']['name'])) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng chọn ảnh.'));
+			Yii::app()->end();
+		}
+
+		$file = $_FILES['photo'];
+		if ($file['error'] !== UPLOAD_ERR_OK) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Lỗi upload (code ' . $file['error'] . ').'));
+			Yii::app()->end();
+		}
+
+		$allowedTypes = array('jpg', 'jpeg', 'png');
+		$maxSize = 5 * 1024 * 1024;
+		$ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+		if (!in_array($ext, $allowedTypes)) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Chỉ chấp nhận ảnh JPG, PNG.'));
+			Yii::app()->end();
+		}
+		if ($file['size'] > $maxSize) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Ảnh vượt quá 5MB.'));
+			Yii::app()->end();
+		}
+
+		$relDir = 'uploads/attendees/final';
+		$uploadPath = Yii::getPathOfAlias('webroot') . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relDir);
+		if (!is_dir($uploadPath) && !@mkdir($uploadPath, 0755, true)) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không thể tạo thư mục upload.'));
+			Yii::app()->end();
+		}
+
+		$newFilename = time() . '_' . substr(md5(uniqid('', true)), 0, 8) . '.' . $ext;
+		$targetPath = $uploadPath . DIRECTORY_SEPARATOR . $newFilename;
+
+		if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+			$path = '/' . $relDir . '/' . $newFilename;
+			echo CJSON::encode(array('success' => true, 'path' => $path, 'message' => 'Tải ảnh thành công.'));
+		} else {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không thể lưu ảnh.'));
+		}
+		Yii::app()->end();
+	}
+
 	private function requirePostJson()
 	{
 		if (!Yii::app()->getRequest()->getIsPostRequest()) {
