@@ -147,10 +147,3 @@ $perColumn = ceil($totalAttrs / $columns);
         <?php endif; ?>
     </div>
 </div>
-
-<?php
-Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/registrationPeriods-view.js',
-    CClientScript::POS_END
-);
-?>
