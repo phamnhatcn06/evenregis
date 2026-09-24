@@ -35,6 +35,53 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    // ----- Upload ảnh ở frontend, chỉ lưu path vào hidden input -----
+    document.querySelectorAll('.photo-file-input').forEach(function (input) {
+        input.addEventListener('change', function () {
+            var file = input.files && input.files[0];
+            if (!file) {
+                return;
+            }
+            var targetId = input.getAttribute('data-target');
+            var previewId = input.getAttribute('data-preview');
+            var hidden = document.getElementById(targetId);
+            var preview = previewId ? document.getElementById(previewId) : null;
+            var status = input.parentNode.querySelector('.photo-upload-status');
+
+            var fd = new FormData();
+            fd.append('photo', file);
+            if (status) { status.textContent = 'Đang tải ảnh...'; }
+            input.disabled = true;
+
+            fetch(cfg.uploadPhotoUrl, {
+                method: 'POST',
+                body: fd,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    input.disabled = false;
+                    if (data.success && data.path) {
+                        hidden.value = data.path;
+                        if (status) { status.textContent = 'Đã tải ảnh: ' + data.path; }
+                        if (preview) {
+                            preview.src = data.path;
+                            preview.classList.remove('d-none');
+                        }
+                    } else {
+                        if (status) { status.textContent = ''; }
+                        Toast.error(data.message || 'Không thể tải ảnh');
+                    }
+                })
+                .catch(function () {
+                    input.disabled = false;
+                    if (status) { status.textContent = ''; }
+                    Toast.error('Lỗi tải ảnh');
+                });
+        });
+    });
+
     // ----- Sửa ảnh / chức danh -----
     document.querySelectorAll('.btn-edit-attendee').forEach(function (btn) {
         btn.addEventListener('click', function () {
