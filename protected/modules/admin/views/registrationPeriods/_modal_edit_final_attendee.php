@@ -16,9 +16,12 @@
                         <input type="text" class="form-control" name="position" id="edit_position" maxlength="255" placeholder="VD: Trưởng phòng Kinh doanh">
                     </div>
                     <div class="form-group mb-3">
-                        <label class="form-label">Đường dẫn ảnh (photo_path)</label>
-                        <input type="text" class="form-control" name="photo_path" id="edit_photo_path" maxlength="255" placeholder="VD: uploads/photos/xxx.jpg">
-                        <small class="text-muted">Nhập đường dẫn ảnh mới nếu cần thay ảnh.</small>
+                        <label class="form-label">Ảnh</label>
+                        <input type="file" class="form-control photo-file-input" accept="image/jpeg,image/png"
+                            data-target="edit_photo_path" data-preview="edit_photo_preview">
+                        <input type="hidden" name="photo_path" id="edit_photo_path">
+                        <small class="text-muted d-block photo-upload-status"></small>
+                        <img id="edit_photo_preview" src="" alt="" class="img-thumbnail mt-2 d-none" style="max-height:120px">
                     </div>
                 </div>
                 <div class="modal-footer">
