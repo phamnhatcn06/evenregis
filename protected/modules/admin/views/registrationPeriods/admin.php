@@ -33,7 +33,7 @@ $this->Tabletitle = 'Quản lý đợt đăng ký';
                 array(
                     'header' => 'Loại đợt',
                     'type' => 'raw',
-                    'value' => 'RegistrationPeriods::getTypeBadge($data->period_type)',
+                    'value' => 'RegistrationPeriods::getKindBadge($data->is_final)',
                     'headerHtmlOptions' => array('style' => 'width:110px'),
                 ),
                 array(
