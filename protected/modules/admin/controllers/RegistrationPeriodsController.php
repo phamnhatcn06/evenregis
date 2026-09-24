@@ -110,6 +110,35 @@ class RegistrationPeriodsController extends AdminController
 		return $model;
 	}
 
+	/**
+	 * Tổng hợp finalist 4 module vào đợt VCK (AJAX, trả JSON).
+	 */
+	public function actionBuildFinal($id)
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest()) {
+			throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+		}
+
+		header('Content-Type: application/json');
+
+		$model = $this->loadModelById($id);
+		if (!$model->isFinal()) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Đợt đăng ký không phải loại Vòng chung kết (VCK).'));
+			Yii::app()->end();
+		}
+
+		$result = $model->buildFinalViaApi();
+		if (!empty($result['success'])) {
+			$data = isset($result['data']) ? $result['data'] : array();
+			$message = isset($result['message']) ? $result['message'] : 'Tổng hợp finalist thành công.';
+			echo CJSON::encode(array('success' => true, 'message' => $message, 'data' => $data));
+		} else {
+			$message = isset($result['error']) ? $result['error'] : 'Không thể tổng hợp finalist.';
+			echo CJSON::encode(array('success' => false, 'message' => $message));
+		}
+		Yii::app()->end();
+	}
+
 	public function actionAdmin()
 	{
 		$model = new RegistrationPeriods('search');
