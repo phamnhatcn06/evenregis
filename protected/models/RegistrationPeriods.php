@@ -111,6 +111,7 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		$data['max_per_org'] = $this->max_per_org ? (int) $this->max_per_org : null;
 		$data['note'] = $this->note ?: null;
 		$data['mail_btc'] = $this->mail_btc ?: null;
+		$data['period_type'] = $this->period_type ?: self::TYPE_REGULAR;
 
 		if ($this->start_time) {
 			$ts = is_numeric($this->start_time) ? $this->start_time : strtotime($this->start_time);
