@@ -84,6 +84,9 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		} elseif (isset($data['event_name'])) {
 			$this->event_name = $data['event_name'];
 		}
+		if (isset($data['period_type'])) {
+			$this->period_type = $data['period_type'];
+		}
 	}
 
 	public function storeViaApi()
