@@ -55,12 +55,12 @@ $selectedContents = isset($selectedContentIds) ? $selectedContentIds : array();
     <div class="row">
         <div class="col-md-6">
             <div class="form-group mb-3">
-                <label class="form-label" for="RegistrationPeriods_period_type">Loại đợt <span class="text-danger">*</span></label>
-                <?php echo $form->dropDownList($model, 'period_type', RegistrationPeriods::getTypeOptions(), array(
+                <label class="form-label" for="RegistrationPeriods_is_final">Loại đợt <span class="text-danger">*</span></label>
+                <?php echo $form->dropDownList($model, 'is_final', RegistrationPeriods::getKindOptions(), array(
                     'class' => 'form-select',
-                    'id' => 'RegistrationPeriods_period_type',
+                    'id' => 'RegistrationPeriods_is_final',
                 )); ?>
-                <?php echo $form->error($model, 'period_type'); ?>
+                <?php echo $form->error($model, 'is_final'); ?>
                 <small class="text-muted">Chọn "Chung kết (VCK)" để tổng hợp thí sinh/VĐV đã lọt vào vòng chung kết.</small>
             </div>
         </div>
