@@ -114,6 +114,25 @@ $perColumn = ceil($totalAttrs / $columns);
     </div>
 </div>
 
+<?php if ($model->isFinal()): ?>
+<div class="card mb-3 border-warning">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fa fa-trophy me-2 text-warning"></i>Vòng chung kết (VCK)</h5>
+        <button type="button" id="btn-build-final" class="btn btn-sm btn-warning"
+            data-url="<?php echo $this->createUrl('buildFinal', array('id' => $model->id)); ?>">
+            <i class="fa fa-magic me-1"></i>Tổng hợp finalist vào VCK
+        </button>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-2">
+            <i class="fa fa-info-circle me-1"></i>Tổng hợp toàn bộ VĐV/thí sinh đã lọt vào vòng chung kết
+            (thể thao, nghiệp vụ, sắc đẹp, văn nghệ) vào đợt đăng ký này, nhóm theo đơn vị. Thao tác có thể chạy lại nhiều lần.
+        </p>
+        <div id="build-final-result"></div>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="card">
     <div class="card-header">
         <h5 class="mb-0"><i class="fa fa-list-ul me-2"></i>Nội dung cho phép đăng ký</h5>
