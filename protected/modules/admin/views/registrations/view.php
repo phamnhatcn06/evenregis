@@ -702,6 +702,9 @@ $canShowSports = $showAllContents || in_array('sports', $allowedContents);
 $canShowCompetition = $showAllContents || in_array('competition', $allowedContents);
 $canShowTalent = $showAllContents || in_array('talent', $allowedContents) || !empty($talentEntries);
 $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
+
+// Đợt Vòng chung kết (VCK): không cho đăng ký bổ sung nội dung => ẩn các nút thêm nội dung
+$canAddContent = $canEdit && empty($isFinalPeriod);
 ?>
 <div class="row">
     <div class="col-md-12">
