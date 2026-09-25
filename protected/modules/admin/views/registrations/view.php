@@ -741,7 +741,7 @@ $canAddContent = $canEdit && empty($isFinalPeriod);
                         <?php endif; ?>
                         <div class="<?php echo $sportsHasAlliance ? 'col-md-9' : 'col-12'; ?>">
 
-                            <?php if ($canEdit): ?>
+                            <?php if ($canAddContent): ?>
                                 <!-- Form chọn liên quân và môn thể thao -->
                                 <div class="row mb-3 g-3 align-items-end">
                                     <div class="col-md-5">
