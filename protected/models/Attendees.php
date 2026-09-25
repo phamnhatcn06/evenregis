@@ -39,6 +39,15 @@ class Attendees extends BaseAttendees
     public $current_approval_index;
     public $next_approval_index;
     public $attendee_type;
+    public $shirt_size;
+
+    /**
+     * Danh sách size áo sự kiện (xem hướng dẫn tại docs/size_ao.pdf).
+     */
+    public static function getShirtSizeOptions()
+    {
+        return array('S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL', 'XXXL' => 'XXXL');
+    }
 
     public static function model($className = __CLASS__)
     {
