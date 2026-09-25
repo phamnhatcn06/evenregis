@@ -38,6 +38,7 @@ class Attendees extends BaseAttendees
     public $end_date;
     public $current_approval_index;
     public $next_approval_index;
+    public $attendee_type;
 
     public static function model($className = __CLASS__)
     {
