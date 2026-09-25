@@ -3917,6 +3917,16 @@ class RegistrationsController extends AdminController
 
 		$successCount = 0;
 		$errorCount = 0;
+		$directorSkipped = 0;
+
+		// Kiểm tra đăng ký đã có giám đốc (phòng ban mã 610) chưa
+		$hasDirector610 = false;
+		foreach (Attendees::getByRegistrationId($registrationId) as $existAtt) {
+			if ((string)(isset($existAtt['department_code']) ? $existAtt['department_code'] : '') === '610') {
+				$hasDirector610 = true;
+				break;
+			}
+		}
 
 		foreach ($staffIds as $staffId) {
 			$staff = Staffs::fetchFromApi($staffId);
@@ -3924,6 +3934,15 @@ class RegistrationsController extends AdminController
 				Yii::log("AddAttendeesFromStaff - Staff not found: {$staffId}", 'error', 'application.registration');
 				$errorCount++;
 				continue;
+			}
+
+			// Mỗi đăng ký chỉ được 1 giám đốc phòng ban 610
+			if ((string)(isset($staff->department_code) ? $staff->department_code : '') === '610') {
+				if ($hasDirector610) {
+					$directorSkipped++;
+					continue;
+				}
+				$hasDirector610 = true;
 			}
 
 			Yii::log("AddAttendeesFromStaff - Staff data: " . json_encode($staff->attributes), 'info', 'application.registration');
