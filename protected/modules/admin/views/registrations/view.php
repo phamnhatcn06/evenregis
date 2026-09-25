@@ -539,6 +539,7 @@ foreach ($eventContents as $ec) {
                         <th style="width:60px;">Ảnh</th>
                         <th>Họ tên</th>
                         <th>Phòng ban - Chức danh</th>
+                        <th style="width:70px;">Size áo</th>
                         <th>Vai trò</th>
                         <th>Ngày vào làm</th>
                         <th>Ngày đến</th>
