@@ -5945,3 +5945,13 @@ var RegistrationView = (function() {
 function startDocumentChunkUpload() {
     RegistrationView.startDocumentChunkUpload();
 }
+
+function showShirtSizeGuide() {
+    var modalEl = document.getElementById('shirtSizeGuideModal');
+    if (!modalEl) { return; }
+    var frame = document.getElementById('shirtSizeGuideFrame');
+    if (frame && !frame.getAttribute('src')) {
+        frame.setAttribute('src', modalEl.getAttribute('data-pdf-url'));
+    }
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+}
