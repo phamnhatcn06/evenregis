@@ -902,7 +902,7 @@ $canAddContent = $canEdit && empty($isFinalPeriod);
                                                             <div><?php echo ($idx + 1) . '. ' . $nameInfo; ?></div>
                                                         <?php endforeach; ?>
                                                     </td>
-                                                    <?php if ($canEdit): ?>
+                                                    <?php if ($canAddContent): ?>
                                                         <td class="text-center">
                                                             <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="RegistrationView.editCompetitionRegistration(<?php echo $compId; ?>, '<?php echo addslashes($compData['competition_name']); ?>')" title="Sửa">
                                                                 <i class="fa fa-pencil"></i>
