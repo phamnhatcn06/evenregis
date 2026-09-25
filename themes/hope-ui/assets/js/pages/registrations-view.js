@@ -3455,6 +3455,8 @@ var RegistrationView = (function() {
 
                     document.getElementById('edit_full_name').value = att.full_name || '';
                     document.getElementById('edit_position').value = att.position || '';
+                    var editShirtEl = document.getElementById('edit_shirt_size');
+                    if (editShirtEl) { editShirtEl.value = att.shirt_size || ''; }
                     document.getElementById('edit_department').value = att.department_name || '';
                     var editRoleSelect = document.getElementById('edit_role_id');
                     if (editRoleSelect) {
