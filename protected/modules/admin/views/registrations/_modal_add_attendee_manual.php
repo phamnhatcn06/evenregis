@@ -26,6 +26,20 @@
                                 <input type="text" class="form-control" name="position" required placeholder="Nhập chức danh">
                             </div>
                             <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between align-items-center">
+                                    <span>Size áo sự kiện</span>
+                                    <button type="button" class="btn btn-sm btn-link p-0" onclick="showShirtSizeGuide()">
+                                        <i class="fa fa-question-circle me-1"></i>Hướng dẫn chọn size
+                                    </button>
+                                </label>
+                                <select class="form-select" name="shirt_size">
+                                    <option value="">-- Chọn size --</option>
+                                    <?php foreach (Attendees::getShirtSizeOptions() as $sz): ?>
+                                        <option value="<?php echo $sz; ?>"><?php echo $sz; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Giới tính <span class="text-danger">*</span></label>
                                 <select class="form-select" name="gender" required>
                                     <option value="">-- Chọn --</option>
