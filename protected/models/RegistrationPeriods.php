@@ -196,6 +196,32 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		));
 	}
 
+	/**
+	 * Danh sách đợt đang mở của 1 sự kiện (id => name), đã áp dụng quy tắc
+	 * ẩn đợt thường khi có đợt VCK (do backend list-active xử lý).
+	 */
+	public static function getActiveListForEvent($eventId)
+	{
+		$list = array();
+		if (!$eventId) {
+			return $list;
+		}
+		$result = ApiClient::get(ApiEndpoints::REGISTRATION_PERIOD_LIST_ACTIVE, array('event_id' => (int) $eventId));
+		if (!empty($result['success']) && isset($result['data'])) {
+			$items = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+			if (is_array($items)) {
+				foreach ($items as $p) {
+					$pid = is_array($p) ? (isset($p['id']) ? $p['id'] : null) : (isset($p->id) ? $p->id : null);
+					$pname = is_array($p) ? (isset($p['name']) ? $p['name'] : '') : (isset($p->name) ? $p->name : '');
+					if ($pid) {
+						$list[$pid] = $pname;
+					}
+				}
+			}
+		}
+		return $list;
+	}
+
 	public static function getActiveList()
 	{
 		$list = array();
