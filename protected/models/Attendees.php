@@ -309,6 +309,9 @@ class Attendees extends BaseAttendees
             if (isset($data['shirt_size'])) {
                 $model->shirt_size = $data['shirt_size'];
             }
+            if (isset($data['badge_org_name'])) {
+                $model->badge_org_name = $data['badge_org_name'];
+            }
             $model->id = $id;
             return $model;
         }
