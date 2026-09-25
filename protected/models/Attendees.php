@@ -40,6 +40,33 @@ class Attendees extends BaseAttendees
     public $next_approval_index;
     public $attendee_type;
     public $shirt_size;
+    public $badge_org_name;
+
+    /**
+     * Danh sách công ty con của 1 đơn vị nhóm (để hiển thị trên thẻ).
+     * Trả về mảng tên công ty. Rỗng nếu đơn vị không thuộc nhóm.
+     */
+    public static function getSubCompaniesByProperty($propertyId)
+    {
+        if (!$propertyId) {
+            return array();
+        }
+        $result = ApiClient::get(ApiEndpoints::ORG_SUB_COMPANY_LIST, array('property_id' => (int) $propertyId));
+        if (empty($result['success']) || !isset($result['data'])) {
+            return array();
+        }
+        $items = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+        $names = array();
+        if (is_array($items)) {
+            foreach ($items as $it) {
+                $name = is_array($it) ? (isset($it['name']) ? $it['name'] : null) : (isset($it->name) ? $it->name : null);
+                if ($name) {
+                    $names[] = $name;
+                }
+            }
+        }
+        return $names;
+    }
 
     /**
      * Danh sách size áo sự kiện (xem hướng dẫn tại docs/size_ao.pdf).
