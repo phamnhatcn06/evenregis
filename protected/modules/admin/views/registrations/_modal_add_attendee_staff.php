@@ -28,6 +28,21 @@
                             <small class="text-muted d-block mt-1">Giữ Ctrl để chọn nhiều vai trò</small>
                         </div>
                         <div class="col-md-3">
+                            <label class="form-label d-flex justify-content-between align-items-center">
+                                <span>Size áo</span>
+                                <button type="button" class="btn btn-sm btn-link p-0" onclick="showShirtSizeGuide()">
+                                    <i class="fa fa-question-circle me-1"></i>Hướng dẫn
+                                </button>
+                            </label>
+                            <select class="form-select" name="shirt_size" id="staff_shirt_size">
+                                <option value="">-- Chọn size --</option>
+                                <?php foreach (Attendees::getShirtSizeOptions() as $sz): ?>
+                                    <option value="<?php echo $sz; ?>"><?php echo $sz; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small class="text-muted d-block mt-1">Áp dụng cho tất cả người được chọn (có thể sửa lại từng người)</small>
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label">Ngày đến</label>
                             <input type="text" class="form-control datepicker" name="check_in_date" id="staff_check_in_date" placeholder="dd/mm/yyyy" autocomplete="off">
                         </div>
