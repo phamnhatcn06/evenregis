@@ -4008,12 +4008,16 @@ class RegistrationsController extends AdminController
 		if ($errorCount > 0) {
 			$message .= ($message ? ' ' : '') . "Có {$errorCount} người không thêm được.";
 		}
+		if ($directorSkipped > 0) {
+			$message .= ($message ? ' ' : '') . "Bỏ qua {$directorSkipped} người thuộc Ban giám đốc (phòng ban 610): đăng ký chỉ được 1 giám đốc.";
+		}
 
 		echo CJSON::encode(array(
-			'success' => $successCount > 0,
+			'success' => ($successCount > 0 || $directorSkipped > 0),
 			'message' => $message,
 			'added' => $successCount,
 			'failed' => $errorCount,
+			'director_skipped' => $directorSkipped,
 		));
 		Yii::app()->end();
 	}
