@@ -42,6 +42,20 @@
                             </select>
                             <small class="text-muted d-block mt-1">Áp dụng cho tất cả người được chọn (có thể sửa lại từng người)</small>
                         </div>
+                        <?php if (!empty($subCompanies)): ?>
+                        <div class="col-md-3">
+                            <label class="form-label">Đơn vị trên thẻ <span class="text-danger">*</span></label>
+                            <select class="form-select" name="badge_org_name" id="staff_badge_org">
+                                <option value="">-- Chọn đơn vị --</option>
+                                <?php foreach ($subCompanies as $sc): ?>
+                                    <option value="<?php echo CHtml::encode($sc); ?>"><?php echo CHtml::encode($sc); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small class="text-muted d-block mt-1">Áp dụng cho tất cả người được chọn (có thể sửa lại từng người)</small>
+                        </div>
+                        <?php else: ?>
+                        <input type="hidden" name="badge_org_name" value="<?php echo CHtml::encode($badgeUnitFixedName); ?>">
+                        <?php endif; ?>
                         <div class="col-md-3">
                             <label class="form-label">Ngày đến</label>
                             <input type="text" class="form-control datepicker" name="check_in_date" id="staff_check_in_date" placeholder="dd/mm/yyyy" autocomplete="off">
