@@ -208,6 +208,40 @@ class RegistrationsController extends AdminController
 		}
 		unset($compData);
 
+		// Phiếu VCK: dựng danh sách nghiệp vụ từ finalist contents (vì competition_registrations trỏ phiếu gốc)
+		if ($isFinalPeriod) {
+			$competitionRegistrations = array();
+			$finalAtts = RegistrationPeriods::getFinalAttendees($model->period_id, $model->property_id);
+			foreach ($finalAtts as $fa) {
+				$contents = isset($fa['contents']) ? $fa['contents'] : array();
+				foreach ($contents as $c) {
+					if (!isset($c['content_type']) || $c['content_type'] !== 'competition') {
+						continue;
+					}
+					$compId = isset($c['ref_id']) ? $c['ref_id'] : null;
+					if (!$compId) {
+						continue;
+					}
+					if (!isset($competitionRegistrations[$compId])) {
+						$competitionRegistrations[$compId] = array(
+							'competition_id' => $compId,
+							'competition_name' => isset($c['ref_name']) ? $c['ref_name'] : '',
+							'attendees' => array(),
+						);
+					}
+					$competitionRegistrations[$compId]['attendees'][] = array(
+						'id' => null,
+						'attendee_id' => isset($fa['id']) ? $fa['id'] : null,
+						'attendee_name' => isset($fa['full_name']) ? $fa['full_name'] : '',
+						'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+						'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
+						'personal_email' => '',
+						'status' => 1,
+					);
+				}
+			}
+		}
+
 		// Load Sport Teams cho đơn vị (bao gồm cả đội liên quân)
 		$sportTeams = array();
 		$sportTeamMembers = array();
