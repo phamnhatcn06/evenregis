@@ -3144,11 +3144,16 @@ var RegistrationView = (function() {
                 roleBadges = '-';
             }
 
+            var isFinalistRow = (att.attendee_type === 'finalist');
+            var lockIcon = isFinalistRow ? ' <i class="fa fa-lock text-warning ms-1" title="Đã lọt chung kết - không được xoá, chỉ sửa ảnh/chức danh"></i>' : '';
+            var shirtCell = att.shirt_size ? '<span class="badge bg-info text-dark">' + escapeHtml(att.shirt_size) + '</span>' : '-';
+
             html += '<tr>' +
                 '<td class="text-center">' + (idx + 1) + '</td>' +
                 '<td class="text-center">' + photoHtml + '</td>' +
-                '<td>' + escapeHtml(att.full_name) + '</td>' +
+                '<td>' + escapeHtml(att.full_name) + lockIcon + '</td>' +
                 '<td>' + escapeHtml(positionDept.join(' - ')) + '</td>' +
+                '<td class="text-center">' + shirtCell + '</td>' +
                 '<td>' + roleBadges + '</td>' +
                 '<td>' + formatDate(att.start_date) + '</td>' +
                 '<td>' + formatDate(att.check_in_date) + '</td>' +
