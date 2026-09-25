@@ -816,7 +816,7 @@ $canAddContent = $canEdit && empty($isFinalPeriod);
                                     'sportTeams' => $sportTeams,
                                     'sportTeamMembers' => $sportTeamMembers,
                                     'model' => $model,
-                                    'canEdit' => $canEdit,
+                                    'canEdit' => $canAddContent,
                                 )); ?>
                             </div>
                         </div><!-- end main col -->
