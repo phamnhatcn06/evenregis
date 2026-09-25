@@ -874,7 +874,7 @@ $canAddContent = $canEdit && empty($isFinalPeriod);
                                                 <th class="col-name">Cuộc thi</th>
                                                 <th class="col-count text-center">Số người</th>
                                                 <th class="col-list">Danh sách thí sinh</th>
-                                                <?php if ($canEdit): ?>
+                                                <?php if ($canAddContent): ?>
                                                     <th class="col-action text-center">Thao tác</th>
                                                 <?php endif; ?>
                                             </tr>
