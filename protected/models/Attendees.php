@@ -313,7 +313,8 @@ class Attendees extends BaseAttendees
             'position_name',
             'department_code',
             'department_name',
-            'end_starting_date'
+            'end_starting_date',
+            'shirt_size'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
@@ -357,7 +358,8 @@ class Attendees extends BaseAttendees
             'position_name',
             'department_code',
             'department_name',
-            'end_starting_date'
+            'end_starting_date',
+            'shirt_size'
         );
         foreach ($extraFields as $field) {
             if (isset($this->$field) && $this->$field !== null && $this->$field !== '') {
