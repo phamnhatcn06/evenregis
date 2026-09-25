@@ -580,7 +580,12 @@ foreach ($eventContents as $ec) {
                                         </div>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo CHtml::encode($fullName); ?></td>
+                                <td>
+                                    <?php echo CHtml::encode($fullName); ?>
+                                    <?php if ($isFinalist): ?>
+                                        <i class="fa fa-lock text-warning ms-1" title="Đã lọt chung kết - không được xoá, chỉ sửa ảnh/chức danh"></i>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo CHtml::encode($position); ?></td>
                                 <td>
                                     <?php if (!empty($roleName)): ?>
