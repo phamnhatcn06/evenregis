@@ -589,6 +589,13 @@ foreach ($eventContents as $ec) {
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo CHtml::encode($position); ?></td>
+                                <td class="text-center">
+                                    <?php if ($shirtSize !== ''): ?>
+                                        <span class="badge bg-info text-dark"><?php echo CHtml::encode($shirtSize); ?></span>
+                                    <?php else: ?>
+                                        <span class="text-muted">-</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <?php if (!empty($roleName)): ?>
                                         <?php foreach (array_map('trim', explode(',', $roleName)) as $role): ?>
