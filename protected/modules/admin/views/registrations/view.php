@@ -566,6 +566,8 @@ foreach ($eventContents as $ec) {
                             $checkInDate = isset($att['check_in_date']) ? $att['check_in_date'] : '';
                             $checkOutDate = isset($att['check_out_date']) ? $att['check_out_date'] : '';
                             $transportName = isset($att['transport_name']) ? $att['transport_name'] : '';
+                            $attendeeType = isset($att['attendee_type']) ? $att['attendee_type'] : '';
+                            $isFinalist = ($attendeeType === 'finalist');
                         ?>
                             <tr>
                                 <td class="text-center" style="width: 50px;"><?php echo $idx + 1; ?></td>
