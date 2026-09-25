@@ -603,8 +603,14 @@ class RegistrationsController extends AdminController
 		// Load approval logs for registration
 		$approvalLogs = RegistrationApprovalLogs::getHistory($id);
 
+		// Công ty con để hiển thị trên thẻ (đơn vị nhóm); rỗng => dùng tên đơn vị cố định
+		$subCompanies = Attendees::getSubCompaniesByProperty($model->property_id);
+		$badgeUnitFixedName = isset($model->property_name) ? $model->property_name : '';
+
 		$this->render('view', array(
 			'model' => $model,
+			'subCompanies' => $subCompanies,
+			'badgeUnitFixedName' => $badgeUnitFixedName,
 			'registrationDetails' => $registrationDetails,
 			'competitionRegistrations' => $competitionRegistrations,
 			'allianceRequest' => $allianceRequest,
