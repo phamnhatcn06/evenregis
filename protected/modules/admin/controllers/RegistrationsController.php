@@ -3968,6 +3968,7 @@ class RegistrationsController extends AdminController
 			$attendee->department_code = isset($staff->department_code) ? $staff->department_code : null;
 			$attendee->department_name = isset($staff->department_name) ? $staff->department_name : null;
 			$attendee->end_starting_date = isset($staff->end_testing_date) ? $staff->end_testing_date : null;
+			$attendee->shirt_size = Yii::app()->getRequest()->getPost('shirt_size') ?: null;
 
 			$uploadedFiles = $this->handleAttendeeDocumentUpload();
 
