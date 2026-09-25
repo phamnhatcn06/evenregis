@@ -3480,6 +3480,9 @@ var RegistrationView = (function() {
                     showSimplePreview('edit_cccd_back_preview', att.cccd_back_path);
                     showSimplePreview('edit_contract_preview', att.contract_path);
 
+                    // Finalist (đã lọt chung kết): khoá mọi ô, chỉ cho sửa ảnh + chức danh
+                    applyFinalistLock(att.attendee_type === 'finalist');
+
                     var bsModal = new bootstrap.Modal(modal);
                     bsModal.show();
 
