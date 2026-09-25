@@ -267,6 +267,9 @@ class Attendees extends BaseAttendees
             if (isset($data['property_name'])) {
                 $model->property_name = $data['property_name'];
             }
+            if (isset($data['attendee_type'])) {
+                $model->attendee_type = $data['attendee_type'];
+            }
             $model->id = $id;
             return $model;
         }
