@@ -615,6 +615,7 @@ class RegistrationsController extends AdminController
 
 		$this->render('view', array(
 			'model' => $model,
+			'isFinalPeriod' => $isFinalPeriod,
 			'subCompanies' => $subCompanies,
 			'badgeUnitFixedName' => $badgeUnitFixedName,
 			'registrationDetails' => $registrationDetails,
