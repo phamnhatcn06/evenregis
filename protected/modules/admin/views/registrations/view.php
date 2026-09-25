@@ -1196,6 +1196,28 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 <?php $this->renderPartial('_modal_import_attendees', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_all_documents'); ?>
 
+<!-- Modal hướng dẫn chọn size áo -->
+<div class="modal fade" id="shirtSizeGuideModal" tabindex="-1" aria-hidden="true"
+     data-pdf-url="<?php echo Yii::app()->getBaseUrl(true); ?>/docs/size_ao.pdf">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="height:85vh;">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-question-circle me-2"></i>Hướng dẫn chọn size áo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="shirtSizeGuideFrame" src="" style="width:100%;height:100%;border:0;"></iframe>
+            </div>
+            <div class="modal-footer">
+                <a href="<?php echo Yii::app()->getBaseUrl(true); ?>/docs/size_ao.pdf" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="fa fa-external-link me-1"></i>Mở trong tab mới
+                </a>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Upload Document -->
 <div class="modal fade" id="uploadDocumentModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
