@@ -629,13 +629,15 @@ foreach ($eventContents as $ec) {
                                                 <i class="fa fa-folder-open-o"></i>
                                             </button>
                                         <?php endif; ?>
-                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(<?php echo $attId; ?>)" title="Sửa">
+                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(<?php echo $attId; ?>)" title="<?php echo $isFinalist ? 'Sửa ảnh / chức danh' : 'Sửa'; ?>">
                                             <i class="fa fa-pencil"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAttendee(<?php echo $attId; ?>)" title="Xóa">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                        <form method="post" action="<?php echo $this->createUrl('deleteAttendee', array('id' => $attId, 'registration_id' => $model->id)); ?>" id="delete-attendee-form-<?php echo $attId; ?>" style="display:none;"></form>
+                                        <?php if (!$isFinalist): ?>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAttendee(<?php echo $attId; ?>)" title="Xóa">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                            <form method="post" action="<?php echo $this->createUrl('deleteAttendee', array('id' => $attId, 'registration_id' => $model->id)); ?>" id="delete-attendee-form-<?php echo $attId; ?>" style="display:none;"></form>
+                                        <?php endif; ?>
                                     </td>
                                 <?php endif; ?>
                                 <?php if ($canManageAttendee): ?>
