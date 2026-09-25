@@ -3465,6 +3465,10 @@ var RegistrationView = (function() {
                     document.getElementById('edit_position').value = att.position || '';
                     var editShirtEl = document.getElementById('edit_shirt_size');
                     if (editShirtEl) { editShirtEl.value = att.shirt_size || ''; }
+                    var editBadgeOrgEl = document.getElementById('edit_badge_org');
+                    if (editBadgeOrgEl && editBadgeOrgEl.tagName === 'SELECT' && att.badge_org_name) {
+                        editBadgeOrgEl.value = att.badge_org_name;
+                    }
                     document.getElementById('edit_department').value = att.department_name || '';
                     var editRoleSelect = document.getElementById('edit_role_id');
                     if (editRoleSelect) {
