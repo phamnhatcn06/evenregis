@@ -41,9 +41,15 @@ class RegistrationsController extends AdminController
 			$relationProperty = Properties::fetchFromApi($model->relation_property_id);
 			$model->relation_property_name = $relationProperty ? $relationProperty->name : '';
 		}
-		if (empty($model->period_name) && $model->period_id) {
+		$isFinalPeriod = false;
+		if ($model->period_id) {
 			$period = RegistrationPeriods::fetchFromApi($model->period_id);
-			$model->period_name = $period ? $period->name : '';
+			if ($period) {
+				if (empty($model->period_name)) {
+					$model->period_name = $period->name;
+				}
+				$isFinalPeriod = $period->isFinal();
+			}
 		}
 
 		// Load allowed contents from registration period
