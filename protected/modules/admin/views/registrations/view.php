@@ -843,7 +843,7 @@ $canAddContent = $canEdit && empty($isFinalPeriod);
                             <span class="badge bg-danger rounded-pill ms-2"><?php echo $competitionPendingCount; ?> yêu cầu</span>
                         <?php endif; ?>
                     </h5>
-                    <?php if ($canEdit): ?>
+                    <?php if ($canAddContent): ?>
                         <button type="button" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#addCompetitionModal" onclick="resetCompetitionModal()">
                             <i class="fa fa-plus me-1"></i>Đăng ký
                         </button>
