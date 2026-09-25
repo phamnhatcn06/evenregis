@@ -4864,6 +4864,7 @@ class RegistrationsController extends AdminController
 			'staff_id' => $attendee->staff_id,
 			'attendee_type' => $attendee->attendee_type,
 			'shirt_size' => $attendee->shirt_size,
+			'badge_org_name' => $attendee->badge_org_name,
 			'full_name' => $attendee->full_name,
 			'position' => $positionName,
 			'department_name' => $departmentName,
