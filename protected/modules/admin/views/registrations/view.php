@@ -1199,9 +1199,9 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 <?php $this->renderPartial('_modal_document'); ?>
 <?php $this->renderPartial('_modal_video'); ?>
 <?php $this->renderPartial('_modal_reject', array('model' => $model)); ?>
-<?php $this->renderPartial('_modal_add_attendee_staff', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
-<?php $this->renderPartial('_modal_edit_attendee', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
-<?php $this->renderPartial('_modal_add_attendee_manual', array('model' => $model, 'roles' => $roles, 'transports' => $transports)); ?>
+<?php $this->renderPartial('_modal_add_attendee_staff', array('model' => $model, 'roles' => $roles, 'transports' => $transports, 'subCompanies' => $subCompanies, 'badgeUnitFixedName' => $badgeUnitFixedName)); ?>
+<?php $this->renderPartial('_modal_edit_attendee', array('model' => $model, 'roles' => $roles, 'transports' => $transports, 'subCompanies' => $subCompanies, 'badgeUnitFixedName' => $badgeUnitFixedName)); ?>
+<?php $this->renderPartial('_modal_add_attendee_manual', array('model' => $model, 'roles' => $roles, 'transports' => $transports, 'subCompanies' => $subCompanies, 'badgeUnitFixedName' => $badgeUnitFixedName)); ?>
 <?php $this->renderPartial('_modal_import_attendees', array('model' => $model)); ?>
 <?php $this->renderPartial('_modal_all_documents'); ?>
 
