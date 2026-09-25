@@ -169,6 +169,9 @@ class ApiEndpoints
     const REGISTRATION_PERIOD_UPDATE = '/api/registration-periods/update/{id}';
     const REGISTRATION_PERIOD_DESTROY = '/api/registration-periods/destroy/{id}';
 
+    // Org sub-companies (công ty con của đơn vị nhóm)
+    const ORG_SUB_COMPANY_LIST = '/api/org-sub-companies';
+
     // Registration Finals (Vòng chung kết - VCK)
     const REGISTRATION_FINAL_BUILD = '/api/registration-finals/build';
     const REGISTRATION_FINAL_PREVIEW = '/api/registration-finals/preview';
