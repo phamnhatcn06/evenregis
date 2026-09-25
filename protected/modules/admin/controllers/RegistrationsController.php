@@ -4282,6 +4282,7 @@ class RegistrationsController extends AdminController
 		$attendee->full_name = Yii::app()->getRequest()->getPost('full_name');
 		$attendee->position = Yii::app()->getRequest()->getPost('position');
 		$attendee->shirt_size = Yii::app()->getRequest()->getPost('shirt_size') ?: null;
+		$attendee->badge_org_name = Yii::app()->getRequest()->getPost('badge_org_name') ?: null;
 		$attendee->gender = Yii::app()->getRequest()->getPost('gender');
 		$roleId = Yii::app()->getRequest()->getPost('role_id');
 		if (is_array($roleId)) {
