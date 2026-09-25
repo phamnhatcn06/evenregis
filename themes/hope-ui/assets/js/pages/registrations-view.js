@@ -3504,6 +3504,36 @@ var RegistrationView = (function() {
             });
     }
 
+    function applyFinalistLock(isFinalist) {
+        var extraLockIds = ['edit_note', 'edit_transport_id', 'edit_check_in_date', 'edit_check_out_date'];
+        var fileIds = ['edit_cccd_front_file', 'edit_cccd_back_file', 'edit_contract_file'];
+        var roleSel = document.getElementById('edit_role_id');
+        var fullNameEl = document.getElementById('edit_full_name');
+        var departmentEl = document.getElementById('edit_department');
+        var positionEl = document.getElementById('edit_position');
+        var titleEl = document.querySelector('#editAttendeeModal .modal-title');
+
+        extraLockIds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) { el.readOnly = isFinalist; el.classList.toggle('bg-light', isFinalist); }
+        });
+        fileIds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) { el.disabled = isFinalist; }
+        });
+        if (roleSel) { roleSel.disabled = isFinalist; }
+
+        if (isFinalist) {
+            if (fullNameEl) { fullNameEl.readOnly = true; fullNameEl.classList.add('bg-light'); }
+            if (departmentEl) { departmentEl.readOnly = true; departmentEl.classList.add('bg-light'); }
+            // Chức danh vẫn cho sửa dù là staff
+            if (positionEl) { positionEl.readOnly = false; positionEl.classList.remove('bg-light'); }
+            if (titleEl) { titleEl.innerHTML = '<i class="fa fa-lock me-2 text-warning"></i>Sửa ảnh / chức danh (đã lọt chung kết)'; }
+        } else {
+            if (titleEl) { titleEl.innerHTML = '<i class="fa fa-pencil me-2"></i>Sửa thông tin người tham dự'; }
+        }
+    }
+
     function clearPreviews() {
         ['edit_portrait_preview', 'edit_cccd_front_preview', 'edit_cccd_back_preview', 'edit_contract_preview'].forEach(function(id) {
             var el = document.getElementById(id);
