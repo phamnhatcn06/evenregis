@@ -690,21 +690,8 @@ class RegistrationsController extends AdminController
 				}
 			}
 		}
-		// Load periods theo event_id hiện có
-		$periods = array();
-		if ($model->event_id) {
-			$periodsData = RegistrationPeriods::getApiDataProvider(array(
-				'event_id' => $model->event_id,
-				'is_active' => 1,
-			), 100)->getData();
-			foreach ($periodsData as $p) {
-				$pId = isset($p->id) ? $p->id : (isset($p['id']) ? $p['id'] : null);
-				$pName = isset($p->name) ? $p->name : (isset($p['name']) ? $p['name'] : '');
-				if ($pId) {
-					$periods[$pId] = $pName;
-				}
-			}
-		}
+		// Load periods theo event_id hiện có (đã ẩn đợt thường nếu có đợt VCK)
+		$periods = RegistrationPeriods::getActiveListForEvent($model->event_id);
 
 		$this->render('create', array(
 			'model' => $model,
@@ -732,21 +719,8 @@ class RegistrationsController extends AdminController
 
 		$events = Events::getApiDataProvider(array('status' => 1), 100)->getData();
 
-		// Load periods theo event_id hiện có
-		$periods = array();
-		if ($model->event_id) {
-			$periodsData = RegistrationPeriods::getApiDataProvider(array(
-				'event_id' => $model->event_id,
-				'is_active' => 1,
-			), 100)->getData();
-			foreach ($periodsData as $p) {
-				$pId = isset($p->id) ? $p->id : (isset($p['id']) ? $p['id'] : null);
-				$pName = isset($p->name) ? $p->name : (isset($p['name']) ? $p['name'] : '');
-				if ($pId) {
-					$periods[$pId] = $pName;
-				}
-			}
-		}
+		// Load periods theo event_id hiện có (đã ẩn đợt thường nếu có đợt VCK)
+		$periods = RegistrationPeriods::getActiveListForEvent($model->event_id);
 
 		// Load properties và relationProperties
 		if ($isAdmin) {
