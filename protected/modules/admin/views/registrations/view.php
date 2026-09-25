@@ -569,6 +569,7 @@ foreach ($eventContents as $ec) {
                             $transportName = isset($att['transport_name']) ? $att['transport_name'] : '';
                             $attendeeType = isset($att['attendee_type']) ? $att['attendee_type'] : '';
                             $isFinalist = ($attendeeType === 'finalist');
+                            $shirtSize = isset($att['shirt_size']) ? $att['shirt_size'] : '';
                         ?>
                             <tr>
                                 <td class="text-center" style="width: 50px;"><?php echo $idx + 1; ?></td>
