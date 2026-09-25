@@ -218,14 +218,16 @@ class RegistrationsController extends AdminController
 					if (!isset($c['content_type']) || $c['content_type'] !== 'competition') {
 						continue;
 					}
-					$compId = isset($c['ref_id']) ? $c['ref_id'] : null;
-					if (!$compId) {
+					$refName = isset($c['ref_name']) ? $c['ref_name'] : '';
+					// Nhóm theo ref_id nếu có, ngược lại theo tên cuộc thi (tương thích production hiện tại)
+					$compId = !empty($c['ref_id']) ? $c['ref_id'] : $refName;
+					if ($compId === '' || $compId === null) {
 						continue;
 					}
 					if (!isset($competitionRegistrations[$compId])) {
 						$competitionRegistrations[$compId] = array(
-							'competition_id' => $compId,
-							'competition_name' => isset($c['ref_name']) ? $c['ref_name'] : '',
+							'competition_id' => !empty($c['ref_id']) ? $c['ref_id'] : null,
+							'competition_name' => $refName,
 							'attendees' => array(),
 						);
 					}
