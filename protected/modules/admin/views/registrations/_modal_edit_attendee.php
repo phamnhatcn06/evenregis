@@ -84,6 +84,24 @@
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            <?php if (!empty($subCompanies)): ?>
+                            <div class="mb-3">
+                                <label class="form-label">Đơn vị hiển thị trên thẻ <span class="text-danger">*</span></label>
+                                <select class="form-select" name="badge_org_name" id="edit_badge_org">
+                                    <option value="">-- Chọn đơn vị --</option>
+                                    <?php foreach ($subCompanies as $sc): ?>
+                                        <option value="<?php echo CHtml::encode($sc); ?>"><?php echo CHtml::encode($sc); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small class="text-muted">Đơn vị thuộc nhóm nhiều công ty — chọn đúng tên hiển thị trên thẻ.</small>
+                            </div>
+                            <?php else: ?>
+                            <div class="mb-3">
+                                <label class="form-label">Đơn vị trên thẻ</label>
+                                <input type="text" class="form-control bg-light" value="<?php echo CHtml::encode($badgeUnitFixedName); ?>" readonly>
+                                <input type="hidden" name="badge_org_name" id="edit_badge_org" value="<?php echo CHtml::encode($badgeUnitFixedName); ?>">
+                            </div>
+                            <?php endif; ?>
                             <div class="mb-3">
                                 <label class="form-label">Phòng ban</label>
                                 <input type="text" class="form-control" name="department" id="edit_department">
