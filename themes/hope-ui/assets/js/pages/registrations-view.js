@@ -3174,11 +3174,14 @@ var RegistrationView = (function() {
                     docsBtn = "<button type=\"button\" class=\"btn btn-sm btn-outline-info me-1\" onclick=\"viewAllDocuments(this)\" data-docs='" + docsJson + "' title=\"Xem tài liệu đính kèm\"><i class=\"fa fa-folder-open-o\"></i></button>";
                 }
                 
+                var deleteBtn = isFinalistRow ? '' : (
+                    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAttendee(' + att.id + ')" title="Xóa"><i class="fa fa-trash"></i></button>' +
+                    '<form method="post" action="' + window.BASE_URL + '/admin/registrations/deleteAttendee/id/' + att.id + '/registration_id/' + registrationId + '" id="delete-attendee-form-' + att.id + '" style="display:none;"></form>'
+                );
                 html += '<td class="text-center">' +
                     docsBtn +
-                    '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(' + att.id + ')" title="Sửa"><i class="fa fa-pencil"></i></button>' +
-                    '<button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeleteAttendee(' + att.id + ')" title="Xóa"><i class="fa fa-trash"></i></button>' +
-                    '<form method="post" action="' + window.BASE_URL + '/admin/registrations/deleteAttendee/id/' + att.id + '/registration_id/' + registrationId + '" id="delete-attendee-form-' + att.id + '" style="display:none;"></form>' +
+                    '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAttendee(' + att.id + ')" title="' + (isFinalistRow ? 'Sửa ảnh / chức danh' : 'Sửa') + '"><i class="fa fa-pencil"></i></button>' +
+                    deleteBtn +
                 '</td>';
             }
 
