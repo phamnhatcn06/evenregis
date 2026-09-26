@@ -208,11 +208,31 @@ class ApiClient extends CComponent
     private static function extractError($data, $httpCode)
     {
         if (is_array($data)) {
+            $message = null;
             if (isset($data['error']['message'])) {
-                return $data['error']['message'];
+                $message = $data['error']['message'];
+            } elseif (isset($data['message'])) {
+                $message = $data['message'];
             }
-            if (isset($data['message'])) {
-                return $data['message'];
+
+            // Kèm chi tiết lỗi validate theo từng trường (Laravel: errors|error.details)
+            $fieldErrors = null;
+            if (isset($data['errors']) && is_array($data['errors'])) {
+                $fieldErrors = $data['errors'];
+            } elseif (isset($data['error']['details']) && is_array($data['error']['details'])) {
+                $fieldErrors = $data['error']['details'];
+            }
+            if (!empty($fieldErrors)) {
+                $parts = array();
+                foreach ($fieldErrors as $field => $msgs) {
+                    $parts[] = $field . ': ' . (is_array($msgs) ? implode(', ', $msgs) : $msgs);
+                }
+                $detail = implode(' | ', $parts);
+                return $message ? ($message . ' — ' . $detail) : $detail;
+            }
+
+            if ($message !== null) {
+                return $message;
             }
         }
         return 'HTTP Error ' . $httpCode;
