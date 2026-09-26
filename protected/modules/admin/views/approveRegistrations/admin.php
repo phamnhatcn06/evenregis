@@ -298,7 +298,7 @@ $columnsAll = array_merge($baseColumns, array($sendMailStatusColumn, $actionColu
 
         <div class="tab-content pt-3" id="approvalTabsContent">
             <!-- Tab Chờ duyệt -->
-            <div class="tab-pane fade show active" id="submitted" role="tabpanel">
+            <div class="tab-pane fade" id="submitted" role="tabpanel">
                 <?php
                 $this->widget('ext.edatatables.EDataTables', array(
                     'id' => 'submitted-grid',
