@@ -4920,11 +4920,17 @@ class RegistrationsController extends AdminController
 
 		$attendee->full_name = Yii::app()->getRequest()->getPost('full_name');
 		$attendee->position = Yii::app()->getRequest()->getPost('position');
+		// Chỉ ghi đè role_id khi form thực sự gửi lên, tránh xoá vai trò hiện có
+		// (backend bắt buộc role_id, để trống sẽ báo "Xác minh dữ liệu thất bại").
 		$roleId = Yii::app()->getRequest()->getPost('role_id');
-		if (is_array($roleId)) {
-			$roleId = implode(', ', $roleId);
+		if ($roleId !== null) {
+			if (is_array($roleId)) {
+				$roleId = implode(', ', $roleId);
+			}
+			$attendee->role_id = $roleId;
+		} elseif (is_array($attendee->role_id)) {
+			$attendee->role_id = implode(', ', $attendee->role_id);
 		}
-		$attendee->role_id = $roleId;
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
 
 		$joinHotelDate = Yii::app()->getRequest()->getPost('join_hotel_date');
