@@ -3188,6 +3188,16 @@ var RegistrationView = (function() {
                 '</td>';
             }
 
+            // Cột Thay thế / Huỷ — phải khớp với <thead> phía server, nếu không DataTable
+            // sẽ báo "Requested unknown parameter" khi reload lại danh sách.
+            if (canManageAttendee) {
+                html += '<td class="text-center">' +
+                    '<button type="button" class="btn btn-sm btn-outline-primary me-1 mb-1" onclick="openReplaceAttendeeModal(' + att.id + ')" title="Thay thế người này"><i class="fa fa-exchange"></i></button>' +
+                    '<button type="button" class="btn btn-sm btn-outline-warning me-1 mb-1" onclick="openCancelContentModal(' + att.id + ')" title="Huỷ nội dung thi đấu"><i class="fa fa-minus-circle"></i></button>' +
+                    '<button type="button" class="btn btn-sm btn-outline-danger mb-1" onclick="openWithdrawAttendeeModal(' + att.id + ')" title="Huỷ tư cách"><i class="fa fa-user-times"></i></button>' +
+                '</td>';
+            }
+
             html += '</tr>';
         });
 
