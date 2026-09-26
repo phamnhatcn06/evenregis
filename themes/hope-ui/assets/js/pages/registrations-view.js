@@ -3115,7 +3115,8 @@ var RegistrationView = (function() {
         var tbody = document.querySelector('#attendees-table tbody');
         if (!tbody) return;
 
-        var colCount = canEdit ? 11 : 10;
+        // 11 cột dữ liệu cơ bản + cột thao tác (canEdit) + cột Thay thế/Huỷ (canManageAttendee)
+        var colCount = 11 + (canEdit ? 1 : 0) + (canManageAttendee ? 1 : 0);
 
         if (attendees.length === 0) {
             tbody.innerHTML = '<tr><td colspan="' + colCount + '" class="text-center text-muted">Chưa có người tham dự nào.</td></tr>';
