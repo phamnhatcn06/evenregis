@@ -998,7 +998,7 @@ $canEditContent = false;
                                             'members' => $entryMembers,
                                             'allAllianceMembers' => $entryMembers,
                                             'model' => $model,
-                                            'canEdit' => $canEdit,
+                                            'canEdit' => $canEditContent,
                                         )); ?>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
