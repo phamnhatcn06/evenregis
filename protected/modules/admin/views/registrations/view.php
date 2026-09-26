@@ -1102,7 +1102,7 @@ $canEditContent = false;
                                                                         <?php endif; ?>
                                                                     </div>
                                                                 </td>
-                                                                <?php if ($canEdit): ?>
+                                                                <?php if ($canEditContent): ?>
                                                                     <td class="text-center">
                                                                         <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
                                                                             <i class="fa fa-trash"></i>
@@ -1161,7 +1161,7 @@ $canEditContent = false;
                                                                         <?php endif; ?>
                                                                     </div>
                                                                 </td>
-                                                                <?php if ($canEdit): ?>
+                                                                <?php if ($canEditContent): ?>
                                                                     <td class="text-center">
                                                                         <button type="button" class="btn btn-sm btn-outline-danger" onclick="RegistrationView.deleteMissContestant(<?php echo $c['id']; ?>)" title="Xóa">
                                                                             <i class="fa fa-trash"></i>
