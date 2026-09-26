@@ -121,6 +121,7 @@
                                     <input type="file" id="add_portrait_file" name="portrait_file" accept="image/*" onchange="previewFileAdd(this, 'add_portrait_preview')">
                                 </div>
                             </div>
+                            <?php if (empty($isFinalPeriod)): // Đợt VCK: đã có giấy tờ từ vòng loại nên ẩn ?>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh CCCD mặt trước <span class="text-danger">*</span></label>
                                 <div id="add_cccd_front_preview" class="file-preview-box mb-2"></div>
@@ -145,6 +146,7 @@
                                     <input type="file" id="add_contract_file" name="contract_file" accept="image/*,.pdf" onchange="previewFileAdd(this, 'add_contract_preview')">
                                 </div>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
