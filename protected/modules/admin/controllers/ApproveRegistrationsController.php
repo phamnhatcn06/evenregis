@@ -497,13 +497,9 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
-        // Phiếu VCK: chỉ giữ lại các cuộc thi sắc đẹp đơn vị có thí sinh vào chung kết.
-        if ($isFinalPeriod && !empty($finalBeautyContestIds)) {
-            foreach (array_keys($beautyContestants) as $contestId) {
-                if (!isset($finalBeautyContestIds[$contestId])) {
-                    unset($beautyContestants[$contestId]);
-                }
-            }
+        // Phiếu VCK: dùng danh sách thí sinh sắc đẹp dựng từ finalist (beauty_contestants trỏ phiếu gốc).
+        if ($isFinalPeriod) {
+            $beautyContestants = $finalBeautyContents;
         }
 
         // Load Talent Entries - chỉ nếu period có content 'talent'
