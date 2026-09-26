@@ -5681,7 +5681,8 @@ class RegistrationsController extends AdminController
 			}
 
 			// 1. Kiểm tra yêu cầu liên quân gửi đi (nếu có relation_property_id)
-			if ($model->relation_property_id) {
+			// Đợt VCK không cần kiểm tra liên quân
+			if (!$isFinalPeriod && $model->relation_property_id) {
 				$allianceRequest = AllianceRequests::findByRegistration(
 					$model->event_id,
 					$model->property_id,
