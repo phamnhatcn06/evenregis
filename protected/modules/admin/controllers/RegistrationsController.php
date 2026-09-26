@@ -5778,23 +5778,34 @@ class RegistrationsController extends AdminController
 					$name = isset($att['full_name']) ? $att['full_name'] : 'Không rõ tên';
 					$attId = isset($att['id']) ? $att['id'] : null;
 
-					// Kiểm tra 4 tệp tài liệu bắt buộc
-					$missingDocs = array();
-					if (empty($att['cccd_front_path'])) {
-						$missingDocs[] = 'CCCD mặt trước';
-					}
-					if (empty($att['cccd_back_path'])) {
-						$missingDocs[] = 'CCCD mặt sau';
-					}
-					if (empty($att['portrait_path'])) {
-						$missingDocs[] = 'Ảnh chân dung';
-					}
-					if (empty($att['contract_path'])) {
-						$missingDocs[] = 'Hợp đồng lao động';
-					}
+					if ($isFinalPeriod) {
+						// Đợt VCK: chỉ cần đủ size áo và ảnh chân dung
+						$photoPath = !empty($att['portrait_path']) ? $att['portrait_path'] : (isset($att['photo_path']) ? $att['photo_path'] : '');
+						if (empty($photoPath)) {
+							$errors[] = "Người tham dự \"{$name}\" chưa có ảnh chân dung.";
+						}
+						if (empty($att['shirt_size'])) {
+							$errors[] = "Người tham dự \"{$name}\" chưa chọn size áo.";
+						}
+					} else {
+						// Kiểm tra 4 tệp tài liệu bắt buộc
+						$missingDocs = array();
+						if (empty($att['cccd_front_path'])) {
+							$missingDocs[] = 'CCCD mặt trước';
+						}
+						if (empty($att['cccd_back_path'])) {
+							$missingDocs[] = 'CCCD mặt sau';
+						}
+						if (empty($att['portrait_path'])) {
+							$missingDocs[] = 'Ảnh chân dung';
+						}
+						if (empty($att['contract_path'])) {
+							$missingDocs[] = 'Hợp đồng lao động';
+						}
 
-					if (!empty($missingDocs)) {
-						$errors[] = "Người tham dự \"{$name}\" chưa tải lên đủ tệp đính kèm bắt buộc: " . implode(', ', $missingDocs) . '.';
+						if (!empty($missingDocs)) {
+							$errors[] = "Người tham dự \"{$name}\" chưa tải lên đủ tệp đính kèm bắt buộc: " . implode(', ', $missingDocs) . '.';
+						}
 					}
 
 					// Kiểm tra email cá nhân cho thí sinh thi Miss
