@@ -3137,15 +3137,20 @@ var RegistrationView = (function() {
             if (att.department_name) positionDept.push(att.department_name);
             if (att.position) positionDept.push(att.position);
 
+            // Vai trò: API list trả về mảng `roles` [{id,name}] hoặc chuỗi `role_name`.
+            var roleNames = [];
+            if (Array.isArray(att.roles)) {
+                roleNames = att.roles.map(function(r) { return r && r.name ? r.name : ''; });
+            } else if (att.role_name) {
+                roleNames = att.role_name.split(',');
+            }
             var roleBadges = '';
-            if (att.role_name) {
-                var roles = att.role_name.split(',').map(function(r) { return r.trim(); });
-                roles.forEach(function(r) {
-                    if (!r) return;
-                    var cls = getRoleBadgeClassJs(r);
-                    roleBadges += '<span class="badge ' + cls + ' me-1 mb-1">' + escapeHtml(r) + '</span>';
-                });
-            } else {
+            roleNames.map(function(r) { return (r || '').trim(); }).forEach(function(r) {
+                if (!r) return;
+                var cls = getRoleBadgeClassJs(r);
+                roleBadges += '<span class="badge ' + cls + ' me-1 mb-1">' + escapeHtml(r) + '</span>';
+            });
+            if (!roleBadges) {
                 roleBadges = '-';
             }
 
