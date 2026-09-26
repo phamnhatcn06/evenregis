@@ -17,6 +17,7 @@ var RegistrationView = (function() {
     var attendeeSelectedStaff = [];
     var existingStaffIds = [];
     var canEdit = false;
+    var canManageAttendee = false;
 
     // Sport registration variables
     var sportAllAttendees = [];
