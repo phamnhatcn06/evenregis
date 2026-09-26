@@ -180,6 +180,33 @@ class ApproveRegistrationsController extends AdminController
                     } elseif ($type === 'beauty') {
                         if ($refId) $finalBeautyContestIds[$refId] = true;
                         $finalContentCodes['miss'] = true;
+                        // Dựng lại danh sách thí sinh sắc đẹp: beauty_contestants trỏ attendee gốc
+                        // nên không tra được qua attendee của phiếu VCK.
+                        $contestKey = !empty($refId) ? $refId : $refName;
+                        if ($contestKey === '' || $contestKey === null) {
+                            continue;
+                        }
+                        if (!isset($finalBeautyContents[$contestKey])) {
+                            $contestName = $refName;
+                            if (!empty($refId)) {
+                                $contest = BeautyContests::fetchFromApi($refId);
+                                if ($contest && !empty($contest->name)) {
+                                    $contestName = $contest->name;
+                                }
+                            }
+                            $finalBeautyContents[$contestKey] = array(
+                                'contest_id' => !empty($refId) ? $refId : null,
+                                'contest_name' => $contestName,
+                                'contestants' => array(),
+                            );
+                        }
+                        $finalBeautyContents[$contestKey]['contestants'][] = array(
+                            'id' => null,
+                            'attendee_id' => isset($fa['id']) ? $fa['id'] : null,
+                            'attendee_name' => isset($fa['full_name']) ? $fa['full_name'] : '',
+                            'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+                            'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
+                        );
                     } elseif ($type === 'talent') {
                         if ($refId) $finalTalentEntryIds[$refId] = true;
                         $finalContentCodes['talent'] = true;
