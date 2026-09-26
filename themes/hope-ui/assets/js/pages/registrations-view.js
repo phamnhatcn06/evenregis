@@ -3165,7 +3165,7 @@ var RegistrationView = (function() {
                 '<td>' + escapeHtml(positionDept.join(' - ')) + '</td>' +
                 '<td class="text-center">' + shirtCell + '</td>' +
                 '<td>' + roleBadges + '</td>' +
-                '<td>' + formatDate(att.start_date) + '</td>' +
+                '<td>' + formatDate(att.join_hotel_date || att.start_date) + '</td>' +
                 '<td>' + formatDate(att.check_in_date) + '</td>' +
                 '<td>' + formatDate(att.check_out_date) + '</td>' +
                 '<td>' + escapeHtml(att.transport_name || '-') + '</td>' +
