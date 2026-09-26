@@ -104,9 +104,15 @@ class ApproveRegistrationsController extends AdminController
                 }
             }
         }
-        if (empty($model->period_name) && $model->period_id) {
+        $isFinalPeriod = false;
+        if ($model->period_id) {
             $period = RegistrationPeriods::fetchFromApi($model->period_id);
-            $model->period_name = $period ? $period->name : '';
+            if ($period) {
+                if (empty($model->period_name)) {
+                    $model->period_name = $period->name;
+                }
+                $isFinalPeriod = $period->isFinal();
+            }
         }
 
         // Load period contents - danh sách nội dung được phép đăng ký trong đợt này
