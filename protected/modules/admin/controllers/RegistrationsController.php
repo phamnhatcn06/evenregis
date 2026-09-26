@@ -498,6 +498,11 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		// Phiếu VCK: dùng danh sách thí sinh sắc đẹp dựng từ finalist (beauty_contestants trỏ phiếu gốc).
+		if ($isFinalPeriod) {
+			$beautyContestants = $finalBeautyContents;
+		}
+
 		// Load Talent Entries cho registration
 		$talentEntries = array();
 		$talentEntryMembers = array();
