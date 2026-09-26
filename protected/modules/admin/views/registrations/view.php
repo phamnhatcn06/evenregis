@@ -705,6 +705,9 @@ $canShowMiss = $showAllContents || in_array('miss', $allowedContents);
 
 // Đợt Vòng chung kết (VCK): không cho đăng ký bổ sung nội dung => ẩn các nút thêm nội dung
 $canAddContent = $canEdit && empty($isFinalPeriod);
+// Ẩn toàn bộ nút thao tác trong 4 card nội dung (Thể thao, Nghiệp vụ, Văn nghệ, Sắc đẹp) => chỉ xem
+$canAddContent = false;
+$canEditContent = false;
 ?>
 <div class="row">
     <div class="col-md-12">
