@@ -5006,6 +5006,8 @@ class RegistrationsController extends AdminController
 			$attendee->role_id = implode(', ', $attendee->role_id);
 		}
 		$attendee->note = Yii::app()->getRequest()->getPost('note');
+		$attendee->shirt_size = Yii::app()->getRequest()->getPost('shirt_size') ?: null;
+		$attendee->badge_org_name = Yii::app()->getRequest()->getPost('badge_org_name') ?: null;
 
 		$joinHotelDate = Yii::app()->getRequest()->getPost('join_hotel_date');
 		if ($joinHotelDate === null) {
