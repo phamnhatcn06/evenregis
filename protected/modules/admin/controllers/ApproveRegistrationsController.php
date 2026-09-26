@@ -653,6 +653,16 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
+        // Phiếu VCK: chỉ giữ lại các tiết mục văn nghệ đã vào chung kết của đơn vị.
+        if ($isFinalPeriod) {
+            $keepFinalEntry = function ($entry) use ($finalTalentEntryIds) {
+                $eid = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+                return $eid && isset($finalTalentEntryIds[$eid]);
+            };
+            $talentEntries = array_values(array_filter($talentEntries, $keepFinalEntry));
+            $allianceTalentEntries = array_values(array_filter($allianceTalentEntries, $keepFinalEntry));
+        }
+
         // Load alliance property names for all talent entries (cả owned và alliance)
         $talentAllianceProperties = array();
         $allTalentEntries = array_merge($talentEntries, $allianceTalentEntries);
