@@ -5712,14 +5712,17 @@ class RegistrationsController extends AdminController
 			}
 
 			// 2. Kiểm tra các yêu cầu liên quân gửi đến đang chờ duyệt (STATUS_PENDING)
-			$incomingAllianceRequests = AllianceRequests::getApiDataProvider(array(
-				'event_id' => $model->event_id,
-				'target_org_id' => $model->property_id,
-				'status' => AllianceRequests::STATUS_PENDING,
-			), 100)->getData();
+			// Đợt VCK không cần kiểm tra liên quân
+			if (!$isFinalPeriod) {
+				$incomingAllianceRequests = AllianceRequests::getApiDataProvider(array(
+					'event_id' => $model->event_id,
+					'target_org_id' => $model->property_id,
+					'status' => AllianceRequests::STATUS_PENDING,
+				), 100)->getData();
 
-			if (!empty($incomingAllianceRequests)) {
-				$errors[] = 'Đơn vị của bạn đang có yêu cầu liên quân gửi đến chưa xử lý. Vui lòng duyệt hoặc từ chối yêu cầu liên quân trước khi gửi duyệt phiếu.';
+				if (!empty($incomingAllianceRequests)) {
+					$errors[] = 'Đơn vị của bạn đang có yêu cầu liên quân gửi đến chưa xử lý. Vui lòng duyệt hoặc từ chối yêu cầu liên quân trước khi gửi duyệt phiếu.';
+				}
 			}
 
 			// 3. Kiểm tra số lượng thành viên đội thi đấu thể thao
