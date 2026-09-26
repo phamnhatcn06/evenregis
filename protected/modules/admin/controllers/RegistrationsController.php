@@ -644,6 +644,18 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		// Phiếu VCK: chỉ giữ lại các tiết mục văn nghệ đã vào chung kết của đơn vị.
+		if ($isFinalPeriod) {
+			$filteredTalentEntries = array();
+			foreach ($talentEntries as $entry) {
+				$eid = isset($entry->id) ? $entry->id : (isset($entry['id']) ? $entry['id'] : null);
+				if ($eid && isset($finalTalentEntryIds[$eid])) {
+					$filteredTalentEntries[] = $entry;
+				}
+			}
+			$talentEntries = array_values($filteredTalentEntries);
+		}
+
 		// Load alliance history (all requests related to this registration)
 		$allianceHistory = array();
 		if ($model->event_id && $model->property_id) {
