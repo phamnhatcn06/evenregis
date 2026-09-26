@@ -1416,6 +1416,7 @@ $jsConfig = array(
     'registeredCompetitions' => $competitionIds,
     'existingStaffIds' => $existingStaffIds,
     'canEdit' => $canEdit,
+    'canManageAttendee' => $canManageAttendee,
     'existingSportTeams' => $existingSportTeams,
 );
 
