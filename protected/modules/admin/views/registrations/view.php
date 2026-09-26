@@ -1093,8 +1093,8 @@ $canEditContent = false;
                                                                             data-contestant-id="<?php echo $c['id']; ?>"
                                                                             value="<?php echo CHtml::encode(isset($c['personal_email']) ? $c['personal_email'] : ''); ?>"
                                                                             placeholder="Nhập email..."
-                                                                            <?php echo !$canEdit ? 'disabled' : ''; ?>>
-                                                                        <?php if ($canEdit): ?>
+                                                                            <?php echo !$canEditContent ? 'disabled' : ''; ?>>
+                                                                        <?php if ($canEditContent): ?>
                                                                             <button type="button" class="btn btn-sm btn-outline-success btn-save-contestant-email"
                                                                                 data-contestant-id="<?php echo $c['id']; ?>" title="Lưu email">
                                                                                 <i class="fa fa-save"></i>
@@ -1152,8 +1152,8 @@ $canEditContent = false;
                                                                             data-contestant-id="<?php echo $c['id']; ?>"
                                                                             value="<?php echo CHtml::encode(isset($c['personal_email']) ? $c['personal_email'] : ''); ?>"
                                                                             placeholder="Nhập email..."
-                                                                            <?php echo !$canEdit ? 'disabled' : ''; ?>>
-                                                                        <?php if ($canEdit): ?>
+                                                                            <?php echo !$canEditContent ? 'disabled' : ''; ?>>
+                                                                        <?php if ($canEditContent): ?>
                                                                             <button type="button" class="btn btn-sm btn-outline-success btn-save-contestant-email"
                                                                                 data-contestant-id="<?php echo $c['id']; ?>" title="Lưu email">
                                                                                 <i class="fa fa-save"></i>
