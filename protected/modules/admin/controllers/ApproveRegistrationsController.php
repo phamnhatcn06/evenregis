@@ -325,6 +325,11 @@ class ApproveRegistrationsController extends AdminController
             unset($compData);
         }
 
+        // Phiếu VCK: dùng danh sách nghiệp vụ dựng từ finalist (competition_registrations trỏ phiếu gốc)
+        if ($isFinalPeriod) {
+            $competitionRegistrations = $finalCompetitionContents;
+        }
+
         // Load Sport Teams - bao gồm cả đội liên quân
         $sportTeams = array();
         $sportTeamMembers = array();
