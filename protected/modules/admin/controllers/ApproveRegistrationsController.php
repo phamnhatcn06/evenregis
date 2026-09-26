@@ -143,6 +143,7 @@ class ApproveRegistrationsController extends AdminController
         $finalTalentEntryIds = array();    // ref_id = talent_entry.id
         $finalBeautyContestIds = array();  // ref_id = beauty_contest.id
         $finalCompetitionContents = array(); // dựng lại danh sách thi nghiệp vụ theo finalist
+        $finalBeautyContents = array();      // dựng lại danh sách thi sắc đẹp theo finalist
         if ($isFinalPeriod && $model->period_id && $model->property_id) {
             $finalContentCodes = array();
             $finalAtts = RegistrationPeriods::getFinalAttendees($model->period_id, $model->property_id);
