@@ -252,7 +252,6 @@ class RegistrationsController extends AdminController
 							'status' => 1,
 						);
 					} elseif ($type === 'beauty') {
-						if ($refId) $finalContentCodes['miss'] = true;
 						$finalContentCodes['miss'] = true;
 						// beauty_contestants trỏ attendee gốc nên không tra được qua attendee phiếu VCK.
 						$contestKey = !empty($refId) ? $refId : $refName;
