@@ -1065,7 +1065,7 @@ $canEditContent = false;
                                                             <th style="width:45px;" class="text-center">STT</th>
                                                             <th>Họ tên</th>
                                                             <th>Email cá nhân</th>
-                                                            <?php if ($canEdit): ?>
+                                                            <?php if ($canEditContent): ?>
                                                                 <th style="width:50px;" class="text-center"></th>
                                                             <?php endif; ?>
                                                         </tr>
@@ -1124,7 +1124,7 @@ $canEditContent = false;
                                                             <th style="width:45px;" class="text-center">STT</th>
                                                             <th>Họ tên</th>
                                                             <th>Email cá nhân</th>
-                                                            <?php if ($canEdit): ?>
+                                                            <?php if ($canEditContent): ?>
                                                                 <th style="width:50px;" class="text-center"></th>
                                                             <?php endif; ?>
                                                         </tr>
