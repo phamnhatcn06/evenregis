@@ -392,6 +392,18 @@ class RegistrationsController extends AdminController
 			}
 		}
 
+		// Phiếu VCK: chỉ giữ lại các đội thể thao đã vào chung kết của đơn vị.
+		if ($isFinalPeriod) {
+			$filteredSportTeams = array();
+			foreach ($sportTeams as $team) {
+				$tid = isset($team->id) ? $team->id : null;
+				if ($tid && isset($finalSportTeamIds[$tid])) {
+					$filteredSportTeams[] = $team;
+				}
+			}
+			$sportTeams = $filteredSportTeams;
+		}
+
 		// Load incoming pending alliance requests if any
 		$incomingRequestsData = array();
 		if ($model->event_id && $model->property_id) {
