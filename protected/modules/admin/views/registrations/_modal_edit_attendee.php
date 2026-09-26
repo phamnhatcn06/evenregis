@@ -35,7 +35,10 @@
                         margin-right: 5px;
                     }
                     .file-preview-box {
-                        min-height: 60px;
+                        min-height: 180px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                         padding: 8px;
                         border: 1px dashed #dee2e6;
                         border-radius: 6px;
@@ -43,7 +46,8 @@
                         text-align: center;
                     }
                     .file-preview-box img {
-                        max-height: 60px;
+                        max-height: 220px;
+                        max-width: 100%;
                         border-radius: 4px;
                         cursor: pointer;
                     }
