@@ -5671,6 +5671,15 @@ class RegistrationsController extends AdminController
 			$model = $this->loadModelById($id);
 			$errors = array();
 
+			// Đợt Vòng chung kết (VCK): không cần đủ CCCD trước/sau + HĐLĐ, chỉ cần đủ size áo và ảnh chân dung
+			$isFinalPeriod = false;
+			if ($model->period_id) {
+				$period = RegistrationPeriods::fetchFromApi($model->period_id);
+				if ($period) {
+					$isFinalPeriod = $period->isFinal();
+				}
+			}
+
 			// 1. Kiểm tra yêu cầu liên quân gửi đi (nếu có relation_property_id)
 			if ($model->relation_property_id) {
 				$allianceRequest = AllianceRequests::findByRegistration(
