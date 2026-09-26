@@ -137,6 +137,58 @@ class ApproveRegistrationsController extends AdminController
             }
         }
 
+        // Phiếu VCK (Vòng chung kết): chỉ hiển thị những nội dung đơn vị được vào chung kết.
+        // Nguồn dữ liệu là final_attendee_contents (mỗi finalist kèm danh sách nội dung đã vào VCK).
+        $finalSportTeamIds = array();      // ref_id = sport_team.id
+        $finalTalentEntryIds = array();    // ref_id = talent_entry.id
+        $finalBeautyContestIds = array();  // ref_id = beauty_contest.id
+        $finalCompetitionContents = array(); // dựng lại danh sách thi nghiệp vụ theo finalist
+        if ($isFinalPeriod && $model->period_id && $model->property_id) {
+            $finalContentCodes = array();
+            $finalAtts = RegistrationPeriods::getFinalAttendees($model->period_id, $model->property_id);
+            foreach ($finalAtts as $fa) {
+                $contents = isset($fa['contents']) ? $fa['contents'] : array();
+                foreach ($contents as $c) {
+                    $type = isset($c['content_type']) ? $c['content_type'] : '';
+                    $refId = isset($c['ref_id']) ? $c['ref_id'] : null;
+                    $refName = isset($c['ref_name']) ? $c['ref_name'] : '';
+                    if ($type === 'sport') {
+                        if ($refId) $finalSportTeamIds[$refId] = true;
+                        $finalContentCodes['sports'] = true;
+                    } elseif ($type === 'competition') {
+                        $finalContentCodes['competition'] = true;
+                        // Nhóm theo ref_id nếu có, ngược lại theo tên (tương thích production hiện tại)
+                        $compKey = !empty($refId) ? $refId : $refName;
+                        if ($compKey === '' || $compKey === null) {
+                            continue;
+                        }
+                        if (!isset($finalCompetitionContents[$compKey])) {
+                            $finalCompetitionContents[$compKey] = array(
+                                'competition_id' => !empty($refId) ? $refId : null,
+                                'competition_name' => $refName,
+                                'attendees' => array(),
+                            );
+                        }
+                        $finalCompetitionContents[$compKey]['attendees'][] = array(
+                            'id' => null,
+                            'attendee_id' => isset($fa['id']) ? $fa['id'] : null,
+                            'attendee_name' => isset($fa['full_name']) ? $fa['full_name'] : '',
+                            'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+                            'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
+                        );
+                    } elseif ($type === 'beauty') {
+                        if ($refId) $finalBeautyContestIds[$refId] = true;
+                        $finalContentCodes['miss'] = true;
+                    } elseif ($type === 'talent') {
+                        if ($refId) $finalTalentEntryIds[$refId] = true;
+                        $finalContentCodes['talent'] = true;
+                    }
+                }
+            }
+            // Giới hạn khối nội dung hiển thị chỉ còn các nội dung đơn vị được vào chung kết.
+            $periodContentCodes = array_keys($finalContentCodes);
+        }
+
         // Load attendees - chỉ lấy của registration này
         $attendees = Attendees::getByRegistrationId($id);
         $attendeesMap = array();
