@@ -13,7 +13,8 @@ class ApproveRegistrationsController extends AdminController
         $filterPeriodId = Yii::app()->request->getQuery('period_id', '');
 
         // Base params cho tất cả tabs
-        $baseParams = array();
+        // include_all_periods: màn hình duyệt hiển thị phiếu của TẤT CẢ đợt (kể cả đợt trước khi có VCK)
+        $baseParams = array('include_all_periods' => 1);
         if ($filterEventId) $baseParams['event_id'] = $filterEventId;
         if ($filterPropertyId) $baseParams['property_id'] = $filterPropertyId;
         if ($filterPeriodId) $baseParams['period_id'] = $filterPeriodId;
