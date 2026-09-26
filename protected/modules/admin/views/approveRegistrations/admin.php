@@ -259,7 +259,7 @@ $columnsAll = array_merge($baseColumns, array($sendMailStatusColumn, $actionColu
     <div class="card-body">
         <ul class="nav approval-tabs" id="approvalTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link tab-submitted active" id="submitted-tab" data-bs-toggle="tab" data-bs-target="#submitted" type="button" role="tab">
+                <button class="nav-link tab-submitted" id="submitted-tab" data-bs-toggle="tab" data-bs-target="#submitted" type="button" role="tab">
                     <div class="tab-info">
                         <div class="tab-icon"><i class="fa fa-clock-o"></i></div>
                         <span>Chờ duyệt</span>
