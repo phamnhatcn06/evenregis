@@ -3126,8 +3126,10 @@ var RegistrationView = (function() {
 
         var html = '';
         attendees.forEach(function(att, idx) {
-            var photoHtml = att.portrait_path
-                ? '<img src="' + escapeHtml(att.portrait_path) + '" class="rounded mx-auto d-block" style="width:160px;height:160px;object-fit:cover;cursor:pointer;" onclick="viewDocument(\'' + escapeHtml(att.portrait_path) + '\', \'image\')" title="Click để xem">'
+            // Fallback sang photo_path giống server render, tránh mất ảnh khi portrait_path rỗng.
+            var photoSrc = att.portrait_path || att.photo_path || '';
+            var photoHtml = photoSrc
+                ? '<img src="' + escapeHtml(photoSrc) + '" class="rounded mx-auto d-block" style="width:160px;height:160px;object-fit:cover;cursor:pointer;" onclick="viewDocument(\'' + escapeHtml(photoSrc) + '\', \'image\')" title="Click để xem">'
                 : '<div class="bg-light rounded d-flex align-items-center justify-content-center mx-auto" style="width:160px;height:160px;"><i class="fa fa-user text-muted fa-3x"></i></div>';
 
             var statusLabel = getApprovalStatusLabel(att.approval_status);
