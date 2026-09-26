@@ -406,6 +406,13 @@ class Attendees extends BaseAttendees
         if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
             $data['start_date'] = $this->join_hotel_date;
         }
+        // Đảm bảo luôn gửi các trường backend validate bắt buộc,
+        // tránh lỗi "Xác minh dữ liệu thất bại" khi array_filter loại bỏ giá trị rỗng.
+        foreach ($this->requiredUpdateFields() as $field => $value) {
+            if (!array_key_exists($field, $data)) {
+                $data[$field] = $value;
+            }
+        }
         $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
         return ApiClient::post($url, $data);
     }
