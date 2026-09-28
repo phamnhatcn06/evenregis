@@ -642,23 +642,33 @@ class EmailHelper
 
             // Tiết mục do đơn vị này tạo
             $entriesById = array();
-            $ownEntries = TalentEntries::getApiDataProvider(array('registration_id' => $registrationId), 1000)->getData();
-            foreach ($ownEntries as $entry) {
-                $entriesById[$entry->id] = $entry;
-            }
-
-            // Tiết mục liên quân: có thành viên là người tham dự của đơn vị này nhưng
-            // tiết mục lại do đơn vị khác tạo (không có trong danh sách trên).
             $allianceEntryIds = array();
-            foreach ($allTalentMembers as $tm) {
-                if (isset($attendeesMap[$tm->attendee_id]) && !isset($entriesById[$tm->entry_id])) {
-                    $allianceEntryIds[$tm->entry_id] = true;
+            if ($isFinalPeriod) {
+                // Phiếu VCK: chỉ lấy các tiết mục đã vào chung kết (theo tập ref_id của finalist).
+                foreach (array_keys($finalTalentEntryIds) as $eid) {
+                    $entry = TalentEntries::fetchFromApi($eid);
+                    if ($entry !== null) {
+                        $entriesById[$eid] = $entry;
+                    }
                 }
-            }
-            foreach (array_keys($allianceEntryIds) as $eid) {
-                $entry = TalentEntries::fetchFromApi($eid);
-                if ($entry !== null) {
-                    $entriesById[$eid] = $entry;
+            } else {
+                $ownEntries = TalentEntries::getApiDataProvider(array('registration_id' => $registrationId), 1000)->getData();
+                foreach ($ownEntries as $entry) {
+                    $entriesById[$entry->id] = $entry;
+                }
+
+                // Tiết mục liên quân: có thành viên là người tham dự của đơn vị này nhưng
+                // tiết mục lại do đơn vị khác tạo (không có trong danh sách trên).
+                foreach ($allTalentMembers as $tm) {
+                    if (isset($attendeesMap[$tm->attendee_id]) && !isset($entriesById[$tm->entry_id])) {
+                        $allianceEntryIds[$tm->entry_id] = true;
+                    }
+                }
+                foreach (array_keys($allianceEntryIds) as $eid) {
+                    $entry = TalentEntries::fetchFromApi($eid);
+                    if ($entry !== null) {
+                        $entriesById[$eid] = $entry;
+                    }
                 }
             }
 
