@@ -917,7 +917,9 @@ class EmailHelper
         }
 
         // Tiêu đề email theo từng đợt đăng ký
-        if ($isDot1) {
+        if ($isFinalPeriod) {
+            $subjectPrefix = '[ĐHMT2026] Xác nhận đăng ký Vòng chung kết';
+        } elseif ($isDot1) {
             $subjectPrefix = '[ĐHMT2026] Xác nhận đăng ký thể thao, miss';
         } elseif ($isDot2) {
             $subjectPrefix = '[ĐHMT2026] Xác nhận đăng ký nghiệp vụ';
