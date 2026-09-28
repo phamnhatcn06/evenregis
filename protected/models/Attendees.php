@@ -558,6 +558,17 @@ class Attendees extends BaseAttendees
 
     public static function getParticipationSummary($attendeeId)
     {
+        // Phiếu VCK: finalist là attendee MỚI (attendee_type=finalist) — không có bản ghi
+        // trực tiếp trong sport_team_members / competition_registrations / beauty_contestants
+        // / talent_entry_members (các bảng này trỏ về attendee GỐC ở đợt vòng loại).
+        // Nếu đúng là finalist, dựng summary từ nội dung/đội GỐC của cùng người rồi lọc
+        // theo final_attendee_contents (chỉ giữ nội dung đã vào chung kết). Trả về member_id
+        // của bản ghi GỐC nên thao tác thay/huỷ tác động thẳng vào đội/đăng ký gốc.
+        $finalSummary = self::tryGetFinalParticipationSummary($attendeeId);
+        if ($finalSummary !== null) {
+            return $finalSummary;
+        }
+
         return array(
             'sport_teams' => self::collectSportTeams($attendeeId),
             'competitions' => self::collectCompetitions($attendeeId),
@@ -565,6 +576,192 @@ class Attendees extends BaseAttendees
             'talent_entries' => self::collectTalentEntries($attendeeId),
             'roles' => self::collectRoles($attendeeId),
         );
+    }
+
+    /**
+     * Nếu $attendeeId là finalist VCK, dựng summary từ nội dung/đội GỐC (đợt vòng loại)
+     * của cùng người, lọc theo final_attendee_contents. Trả về null nếu KHÔNG phải finalist
+     * (để caller xử lý theo luồng thường).
+     *
+     * @param int $attendeeId
+     * @return array|null
+     */
+    protected static function tryGetFinalParticipationSummary($attendeeId)
+    {
+        $attendee = self::fetchFromApi($attendeeId);
+        if (!$attendee) {
+            return null;
+        }
+        $type = isset($attendee->attendee_type) ? $attendee->attendee_type : '';
+        if ($type !== 'finalist') {
+            return null;
+        }
+        if (empty($attendee->registration_id)) {
+            return null;
+        }
+
+        // 1. Lấy period_id qua registration để gọi endpoint final-attendees.
+        $reg = Registrations::fetchFromApi($attendee->registration_id);
+        $periodId = ($reg && isset($reg->period_id)) ? $reg->period_id : null;
+        if (!$periodId) {
+            return null;
+        }
+
+        // 2. Nội dung VCK của chính finalist này (sport/competition/beauty/talent + ref_id).
+        $finalContents = self::getFinalContentsForAttendee($periodId, $attendee->property_id, $attendeeId);
+
+        $sportTeamIds = array();
+        $competitionRefIds = array();
+        $competitionRefNames = array();
+        $beautyContestIds = array();
+        $talentEntryIds = array();
+        foreach ($finalContents as $c) {
+            $ctype = isset($c['content_type']) ? $c['content_type'] : '';
+            $refId = isset($c['ref_id']) ? $c['ref_id'] : null;
+            $refName = isset($c['ref_name']) ? $c['ref_name'] : '';
+            if ($ctype === 'sport') {
+                if ($refId) { $sportTeamIds[(string)$refId] = true; }
+            } elseif ($ctype === 'competition') {
+                if ($refId) { $competitionRefIds[(string)$refId] = true; }
+                if ($refName !== '') { $competitionRefNames[mb_strtolower(trim($refName), 'UTF-8')] = true; }
+            } elseif ($ctype === 'beauty') {
+                if ($refId) { $beautyContestIds[(string)$refId] = true; }
+            } elseif ($ctype === 'talent') {
+                if ($refId) { $talentEntryIds[(string)$refId] = true; }
+            }
+        }
+
+        // 3. Tìm các attendee GỐC cùng danh tính (cùng sự kiện), loại chính finalist và các
+        //    bản finalist khác. Một người có thể có nhiều attendee gốc (thể thao ở đợt này,
+        //    nghiệp vụ ở đợt khác) nên phải gộp tất cả.
+        $sourceIds = self::resolveSourceAttendeeIds($attendee);
+
+        $sportTeams = array();  $seenTeam = array();
+        $competitions = array(); $seenComp = array();
+        $beauty = array();       $seenBeauty = array();
+        $talents = array();      $seenTalent = array();
+        $roles = array();        $seenRole = array();
+
+        foreach ($sourceIds as $sid) {
+            foreach (self::collectSportTeams($sid) as $t) {
+                $tid = (string) $t['sport_team_id'];
+                if (!isset($sportTeamIds[$tid]) || isset($seenTeam[$tid])) { continue; }
+                $seenTeam[$tid] = true;
+                $sportTeams[] = $t;
+            }
+            foreach (self::collectCompetitions($sid) as $c) {
+                $cid = (string) $c['competition_id'];
+                $nameKey = mb_strtolower(trim((string) $c['competition_name']), 'UTF-8');
+                if (!isset($competitionRefIds[$cid]) && !isset($competitionRefNames[$nameKey])) { continue; }
+                if (isset($seenComp[$cid])) { continue; }
+                $seenComp[$cid] = true;
+                $competitions[] = $c;
+            }
+            foreach (self::collectBeautyContests($sid) as $b) {
+                $bid = (string) $b['contest_id'];
+                if (!isset($beautyContestIds[$bid]) || isset($seenBeauty[$bid])) { continue; }
+                $seenBeauty[$bid] = true;
+                $beauty[] = $b;
+            }
+            foreach (self::collectTalentEntries($sid) as $te) {
+                $eid = (string) $te['entry_id'];
+                if (!isset($talentEntryIds[$eid]) || isset($seenTalent[$eid])) { continue; }
+                $seenTalent[$eid] = true;
+                $talents[] = $te;
+            }
+            foreach (self::collectRoles($sid) as $r) {
+                $rid = (string) $r['role_id'];
+                if (isset($seenRole[$rid])) { continue; }
+                $seenRole[$rid] = true;
+                $roles[] = $r;
+            }
+        }
+
+        return array(
+            'sport_teams' => $sportTeams,
+            'competitions' => $competitions,
+            'beauty_contests' => $beauty,
+            'talent_entries' => $talents,
+            'roles' => $roles,
+        );
+    }
+
+    /**
+     * Danh sách nội dung VCK (final_attendee_contents) của 1 finalist cụ thể.
+     *
+     * @return array Mỗi phần tử: {content_type, ref_id, ref_name}
+     */
+    protected static function getFinalContentsForAttendee($periodId, $propertyId, $attendeeId)
+    {
+        $finalAtts = RegistrationPeriods::getFinalAttendees($periodId, $propertyId);
+        foreach ($finalAtts as $fa) {
+            $faId = isset($fa['id']) ? $fa['id'] : (isset($fa['attendee_id']) ? $fa['attendee_id'] : null);
+            if ((string) $faId === (string) $attendeeId) {
+                return (isset($fa['contents']) && is_array($fa['contents'])) ? $fa['contents'] : array();
+            }
+        }
+        return array();
+    }
+
+    /**
+     * Tìm các attendee GỐC (không phải bản finalist) cùng danh tính với finalist,
+     * trong cùng sự kiện. Khớp theo staff_code / staff_id / id_card; nếu người không có
+     * định danh nào thì fallback theo full_name.
+     *
+     * @param Attendees $finalAttendee
+     * @return array Danh sách attendee_id gốc
+     */
+    protected static function resolveSourceAttendeeIds($finalAttendee)
+    {
+        $staffId = isset($finalAttendee->staff_id) ? $finalAttendee->staff_id : null;
+        $staffCode = isset($finalAttendee->staff_code) ? (string) $finalAttendee->staff_code : '';
+        $idCard = isset($finalAttendee->id_card) ? (string) $finalAttendee->id_card : '';
+        $fullName = isset($finalAttendee->full_name) ? (string) $finalAttendee->full_name : '';
+        $eventId = isset($finalAttendee->event_id) ? $finalAttendee->event_id : null;
+        $excludeId = (string) $finalAttendee->id;
+
+        $hasIdentity = ($staffId || $staffCode !== '' || $idCard !== '');
+
+        $res = ApiClient::get(ApiEndpoints::ATTENDEE_LIST, array('per_page' => 5000));
+        if (empty($res['success']) || !isset($res['data'])) {
+            return array();
+        }
+        $list = isset($res['data']['data']) ? $res['data']['data'] : $res['data'];
+        if (!is_array($list)) {
+            return array();
+        }
+
+        $ids = array();
+        foreach ($list as $a) {
+            $aArr = is_array($a) ? $a : (array) $a;
+            $aid = isset($aArr['id']) ? (string) $aArr['id'] : '';
+            if ($aid === '' || $aid === $excludeId) { continue; }
+            // Chỉ tìm trong cùng sự kiện.
+            if ($eventId && isset($aArr['event_id']) && (string) $aArr['event_id'] !== (string) $eventId) { continue; }
+            // Bỏ qua các bản finalist khác (chỉ lấy bản GỐC ở vòng loại).
+            if (isset($aArr['attendee_type']) && $aArr['attendee_type'] === 'finalist') { continue; }
+
+            $matched = false;
+            if ($hasIdentity) {
+                if ($staffCode !== '' && isset($aArr['staff_code']) && $aArr['staff_code'] !== '' &&
+                    strtolower(trim((string) $aArr['staff_code'])) === strtolower(trim($staffCode))) {
+                    $matched = true;
+                } elseif ($staffId && isset($aArr['staff_id']) && $aArr['staff_id'] !== '' &&
+                    (string) $aArr['staff_id'] === (string) $staffId) {
+                    $matched = true;
+                } elseif ($idCard !== '' && isset($aArr['id_card']) && $aArr['id_card'] !== '' &&
+                    trim((string) $aArr['id_card']) === trim($idCard)) {
+                    $matched = true;
+                }
+            } elseif ($fullName !== '' && isset($aArr['full_name'])) {
+                $matched = (mb_strtolower(trim((string) $aArr['full_name']), 'UTF-8') === mb_strtolower(trim($fullName), 'UTF-8'));
+            }
+
+            if ($matched) {
+                $ids[$aid] = true;
+            }
+        }
+        return array_keys($ids);
     }
 
     /**
