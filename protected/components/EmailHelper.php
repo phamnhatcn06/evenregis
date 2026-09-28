@@ -507,20 +507,29 @@ class EmailHelper
 
                     // Chỉ lấy VĐV thuộc đơn vị hiện tại (có trong danh sách người tham dự của phiếu đăng ký này);
                     // bỏ qua VĐV liên quân đến từ đơn vị khác.
-                    if ($attId === null || !isset($attendeesMap[$attId])) {
+                    // Phiếu VCK: thành viên đội trỏ tới attendee GỐC (không có trong attendeesMap của phiếu VCK),
+                    // nên không lọc theo attendeesMap — lấy thông tin trực tiếp từ dữ liệu thành viên của đội.
+                    $inMap = ($attId !== null && isset($attendeesMap[$attId]));
+                    if (!$isFinalPeriod && !$inMap) {
                         continue;
                     }
-                    $attInfo = $attendeesMap[$attId];
+                    $attInfo = $inMap ? $attendeesMap[$attId] : array();
+                    $memberVal = function ($key) use ($member, $memberIsObj) {
+                        if ($memberIsObj) {
+                            return isset($member->$key) ? $member->$key : null;
+                        }
+                        return isset($member[$key]) ? $member[$key] : null;
+                    };
 
-                    $attName = $memberIsObj ? (isset($member->attendee_name) ? $member->attendee_name : '') : (isset($member['attendee_name']) ? $member['attendee_name'] : '');
+                    $attName = $memberVal('attendee_name');
                     if (empty($attName) && !empty($attInfo['full_name'])) {
                         $attName = $attInfo['full_name'];
                     }
-                    $gender = $memberIsObj ? (isset($member->gender) ? $member->gender : null) : (isset($member['gender']) ? $member['gender'] : null);
+                    $gender = $memberVal('gender');
                     if ($gender === null && isset($attInfo['gender'])) {
                         $gender = $attInfo['gender'];
                     }
-                    $propName = $memberIsObj ? (isset($member->property_name) ? $member->property_name : '') : (isset($member['property_name']) ? $member['property_name'] : '');
+                    $propName = $memberVal('property_name');
                     if (empty($propName) && !empty($attInfo['property_name'])) {
                         $propName = $attInfo['property_name'];
                     }
@@ -528,9 +537,21 @@ class EmailHelper
                         $propName = $model->property_name;
                     }
 
-                    $staffCode = $memberIsObj ? (isset($member->staff_code) ? $member->staff_code : '') : (isset($member['staff_code']) ? $member['staff_code'] : '');
+                    $staffCode = $memberVal('staff_code');
                     if (empty($staffCode) && !empty($attInfo['staff_code'])) {
                         $staffCode = $attInfo['staff_code'];
+                    }
+
+                    $positionName = isset($attInfo['position_name']) ? $attInfo['position_name'] : '';
+                    if (empty($positionName)) {
+                        $positionName = (string)($memberVal('attendee_position') ?: $memberVal('position'));
+                    }
+                    $memberPhoto = self::resolveAttendeePhoto($attInfo);
+                    if (empty($memberPhoto)) {
+                        $rawPhoto = $memberVal('attendee_photo') ?: $memberVal('photo_path');
+                        if (!empty($rawPhoto)) {
+                            $memberPhoto = self::resolveAttendeePhoto(array('photo_path' => $rawPhoto));
+                        }
                     }
 
                     $enrichedMembers[] = array(
@@ -538,10 +559,10 @@ class EmailHelper
                         'staff_code' => $staffCode,
                         'gender' => $gender,
                         'property_name' => $propName,
-                        'position_name' => isset($attInfo['position_name']) ? $attInfo['position_name'] : '',
+                        'position_name' => $positionName,
                         'division_name' => isset($attInfo['division_name']) ? $attInfo['division_name'] : '',
                         'start_working_date' => isset($attInfo['end_starting_date']) ? $attInfo['end_starting_date'] : '',
-                        'photo_path' => self::resolveAttendeePhoto($attInfo),
+                        'photo_path' => $memberPhoto,
                     );
 
                     if (!empty($propName) && $propName !== $model->property_name && !in_array($propName, $allianceProperties)) {
