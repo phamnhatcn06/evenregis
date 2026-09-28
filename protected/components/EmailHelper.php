@@ -240,6 +240,90 @@ class EmailHelper
             }
         }
 
+        // Phiếu VCK (Vòng chung kết): nội dung hiển thị lấy từ finalist (final_attendee_contents),
+        // KHÔNG theo registration_period_contents (đợt VCK không cấu hình contents) và cũng không
+        // tra được theo phiếu gốc. Dựng lại danh sách nghiệp vụ/sắc đẹp từ finalist, và ghi nhận
+        // tập id đội thể thao / tiết mục văn nghệ đã vào chung kết để lọc ở các bước sau.
+        $finalSportTeamIds = array();          // ref_id = sport_team.id
+        $finalTalentEntryIds = array();        // ref_id = talent_entry.id
+        $finalBeautyContents = array();        // dựng lại danh sách thi sắc đẹp theo finalist
+        $finalCompetitionRegistrations = array(); // dựng lại danh sách thi nghiệp vụ theo finalist
+        if ($isFinalPeriod && $model->period_id && $model->property_id) {
+            $finalContentCodes = array();
+            $finalAtts = RegistrationPeriods::getFinalAttendees($model->period_id, $model->property_id);
+            foreach ($finalAtts as $fa) {
+                $contents = isset($fa['contents']) ? $fa['contents'] : array();
+                foreach ($contents as $c) {
+                    $type = isset($c['content_type']) ? $c['content_type'] : '';
+                    $refId = isset($c['ref_id']) ? $c['ref_id'] : null;
+                    $refName = isset($c['ref_name']) ? $c['ref_name'] : '';
+                    if ($type === 'sport') {
+                        if ($refId) $finalSportTeamIds[$refId] = true;
+                        $finalContentCodes['sports'] = true;
+                    } elseif ($type === 'competition') {
+                        $finalContentCodes['competition'] = true;
+                        $compId = !empty($refId) ? $refId : $refName;
+                        if ($compId === '' || $compId === null) {
+                            continue;
+                        }
+                        if (!isset($finalCompetitionRegistrations[$compId])) {
+                            $finalCompetitionRegistrations[$compId] = array(
+                                'competition_id' => !empty($refId) ? $refId : null,
+                                'competition_name' => $refName,
+                                'attendees' => array(),
+                            );
+                        }
+                        $finalCompetitionRegistrations[$compId]['attendees'][] = array(
+                            'id' => null,
+                            'attendee_id' => isset($fa['id']) ? $fa['id'] : null,
+                            'attendee_name' => isset($fa['full_name']) ? $fa['full_name'] : '',
+                            'staff_code' => isset($fa['staff_code']) ? $fa['staff_code'] : '',
+                            'gender' => isset($fa['gender']) ? $fa['gender'] : null,
+                            'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+                            'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
+                            'start_working_date' => isset($fa['end_starting_date']) ? $fa['end_starting_date'] : '',
+                            'photo_path' => self::resolveAttendeePhoto($fa),
+                        );
+                    } elseif ($type === 'beauty') {
+                        $finalContentCodes['miss'] = true;
+                        $contestKey = !empty($refId) ? $refId : $refName;
+                        if ($contestKey === '' || $contestKey === null) {
+                            continue;
+                        }
+                        if (!isset($finalBeautyContents[$contestKey])) {
+                            $contestName = $refName;
+                            if (!empty($refId)) {
+                                $contest = BeautyContests::fetchFromApi($refId);
+                                if ($contest && !empty($contest->name)) {
+                                    $contestName = $contest->name;
+                                }
+                            }
+                            $finalBeautyContents[$contestKey] = array(
+                                'contest_id' => !empty($refId) ? $refId : null,
+                                'contest_name' => $contestName,
+                                'contestants' => array(),
+                            );
+                        }
+                        $finalBeautyContents[$contestKey]['contestants'][] = array(
+                            'attendee_name' => isset($fa['full_name']) ? $fa['full_name'] : '',
+                            'staff_code' => isset($fa['staff_code']) ? $fa['staff_code'] : '',
+                            'candidate_number' => isset($fa['candidate_number']) ? $fa['candidate_number'] : '',
+                            'contest_name' => isset($finalBeautyContents[$contestKey]['contest_name']) ? $finalBeautyContents[$contestKey]['contest_name'] : '',
+                            'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+                            'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
+                            'start_working_date' => isset($fa['end_starting_date']) ? $fa['end_starting_date'] : '',
+                            'photo_path' => self::resolveAttendeePhoto($fa),
+                        );
+                    } elseif ($type === 'talent') {
+                        if ($refId) $finalTalentEntryIds[$refId] = true;
+                        $finalContentCodes['talent'] = true;
+                    }
+                }
+            }
+            // Đợt VCK không có registration_period_contents → suy ra codes từ chính finalist.
+            $periodContentCodes = array_keys($finalContentCodes);
+        }
+
         // Cờ đợt để hiển thị (fallback theo tên period khi không lấy được content codes)
         $periodNameLower = mb_strtolower((string)$model->period_name);
         $noCodes = empty($periodContentCodes);
