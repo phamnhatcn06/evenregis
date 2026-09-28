@@ -468,6 +468,11 @@ class EmailHelper
                 $teamId = $isObject ? (isset($team->id) ? $team->id : null) : (isset($team['id']) ? $team['id'] : null);
                 if (!$teamId) continue;
 
+                // Phiếu VCK: chỉ giữ lại các đội đã vào chung kết của đơn vị.
+                if ($isFinalPeriod && !isset($finalSportTeamIds[$teamId])) {
+                    continue;
+                }
+
                 $sportId = $isObject ? (isset($team->sport_id) ? $team->sport_id : null) : (isset($team['sport_id']) ? $team['sport_id'] : null);
 
                 // Loại bỏ nếu môn thể thao này không thuộc danh sách môn đang active của sự kiện
