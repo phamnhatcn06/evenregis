@@ -372,7 +372,10 @@ class EmailHelper
 
         // 5. Tải danh sách Thi nghiệp vụ (Đợt 2)
         $competitionRegistrations = array();
-        if ($showCompetition) {
+        if ($isFinalPeriod) {
+            // Phiếu VCK: dùng danh sách đã dựng lại từ finalist (competition_registrations trỏ phiếu gốc).
+            $competitionRegistrations = $finalCompetitionRegistrations;
+        } elseif ($showCompetition) {
             $compRegsData = CompetitionRegistrations::getApiDataProvider(array('registration_id' => $registrationId), 200)->getData();
             foreach ($compRegsData as $reg) {
                 $compId = isset($reg->competition_id) ? $reg->competition_id : (isset($reg['competition_id']) ? $reg['competition_id'] : null);
