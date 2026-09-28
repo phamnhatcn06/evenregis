@@ -898,6 +898,7 @@ class EmailHelper
             'competitionRegistrations' => $competitionRegistrations,
             'attendeesCount' => $attendeesCount,
             'personnelChanges' => $personnelChanges,
+            'isFinalPeriod' => $isFinalPeriod,
         );
 
         // 8. Tạo file PDF đính kèm
