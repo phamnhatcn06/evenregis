@@ -712,7 +712,14 @@ class EmailHelper
         // 6c. Tải danh sách thí sinh Miss — lọc theo registration_id của phiếu đang xuất
         // (filter server-side của API không hoạt động nên tải toàn bộ rồi lọc client-side)
         $beautyContestantsData = array();
-        if ($showMiss) {
+        if ($isFinalPeriod) {
+            // Phiếu VCK: beauty_contestants trỏ attendee gốc nên dùng danh sách đã dựng lại từ finalist.
+            foreach ($finalBeautyContents as $contest) {
+                foreach ($contest['contestants'] as $ct) {
+                    $beautyContestantsData[] = $ct;
+                }
+            }
+        } elseif ($showMiss) {
             $allContestants = BeautyContestants::getApiDataProvider(array(), 5000)->getData();
             foreach ($allContestants as $c) {
                 if ($c->registration_id != $registrationId) {
