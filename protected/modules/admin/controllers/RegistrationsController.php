@@ -1375,6 +1375,12 @@ class RegistrationsController extends AdminController
 			return null;
 		}
 
+		// Đợt Vòng chung kết (VCK): bỏ qua kiểm tra đủ người ở các nội dung nghiệp vụ
+		$period = RegistrationPeriods::fetchFromApi($model->period_id);
+		if ($period && $period->isFinal()) {
+			return null;
+		}
+
 		// Kiểm tra đơn vị có has_golf = 1 thì không validate
 		if ($model->property_id) {
 			$property = Properties::fetchFromApi($model->property_id);
