@@ -176,6 +176,7 @@ class EmailHelper
         }
         // Tải thông tin đợt đăng ký (period) — lấy tên đợt còn thiếu & email BTC (mail_btc) để CC
         $periodMailBtc = null;
+        $isFinalPeriod = false; // Đợt Vòng chung kết (VCK) — dữ liệu lấy từ finalist, không theo phiếu gốc
         if ($model->period_id) {
             $period = RegistrationPeriods::fetchFromApi($model->period_id);
             if ($period) {
@@ -185,6 +186,7 @@ class EmailHelper
                 if (!empty($period->mail_btc)) {
                     $periodMailBtc = $period->mail_btc;
                 }
+                $isFinalPeriod = $period->isFinal();
             }
         }
 
