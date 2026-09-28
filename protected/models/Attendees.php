@@ -73,7 +73,7 @@ class Attendees extends BaseAttendees
      */
     public static function getShirtSizeOptions()
     {
-        return array('S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL', 'XXXL' => 'XXXL');
+        return array('S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL', 'XXXL' => 'XXXL', '4XL' => '4XL', '5XL' => '5XL');
     }
 
     public static function model($className = __CLASS__)
