@@ -374,8 +374,9 @@ foreach ($transportsData as $t) {
     if ($tId) $transports[$tId] = $tName;
 }
 
-// Quyền thay thế / huỷ tư cách người tham dự (độc lập với trạng thái editable của phiếu)
-$canManageAttendee = PermissionHelper::can('registrations', 'update');
+// Quyền thay thế / huỷ tư cách người tham dự: chỉ admin mới được thao tác,
+// nên ẩn hoàn toàn cột "Thay thế / Huỷ" ở màn hình này.
+$canManageAttendee = false;
 
 // Dữ liệu cho form thay thế người tham dự
 $staffList = array();
