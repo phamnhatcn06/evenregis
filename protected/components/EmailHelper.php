@@ -679,15 +679,18 @@ class EmailHelper
                         continue;
                     }
                     $aid = $tm->attendee_id;
-                    // Chỉ hiển thị người thuộc đơn vị hiện tại (bỏ qua thành viên liên quân từ đơn vị khác)
-                    if (!isset($attendeesMap[$aid])) {
+                    // Chỉ hiển thị người thuộc đơn vị hiện tại (bỏ qua thành viên liên quân từ đơn vị khác).
+                    // Phiếu VCK: thành viên tiết mục trỏ attendee GỐC nên không lọc theo attendeesMap.
+                    $inMap = isset($attendeesMap[$aid]);
+                    if (!$isFinalPeriod && !$inMap) {
                         continue;
                     }
-                    $info = $attendeesMap[$aid];
+                    $info = $inMap ? $attendeesMap[$aid] : array();
+                    $tmName = isset($tm->attendee_name) ? $tm->attendee_name : '';
                     $members[] = array(
-                        'attendee_name' => !empty($info['full_name']) ? $info['full_name'] : ('#' . $aid),
+                        'attendee_name' => !empty($info['full_name']) ? $info['full_name'] : (!empty($tmName) ? $tmName : ('#' . $aid)),
                         'staff_code' => isset($info['staff_code']) ? $info['staff_code'] : '',
-                        'gender' => isset($info['gender']) ? $info['gender'] : null,
+                        'gender' => isset($info['gender']) ? $info['gender'] : (isset($tm->gender) ? $tm->gender : null),
                         'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
                         'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
                         'start_working_date' => isset($info['end_starting_date']) ? $info['end_starting_date'] : '',
