@@ -309,6 +309,7 @@ $isFullAdmin = isset($allPerms['*'])
                 'sportTeams' => $sportTeams,
                 'sportTeamMembers' => $sportTeamMembers,
                 'model' => $model,
+                'canManageLineup' => $isFullAdmin,
             )); ?>
         </div>
     </div>
