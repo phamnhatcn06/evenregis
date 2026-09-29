@@ -1171,6 +1171,10 @@
         });
         var staff = document.getElementById('add_staff'); if (staff) { staff.value = ''; }
         var other = document.getElementById('add_other'); if (other) { other.value = ''; }
+        if (window.jQuery && jQuery.fn.select2) {
+            if (staff && jQuery(staff).hasClass('select2-hidden-accessible')) { jQuery(staff).val('').trigger('change.select2'); }
+            if (other && jQuery(other).hasClass('select2-hidden-accessible')) { jQuery(other).val('').trigger('change.select2'); }
+        }
         var eid = document.getElementById('add_existing_id'); if (eid) { eid.value = ''; }
         var roleSel = document.getElementById('add_roles');
         if (roleSel) { Array.prototype.forEach.call(roleSel.options, function (o) { o.selected = false; }); }
