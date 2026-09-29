@@ -2439,6 +2439,116 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
+     * Sửa đội hình (thêm/gỡ thành viên) — chỉ quản trị toàn quyền.
+     *
+     * Nhận danh sách attendee_ids của ĐƠN VỊ muốn có trong đội. Thành viên liên quân
+     * (attendee không thuộc phiếu này) được GIỮ NGUYÊN. Gỡ những người của đơn vị không còn
+     * trong danh sách, thêm những người mới được chọn.
+     */
+    public function actionUpdateSportTeamLineup()
+    {
+        header('Content-Type: application/json');
+
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+
+        $perms = AuthHandler::getPermissions();
+        $parsed = PermissionHelper::getParsedPermissions();
+        $ar = isset($parsed['approveregistrations']) ? $parsed['approveregistrations'] : null;
+        $isFullAdmin = isset($perms['*'])
+            || ($ar && $ar['create'] && $ar['read'] && $ar['update'] && $ar['delete']);
+        if (!$isFullAdmin) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Chỉ quản trị toàn quyền mới được sửa đội hình.'));
+            Yii::app()->end();
+        }
+
+        $req = Yii::app()->request;
+        $teamId = $req->getPost('team_id');
+        $registrationId = $req->getPost('registration_id');
+        $attendeeIds = $req->getPost('attendee_ids', array());
+        $attendeeNames = $req->getPost('attendee_names', array());
+        if (!is_array($attendeeIds)) { $attendeeIds = array(); }
+        if (!is_array($attendeeNames)) { $attendeeNames = array(); }
+
+        if (!$teamId || !$registrationId) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu thông tin đội hoặc phiếu đăng ký.'));
+            Yii::app()->end();
+        }
+
+        $team = SportTeams::fetchFromApi($teamId);
+        if (!$team) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Không tìm thấy đội.'));
+            Yii::app()->end();
+        }
+
+        // Người của đơn vị (thuộc phiếu này).
+        $ownAttendeeIds = array();
+        $ownNames = array();
+        foreach (Attendees::getByRegistrationId($registrationId) as $att) {
+            if (isset($att['id'])) {
+                $oid = (string)$att['id'];
+                $ownAttendeeIds[$oid] = true;
+                $ownNames[$oid] = isset($att['full_name']) ? $att['full_name'] : '';
+            }
+        }
+
+        // Chỉ giữ các id hợp lệ thuộc đơn vị (không cho gán người ngoài phiếu).
+        $desired = array();
+        $desiredNames = array();
+        foreach ($attendeeIds as $i => $aid) {
+            $aid = (string)$aid;
+            if ($aid !== '' && isset($ownAttendeeIds[$aid])) {
+                $desired[$aid] = true;
+                $desiredNames[$aid] = isset($attendeeNames[$i]) ? $attendeeNames[$i] : (isset($ownNames[$aid]) ? $ownNames[$aid] : '');
+            }
+        }
+
+        // Thành viên hiện tại của đội.
+        $members = SportTeamMembers::getApiDataProvider(array('sport_team_id' => $teamId), 500)->getData();
+        $currentOwn = array(); // attendee_id => member_id (thành viên của đơn vị)
+        foreach ($members as $m) {
+            $mAttId = (string)(isset($m->attendee_id) ? $m->attendee_id : '');
+            if ($mAttId !== '' && isset($ownAttendeeIds[$mAttId])) {
+                $currentOwn[$mAttId] = isset($m->id) ? $m->id : null;
+            }
+        }
+
+        // Gỡ: người của đơn vị đang trong đội nhưng không còn được chọn.
+        $removed = 0;
+        foreach ($currentOwn as $aid => $memberId) {
+            if (!isset($desired[$aid]) && $memberId) {
+                SportTeamMembers::deleteViaApi($memberId);
+                $removed++;
+            }
+        }
+
+        // Thêm: người được chọn nhưng chưa có trong đội.
+        $added = 0;
+        foreach ($desired as $aid => $_on) {
+            if (!isset($currentOwn[$aid])) {
+                $mem = new SportTeamMembers();
+                $mem->sport_team_id = $teamId;
+                $mem->attendee_id = $aid;
+                $mem->name = isset($desiredNames[$aid]) ? $desiredNames[$aid] : '';
+                $mem->storeViaApi();
+                $added++;
+            }
+        }
+
+        $ssoUser = AuthHandler::getUser();
+        $email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+        Yii::log("Sửa đội hình team #{$teamId} (phiếu #{$registrationId}) bởi {$email}: +{$added} -{$removed}", 'info', 'application.controllers.ApproveRegistrationsController');
+
+        echo CJSON::encode(array(
+            'success' => true,
+            'message' => "Đã cập nhật đội hình (thêm {$added}, gỡ {$removed}).",
+        ));
+        Yii::app()->end();
+    }
+
+    /**
      * Trích id bản ghi attendee mới từ kết quả ApiClient.
      */
     private function extractNewId($result)
