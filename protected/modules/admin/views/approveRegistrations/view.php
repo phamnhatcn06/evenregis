@@ -125,7 +125,15 @@ $attributes = array(
     </div>
 </div>
 
-<?php $allPerms = PermissionHelper::getAllPermissions(); $isFullAdmin = isset($allPerms['*']); ?>
+<?php
+// "Bổ sung người" chỉ cho admin TOÀN QUYỀN màn duyệt: có wildcard hệ thống '*',
+// hoặc quyền approveregistrations là full CRUD (giá trị '*' hoặc '1 1 1 1').
+$allPerms = PermissionHelper::getAllPermissions();
+$parsedPerms = PermissionHelper::getParsedPermissions();
+$arPerm = isset($parsedPerms['approveregistrations']) ? $parsedPerms['approveregistrations'] : null;
+$isFullAdmin = isset($allPerms['*'])
+    || ($arPerm && $arPerm['create'] && $arPerm['read'] && $arPerm['update'] && $arPerm['delete']);
+?>
 <div class="card mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự</h5>
