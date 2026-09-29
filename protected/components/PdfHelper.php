@@ -128,7 +128,10 @@ class PdfHelper
         $isDot2 = !empty($data['isDot2']);
         $periodContentCodes = isset($data['periodContentCodes']) && is_array($data['periodContentCodes']) ? $data['periodContentCodes'] : array();
         $isDot3 = in_array('talent', $periodContentCodes) && !$isDot1;
-        if ($isDot1) {
+        $isFinalPeriod = !empty($data['isFinalPeriod']);
+        if ($isFinalPeriod) {
+            $contentPart = 'Vong_Chung_Ket';
+        } elseif ($isDot1) {
             $contentPart = 'The_Thao_Miss';
         } elseif ($isDot2) {
             $contentPart = 'Nghiep_Vu';
