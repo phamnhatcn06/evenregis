@@ -1152,4 +1152,249 @@
                 Toast.error('Lỗi kết nối máy chủ.');
             });
     }
+
+    // =====================================================================
+    // BỔ SUNG NGƯỜI (chỉ quản trị toàn quyền)
+    // =====================================================================
+
+    window.addPreviewFile = window.replacePreviewFile;
+
+    var ADD_FILE_KEYS = ['portrait', 'cccd_front', 'cccd_back', 'contract'];
+
+    function addResetForm() {
+        var form = document.getElementById('addAttendeeForm');
+        if (!form) { return; }
+        ['add_name', 'add_pos', 'add_idcard'].forEach(function (id) {
+            var el = document.getElementById(id); if (el) { el.value = ''; }
+        });
+        var staff = document.getElementById('add_staff'); if (staff) { staff.value = ''; }
+        var other = document.getElementById('add_other'); if (other) { other.value = ''; }
+        var eid = document.getElementById('add_existing_id'); if (eid) { eid.value = ''; }
+        var roleSel = document.getElementById('add_roles');
+        if (roleSel) { Array.prototype.forEach.call(roleSel.options, function (o) { o.selected = false; }); }
+        ADD_FILE_KEYS.forEach(function (k) {
+            var hidden = document.getElementById('add_url_' + k); if (hidden) { hidden.value = ''; }
+            var prev = document.getElementById('add_prev_' + k); if (prev) { prev.innerHTML = ''; }
+            var file = form.querySelector('input[name="' + k + '_file"]'); if (file) { file.value = ''; }
+        });
+        form.querySelectorAll('input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
+        form.querySelectorAll('.add-team-opts, .add-talent-opts').forEach(function (o) { o.classList.add('d-none'); });
+        form.querySelectorAll('input[name^="team_jersey"], input[name^="team_position"], input[name^="talent_role"]').forEach(function (i) { i.value = ''; });
+        var alertBox = document.getElementById('add_profile_alert');
+        if (alertBox) { alertBox.classList.add('d-none'); }
+    }
+
+    // Điền hồ sơ (ảnh, CCCD, HĐLĐ, vai trò) từ một attendee đã có vào form bổ sung.
+    function addApplyProfile(att) {
+        var eid = document.getElementById('add_existing_id');
+        if (eid) { eid.value = att.id || ''; }
+        ADD_FILE_KEYS.forEach(function (k) {
+            var path = k + '_path';
+            var fileUrl = att[path] || (k === 'portrait' ? att.photo_path : '') || '';
+            var hidden = document.getElementById('add_url_' + k);
+            var prev = document.getElementById('add_prev_' + k);
+            if (fileUrl) {
+                if (hidden) { hidden.value = fileUrl; }
+                if (prev) {
+                    var isPdf = String(fileUrl).toLowerCase().endsWith('.pdf');
+                    prev.innerHTML = isPdf
+                        ? '<i class="fa fa-file-pdf-o fa-lg text-danger"></i><br><span class="badge bg-success">Hồ sơ cũ</span>'
+                        : '<img src="' + escapeHtml(fileUrl) + '" style="max-height:44px;border-radius:4px;"><br><span class="badge bg-success">Hồ sơ cũ</span>';
+                }
+            } else if (hidden) { hidden.value = ''; }
+        });
+        var roleSel = document.getElementById('add_roles');
+        if (roleSel && att.role_id) {
+            var ids = String(att.role_id).split(',').map(function (x) { return x.trim(); });
+            Array.prototype.forEach.call(roleSel.options, function (o) { o.selected = ids.indexOf(o.value) >= 0; });
+        }
+    }
+
+    function addClearProfile() {
+        var eid = document.getElementById('add_existing_id'); if (eid) { eid.value = ''; }
+        ADD_FILE_KEYS.forEach(function (k) {
+            var hidden = document.getElementById('add_url_' + k); if (hidden) { hidden.value = ''; }
+            var prev = document.getElementById('add_prev_' + k); if (prev) { prev.innerHTML = ''; }
+        });
+        var alertBox = document.getElementById('add_profile_alert');
+        if (alertBox) { alertBox.classList.add('d-none'); }
+    }
+
+    // Chọn nhân sự SMILE → tra hồ sơ cũ để tái sử dụng ảnh + tự điền.
+    function addOnStaffChange() {
+        var staff = document.getElementById('add_staff');
+        var other = document.getElementById('add_other');
+        if (other && other.value) { other.value = ''; }
+        addClearProfile();
+        ['add_name', 'add_pos', 'add_idcard'].forEach(function (id) { var el = document.getElementById(id); if (el) { el.value = ''; } });
+        var roleSel = document.getElementById('add_roles');
+        if (roleSel) { Array.prototype.forEach.call(roleSel.options, function (o) { o.selected = false; }); }
+        if (!staff || !staff.value) { return; }
+
+        var opt = staff.options[staff.selectedIndex];
+        var nameEl = document.getElementById('add_name'); if (nameEl) { nameEl.value = opt.getAttribute('data-name') || ''; }
+        var posEl = document.getElementById('add_pos'); if (posEl) { posEl.value = opt.getAttribute('data-position') || ''; }
+        var staffCode = opt.getAttribute('data-code') || '';
+
+        var regInput = document.querySelector('#addAttendeeForm input[name="registration_id"]');
+        var regId = regInput ? regInput.value : '';
+        var url = checkStaffUrl + '?staff_id=' + encodeURIComponent(staff.value)
+            + '&staff_code=' + encodeURIComponent(staffCode)
+            + '&registration_id=' + encodeURIComponent(regId || '');
+        var alertBox = document.getElementById('add_profile_alert');
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!(data.success && data.has_attendee && data.attendee)) { return; }
+                addApplyProfile(data.attendee);
+                var att = data.attendee;
+                var idEl = document.getElementById('add_idcard');
+                if (att.id_card && idEl && !idEl.value) { idEl.value = att.id_card; }
+                if (alertBox) {
+                    if (data.in_registration) {
+                        alertBox.className = 'alert alert-warning py-1 px-2 mt-1 small';
+                        alertBox.innerHTML = '<i class="fa fa-info-circle me-1"></i><strong>Người này đã có trong đăng ký.</strong> Sẽ dùng lại bản ghi hiện có, chỉ gán thêm nội dung.';
+                    } else {
+                        alertBox.className = 'alert alert-success py-1 px-2 mt-1 small';
+                        alertBox.innerHTML = '<i class="fa fa-check-circle me-1"></i><strong>Đã tìm thấy hồ sơ cũ.</strong> Ảnh/hồ sơ được dùng lại.';
+                    }
+                    alertBox.classList.remove('d-none');
+                }
+            })
+            .catch(function () {});
+    }
+
+    // Chọn người đã có của đơn vị → điền thông tin + tải hồ sơ.
+    function addOnOtherChange() {
+        var other = document.getElementById('add_other');
+        var staff = document.getElementById('add_staff');
+        if (staff && staff.value) { staff.value = ''; }
+        addClearProfile();
+        ['add_name', 'add_pos', 'add_idcard'].forEach(function (id) { var el = document.getElementById(id); if (el) { el.value = ''; } });
+        var roleSel = document.getElementById('add_roles');
+        if (roleSel) { Array.prototype.forEach.call(roleSel.options, function (o) { o.selected = false; }); }
+        if (!other || !other.value) { return; }
+
+        var opt = other.options[other.selectedIndex];
+        var nameEl = document.getElementById('add_name'); if (nameEl) { nameEl.value = opt.getAttribute('data-name') || ''; }
+        var posEl = document.getElementById('add_pos'); if (posEl) { posEl.value = opt.getAttribute('data-position') || ''; }
+        var idEl = document.getElementById('add_idcard'); if (idEl) { idEl.value = opt.getAttribute('data-idcard') || ''; }
+
+        var alertBox = document.getElementById('add_profile_alert');
+        if (!attendeeProfileUrl) { return; }
+        fetch(attendeeProfileUrl + '?attendee_id=' + encodeURIComponent(other.value), { headers: { 'Accept': 'application/json' } })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!(data.success && data.attendee)) { return; }
+                addApplyProfile(data.attendee);
+                if (alertBox) {
+                    var inCurrent = opt.getAttribute('data-incurrent') === '1';
+                    alertBox.className = 'alert ' + (inCurrent ? 'alert-warning' : 'alert-success') + ' py-1 px-2 mt-1 small';
+                    alertBox.innerHTML = inCurrent
+                        ? '<i class="fa fa-info-circle me-1"></i><strong>Người này đã có trong đăng ký hiện tại.</strong> Sẽ dùng lại bản ghi, chỉ gán thêm nội dung.'
+                        : '<i class="fa fa-check-circle me-1"></i><strong>Đã lấy hồ sơ từ đăng ký khác.</strong> Ảnh/CCCD/HĐLĐ được dùng lại.';
+                    alertBox.classList.remove('d-none');
+                }
+            })
+            .catch(function () {});
+    }
+
+    window.openAddAttendeeModal = function () {
+        addResetForm();
+        showModal('addAttendeeModal');
+    };
+
+    var addStaffSel = document.getElementById('add_staff');
+    if (addStaffSel) { addStaffSel.addEventListener('change', addOnStaffChange); }
+    var addOtherSel = document.getElementById('add_other');
+    if (addOtherSel) { addOtherSel.addEventListener('change', addOnOtherChange); }
+
+    // Hiện tuỳ chọn (số áo/vị trí/đội trưởng, vai trò tiết mục) khi tích chọn nội dung.
+    document.addEventListener('change', function (e) {
+        if (e.target.classList && e.target.classList.contains('add-assign-team')) {
+            var opts = document.querySelector('.add-team-opts[data-team="' + e.target.getAttribute('data-id') + '"]');
+            if (opts) { opts.classList.toggle('d-none', !e.target.checked); }
+        }
+        if (e.target.classList && e.target.classList.contains('add-assign-talent')) {
+            var topts = document.querySelector('.add-talent-opts[data-talent="' + e.target.getAttribute('data-id') + '"]');
+            if (topts) { topts.classList.toggle('d-none', !e.target.checked); }
+        }
+    });
+
+    var addForm = document.getElementById('addAttendeeForm');
+    if (addForm) {
+        addForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var staffId = (document.getElementById('add_staff') || {}).value || '';
+            var otherId = (document.getElementById('add_other') || {}).value || '';
+            var fullName = ((document.getElementById('add_name') || {}).value || '').trim();
+            if (!staffId && !otherId && !fullName) {
+                Toast.error('Chọn nhân sự SMILE, người có sẵn, hoặc nhập họ tên.');
+                return;
+            }
+            var portraitFile = addForm.querySelector('input[name="portrait_file"]');
+            var hasPortraitFile = portraitFile && portraitFile.files && portraitFile.files[0];
+            var portraitUrl = (document.getElementById('add_url_portrait') || {}).value || '';
+            if (!staffId && !otherId && !hasPortraitFile && !portraitUrl) {
+                Toast.error('Cần ảnh chân dung cho người bổ sung.');
+                return;
+            }
+
+            var fd = new FormData(addForm);
+            fd.set('staff_id', staffId);
+            fd.set('full_name', fullName);
+            fd.set('position', (document.getElementById('add_pos') || {}).value || '');
+            fd.set('id_card', (document.getElementById('add_idcard') || {}).value || '');
+
+            var roleSel = document.getElementById('add_roles');
+            var roleVals = [];
+            if (roleSel) { Array.prototype.forEach.call(roleSel.selectedOptions, function (o) { roleVals.push(o.value); }); }
+            fd.set('role_id', roleVals.join(', '));
+
+            // Hồ sơ cũ dùng lại (nếu có).
+            ADD_FILE_KEYS.forEach(function (k) {
+                var url = (document.getElementById('add_url_' + k) || {}).value || '';
+                if (url) { fd.set('existing_' + k + '_url', url); }
+            });
+
+            Swal.fire({
+                title: 'Xác nhận bổ sung',
+                text: 'Bổ sung người này vào đăng ký?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Bổ sung',
+                cancelButtonText: 'Đóng'
+            }).then(function (result) {
+                if (result.isConfirmed) { submitAdd(fd); }
+            });
+        });
+    }
+
+    function submitAdd(formData) {
+        var btn = document.getElementById('btn_submit_add');
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang xử lý...';
+        fetch(addUrl, { method: 'POST', body: formData })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('addAttendeeModal'));
+                    if (modal) { modal.hide(); }
+                    Toast.success(data.message || 'Đã bổ sung người.');
+                    setTimeout(function () { location.reload(); }, 1200);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    Toast.error(data.error || 'Có lỗi xảy ra.');
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                Toast.error('Lỗi kết nối máy chủ.');
+            });
+    }
 })();
