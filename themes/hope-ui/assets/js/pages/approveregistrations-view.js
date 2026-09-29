@@ -1332,7 +1332,7 @@
                 Toast.error('Chọn nhân sự SMILE, người có sẵn, hoặc nhập họ tên.');
                 return;
             }
-            var portraitFile = addForm.querySelector('input[name="portrait_file"]');
+            var portraitFile = addForm.querySelector('input[name="sub_portrait_file_0"]');
             var hasPortraitFile = portraitFile && portraitFile.files && portraitFile.files[0];
             var portraitUrl = (document.getElementById('add_url_portrait') || {}).value || '';
             if (!staffId && !otherId && !hasPortraitFile && !portraitUrl) {
