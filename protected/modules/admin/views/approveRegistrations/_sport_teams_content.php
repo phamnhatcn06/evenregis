@@ -6,7 +6,10 @@
  * @var array $sportTeams Danh sách teams
  * @var array $sportTeamMembers Danh sách members theo teamId
  * @var Registrations $model
+ * @var bool $canManageLineup Cho phép admin sửa đội hình (thêm/gỡ thành viên)
  */
+
+$canManageLineup = isset($canManageLineup) ? $canManageLineup : false;
 
 $teamsData = array();
 foreach ($sportTeams as $team) {
