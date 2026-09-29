@@ -316,7 +316,20 @@ class EmailHelper
                             'photo_path' => self::resolveAttendeePhoto($fa),
                         );
                     } elseif ($type === 'talent') {
-                        if ($refId) $finalTalentEntryIds[$refId] = true;
+                        if ($refId) {
+                            $finalTalentEntryIds[$refId] = true;
+                            // Thành viên tiết mục lấy thẳng từ finalist của đơn vị → chỉ người
+                            // của đơn vị hiện tại, KHÔNG kèm thành viên liên quân đơn vị khác.
+                            $finalTalentMembers[$refId][] = array(
+                                'attendee_name' => isset($fa['full_name']) ? $fa['full_name'] : '',
+                                'staff_code' => isset($fa['staff_code']) ? $fa['staff_code'] : '',
+                                'gender' => isset($fa['gender']) ? $fa['gender'] : null,
+                                'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+                                'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
+                                'start_working_date' => isset($fa['end_starting_date']) ? $fa['end_starting_date'] : '',
+                                'photo_path' => self::resolveAttendeePhoto($fa),
+                            );
+                        }
                         $finalContentCodes['talent'] = true;
                     }
                 }
