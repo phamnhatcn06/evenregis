@@ -1301,7 +1301,27 @@
             .catch(function () {});
     }
 
+    // Khởi tạo select2 cho 2 dropdown chọn người trong modal bổ sung (có ô tìm kiếm).
+    function addInitSelect2() {
+        if (!(window.jQuery && jQuery.fn.select2)) { return; }
+        var $modal = jQuery('#addAttendeeModal');
+        [
+            { sel: '#add_staff', ph: '-- Chọn nhân sự SMILE --' },
+            { sel: '#add_other', ph: '-- Chọn người đã có --' }
+        ].forEach(function (cfg) {
+            var $el = jQuery(cfg.sel);
+            if (!$el.length || $el.hasClass('select2-hidden-accessible')) { return; }
+            $el.select2({
+                dropdownParent: $modal,
+                width: '100%',
+                placeholder: cfg.ph,
+                allowClear: true
+            });
+        });
+    }
+
     window.openAddAttendeeModal = function () {
+        addInitSelect2();
         addResetForm();
         showModal('addAttendeeModal');
     };
