@@ -108,7 +108,7 @@ $fileFields = array(
                                             <div class="col-6 mb-2">
                                                 <label class="form-label small fw-bold mb-1"><?php echo $f['label']; ?><?php echo $f['req'] ? ' <span class="text-danger">*</span>' : ''; ?></label>
                                                 <div id="add_prev_<?php echo $f['k']; ?>" class="border rounded text-center p-1 mb-1" style="min-height:44px;"></div>
-                                                <input type="file" class="form-control form-control-sm" name="<?php echo $f['k']; ?>_file"
+                                                <input type="file" class="form-control form-control-sm" name="sub_<?php echo $f['k']; ?>_file_0"
                                                        accept="image/*<?php echo $f['pdf'] ? ',.pdf' : ''; ?>"
                                                        onchange="addPreviewFile(this, 'add_prev_<?php echo $f['k']; ?>')">
                                                 <input type="hidden" class="add-url" data-path="<?php echo $f['k']; ?>" id="add_url_<?php echo $f['k']; ?>">
