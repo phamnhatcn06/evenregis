@@ -1337,6 +1337,10 @@ if (PermissionHelper::can('approveregistrations', 'update')) {
             'talentEntries' => isset($talentEntries) ? $talentEntries : array(),
             'allianceTalentEntries' => isset($allianceTalentEntries) ? $allianceTalentEntries : array(),
         ));
+        $this->renderPartial('_modal_edit_team_lineup', array(
+            'model' => $model,
+            'attendees' => $attendees,
+        ));
     }
     Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/select2/css/select2.min.css');
     Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
