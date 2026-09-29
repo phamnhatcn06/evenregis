@@ -1175,7 +1175,7 @@
         ADD_FILE_KEYS.forEach(function (k) {
             var hidden = document.getElementById('add_url_' + k); if (hidden) { hidden.value = ''; }
             var prev = document.getElementById('add_prev_' + k); if (prev) { prev.innerHTML = ''; }
-            var file = form.querySelector('input[name="' + k + '_file"]'); if (file) { file.value = ''; }
+            var file = form.querySelector('input[name="sub_' + k + '_file_0"]'); if (file) { file.value = ''; }
         });
         form.querySelectorAll('input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
         form.querySelectorAll('.add-team-opts, .add-talent-opts').forEach(function (o) { o.classList.add('d-none'); });
