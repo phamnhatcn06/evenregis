@@ -427,18 +427,23 @@
     $isDot2 = isset($isDot2) ? $isDot2 : in_array('competition', $periodContentCodes);
     $isDot3 = in_array('talent', $periodContentCodes) && !$isDot1;
 
-    $mau1Parts = array();
-    if ($isDot1) {
-        $mau1Parts[] = 'thể thao';
-        $mau1Parts[] = 'miss';
+    // Phiếu VCK tổng hợp mọi nội dung → tiêu đề chỉ là "Đăng ký tham dự", không liệt kê nội dung.
+    if ($isFinalPeriod) {
+        $mau1Title = 'Đăng ký tham dự';
+    } else {
+        $mau1Parts = array();
+        if ($isDot1) {
+            $mau1Parts[] = 'thể thao';
+            $mau1Parts[] = 'miss';
+        }
+        if ($isDot2) {
+            $mau1Parts[] = 'nghiệp vụ';
+        }
+        if ($isDot3) {
+            $mau1Parts[] = 'văn nghệ';
+        }
+        $mau1Title = 'Đăng ký tham dự' . (empty($mau1Parts) ? '' : ' ' . implode(', ', $mau1Parts));
     }
-    if ($isDot2) {
-        $mau1Parts[] = 'nghiệp vụ';
-    }
-    if ($isDot3) {
-        $mau1Parts[] = 'văn nghệ';
-    }
-    $mau1Title = 'Đăng ký tham dự ' . (empty($mau1Parts) ? '' : ' ' . implode(', ', $mau1Parts));
     ?>
 
     <!-- ============================ TRANG 1 — MẪU SỐ 1 ============================ -->
