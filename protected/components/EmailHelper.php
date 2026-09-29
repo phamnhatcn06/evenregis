@@ -843,8 +843,7 @@ class EmailHelper
             }
         }
 
-        // Đếm số người tham dự theo đợt (unique theo staff_code, fallback tên):
-        //   Đợt 1 → thể thao + Miss | Đợt 2 → thi nghiệp vụ | Đợt 3 → văn nghệ
+        // Đếm số người tham dự (unique theo staff_code, fallback tên).
         $attendeeKeys = array();
         $collectKey = function ($person) use (&$attendeeKeys) {
             $code = isset($person['staff_code']) ? trim((string)$person['staff_code']) : '';
@@ -854,27 +853,48 @@ class EmailHelper
                 $attendeeKeys[$key] = true;
             }
         };
-        if ($isDot1) {
-            foreach ($sportTeamsData as $team) {
-                foreach ($team['members'] as $m) {
-                    $collectKey($m);
+
+        // Phiếu VCK (Vòng chung kết) tổng hợp mọi nội dung: đếm & liệt kê TẤT CẢ người
+        // trên phiếu (finalist + giám đốc + lái xe), không chỉ người gắn nội dung — vì
+        // giám đốc/lái xe không tham gia nội dung nào nên sẽ bị bỏ sót nếu đếm theo nội dung.
+        $finalAllAttendees = array();
+        if ($isFinalPeriod) {
+            foreach ($attendees as $att) {
+                $person = array(
+                    'attendee_name' => isset($att['full_name']) ? $att['full_name'] : '',
+                    'staff_code' => isset($att['staff_code']) ? $att['staff_code'] : '',
+                    'gender' => isset($att['gender']) ? $att['gender'] : null,
+                    'division_name' => isset($att['division_name']) ? $att['division_name'] : '',
+                    'start_working_date' => isset($att['end_starting_date']) ? $att['end_starting_date'] : '',
+                    'photo_path' => self::resolveAttendeePhoto($att),
+                );
+                $collectKey($person);
+                $finalAllAttendees[] = $person;
+            }
+        } else {
+            //   Đợt 1 → thể thao + Miss | Đợt 2 → thi nghiệp vụ | Đợt 3 → văn nghệ
+            if ($isDot1) {
+                foreach ($sportTeamsData as $team) {
+                    foreach ($team['members'] as $m) {
+                        $collectKey($m);
+                    }
+                }
+                foreach ($beautyContestantsData as $c) {
+                    $collectKey($c);
                 }
             }
-            foreach ($beautyContestantsData as $c) {
-                $collectKey($c);
-            }
-        }
-        if ($isDot2) {
-            foreach ($competitionRegistrations as $comp) {
-                foreach ($comp['attendees'] as $a) {
-                    $collectKey($a);
+            if ($isDot2) {
+                foreach ($competitionRegistrations as $comp) {
+                    foreach ($comp['attendees'] as $a) {
+                        $collectKey($a);
+                    }
                 }
             }
-        }
-        if ($showTalent) {
-            foreach ($talentEntriesData as $entry) {
-                foreach ($entry['members'] as $m) {
-                    $collectKey($m);
+            if ($showTalent) {
+                foreach ($talentEntriesData as $entry) {
+                    foreach ($entry['members'] as $m) {
+                        $collectKey($m);
+                    }
                 }
             }
         }
