@@ -33,7 +33,10 @@ foreach ($sportTeams as $team) {
         }
     }
 
-    // Chỉ cho sửa đội hình nếu đội thuộc đơn vị hiện tại (không sửa đội của đơn vị khác trong liên quân).
+    // Đội có thuộc đơn vị hiện tại hay không (dùng cho nhãn/tooltip).
+    // LƯU Ý: kể cả đội liên quân do đơn vị KHÁC sở hữu, admin vẫn được sửa phần đội hình
+    // của ĐƠN VỊ HIỆN TẠI. Backend (actionUpdateSportTeamLineup) chỉ thêm/gỡ người thuộc
+    // phiếu hiện tại, thành viên liên quân của đơn vị khác luôn được giữ nguyên.
     $isTeamOwner = ($teamPropertyId == $model->property_id);
     $teamsData[] = array(
         'team_id' => $teamId,
