@@ -125,19 +125,25 @@ $attributes = array(
     </div>
 </div>
 
+<?php $allPerms = PermissionHelper::getAllPermissions(); $isFullAdmin = isset($allPerms['*']); ?>
 <div class="card mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fa fa-users me-2"></i>Danh sách người tham dự</h5>
-        <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED && $pending > 0): ?>
-            <div class="d-flex gap-2">
+        <div class="d-flex gap-2">
+            <?php if ($isFullAdmin): ?>
+                <button type="button" class="btn btn-primary btn-sm px-3" onclick="openAddAttendeeModal()">
+                    <i class="fa fa-user-plus me-1"></i>Bổ sung người
+                </button>
+            <?php endif; ?>
+            <?php if ((int)$model->status === Registrations::STATUS_SUBMITTED && $pending > 0): ?>
                 <button type="button" class="btn btn-success btn-sm px-3" onclick="approveAllAttendees()">
                     <i class="fa fa-check me-1"></i>Duyệt tất cả
                 </button>
                 <button type="button" class="btn btn-outline-danger btn-sm px-3" onclick="rejectAllAttendees()">
                     <i class="fa fa-times me-1"></i>Từ chối tất cả
                 </button>
-            </div>
-        <?php endif; ?>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card-body">
         <?php $canManageAttendee = PermissionHelper::can('approveregistrations', 'update'); ?>
