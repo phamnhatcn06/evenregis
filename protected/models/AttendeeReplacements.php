@@ -137,6 +137,8 @@ class AttendeeReplacements extends CFormModel
                 return 'Thay thế';
             case self::ACTION_CANCEL_CONTENT:
                 return 'Huỷ nội dung';
+            case self::ACTION_ADD:
+                return 'Bổ sung người';
             case self::ACTION_WITHDRAW:
             default:
                 return 'Huỷ tư cách';
