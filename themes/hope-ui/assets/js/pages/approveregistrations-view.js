@@ -1406,4 +1406,150 @@
                 Toast.error('Lỗi kết nối máy chủ.');
             });
     }
+
+    // =====================================================================
+    // SỬA ĐỘI HÌNH (thêm/gỡ thành viên) — chỉ quản trị toàn quyền
+    // =====================================================================
+
+    var LINEUP_ATTENDEES = readJson('lineup_attendees_list') || [];
+    var lineupOwnSelected = {}; // attendee_id -> true (người của đơn vị đang chọn)
+
+    function lineupRegistrationId() {
+        var el = document.querySelector('#editLineupForm input[name="registration_id"]');
+        return el ? el.value : '';
+    }
+
+    function updateLineupCount() {
+        var n = 0;
+        document.querySelectorAll('#lineup_members_container .lineup-check:checked').forEach(function () { n++; });
+        var el = document.getElementById('lineup_count');
+        if (el) { el.textContent = n; }
+    }
+
+    function renderLineupList(ownMemberIds) {
+        var container = document.getElementById('lineup_members_container');
+        if (!container) { return; }
+        if (!LINEUP_ATTENDEES.length) {
+            container.innerHTML = '<p class="text-muted small p-2 mb-0">Phiếu chưa có người tham dự nào.</p>';
+            return;
+        }
+        var html = '';
+        LINEUP_ATTENDEES.forEach(function (a) {
+            var checked = ownMemberIds.indexOf(String(a.id)) >= 0;
+            var pending = parseInt(a.approval_status, 10) !== 1
+                ? ' <span class="badge bg-warning text-dark">Chưa duyệt</span>' : '';
+            html += '<label class="d-flex align-items-center gap-2 px-2 py-1 border-bottom lineup-row" data-name="' + escapeHtml((a.name || '').toLowerCase()) + '">'
+                + '<input type="checkbox" class="form-check-input lineup-check m-0" value="' + escapeHtml(a.id) + '"'
+                + ' data-name="' + escapeHtml(a.name || '') + '"' + (checked ? ' checked' : '') + '>'
+                + '<span>' + escapeHtml(a.name || ('#' + a.id))
+                + (a.position ? ' <small class="text-muted">· ' + escapeHtml(a.position) + '</small>' : '')
+                + pending + '</span>'
+                + '</label>';
+        });
+        container.innerHTML = html;
+        container.querySelectorAll('.lineup-check').forEach(function (cb) {
+            cb.addEventListener('change', updateLineupCount);
+        });
+        updateLineupCount();
+    }
+
+    window.openEditLineupModal = function (teamId, label) {
+        var form = document.getElementById('editLineupForm');
+        if (!form) { return; }
+        document.getElementById('lineup_team_id').value = teamId;
+        document.getElementById('lineup_team_label').textContent = label || ('#' + teamId);
+        var search = document.getElementById('lineup_search');
+        if (search) { search.value = ''; }
+        var allianceBox = document.getElementById('lineup_alliance_box');
+        if (allianceBox) { allianceBox.classList.add('d-none'); }
+        var container = document.getElementById('lineup_members_container');
+        if (container) { container.innerHTML = ''; }
+        var loading = document.getElementById('lineup_loading');
+        if (loading) { loading.classList.remove('d-none'); }
+
+        showModal('editLineupModal');
+
+        var url = teamDetailUrl + '?id=' + encodeURIComponent(teamId)
+            + '&registration_id=' + encodeURIComponent(lineupRegistrationId());
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (loading) { loading.classList.add('d-none'); }
+                if (!data.success || !data.data) {
+                    if (container) { container.innerHTML = '<p class="text-danger small p-2 mb-0">' + escapeHtml(data.error || 'Không tải được đội.') + '</p>'; }
+                    return;
+                }
+                var members = data.data.members || [];
+                var ownMemberIds = [];
+                var allianceNames = [];
+                members.forEach(function (m) {
+                    if (m.is_own_member) {
+                        ownMemberIds.push(String(m.attendee_id));
+                    } else {
+                        allianceNames.push(m.attendee_name || m.name || ('#' + m.attendee_id));
+                    }
+                });
+                if (allianceNames.length && allianceBox) {
+                    document.getElementById('lineup_alliance_names').textContent = ' ' + allianceNames.join(', ');
+                    allianceBox.classList.remove('d-none');
+                }
+                renderLineupList(ownMemberIds);
+            })
+            .catch(function () {
+                if (loading) { loading.classList.add('d-none'); }
+                if (container) { container.innerHTML = '<p class="text-danger small p-2 mb-0">Lỗi kết nối máy chủ.</p>'; }
+            });
+    };
+
+    var lineupSearch = document.getElementById('lineup_search');
+    if (lineupSearch) {
+        lineupSearch.addEventListener('input', function () {
+            var q = this.value.trim().toLowerCase();
+            document.querySelectorAll('#lineup_members_container .lineup-row').forEach(function (row) {
+                var nm = row.getAttribute('data-name') || '';
+                row.classList.toggle('d-none', q !== '' && nm.indexOf(q) < 0);
+            });
+        });
+    }
+
+    var lineupForm = document.getElementById('editLineupForm');
+    if (lineupForm) {
+        lineupForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var fd = new FormData();
+            fd.append('team_id', document.getElementById('lineup_team_id').value);
+            fd.append('registration_id', lineupRegistrationId());
+            document.querySelectorAll('#lineup_members_container .lineup-check:checked').forEach(function (cb) {
+                fd.append('attendee_ids[]', cb.value);
+                fd.append('attendee_names[]', cb.getAttribute('data-name') || '');
+            });
+            submitLineup(fd);
+        });
+    }
+
+    function submitLineup(formData) {
+        var btn = document.getElementById('btn_submit_lineup');
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+        fetch(lineupUpdateUrl, { method: 'POST', body: formData })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('editLineupModal'));
+                    if (modal) { modal.hide(); }
+                    Toast.success(data.message || 'Đã cập nhật đội hình.');
+                    setTimeout(function () { location.reload(); }, 1200);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    Toast.error(data.error || 'Có lỗi xảy ra.');
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                Toast.error('Lỗi kết nối máy chủ.');
+            });
+    }
 })();
