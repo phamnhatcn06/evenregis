@@ -153,7 +153,9 @@ $attributes = array(
              data-withdraw-url="<?php echo $this->createUrl('withdrawAttendee'); ?>"
              data-cancel-content-url="<?php echo $this->createUrl('cancelContent'); ?>"
              data-check-staff-url="<?php echo $this->createUrl('checkStaffAttendee'); ?>"
-             data-attendee-profile-url="<?php echo $this->createUrl('attendeeProfile'); ?>"></div>
+             data-attendee-profile-url="<?php echo $this->createUrl('attendeeProfile'); ?>"
+             data-add-url="<?php echo $this->createUrl('addAttendee'); ?>"
+             data-is-admin="<?php echo $isFullAdmin ? '1' : '0'; ?>"></div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-0" id="attendees-table">
                 <thead class="table-light">
