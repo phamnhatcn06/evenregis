@@ -919,6 +919,7 @@ class EmailHelper
             'attendeesCount' => $attendeesCount,
             'personnelChanges' => $personnelChanges,
             'isFinalPeriod' => $isFinalPeriod,
+            'finalAllAttendees' => $finalAllAttendees,
         );
 
         // 8. Tạo file PDF đính kèm
