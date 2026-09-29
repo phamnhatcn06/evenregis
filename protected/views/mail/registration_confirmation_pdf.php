@@ -360,6 +360,17 @@
             $confirmAttendees[$k]['photo'] = $photo;
         }
     };
+    // Phiếu VCK (Vòng chung kết): nạp TRƯỚC toàn bộ người trên phiếu (finalist + giám đốc +
+    // lái xe) để không bỏ sót người không gắn nội dung; các vòng lặp nội dung bên dưới chỉ
+    // bổ sung thêm "nội dung tham gia" cho những người có nội dung.
+    $isFinalPeriod = isset($isFinalPeriod) ? $isFinalPeriod : false;
+    $finalAllAttendees = isset($finalAllAttendees) && is_array($finalAllAttendees) ? $finalAllAttendees : array();
+    if ($isFinalPeriod && !empty($finalAllAttendees)) {
+        foreach ($finalAllAttendees as $p) {
+            $addConfirm($p['attendee_name'], isset($p['staff_code']) ? $p['staff_code'] : '', isset($p['gender']) ? $p['gender'] : null, isset($p['division_name']) ? $p['division_name'] : '', '', isset($p['photo_path']) ? $p['photo_path'] : '', isset($p['start_working_date']) ? $p['start_working_date'] : '');
+        }
+    }
+
     foreach ($sportTeams as $team) {
         foreach ($team['members'] as $m) {
             $addConfirm($m['attendee_name'], isset($m['staff_code']) ? $m['staff_code'] : '', isset($m['gender']) ? $m['gender'] : null, isset($m['division_name']) ? $m['division_name'] : '', $team['sport_name'], isset($m['photo_path']) ? $m['photo_path'] : '', isset($m['start_working_date']) ? $m['start_working_date'] : '');
