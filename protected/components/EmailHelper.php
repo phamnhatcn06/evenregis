@@ -246,6 +246,7 @@ class EmailHelper
         // tập id đội thể thao / tiết mục văn nghệ đã vào chung kết để lọc ở các bước sau.
         $finalSportTeamIds = array();          // ref_id = sport_team.id
         $finalTalentEntryIds = array();        // ref_id = talent_entry.id
+        $finalTalentMembers = array();         // ref_id => danh sách thành viên (chỉ finalist của đơn vị)
         $finalBeautyContents = array();        // dựng lại danh sách thi sắc đẹp theo finalist
         $finalCompetitionRegistrations = array(); // dựng lại danh sách thi nghiệp vụ theo finalist
         if ($isFinalPeriod && $model->period_id && $model->property_id) {
