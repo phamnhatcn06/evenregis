@@ -65,6 +65,13 @@ usort($teamsData, function ($a, $b) {
                     <span class="badge bg-info ms-2"><i class="fa fa-handshake-o me-1"></i>Liên quân: <?php echo CHtml::encode(implode(', ', $teamData['alliance_properties'])); ?></span>
                 <?php endif; ?>
             </div>
+            <?php if ($canManageLineup && $teamData['is_team_owner'] && $teamData['team_id']): ?>
+                <button type="button" class="btn btn-sm btn-outline-primary"
+                        onclick="openEditLineupModal(<?php echo (int)$teamData['team_id']; ?>, '<?php echo CHtml::encode(addslashes($teamData['sport_name'] . ' - ' . $teamData['team_name'])); ?>')"
+                        title="Thêm/gỡ thành viên đội">
+                    <i class="fa fa-pencil me-1"></i>Sửa đội hình
+                </button>
+            <?php endif; ?>
         </div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-sm mb-3">
