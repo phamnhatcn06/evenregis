@@ -33,12 +33,16 @@ foreach ($sportTeams as $team) {
         }
     }
 
+    // Chỉ cho sửa đội hình nếu đội thuộc đơn vị hiện tại (không sửa đội của đơn vị khác trong liên quân).
+    $isTeamOwner = ($teamPropertyId == $model->property_id);
     $teamsData[] = array(
+        'team_id' => $teamId,
         'sport_name' => $sportName,
         'team_name' => $teamName,
         'members' => $membersList,
         'alliance_properties' => $allianceProperties,
         'is_alliance' => !empty($allianceProperties),
+        'is_team_owner' => $isTeamOwner,
     );
 }
 usort($teamsData, function ($a, $b) {
