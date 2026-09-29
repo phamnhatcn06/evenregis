@@ -1412,7 +1412,6 @@
     // =====================================================================
 
     var LINEUP_ATTENDEES = readJson('lineup_attendees_list') || [];
-    var lineupOwnSelected = {}; // attendee_id -> true (người của đơn vị đang chọn)
 
     function lineupRegistrationId() {
         var el = document.querySelector('#editLineupForm input[name="registration_id"]');
