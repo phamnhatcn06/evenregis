@@ -94,7 +94,7 @@ $fileFields = array(
                                     </div>
 
                                     <div class="mb-2">
-                                        <label class="form-label small mb-1">Vai trò</label>
+                                        <label class="form-label small mb-1">Vai trò <span class="text-danger">*</span></label>
                                         <select class="form-select form-select-sm" id="add_roles" multiple size="3">
                                             <?php foreach ($roles as $rid => $rname): ?>
                                                 <option value="<?php echo CHtml::encode($rid); ?>"><?php echo CHtml::encode($rname); ?></option>
