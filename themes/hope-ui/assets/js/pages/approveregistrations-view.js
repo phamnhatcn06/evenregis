@@ -1340,15 +1340,22 @@
                 return;
             }
 
+            var roleSel = document.getElementById('add_roles');
+            var roleVals = [];
+            if (roleSel) { Array.prototype.forEach.call(roleSel.selectedOptions, function (o) { roleVals.push(o.value); }); }
+            // Backend bắt buộc vai trò khi tạo attendee mới. Khi dùng lại người có sẵn (existing_id)
+            // thì không tạo mới nên không bắt buộc.
+            var existingId = (document.getElementById('add_existing_id') || {}).value || '';
+            if (!existingId && !roleVals.length) {
+                Toast.error('Vui lòng chọn ít nhất một vai trò.');
+                return;
+            }
+
             var fd = new FormData(addForm);
             fd.set('staff_id', staffId);
             fd.set('full_name', fullName);
             fd.set('position', (document.getElementById('add_pos') || {}).value || '');
             fd.set('id_card', (document.getElementById('add_idcard') || {}).value || '');
-
-            var roleSel = document.getElementById('add_roles');
-            var roleVals = [];
-            if (roleSel) { Array.prototype.forEach.call(roleSel.selectedOptions, function (o) { roleVals.push(o.value); }); }
             fd.set('role_id', roleVals.join(', '));
 
             // Hồ sơ cũ dùng lại (nếu có).
