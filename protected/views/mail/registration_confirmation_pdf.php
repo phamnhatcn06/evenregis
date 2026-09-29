@@ -593,7 +593,7 @@
         <?php endif; ?>
 
         <?php if (!empty($sportTeams)): ?>
-            <div class="doc-title">Danh sách các vận động viên tham gia thi đấu vòng loại</div>
+            <div class="doc-title">Danh sách các vận động viên tham gia thi đấu <?php echo $isFinalPeriod ? 'vòng chung kết' : 'vòng loại'; ?></div>
             <?php
             // Tách môn đồng đội và môn đơn/đôi để bố cục bảng đều nhau
             $teamGroup = array();
