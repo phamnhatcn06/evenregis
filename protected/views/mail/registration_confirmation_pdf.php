@@ -373,6 +373,12 @@
 
     foreach ($sportTeams as $team) {
         foreach ($team['members'] as $m) {
+            // Trang xác nhận (ảnh) chỉ liệt kê người của đơn vị hiện tại — bỏ VĐV liên quân
+            // đến từ đơn vị khác (đội thể thao có thể gồm cả VĐV liên quân).
+            $mProp = isset($m['property_name']) ? trim((string)$m['property_name']) : '';
+            if ($mProp !== '' && $propertyName !== '' && $mProp !== $propertyName) {
+                continue;
+            }
             $addConfirm($m['attendee_name'], isset($m['staff_code']) ? $m['staff_code'] : '', isset($m['gender']) ? $m['gender'] : null, isset($m['division_name']) ? $m['division_name'] : '', $team['sport_name'], isset($m['photo_path']) ? $m['photo_path'] : '', isset($m['start_working_date']) ? $m['start_working_date'] : '');
         }
     }
