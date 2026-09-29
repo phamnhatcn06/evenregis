@@ -2177,6 +2177,263 @@ class ApproveRegistrationsController extends AdminController
     }
 
     /**
+     * Bổ sung người vào đăng ký (chỉ quản trị toàn quyền).
+     *
+     * Cho phép admin thêm một người mới (hoặc dùng lại người đã có của đơn vị) vào phiếu
+     * đăng ký ngay trên màn hình duyệt, đồng thời gán người đó vào các NỘI DUNG ĐÃ CÓ trên
+     * phiếu (đội thể thao, cuộc thi nghiệp vụ, thi Miss, tiết mục văn nghệ). Người bổ sung
+     * được duyệt luôn (đã có quy trình xác nhận bên ngoài). Không xoá/huỷ ai.
+     */
+    public function actionAddAttendee()
+    {
+        header('Content-Type: application/json');
+
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+
+        // Chỉ quản trị TOÀN QUYỀN (wildcard '*') mới được bổ sung người trên màn hình duyệt.
+        $perms = AuthHandler::getPermissions();
+        if (empty($perms['*'])) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Chỉ quản trị toàn quyền mới được bổ sung người.'));
+            Yii::app()->end();
+        }
+
+        $req = Yii::app()->request;
+        $registrationId = $req->getPost('registration_id');
+        $eventId = $req->getPost('event_id');
+        $propertyId = $req->getPost('property_id');
+
+        if (!$registrationId) {
+            echo CJSON::encode(array('success' => false, 'error' => 'Thiếu phiếu đăng ký.'));
+            Yii::app()->end();
+        }
+
+        $staffId = trim($req->getPost('staff_id', ''));
+        $fullName = trim($req->getPost('full_name', ''));
+        $position = trim($req->getPost('position', ''));
+        $idCard = trim($req->getPost('id_card', ''));
+        $roleId = trim($req->getPost('role_id', ''));
+        $postedExistingId = trim($req->getPost('existing_attendee_id', ''));
+
+        $assignTeam = $req->getPost('assign_team', array());
+        $teamJersey = $req->getPost('team_jersey', array());
+        $teamPosition = $req->getPost('team_position', array());
+        $teamCaptain = $req->getPost('team_captain', array());
+        $assignComp = $req->getPost('assign_comp', array());
+        $assignBeauty = $req->getPost('assign_beauty', array());
+        $assignTalent = $req->getPost('assign_talent', array());
+        $talentRole = $req->getPost('talent_role', array());
+        foreach (array('assignTeam', 'teamJersey', 'teamPosition', 'teamCaptain', 'assignComp', 'assignBeauty', 'assignTalent', 'talentRole') as $v) {
+            if (!is_array($$v)) { $$v = array(); }
+        }
+
+        // Chuẩn hoá danh sách nội dung được tích chọn.
+        $teamIds = array();
+        foreach ($assignTeam as $tid => $on) { if ($on) { $teamIds[] = $tid; } }
+        $compIds = array();
+        foreach ($assignComp as $cid => $on) { if ($on) { $compIds[] = $cid; } }
+        $beautyIds = array();
+        foreach ($assignBeauty as $bid => $on) { if ($on) { $beautyIds[] = $bid; } }
+        $talentIds = array();
+        foreach ($assignTalent as $eid => $on) { if ($on) { $talentIds[] = $eid; } }
+
+        // Bổ sung người: bắt buộc có thông tin người (SMILE hoặc họ tên).
+        $staffCode = null;
+        if ($staffId) {
+            $staff = Staffs::fetchFromApi($staffId);
+            if ($staff) {
+                if ($fullName === '') { $fullName = $staff->full_name; }
+                if ($position === '') { $position = isset($staff->position_name) ? $staff->position_name : ''; }
+                $staffCode = isset($staff->staff_code) ? $staff->staff_code : null;
+            }
+        }
+        if (!$staffId && $fullName === '') {
+            echo CJSON::encode(array('success' => false, 'error' => 'Chưa có thông tin người bổ sung (chọn nhân sự SMILE hoặc nhập họ tên).'));
+            Yii::app()->end();
+        }
+
+        $ssoUser = AuthHandler::getUser();
+        $email = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+        // 1. Xác định attendee: ưu tiên dùng lại bản ghi đang hoạt động trong chính đăng ký này.
+        $attendeeId = null;
+        $reused = false;
+        if ($postedExistingId !== '') {
+            $cand = Attendees::fetchFromApi($postedExistingId);
+            if ($cand
+                && (string)$cand->registration_id === (string)$registrationId
+                && (int)(isset($cand->is_active) ? $cand->is_active : 1) !== 0) {
+                $attendeeId = $cand->id;
+                if ($fullName === '' && !empty($cand->full_name)) { $fullName = $cand->full_name; }
+                if ($staffCode === null && !empty($cand->staff_code)) { $staffCode = $cand->staff_code; }
+                $reused = true;
+            }
+        }
+        if (!$attendeeId) {
+            $existingInReg = $this->findActiveAttendeeInRegistration($registrationId, $staffId, $staffCode, $idCard, null);
+            if ($existingInReg) {
+                $attendeeId = $existingInReg['id'];
+                if ($fullName === '' && !empty($existingInReg['full_name'])) { $fullName = $existingInReg['full_name']; }
+                if ($staffCode === null && !empty($existingInReg['staff_code'])) { $staffCode = $existingInReg['staff_code']; }
+                $reused = true;
+            }
+        }
+
+        // 2. Tạo mới attendee nếu chưa có (duyệt luôn).
+        if (!$attendeeId) {
+            $new = new Attendees();
+            $new->event_id = $eventId;
+            $new->registration_id = $registrationId;
+            $new->property_id = $propertyId;
+            $new->full_name = $fullName;
+            $new->position = $position;
+            $new->position_name = $position;
+            $new->id_card = $idCard;
+            if ($staffId) { $new->staff_id = $staffId; }
+            if ($staffCode) { $new->staff_code = $staffCode; }
+            $new->role_id = $roleId;
+            $new->approval_status = Attendees::APPROVAL_APPROVED;
+            $new->approved_at = date('Y-m-d H:i:s');
+            $new->approved_by = $email;
+
+            // Ảnh/hồ sơ: file upload mới → URL hồ sơ cũ (frontend gửi) → copy từ hồ sơ cũ của đúng người.
+            $existingAttendee = $this->resolveExistingProfile($postedExistingId, $staffId, $staffCode, $idCard, null, $registrationId);
+            $uploads = $this->handleReplaceUpload(0);
+            $postedFileUrls = array(
+                'portrait_path'   => trim($req->getPost('existing_portrait_url', '')),
+                'cccd_front_path' => trim($req->getPost('existing_cccd_front_url', '')),
+                'cccd_back_path'  => trim($req->getPost('existing_cccd_back_url', '')),
+                'contract_path'   => trim($req->getPost('existing_contract_url', '')),
+            );
+            $fileMap = array(
+                'portrait_path' => array('portrait_path', 'photo_path'),
+                'cccd_front_path' => array('cccd_front_path'),
+                'cccd_back_path' => array('cccd_back_path'),
+                'contract_path' => array('contract_path'),
+            );
+            foreach ($fileMap as $targetAttr => $sourceAttrs) {
+                if (!empty($uploads[$targetAttr])) {
+                    $new->$targetAttr = $uploads[$targetAttr];
+                } elseif (!empty($postedFileUrls[$targetAttr])) {
+                    $new->$targetAttr = $postedFileUrls[$targetAttr];
+                } elseif ($existingAttendee) {
+                    foreach ($sourceAttrs as $sAttr) {
+                        if (isset($existingAttendee->$sAttr) && !empty($existingAttendee->$sAttr)) {
+                            $new->$targetAttr = $existingAttendee->$sAttr;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $storeResult = $new->storeViaApi();
+            $attendeeId = $this->extractNewId($storeResult);
+            if (!$attendeeId) {
+                $err = isset($storeResult['error']) ? $storeResult['error'] : 'Không thể tạo người bổ sung.';
+                echo CJSON::encode(array('success' => false, 'error' => $err));
+                Yii::app()->end();
+            }
+        }
+
+        // 3. Nội dung đã có của người (nếu dùng lại) → bỏ qua để không gán trùng.
+        $haveTeams = array();
+        $haveComps = array();
+        $haveBeauty = array();
+        $haveTalents = array();
+        if ($reused) {
+            $sum = Attendees::getParticipationSummary($attendeeId);
+            foreach ($sum['sport_teams'] as $rt) { $haveTeams[(string)$rt['sport_team_id']] = true; }
+            foreach ($sum['competitions'] as $rc) { $haveComps[(string)$rc['competition_id']] = true; }
+            foreach ($sum['beauty_contests'] as $rb) { $haveBeauty[(string)$rb['contest_id']] = true; }
+            foreach ($sum['talent_entries'] as $re) { $haveTalents[(string)$re['entry_id']] = true; }
+        }
+
+        $added = array('sports' => array(), 'competitions' => array(), 'beauty' => array(), 'talents' => array());
+
+        // 4a. Gán vào đội thể thao đã có.
+        foreach ($teamIds as $tid) {
+            if (isset($haveTeams[(string)$tid])) { continue; }
+            $mem = new SportTeamMembers();
+            $mem->sport_team_id = $tid;
+            $mem->attendee_id = $attendeeId;
+            $mem->name = $fullName;
+            $jersey = isset($teamJersey[$tid]) ? trim($teamJersey[$tid]) : '';
+            if ($jersey !== '') { $mem->jersey_number = $jersey; }
+            $pos = isset($teamPosition[$tid]) ? trim($teamPosition[$tid]) : '';
+            if ($pos !== '') { $mem->position = $pos; }
+            $mem->is_captain = !empty($teamCaptain[$tid]) ? 1 : 0;
+            $mem->storeViaApi();
+            $added['sports'][] = array('team_id' => $tid);
+        }
+
+        // 4b. Gán vào cuộc thi nghiệp vụ (số báo danh do backend cấp).
+        foreach ($compIds as $cid) {
+            if (isset($haveComps[(string)$cid])) { continue; }
+            $cr = new CompetitionRegistrations();
+            $cr->competition_id = $cid;
+            $cr->registration_id = $registrationId;
+            $cr->attendee_id = $attendeeId;
+            $cr->status = CompetitionRegistrations::STATUS_PENDING;
+            $cr->storeViaApi();
+            $added['competitions'][] = array('competition_id' => $cid);
+        }
+
+        // 4c. Gán vào cuộc thi Miss.
+        foreach ($beautyIds as $bid) {
+            if (isset($haveBeauty[(string)$bid])) { continue; }
+            $contestant = new BeautyContestants();
+            $contestant->contest_id = $bid;
+            $contestant->attendee_id = $attendeeId;
+            $contestant->registration_id = $registrationId;
+            $contestant->candidate_number = 'MS' . $attendeeId . chr(mt_rand(65, 90));
+            $contestant->status = BeautyContestants::STATUS_REGISTERED;
+            $contestant->storeViaApi();
+            $added['beauty'][] = array('contest_id' => $bid);
+        }
+
+        // 4d. Gán vào tiết mục văn nghệ.
+        foreach ($talentIds as $eid) {
+            if (isset($haveTalents[(string)$eid])) { continue; }
+            $tm = new TalentEntryMembers();
+            $tm->entry_id = $eid;
+            $tm->attendee_id = $attendeeId;
+            $role = isset($talentRole[$eid]) ? trim($talentRole[$eid]) : '';
+            if ($role !== '') { $tm->role = $role; }
+            $tm->storeViaApi();
+            $added['talents'][] = array('entry_id' => $eid);
+        }
+
+        // 5. Ghi lịch sử (không chặn nếu backend chưa hỗ trợ action 'add').
+        AttendeeReplacements::record(array(
+            'registration_id' => $registrationId,
+            'event_id' => $eventId,
+            'property_id' => $propertyId,
+            'action' => AttendeeReplacements::ACTION_ADD,
+            'old_attendee_id' => null,
+            'old_attendee_name' => null,
+            'old_staff_code' => null,
+            'new_attendee_id' => $attendeeId,
+            'new_attendee_name' => $fullName,
+            'new_staff_code' => $staffCode,
+            'affected_contents' => array(
+                'sports' => $added['sports'],
+                'competitions' => $added['competitions'],
+                'beauty_contests' => $added['beauty'],
+                'talents' => $added['talents'],
+            ),
+            'cancelled_teams' => array(),
+            'reason' => 'Bổ sung người bởi quản trị',
+            'performed_by' => $email,
+        ));
+
+        Yii::log("Bổ sung attendee #{$attendeeId} vào đăng ký #{$registrationId} bởi {$email}. Reused=" . ($reused ? '1' : '0'), 'info', 'application.controllers.ApproveRegistrationsController');
+        echo CJSON::encode(array('success' => true, 'message' => 'Đã bổ sung người vào đăng ký.'));
+        Yii::app()->end();
+    }
+
+    /**
      * Trích id bản ghi attendee mới từ kết quả ApiClient.
      */
     private function extractNewId($result)
