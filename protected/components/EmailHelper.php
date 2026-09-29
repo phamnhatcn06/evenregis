@@ -896,6 +896,11 @@ class EmailHelper
             //    sách bản ghi phiếu VCK; gộp thêm để không bỏ sót (dedup theo staff_code/tên).
             foreach ($sportTeamsData as $team) {
                 foreach ($team['members'] as $m) {
+                    // Bỏ VĐV liên quân đến từ đơn vị khác — chỉ đếm người của đơn vị hiện tại.
+                    $mProp = isset($m['property_name']) ? trim((string)$m['property_name']) : '';
+                    if ($mProp !== '' && !empty($model->property_name) && $mProp !== $model->property_name) {
+                        continue;
+                    }
                     $collectKey($m);
                 }
             }
