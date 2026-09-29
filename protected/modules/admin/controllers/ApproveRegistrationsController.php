@@ -2193,9 +2193,14 @@ class ApproveRegistrationsController extends AdminController
             Yii::app()->end();
         }
 
-        // Chỉ quản trị TOÀN QUYỀN (wildcard '*') mới được bổ sung người trên màn hình duyệt.
+        // Chỉ quản trị TOÀN QUYỀN mới được bổ sung người trên màn hình duyệt:
+        // có wildcard hệ thống '*', hoặc quyền approveregistrations là full CRUD ('*' hoặc '1 1 1 1').
         $perms = AuthHandler::getPermissions();
-        if (empty($perms['*'])) {
+        $parsed = PermissionHelper::getParsedPermissions();
+        $ar = isset($parsed['approveregistrations']) ? $parsed['approveregistrations'] : null;
+        $isFullAdmin = isset($perms['*'])
+            || ($ar && $ar['create'] && $ar['read'] && $ar['update'] && $ar['delete']);
+        if (!$isFullAdmin) {
             echo CJSON::encode(array('success' => false, 'error' => 'Chỉ quản trị toàn quyền mới được bổ sung người.'));
             Yii::app()->end();
         }
