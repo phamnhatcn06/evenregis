@@ -859,6 +859,7 @@ class EmailHelper
         // giám đốc/lái xe không tham gia nội dung nào nên sẽ bị bỏ sót nếu đếm theo nội dung.
         $finalAllAttendees = array();
         if ($isFinalPeriod) {
+            // 1) Toàn bộ người là bản ghi trên phiếu VCK (finalist + giám đốc + lái xe).
             foreach ($attendees as $att) {
                 $person = array(
                     'attendee_name' => isset($att['full_name']) ? $att['full_name'] : '',
@@ -870,6 +871,27 @@ class EmailHelper
                 );
                 $collectKey($person);
                 $finalAllAttendees[] = $person;
+            }
+            // 2) Người tham gia theo nội dung (thể thao / nghiệp vụ / văn nghệ / miss) —
+            //    dựng lại từ finalist nên có thể trỏ tới attendee GỐC không nằm trong danh
+            //    sách bản ghi phiếu VCK; gộp thêm để không bỏ sót (dedup theo staff_code/tên).
+            foreach ($sportTeamsData as $team) {
+                foreach ($team['members'] as $m) {
+                    $collectKey($m);
+                }
+            }
+            foreach ($competitionRegistrations as $comp) {
+                foreach ($comp['attendees'] as $a) {
+                    $collectKey($a);
+                }
+            }
+            foreach ($talentEntriesData as $entry) {
+                foreach ($entry['members'] as $m) {
+                    $collectKey($m);
+                }
+            }
+            foreach ($beautyContestantsData as $c) {
+                $collectKey($c);
             }
         } else {
             //   Đợt 1 → thể thao + Miss | Đợt 2 → thi nghiệp vụ | Đợt 3 → văn nghệ
