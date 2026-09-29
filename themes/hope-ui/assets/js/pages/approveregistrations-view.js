@@ -19,6 +19,8 @@
     var checkStaffUrl = config.getAttribute('data-check-staff-url');
     var attendeeProfileUrl = config.getAttribute('data-attendee-profile-url');
     var addUrl = config.getAttribute('data-add-url');
+    var teamDetailUrl = config.getAttribute('data-team-detail-url');
+    var lineupUpdateUrl = config.getAttribute('data-lineup-update-url');
 
     function escapeHtml(str) {
         return String(str == null ? '' : str)
