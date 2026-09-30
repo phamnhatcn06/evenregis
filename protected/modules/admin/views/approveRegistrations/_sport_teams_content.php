@@ -33,7 +33,10 @@ foreach ($sportTeams as $team) {
         }
     }
 
-    // Chỉ cho sửa đội hình nếu đội thuộc đơn vị hiện tại (không sửa đội của đơn vị khác trong liên quân).
+    // Đội có thuộc đơn vị hiện tại hay không (dùng cho nhãn/tooltip).
+    // LƯU Ý: kể cả đội liên quân do đơn vị KHÁC sở hữu, admin vẫn được sửa phần đội hình
+    // của ĐƠN VỊ HIỆN TẠI. Backend (actionUpdateSportTeamLineup) chỉ thêm/gỡ người thuộc
+    // phiếu hiện tại, thành viên liên quân của đơn vị khác luôn được giữ nguyên.
     $isTeamOwner = ($teamPropertyId == $model->property_id);
     $teamsData[] = array(
         'team_id' => $teamId,
@@ -65,11 +68,12 @@ usort($teamsData, function ($a, $b) {
                     <span class="badge bg-info ms-2"><i class="fa fa-handshake-o me-1"></i>Liên quân: <?php echo CHtml::encode(implode(', ', $teamData['alliance_properties'])); ?></span>
                 <?php endif; ?>
             </div>
-            <?php if ($canManageLineup && $teamData['is_team_owner'] && $teamData['team_id']): ?>
+            <?php if ($canManageLineup && $teamData['team_id']): ?>
+                <?php $isAllianceTeam = ($teamData['is_alliance'] && !$teamData['is_team_owner']); ?>
                 <button type="button" class="btn btn-sm btn-outline-primary"
                         onclick="openEditLineupModal(<?php echo (int)$teamData['team_id']; ?>, '<?php echo CHtml::encode(addslashes($teamData['sport_name'] . ' - ' . $teamData['team_name'])); ?>')"
-                        title="Thêm/gỡ thành viên đội">
-                    <i class="fa fa-pencil me-1"></i>Sửa đội hình
+                        title="<?php echo $isAllianceTeam ? 'Sửa đội hình của đơn vị hiện tại (giữ nguyên thành viên liên quân)' : 'Thêm/gỡ thành viên đội'; ?>">
+                    <i class="fa fa-pencil me-1"></i>Sửa đội hình<?php echo $isAllianceTeam ? ' (đơn vị này)' : ''; ?>
                 </button>
             <?php endif; ?>
         </div>
