@@ -880,6 +880,10 @@ class EmailHelper
         if ($isFinalPeriod) {
             // 1) Toàn bộ người là bản ghi trên phiếu VCK (finalist + giám đốc + lái xe).
             foreach ($attendees as $att) {
+                // Bỏ người đã huỷ tư cách (is_active=0) khỏi danh sách email.
+                if (isset($att['is_active']) && (int)$att['is_active'] === 0) {
+                    continue;
+                }
                 $person = array(
                     'attendee_name' => isset($att['full_name']) ? $att['full_name'] : '',
                     'staff_code' => isset($att['staff_code']) ? $att['staff_code'] : '',
