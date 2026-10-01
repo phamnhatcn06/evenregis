@@ -357,6 +357,13 @@ class EmailHelper
         if (in_array('talent', $periodContentCodes) && !$isDot1) {
             $ccRaw[] = 'daihoi.bansukientruyenthong@muongthanh.vn';
         }
+        // Đợt 4 (Vòng chung kết) → CC toàn bộ các ban tổ chức
+        if ($isFinalPeriod) {
+            $ccRaw[] = 'daihoi.banthethao@muongthanh.vn';
+            $ccRaw[] = 'daihoi.bannghiepvu@muongthanh.vn';
+            $ccRaw[] = 'daihoi.bansukientruyenthong@muongthanh.vn';
+            $ccRaw[] = 'daihoi.banhanhchinhlogistic@muongthanh.vn';
+        }
         // CC cố định cho mọi email (khi không ở chế độ debug): Ban Hành chính - Logistic
         if (!self::DEBUG_MODE) {
             $ccRaw[] = 'daihoi.banhanhchinhlogistic@muongthanh.vn';
