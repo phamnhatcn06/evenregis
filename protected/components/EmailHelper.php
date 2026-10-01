@@ -869,14 +869,29 @@ class EmailHelper
             }
         }
 
-        // Đếm số người tham dự (unique theo staff_code, fallback tên).
-        $attendeeKeys = array();
-        $collectKey = function ($person) use (&$attendeeKeys) {
+        // Đếm số người tham dự (unique). Một người có thể đến từ 2 nguồn khác nhau:
+        //   - Bản ghi trên phiếu (có thể thiếu staff_code)
+        //   - Dữ liệu theo nội dung (trỏ attendee gốc, thường có staff_code)
+        // Nên coi là TRÙNG khi khớp staff_code HOẶC khớp tên, tránh đếm 2 lần
+        // (khi một nguồn khuyết mã NV sẽ keyed theo tên, nguồn kia keyed theo mã).
+        $seenCodes = array();
+        $seenNames = array();
+        $uniqueAttendeeCount = 0;
+        $collectKey = function ($person) use (&$seenCodes, &$seenNames, &$uniqueAttendeeCount) {
             $code = isset($person['staff_code']) ? trim((string)$person['staff_code']) : '';
-            $name = isset($person['attendee_name']) ? trim((string)$person['attendee_name']) : '';
-            $key = $code !== '' ? 'c:' . $code : ($name !== '' ? 'n:' . mb_strtolower($name) : '');
-            if ($key !== '') {
-                $attendeeKeys[$key] = true;
+            $name = isset($person['attendee_name']) ? mb_strtolower(trim((string)$person['attendee_name'])) : '';
+            if ($code === '' && $name === '') {
+                return;
+            }
+            $known = ($code !== '' && isset($seenCodes[$code])) || ($name !== '' && isset($seenNames[$name]));
+            if ($code !== '') {
+                $seenCodes[$code] = true;
+            }
+            if ($name !== '') {
+                $seenNames[$name] = true;
+            }
+            if (!$known) {
+                $uniqueAttendeeCount++;
             }
         };
 
