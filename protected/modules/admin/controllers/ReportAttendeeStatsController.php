@@ -2071,7 +2071,6 @@ class ReportAttendeeStatsController extends AdminController
 
         $usedSportIds = array();
         $usedCompIds = array();
-        $finalEntryInfo = array(); // entry_id => array('title', 'is_alliance_team')
         $hasTalent = false;
         $hasMiss = false;
 
