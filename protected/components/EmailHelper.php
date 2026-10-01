@@ -970,7 +970,7 @@ class EmailHelper
                 }
             }
         }
-        $attendeesCount = count($attendeeKeys);
+        $attendeesCount = $uniqueAttendeeCount;
 
         // Lịch sử thay đổi nhân sự (thay thế / huỷ tư cách) — hiển thị mục riêng
         $personnelChanges = AttendeeReplacements::getFormattedByRegistrationId($registrationId);
