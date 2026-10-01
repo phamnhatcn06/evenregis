@@ -2055,123 +2055,70 @@ class ReportAttendeeStatsController extends AdminController
             return $key;
         };
 
-        // --- THỂ THAO: đội vào chung kết -> mở rộng thành viên qua sport_team_members ---
+        // Danh sách VCK lấy TỪ các phiếu đăng ký thuộc đợt Vòng chung kết (is_final)
+        // của sự kiện. Mỗi người là một attendee trên phiếu VCK, kèm contents[] đánh
+        // dấu nội dung họ vào chung kết (sport/competition/beauty/talent).
+        $finalPeriodId = RegistrationPeriods::getFinalPeriodIdForEvent($eventId);
+
+        // Map đội thể thao -> môn, để quy nội dung sport (ref_id = sport_team_id) về sport_id.
         $finalTeamSport = array(); // team_id => sport_id
-        $usedSportIds = array();
         foreach (array_keys($activeSportIds) as $spId) {
             foreach (SportTeams::getFinalists($eventId, $spId) as $f) {
                 $teamId = isset($f['team_id']) ? $f['team_id'] : null;
                 if ($teamId !== null) $finalTeamSport[$teamId] = $spId;
             }
         }
-        if (!empty($finalTeamSport)) {
-            foreach (SportTeamMembers::getRawListByEvent($eventId) as $sm) {
-                if (!empty($sm['deleted_at'])) continue;
-                $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
-                if ($teamId === null || !isset($finalTeamSport[$teamId])) continue;
-                $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
-                $fallback = array(
-                    'full_name' => $pick($sm, array('attendee_name', 'full_name', 'name')),
-                    'property_name' => $pick($sm, array('property_name')),
-                    'position' => $pick($sm, array('attendee_position', 'position')),
-                    'gender' => $pick($sm, array('gender')),
-                );
-                $key = $addParticipant($attId, $fallback);
-                if ($key === null) continue;
-                $spId = $finalTeamSport[$teamId];
-                $participants[$key]['sports'][$spId] = true;
-                $usedSportIds[$spId] = true;
-            }
-        }
 
-        // --- NGHIỆP VỤ: thí sinh vào chung kết ---
+        $usedSportIds = array();
         $usedCompIds = array();
-        foreach (array_keys($activeCompIds) as $compId) {
-            foreach (CompetitionRegistrations::getFinalists($compId) as $f) {
-                $reg = isset($f['registration']) && is_array($f['registration']) ? $f['registration'] : array();
-                $att = isset($reg['attendee']) && is_array($reg['attendee']) ? $reg['attendee'] : array();
-                $attId = $pick($reg, array('attendee_id'));
-                if (!$attId) $attId = $pick($f, array('attendee_id'));
-                if (!$attId) $attId = $pick($att, array('id'));
-                $prop = isset($att['property']) && is_array($att['property']) ? $att['property'] : array();
-                $fallback = array(
-                    'full_name' => $pick($reg, array('attendee_name', 'full_name', 'name'))
-                        ?: $pick($att, array('full_name', 'name')),
-                    'property_name' => $pick($reg, array('property_name')) ?: $pick($prop, array('name')),
-                    'position' => $pick($reg, array('position')) ?: $pick($att, array('position')),
-                    'gender' => $pick($att, array('gender')),
-                );
-                $key = $addParticipant($attId, $fallback);
-                if ($key === null) continue;
-                $participants[$key]['competitions'][$compId] = true;
-                $usedCompIds[$compId] = true;
-            }
-        }
-
-        // --- VĂN NGHỆ: tiết mục vào chung kết -> mở rộng thành viên ---
-        $finalEntryIds = array();
         $finalEntryInfo = array(); // entry_id => array('title', 'is_alliance_team')
-        $talentShows = TalentShows::getApiDataProvider(array('event_id' => $eventId), 200)->getData();
-        foreach ($talentShows as $show) {
-            $showId = isset($show->id) ? $show->id : null;
-            if (!$showId) continue;
-            foreach (TalentEntries::getFinalists($showId) as $f) {
-                $entryId = isset($f['entry_id']) ? $f['entry_id'] : null;
-                if ($entryId === null) continue;
-                $finalEntryIds[$entryId] = true;
-                $entry = isset($f['entry']) && is_array($f['entry']) ? $f['entry'] : array();
-                $finalEntryInfo[$entryId] = array(
-                    'title' => $pick($entry, array('title', 'name')),
-                    'is_alliance_team' => !empty($entry['is_alliance_team']),
-                );
-            }
-        }
-        if (!empty($finalEntryIds)) {
-            foreach (TalentEntryMembers::getRawListByEvent($eventId) as $tm) {
-                if (!empty($tm['deleted_at'])) continue;
-                $entryId = isset($tm['entry_id']) ? $tm['entry_id'] : null;
-                if ($entryId === null || !isset($finalEntryIds[$entryId])) continue;
-                $attId = isset($tm['attendee_id']) ? $tm['attendee_id'] : null;
-                $fallback = array(
-                    'full_name' => $pick($tm, array('attendee_name', 'full_name', 'name')),
-                    'property_name' => $pick($tm, array('property_name')),
-                    'position' => $pick($tm, array('attendee_position', 'position')),
-                    'gender' => $pick($tm, array('gender')),
-                );
-                $key = $addParticipant($attId, $fallback);
-                if ($key === null) continue;
-                if (isset($finalEntryInfo[$entryId])) {
-                    $participants[$key]['talent_entries'][$entryId] = $finalEntryInfo[$entryId];
-                }
-                $participants[$key]['talent'] = true;
-            }
-        }
-        $hasTalent = !empty($finalEntryIds);
-
-        // --- MISS: thí sinh vào chung kết ---
+        $hasTalent = false;
         $hasMiss = false;
-        $beautyContests = BeautyContests::getApiDataProvider(array('event_id' => $eventId), 100)->getData();
-        foreach ($beautyContests as $contest) {
-            $contestId = isset($contest->id) ? $contest->id : null;
-            if (!$contestId) continue;
-            foreach (BeautyContestants::getFinalists($contestId) as $f) {
-                $c = isset($f['contestant']) && is_array($f['contestant']) ? $f['contestant'] : array();
-                $att = isset($c['attendee']) && is_array($c['attendee']) ? $c['attendee'] : array();
-                $attId = $pick($c, array('attendee_id'));
-                if (!$attId) $attId = $pick($f, array('attendee_id'));
-                if (!$attId) $attId = $pick($att, array('id'));
-                $prop = isset($att['property']) && is_array($att['property']) ? $att['property'] : array();
-                $fallback = array(
-                    'full_name' => $pick($c, array('attendee_name', 'full_name', 'name'))
-                        ?: $pick($att, array('full_name', 'name')),
-                    'property_name' => $pick($c, array('property_name')) ?: $pick($prop, array('name')),
-                    'position' => $pick($c, array('position')) ?: $pick($att, array('position')),
-                    'gender' => $pick($c, array('gender')) ?: $pick($att, array('gender')),
-                );
-                $key = $addParticipant($attId, $fallback);
-                if ($key === null) continue;
-                $participants[$key]['miss'] = true;
-                $hasMiss = true;
+
+        $finalAttendees = $finalPeriodId
+            ? RegistrationPeriods::getFinalAttendees($finalPeriodId)
+            : array();
+        foreach ($finalAttendees as $fa) {
+            $attId = isset($fa['id']) ? $fa['id'] : null;
+            $fallback = array(
+                'full_name' => $pick($fa, array('full_name', 'name')),
+                'property_name' => $pick($fa, array('property_name')),
+                'position' => $pick($fa, array('position_name', 'position')),
+                'gender' => $pick($fa, array('gender')),
+            );
+            $key = $addParticipant($attId, $fallback);
+            if ($key === null) continue;
+
+            $contents = isset($fa['contents']) && is_array($fa['contents']) ? $fa['contents'] : array();
+            foreach ($contents as $c) {
+                $ctype = isset($c['content_type']) ? $c['content_type'] : '';
+                $refId = isset($c['ref_id']) ? $c['ref_id'] : null;
+                $refName = isset($c['ref_name']) ? $c['ref_name'] : '';
+                if ($ctype === 'sport') {
+                    // ref_id = sport_team_id -> quy về sport_id
+                    $spId = ($refId !== null && isset($finalTeamSport[$refId])) ? $finalTeamSport[$refId] : null;
+                    if ($spId !== null && isset($sportNameMap[$spId])) {
+                        $participants[$key]['sports'][$spId] = true;
+                        $usedSportIds[$spId] = true;
+                    }
+                } elseif ($ctype === 'competition') {
+                    if ($refId !== null && isset($competitionNameMap[$refId])) {
+                        $participants[$key]['competitions'][$refId] = true;
+                        $usedCompIds[$refId] = true;
+                    }
+                } elseif ($ctype === 'talent') {
+                    if ($refId !== null) {
+                        $participants[$key]['talent_entries'][$refId] = array(
+                            'title' => $refName,
+                            'is_alliance_team' => false,
+                        );
+                    }
+                    $participants[$key]['talent'] = true;
+                    $hasTalent = true;
+                } elseif ($ctype === 'beauty') {
+                    $participants[$key]['miss'] = true;
+                    $hasMiss = true;
+                }
             }
         }
 
