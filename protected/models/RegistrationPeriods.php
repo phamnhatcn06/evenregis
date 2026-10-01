@@ -222,6 +222,27 @@ class RegistrationPeriods extends BaseRegistrationPeriods
 		return $list;
 	}
 
+	/**
+	 * Lấy id đợt Vòng chung kết (is_final = 1) của 1 sự kiện.
+	 * @return int|null id đợt VCK, hoặc null nếu sự kiện chưa có đợt VCK.
+	 */
+	public static function getFinalPeriodIdForEvent($eventId)
+	{
+		if (!$eventId) {
+			return null;
+		}
+		$items = self::getApiDataProvider(array('event_id' => (int) $eventId), 200)->getData();
+		foreach ($items as $p) {
+			$isFinal = is_object($p)
+				? (isset($p->is_final) ? $p->is_final : null)
+				: (isset($p['is_final']) ? $p['is_final'] : null);
+			if ((int) $isFinal === self::KIND_FINAL) {
+				return is_object($p) ? $p->id : $p['id'];
+			}
+		}
+		return null;
+	}
+
 	public static function getActiveList()
 	{
 		$list = array();
