@@ -413,6 +413,10 @@ class Attendees extends BaseAttendees
         if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
             $data['start_date'] = $this->join_hotel_date;
         }
+        // Map badge_org_name to unit_label for API (DB column is unit_label)
+        if (isset($this->badge_org_name) && $this->badge_org_name !== null && $this->badge_org_name !== '') {
+            $data['unit_label'] = $this->badge_org_name;
+        }
         // Đảm bảo luôn gửi các trường backend validate bắt buộc,
         // tránh lỗi "Xác minh dữ liệu thất bại" khi array_filter loại bỏ giá trị rỗng.
         foreach ($this->requiredUpdateFields() as $field => $value) {
