@@ -11,6 +11,11 @@ class RunAuth extends CFormModel
         return ApiClient::post(ApiEndpoints::RUN_AUTH_IDENTIFY, array('identifier' => $identifier));
     }
 
+    public static function identifyByQr($qrValue)
+    {
+        return ApiClient::post(ApiEndpoints::RUN_AUTH_IDENTIFY_BY_QR, array('qr_value' => $qrValue));
+    }
+
     public static function setPin($identifier, $pin)
     {
         return ApiClient::post(ApiEndpoints::RUN_AUTH_SET_PIN, array('identifier' => $identifier, 'pin' => $pin));
