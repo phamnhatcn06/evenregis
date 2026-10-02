@@ -2089,6 +2089,7 @@ class ReportAttendeeStatsController extends AdminController
                 'position' => $pick($fa, array('position_name', 'position')),
                 'gender' => $pick($fa, array('gender')),
                 'shirt_size' => $pick($fa, array('shirt_size')),
+                'unit_label' => $pick($fa, array('unit_label')),
             );
             $key = $addParticipant($attId, $fallback);
             if ($key === null) continue;
