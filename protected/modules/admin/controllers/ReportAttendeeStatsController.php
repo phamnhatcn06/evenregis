@@ -1941,6 +1941,7 @@ class ReportAttendeeStatsController extends AdminController
                 'property_id' => isset($att->property_id) ? $att->property_id : null,
                 'property_name' => isset($att->property_name) ? $att->property_name : '',
                 'shirt_size' => isset($att->shirt_size) ? $att->shirt_size : '',
+                'unit_label' => isset($att->unit_label) ? $att->unit_label : '',
             );
         }
 
