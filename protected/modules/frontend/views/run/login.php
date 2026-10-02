@@ -58,7 +58,7 @@ if ($step === 'identify') {
                         <input type="hidden" name="step" value="setpin">
                         <input type="hidden" name="identifier" value="<?php echo CHtml::encode($identifier); ?>">
                         <div class="mb-3">
-                            <label class="form-label">Mã PIN mới (6 số)</label>
+                            <label class="form-label">Mã PIN mới (tối thiểu 6 số)</label>
                             <input type="password" name="pin" class="form-control text-center" inputmode="numeric"
                                    pattern="\d{6,}" minlength="6" placeholder="••••••" required>
                         </div>
