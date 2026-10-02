@@ -1,6 +1,17 @@
 <?php
 $this->pageTitle = 'Đăng ký chạy - Đăng nhập';
 $loginUrl = $this->createUrl('/frontend/run/login');
+
+if ($step === 'identify') {
+    Yii::app()->clientScript->registerScriptFile(
+        Yii::app()->theme->baseUrl . '/assets/vendor/html5-qrcode/html5-qrcode.min.js',
+        CClientScript::POS_END
+    );
+    Yii::app()->clientScript->registerScriptFile(
+        Yii::app()->theme->baseUrl . '/assets/js/pages/run-qr-login.js',
+        CClientScript::POS_END
+    );
+}
 ?>
 <div class="row justify-content-center mt-4">
     <div class="col-md-5 col-sm-8">
