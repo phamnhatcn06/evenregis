@@ -2046,6 +2046,7 @@ class ReportAttendeeStatsController extends AdminController
                     'staff_code' => $info ? $info['staff_code'] : '',
                     'position' => $info ? $info['position'] : (isset($fallback['position']) ? $fallback['position'] : ''),
                     'department_name' => $info ? $info['department_name'] : '',
+                    'shirt_size' => $info ? $info['shirt_size'] : (isset($fallback['shirt_size']) ? $fallback['shirt_size'] : ''),
                     'sports' => array(),
                     'competitions' => array(),
                     'talent' => false,
