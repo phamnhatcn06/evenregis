@@ -254,6 +254,9 @@ class EmailHelper
             $finalContentCodes = array();
             $finalAtts = RegistrationPeriods::getFinalAttendees($model->period_id, $model->property_id);
             foreach ($finalAtts as $fa) {
+                if (isset($fa['id']) && $fa['id'] !== null) {
+                    $finalAttendeeIds[$fa['id']] = true;
+                }
                 $contents = isset($fa['contents']) ? $fa['contents'] : array();
                 foreach ($contents as $c) {
                     $type = isset($c['content_type']) ? $c['content_type'] : '';
