@@ -39,14 +39,23 @@ class RunController extends CController
             $formStep = isset($_POST['step']) ? $_POST['step'] : 'identify';
             $identifier = trim(isset($_POST['identifier']) ? $_POST['identifier'] : '');
 
-            if ($formStep === 'identify') {
-                $res = RunAuth::identify($identifier);
+            if ($formStep === 'identify' || $formStep === 'qr') {
+                if ($formStep === 'qr') {
+                    $qrValue = trim(isset($_POST['qr_value']) ? $_POST['qr_value'] : '');
+                    $res = RunAuth::identifyByQr($qrValue);
+                } else {
+                    $res = RunAuth::identify($identifier);
+                }
                 if ($res['success'] && isset($res['data']['data'])) {
                     $data = $res['data']['data'];
                     $fullName = isset($data['full_name']) ? $data['full_name'] : '';
+                    // QR trả về định danh (DHMT+lucky) để dùng cho bước nhập PIN
+                    if (!empty($data['identifier'])) {
+                        $identifier = $data['identifier'];
+                    }
                     $step = !empty($data['pin_is_set']) ? 'login' : 'setpin';
                 } else {
-                    Yii::app()->user->setFlash('error', $res['error'] ?: 'Định danh không tồn tại.');
+                    Yii::app()->user->setFlash('error', $res['error'] ?: 'Không nhận diện được. Vui lòng thử lại.');
                 }
             } elseif ($formStep === 'setpin') {
                 $pin = isset($_POST['pin']) ? $_POST['pin'] : '';
