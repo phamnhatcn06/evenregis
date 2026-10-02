@@ -596,6 +596,7 @@ class ApiEndpoints
     const RUN_REGISTRATION_MINE = '/api/run-registrations/mine';
 
     const RUN_AUTH_IDENTIFY = '/api/run-auth/identify';
+    const RUN_AUTH_IDENTIFY_BY_QR = '/api/run-auth/identify-by-qr';
     const RUN_AUTH_SET_PIN = '/api/run-auth/set-pin';
     const RUN_AUTH_LOGIN = '/api/run-auth/login';
     const RUN_AUTH_GEN_LUCKY = '/api/run-auth/gen-lucky';
