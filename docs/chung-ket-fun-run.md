@@ -160,8 +160,8 @@ UPDATE run_events
 | BE: schema + CRUD nội dung + FCFS claim + auth + gen-lucky | ✅ Xong, verified (tinker + HTTP) |
 | FE: models + admin CRUD + admin danh sách/Excel/gen-lucky | ✅ Xong, lint sạch |
 | FE: cổng public login/đăng ký/kết quả | ✅ Xong, verified HTTP end-to-end |
-| Passcode độ dài linh hoạt (toàn số) | ⏳ Cần chỉnh (đang khóa cứng 6 số) |
-| Nút quét QR thẻ + endpoint identify-by-qr | ⏳ Chưa làm (làm khi gần sự kiện / đã có thẻ) |
+| Passcode toàn số, **tối thiểu 6 số**, độ dài tự do | ✅ Xong (BE regex `^\d{6,}$`, form `minlength=6`) |
+| Nút quét QR thẻ + endpoint `run-auth/identify-by-qr` | ✅ Xong, verified HTTP (thư viện html5-qrcode local, trích token từ URL/chuỗi thuần) |
 | Gửi định danh cho người tham dự | ⏳ Ngoài phạm vi hiện tại |
 
 ### Thao tác cấu hình phía người dùng
