@@ -531,26 +531,41 @@ class EmailHelper
                     $memberIsObj = is_object($member);
                     $attId = $memberIsObj ? (isset($member->attendee_id) ? $member->attendee_id : null) : (isset($member['attendee_id']) ? $member['attendee_id'] : null);
 
-                    // Chỉ lấy VĐV thuộc đơn vị hiện tại (có trong danh sách người tham dự của phiếu đăng ký này);
-                    // bỏ qua VĐV liên quân đến từ đơn vị khác.
-                    // Phiếu VCK: thành viên đội trỏ tới attendee GỐC (không có trong attendeesMap của phiếu VCK),
-                    // nên lọc theo tập finalist của đơn vị hiện tại ($finalAttendeeIds) — vẫn loại được
-                    // VĐV liên quân đến từ đơn vị khác.
-                    $inMap = ($attId !== null && isset($attendeesMap[$attId]));
-                    if ($isFinalPeriod) {
-                        if ($attId === null || !isset($finalAttendeeIds[$attId])) {
-                            continue;
-                        }
-                    } elseif (!$inMap) {
-                        continue;
-                    }
-                    $attInfo = $inMap ? $attendeesMap[$attId] : array();
                     $memberVal = function ($key) use ($member, $memberIsObj) {
                         if ($memberIsObj) {
                             return isset($member->$key) ? $member->$key : null;
                         }
                         return isset($member[$key]) ? $member[$key] : null;
                     };
+                    $inMap = ($attId !== null && isset($attendeesMap[$attId]));
+
+                    // File xác nhận của mỗi đơn vị chỉ liệt kê VĐV THUỘC ĐƠN VỊ HIỆN TẠI.
+                    // Với đội liên quân: mỗi đơn vị chỉ liệt kê VĐV của mình, KHÔNG hiện VĐV đến
+                    // từ đơn vị khác. Lọc theo ĐƠN VỊ của VĐV (property_name từ API, lấy theo
+                    // attendee.property_id) thay vì theo phiếu đăng ký — để không bỏ sót VĐV của
+                    // đơn vị mình khi bản ghi attendee được tạo dưới phiếu của đơn vị chủ đội.
+                    // Phiếu VCK: thành viên đội trỏ tới attendee GỐC (không có trong attendeesMap
+                    // của phiếu VCK) → lọc theo tập finalist của đơn vị hiện tại ($finalAttendeeIds).
+                    if ($isFinalPeriod) {
+                        if ($attId === null || !isset($finalAttendeeIds[$attId])) {
+                            continue;
+                        }
+                    } else {
+                        $memberPropName = $memberVal('property_name');
+                        if (empty($memberPropName) && $inMap && !empty($attendeesMap[$attId]['property_name'])) {
+                            $memberPropName = $attendeesMap[$attId]['property_name'];
+                        }
+                        if (!empty($memberPropName) && !empty($model->property_name)) {
+                            // Xác định được đơn vị của VĐV → chỉ giữ nếu đúng đơn vị hiện tại.
+                            if (trim((string)$memberPropName) !== trim((string)$model->property_name)) {
+                                continue;
+                            }
+                        } elseif (!$inMap) {
+                            // Không xác định được đơn vị → giữ hành vi cũ: phải nằm trong phiếu hiện tại.
+                            continue;
+                        }
+                    }
+                    $attInfo = $inMap ? $attendeesMap[$attId] : array();
 
                     $attName = $memberVal('attendee_name');
                     if (empty($attName) && !empty($attInfo['full_name'])) {
