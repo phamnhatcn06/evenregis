@@ -2278,7 +2278,7 @@ class ReportAttendeeStatsController extends AdminController
             return $contentFilter === null || in_array($type, $contentFilter, true);
         };
         if ($includeUnitCols) {
-            $fixedHeaders = array('STT', 'Mã ĐV', 'Đơn vị', 'Đơn vị (thẻ)', 'Họ và tên', 'Giới tính', 'Size áo', 'Mã NV', 'Chức danh', 'Bộ phận');
+            $fixedHeaders = array('STT', 'Mã ĐV', 'Đơn vị', 'Tên đơn vị trên thẻ', 'Họ và tên', 'Giới tính', 'Size áo', 'Mã NV', 'Chức danh', 'Bộ phận');
             $fixedWidths = array(6, 10, 30, 30, 26, 9, 8, 12, 30, 24);
             $genderCol = 5;
         } else {
