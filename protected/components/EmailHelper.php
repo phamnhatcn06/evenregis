@@ -245,6 +245,7 @@ class EmailHelper
         // tra được theo phiếu gốc. Dựng lại danh sách nghiệp vụ/sắc đẹp từ finalist, và ghi nhận
         // tập id đội thể thao / tiết mục văn nghệ đã vào chung kết để lọc ở các bước sau.
         $finalSportTeamIds = array();          // ref_id = sport_team.id
+        $finalAttendeeIds = array();           // attendee_id gốc của finalist thuộc đơn vị hiện tại
         $finalTalentEntryIds = array();        // ref_id = talent_entry.id
         $finalTalentMembers = array();         // ref_id => danh sách thành viên (chỉ finalist của đơn vị)
         $finalBeautyContents = array();        // dựng lại danh sách thi sắc đẹp theo finalist
