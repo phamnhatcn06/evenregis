@@ -534,9 +534,14 @@ class EmailHelper
                     // Chỉ lấy VĐV thuộc đơn vị hiện tại (có trong danh sách người tham dự của phiếu đăng ký này);
                     // bỏ qua VĐV liên quân đến từ đơn vị khác.
                     // Phiếu VCK: thành viên đội trỏ tới attendee GỐC (không có trong attendeesMap của phiếu VCK),
-                    // nên không lọc theo attendeesMap — lấy thông tin trực tiếp từ dữ liệu thành viên của đội.
+                    // nên lọc theo tập finalist của đơn vị hiện tại ($finalAttendeeIds) — vẫn loại được
+                    // VĐV liên quân đến từ đơn vị khác.
                     $inMap = ($attId !== null && isset($attendeesMap[$attId]));
-                    if (!$isFinalPeriod && !$inMap) {
+                    if ($isFinalPeriod) {
+                        if ($attId === null || !isset($finalAttendeeIds[$attId])) {
+                            continue;
+                        }
+                    } elseif (!$inMap) {
                         continue;
                     }
                     $attInfo = $inMap ? $attendeesMap[$attId] : array();
