@@ -1,0 +1,64 @@
+<?php
+$this->pageTitle = 'Đăng ký chạy - Đăng nhập';
+$loginUrl = $this->createUrl('/frontend/run/login');
+?>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-5 col-sm-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h4 class="text-center mb-1">Cổng đăng ký Bộ môn Chạy</h4>
+                <p class="text-center text-muted mb-4">Dành cho người tham dự Vòng chung kết</p>
+
+                <?php if ($step === 'identify'): ?>
+                    <form method="post" action="<?php echo $loginUrl; ?>">
+                        <input type="hidden" name="step" value="identify">
+                        <div class="mb-3">
+                            <label class="form-label">Định danh đăng nhập</label>
+                            <input type="text" name="identifier" class="form-control form-control-lg text-center"
+                                   placeholder="VD: DHMT123456" value="<?php echo CHtml::encode($identifier); ?>"
+                                   autofocus required>
+                            <div class="form-text">Nhập mã định danh được Ban tổ chức cung cấp (bắt đầu bằng DHMT).</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Tiếp tục</button>
+                    </form>
+
+                <?php elseif ($step === 'setpin'): ?>
+                    <div class="alert alert-info py-2">Xin chào <strong><?php echo CHtml::encode($fullName); ?></strong>. Vui lòng tạo mã PIN 6 số để đăng nhập.</div>
+                    <form method="post" action="<?php echo $loginUrl; ?>">
+                        <input type="hidden" name="step" value="setpin">
+                        <input type="hidden" name="identifier" value="<?php echo CHtml::encode($identifier); ?>">
+                        <div class="mb-3">
+                            <label class="form-label">Mã PIN mới (6 số)</label>
+                            <input type="password" name="pin" class="form-control text-center" inputmode="numeric"
+                                   pattern="\d{6}" maxlength="6" placeholder="••••••" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nhập lại mã PIN</label>
+                            <input type="password" name="pin_confirm" class="form-control text-center" inputmode="numeric"
+                                   pattern="\d{6}" maxlength="6" placeholder="••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Đặt mã PIN & Đăng nhập</button>
+                    </form>
+
+                <?php else: ?>
+                    <?php if ($fullName): ?>
+                        <div class="alert alert-info py-2">Xin chào <strong><?php echo CHtml::encode($fullName); ?></strong>. Nhập mã PIN để đăng nhập.</div>
+                    <?php endif; ?>
+                    <form method="post" action="<?php echo $loginUrl; ?>">
+                        <input type="hidden" name="step" value="login">
+                        <input type="hidden" name="identifier" value="<?php echo CHtml::encode($identifier); ?>">
+                        <div class="mb-3">
+                            <label class="form-label">Mã PIN</label>
+                            <input type="password" name="pin" class="form-control form-control-lg text-center" inputmode="numeric"
+                                   pattern="\d{6}" maxlength="6" placeholder="••••••" autofocus required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+                        <div class="text-center mt-2">
+                            <a href="<?php echo $loginUrl; ?>" class="small text-muted">Nhập lại định danh khác</a>
+                        </div>
+                    </form>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
