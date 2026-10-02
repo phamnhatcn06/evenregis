@@ -363,6 +363,10 @@ class Attendees extends BaseAttendees
         if (isset($this->join_hotel_date) && $this->join_hotel_date !== null && $this->join_hotel_date !== '') {
             $data['start_date'] = $this->join_hotel_date;
         }
+        // Map badge_org_name to unit_label for API (DB column is unit_label)
+        if (isset($this->badge_org_name) && $this->badge_org_name !== null && $this->badge_org_name !== '') {
+            $data['unit_label'] = $this->badge_org_name;
+        }
         $result = ApiClient::post(ApiEndpoints::ATTENDEE_STORE, $data);
         return $result;
     }
