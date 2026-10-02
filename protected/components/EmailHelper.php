@@ -257,6 +257,16 @@ class EmailHelper
                 if (isset($fa['id']) && $fa['id'] !== null) {
                     $finalAttendeeIds[$fa['id']] = true;
                 }
+                // Thành viên đội thể thao/nội dung trỏ tới attendee GỐC (vòng loại), còn record VCK
+                // là attendee mới. Gộp thêm source_attendee_ids (attendee gốc tương ứng finalist)
+                // để lọc được thành viên đội theo đúng finalist của đơn vị hiện tại.
+                if (!empty($fa['source_attendee_ids']) && is_array($fa['source_attendee_ids'])) {
+                    foreach ($fa['source_attendee_ids'] as $srcId) {
+                        if ($srcId !== null && $srcId !== '') {
+                            $finalAttendeeIds[$srcId] = true;
+                        }
+                    }
+                }
                 $contents = isset($fa['contents']) ? $fa['contents'] : array();
                 foreach ($contents as $c) {
                     $type = isset($c['content_type']) ? $c['content_type'] : '';
