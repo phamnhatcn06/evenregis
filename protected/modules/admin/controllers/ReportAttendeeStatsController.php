@@ -2374,8 +2374,9 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $stt++);
             if ($includeUnitCols) {
                 $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['property_code']);
+                $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['property_name']);
             }
-            $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['property_name']);
+            $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['unit_label']) ? $p['unit_label'] : '');
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['full_name']);
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $this->formatGender($p['gender']));
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['shirt_size']) ? $p['shirt_size'] : '');
