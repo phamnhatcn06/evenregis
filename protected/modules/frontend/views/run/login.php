@@ -33,6 +33,25 @@ if ($step === 'identify') {
                         <button type="submit" class="btn btn-primary w-100">Tiếp tục</button>
                     </form>
 
+                    <div class="text-center my-3 text-muted">— hoặc —</div>
+
+                    <button type="button" id="btn-scan-qr" class="btn btn-outline-primary w-100">
+                        <i class="fa fa-qrcode me-1"></i> Quét QR thẻ tham dự
+                    </button>
+
+                    <!-- Khung camera quét QR (ẩn đến khi bấm) -->
+                    <div id="qr-scan-wrap" class="mt-3" style="display:none;">
+                        <div id="qr-reader" style="width:100%;"></div>
+                        <button type="button" id="btn-stop-qr" class="btn btn-outline-secondary btn-sm w-100 mt-2">Đóng camera</button>
+                        <div class="form-text">Đưa mã QR trên thẻ vào khung hình. Cần cho phép quyền camera.</div>
+                    </div>
+
+                    <!-- Form ẩn gửi giá trị QR về server -->
+                    <form method="post" action="<?php echo $loginUrl; ?>" id="qr-login-form">
+                        <input type="hidden" name="step" value="qr">
+                        <input type="hidden" name="qr_value" id="qr_value">
+                    </form>
+
                 <?php elseif ($step === 'setpin'): ?>
                     <div class="alert alert-info py-2">Xin chào <strong><?php echo CHtml::encode($fullName); ?></strong>. Vui lòng tạo mã PIN 6 số để đăng nhập.</div>
                     <form method="post" action="<?php echo $loginUrl; ?>">
