@@ -309,7 +309,10 @@ class Attendees extends BaseAttendees
             if (isset($data['shirt_size'])) {
                 $model->shirt_size = $data['shirt_size'];
             }
-            if (isset($data['badge_org_name'])) {
+            // API/DB lưu tên đơn vị trên thẻ ở cột unit_label
+            if (isset($data['unit_label'])) {
+                $model->badge_org_name = $data['unit_label'];
+            } elseif (isset($data['badge_org_name'])) {
                 $model->badge_org_name = $data['badge_org_name'];
             }
             $model->id = $id;
