@@ -583,6 +583,23 @@ class ApiEndpoints
     const TALENT_FINAL_LIST = '/api/talent-finals/list/{id}';
     const TALENT_FINAL_REMOVE = '/api/talent-finals/remove/{id}';
 
+    // Run (Cổng đăng ký bộ môn chạy)
+    const RUN_EVENT_LIST = '/api/run-events';
+    const RUN_EVENT_LIST_OPEN = '/api/run-events/list-open';
+    const RUN_EVENT_STORE = '/api/run-events/store';
+    const RUN_EVENT_DETAIL = '/api/run-events/detail/{id}';
+    const RUN_EVENT_UPDATE = '/api/run-events/update/{id}';
+    const RUN_EVENT_DESTROY = '/api/run-events/destroy/{id}';
+
+    const RUN_REGISTRATION_LIST = '/api/run-registrations';
+    const RUN_REGISTRATION_CLAIM = '/api/run-registrations/claim';
+    const RUN_REGISTRATION_MINE = '/api/run-registrations/mine';
+
+    const RUN_AUTH_IDENTIFY = '/api/run-auth/identify';
+    const RUN_AUTH_SET_PIN = '/api/run-auth/set-pin';
+    const RUN_AUTH_LOGIN = '/api/run-auth/login';
+    const RUN_AUTH_GEN_LUCKY = '/api/run-auth/gen-lucky';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
