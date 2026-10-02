@@ -2424,6 +2424,9 @@ class ReportAttendeeStatsController extends AdminController
         $sheet->getStyle('A' . $dataStart . ':A' . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $gLetter = PHPExcel_Cell::stringFromColumnIndex($genderCol);
         $sheet->getStyle($gLetter . $dataStart . ':' . $gLetter . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        // Căn giữa cột Size áo (ngay sau cột Giới tính)
+        $shirtLetter = PHPExcel_Cell::stringFromColumnIndex($genderCol + 1);
+        $sheet->getStyle($shirtLetter . $dataStart . ':' . $shirtLetter . $lastDataRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         if (!$listContents && $totalCols > $fixedCount) {
             // Chế độ ma trận: căn giữa các cột đánh dấu
             $firstMarkCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
