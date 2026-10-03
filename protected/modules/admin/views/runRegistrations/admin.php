@@ -28,14 +28,15 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                     <a href="<?php echo $this->createUrl('export', array('event_id' => $eventId)); ?>" class="btn btn-success">
                         <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
                     </a>
-                    <?php if ($canUpdate): ?>
-                        <form method="post" action="<?php echo $this->createUrl('genLucky'); ?>" style="display:inline-block;">
-                            <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
-                            <button type="submit" class="btn btn-warning">
-                                <i class="fa fa-random me-1"></i>Cấp số lucky
-                            </button>
-                        </form>
-                    <?php endif; ?>
+                    <?php
+                    // Nút "Cấp số lucky" cũ đã được ẩn: nó cấp mã theo TỪNG BẢN GHI attendee nên
+                    // một người có thể nhận nhiều mã. Việc cấp mã đã chuyển sang màn Tổng hợp
+                    // danh sách Vòng Chung Kết, nơi mã được cấp theo NGƯỜI đã gộp.
+                    ?>
+                    <a href="<?php echo $this->createUrl('/admin/finalAttendeeRosters/admin', array('event_id' => $eventId)); ?>"
+                       class="btn btn-outline-warning">
+                        <i class="fa fa-ticket me-1"></i>Cấp mã lucky ở màn Tổng hợp VCK
+                    </a>
                 <?php endif; ?>
             </div>
         </form>
