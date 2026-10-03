@@ -25,6 +25,17 @@ class FinalAttendeeRostersController extends AdminController
         $eventId  = $this->getIntParam('event_id');
         $periodId = $this->getIntParam('period_id');
 
+        // Tìm nhanh cho modal gộp dòng: trả JSON gọn, không render cả trang.
+        if (!empty($_GET['ajax_search'])) {
+            $this->renderJson(array(
+                'success' => true,
+                'rows'    => $eventId && $periodId
+                    ? $this->searchRows($eventId, $periodId)
+                    : array(),
+            ));
+            return;
+        }
+
         $eventList  = $this->getEventList();
         $periodList = $eventId ? $this->getFinalPeriodList($eventId) : array();
 
