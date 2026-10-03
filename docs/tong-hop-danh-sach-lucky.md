@@ -1,37 +1,57 @@
-# Tổng hợp danh sách người tham dự & cấp mã Lucky
+# Tổng hợp danh sách Vòng Chung Kết & cấp mã Lucky
 
-> Tài liệu phân tích nghiệp vụ (PRD) — màn hình tổng hợp toàn bộ người tham dự của tất cả đơn vị,
-> lọc theo đơn vị / bộ phận / phòng ban, cấp mã lucky draw duy nhất, sửa thủ công chức danh.
-> Cập nhật: 2026-10-03. Liên quan: `docs/chung-ket-fun-run.md`, `docs/system-design.md`.
+> Tài liệu phân tích nghiệp vụ (PRD) — bảng tổng hợp riêng chứa toàn bộ người vào Vòng Chung Kết
+> (VCK) của tất cả đơn vị; đồng bộ (migrate) lặp lại được từ `attendees`; sửa thủ công mọi trường
+> với bảo vệ chống ghi đè theo từng trường; cấp mã lucky draw duy nhất theo người.
+> Cập nhật: 2026-10-03 (bản revise 2 — theo quyết định của chủ dự án).
+> Liên quan: `docs/chung-ket-fun-run.md`, `docs/system-design.md`, memory `vck-final-aggregation`,
+> memory `replace-withdraw-attendee`.
+
+---
+
+## 0. Các quyết định đã chốt với chủ dự án
+
+| # | Vấn đề | Quyết định |
+|---|--------|-----------|
+| 1 | Một người có nhiều bản ghi `attendees` (nhiều đợt / bản finalist) | **GỘP thành 1 người, cấp 1 mã lucky duy nhất** |
+| 2 | Phạm vi cấp mã | **Toàn bộ người vào Vòng Chung Kết** (không giới hạn chỉ `approved`) |
+| 3 | Lọc theo bộ phận (division) | **Có** — cần lọc riêng |
+| 4 | Kiến trúc | **TÁCH HẲN RA MỘT BẢNG RIÊNG**, chỉ chứa người vào Chung Kết |
+| 5 | Đồng bộ | Có **tính năng migrate từ attendees VCK**, **chạy lại nhiều lần** được |
+| 6 | Sửa thủ công | **Mọi trường** trong bảng mới sửa được |
+| 7 | Chống ghi đè | Trường nào đã sửa thủ công thì lần migrate sau **KHÔNG ghi đè trường đó** (bảo vệ **theo từng trường**, không theo từng dòng) |
 
 ---
 
 ## 1. Mục tiêu & phạm vi
 
 ### Mục tiêu
-Sau khi tất cả đơn vị đã nộp/được duyệt đăng ký, HO cần **một màn hình duy nhất** nhìn thấy
-**toàn bộ người tham dự của toàn bộ đơn vị** trong một sự kiện, để:
+Sau khi các đơn vị đã đăng ký và kết quả vòng loại đã chốt, HO cần **một bảng tổng hợp duy nhất**
+chứa **toàn bộ người vào Vòng Chung Kết của mọi đơn vị**, để:
 
-1. Tra cứu / lọc nhanh theo **đơn vị (property)**, **bộ phận (division)**, **phòng ban (department)**.
-2. **Cấp mã lucky draw** duy nhất cho từng người — mã này đồng thời là **mã đăng nhập**
-   (`DHMT` + lucky) và là gốc để ghép **số BIB** của cổng chạy (xem `chung-ket-fun-run.md` §3).
-3. **Sửa thủ công chức danh hiển thị** của từng người, độc lập với chức danh đồng bộ từ SMILE
-   (để in thẻ / xuất danh sách / bốc thăm đúng chức danh mong muốn).
-4. Xuất Excel danh sách tổng hợp (kèm mã lucky) để phân phát định danh và phục vụ bốc thăm.
+1. Tra cứu / lọc theo **đơn vị (property)**, **bộ phận (division)**, **phòng ban (department)**.
+2. **Cấp mã lucky draw** duy nhất **theo người** (không theo bản ghi đăng ký) — mã này đồng thời là
+   **mã đăng nhập** (`DHMT` + lucky) và gốc ghép **số BIB** của cổng chạy
+   (xem `chung-ket-fun-run.md` §3).
+3. **Sửa thủ công mọi thông tin** của từng người (chức danh, họ tên, đơn vị hiển thị, bộ phận,
+   phòng ban, size áo, SĐT…) độc lập với dữ liệu đồng bộ từ SMILE / từ phiếu đăng ký.
+4. **Đồng bộ lại** từ danh sách VCK bất cứ lúc nào (đơn vị nộp muộn, thay người, bổ sung người)
+   mà **không mất** những gì HO đã sửa tay.
+5. Xuất Excel danh sách tổng hợp (kèm mã lucky) để phân phát định danh và phục vụ bốc thăm.
 
 ### Trong phạm vi
-- Màn hình admin tổng hợp: bộ lọc + bảng phân trang + tìm kiếm.
-- Cấp mã lucky theo sự kiện (idempotent) và cấp bù cho người thêm sau.
-- Sửa chức danh hiển thị (inline edit + modal sửa 1 người), có ghi `updated_by`.
+- Bảng DB mới + đồng bộ (migrate) idempotent, có **dry-run/preview**.
+- Màn hình admin: bộ lọc + bảng phân trang + tìm kiếm + thống kê.
+- Inline edit **nhiều trường**, có badge đánh dấu trường đã sửa tay + nút khôi phục dữ liệu gốc.
+- Cấp mã lucky theo người (gộp trùng), idempotent, cấp bù cho người thêm sau.
 - Xuất Excel theo bộ lọc hiện tại.
 - Phân quyền theo controller mới.
 
 ### Ngoài phạm vi (giai đoạn này)
-- Cơ chế **bốc thăm** (random, giải thưởng, màn hình trình diễn quay số) — tài liệu riêng.
+- Cơ chế **bốc thăm** (quay số, giải thưởng, màn hình trình diễn) — tài liệu riêng.
 - Gửi mã lucky/PIN tự động qua email/SMS/Zalo.
-- Đặt/khởi tạo lại `login_pin` thay người dùng (reset PIN) — nêu ở §13 câu hỏi.
-- In thẻ / QR (đã có module badge riêng).
-- Sửa các field khác ngoài chức danh (họ tên, đơn vị… vẫn sửa ở màn đăng ký/duyệt).
+- In thẻ / QR (module badge riêng) — chỉ bàn tới việc **lấy dữ liệu** từ bảng mới.
+- Ghi ngược (write-back) các trường đã sửa tay về `attendees` — xem §13 câu hỏi.
 
 ---
 
@@ -39,262 +59,431 @@ Sau khi tất cả đơn vị đã nộp/được duyệt đăng ký, HO cần *
 
 | Actor | Quyền trên màn hình này |
 |-------|------------------------|
-| **Admin HO** (`users.role=admin`, hoặc permission `*`) | Toàn quyền: xem, lọc, cấp mã lucky, sửa chức danh, xuất Excel |
-| **Nhân sự HO (HR)** | Xem + lọc + xuất Excel; sửa chức danh nếu được cấp `update` |
-| **BTC các ban** | Chỉ xem (read) nếu được cấp — phục vụ tra cứu |
-| **Đại diện đơn vị** | **Không** truy cập (màn hình này là toàn hệ thống) |
+| **Admin HO** (`users.role=admin`, hoặc permission `*`) | Toàn quyền: xem, lọc, đồng bộ, cấp mã lucky, sửa mọi trường, khôi phục gốc, xuất Excel |
+| **Nhân sự HO (HR)** | Xem + lọc + xuất Excel; sửa dữ liệu nếu được cấp `update` |
+| **BTC các ban** | Chỉ xem (read) — phục vụ tra cứu |
+| **Đại diện đơn vị** | **Không** truy cập |
 
 ### Permission mới
-- Controller mới: **`attendeesummary`** (đặt theo quy ước key chữ thường của `MControllers`).
-- Mapping action → quyền:
+- Controller mới: **`finalroster`** (key chữ thường trong `MControllers`).
 
 | Action | Quyền yêu cầu |
 |--------|---------------|
-| `admin` (danh sách), `export` | `attendeesummary.read` |
-| `updatePosition` (sửa chức danh) | `attendeesummary.update` |
-| `genLucky` (cấp mã lucky) | `attendeesummary.create` |
+| `admin` (danh sách), `export`, `syncPreview` | `finalroster.read` |
+| `updateField`, `resetField` | `finalroster.update` |
+| `sync` (đồng bộ ghi thật), `genLucky` | `finalroster.create` |
+| `destroy` (loại người khỏi bảng tổng hợp) | `finalroster.delete` |
 
-- Check bằng `PermissionHelper::can('attendeesummary', 'update')` trong controller **và** ẩn/hiện
-  nút trong view.
-- Việc cấu hình: thêm bản ghi vào bảng `MControllers` + cột `roles.controllers` để hiện menu sidebar.
-
----
-
-## 3. Quyết định thiết kế then chốt: VIEW/query trực tiếp hay bảng snapshot?
-
-### Hiện trạng (đã kiểm chứng trong code)
-- `attendees` **đã có** đầy đủ dữ liệu cần thiết: `event_id`, `registration_id`, `property_id`,
-  `staff_id`, `staff_code`, `full_name`, `id_card`, `position`, `position_code`, `position_name`,
-  `department_code`, `department_name`, `unit_label`, `attendee_type`, `is_active`,
-  `approval_status`, `qr_token`, `badge_number`
-  (migration `database/migrations/2026_06_16_084548_add_columns_to_attendees_table.php`).
-- `attendees` **đã có** `lucky_number` (UNIQUE), `login_pin`, `pin_set_at`,
-  `login_failed_attempts`, `login_locked_until`
-  (migration `Modules/Run/Database/Migrations/2026_10_02_100002_add_run_login_columns_to_attendees_table.php`).
-- Quy mô: ~600 → vài nghìn bản ghi/sự kiện. Đây là **quy mô nhỏ** với MySQL/InnoDB.
-
-### Trade-off
-
-| Tiêu chí | Query trực tiếp trên `attendees` | Bảng snapshot riêng |
-|----------|----------------------------------|---------------------|
-| Đồng bộ dữ liệu | ✅ Luôn đúng realtime; người thay thế/huỷ/bổ sung phản ánh ngay | ❌ Lệch ngay khi có thay/huỷ/bổ sung; phải có job/nút "làm mới" + xử lý diff |
-| Sửa chức danh thủ công | ✅ Lưu vào cột override trên `attendees`, đi theo người suốt vòng đời (in thẻ, email, cổng chạy đều hưởng) | ⚠️ Chỉ sống trong snapshot; các màn khác (thẻ, email) vẫn dùng chức danh cũ → **hai nguồn sự thật** |
-| Mã lucky | ✅ `lucky_number` đã nằm trên `attendees` và UNIQUE; cổng chạy `RunAuthService::resolve` tra thẳng cột này | ❌ Nếu để lucky ở snapshot thì cổng chạy phải sửa để join snapshot — đập vào code đã verified |
-| Hiệu năng | ✅ ~600–5.000 dòng, lọc theo index `event_id`/`property_id`, phân trang 25–50 → vài ms | Không nhanh hơn đáng kể ở quy mô này |
-| Rủi ro mới | Cần bổ sung filter + index (nhỏ) | Thêm bảng, thêm job, thêm trạng thái lệch, thêm bug |
-| Người nộp muộn | ✅ Tự xuất hiện | ❌ Phải chạy lại snapshot |
-
-### ✅ KHUYẾN NGHỊ (chốt)
-**KHÔNG tạo bảng snapshot.** Dùng **query tổng hợp trực tiếp trên `attendees`** qua một
-endpoint/repository mới (`attendees/summary`), cộng thêm:
-
-1. Bổ sung **cột override chức danh** trên `attendees` (§5).
-2. Bổ sung **cột bộ phận** trên `attendees` để lọc không cần join (§4).
-3. Bổ sung **index** phục vụ lọc (§7).
-4. Mã lucky giữ nguyên trên `attendees.lucky_number` (đã có, đã UNIQUE).
-
-Lý do quyết định: màn hình này là **khung nhìn (view) + nơi chỉnh sửa một vài field**, không phải
-"chốt sổ bất biến". Dữ liệu người tham dự còn biến động liên tục (thay thế / huỷ tư cách / bổ sung
-người — xem `replace-withdraw-attendee`), nên snapshot chắc chắn lệch. Nếu sau này cần **chốt sổ
-bất biến để bốc thăm** (danh sách đóng băng tại thời điểm T), hãy làm **snapshot chỉ-đọc riêng cho
-phiên bốc thăm** (bảng `lucky_draw_snapshots`) ở tài liệu bốc thăm — đó là nhu cầu khác, không
-phải màn hình này.
+- Check bằng `PermissionHelper::can('finalroster', 'update')` trong **controller** *và* ẩn/hiện nút
+  trong **view**.
+- Cấu hình: thêm bản ghi vào `MControllers` + cột `roles.controllers` để hiện menu sidebar.
 
 ---
 
-## 4. Nguồn dữ liệu "đơn vị / bộ phận / phòng ban"
+## 3. Quyết định thiết kế then chốt
 
-### Cây tổ chức thực tế trong BE (đã kiểm chứng)
+### 3.1 Bảng riêng (đã chốt) — hệ quả phải xử lý
+
+Chủ dự án chốt **tách hẳn một bảng riêng**. Bảng này trở thành **nguồn sự thật cho danh sách VCK
+và cho bốc thăm**, còn `attendees` vẫn là nguồn sự thật của **quy trình đăng ký**. Hai nguồn song
+song nên tài liệu phải định nghĩa rõ ranh giới:
+
+| Việc | Nguồn sự thật |
+|------|---------------|
+| Đăng ký / duyệt / thay thế / huỷ tư cách | `attendees` (không đổi) |
+| Danh sách VCK tổng hợp, mã lucky, dữ liệu đã HO chỉnh tay, bốc thăm, in danh sách | **Bảng mới** |
+| Đăng nhập cổng chạy + số BIB | `attendees.lucky_number` (giữ nguyên — xem §6.3) |
+
+Hệ quả bắt buộc: **phải có quy trình đồng bộ một chiều có kiểm soát**
+(`attendees` → bảng mới), chạy lại được, và **không ghi đè** trường HO đã sửa.
+
+### 3.2 Cơ chế theo dõi "trường nào đã sửa thủ công"
+
+Ba phương án đã cân nhắc:
+
+| Phương án | Cách làm | Ưu | Nhược |
+|-----------|----------|-----|------|
+| **A. Cột JSON `overridden_fields`** | Một cột JSON chứa mảng tên trường đã override, vd `["position","division_name"]`. Giá trị sửa **ghi thẳng vào cột thật** | Giá trị sống ở cột thật ⇒ **lọc/sort/index chạy bình thường**; 1 query lấy đủ dòng + cờ override; migrate chỉ cần `in_array()`; thêm trường editable mới **không cần migration** | Không ràng buộc được tên trường ở cấp DB; lọc "dòng nào đã override trường X" phải dùng `JSON_CONTAINS` |
+| **B. Cột `*_override` song song cho từng trường** | `position` + `position_override`, `division_name` + `division_name_override`, … | Kiểu dữ liệu rõ ràng, giữ được cả giá trị gốc lẫn giá trị sửa | **~20 trường ⇒ ~20 cột thêm**; mọi filter/sort/export phải `COALESCE(x_override, x)` ⇒ **index vô dụng**, query phình; thêm trường editable mới phải migration |
+| **C. Bảng `*_overrides` key-value** | Bảng con `(roster_id, field_name, value)` | Mềm dẻo nhất, có lịch sử theo trường | Phải JOIN/aggregate mỗi lần hiển thị danh sách (600–5.000 dòng × 20 trường); lọc/sort theo trường đã override rất khó; tăng độ phức tạp code hiển thị |
+
+#### ✅ CHỌN PHƯƠNG ÁN A — cột JSON `overridden_fields`
+
+**Lý do:**
+1. **Hiệu năng & đơn giản của query:** giá trị hiển thị luôn nằm ở **cột thật**, nên lọc theo đơn vị
+   / bộ phận / phòng ban, sort theo tên, tìm kiếm từ khoá đều **dùng index trực tiếp** — không
+   `COALESCE`, không JOIN. Đây là ưu điểm quyết định so với B và C, vì màn hình này **chủ yếu là
+   lọc và sort**.
+2. **Migrate đơn giản và an toàn:** vòng lặp đồng bộ chỉ cần
+   `if (!in_array($field, $overridden)) { $row->$field = $src->$field; }` — logic per-field, dễ
+   đọc, dễ test, khó sai.
+3. **Mở rộng không tốn migration:** chủ dự án yêu cầu "mọi thông tin sửa được", danh sách trường
+   sẽ còn thay đổi. A cho phép thêm trường editable bằng cách khai báo trong hằng số
+   `EDITABLE_FIELDS` của Entity, không phải thêm cột.
+4. **Giữ được giá trị gốc mà không nhân đôi cột:** cột `attendee_id` + `source_snapshot` (JSON ảnh
+   dữ liệu gốc lần migrate gần nhất) đủ để hiện tooltip "Gốc: …" và để nút **"Khôi phục gốc"** hoạt
+   động — rẻ hơn 20 cột `*_override`.
+
+**Ảnh hưởng tới query / filter / index:**
+- Filter & sort thông thường: **không ảnh hưởng** (cột thật, có index).
+- Cần đếm/lọc "các dòng đã sửa tay": dùng
+  `WHERE JSON_LENGTH(overridden_fields) > 0`, hoặc theo trường cụ thể
+  `WHERE JSON_CONTAINS(overridden_fields, '"position"')`. Đây là **truy vấn phụ, tần suất thấp**,
+  chấp nhận full scan ở quy mô vài nghìn dòng.
+- Nếu về sau cần lọc nhanh "đã sửa tay/chưa": thêm cột **`has_override` TINYINT(1)** (ghi kèm mỗi
+  lần update) + index — rẻ, không phá thiết kế.
+- MySQL cần ≥ 5.7 (đã dùng InnoDB/utf8mb4 nên OK). Nếu môi trường production là MySQL 5.6, dùng
+  `TEXT` lưu JSON + xử lý ở tầng ứng dụng (Laravel cast `array` vẫn chạy).
+
+**Quy ước lưu:**
+- `overridden_fields`: JSON array tên cột đã override, vd `["position","division_name","phone_number"]`.
+  Mặc định `[]` (không dùng `NULL` để tránh phân nhánh logic).
+- Mỗi lần HO sửa trường `X` ⇒ ghi giá trị vào cột `X` **và** thêm `"X"` vào `overridden_fields`.
+- Nút **"Khôi phục gốc"** cho trường `X` ⇒ gỡ `"X"` khỏi `overridden_fields` **và** ghi lại giá trị
+  từ `source_snapshot.X` (lần migrate sau cũng sẽ cập nhật bình thường).
+- `lucky_number` **không bao giờ** nằm trong `overridden_fields` (xem §6).
+
+---
+
+## 4. Nguồn dữ liệu & phạm vi "người vào Chung Kết"
+
+### 4.1 Xác định nguồn (đã kiểm chứng trong code)
+Người vào Chung Kết = attendee trên phiếu của đợt `registration_periods.is_final = 1` của sự kiện.
+Cơ chế này **đã có sẵn** (memory `vck-final-aggregation`):
+- Cột `registration_periods.is_final`, `attendees.attendee_type` (`finalist` / `director` / `driver`).
+- Bảng `final_attendee_contents` (nội dung VCK của từng finalist).
+- `FinalAggregationService::buildFinal` / `seedRegistration` / `listFinalAttendees`
+  (`listFinalAttendees` đã lọc `is_active = 1` và trả thêm `source_attendee_ids`).
+- Endpoint `GET /api/registration-finals/attendees`, command `vck:build`, `vck:sync-unit`.
+
+⇒ **Nguồn đồng bộ của bảng mới = `FinalAggregationService::listFinalAttendees`** (tái dùng, không
+viết lại logic xác định finalist).
+
+### 4.2 Cây tổ chức "đơn vị / bộ phận / phòng ban"
 ```
-properties (đơn vị / khách sạn)   ← attendees.property_id
-   └── divisions (BỘ PHẬN)        ← divisions: property_code, code, name, unique_code
+properties (ĐƠN VỊ)              ← attendees.property_id
+   └── divisions (BỘ PHẬN)        ← divisions: property_code, code, name
          └── departments (PHÒNG BAN) ← departments: property_code, division_code, code, name
                └── staffs         ← staffs: property_code, division_code, department_code, position_code
 ```
 
-### Trên `attendees` hiện có gì
-
-| Khái niệm | Cột trên `attendees` | Trạng thái |
-|-----------|---------------------|-----------|
+| Khái niệm | Trên `attendees` | Trạng thái |
+|-----------|------------------|-----------|
 | Đơn vị | `property_id` (+ `unit_label` là **nhãn in thẻ**, không phải mã đơn vị) | ✅ Có |
-| Phòng ban | `department_code`, `department_name` | ✅ Có (set trong `AttendeeService::syncWithStaffData` khi có `staff_id`) |
-| Bộ phận | **KHÔNG CÓ** | ❌ Thiếu |
+| Phòng ban | `department_code`, `department_name` | ✅ Có (set ở `AttendeeService::syncWithStaffData`) |
+| Bộ phận | **KHÔNG CÓ cột** | ❌ Thiếu |
 | Chức danh SMILE | `position_code`, `position_name` | ✅ Có |
+| Chức danh đơn vị nhập | `position` | ✅ Có |
 
-> Lưu ý: `Modules/Registration/Http/Resources/AttendeeResource.php` **đã trả** `division_code`/
-> `division_name` nhưng bằng fallback `$this->staff->division_code` / `$this->staff->division->name`
-> — tức **chỉ có khi `staff_id` tồn tại**, và **không lọc/sort được** vì không có cột trên bảng.
-> Người nhập thủ công (không từ SMILE) sẽ rỗng.
+> `Modules/Registration/Http/Resources/AttendeeResource.php` có trả `division_code`/`division_name`
+> nhưng bằng fallback `$this->staff->division_code` / `$this->staff->division->name` ⇒ **chỉ có khi
+> `staff_id` tồn tại**, và **không lọc/sort được**.
 
-### Phải bổ sung
-- Thêm 2 cột trên `attendees`: **`division_code`**, **`division_name`** (nullable, string 255).
-- Điền giá trị tại `AttendeeService::syncWithStaffData` (lấy `$staff->division_code` và
-  `$staff->division->name`).
-- Viết **command backfill** cho dữ liệu cũ: với attendee có `staff_id` → lấy từ `staffs`;
-  với attendee chỉ có `department_code` → tra `departments.division_code` theo
-  (`property_code`, `code`) rồi lấy tên từ `divisions`.
-- Attendee nhập thủ công (không có `staff_id`, không `department_code`): để rỗng, màn hình gom vào
-  nhóm **"Chưa xác định"** và có bộ lọc riêng để HO rà soát.
+### 4.3 Xử lý bộ phận (đã chốt: cần lọc riêng)
+Vì bảng mới **có cột `division_code`/`division_name` riêng**, ta **không bắt buộc** phải thêm cột
+vào `attendees`. Trình đồng bộ giải quyết bộ phận theo thứ tự:
+
+1. `staffs.division_code` + `divisions.name` — nếu attendee có `staff_id` hoặc `staff_code`.
+2. Nếu không có staff: tra `departments` theo (`property_code`, `department_code`) → lấy
+   `division_code` → lấy tên từ `divisions`.
+3. Không tra được ⇒ để rỗng, màn hình gom vào nhóm **"Chưa xác định"** (badge vàng) + có filter
+   riêng để HO rà soát và **sửa tay** (trường này editable, sửa rồi migrate sau không ghi đè).
+
+> **Khuyến nghị phụ (không bắt buộc, không chặn):** vẫn nên thêm `division_code`/`division_name`
+> vào `attendees` để các màn khác (duyệt, báo cáo, email) cũng lọc được. Nhưng với phạm vi tài liệu
+> này, bước 1–2 ở trên đã đủ ⇒ **tách thành slice tuỳ chọn S11**.
 
 ---
 
-## 5. Chức danh: gốc (SMILE) vs hiển thị (override)
+## 5. Sửa thủ công — danh sách trường & quy tắc
 
-### Phân tích hiện trạng
-Trên `attendees` đang có **ba** field liên quan:
-- `position_code`, `position_name` — **đồng bộ từ SMILE**, bị ghi đè mỗi lần `syncWithStaffData`.
-- `position` — field người dùng nhập ở form đăng ký (và là field duy nhất mà whitelist finalist VCK
-  cho sửa). Nhưng `position` đang bị dùng **lẫn lộn** làm cả "chức danh nhập tay" lẫn "chức danh
-  in thẻ", nên không an toàn để làm override chính thức (nhiều luồng khác đang ghi vào nó).
+### 5.1 Trường được sửa (`EDITABLE_FIELDS`)
+| Nhóm | Trường |
+|------|--------|
+| Định danh | `full_name`, `staff_code`, `id_card`, `birthday`, `gender`, `phone_number`, `email` |
+| Tổ chức | `property_id`, `property_name`, `unit_label`, `division_code`, `division_name`, `department_code`, `department_name` |
+| Chức danh | `position` (chức danh **hiển thị**), `position_name` (gốc SMILE — chỉ sửa khi thật cần) |
+| Khác | `shirt_size`, `attendee_type`, `note`, `sort_order` |
 
-### Thiết kế đề xuất (tách bạch 3 lớp)
+### 5.2 Trường **KHÔNG** được sửa
+`id`, `event_id`, `attendee_id`, `dedup_key`, `lucky_number`, `source_snapshot`,
+`overridden_fields`, các cột `*_by` / `*_at`, `deleted_at`.
 
-| Lớp | Cột | Ai ghi | Ghi đè bởi sync SMILE? |
-|-----|-----|--------|------------------------|
-| Chức danh **gốc** | `position_code`, `position_name` | `syncWithStaffData` | ✅ Có (đúng kỳ vọng) |
-| Chức danh **đơn vị nhập** | `position` | Form đăng ký của đơn vị | ❌ Không |
-| Chức danh **hiển thị (override HO)** | **`position_override`** (mới) + `position_override_by`, `position_override_at` | **Chỉ** màn hình tổng hợp này | ❌ **Không bao giờ** |
+> `lucky_number` do hệ thống sinh, **không cho sửa tay** để tránh phá UNIQUE và phá BIB đã in.
+> Nếu chủ dự án cần đổi mã cho một người → xem §13 câu hỏi.
 
-### Quy tắc hiển thị (một hàm duy nhất, dùng chung mọi nơi)
-```
-chức danh hiển thị = position_override
-                   ?: position
-                   ?: position_name
-                   ?: ''
-```
-- Đặt thành accessor trên Entity BE (`getDisplayPositionAttribute`) và trả về API dưới key
-  **`position_display`** để FE (bảng tổng hợp, thẻ, Excel, email) dùng chung, không ai tự ghép lại.
-- `syncWithStaffData` **không được** đụng `position_override`.
-- UI phải hiển thị rõ: ô chức danh có icon ✎ khi đang là override, hover thấy chức danh gốc SMILE,
-  và có nút **"Khôi phục chức danh gốc"** (set `position_override = NULL`).
+### 5.3 Chức danh: 3 lớp (giữ nguyên tinh thần bản trước)
+| Lớp | Nơi lưu | Ghi đè bởi migrate? |
+|-----|---------|---------------------|
+| Gốc SMILE | `final_rosters.position_name` ← `attendees.position_name` | ✅ Có (trừ khi được override) |
+| Đơn vị nhập | `attendees.position` → `final_rosters.position` | ✅ Có (trừ khi được override) |
+| **HO sửa tay** | `final_rosters.position` + `"position"` trong `overridden_fields` | ❌ **Không bao giờ** |
+
+Chức danh hiển thị trên UI/Excel/thẻ: **`position_display`** = `position` ?: `position_name` ?: `''`
+— đặt thành accessor duy nhất trên Entity, mọi nơi dùng chung.
 
 ---
 
 ## 6. Mã Lucky Draw
 
-### Hiện trạng (đã kiểm chứng)
-- `RunAuthService::provisionLucky(int $eventId)` sinh `random_int(100000, 999999)` → **6 chữ số**,
-  kiểm tra trùng trong bộ nhớ dựa trên toàn bộ `lucky_number` đang dùng, **chỉ cấp cho người
-  `lucky_number IS NULL`** → **đã idempotent** (chạy lại không đổi mã người đã có). ✅
-- Command `run:gen-lucky {event_id}` + endpoint `POST /api/run-auth/gen-lucky` **đã tồn tại**,
-  FE đã có nút ở `admin/runRegistrations/admin`. ✅
-- **GIỚI HẠN QUAN TRỌNG:** `provisionLucky` chỉ quét attendee thuộc phiếu của
-  `registration_periods.is_final = 1` (**chỉ finalist VCK**). Màn hình tổng hợp cần cấp mã cho
-  **TOÀN BỘ người tham dự của sự kiện** → **phải mở rộng phạm vi**.
-- `attendees.lucky_number` UNIQUE ở **cấp bảng** → unique **toàn hệ thống**, không theo event.
-- `AttendeeResource` **chưa trả** `lucky_number` → phải bổ sung.
+### 6.1 Hiện trạng (đã kiểm chứng trong code)
+- `attendees.lucky_number` (string 20, **UNIQUE cấp bảng ⇒ unique toàn hệ thống**), `login_pin`
+  (hash), `pin_set_at`, `login_failed_attempts`, `login_locked_until` — migration
+  `Modules/Run/Database/Migrations/2026_10_02_100002_add_run_login_columns_to_attendees_table.php`.
+- `RunAuthService::provisionLucky($eventId)` sinh `random_int(100000, 999999)` = **6 chữ số**, chỉ
+  cấp cho `lucky_number IS NULL` ⇒ **đã idempotent**.
+- `provisionLucky` **đã quét đúng phạm vi finalist VCK** (lọc `registration_periods.is_final = 1`)
+  ⇒ **khớp với quyết định #2** của chủ dự án.
+- Command `run:gen-lucky {event_id}` + endpoint `POST /api/run-auth/gen-lucky`; FE đã có nút ở
+  `admin/runRegistrations/admin`.
+- `RunAuthService::resolve()` tra `Attendee::where('lucky_number', $lucky)->where('is_active', 1)`
+  ⇒ **cổng chạy đọc thẳng `attendees`**.
+- `AttendeeResource` **chưa trả** `lucky_number`.
 
-### Quyết định đề xuất
-| Vấn đề | Quyết định đề xuất |
-|--------|--------------------|
-| Format | **6 chữ số**, `100000`–`999999` (giữ nguyên để không phá cổng chạy & BIB đã verified) |
-| Unique scope | **Toàn hệ thống** (giữ UNIQUE hiện có). Lý do: mã là định danh đăng nhập, không được đụng nhau giữa các sự kiện; một người dự nhiều sự kiện nên **giữ nguyên một mã** |
-| Idempotent | ✅ Chỉ cấp cho `lucky_number IS NULL`; **không bao giờ** sinh lại mã đã cấp |
-| Người thêm sau | Bấm lại "Cấp mã lucky" → chỉ người chưa có mã được cấp. Khuyến nghị thêm **auto-provision** khi tạo attendee mới (hook ở `AttendeeService::store`) để không phụ thuộc người bấm nút |
-| Người bị huỷ tư cách | **Giữ nguyên** `lucky_number` (không thu hồi, không tái sử dụng) → tránh người khác nhận mã đã in/đã phát. Lọc `is_active=1` khi đăng nhập (`RunAuthService::resolve` đã làm) |
-| Người thay thế | Người thay được cấp **mã MỚI** của riêng mình; mã người bị thay giữ nguyên nhưng vô hiệu vì `is_active=0` |
-| Quan hệ login | Định danh = `DHMT` + `lucky_number`; PIN do người dùng tự đặt (≥6 số), hash, lockout 5 lần/15 phút — **đã có, không làm lại** |
-| Quan hệ BIB | `run_events.code + lucky_number` (vd `5K123456`) — **không đổi** |
-| Cạn mã | Không gian 900.000 mã, nhu cầu vài nghìn → an toàn. Vẫn phải xử lý lỗi `UNIQUE` khi chạy song song |
+### 6.2 Đánh giá lại: có cần endpoint mới?
+**Không cần endpoint mới cho việc "sinh mã theo event"** — phạm vi `provisionLucky` đã đúng.
+Nhưng **vẫn phải bổ sung logic gộp người** (quyết định #1), vì `provisionLucky` hiện cấp mã
+**theo từng bản ghi attendee** ⇒ một người có 2 bản ghi sẽ nhận **2 mã khác nhau** (sai nghiệp vụ).
 
-### Tái dùng hay làm mới?
-**Tái dùng service, thêm endpoint mới.** Cụ thể:
-- **KHÔNG** sửa phạm vi của `run-auth/gen-lucky` hiện có (cổng chạy đang dựa vào nó, đã verified).
-- Thêm method `provisionLuckyForEvent(int $eventId, array $filters = [])` trong `RunAuthService`
-  (tách phần sinh mã thành helper dùng chung với `provisionLucky`) — quét **toàn bộ** attendee của
-  `event_id`, `is_active = 1`, `lucky_number IS NULL`; tuỳ chọn lọc theo `property_id`.
-- Thêm endpoint **`POST /api/attendees/provision-lucky`** (module Registration) gọi method trên.
-- Thêm command `attendees:gen-lucky {event_id} [--property=]` để chạy nền/thủ công.
-- Chống race: bọc vòng sinh mã trong retry 3 lần bắt `QueryException` mã 23000 (duplicate key).
+⇒ **Phương án: giữ nguyên endpoint/command cũ cho cổng chạy, bổ sung bước cấp mã ở bảng mới.**
 
----
+| Việc | Thực hiện ở đâu |
+|------|-----------------|
+| Sinh mã **theo người đã gộp** | Service mới `FinalRosterService::provisionLucky($eventId)` — chạy trên `final_rosters` (1 dòng = 1 người) |
+| Ghi ngược mã về `attendees` để cổng chạy chạy được | Cùng service, xem §6.3 |
+| `run:gen-lucky` / `run-auth/gen-lucky` cũ | **Giữ nguyên, không sửa**. Khuyến nghị **ngừng dùng** nút cũ khi bảng mới lên production (nêu ở §13) |
 
-## 7. Thiết kế DB (migration cụ thể)
+### 6.3 ⭐ Giữ tương thích cổng chạy Fun Run (đã verified — không được phá)
 
-**Không tạo bảng mới cho danh sách tổng hợp.** Chỉ bổ sung cột + index trên `attendees`.
+**Ràng buộc:** `attendees.lucky_number` là UNIQUE **toàn bảng** ⇒ **không thể** ghi cùng một mã vào
+nhiều bản ghi attendee của cùng một người.
 
-### Migration 1 — cột bộ phận
-`Modules/Registration/Database/Migrations/2026_10_03_100000_add_division_columns_to_attendees_table.php`
-```php
-Schema::table('attendees', function (Blueprint $table) {
-    $table->string('division_code', 255)->nullable()->after('department_name');
-    $table->string('division_name', 255)->nullable()->after('division_code');
-});
-```
+**Phương án chốt — "một mã, ghi vào bản ghi đại diện":**
 
-### Migration 2 — cột override chức danh
-`...2026_10_03_100100_add_position_override_to_attendees_table.php`
-```php
-Schema::table('attendees', function (Blueprint $table) {
-    $table->string('position_override', 255)->nullable()->after('position_name');
-    $table->string('position_override_by', 190)->nullable()->after('position_override'); // email người sửa
-    $table->unsignedInteger('position_override_at')->nullable()->after('position_override_by'); // unix timestamp
-});
-```
-> Theo rule dự án: thời gian dùng **unix timestamp INT UNSIGNED** (giống `pin_set_at`).
-> Soft delete: `attendees` **đã có** `SoftDeletes` (`deleted_at`) — không cần thêm.
+1. Mỗi dòng `final_rosters` có `attendee_id` = **bản ghi attendee đại diện** của người đó
+   (chọn theo §7.3), và `source_attendee_ids` (JSON) = tất cả bản ghi attendee cùng người.
+2. `FinalRosterService::provisionLucky`:
+   - Với mỗi dòng chưa có `lucky_number`:
+     a) **Tái sử dụng trước:** nếu bất kỳ attendee nào trong `source_attendee_ids` **đã có**
+        `lucky_number` ⇒ **lấy mã đó** (ưu tiên mã của `attendee_id` đại diện; nếu nhiều mã khác
+        nhau ⇒ chọn mã **nhỏ nhất / cấp sớm nhất** và ghi cảnh báo xung đột).
+     b) Nếu chưa ai có ⇒ sinh mã 6 số mới, kiểm tra trùng trên **cả** `attendees.lucky_number` và
+        `final_rosters.lucky_number`.
+   - Ghi mã vào `final_rosters.lucky_number`.
+   - **Ghi ngược** mã vào `attendees.lucky_number` của **đúng bản ghi đại diện**
+     (`final_rosters.attendee_id`).
+   - Với các bản ghi attendee trùng người còn lại: nếu đang giữ **mã khác** ⇒ **set `NULL`** để
+     tránh một người hai định danh, và **ghi log xung đột** để HO rà soát. ⚠️ Nếu mã đó **đã phát ra
+     ngoài**, phải báo thu hồi (xem §11, và §13 câu hỏi).
+3. Cổng chạy **không sửa một dòng code nào**: `RunAuthService::resolve` vẫn tra
+   `attendees.lucky_number` + `is_active = 1` và luôn ra **đúng một** attendee đại diện.
+   `identifyByQr`, `setPin`, `login`, BIB (`run_events.code + lucky_number`) giữ nguyên.
+4. `login_pin` / `pin_set_at` / lockout **vẫn ở `attendees`**, **không** nhân bản sang bảng mới.
+   Bảng mới chỉ **đọc** để hiển thị cờ `pin_is_set` (join theo `attendee_id`).
 
-### Migration 3 — index phục vụ lọc
-`...2026_10_03_100200_add_summary_indexes_to_attendees_table.php`
-```php
-Schema::table('attendees', function (Blueprint $table) {
-    $table->index(['event_id', 'property_id', 'is_active'], 'idx_attendees_event_property_active');
-    $table->index(['event_id', 'division_code'], 'idx_attendees_event_division');
-    $table->index(['event_id', 'department_code'], 'idx_attendees_event_department');
-    // lucky_number đã có UNIQUE từ migration module Run
-});
-```
-> Kiểm tra trùng với `2026_05_26_100803_add_approval_indexes_to_attendees_and_registrations_tables.php`
-> trước khi tạo, tránh index dư.
+> Tóm lại: **`attendees.lucky_number` vẫn là nguồn sự thật cho đăng nhập**; `final_rosters.lucky_number`
+> là bản sao phục vụ bốc thăm/tổng hợp, luôn được ghi đồng thời trong cùng transaction.
 
-### Không thay đổi
-- `lucky_number` (UNIQUE) — giữ nguyên.
-- `login_pin`, `pin_set_at`, `login_failed_attempts`, `login_locked_until` — giữ nguyên.
+### 6.4 Quy tắc mã lucky
+
+| Vấn đề | Quyết định |
+|--------|-----------|
+| Format | **6 chữ số**, `100000`–`999999` (giữ nguyên — ràng buộc BIB đã verified) |
+| Unique scope | **Toàn hệ thống** (UNIQUE trên cả `attendees` và `final_rosters`) |
+| Đơn vị cấp mã | **Theo người đã gộp** (1 dòng `final_rosters` = 1 người = 1 mã) |
+| Idempotent | ✅ Chỉ cấp cho dòng `lucky_number IS NULL`; **không bao giờ** sinh lại mã đã cấp |
+| Người thêm sau | Đồng bộ lại → dòng mới `lucky_number = NULL` → bấm "Cấp mã lucky" cấp bù. Khuyến nghị **tự động cấp mã ngay cuối bước đồng bộ** (một nút làm cả hai) |
+| Người bị huỷ tư cách | **Giữ mã**, không tái sử dụng; đánh dấu dòng `status = withdrawn` (xem §11) |
+| Người thay thế | Là người **khác** ⇒ dòng mới ⇒ **mã mới**; mã người bị thay giữ nguyên nhưng vô hiệu |
+| Cạn mã | 900.000 mã cho vài nghìn người ⇒ an toàn |
+| Cạnh tranh | Bọc retry 3 lần bắt duplicate key + cache lock theo `event_id` |
 
 ---
 
-## 8. API endpoints cần có
+## 7. Thiết kế DB
 
-Chuẩn: `.claude/rules/api-conventions.md` — `{success, data, message}` / `{success, error}`,
+### 7.1 Bảng mới `final_rosters`
+> Tên đề xuất: **`final_rosters`** (snake_case, số nhiều — đúng rule). Phương án tên khác:
+> `final_attendee_rosters`, `vck_rosters`. Chốt tên trước khi viết migration.
+
+Migration: `Modules/Registration/Database/Migrations/2026_10_03_110000_create_final_rosters_table.php`
+
+| Cột | Kiểu | Mô tả |
+|-----|------|-------|
+| `id` | BIGINT UNSIGNED AI | PK |
+| `event_id` | INT UNSIGNED, NOT NULL | Sự kiện |
+| `period_id` | INT UNSIGNED, NULL | Đợt VCK (`is_final = 1`) nguồn |
+| `attendee_id` | INT UNSIGNED, NULL | **Bản ghi attendee đại diện** (tham chiếu nguồn, dùng để ghi ngược lucky & đọc `pin_is_set`) |
+| `source_attendee_ids` | JSON, NULL | Tất cả bản ghi attendee cùng người (phục vụ gộp & truy vết) |
+| `registration_id` | INT UNSIGNED, NULL | Phiếu VCK nguồn |
+| `dedup_key` | VARCHAR(190), NOT NULL | Khoá gộp người (§7.3) |
+| `dedup_source` | VARCHAR(20), NULL | `staff_code` / `id_card` / `name_birthday` — nguồn sinh khoá |
+| **Định danh** | | |
+| `full_name` | VARCHAR(255) | |
+| `staff_code` | VARCHAR(100), NULL | |
+| `id_card` | VARCHAR(50), NULL | |
+| `birthday` | DATE, NULL | |
+| `gender` | TINYINT, NULL | |
+| `phone_number` | VARCHAR(50), NULL | |
+| `email` | VARCHAR(190), NULL | |
+| **Tổ chức** | | |
+| `property_id` | INT UNSIGNED, NULL | Đơn vị |
+| `property_code` | VARCHAR(50), NULL | |
+| `property_name` | VARCHAR(255), NULL | Phi chuẩn hoá để lọc/sort/export không join |
+| `unit_label` | VARCHAR(255), NULL | Nhãn in thẻ |
+| `division_code` | VARCHAR(50), NULL | **Bộ phận** |
+| `division_name` | VARCHAR(255), NULL | |
+| `department_code` | VARCHAR(50), NULL | **Phòng ban** |
+| `department_name` | VARCHAR(255), NULL | |
+| **Chức danh** | | |
+| `position` | VARCHAR(255), NULL | Chức danh hiển thị |
+| `position_code` | VARCHAR(100), NULL | |
+| `position_name` | VARCHAR(255), NULL | Chức danh gốc SMILE |
+| **Khác** | | |
+| `attendee_type` | VARCHAR(20), NULL | `finalist` / `director` / `driver` |
+| `shirt_size` | VARCHAR(10), NULL | |
+| `note` | TEXT, NULL | |
+| `sort_order` | INT, DEFAULT 0 | |
+| **Lucky** | | |
+| `lucky_number` | VARCHAR(20), NULL, **UNIQUE** | Mã lucky duy nhất theo người |
+| `lucky_provisioned_at` | INT UNSIGNED, NULL | Unix timestamp |
+| **Trạng thái & override** | | |
+| `status` | TINYINT UNSIGNED, DEFAULT 1 | `1` active / `2` withdrawn (đã huỷ tư cách) / `3` manual (HO tự thêm, không có nguồn) |
+| `overridden_fields` | JSON, NOT NULL DEFAULT `'[]'` | **Danh sách trường đã sửa tay** (§3.2) |
+| `has_override` | TINYINT(1), DEFAULT 0 | Cờ phụ để lọc nhanh |
+| `source_snapshot` | JSON, NULL | Ảnh dữ liệu gốc lần migrate gần nhất (phục vụ tooltip "Gốc: …" + nút khôi phục) |
+| `last_synced_at` | INT UNSIGNED, NULL | Unix timestamp lần đồng bộ cuối |
+| **Audit** | | |
+| `created_by` | VARCHAR(190), NULL | Email, lấy từ `AuthHandler::getUser()['email']` |
+| `updated_by` | VARCHAR(190), NULL | |
+| `created_at` / `updated_at` | INT UNSIGNED, NULL | **Unix timestamp** (đúng rule dự án) |
+| `deleted_at` | INT UNSIGNED, NULL | **Soft delete** |
+
+**Index / Unique**
+```
+UNIQUE uq_final_rosters_lucky_number        (lucky_number)
+UNIQUE uq_final_rosters_event_dedup         (event_id, dedup_key, deleted_at)
+INDEX  idx_final_rosters_event_property     (event_id, property_id, status)
+INDEX  idx_final_rosters_event_division     (event_id, division_code)
+INDEX  idx_final_rosters_event_department   (event_id, department_code)
+INDEX  idx_final_rosters_attendee           (attendee_id)
+INDEX  idx_final_rosters_full_name          (full_name)
+INDEX  idx_final_rosters_event_override     (event_id, has_override)
+```
+> `deleted_at` trong unique key để người đã xoá mềm không chặn việc đồng bộ lại cùng một người.
+> Nếu MySQL không chấp nhận NULL trong unique theo kỳ vọng, dùng unique
+> `(event_id, dedup_key)` + xoá cứng khi cần đồng bộ lại (nêu ở §13).
+
+### 7.2 Bảng log đồng bộ `final_roster_sync_logs`
+Migration: `...2026_10_03_110100_create_final_roster_sync_logs_table.php`
+
+| Cột | Kiểu | Mô tả |
+|-----|------|-------|
+| `id` | BIGINT UNSIGNED AI | |
+| `event_id` | INT UNSIGNED | |
+| `period_id` | INT UNSIGNED, NULL | |
+| `property_id` | INT UNSIGNED, NULL | Nếu chạy 1 đơn vị |
+| `mode` | VARCHAR(10) | `preview` / `apply` |
+| `inserted` / `updated` / `skipped_override` / `conflicts` / `unchanged` | INT UNSIGNED DEFAULT 0 | Số liệu báo cáo |
+| `detail` | JSON, NULL | Chi tiết: danh sách dòng thêm/sửa, field bị bỏ qua, cảnh báo gộp |
+| `run_by` | VARCHAR(190), NULL | Email người chạy |
+| `created_at` | INT UNSIGNED | |
+
+### 7.3 Quy tắc gộp người (dedup)
+
+**Khoá gộp** — tính theo thứ tự, dừng ở cái đầu tiên có giá trị:
+
+| Ưu tiên | Điều kiện | `dedup_key` | `dedup_source` |
+|---------|-----------|-------------|----------------|
+| 1 | `staff_code` khác rỗng | `SC:` + upper(trim(staff_code)) | `staff_code` |
+| 2 | `id_card` khác rỗng | `IC:` + chỉ giữ chữ số của id_card | `id_card` |
+| 3 | còn lại | `NB:` + slug(họ tên bỏ dấu, lowercase, 1 space) + `|` + `birthday` (`Ymd`, rỗng ⇒ `00000000`) | `name_birthday` |
+
+- Khoá chuẩn hoá: bỏ dấu, lowercase, gộp khoảng trắng — **phải dùng một hàm duy nhất**
+  `FinalRosterService::buildDedupKey()` để preview và apply luôn giống nhau.
+- Phạm vi gộp: **trong cùng `event_id`** (không gộp xuyên sự kiện).
+
+**Chọn bản ghi gốc (đại diện)** khi nhiều attendee cùng khoá — theo thứ tự:
+1. Bản ghi có `attendee_type = 'finalist'` (bản VCK) — **ưu tiên cao nhất**, vì đây là bản đang nằm
+   trên phiếu VCK và các màn VCK đều tham chiếu nó.
+2. Nếu vẫn nhiều: bản có `is_active = 1` và `approval_status = approved`.
+3. Nếu vẫn nhiều: bản có **nhiều trường khác rỗng nhất** (đầy đủ dữ liệu nhất).
+4. Nếu vẫn nhiều: bản có `id` **nhỏ nhất** (cũ nhất, ổn định giữa các lần chạy).
+
+**Gộp dữ liệu từ các bản còn lại:** với mỗi trường, nếu bản gốc **rỗng** mà bản khác **có giá trị**
+⇒ lấy giá trị đó (fill-in, không ghi đè). Nếu hai bản **đều có giá trị khác nhau** ⇒ giữ bản gốc và
+**ghi vào `detail.conflicts`** để HO xem ở báo cáo đồng bộ (không tự quyết).
+
+**Khi migrate lại phát hiện gộp sai:**
+- *Trường hợp A — hai người bị gộp thành một* (vd dùng chung `name_birthday` do trùng tên, thiếu
+  ngày sinh): preview báo `conflict_type = possible_wrong_merge` (cùng `dedup_key` nhưng
+  `staff_code`/`id_card` khác nhau). HO xử lý bằng chức năng **"Tách người"**: nhập `staff_code`/
+  `id_card` cho một bên (sửa tay ⇒ vào `overridden_fields`), đồng bộ lại sẽ sinh `dedup_key` mới và
+  **tạo dòng mới**; dòng cũ giữ mã lucky, dòng mới được cấp mã mới.
+- *Trường hợp B — một người bị tách thành hai dòng* (vd lần đầu thiếu `staff_code`): preview báo
+  `conflict_type = duplicate_person` khi phát hiện hai dòng cùng `staff_code`/`id_card` nhưng khác
+  `dedup_key`. HO xử lý bằng chức năng **"Gộp dòng"**: chọn dòng giữ lại (giữ `lucky_number` cũ hơn),
+  dòng kia **xoá mềm**, `source_attendee_ids` được hợp nhất, mã lucky dòng bị xoá **không** tái sử dụng.
+- Cả hai chức năng chỉ thao tác trên bảng mới, **không** sửa `attendees`.
+
+### 7.4 Có sửa `attendees` không?
+**Chỉ một thay đổi bắt buộc, rất nhỏ:**
+- Bổ sung `lucky_number` (+ `pin_is_set` dạng accessor) vào `Modules/Registration/Http/Resources/AttendeeResource.php`
+  để FE/đồng bộ đọc được (hiện chưa trả).
+- **Không** cần migration trên `attendees` cho phạm vi này.
+- (Tuỳ chọn, slice S11) thêm `division_code`/`division_name` vào `attendees` để các màn khác cũng
+  lọc được — không chặn tính năng này.
+
+---
+
+## 8. API endpoints
+
+Chuẩn `.claude/rules/api-conventions.md`: `{success, data, message}` / `{success, error}`,
 list có `pagination`. Prefix `api`, middleware `auth.token` (API key).
+Module: `Registration` (cùng chỗ với `FinalAggregationService`).
 
-### 8.1 `GET /api/attendees/summary` — danh sách tổng hợp
+### 8.1 `GET /api/final-rosters` — danh sách tổng hợp
 | Param | Kiểu | Mô tả |
 |-------|------|-------|
 | `event_id` | int, **bắt buộc** | Sự kiện |
+| `period_id` | int | Đợt VCK |
 | `property_id` | int | Lọc đơn vị |
 | `division_code` | string | Lọc bộ phận (`__none__` = chưa xác định) |
 | `department_code` | string | Lọc phòng ban (`__none__` = chưa xác định) |
-| `has_lucky` | 0/1 | Lọc người đã/chưa có mã lucky |
-| `pin_is_set` | 0/1 | Lọc người đã/chưa đặt PIN |
-| `attendee_type` | string | `finalist` / `director` / `driver` / rỗng |
-| `approval_status` | int | 0 pending / 1 approved / 2 rejected |
-| `is_active` | 0/1 | Mặc định `1` |
-| `keyword` | string | Tìm theo `full_name`, `staff_code`, `id_card`, `lucky_number`, `badge_number` |
-| `page`, `per_page` | int | Phân trang (mặc định 25) |
-| `sort_by`, `order` | string | `full_name` / `property_id` / `division_name` / `lucky_number` |
+| `attendee_type` | string | `finalist` / `director` / `driver` |
+| `has_lucky` | 0/1 | Đã / chưa có mã lucky |
+| `pin_is_set` | 0/1 | Đã / chưa đặt PIN (join `attendees` theo `attendee_id`) |
+| `has_override` | 0/1 | Đã / chưa sửa tay |
+| `status` | int | `1` active (mặc định) / `2` withdrawn / `3` manual |
+| `keyword` | string | `full_name`, `staff_code`, `id_card`, `lucky_number` |
+| `page`, `per_page` | int | Mặc định 25 |
+| `sort_by`, `order` | string | `full_name` / `property_name` / `division_name` / `lucky_number` / `sort_order` |
 
-Response (200):
+Response 200:
 ```json
 {
   "success": true,
   "data": [
     {
-      "id": 4821, "event_id": 3, "registration_id": 463,
+      "id": 1021, "event_id": 3, "period_id": 4,
+      "attendee_id": 4821, "source_attendee_ids": [1003, 4821],
+      "dedup_key": "SC:HN0123", "dedup_source": "staff_code",
+      "full_name": "Nguyễn Văn A", "staff_code": "HN0123",
       "property_id": 66, "property_name": "Mường Thanh Grand Hà Nội",
       "unit_label": "MT Grand Hà Nội",
-      "staff_code": "HN0123", "full_name": "Nguyễn Văn A",
       "division_code": "FB", "division_name": "Bộ phận Nhà hàng",
       "department_code": "610", "department_name": "Phòng Giám đốc",
+      "position": "Trưởng bộ phận Nhà hàng",
       "position_name": "Trưởng ca",
-      "position": "Trưởng ca",
-      "position_override": "Trưởng bộ phận Nhà hàng",
       "position_display": "Trưởng bộ phận Nhà hàng",
-      "lucky_number": "123456",
-      "login_identifier": "DHMT123456",
+      "attendee_type": "finalist", "shirt_size": "L",
+      "lucky_number": "123456", "login_identifier": "DHMT123456",
       "pin_is_set": true,
-      "attendee_type": "finalist",
-      "approval_status": 1, "is_active": 1
+      "overridden_fields": ["position", "division_name"],
+      "has_override": 1,
+      "source_snapshot": { "position": "Trưởng ca", "division_name": null },
+      "status": 1, "last_synced_at": 1759460000,
+      "updated_by": "hr@muongthanh.vn"
     }
   ],
   "pagination": { "page": 1, "limit": 25, "total": 612, "totalPages": 25 }
@@ -302,178 +491,295 @@ Response (200):
 ```
 > `login_pin` **không bao giờ** xuất hiện trong response.
 
-### 8.2 `GET /api/attendees/summary-filters` — nguồn cho dropdown
-`event_id` bắt buộc. Trả về các đơn vị / bộ phận / phòng ban **thực sự có người** trong sự kiện
-(để dropdown không chứa lựa chọn cho ra 0 kết quả) + dropdown phụ thuộc:
+### 8.2 `GET /api/final-rosters/filters`
+`event_id` bắt buộc. Trả về các đơn vị / bộ phận / phòng ban **thực sự có người** trong bảng, phục
+vụ dropdown phụ thuộc:
 ```json
 { "success": true, "data": {
-  "properties": [{ "id": 66, "name": "..." }],
-  "divisions":  [{ "property_id": 66, "code": "FB", "name": "...", "total": 23 }],
-  "departments":[{ "property_id": 66, "division_code": "FB", "code": "610", "name": "...", "total": 5 }]
+  "properties":  [{ "id": 66, "name": "...", "total": 23 }],
+  "divisions":   [{ "property_id": 66, "code": "FB", "name": "...", "total": 9 }],
+  "departments": [{ "property_id": 66, "division_code": "FB", "code": "610", "name": "...", "total": 3 }]
 }}
 ```
 
-### 8.3 `GET /api/attendees/summary-stats` — thẻ số liệu
-Trả `{ total, with_lucky, without_lucky, pin_set, by_property: [...] }`.
+### 8.3 `GET /api/final-rosters/stats`
+`{ total, with_lucky, without_lucky, pin_set, with_override, withdrawn, by_property: [...] }`
 
-### 8.4 `POST /api/attendees/provision-lucky` — cấp mã lucky
+### 8.4 `POST /api/final-rosters/sync` — đồng bộ từ danh sách VCK
+Body: `{ "event_id": 3, "period_id": 4, "property_id": null, "mode": "preview|apply", "run_by": "hr@..." }`
+
+- `mode = preview` ⇒ **dry-run**, không ghi `final_rosters`, chỉ ghi `final_roster_sync_logs`
+  (`mode=preview`).
+- `mode = apply` ⇒ ghi thật, trong transaction.
+
+Response 200:
+```json
+{ "success": true, "data": {
+  "mode": "preview",
+  "summary": { "inserted": 57, "updated": 480, "skipped_override": 23, "unchanged": 52, "conflicts": 2 },
+  "inserted_rows": [{ "full_name": "...", "property_name": "...", "dedup_key": "SC:..." }],
+  "skipped_fields": [{ "roster_id": 1021, "full_name": "...", "fields": ["position", "division_name"] }],
+  "conflicts": [
+    { "type": "possible_wrong_merge", "dedup_key": "NB:nguyen-van-a|00000000", "attendee_ids": [1003, 2117] },
+    { "type": "duplicate_person", "staff_code": "HN0123", "roster_ids": [1021, 1455] }
+  ],
+  "log_id": 88
+}, "message": "Xem trước: 57 thêm mới, 480 cập nhật, 23 trường bị bỏ qua do đã sửa tay, 2 cảnh báo." }
+```
+- 422 thiếu `event_id`/`period_id` hoặc đợt không phải `is_final`.
+- 409 đang có tiến trình đồng bộ khác (cache lock `final-rosters:sync:{event_id}`, TTL 300s).
+
+### 8.5 `POST /api/final-rosters/provision-lucky`
 Body: `{ "event_id": 3, "property_id": null }`
-- 200: `{ "success": true, "data": { "provisioned": 57, "total_with_lucky": 612 }, "message": "Đã cấp mã lucky cho 57 người." }`
-- 422: thiếu/không hợp lệ `event_id`.
-- 409: đang có tiến trình cấp mã khác (lock).
+- Sinh mã theo **người đã gộp**, ghi ngược vào `attendees` của bản đại diện (§6.3).
+- 200: `{ "success": true, "data": { "provisioned": 57, "reused": 12, "conflicts": [...], "total_with_lucky": 612 }, "message": "Đã cấp mã lucky cho 57 người (tái dùng 12 mã có sẵn)." }`
+- 422 thiếu `event_id`; 409 đang chạy.
 
-### 8.5 `POST /api/attendees/update-position/{id}` — sửa chức danh hiển thị
-Body: `{ "position_override": "Trưởng bộ phận Nhà hàng", "updated_by": "hr@muongthanh.vn" }`
-- Chuỗi rỗng / `null` ⇒ **xoá override**, quay về chức danh gốc.
-- Ghi `position_override_by` = email người thực hiện, `position_override_at` = `time()`.
-- Ghi `audit_logs` (action `attendee.position_override`, `old_data`/`new_data`).
-- 200 trả về bản ghi đã cập nhật (kèm `position_display` mới).
-- 404 không tìm thấy, 422 quá 255 ký tự, 403 không có quyền.
-- **Endpoint riêng** (không dùng `attendees/update`) vì `AttendeeService::update` có whitelist cứng
-  cho finalist VCK (chỉ `photo_path`/`position`/`shirt_size`/`badge_org_name`/`is_active`/`note`)
-  → gửi qua đó sẽ bị lọc mất. Endpoint riêng cũng giới hạn bề mặt tấn công đúng 1 field.
+### 8.6 `POST /api/final-rosters/update/{id}` — sửa thủ công
+Body: `{ "fields": { "position": "Trưởng bộ phận Nhà hàng", "division_name": "Bộ phận Nhà hàng" }, "updated_by": "hr@..." }`
+- Chỉ nhận trường trong `EDITABLE_FIELDS`; trường ngoài danh sách ⇒ **bỏ qua** (không lỗi) và ghi log.
+- Mỗi trường được sửa ⇒ thêm tên vào `overridden_fields`, set `has_override = 1`,
+  `updated_by`, `updated_at = time()`.
+- Ghi `audit_logs` (`action = final_roster.update`, `old_data` / `new_data`).
+- 200 trả về dòng đã cập nhật (kèm `position_display`, `overridden_fields` mới).
+- 404 không tìm thấy; 422 validate (độ dài, định dạng ngày, gender…); 409 nếu sửa khiến
+  `dedup_key` trùng dòng khác (trả cảnh báo, gợi ý dùng "Gộp dòng").
 
-### 8.6 `GET /api/attendees/summary-export` *(tuỳ chọn)*
-Nếu muốn BE sinh Excel. **Khuyến nghị FE tự sinh** bằng PHPExcel (đã có pattern ở
-`RunRegistrationsController`, `ReportsController`) — không thêm endpoint.
+### 8.7 `POST /api/final-rosters/reset-field/{id}` — khôi phục trường về gốc
+Body: `{ "fields": ["position"], "updated_by": "hr@..." }`
+- Gỡ tên trường khỏi `overridden_fields`, ghi lại giá trị từ `source_snapshot`, cập nhật
+  `has_override`. Lần đồng bộ sau sẽ cập nhật trường đó bình thường.
+- 200 trả dòng đã cập nhật. 422 nếu trường không nằm trong `overridden_fields`.
+
+### 8.8 `POST /api/final-rosters/store` — HO thêm người thủ công
+Dành cho người không có trong danh sách VCK (ngoại lệ). Tạo dòng `status = 3 (manual)`,
+`attendee_id = NULL`, **tất cả trường** vào `overridden_fields` (để đồng bộ không chạm).
+⚠️ Người `manual` **không ghi ngược được lucky về `attendees`** ⇒ **không đăng nhập được cổng chạy**.
+Phải cảnh báo rõ trên UI (xem §13 câu hỏi).
+
+### 8.9 `POST /api/final-rosters/merge` và `POST /api/final-rosters/split`
+Xử lý gộp sai / tách sai (§7.3). Body `merge`: `{ "keep_id": 1021, "merge_id": 1455 }`.
+Body `split`: `{ "id": 1021, "attendee_ids_to_split": [2117], "new_dedup_hint": { "id_card": "..." } }`.
+
+### 8.10 `DELETE /api/final-rosters/destroy/{id}`
+Xoá mềm (`deleted_at = time()`), giữ `lucky_number` (không tái sử dụng).
+
+### 8.11 Xuất Excel
+**FE tự sinh** bằng PHPExcel (pattern đã có ở `RunRegistrationsController`, `ReportsController`)
+⇒ **không thêm endpoint BE**.
+
+### 8.12 Command artisan
+```
+php artisan final-roster:sync {event_id} {period_id} [--property=] [--dry-run]
+php artisan final-roster:gen-lucky {event_id} [--property=]
+```
+> Chạy bằng MAMP php8.1 kèm cờ extension (xem `chung-ket-fun-run.md` §9).
+
+### 8.13 Endpoint cũ — không sửa
+`POST /api/run-auth/gen-lucky` và `run:gen-lucky` **giữ nguyên** (cổng chạy đã verified).
+Khuyến nghị ngừng dùng nút cũ ở `admin/runRegistrations/admin` khi bảng mới lên production, vì nút
+cũ cấp mã **theo bản ghi** (không gộp người).
 
 ---
 
-## 9. Frontend Yii — controller / view / JS
+## 9. Frontend Yii
 
 ### Files cần tạo
 | File | Nội dung |
 |------|----------|
-| `protected/models/AttendeeSummary.php` | `CFormModel` + static methods: `getApiDataProvider($params)`, `getFilterOptions($eventId)`, `getStats($eventId)`, `provisionLuckyViaApi($eventId, $propertyId)`, `updatePositionViaApi($id, $value)`. **Toàn bộ** gọi `ApiClient` nằm ở đây |
-| `protected/components/ApiEndpoints.php` (sửa) | Thêm `ATTENDEE_SUMMARY_LIST`, `ATTENDEE_SUMMARY_FILTERS`, `ATTENDEE_SUMMARY_STATS`, `ATTENDEE_PROVISION_LUCKY`, `ATTENDEE_UPDATE_POSITION` |
-| `protected/modules/admin/controllers/AttendeeSummaryController.php` | `actionAdmin`, `actionGenLucky` (POST), `actionUpdatePosition` (POST, JSON), `actionExport` |
-| `protected/modules/admin/views/attendeeSummary/admin.php` | View chính |
-| `.../attendeeSummary/_filters.php` | Partial bộ lọc |
-| `.../attendeeSummary/_modal_edit_position.php` | Modal sửa chức danh |
-| `.../attendeeSummary/_modal_gen_lucky.php` | Modal xác nhận cấp mã lucky (chọn phạm vi: toàn sự kiện / 1 đơn vị) |
-| `themes/hope-ui/assets/js/pages/attendeesummary-admin.js` | Toàn bộ JS (lọc phụ thuộc, inline edit, gen lucky, copy mã) |
+| `protected/models/FinalRosters.php` | `CFormModel`. Static: `getApiDataProvider($params)`, `getFilterOptions($eventId)`, `getStats($eventId)`, `syncViaApi($params)`, `provisionLuckyViaApi($eventId,$propertyId)`, `updateFieldsViaApi($id,$fields)`, `resetFieldsViaApi($id,$fields)`, `mergeViaApi()`, `splitViaApi()`, `deleteViaApi($id)`. Hằng số `STATUS_ACTIVE=1`, `STATUS_WITHDRAWN=2`, `STATUS_MANUAL=3`, `getStatusLabel()`, `EDITABLE_FIELDS`. **Toàn bộ** `ApiClient` nằm ở đây |
+| `protected/components/ApiEndpoints.php` (sửa) | Thêm nhóm `FINAL_ROSTER_*`: `LIST`, `FILTERS`, `STATS`, `SYNC`, `PROVISION_LUCKY`, `UPDATE`, `RESET_FIELD`, `STORE`, `MERGE`, `SPLIT`, `DESTROY` |
+| `protected/modules/admin/controllers/FinalRosterController.php` | `actionAdmin`, `actionSyncPreview` (JSON), `actionSync` (POST), `actionGenLucky` (POST), `actionUpdateField` (POST JSON), `actionResetField` (POST JSON), `actionMerge`, `actionSplit`, `actionDelete`, `actionExport` |
+| `.../views/finalRoster/admin.php` | View chính |
+| `.../views/finalRoster/_filters.php` | Partial bộ lọc |
+| `.../views/finalRoster/_modal_sync.php` | Modal đồng bộ (chọn phạm vi + **bảng kết quả dry-run** + nút "Ghi thật") |
+| `.../views/finalRoster/_modal_edit_row.php` | Modal sửa **toàn bộ trường** của 1 người |
+| `.../views/finalRoster/_modal_gen_lucky.php` | Modal xác nhận cấp mã lucky |
+| `.../views/finalRoster/_modal_merge_split.php` | Modal gộp / tách người |
+| `themes/hope-ui/assets/js/pages/finalroster-admin.js` | Toàn bộ JS |
 
-> Có **2 modal** ⇒ theo rule phải tách thành `_modal_*.php` riêng.
-> **Không** inline `<script>` trong view; register bằng `clientScript->registerScriptFile`.
-> Truyền cấu hình (URL, apiKey nếu cần) qua `data-*` attribute trên một div
-> `#attendee-summary-config`.
+> ≥ 2 modal ⇒ **bắt buộc** tách `_modal_*.php` riêng.
+> **Không** inline `<script>`; register bằng
+> `Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/js/pages/finalroster-admin.js', CClientScript::POS_END)`.
+> Cấu hình (URL các action, danh sách trường editable, nhãn tiếng Việt) truyền qua `data-*` trên
+> `<div id="final-roster-config">`.
+> View **không gọi Model** — mọi dropdown/dữ liệu truyền từ controller qua `render()`.
 
 ### Mô tả UI
 
 **Header card**
-- Tiêu đề "Tổng hợp danh sách người tham dự".
-- Dropdown **Sự kiện** (bắt buộc, chọn trước mới hiện bảng).
-- Nút **"Cấp mã lucky"** (primary, ẩn nếu không có quyền `create`) → mở
-  `_modal_gen_lucky`, submit theo rule `modal-submit.md` (disable nút + spinner + Toast + reload).
-- Nút **"Xuất Excel"** (giữ nguyên bộ lọc hiện tại).
+- Tiêu đề "Tổng hợp danh sách Vòng Chung Kết".
+- Dropdown **Sự kiện** + **Đợt VCK** (bắt buộc; chọn xong mới hiện bảng).
+- Nút **"Đồng bộ từ danh sách VCK"** (primary, cần quyền `create`) → `_modal_sync`:
+  1. Chọn phạm vi (toàn sự kiện / một đơn vị).
+  2. Bấm **"Xem trước"** → gọi `syncPreview` → hiện bảng số liệu:
+     *Thêm mới / Cập nhật / Bỏ qua do đã sửa tay / Không đổi / Cảnh báo*, kèm danh sách chi tiết
+     (tên người, trường bị bỏ qua, cảnh báo gộp).
+  3. Bấm **"Ghi thật"** → gọi `sync` (`mode=apply`) → Toast + reload.
+  Nút submit tuân thủ `modal-submit.md`: disable + spinner + Toast + đóng modal.
+- Nút **"Cấp mã lucky"** (cần `create`).
+- Nút **"Xuất Excel"** (giữ bộ lọc hiện tại).
 
-**Dải thống kê** (4 thẻ): Tổng số người · Đã có mã lucky · Chưa có mã lucky · Đã đặt PIN.
+**Dải thống kê** (6 thẻ): Tổng số người · Đã có mã lucky · Chưa có mã lucky · Đã đặt PIN ·
+Đã sửa tay · Đã huỷ tư cách.
+Nếu `without_lucky > 0` ⇒ badge cảnh báo đỏ "Còn N người chưa có mã lucky" ngay cạnh nút cấp mã.
 
-**Bộ lọc** (`_filters.php`, form GET)
-| Trường | Kiểu |
-|--------|------|
-| Đơn vị | dropdown (từ `summary-filters`) |
-| Bộ phận | dropdown **phụ thuộc Đơn vị** (AJAX, theo pattern `Dependent Dropdown`) |
-| Phòng ban | dropdown **phụ thuộc Bộ phận** |
-| Loại người tham dự | dropdown (Finalist / Giám đốc / Lái xe / Khác) |
-| Trạng thái mã lucky | dropdown (Tất cả / Đã có / Chưa có) |
-| Trạng thái duyệt | dropdown dùng `Attendees::getApprovalStatusOptions()` |
-| Từ khoá | text (tên / mã NV / CCCD / mã lucky / số thẻ) |
-| Nút | "Tìm kiếm", "Xoá lọc" |
+**Bộ lọc** (`_filters.php`, form GET): Đơn vị → **Bộ phận** (dropdown phụ thuộc, AJAX theo pattern
+`Dependent Dropdown`) → **Phòng ban** (phụ thuộc Bộ phận) · Loại người tham dự · Trạng thái mã lucky ·
+Đã sửa tay · Trạng thái · Từ khoá · nút "Tìm kiếm" / "Xoá lọc".
 
-**Bảng dữ liệu** (`CGridView` hoặc bảng tự render, phân trang 25/50/100)
+**Bảng dữ liệu** (phân trang 25/50/100)
 
 | # | Cột | Ghi chú |
 |---|-----|---------|
 | 1 | STT | |
-| 2 | Mã lucky | in đậm, kèm `DHMT123456` và icon copy; rỗng → badge xám "Chưa cấp" |
-| 3 | Họ và tên | link sang `admin/attendees/view` |
-| 4 | Mã NV | `staff_code` |
-| 5 | Đơn vị | `property_name` |
-| 6 | Bộ phận | `division_name`, rỗng → "Chưa xác định" (badge vàng) |
-| 7 | Phòng ban | `department_name` |
-| 8 | Chức danh | `position_display`; **inline edit**: click icon ✎ → input tại chỗ, Enter/blur lưu qua AJAX. Có override → hiện icon ✎ xanh + tooltip "Gốc SMILE: {position_name}" + nút ↺ khôi phục |
-| 9 | PIN | badge "Đã đặt" / "Chưa đặt" |
-| 10 | Trạng thái | badge duyệt (dùng `Attendees::getApprovalStatusLabel`) |
-| 11 | Thao tác | nút sửa chức danh (mở modal, cho mobile) |
+| 2 | Mã lucky | in đậm + `DHMT123456` + icon copy; rỗng ⇒ badge xám "Chưa cấp" |
+| 3 | Họ và tên | **inline edit**; link phụ sang `admin/attendees/view` theo `attendee_id` |
+| 4 | Mã NV | inline edit |
+| 5 | Đơn vị | `property_name`, inline edit |
+| 6 | Bộ phận | `division_name`, rỗng ⇒ badge vàng "Chưa xác định", inline edit |
+| 7 | Phòng ban | `department_name`, inline edit |
+| 8 | Chức danh | `position_display`, inline edit |
+| 9 | Size áo | inline edit (dropdown) |
+| 10 | Loại | badge `finalist` / `director` / `driver` |
+| 11 | PIN | badge "Đã đặt" / "Chưa đặt" |
+| 12 | Trạng thái | badge theo `getStatusLabel()` |
+| 13 | Thao tác | "Sửa" (mở `_modal_edit_row` — sửa đủ trường, tốt cho mobile) · "Gộp/Tách" · "Xoá" |
 
-**Quy tắc UI bắt buộc**
-- Toàn bộ nhãn/thông báo **tiếng Việt có dấu**.
-- Thành công/lỗi dùng **Toast** (`Toast.success` / `Toast.error`), **không** Bootstrap Alert.
-- Không có chức năng xoá trên màn này → không cần SweetAlert; nếu thêm "Khôi phục chức danh gốc"
-  hàng loạt thì dùng SweetAlert xác nhận.
-- Mọi dữ liệu dropdown **truyền từ controller qua `render()`** — view không gọi Model.
+**Đánh dấu trường đã sửa thủ công** (yêu cầu cốt lõi)
+- Ô thuộc `overridden_fields` ⇒ viền trái màu cam + icon ✎ nhỏ.
+- Hover/tooltip: **"Đã sửa tay — Gốc: {source_snapshot.field}"**.
+- Icon ↺ **"Khôi phục gốc"** ngay trong ô → gọi `resetField`.
+- Dòng có `has_override = 1` ⇒ badge "Đã sửa tay (N trường)" ở cột Trạng thái.
+- Có nút lọc nhanh ở header: "Chỉ xem dòng đã sửa tay".
+
+**Inline edit (JS)**
+- Click icon ✎ hoặc double-click ô ⇒ biến thành input/select tại chỗ.
+- Enter hoặc blur ⇒ `POST actionUpdateField` (JSON) → cập nhật ô + thêm dấu override +
+  `Toast.success('Đã cập nhật.')`.
+- Esc ⇒ huỷ. Lỗi ⇒ **giữ giá trị cũ** + `Toast.error(message)`, **không reload**.
+- Không dùng Bootstrap Alert ở bất kỳ đâu; xoá dòng / khôi phục hàng loạt dùng **SweetAlert2** qua
+  `confirmDelete(formId)` / `MyHelper::renderDeleteButton()`.
 
 ### Xuất Excel
-`actionExport` lấy toàn bộ bản ghi theo bộ lọc (`per_page` lớn), dùng PHPExcel, các cột:
-Mã lucky · Định danh (DHMT+lucky) · Họ tên · Mã NV · CCCD · Đơn vị · Bộ phận · Phòng ban ·
-Chức danh hiển thị · Chức danh gốc (SMILE) · Loại · Trạng thái duyệt.
-Tên file: `TongHop_DanhSach_Lucky_{event_id}_{Ymd_His}.xlsx`.
+`actionExport` lấy toàn bộ dòng theo bộ lọc (`per_page` lớn, giới hạn 10.000, đọc theo chunk).
+Cột: Mã lucky · Định danh (`DHMT`+lucky) · Họ tên · Mã NV · CCCD · Ngày sinh · Đơn vị · Nhãn in thẻ ·
+Bộ phận · Phòng ban · Chức danh hiển thị · Chức danh gốc (SMILE) · Size áo · Loại · Trạng thái ·
+Đã sửa tay (các trường).
+Tên file: `TongHop_VCK_Lucky_{event_id}_{Ymd_His}.xlsx`.
 
 ---
 
 ## 10. Luồng nghiệp vụ
 
-### 10.1 Xem & lọc
+### 10.1 Đồng bộ (migrate) từ danh sách VCK — có dry-run
 ```mermaid
 sequenceDiagram
   participant HO as Admin HO
-  participant V as View admin.php
-  participant C as AttendeeSummaryController
-  participant M as Model AttendeeSummary
-  participant API as BE Laravel
+  participant JS as finalroster-admin.js
+  participant C as FinalRosterController
+  participant M as Model FinalRosters
+  participant API as BE /api/final-rosters/sync
+  participant SVC as FinalRosterService
+  participant SRC as FinalAggregationService
 
-  HO->>V: Chọn sự kiện + bộ lọc → Tìm kiếm
-  V->>C: GET /admin/attendeeSummary/admin?event_id=3&division_code=FB
-  C->>M: getFilterOptions(3) / getApiDataProvider(params)
-  M->>API: GET /api/attendees/summary-filters, /api/attendees/summary
-  API-->>M: JSON {data, pagination}
-  M-->>C: ApiDataProvider + options
-  C-->>V: render('admin', {dataProvider, filterOptions, stats, canEdit, canGenLucky})
-  V-->>HO: Bảng + thẻ số liệu
-```
-
-### 10.2 Cấp mã lucky
-```mermaid
-sequenceDiagram
-  participant HO as Admin HO
-  participant JS as attendeesummary-admin.js
-  participant C as Controller
-  participant M as Model
-  participant API as BE
-
-  HO->>JS: Bấm "Cấp mã lucky" → chọn phạm vi → Xác nhận
-  JS->>JS: disable nút + spinner
-  JS->>C: POST /admin/attendeeSummary/genLucky
-  C->>C: PermissionHelper::can('attendeesummary','create')
-  C->>M: AttendeeSummary::provisionLuckyViaApi(event_id, property_id)
-  M->>API: POST /api/attendees/provision-lucky
-  API->>API: lấy attendee event_id + is_active=1 + lucky_number IS NULL
-  API->>API: sinh 6 số random, loại trùng, retry nếu dup key
-  API-->>M: {provisioned: 57}
-  M-->>C: result
-  C-->>JS: JSON {success, message}
+  HO->>JS: Bấm "Đồng bộ từ danh sách VCK" → chọn phạm vi → "Xem trước"
+  JS->>C: POST /admin/finalRoster/syncPreview
+  C->>M: FinalRosters::syncViaApi({mode:'preview'})
+  M->>API: POST /api/final-rosters/sync
+  API->>SVC: sync(eventId, periodId, property, 'preview')
+  SVC->>SRC: listFinalAttendees(periodId, property)
+  SRC-->>SVC: danh sách finalist (+ source_attendee_ids)
+  SVC->>SVC: buildDedupKey → gộp người → chọn bản gốc
+  SVC->>SVC: đối chiếu final_rosters; mỗi field: nếu nằm trong overridden_fields → SKIP
+  SVC->>SVC: ghi final_roster_sync_logs(mode=preview)
+  SVC-->>API: {inserted, updated, skipped_override, unchanged, conflicts, detail}
+  API-->>JS: JSON summary
+  JS-->>HO: Bảng kết quả xem trước + cảnh báo gộp
+  HO->>JS: Bấm "Ghi thật"
+  JS->>C: POST /admin/finalRoster/sync (mode=apply)
+  C->>API: POST /api/final-rosters/sync {mode:'apply'}
+  API->>SVC: sync(..., 'apply') trong transaction + cache lock
+  SVC->>SVC: insert/update; set last_synced_at + source_snapshot; KHÔNG chạm trường override
+  SVC-->>API: summary thật
+  API-->>JS: {success, message}
   JS->>JS: đóng modal + Toast.success + reload
 ```
 
-### 10.3 Sửa chức danh hiển thị
+**Giả mã lõi đồng bộ (per-field):**
+```
+foreach (người đã gộp as $src) {
+    $key = buildDedupKey($src);
+    $row = find(event_id, dedup_key = $key) ?? new FinalRoster(status = ACTIVE);
+    $overridden = $row->overridden_fields ?: [];
+    foreach (SYNCABLE_FIELDS as $f) {
+        if (in_array($f, $overridden)) { $report->skipped_override[] = [$row, $f]; continue; }
+        $row->$f = $src->$f;
+    }
+    $row->attendee_id         = $src->primary_attendee_id;   // luôn cập nhật (hệ thống)
+    $row->source_attendee_ids = $src->attendee_ids;          // luôn cập nhật
+    $row->source_snapshot     = snapshot($src);              // luôn cập nhật
+    $row->last_synced_at      = time();
+    // lucky_number: KHÔNG BAO GIỜ ghi ở bước đồng bộ
+    $row->save();
+}
+// Người có trong final_rosters nhưng không còn trong nguồn VCK:
+//   status = WITHDRAWN (không xoá, giữ mã lucky) + báo cáo
+```
+
+### 10.2 Cấp mã lucky (gộp người + ghi ngược `attendees`)
 ```mermaid
 sequenceDiagram
   participant HO as Admin HO
-  participant JS as JS inline edit
+  participant C as Controller
+  participant API as BE /api/final-rosters/provision-lucky
+  participant SVC as FinalRosterService
+  participant DB as MySQL
+
+  HO->>C: Bấm "Cấp mã lucky" → xác nhận
+  C->>C: PermissionHelper::can('finalroster','create')
+  C->>API: POST {event_id, property_id}
+  API->>SVC: provisionLucky()
+  loop mỗi dòng lucky_number IS NULL
+    SVC->>DB: tìm lucky_number sẵn có trong source_attendee_ids
+    alt đã có mã
+      SVC->>DB: tái dùng mã đó (reused++); nếu nhiều mã khác nhau → chọn mã cấp sớm nhất + log conflict
+    else chưa có
+      SVC->>DB: sinh 6 số, kiểm tra trùng trên attendees + final_rosters (retry 3 lần nếu dup key)
+    end
+    SVC->>DB: UPDATE final_rosters.lucky_number
+    SVC->>DB: UPDATE attendees.lucky_number WHERE id = final_rosters.attendee_id
+    SVC->>DB: SET NULL các attendee trùng người đang giữ mã KHÁC + log conflict
+  end
+  SVC-->>API: {provisioned, reused, conflicts}
+  API-->>C: JSON
+  C-->>HO: Toast.success + reload
+```
+
+### 10.3 Sửa thủ công & khôi phục gốc
+```mermaid
+sequenceDiagram
+  participant HO as Admin HO
+  participant JS as Inline edit
   participant C as Controller
   participant API as BE
 
-  HO->>JS: Click ✎ → sửa text → Enter
-  JS->>C: POST /admin/attendeeSummary/updatePosition {id, position_override}
-  C->>C: can('attendeesummary','update'); email = AuthHandler::getUser()['email']
-  C->>API: POST /api/attendees/update-position/{id} {position_override, updated_by}
-  API->>API: ghi position_override + _by + _at(time()) + audit_logs
-  API-->>C: {success, data:{position_display}}
+  HO->>JS: Click ✎ ô "Bộ phận" → nhập → Enter
+  JS->>C: POST /admin/finalRoster/updateField {id, fields:{division_name:"..."}}
+  C->>C: can('finalroster','update'); email = AuthHandler::getUser()['email']
+  C->>API: POST /api/final-rosters/update/{id} {fields, updated_by}
+  API->>API: ghi cột thật + push "division_name" vào overridden_fields + has_override=1 + updated_at=time() + audit_logs
+  API-->>C: {success, data}
   C-->>JS: JSON
-  JS->>JS: cập nhật ô + Toast.success('Đã cập nhật chức danh.')
+  JS->>JS: cập nhật ô + hiện dấu ✎ cam + Toast.success
+
+  HO->>JS: Bấm ↺ "Khôi phục gốc"
+  JS->>C: POST /admin/finalRoster/resetField {id, fields:["division_name"]}
+  C->>API: POST /api/final-rosters/reset-field/{id}
+  API->>API: gỡ khỏi overridden_fields + ghi lại từ source_snapshot
+  API-->>JS: {success}
+  JS->>JS: bỏ dấu ✎ + Toast.success('Đã khôi phục dữ liệu gốc.')
 ```
-Nếu lỗi: giữ giá trị cũ trong ô, `Toast.error(message)`.
 
 ---
 
@@ -481,19 +787,22 @@ Nếu lỗi: giữ giá trị cũ trong ô, `Toast.error(message)`.
 
 | # | Tình huống | Xử lý |
 |---|-----------|-------|
-| 1 | **Trùng mã lucky** khi 2 tiến trình cấp mã song song | UNIQUE DB chặn; bọc retry 3 lần bắt duplicate key; thêm cache lock `attendees:provision-lucky:{event_id}` TTL 60s → trả 409 nếu đang chạy |
-| 2 | **Cạn mã** / không gian hẹp | 900.000 mã cho vài nghìn người → an toàn. Nếu một ngày vượt 50% không gian, đổi sang 7 số (phải sửa cả BIB) |
-| 3 | **Huỷ tư cách** (`is_active=0` + `deleted_at`) | Không thu hồi mã. Màn tổng hợp mặc định `is_active=1`; có filter "Đã huỷ" để rà soát. Cổng chạy đã lọc `is_active=1` |
-| 4 | **Thay thế người** | Người thay là attendee mới ⇒ chưa có mã. Phải **bấm cấp mã lại** (hoặc auto-provision ở `store`) nếu không người thay **không đăng nhập được** cổng chạy. ⚠️ Rủi ro vận hành cao — khuyến nghị bật auto-provision |
-| 5 | **Mã đã in/phát rồi mới thay người** | Mã người bị thay đã phát ra ngoài; vô hiệu bằng `is_active=0`. Cần quy trình thông báo thu hồi giấy định danh |
-| 6 | **Đơn vị nộp muộn** sau khi đã cấp mã | Idempotent ⇒ bấm lại chỉ cấp cho người mới. Thêm badge cảnh báo "Còn N người chưa có mã" ngay trên header |
-| 7 | **Sync SMILE ghi đè chức danh** | `syncWithStaffData` chỉ ghi `position_code`/`position_name`; **tuyệt đối không** chạm `position_override`. Cần test hồi quy đúng điểm này |
-| 8 | **`division_code` rỗng** với người nhập thủ công | Hiển thị "Chưa xác định" + filter riêng; dropdown Bộ phận có lựa chọn "(Chưa xác định)" |
-| 9 | **Một người 2 bản ghi attendee** (đăng ký 2 đợt — xem `replace-withdraw-attendee`) | ⚠️ Sẽ ra **2 mã lucky khác nhau** cho cùng 1 người → sai nghiệp vụ bốc thăm & đăng nhập. **Phải chốt với chủ dự án** (§13 Q1). Đề xuất: gộp theo `staff_code`/`id_card` trong cùng event — nếu đã có bản ghi khác của cùng người có `lucky_number` thì **dùng lại mã đó** |
-| 10 | **Finalist VCK** | Bản ghi finalist là attendee riêng; nếu áp dụng gộp theo Q9 thì finalist dùng lại mã của bản gốc → một người một mã, đúng kỳ vọng |
-| 11 | **Lộ danh sách mã lucky** (Excel chứa mã đăng nhập) | Mã chỉ là *định danh*, vẫn cần PIN. Tuy vậy file Excel phải coi là dữ liệu nội bộ; không log mã, không đưa vào URL công khai; `login_pin` không bao giờ trả qua API |
-| 12 | **Hiệu năng** khi bỏ phân trang lúc export | Giới hạn export tối đa 10.000 dòng/lần, chunk khi đọc |
-| 13 | **Inline edit mất dữ liệu** khi mạng lỗi | Giữ giá trị cũ, Toast lỗi, không reload trang |
+| 1 | **Hai nguồn sự thật lệch nhau** (`attendees` vs `final_rosters`) | Đây là cái giá của kiến trúc bảng riêng. Giảm thiểu: hiện `last_synced_at` ngay trên header; badge "Dữ liệu có thể đã cũ" nếu > 24h; nút đồng bộ luôn sẵn; mọi báo cáo bốc thăm **chỉ** đọc bảng mới |
+| 2 | **Trùng mã lucky** khi cấp song song | UNIQUE trên cả 2 bảng; retry 3 lần bắt duplicate key (SQLSTATE 23000); cache lock theo `event_id` ⇒ 409 |
+| 3 | **Một người giữ 2 mã khác nhau trên `attendees`** (do `run:gen-lucky` cũ đã cấp theo bản ghi) | Bước cấp mã **tái dùng mã cấp sớm nhất** và `SET NULL` mã còn lại + ghi `conflicts`. ⚠️ Nếu mã bị NULL **đã phát ra ngoài** ⇒ người đó đăng nhập thất bại. **Phải chạy đối soát trước khi phát định danh** (slice S8) |
+| 4 | **Người bị huỷ tư cách sau khi đã migrate** | Không còn trong nguồn VCK ⇒ đồng bộ set `status = WITHDRAWN`, **không xoá**, **giữ mã lucky** (không tái sử dụng). Mặc định ẩn khỏi danh sách (filter `status=1`), có filter riêng để xem. `attendees.is_active = 0` ⇒ cổng chạy tự chặn đăng nhập. Xem §13 câu hỏi |
+| 5 | **Người thay thế** | Là người khác ⇒ dòng mới ⇒ mã mới. Phải chạy **đồng bộ + cấp mã** sau mỗi lần thay người, nếu không người thay **không đăng nhập được** cổng chạy. Khuyến nghị gộp hai bước vào một nút |
+| 6 | **Đơn vị nộp muộn** | Đồng bộ lại ⇒ dòng mới; `skipped_override` không ảnh hưởng. Badge "Còn N người chưa có mã" nhắc HO cấp bù |
+| 7 | **Gộp sai / tách sai** (trùng tên, thiếu `staff_code`) | Preview báo `possible_wrong_merge` / `duplicate_person`; HO dùng chức năng Tách/Gộp (§7.3). Khuyến nghị **không** auto-merge theo họ tên khi thiếu ngày sinh |
+| 8 | **Sửa tay làm `dedup_key` đổi** (vd điền `staff_code` mới) | Lần đồng bộ sau sinh khoá mới ⇒ **tạo dòng mới** và dòng cũ thành `WITHDRAWN`. Service phải phát hiện (so `source_attendee_ids` giao nhau) và báo `duplicate_person` thay vì âm thầm tách. `dedup_key` **không** nằm trong `EDITABLE_FIELDS` |
+| 9 | **Override "khoá chết" dữ liệu sai** | Nếu HO sửa sai rồi quên, migrate sau không sửa được. Bắt buộc có nút **"Khôi phục gốc"** từng trường + báo cáo "Các trường đang bị override" trong kết quả đồng bộ |
+| 10 | **`overridden_fields` chứa tên trường không còn tồn tại** (đổi schema) | Khi đọc, lọc theo `EDITABLE_FIELDS` hiện hành; bỏ qua tên lạ, không lỗi |
+| 11 | **JSON không hỗ trợ** (MySQL 5.6) | Dùng `TEXT` + cast `array` ở Laravel; thay `JSON_LENGTH/JSON_CONTAINS` bằng cột `has_override` + lọc ở tầng ứng dụng |
+| 12 | **Người `manual` (HO tự thêm)** | `attendee_id = NULL` ⇒ **không ghi ngược lucky về `attendees`** ⇒ **không đăng nhập cổng chạy được**. UI phải cảnh báo đỏ; §13 câu hỏi |
+| 13 | **Rò rỉ danh sách mã lucky** (Excel) | Mã chỉ là *định danh*, vẫn cần PIN. `login_pin` **không bao giờ** trả qua API/Excel/log; mã không đưa vào URL công khai |
+| 14 | **Hiệu năng export / đồng bộ** | Chunk 500 dòng; export tối đa 10.000 dòng/lần; đồng bộ bọc transaction + lock, chạy được qua artisan nếu dữ liệu lớn |
+| 15 | **Đồng bộ chạy chồng** (nút + cron + artisan) | Cache lock `final-rosters:sync:{event_id}` TTL 300s ⇒ 409 "Đang có tiến trình đồng bộ khác" |
+| 16 | **Sai `period_id`** (đợt không `is_final`) | BE validate, trả 422 "Đợt không phải Vòng Chung Kết" |
 
 ---
 
@@ -501,44 +810,71 @@ Nếu lỗi: giữ giá trị cũ trong ô, `Toast.error(message)`.
 
 | Slice | Nội dung | Verify được bằng | Ước lượng | Phụ thuộc |
 |-------|----------|------------------|-----------|-----------|
-| **S0** | Migration: `division_code`/`division_name`, `position_override(+_by,_at)`, index. Cập nhật `$fillable`, `AttendeeRequest`, `AttendeeResource` (thêm `division_*`, `position_override`, `position_display`, `lucky_number`, `login_identifier`, `pin_is_set`). Accessor `position_display`. `syncWithStaffData` điền `division_*` | `php artisan migrate` + tinker đọc 1 attendee thấy field mới | **M (1d)** | — |
-| **S1** | BE: `GET /api/attendees/summary` + repository filter đầy đủ + phân trang + sort | curl/Postman với event thật, kiểm đủ filter | **M (1d)** | S0 |
-| **S2** | FE: Model `AttendeeSummary` + `ApiEndpoints` + Controller `actionAdmin` + view `admin.php` + `_filters.php` (bảng + lọc + phân trang, **chỉ đọc**) | Mở `/admin/attendeeSummary/admin?event_id=3`, lọc ra đúng người | **L (3d)** | S1 |
-| **S3** | BE+FE: `summary-filters` + dropdown phụ thuộc Đơn vị → Bộ phận → Phòng ban (JS) | Chọn đơn vị → bộ phận tự nạp đúng | **M (1d)** | S2 |
-| **S4** | BE: `provisionLuckyForEvent` + `POST /api/attendees/provision-lucky` + command `attendees:gen-lucky` + lock/retry. FE: modal + action `genLucky` | Tinker: 2 lần chạy liên tiếp, lần 2 `provisioned=0`; test song song không trùng mã | **M (1d)** | S0 |
-| **S5** | BE: `POST /api/attendees/update-position/{id}` + audit log. FE: inline edit + `_modal_edit_position` + nút khôi phục gốc | Sửa chức danh → reload vẫn đúng; chạy lại sync SMILE không mất override | **M (1d)** | S0, S2 |
-| **S6** | Backfill `division_*` cho dữ liệu cũ (command) + báo cáo số người còn "Chưa xác định" | Chạy command, đếm còn lại | **S (4h)** | S0 |
-| **S7** | `summary-stats` + dải 4 thẻ thống kê + badge cảnh báo "còn N người chưa có mã" | Số liệu khớp với đếm SQL | **S (4h)** | S1, S4 |
-| **S8** | Xuất Excel theo bộ lọc | Tải file, mở kiểm đủ cột & đúng bộ lọc | **M (1d)** | S2 |
-| **S9** | Phân quyền: thêm `attendeesummary` vào `MControllers` + `roles.controllers`, gate view/controller, menu sidebar | Đăng nhập tài khoản HR không quyền update → không thấy nút sửa | **S (4h)** | S2, S4, S5 |
-| **S10** | Xử lý "một người nhiều attendee" theo quyết định Q1; auto-provision khi tạo attendee mới | Tạo người thay → có mã ngay / dùng lại mã cũ | **M (1d)** | S4 + Q1 chốt |
+| **S0** | Migration `final_rosters` + `final_roster_sync_logs`; Entity `FinalRoster` (SoftDeletes, cast `overridden_fields`/`source_attendee_ids`/`source_snapshot` = array, timestamp unix, hằng `EDITABLE_FIELDS`/`SYNCABLE_FIELDS`/`STATUS_*`, accessor `position_display`). Bổ sung `lucky_number` + `pin_is_set` vào `AttendeeResource` | `artisan migrate` + tinker tạo/đọc 1 dòng, cast JSON đúng | **M (1d)** | — |
+| **S1** | `FinalRosterService::buildDedupKey()` + logic **gộp người** + chọn bản gốc + fill-in + phát hiện conflict. Unit test với bộ dữ liệu giả (cùng `staff_code`, cùng `id_card`, trùng tên thiếu ngày sinh) | Test: 3 bản ghi 1 người ⇒ 1 kết quả; 2 người trùng tên ⇒ báo conflict | **M (1d)** | S0 |
+| **S2** | `FinalRosterService::sync()` + **dry-run/preview** + **bảo vệ per-field** + ghi `final_roster_sync_logs`. Endpoint `POST /api/final-rosters/sync`. Command `final-roster:sync --dry-run` | Tinker/artisan: chạy preview ⇒ số liệu; apply ⇒ dữ liệu vào bảng; **sửa 1 trường rồi apply lại ⇒ trường đó KHÔNG đổi, báo `skipped_override`** | **L (3d)** | S1 |
+| **S3** | BE: `GET /api/final-rosters` (filter đầy đủ, phân trang, sort) + `/filters` + `/stats` | Postman: lọc theo đơn vị/bộ phận/phòng ban/`has_override` ra đúng | **M (1d)** | S0 |
+| **S4** | FE: `ApiEndpoints` + model `FinalRosters` + `FinalRosterController::actionAdmin` + `admin.php` + `_filters.php` (bảng + lọc + phân trang + thống kê, **chỉ đọc**) | Mở `/admin/finalRoster/admin?event_id=3&period_id=4`, lọc ra đúng người | **L (3d)** | S3 |
+| **S5** | FE: dropdown phụ thuộc Đơn vị → Bộ phận → Phòng ban (AJAX) | Chọn đơn vị ⇒ bộ phận tự nạp đúng danh sách | **S (4h)** | S4 |
+| **S6** | FE: `_modal_sync` (xem trước ⇒ ghi thật) + `actionSyncPreview`/`actionSync` + hiển thị báo cáo `skipped_override`/`conflicts` | Bấm xem trước thấy số liệu; ghi thật dữ liệu vào bảng; trường đã sửa tay nằm trong danh sách bỏ qua | **M (1d)** | S2, S4 |
+| **S7** | BE+FE: `update/{id}` + `reset-field/{id}` + inline edit nhiều trường + `_modal_edit_row` + badge ✎ + tooltip "Gốc: …" + nút ↺ | Sửa 3 trường khác nhau ⇒ `overridden_fields` đúng; khôi phục 1 trường ⇒ gỡ đúng tên; audit log có bản ghi | **L (3d)** | S0, S4 |
+| **S8** | BE: `provisionLucky` theo người đã gộp + **ghi ngược `attendees`** + xử lý mã trùng người + lock/retry. Command `final-roster:gen-lucky`. FE: `_modal_gen_lucky` + `actionGenLucky`. **Kèm báo cáo đối soát mã cũ** | Tinker: chạy 2 lần ⇒ lần 2 `provisioned=0`; người có 2 bản ghi ⇒ **1 mã**; `attendees.lucky_number` của bản đại diện đúng; **test cổng chạy: `DHMT`+mã login được** | **L (3d)** | S0, S1 |
+| **S9** | FE: xuất Excel theo bộ lọc (PHPExcel) | Tải file, kiểm đủ cột + đúng bộ lọc + cột "Đã sửa tay" | **M (1d)** | S4 |
+| **S10** | BE+FE: `merge` / `split` + `_modal_merge_split` + `store` (thêm thủ công) + `destroy` (xoá mềm) | Gộp 2 dòng ⇒ 1 dòng giữ mã cũ hơn; tách ⇒ dòng mới có mã mới | **M (1d)** | S7, S8 |
+| **S11** | Phân quyền: thêm `finalroster` vào `MControllers` + `roles.controllers`, gate controller + view, menu sidebar | HR không quyền update ⇒ không thấy nút sửa; URL trực tiếp ⇒ 403 | **S (4h)** | S4, S6, S7, S8 |
+| **S12** *(tuỳ chọn)* | Thêm `division_code`/`division_name` vào `attendees` + điền ở `syncWithStaffData` + command backfill (để các màn khác cũng lọc được) | Chạy backfill, đếm số người còn "Chưa xác định" | **M (1d)** | S0 |
 
-**Thứ tự thực thi:** S0 → S1 → S2 → (S3 ∥ S4 ∥ S5) → S6 → S7 → S8 → S9 → S10.
-**Tổng ước lượng:** ~11–12 ngày công (chưa gồm S10 nếu Q1 chưa chốt).
+**Thứ tự thực thi:**
+`S0 → S1 → (S2 ∥ S3) → S4 → (S5 ∥ S6 ∥ S7 ∥ S8) → S9 → S10 → S11 → [S12]`
+
+**Tổng ước lượng:** **~19 ngày công** (không gồm S12 tuỳ chọn ⇒ +1d).
+> Tăng ~7 ngày so với phương án query trực tiếp, chủ yếu do S2 (đồng bộ + dry-run + bảo vệ
+> per-field: 3d), S7 (sửa tay nhiều trường + khôi phục: 3d) và S8 (gộp người + ghi ngược + đối
+> soát: 3d).
+
+**Mốc giao hàng gợi ý:**
+- **Mốc 1 (S0–S4, ~8d):** xem được danh sách VCK tổng hợp, đồng bộ qua artisan.
+- **Mốc 2 (S5–S8, ~7.5d):** đồng bộ + sửa tay + cấp mã lucky hoạt động đủ trên UI.
+- **Mốc 3 (S9–S11, ~2.5d):** Excel, gộp/tách, phân quyền — sẵn sàng production.
 
 ---
 
 ## 13. Câu hỏi cần chủ dự án chốt
 
-1. **Một người có 2 bản ghi attendee (đăng ký 2 đợt / bản finalist VCK) thì cấp 1 mã lucky hay 2?**
-   (Đề xuất: **1 mã duy nhất/người**, gộp theo `staff_code` → fallback `id_card` → fallback họ tên,
-   trong cùng sự kiện.) — chặn slice S10.
-2. **Phạm vi cấp mã:** cấp cho **toàn bộ** người tham dự của sự kiện, hay chỉ người đã `approved`?
-   (Đề xuất: chỉ `approval_status = approved` + `is_active = 1`.)
-3. **Người bị huỷ tư cách:** giữ mã (không tái sử dụng) — xác nhận chấp nhận "mã chết"?
-4. **Người thay thế / bổ sung sau:** có bật **tự động cấp mã** ngay khi tạo attendee mới không,
-   hay bắt buộc HO bấm nút? (Đề xuất: tự động.)
-5. **Ai được sửa chức danh hiển thị?** Chỉ Admin HO, hay HR cũng được? Đơn vị có được sửa không?
-   (Đề xuất: Admin HO + HR; đơn vị không.)
-6. **Chức danh override ảnh hưởng tới đâu?** Có áp dụng cho **in thẻ**, **email xác nhận**,
-   **danh sách VCK** luôn không, hay chỉ hiển thị ở màn tổng hợp + Excel?
-   (Đề xuất: áp dụng mọi nơi qua `position_display`.)
-7. **Bộ phận (division)** có thực sự cần lọc riêng không, hay chỉ cần Đơn vị + Phòng ban?
-   (Nếu không cần, bỏ được Migration 1 + slice S6 → tiết kiệm ~1.5 ngày.)
-8. **Reset PIN:** HO có cần chức năng xoá PIN của một người (khi họ quên) trên màn này không?
-   (Hiện chưa có; nếu cần sẽ thêm endpoint + nút, ~4h.)
-9. **Độ dài mã lucky:** giữ **6 số** (đang chạy, ràng buộc BIB cổng chạy) — xác nhận?
-10. **Có cần chốt sổ (đóng băng) danh sách tại thời điểm bốc thăm** không? Nếu có, sẽ làm snapshot
-    chỉ-đọc riêng ở tài liệu bốc thăm, không ảnh hưởng màn hình này.
-11. **Excel chứa mã lucky** được phát hành cho ai? Cần cột nào thêm (số điện thoại, email) để phân
-    phát định danh?
+> 3 câu chặn trước đây (gộp người / phạm vi cấp mã / lọc bộ phận) **đã chốt** và nằm ở §0.
+
+### Nhóm A — ảnh hưởng tới vận hành mã lucky
+1. **Mã lucky đã cấp theo bản ghi trước đây** (qua `run:gen-lucky`): nếu đối soát phát hiện một
+   người đang giữ 2 mã và **cả hai đã phát ra ngoài**, xử lý thế nào? (Đề xuất: giữ mã cấp sớm nhất,
+   `SET NULL` mã kia, HO thông báo thu hồi. Cần xác nhận quy trình thông báo.)
+2. **Người HO thêm thủ công** (không có trong danh sách VCK, `attendee_id = NULL`): có cần **đăng
+   nhập cổng chạy** không? Nếu **có** ⇒ phải tạo kèm một bản ghi `attendees` tối thiểu để ghi ngược
+   mã (+1 ngày công). Nếu **không** ⇒ UI chỉ cảnh báo.
+3. **Có cho phép sửa tay `lucky_number`** không? (Đề xuất: **không** — tránh phá UNIQUE và BIB đã in.)
+4. **Giữ 6 chữ số** cho mã lucky (ràng buộc BIB `run_events.code + lucky_number`) — xác nhận?
+5. Sau khi bảng mới lên production, có **ẩn/vô hiệu nút "Cấp số lucky"** cũ ở
+   `admin/runRegistrations/admin` không? (Đề xuất: ẩn, vì nút cũ cấp mã theo bản ghi, không gộp người.)
+
+### Nhóm B — vòng đời dữ liệu bảng mới
+6. **Người bị huỷ tư cách sau khi đã migrate:** đánh dấu `WITHDRAWN` và **giữ** trong bảng (mặc định
+   ẩn, giữ mã) — xác nhận? Hay **xoá mềm hẳn** khỏi bảng tổng hợp?
+7. **Trường đã override có cần nút "Khôi phục về dữ liệu gốc"** không? (Đề xuất: **có**, từng trường
+   + có cả "khôi phục toàn bộ dòng" — đã đưa vào slice S7. Xác nhận để không làm thừa/thiếu.)
+8. Có cần **ghi ngược (write-back)** các trường HO sửa tay về `attendees` không? (Đề xuất: **không** —
+   giữ một chiều cho đơn giản; nhưng nếu in thẻ/email vẫn đọc `attendees` thì chức danh sửa tay sẽ
+   **không** xuất hiện trên thẻ. **Câu này ảnh hưởng trực tiếp tới câu 9.**)
+9. **Chức danh sửa tay áp dụng tới đâu?** Chỉ màn tổng hợp + Excel + bốc thăm, hay cả **in thẻ** và
+   **email xác nhận**? Nếu cả thẻ/email ⇒ các module đó phải đọc từ `final_rosters` (hoặc bật
+   write-back ở câu 8) — **+1.5 ngày công**.
+10. **Có cần lịch sử thay đổi theo trường** (ai sửa gì, lúc nào, giá trị cũ) hiển thị ngay trên UI
+    không? (Hiện chỉ ghi `audit_logs` + `updated_by`/`updated_at`. Nếu cần UI lịch sử ⇒ +1 ngày.)
+11. **Đồng bộ tự động theo lịch** (cron hằng ngày) hay **chỉ bấm tay**? (Đề xuất: chỉ bấm tay ở giai
+    đoạn này, vì cần HO xem preview trước khi ghi.)
+
+### Nhóm C — còn tồn từ bản trước
+12. Ai được sửa dữ liệu: Admin HO + HR? Đơn vị **không** — xác nhận?
+13. Có cần chức năng **reset PIN** cho người quên PIN trên màn này không? (~4h)
+14. **Có cần đóng băng danh sách** tại thời điểm bốc thăm không? (Bảng mới đã gần như là snapshot;
+    nếu cần bất biến tuyệt đối thì thêm cột `locked_at` + chặn mọi sửa/đồng bộ sau khi khoá — ~4h.)
+15. **Excel chứa mã lucky** phát cho ai? Cần thêm cột nào (SĐT, email) để phân phát định danh?
+16. **Tên bảng** chốt là `final_rosters` hay `final_attendee_rosters` / `vck_rosters`?
