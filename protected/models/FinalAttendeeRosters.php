@@ -369,6 +369,18 @@ class FinalAttendeeRosters extends CFormModel
     }
 
     /**
+     * HO thêm người thủ công. BE tạo kèm bản ghi attendee tối thiểu, cấp luôn mã lucky và số thẻ.
+     */
+    public static function storeViaApi($data)
+    {
+        $ssoUser = AuthHandler::getUser();
+
+        return ApiClient::post(ApiEndpoints::FINAL_ATTENDEE_ROSTER_STORE, array_merge($data, array(
+            'created_by' => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        )));
+    }
+
+    /**
      * Chuyển các dòng dữ liệu API thành model để view dùng.
      */
     public static function createFromApiList($rows)

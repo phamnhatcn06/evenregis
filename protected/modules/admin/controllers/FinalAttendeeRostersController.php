@@ -61,6 +61,7 @@ class FinalAttendeeRostersController extends AdminController
             'filterOptions' => $filterOptions,
             'lastSyncedAt'  => $lastSyncedAt,
             'audit'         => $audit,
+            'roleList'      => $this->getRoleList(),
             'pageSize'      => $this->resolvePageSize(),
             'pageSizes'     => self::PAGE_SIZES,
             'filters'       => $this->getFilterValues(),
@@ -210,6 +211,73 @@ class FinalAttendeeRostersController extends AdminController
             'success' => true,
             'message' => isset($result['data']['message']) ? $result['data']['message'] : 'Đã cấp mã lucky.',
             'report'  => isset($result['data']['data']) ? $result['data']['data'] : array(),
+        ));
+    }
+
+    /**
+     * HO thêm người thủ công vào danh sách (JSON).
+     */
+    public function actionCreate()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            $this->renderJson(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'), 400);
+            return;
+        }
+
+        if (!PermissionHelper::can('finalattendeerosters', 'create')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền thêm người.'), 403);
+            return;
+        }
+
+        $request = Yii::app()->request;
+        $data    = array(
+            'event_id'    => (int) $request->getPost('event_id'),
+            'period_id'   => (int) $request->getPost('period_id'),
+            'property_id' => (int) $request->getPost('property_id'),
+            'full_name'   => trim((string) $request->getPost('full_name')),
+        );
+
+        if (!$data['event_id'] || !$data['period_id'] || !$data['property_id'] || $data['full_name'] === '') {
+            $this->renderJson(array(
+                'success' => false,
+                'message' => 'Vui lòng nhập đủ sự kiện, đợt Vòng Chung Kết, đơn vị và họ tên.',
+            ), 422);
+            return;
+        }
+
+        $roleId = $request->getPost('role_id');
+        if ($roleId !== null && $roleId !== '') {
+            $data['role_id'] = (int) $roleId;
+        }
+
+        foreach (array_keys(FinalAttendeeRosters::editableFields()) as $field) {
+            if (isset($data[$field])) {
+                continue;
+            }
+            $value = $request->getPost($field);
+            if ($value !== null && trim((string) $value) !== '') {
+                $data[$field] = trim((string) $value);
+            }
+        }
+
+        $result = FinalAttendeeRosters::storeViaApi($data);
+
+        if (!$result['success']) {
+            // 409 = người này đã có trong danh sách hoặc hết dải số thẻ.
+            $status = isset($result['code']) && (int) $result['code'] >= 400 ? (int) $result['code'] : 500;
+            $this->renderJson(array(
+                'success' => false,
+                'message' => $result['error'] ?: 'Không thể thêm người.',
+            ), $status);
+            return;
+        }
+
+        $row = isset($result['data']['data']) ? $result['data']['data'] : array();
+
+        $this->renderJson(array(
+            'success' => true,
+            'message' => isset($result['data']['message']) ? $result['data']['message'] : 'Đã thêm người.',
+            'row'     => $row,
         ));
     }
 
@@ -425,6 +493,22 @@ class FinalAttendeeRostersController extends AdminController
     protected function getIntParam($name)
     {
         return isset($_GET[$name]) && $_GET[$name] !== '' ? (int) $_GET[$name] : null;
+    }
+
+    /**
+     * Danh mục vai trò người tham dự, cho dropdown ở modal thêm người.
+     */
+    protected function getRoleList()
+    {
+        $list = array();
+        try {
+            foreach (Roles::getApiDataProvider(array(), 200)->getData() as $role) {
+                $list[$role->id] = $role->name;
+            }
+        } catch (Exception $e) {
+            Yii::log('Không tải được danh mục vai trò: ' . $e->getMessage(), CLogger::LEVEL_WARNING);
+        }
+        return $list;
     }
 
     protected function getEventList()
