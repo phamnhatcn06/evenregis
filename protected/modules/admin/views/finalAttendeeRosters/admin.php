@@ -173,6 +173,9 @@ $flashMessages = Yii::app()->user->getFlashes();
                             <th style="width:110px;">Loại</th>
                             <th style="width:90px;">PIN</th>
                             <th style="width:150px;">Trạng thái</th>
+                            <?php if ($canUpdate): ?>
+                                <th style="width:90px;">Thao tác</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -281,12 +284,43 @@ $flashMessages = Yii::app()->user->getFlashes();
                                     </div>
                                 <?php endif; ?>
                             </td>
+
+                            <?php if ($canUpdate): ?>
+                            <td>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary js-edit-row"
+                                        data-row="<?php echo CHtml::encode(CJSON::encode(array(
+                                            'id'                => $row->id,
+                                            'full_name'         => $row->full_name,
+                                            'staff_code'        => $row->staff_code,
+                                            'id_card'           => $row->id_card,
+                                            'phone_number'      => $row->phone_number,
+                                            'email'             => $row->email,
+                                            'property_name'     => $row->property_name,
+                                            'unit_label'        => $row->unit_label,
+                                            'division_name'     => $row->division_name,
+                                            'department_name'   => $row->department_name,
+                                            'position'          => $row->position,
+                                            'shirt_size'        => $row->shirt_size,
+                                            'attendee_type'     => $row->attendee_type,
+                                            'note'              => $row->note,
+                                            'overridden_fields' => $overridden,
+                                            'source_snapshot'   => is_array($row->source_snapshot) ? $row->source_snapshot : array(),
+                                            'lucky_number'      => $row->lucky_number,
+                                            'updated_by'        => $row->updated_by,
+                                            'last_synced_at'    => $row->last_synced_at,
+                                        ))); ?>"
+                                        title="Sửa thông tin người này">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                            </td>
+                            <?php endif; ?>
                         </tr>
                         <?php endforeach; ?>
 
                         <?php if (empty($rows)): ?>
                         <tr>
-                            <td colspan="12" class="text-center text-muted py-4">
+                            <td colspan="<?php echo $canUpdate ? 13 : 12; ?>" class="text-center text-muted py-4">
                                 <i class="fa fa-inbox fa-2x mb-2 d-block"></i>
                                 Không có dữ liệu. Hãy bấm <strong>Đồng bộ từ danh sách VCK</strong> để nạp danh sách.
                             </td>
@@ -311,6 +345,10 @@ $flashMessages = Yii::app()->user->getFlashes();
             <?php endif; ?>
         </div>
     </div>
+
+    <?php if ($canUpdate): ?>
+        <?php $this->renderPartial('_modal_edit_row'); ?>
+    <?php endif; ?>
 
     <?php if ($canCreate): ?>
         <?php $this->renderPartial('_modal_sync', array(

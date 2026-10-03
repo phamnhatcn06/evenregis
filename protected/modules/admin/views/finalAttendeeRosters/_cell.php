@@ -20,9 +20,11 @@ if (!$isOverridden) {
     return;
 }
 
-$original = $row->originalValue($field);
-$tooltip  = 'Đã sửa tay — Gốc: '
+$original   = $row->originalValue($field);
+$hasOrigin  = $row->hasOriginalValue($field);
+$tooltip    = 'Đã sửa tay — Gốc: '
     . (trim((string) $original) !== '' ? $original : '(để trống)');
+$canRestore = isset($canUpdate) ? $canUpdate : false;
 ?>
 <span class="js-cell d-inline-block ps-2 border-start border-3 border-warning"
       data-field="<?php echo CHtml::encode($field); ?>"
@@ -31,4 +33,13 @@ $tooltip  = 'Đã sửa tay — Gốc: '
       title="<?php echo CHtml::encode($tooltip); ?>">
     <?php echo CHtml::encode($display); ?>
     <i class="fa fa-pencil text-warning ms-1 small"></i>
+    <?php if ($canRestore && $hasOrigin): ?>
+        <button type="button" class="btn btn-link btn-sm p-0 ms-1 js-cell-reset"
+                data-field="<?php echo CHtml::encode($field); ?>"
+                data-roster-id="<?php echo (int) $row->id; ?>"
+                data-field-label="<?php echo CHtml::encode($field); ?>"
+                title="Khôi phục về giá trị gốc">
+            <i class="fa fa-undo"></i>
+        </button>
+    <?php endif; ?>
 </span>
