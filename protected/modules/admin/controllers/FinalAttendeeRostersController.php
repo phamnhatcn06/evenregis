@@ -458,6 +458,150 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Gộp hai dòng của cùng một người (JSON).
+     */
+    public function actionMerge()
+    {
+        if (!$this->guardWrite('update')) {
+            return;
+        }
+
+        $request = Yii::app()->request;
+        $keepId  = (int) $request->getPost('keep_id');
+        $mergeId = (int) $request->getPost('merge_id');
+
+        if (!$keepId || !$mergeId) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn cả hai dòng cần gộp.'), 422);
+            return;
+        }
+
+        $this->respondApi(FinalAttendeeRosters::mergeViaApi($keepId, $mergeId), 'Không thể gộp dòng.');
+    }
+
+    /**
+     * Tách một số bản ghi khỏi dòng hiện tại (JSON).
+     */
+    public function actionSplit()
+    {
+        if (!$this->guardWrite('update')) {
+            return;
+        }
+
+        $request     = Yii::app()->request;
+        $id          = (int) $request->getPost('id');
+        $attendeeIds = $request->getPost('attendee_ids_to_split');
+        $attendeeIds = is_array($attendeeIds) ? array_map('intval', $attendeeIds) : array();
+
+        if (!$id || empty($attendeeIds)) {
+            $this->renderJson(array(
+                'success' => false,
+                'message' => 'Vui lòng chọn người cần tách ra khỏi dòng này.',
+            ), 422);
+            return;
+        }
+
+        $hint = array();
+        foreach (array('staff_code', 'id_card', 'full_name', 'birthday') as $field) {
+            $value = $request->getPost($field);
+            if ($value !== null && trim((string) $value) !== '') {
+                $hint[$field] = trim((string) $value);
+            }
+        }
+
+        $this->respondApi(
+            FinalAttendeeRosters::splitViaApi($id, $attendeeIds, $hint),
+            'Không thể tách người.'
+        );
+    }
+
+    /**
+     * Huỷ tư cách người tham dự (JSON). Mã lucky được giữ lại.
+     */
+    public function actionDelete()
+    {
+        if (!$this->guardWrite('delete')) {
+            return;
+        }
+
+        $id = (int) Yii::app()->request->getPost('id');
+        if (!$id) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu mã dòng cần huỷ.'), 422);
+            return;
+        }
+
+        $alsoDeactivate = Yii::app()->request->getPost('also_deactivate_attendee');
+        $alsoDeactivate = $alsoDeactivate === null || (string) $alsoDeactivate !== '0';
+
+        $this->respondApi(
+            FinalAttendeeRosters::deleteViaApi($id, $alsoDeactivate),
+            'Không thể huỷ tư cách.'
+        );
+    }
+
+    /**
+     * Đánh dấu xung đột đã xử lý (JSON).
+     */
+    public function actionClearConflict()
+    {
+        if (!$this->guardWrite('update')) {
+            return;
+        }
+
+        $id = (int) Yii::app()->request->getPost('id');
+        if (!$id) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu mã dòng.'), 422);
+            return;
+        }
+
+        $this->respondApi(
+            FinalAttendeeRosters::clearConflictViaApi($id),
+            'Không xoá được cờ xung đột.'
+        );
+    }
+
+    /**
+     * Kiểm tra POST + quyền cho các action ghi. Trả false nếu đã xuất lỗi.
+     */
+    protected function guardWrite($operation)
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            $this->renderJson(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'), 400);
+            return false;
+        }
+
+        if (!PermissionHelper::can('finalattendeerosters', $operation)) {
+            $this->renderJson(array(
+                'success' => false,
+                'message' => 'Bạn không có quyền thực hiện thao tác này.',
+            ), 403);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Chuyển kết quả ApiClient thành JSON cho JS, giữ nguyên HTTP status thật của API.
+     */
+    protected function respondApi($result, $fallbackMessage)
+    {
+        if (!$result['success']) {
+            $status = isset($result['code']) && (int) $result['code'] >= 400 ? (int) $result['code'] : 500;
+            $this->renderJson(array(
+                'success' => false,
+                'message' => $result['error'] ?: $fallbackMessage,
+            ), $status);
+            return;
+        }
+
+        $this->renderJson(array(
+            'success' => true,
+            'message' => isset($result['data']['message']) ? $result['data']['message'] : 'Đã cập nhật.',
+            'data'    => isset($result['data']['data']) ? $result['data']['data'] : null,
+        ));
+    }
+
+    /**
      * Đối soát dải số thẻ và mã lucky (JSON, chỉ đọc).
      */
     public function actionAudit()

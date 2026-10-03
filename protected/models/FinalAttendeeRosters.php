@@ -368,6 +368,54 @@ class FinalAttendeeRosters extends CFormModel
         return null;
     }
 
+    /** Gộp hai dòng của cùng một người. */
+    public static function mergeViaApi($keepId, $mergeId)
+    {
+        $ssoUser = AuthHandler::getUser();
+
+        return ApiClient::post(ApiEndpoints::FINAL_ATTENDEE_ROSTER_MERGE, array(
+            'keep_id'    => $keepId,
+            'merge_id'   => $mergeId,
+            'auth_email' => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
+    /** Tách một số bản ghi khỏi dòng hiện tại thành dòng riêng. */
+    public static function splitViaApi($id, $attendeeIds, $dedupHint = array())
+    {
+        $ssoUser = AuthHandler::getUser();
+
+        return ApiClient::post(ApiEndpoints::FINAL_ATTENDEE_ROSTER_SPLIT, array(
+            'id'                    => $id,
+            'attendee_ids_to_split' => array_values((array) $attendeeIds),
+            'new_dedup_hint'        => $dedupHint,
+            'auth_email'            => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
+    /** Huỷ tư cách: xoá mềm dòng, giữ mã lucky. */
+    public static function deleteViaApi($id, $alsoDeactivateAttendee = true)
+    {
+        $ssoUser = AuthHandler::getUser();
+        $url     = ApiEndpoints::url(ApiEndpoints::FINAL_ATTENDEE_ROSTER_DESTROY, array('id' => $id));
+
+        return ApiClient::post($url, array(
+            'also_deactivate_attendee' => $alsoDeactivateAttendee ? 1 : 0,
+            'auth_email'               => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
+    /** Đánh dấu xung đột đã xử lý. */
+    public static function clearConflictViaApi($id)
+    {
+        $ssoUser = AuthHandler::getUser();
+        $url     = ApiEndpoints::url(ApiEndpoints::FINAL_ATTENDEE_ROSTER_CLEAR_CONFLICT, array('id' => $id));
+
+        return ApiClient::post($url, array(
+            'auth_email' => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
     /**
      * Lấy đúng một trang dữ liệu, chỉ định trang tường minh.
      *
