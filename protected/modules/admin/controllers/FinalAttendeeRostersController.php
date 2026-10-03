@@ -185,17 +185,14 @@ class FinalAttendeeRostersController extends AdminController
      */
     protected function fetchAllForExport($params)
     {
-        $all   = array();
-        $page  = 1;
-        $chunk = array();
+        $all  = array();
+        $page = 1;
 
         do {
-            $dataProvider = FinalAttendeeRosters::getApiDataProvider($params, self::EXPORT_CHUNK_SIZE);
-            $dataProvider->pagination->setCurrentPage($page - 1);
+            $chunk = FinalAttendeeRosters::fetchPage($params, $page, self::EXPORT_CHUNK_SIZE);
 
-            $chunk = $dataProvider->getData();
-            foreach ($chunk as $model) {
-                $all[] = $model->getAttributes();
+            foreach ($chunk as $item) {
+                $all[] = $item;
             }
 
             $page++;
