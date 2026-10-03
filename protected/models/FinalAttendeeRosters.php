@@ -306,6 +306,34 @@ class FinalAttendeeRosters extends CFormModel
     }
 
     /**
+     * Sửa thủ công một hoặc nhiều trường. $fields = array('tên_trường' => giá_trị).
+     */
+    public static function updateFieldsViaApi($id, $fields)
+    {
+        $ssoUser = AuthHandler::getUser();
+        $url     = ApiEndpoints::url(ApiEndpoints::FINAL_ATTENDEE_ROSTER_UPDATE, array('id' => $id));
+
+        return ApiClient::post($url, array(
+            'fields'     => $fields,
+            'updated_by' => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
+    /**
+     * Khôi phục các trường về giá trị gốc từ lần đồng bộ cuối.
+     */
+    public static function resetFieldsViaApi($id, $fields)
+    {
+        $ssoUser = AuthHandler::getUser();
+        $url     = ApiEndpoints::url(ApiEndpoints::FINAL_ATTENDEE_ROSTER_RESET_FIELD, array('id' => $id));
+
+        return ApiClient::post($url, array(
+            'fields'     => array_values((array) $fields),
+            'updated_by' => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
+    /**
      * Chuyển các dòng dữ liệu API thành model để view dùng.
      */
     public static function createFromApiList($rows)
