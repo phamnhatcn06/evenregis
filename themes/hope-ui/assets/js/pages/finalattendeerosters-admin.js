@@ -15,7 +15,7 @@
 
         showFlashMessages(config);
         bindCopyButtons();
-        bindDependentFilters();
+        bindDependentFilters(config);
     });
 
     /** Flash message từ PHP hiển thị bằng Toast, không dùng Bootstrap Alert. */
