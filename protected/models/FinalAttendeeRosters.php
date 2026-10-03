@@ -236,7 +236,7 @@ class FinalAttendeeRosters extends CFormModel
      * Lưu ý: BE gộp các mã cùng tên thành một option (vd mã 650 và 810 cùng tên
      * "An ninh - Kỹ thuật - CNTT") nên `code` có thể là danh sách mã cách nhau dấu phẩy.
      */
-    public static function getFilterOptions($eventId, $periodId = null, $propertyId = null)
+    public static function getFilterOptions($eventId, $periodId = null, $propertyId = null, $divisionCode = null)
     {
         $empty = array('properties' => array(), 'divisions' => array(), 'departments' => array());
 
@@ -245,9 +245,10 @@ class FinalAttendeeRosters extends CFormModel
         }
 
         $result = ApiClient::get(ApiEndpoints::FINAL_ATTENDEE_ROSTER_FILTERS, array(
-            'event_id'    => $eventId,
-            'period_id'   => $periodId,
-            'property_id' => $propertyId,
+            'event_id'      => $eventId,
+            'period_id'     => $periodId,
+            'property_id'   => $propertyId,
+            'division_code' => $divisionCode,
         ));
 
         if ($result['success'] && isset($result['data']['data'])) {
