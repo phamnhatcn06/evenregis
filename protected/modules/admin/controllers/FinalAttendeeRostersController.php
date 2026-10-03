@@ -64,6 +64,48 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Trả giá trị dropdown Bộ phận / Phòng ban theo phạm vi đang chọn (JSON, cho dropdown phụ thuộc).
+     *
+     * Đi qua controller thay vì để JS gọi thẳng External API, để API key không bị nhúng vào HTML.
+     */
+    public function actionFilterOptions()
+    {
+        if (!PermissionHelper::can('finalattendeerosters', 'read')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền xem danh sách này.'), 403);
+            return;
+        }
+
+        $eventId = $this->getIntParam('event_id');
+        if (!$eventId) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu sự kiện.'), 422);
+            return;
+        }
+
+        $options = FinalAttendeeRosters::getFilterOptions(
+            $eventId,
+            $this->getIntParam('period_id'),
+            $this->getIntParam('property_id'),
+            isset($_GET['division_code']) && $_GET['division_code'] !== '' ? $_GET['division_code'] : null
+        );
+
+        $this->renderJson(array(
+            'success'     => true,
+            'divisions'   => $options['divisions'],
+            'departments' => $options['departments'],
+        ));
+    }
+
+    /**
+     * Xuất JSON và kết thúc request, kèm HTTP status thật để JS phân biệt được lỗi.
+     */
+    protected function renderJson($payload, $status = 200)
+    {
+        header('Content-Type: application/json; charset=utf-8', true, $status);
+        echo CJSON::encode($payload);
+        Yii::app()->end();
+    }
+
+    /**
      * Gom tham số lọc gửi sang API.
      */
     protected function buildFilterParams($eventId, $periodId)
