@@ -356,9 +356,20 @@ class FinalAttendeeRosters extends CFormModel
     /** Giá trị gốc trước khi sửa tay, dùng cho tooltip "Gốc: ..." */
     public function originalValue($field)
     {
-        if (is_array($this->source_snapshot) && array_key_exists($field, $this->source_snapshot)) {
+        if ($this->hasOriginalValue($field)) {
             return $this->source_snapshot[$field];
         }
         return null;
+    }
+
+    /**
+     * Có giá trị gốc để khôi phục hay không.
+     *
+     * Dòng HO tự thêm không có nguồn nên không có gì khôi phục — khi đó không hiện nút ↺
+     * để HO không bấm vào một thao tác chắc chắn thất bại.
+     */
+    public function hasOriginalValue($field)
+    {
+        return is_array($this->source_snapshot) && array_key_exists($field, $this->source_snapshot);
     }
 }
