@@ -167,6 +167,109 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Sửa thủ công các trường của một dòng (JSON, cho inline edit và modal sửa).
+     */
+    public function actionUpdateField()
+    {
+        $this->runFieldAction('update');
+    }
+
+    /**
+     * Khôi phục các trường về giá trị gốc (JSON).
+     */
+    public function actionResetField()
+    {
+        $this->runFieldAction('reset');
+    }
+
+    /**
+     * Thân chung của sửa tay và khôi phục gốc.
+     */
+    protected function runFieldAction($operation)
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            $this->renderJson(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'), 400);
+            return;
+        }
+
+        if (!PermissionHelper::can('finalattendeerosters', 'update')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền sửa danh sách.'), 403);
+            return;
+        }
+
+        $request = Yii::app()->request;
+        $id      = (int) $request->getPost('id');
+
+        if (!$id) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu mã dòng cần sửa.'), 422);
+            return;
+        }
+
+        if ($operation === 'reset') {
+            $fields = $request->getPost('fields');
+            $fields = is_array($fields) ? $fields : array_filter(array((string) $fields));
+
+            if (empty($fields)) {
+                $this->renderJson(array('success' => false, 'message' => 'Chưa chọn trường cần khôi phục.'), 422);
+                return;
+            }
+
+            $result = FinalAttendeeRosters::resetFieldsViaApi($id, $fields);
+        } else {
+            $fields = $this->collectEditableFields($request->getPost('fields'));
+
+            if (empty($fields)) {
+                $this->renderJson(array('success' => false, 'message' => 'Không có trường nào được phép sửa.'), 422);
+                return;
+            }
+
+            $result = FinalAttendeeRosters::updateFieldsViaApi($id, $fields);
+        }
+
+        if (!$result['success']) {
+            // 409 = sửa xong bị trùng khoá với người khác, 404 = không tìm thấy dòng.
+            $status = isset($result['code']) && (int) $result['code'] >= 400 ? (int) $result['code'] : 500;
+            $this->renderJson(array(
+                'success' => false,
+                'message' => $result['error'] ?: 'Không thể cập nhật.',
+            ), $status);
+            return;
+        }
+
+        $data = isset($result['data']['data']) ? $result['data']['data'] : array();
+
+        $this->renderJson(array(
+            'success' => true,
+            'message' => isset($result['data']['message']) ? $result['data']['message'] : 'Đã cập nhật.',
+            'row'     => isset($data['row']) ? $data['row'] : null,
+        ));
+    }
+
+    /**
+     * Lọc chỉ giữ trường được phép sửa.
+     *
+     * Chặn ngay ở FE để request lạ không đi tới API; BE vẫn lọc lần nữa nên đây là lớp đầu,
+     * không phải lớp duy nhất. `lucky_number` không nằm trong danh sách nên không có đường sửa.
+     */
+    protected function collectEditableFields($input)
+    {
+        if (!is_array($input)) {
+            return array();
+        }
+
+        $allowed = array_keys(FinalAttendeeRosters::editableFields());
+        $fields  = array();
+
+        foreach ($input as $name => $value) {
+            if (in_array($name, $allowed, true)) {
+                $fields[$name] = is_string($value) ? trim($value) : $value;
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
      * Xuất JSON và kết thúc request, kèm HTTP status thật để JS phân biệt được lỗi.
      */
     protected function renderJson($payload, $status = 200)
