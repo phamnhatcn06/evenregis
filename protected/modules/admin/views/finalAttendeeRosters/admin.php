@@ -97,6 +97,12 @@ $flashMessages = Yii::app()->user->getFlashes();
                             <?php endif; ?>
                         </button>
                     <?php endif; ?>
+                    <a href="<?php echo $this->createUrl('export', array_merge(
+                        array('event_id' => $eventId, 'period_id' => $periodId),
+                        array_filter($filters, function ($value) { return $value !== null && $value !== ''; })
+                    )); ?>" class="btn btn-success" title="Xuất đúng những dòng đang lọc">
+                        <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                    </a>
                 <?php endif; ?>
             </div>
         </div>
