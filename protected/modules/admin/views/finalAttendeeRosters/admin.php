@@ -42,6 +42,10 @@ $flashMessages = Yii::app()->user->getFlashes();
      data-period-id="<?php echo (int) $periodId; ?>"
      data-filters-url="<?php echo $this->createUrl('admin'); ?>"
      data-filter-options-url="<?php echo $this->createUrl('filterOptions'); ?>"
+     data-update-field-url="<?php echo $this->createUrl('updateField'); ?>"
+     data-reset-field-url="<?php echo $this->createUrl('resetField'); ?>"
+     data-can-update="<?php echo $canUpdate ? 1 : 0; ?>"
+     data-field-labels="<?php echo CHtml::encode(CJSON::encode(FinalAttendeeRosters::editableFields())); ?>"
      data-flash="<?php echo CHtml::encode(CJSON::encode($flashMessages)); ?>"></div>
 
 <div class="card mb-3">
