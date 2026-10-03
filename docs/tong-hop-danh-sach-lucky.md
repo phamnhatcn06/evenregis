@@ -726,7 +726,8 @@ BEGIN TRANSACTION
        vẫn không có ⇒ ROLLBACK, 422
   3. Sinh qr_token unique (retry 3 lần)
   4. Sinh lucky_number unique 6 số — check attendees + final_attendee_rosters (withTrashed), retry 3 lần
-  5. INSERT attendees {...§9.1, lucky_number, qr_token}
+  4b. Sinh badge_number "MT" + 3 số theo §9.4 (trong cùng lock, retry nếu duplicate)
+  5. INSERT attendees {...§9.1, lucky_number, qr_token, badge_number}
   6. INSERT final_attendee_rosters {
         status = MANUAL (3),
         attendee_id = <id vừa tạo>,
