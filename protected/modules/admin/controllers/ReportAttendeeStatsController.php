@@ -2361,7 +2361,13 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $h);
         }
         if ($listContents) {
-            $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Nội dung');
+            if ($splitContents) {
+                for ($i = 1; $i <= $splitCount; $i++) {
+                    $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Nội dung ' . $i);
+                }
+            } else {
+                $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, 'Nội dung');
+            }
         } else {
             foreach ($sportColumns as $sc) {
                 $sheet->setCellValueByColumnAndRow($colIndex++, $headerRow, $sc['name']);
