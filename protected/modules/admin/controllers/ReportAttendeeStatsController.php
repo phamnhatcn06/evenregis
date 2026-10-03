@@ -2473,9 +2473,9 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->getStyle($firstMarkCol . $dataStart . ':' . $lastColLetter . $lastDataRow)
                 ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         } elseif ($listContents) {
-            // Cột "Nội dung": căn trái, cho xuống dòng
+            // Cột "Nội dung" (1 cột gộp hoặc nhiều cột tách): căn trái, cho xuống dòng
             $contentCol = PHPExcel_Cell::stringFromColumnIndex($fixedCount);
-            $sheet->getStyle($contentCol . $dataStart . ':' . $contentCol . $lastDataRow)
+            $sheet->getStyle($contentCol . $dataStart . ':' . $lastColLetter . $lastDataRow)
                 ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT)->setWrapText(true);
         }
 
