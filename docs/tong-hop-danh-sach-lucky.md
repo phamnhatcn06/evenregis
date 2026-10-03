@@ -704,7 +704,7 @@ Người HO thêm tay **phải đăng nhập được cổng chạy**. Vì cổn
 | `event_id` | từ request | ✅ | HO chọn |
 | `registration_id` | **phiếu VCK của đơn vị đó** | ✅ | Tra phiếu theo (`period_id`, `property_id`); **nếu chưa có ⇒ tái dùng `FinalAggregationService::ensureUnitRegistrations`** để tạo phiếu rỗng |
 | `property_id` | từ request | ✅ | HO chọn |
-| `role_id` | từ request, mặc định cấu hình `MANUAL_DEFAULT_ROLE_ID` | ✅ | **Bắt buộc bởi BE** |
+| `role_id` | từ request; mặc định đọc từ **param cấu hình** `finalRosterManualRoleId` | ✅ | **Bắt buộc bởi BE** — xem §9.3 (⚠️ chưa chốt được giá trị) |
 | `full_name` | từ request | ✅ | |
 | `attendee_type` | `'manual'` | ✅ | Phân biệt với finalist/director/driver |
 | `is_active` | `1` | ✅ | Để cổng chạy cho đăng nhập |
