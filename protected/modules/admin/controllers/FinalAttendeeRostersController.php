@@ -469,6 +469,35 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Danh sách gọn phục vụ tìm nhanh trong modal gộp dòng.
+     */
+    protected function searchRows($eventId, $periodId)
+    {
+        $keyword = isset($_GET['keyword']) ? trim((string) $_GET['keyword']) : '';
+        if ($keyword === '') {
+            return array();
+        }
+
+        $rows = FinalAttendeeRosters::fetchPage(array(
+            'event_id'  => $eventId,
+            'period_id' => $periodId,
+            'keyword'   => $keyword,
+        ), 1, 25);
+
+        $result = array();
+        foreach ($rows as $row) {
+            $result[] = array(
+                'id'           => isset($row['id']) ? (int) $row['id'] : null,
+                'full_name'    => isset($row['full_name']) ? $row['full_name'] : '',
+                'staff_code'   => isset($row['staff_code']) ? $row['staff_code'] : '',
+                'lucky_number' => isset($row['lucky_number']) ? $row['lucky_number'] : '',
+            );
+        }
+
+        return $result;
+    }
+
+    /**
      * Gộp hai dòng của cùng một người (JSON).
      */
     public function actionMerge()
