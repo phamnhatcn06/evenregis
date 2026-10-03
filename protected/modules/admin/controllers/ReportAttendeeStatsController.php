@@ -2332,7 +2332,7 @@ class ReportAttendeeStatsController extends AdminController
         }
         $fixedCount = count($fixedHeaders);
         if ($listContents) {
-            $extraCols = 1; // cột "Nội dung" gộp
+            $extraCols = $splitContents ? $splitCount : 1; // cột "Nội dung"
         } else {
             $extraCols = count($sportColumns) + count($compColumns) + ($hasTalent ? 1 : 0) + ($hasMiss ? 1 : 0);
         }
