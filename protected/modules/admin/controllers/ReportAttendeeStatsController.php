@@ -2515,7 +2515,13 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth($width);
         }
         if ($listContents) {
-            $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($fixedCount))->setWidth(55);
+            if ($splitContents) {
+                for ($i = 0; $i < $splitCount; $i++) {
+                    $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($fixedCount + $i))->setWidth(24);
+                }
+            } else {
+                $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($fixedCount))->setWidth(55);
+            }
         } else {
             for ($i = $fixedCount; $i < $totalCols; $i++) {
                 $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($i))->setWidth(14);
