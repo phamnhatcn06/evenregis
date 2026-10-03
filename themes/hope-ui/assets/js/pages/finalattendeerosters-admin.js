@@ -17,7 +17,281 @@
         bindCopyButtons();
         bindDependentFilters(config);
         bindSyncModal();
+        bindEditRowModal(config);
+        bindCellReset(config);
     });
+
+    /**
+     * Modal sửa thủ công toàn bộ trường của một người.
+     *
+     * Chỉ gửi lên những trường HO THỰC SỰ đổi, để không vô tình đánh dấu "đã sửa tay" cho
+     * các trường chỉ đi ngang qua form mà giá trị không thay đổi.
+     */
+    function bindEditRowModal(config) {
+        var form = document.getElementById('form_edit_row');
+        if (!form) {
+            return;
+        }
+
+        var modalElement = document.getElementById('modal_edit_row');
+        var saveButton = document.getElementById('btn_edit_row_save');
+        var resetAllButton = document.getElementById('btn_reset_all');
+        var fieldLabels = parseJson(config.getAttribute('data-field-labels')) || {};
+        var current = null;
+
+        document.querySelectorAll('.js-edit-row').forEach(function (button) {
+            button.addEventListener('click', function () {
+                current = parseJson(button.getAttribute('data-row'));
+                if (!current) {
+                    return;
+                }
+                fillEditForm(current, fieldLabels);
+                new bootstrap.Modal(modalElement).show();
+            });
+        });
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var changed = collectChangedFields(current);
+            if (Object.keys(changed).length === 0) {
+                if (typeof Toast !== 'undefined') {
+                    Toast.info('Bạn chưa thay đổi trường nào.');
+                }
+                return;
+            }
+
+            var body = new FormData();
+            body.append('id', current.id);
+            Object.keys(changed).forEach(function (field) {
+                body.append('fields[' + field + ']', changed[field]);
+            });
+
+            postWithButton(form.action, body, saveButton, function (data) {
+                var modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+                if (typeof Toast !== 'undefined') {
+                    Toast.success(data.message);
+                }
+                window.setTimeout(function () { window.location.reload(); }, 600);
+            });
+        });
+
+        // Nút ↺ trong từng ô của modal
+        form.querySelectorAll('.js-reset-field').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var field = button.getAttribute('data-field');
+                confirmReset([field], current, fieldLabels, config, resetAllButton);
+            });
+        });
+
+        if (resetAllButton) {
+            resetAllButton.addEventListener('click', function () {
+                var fields = (current && current.overridden_fields) || [];
+                if (fields.length === 0) {
+                    return;
+                }
+                confirmReset(fields, current, fieldLabels, config, resetAllButton);
+            });
+        }
+    }
+
+    /** Nạp dữ liệu dòng vào form, kèm dấu "đã sửa tay" và giá trị gốc từng trường. */
+    function fillEditForm(row, fieldLabels) {
+        setText('edit_row_name', row.full_name || '');
+        var idInput = document.getElementById('edit_row_id');
+        if (idInput) {
+            idInput.value = row.id;
+        }
+
+        var overridden = row.overridden_fields || [];
+        var snapshot = row.source_snapshot || {};
+
+        document.querySelectorAll('#form_edit_row .js-edit-field').forEach(function (input) {
+            var field = input.getAttribute('data-field');
+            input.value = row[field] === null || row[field] === undefined ? '' : row[field];
+
+            var isOverridden = overridden.indexOf(field) !== -1;
+            var hasOrigin = Object.prototype.hasOwnProperty.call(snapshot, field);
+
+            toggle('badge_' + field, isOverridden);
+            toggleClass('origin_' + field, 'd-none', !(isOverridden && hasOrigin));
+
+            if (isOverridden && hasOrigin) {
+                var origin = snapshot[field];
+                setText('origin_' + field, 'Gốc: ' + (origin === null || origin === '' ? '(để trống)' : origin));
+            }
+
+            var resetButton = document.querySelector('.js-reset-field[data-field="' + field + '"]');
+            if (resetButton) {
+                // Dòng HO tự thêm không có nguồn nên không có gì để khôi phục.
+                resetButton.classList.toggle('d-none', !(isOverridden && hasOrigin));
+            }
+        });
+
+        toggleClass('btn_reset_all', 'd-none', overridden.length === 0);
+
+        var meta = [];
+        if (row.lucky_number) {
+            meta.push('Mã lucky: ' + row.lucky_number + ' (không sửa được)');
+        }
+        if (row.updated_by) {
+            meta.push('Sửa gần nhất bởi: ' + row.updated_by);
+        }
+        if (overridden.length > 0) {
+            meta.push('Đang có ' + overridden.length + ' trường sửa tay: '
+                + overridden.map(function (f) { return fieldLabels[f] || f; }).join(', '));
+        }
+        setText('edit_row_meta', meta.join(' · '));
+    }
+
+    /** Chỉ lấy trường có giá trị khác với dữ liệu đang hiển thị. */
+    function collectChangedFields(row) {
+        var changed = {};
+        if (!row) {
+            return changed;
+        }
+
+        document.querySelectorAll('#form_edit_row .js-edit-field').forEach(function (input) {
+            var field = input.getAttribute('data-field');
+            var before = row[field] === null || row[field] === undefined ? '' : String(row[field]);
+            var after = input.value === null ? '' : String(input.value);
+
+            if (before.trim() !== after.trim()) {
+                changed[field] = after;
+            }
+        });
+
+        return changed;
+    }
+
+    /** Nút ↺ ngay trên ô của bảng danh sách. */
+    function bindCellReset(config) {
+        var fieldLabels = parseJson(config.getAttribute('data-field-labels')) || {};
+
+        document.querySelectorAll('.js-cell-reset').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.stopPropagation();
+                var field = button.getAttribute('data-field');
+                var rosterId = button.getAttribute('data-roster-id');
+                confirmReset([field], { id: rosterId }, fieldLabels, config, null);
+            });
+        });
+    }
+
+    /** Khôi phục về gốc là thao tác mất dữ liệu đã sửa nên luôn hỏi lại bằng SweetAlert. */
+    function confirmReset(fields, row, fieldLabels, config, resetAllButton) {
+        if (!row || !row.id || !fields || fields.length === 0) {
+            return;
+        }
+
+        var names = fields.map(function (f) { return fieldLabels[f] || f; }).join(', ');
+        var url = config.getAttribute('data-reset-field-url');
+
+        var send = function () {
+            var body = new FormData();
+            body.append('id', row.id);
+            fields.forEach(function (field) {
+                body.append('fields[]', field);
+            });
+
+            postWithButton(url, body, resetAllButton, function (data) {
+                if (typeof Toast !== 'undefined') {
+                    Toast.success(data.message);
+                }
+                window.setTimeout(function () { window.location.reload(); }, 600);
+            });
+        };
+
+        if (typeof Swal === 'undefined') {
+            send();
+            return;
+        }
+
+        Swal.fire({
+            title: 'Khôi phục về giá trị gốc?',
+            html: 'Giá trị bạn đã sửa tay ở <strong>' + names
+                + '</strong> sẽ bị thay bằng dữ liệu gốc từ lần đồng bộ cuối, và các lần đồng bộ sau'
+                + ' sẽ lại cập nhật trường này.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Khôi phục',
+            cancelButtonText: 'Hủy'
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                send();
+            }
+        });
+    }
+
+    /** POST kèm loading state trên nút, theo quy tắc submit trong modal. */
+    function postWithButton(url, body, button, onSuccess) {
+        var originalHtml = button ? button.innerHTML : null;
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang xử lý...';
+        }
+
+        fetch(url, {
+            method: 'POST',
+            body: body,
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+            .then(function (response) {
+                return response.json().then(function (data) {
+                    return { ok: response.ok, data: data };
+                });
+            })
+            .then(function (result) {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalHtml;
+                }
+
+                if (!result.ok || !result.data.success) {
+                    // 409 = sửa xong bị trùng khoá với người khác; giữ nguyên giá trị cũ,
+                    // không reload để HO đọc được thông báo và sửa lại.
+                    if (typeof Toast !== 'undefined') {
+                        Toast.error(result.data.message || 'Không thể cập nhật.');
+                    }
+                    return;
+                }
+
+                onSuccess(result.data);
+            })
+            .catch(function () {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalHtml;
+                }
+                if (typeof Toast !== 'undefined') {
+                    Toast.error('Lỗi kết nối server.');
+                }
+            });
+    }
+
+    function parseJson(raw) {
+        if (!raw) {
+            return null;
+        }
+        try {
+            return JSON.parse(raw);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function toggleClass(id, className, on) {
+        var element = document.getElementById(id);
+        if (element) {
+            element.classList.toggle(className, on);
+        }
+    }
 
     /**
      * Modal đồng bộ: Xem trước (dry-run) -> Ghi thật.

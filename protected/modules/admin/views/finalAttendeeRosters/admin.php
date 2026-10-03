@@ -213,6 +213,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                                     'field'      => 'full_name',
                                     'value'      => $row->full_name,
                                     'overridden' => $overridden,
+                                    'canUpdate'  => $canUpdate,
                                 ), true); ?>
                                 <?php if ($row->attendee_id): ?>
                                     <div class="small">
@@ -229,10 +230,12 @@ $flashMessages = Yii::app()->user->getFlashes();
 
                             <td><?php echo $this->renderPartial('_cell', array(
                                 'row' => $row, 'field' => 'staff_code', 'value' => $row->staff_code, 'overridden' => $overridden,
+                                    'canUpdate'  => $canUpdate,
                             ), true); ?></td>
 
                             <td><?php echo $this->renderPartial('_cell', array(
                                 'row' => $row, 'field' => 'property_name', 'value' => $row->property_name, 'overridden' => $overridden,
+                                    'canUpdate'  => $canUpdate,
                             ), true); ?></td>
 
                             <td>
@@ -241,6 +244,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 <?php else: ?>
                                     <?php echo $this->renderPartial('_cell', array(
                                         'row' => $row, 'field' => 'division_name', 'value' => $row->division_name, 'overridden' => $overridden,
+                                    'canUpdate'  => $canUpdate,
                                     ), true); ?>
                                 <?php endif; ?>
                             </td>
@@ -251,6 +255,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 <?php else: ?>
                                     <?php echo $this->renderPartial('_cell', array(
                                         'row' => $row, 'field' => 'department_name', 'value' => $row->department_name, 'overridden' => $overridden,
+                                    'canUpdate'  => $canUpdate,
                                     ), true); ?>
                                 <?php endif; ?>
                             </td>
@@ -261,6 +266,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                                     'field'      => 'position',
                                     'value'      => $row->position_display,
                                     'overridden' => $overridden,
+                                    'canUpdate'  => $canUpdate,
                                 ), true); ?>
                             </td>
 
