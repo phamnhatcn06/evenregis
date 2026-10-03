@@ -74,8 +74,8 @@ $flashMessages = Yii::app()->user->getFlashes();
             <div class="col-md-4 text-end">
                 <?php if ($eventId && $periodId): ?>
                     <?php if ($canCreate): ?>
-                        <button type="button" class="btn btn-primary" disabled
-                                title="Chức năng đồng bộ sẽ bật ở bước tiếp theo">
+                        <button type="button" class="btn btn-primary"
+                                data-bs-toggle="modal" data-bs-target="#modal_sync">
                             <i class="fa fa-refresh me-1"></i>Đồng bộ từ danh sách VCK
                         </button>
                     <?php endif; ?>
