@@ -5,6 +5,8 @@
 > công mọi trường với bảo vệ chống ghi đè theo từng trường; cấp mã lucky draw **duy nhất, một lần,
 > đi theo người suốt sự kiện**.
 > Cập nhật: 2026-10-03 (bản revise 4 — **CHỐT**).
+> Liên quan: `docs/chung-ket-fun-run.md`, `docs/system-design.md`, memory `vck-final-aggregation`,
+> memory `replace-withdraw-attendee`.
 >
 > ## ✅ TRẠNG THÁI: TOÀN BỘ CÂU HỎI CHẶN ĐÃ ĐƯỢC CHỐT — **slice S0 sẵn sàng triển khai**
 >
@@ -17,8 +19,6 @@
 >
 > Thứ tự slice: `S0 → S1 → (S2 ∥ S3) → S4 → (S5 ∥ S6 ∥ S7 ∥ S8) → S9 → S10 → S11 → S12 → S13 → [S14]`
 > — chi tiết ở **§13**.
-> Liên quan: `docs/chung-ket-fun-run.md`, `docs/system-design.md`, memory `vck-final-aggregation`,
-> memory `replace-withdraw-attendee`.
 
 ---
 
@@ -1290,7 +1290,7 @@ sequenceDiagram
 **Thứ tự thực thi:**
 `S0 → S1 → (S2 ∥ S3) → S4 → (S5 ∥ S6 ∥ S7 ∥ S8) → S9 → S10 → S11 → S12 → S13 → [S14]`
 
-### Tổng ước lượng mới
+### Tổng ước lượng — CHỐT
 
 | Nhóm | Ngày công |
 |------|-----------|
@@ -1298,7 +1298,7 @@ sequenceDiagram
 | **S9 — write-back thẻ/email (quyết định #10)** | **+1.5** |
 | **S10 — thêm người thủ công + attendees tối thiểu (quyết định #9)** | **+1.0** |
 | S11–S13 (Excel, gộp/tách/huỷ, phân quyền) | 2.5 |
-| **TỌNG CHỐT** | **≈ 22.0 ngày công** |
+| **TỔNG CHỐT** | **≈ 22.0 ngày công** |
 | S14 tuỳ chọn (`division_*` trên `attendees`) | +1.0 |
 
 > So với bản revise 3 (≈21.5d): **+0.5 ngày** cho **endpoint audit tổng hợp + command + 2 badge đối
@@ -1316,55 +1316,36 @@ sequenceDiagram
 
 ---
 
-## 14. Câu hỏi còn tồn
+## 14. Câu hỏi còn tồn — **KHÔNG câu nào chặn triển khai**
 
-> Đã chốt và **xoá khỏi danh sách**: ca 2 mã, người thủ công đăng nhập, sửa tay `lucky_number`,
-> người bị huỷ, write-back, phạm vi chức danh, tên bảng, **ẩn nút cấp mã cũ**, **quy ước
-> `badge_number`**. Toàn bộ nằm ở **§0**.
+> ✅ **Toàn bộ câu hỏi chặn đã được chốt** (18 quyết định ở §0). **Slice S0 có thể bắt đầu ngay.**
+>
+> Đã chốt và xoá khỏi danh sách: gộp người · phạm vi cấp mã · lọc bộ phận · kiến trúc bảng riêng ·
+> dirty-field per-field · vòng đời mã lucky bất biến · người thủ công đăng nhập được · phạm vi chức
+> danh + write-back · xoá mềm giữ mã · tên bảng · **vai trò `btc`** · **`badge_number` `MT`+3 số** ·
+> **scope số thẻ toàn hệ thống** · **ẩn nút cấp mã cũ** · **đối soát qua API** · **một endpoint audit**.
+>
+> 12 câu dưới đây là **tinh chỉnh phạm vi / vận hành**, trả lời được **trong lúc build** mà không
+> chặn slice nào. Cột "Chặn slice" ghi rõ thời điểm muộn nhất cần câu trả lời.
 
-### 🔴 Nhóm 0 — CHẶN slice S10, cần trả lời trước khi build
-1. **`role_id` cho người HO thêm tay — chọn lại vai trò nào?**
-   Chủ dự án chốt "admin" nhưng bảng `roles` **không có** record đó (§9.4 — đã kiểm chứng migration,
-   không có seeder, dump chỉ có 10 record). Vui lòng chọn **một** trong danh mục hiện có:
-   - **`btc` — Ban tổ chức** (id 8) — gần nghĩa "BTC/HO" nhất
-   - **`support` — Hỗ trợ đại hội** (id 1)
-   - **`guest` — Khách mời** (id 6)
-   - *(hoặc một trong 7 vai trò còn lại: `sports`, `competition`, `director`, `deputy_director`,
-     `team_lead`, `miss`, `talent`)*
+### Nhóm A — tinh chỉnh tính năng (trả lời trước slice tương ứng là đủ)
 
-   Nếu muốn **thêm vai trò mới** vào `roles` ⇒ cần **xin phép rõ ràng**, vì ảnh hưởng dropdown vai
-   trò ở màn đăng ký, màu badge trên thẻ và các báo cáo theo vai trò. Tài liệu này không tự đề xuất.
-2. **`badge_number`: scope đánh số** — chọn **phương án B** (khuyến nghị: `MT001`→`MT999` duy nhất
-   toàn hệ thống, không lặp) hay **phương án A** (mỗi sự kiện đánh lại từ `MT001`, phải thêm hậu tố
-   event vào chuỗi, **+2h**)? Xem §9.5.
-3. **Đối soát tiền tố `MT`:** cần ai chạy
-   `SELECT badge_number FROM attendees WHERE badge_number LIKE 'MT%'` trên DB thật để xác nhận không
-   có dữ liệu cũ đụng tiền tố? (Code hiện **không có** bộ sinh `badge_number` nào ⇒ gần như chắc
-   chắn rỗng, nhưng cần xác nhận.)
+| # | Câu hỏi | Đề xuất của tài liệu | Cần trả lời trước |
+|---|---------|----------------------|-------------------|
+| 1 | **`full_name` có write-back về `attendees`** không? Đổi tên trên `attendees` ảnh hưởng email/phiếu/đội thể thao | **Tạm KHÔNG** — cờ `WRITE_BACK_FULL_NAME = false`; bật sau không phát sinh ngày công | **S9** |
+| 2 | Xác nhận cần nút **"Khôi phục về dữ liệu gốc"** (từng trường + cả dòng)? | **Có** — đã nằm trong S7 | **S7** |
+| 3 | Có cần **UI lịch sử thay đổi theo trường** (ai sửa gì, lúc nào, giá trị cũ)? | **Chưa cần** — hiện đã có `audit_logs` + `updated_by`/`updated_at`. Nếu cần ⇒ **+1 ngày** | Sau S7 (tăng phạm vi) |
+| 4 | **Đồng bộ tự động theo cron** hay chỉ bấm tay? | **Chỉ bấm tay** — vì cần HO xem preview trước khi ghi | Sau S6 (tăng phạm vi) |
+| 5 | Huỷ tư cách có **đồng thời set `attendees.is_active = 0`**? | **Có** — tham số `also_deactivate_attendee = true`, để cổng chạy chặn đăng nhập ngay | **S12** |
+| 6 | Có cần **reset PIN** cho người quên PIN trên màn này? | Chưa có; nếu cần ⇒ **+4h** | Sau S7 (tăng phạm vi) |
+| 7 | Có cần **đóng băng danh sách** tại thời điểm bốc thăm (cột `locked_at` + chặn sửa/đồng bộ)? | Chưa cần; nếu cần ⇒ **+4h** | Trước ngày bốc thăm |
 
-### Nhóm A — mã lucky
-4. **Giữ 6 chữ số** cho mã lucky (ràng buộc BIB `run_events.code + lucky_number`) — xác nhận?
-5. **Quy trình thông báo thu hồi định danh** cho người bị NULL mã (ca §6.4): ai thông báo, bằng kênh
-   nào? (Màn hình đã có badge + báo cáo; cần người chịu trách nhiệm.)
-6. Command `run:gen-lucky` cũ: đồng ý **giữ lại nhưng thêm cảnh báo + `confirm()`** (không xoá, để
-   còn đường cứu hộ) — xác nhận? (§9.6)
+### Nhóm B — vận hành & quy trình (không ảnh hưởng code)
 
-### Nhóm B — vòng đời & lan toả dữ liệu
-7. **`full_name` có write-back về `attendees` không?** (Đề xuất: **tạm KHÔNG** —
-   `WRITE_BACK_FULL_NAME = false` — vì đổi tên trên `attendees` ảnh hưởng email/phiếu/đội thể thao.
-   Nếu chủ dự án muốn tên sửa tay cũng lên thẻ ⇒ bật cờ, không phát sinh thêm ngày công.)
-8. **Có cần nút "Khôi phục về dữ liệu gốc"** cho trường đã override (từng trường + cả dòng)?
-   (Đã đưa vào S7 — xác nhận để không làm thừa.)
-9. Có cần **UI lịch sử thay đổi theo trường** (ai sửa gì, lúc nào, giá trị cũ) không?
-   (Hiện chỉ `audit_logs` + `updated_by`/`updated_at`. Nếu cần UI ⇒ **+1 ngày**.)
-10. **Đồng bộ tự động theo lịch** (cron hằng ngày) hay chỉ bấm tay? (Đề xuất: bấm tay, vì cần HO xem
-    preview trước khi ghi.)
-11. Khi huỷ tư cách trên bảng mới, có **đồng thời set `attendees.is_active = 0`** không?
-    (Đề xuất: **có**, tham số `also_deactivate_attendee = true` — để cổng chạy chặn đăng nhập ngay.)
-
-### Nhóm C — vận hành
-12. Ai được sửa dữ liệu: **Admin HO + HR**? Đơn vị **không** — xác nhận?
-13. Có cần chức năng **reset PIN** cho người quên PIN trên màn này không? (~4h)
-14. **Có cần đóng băng danh sách** tại thời điểm bốc thăm? (Thêm cột `locked_at` + chặn mọi
-    sửa/đồng bộ sau khi khoá — ~4h.)
-15. **Excel chứa mã lucky** phát cho ai? Cần thêm cột nào (SĐT, email) để phân phát định danh?
+| # | Câu hỏi | Đề xuất của tài liệu |
+|---|---------|----------------------|
+| 8 | **Giữ 6 chữ số** cho mã lucky (ràng buộc BIB `run_events.code + lucky_number`) — xác nhận? | Giữ 6 số, không đổi |
+| 9 | **Quy trình thông báo thu hồi định danh** cho người bị NULL mã (ca §6.4): ai thông báo, kênh nào? | Màn hình đã có badge + báo cáo; cần chỉ định người chịu trách nhiệm |
+| 10 | Command `run:gen-lucky` cũ: **giữ lại + thêm cảnh báo `confirm()`** (không xoá, để còn đường cứu hộ) — xác nhận? | Giữ + cảnh báo (§9.6) |
+| 11 | Ai được sửa dữ liệu: **Admin HO + HR**? Đơn vị **không** — xác nhận? | HO + HR; đơn vị không truy cập |
+| 12 | **Excel chứa mã lucky** phát cho ai? Cần thêm cột nào (SĐT, email) để phân phát định danh? | Hiện đã có đủ cột định danh; thêm SĐT/email nếu cần phân phát qua tin nhắn |
