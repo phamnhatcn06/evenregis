@@ -97,6 +97,76 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Xem trước kết quả đồng bộ (dry-run) — KHÔNG ghi dữ liệu.
+     */
+    public function actionSyncPreview()
+    {
+        $this->runSync(FinalAttendeeRosters::SYNC_MODE_PREVIEW);
+    }
+
+    /**
+     * Ghi thật kết quả đồng bộ.
+     */
+    public function actionSync()
+    {
+        $this->runSync(FinalAttendeeRosters::SYNC_MODE_APPLY);
+    }
+
+    /**
+     * Thân chung của xem trước và ghi thật, chỉ khác tham số mode.
+     */
+    protected function runSync($mode)
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            $this->renderJson(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'), 400);
+            return;
+        }
+
+        // Cả xem trước và ghi thật đều cần quyền tạo: xem trước tiết lộ toàn bộ danh sách VCK.
+        if (!PermissionHelper::can('finalattendeerosters', 'create')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền đồng bộ danh sách.'), 403);
+            return;
+        }
+
+        $request  = Yii::app()->request;
+        $eventId  = (int) $request->getPost('event_id');
+        $periodId = (int) $request->getPost('period_id');
+
+        if (!$eventId || !$periodId) {
+            $this->renderJson(array(
+                'success' => false,
+                'message' => 'Vui lòng chọn sự kiện và đợt Vòng Chung Kết.',
+            ), 422);
+            return;
+        }
+
+        $propertyId = $request->getPost('property_id');
+        $propertyId = $propertyId !== null && $propertyId !== '' ? (int) $propertyId : null;
+
+        $result = FinalAttendeeRosters::syncViaApi($eventId, $periodId, $propertyId, $mode);
+
+        if (!$result['success']) {
+            // BE trả 409 khi đang có tiến trình đồng bộ khác, 422 khi tham số sai.
+            $status = isset($result['code']) && (int) $result['code'] >= 400 ? (int) $result['code'] : 500;
+            $this->renderJson(array(
+                'success' => false,
+                'message' => $result['error'] ?: 'Không thể đồng bộ danh sách.',
+            ), $status);
+            return;
+        }
+
+        $report  = isset($result['data']['data']) ? $result['data']['data'] : array();
+        $message = isset($result['data']['message']) ? $result['data']['message'] : 'Đã đồng bộ.';
+
+        $this->renderJson(array(
+            'success' => true,
+            'mode'    => $mode,
+            'message' => $message,
+            'report'  => $report,
+        ));
+    }
+
+    /**
      * Xuất JSON và kết thúc request, kèm HTTP status thật để JS phân biệt được lỗi.
      */
     protected function renderJson($payload, $status = 200)
