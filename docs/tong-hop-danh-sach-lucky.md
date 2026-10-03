@@ -711,7 +711,7 @@ Người HO thêm tay **phải đăng nhập được cổng chạy**. Vì cổn
 | `approval_status` | `APPROVED (1)` | ✅ | Người do HO thêm coi như đã duyệt |
 | `qr_token` | **sinh unique** `bin2hex(random_bytes(16))`, retry nếu trùng | ✅ | Để quét QR thẻ (`identifyByQr`) |
 | `lucky_number` | **cấp ngay trong transaction** (6 số, unique, check `withTrashed()`) | ✅ | Để đăng nhập `DHMT`+lucky |
-| `badge_number` | sinh theo quy ước `MN` + số thứ tự, **unique trong event** | ⬜ nên có | Phục vụ in thẻ |
+| `badge_number` | sinh theo quy ước **`MT` + 3 số** (`MT001`…), unique | ✅ | Phục vụ in thẻ — thiết kế ở §9.4 |
 | `position`, `unit_label`, `shirt_size`, `id_card`, `staff_code`, `phone_number`, `gender`, `birthday` | từ request nếu có | ⬜ | |
 | `staff_id` | `NULL` | ⬜ | Người ngoài SMILE |
 | `created_by` | email HO | ⬜ | `AuthHandler::getUser()['email']` |
