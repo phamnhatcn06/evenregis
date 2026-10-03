@@ -215,12 +215,24 @@
         }
 
         row.attendeeIds.forEach(function (id, index) {
+            // Dựng bằng DOM thay vì innerHTML: id lấy từ API nên không ghép thẳng vào HTML.
             var wrapper = document.createElement('div');
             wrapper.className = 'form-check';
-            wrapper.innerHTML = '<input class="form-check-input" type="checkbox"'
-                + ' name="attendee_ids_to_split[]" value="' + id + '" id="split_att_' + id + '">'
-                + '<label class="form-check-label" for="split_att_' + id + '">'
-                + 'Bản ghi #' + id + (index === 0 ? ' (bản đại diện)' : '') + '</label>';
+
+            var input = document.createElement('input');
+            input.className = 'form-check-input';
+            input.type = 'checkbox';
+            input.name = 'attendee_ids_to_split[]';
+            input.value = id;
+            input.id = 'split_att_' + id;
+
+            var label = document.createElement('label');
+            label.className = 'form-check-label';
+            label.setAttribute('for', input.id);
+            label.textContent = 'Bản ghi #' + id + (index === 0 ? ' (bản đại diện)' : '');
+
+            wrapper.appendChild(input);
+            wrapper.appendChild(label);
             container.appendChild(wrapper);
         });
     }
@@ -300,6 +312,20 @@
      * Sau khi lưu, hiện mã lucky và định danh DHMT trong hộp thoại chờ HO xác nhận đã ghi lại —
      * nếu reload ngay thì HO mất thông tin cần phát cho người đó.
      */
+    /**
+     * Nút lưu trong modal là type="button" (theo rules/modal-submit.md) nên không tự gửi form.
+     * Hàm này nối nút với form, đồng thời giữ được việc bấm Enter trong ô nhập.
+     */
+    function wireSubmitButton(form, button) {
+        button.addEventListener('click', function () {
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+                return;
+            }
+            form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        });
+    }
+
     function bindAddPersonModal() {
         var form = document.getElementById('form_add_person');
         var button = document.getElementById('btn_add_person_save');
@@ -307,6 +333,8 @@
         if (!form || !button) {
             return;
         }
+
+        wireSubmitButton(form, button);
 
         form.addEventListener('submit', function (event) {
             event.preventDefault();
@@ -473,6 +501,10 @@
                 new bootstrap.Modal(modalElement).show();
             });
         });
+
+        if (saveButton) {
+            wireSubmitButton(form, saveButton);
+        }
 
         form.addEventListener('submit', function (event) {
             event.preventDefault();

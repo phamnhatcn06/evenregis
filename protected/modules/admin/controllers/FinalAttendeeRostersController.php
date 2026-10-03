@@ -117,7 +117,13 @@ class FinalAttendeeRostersController extends AdminController
 
         $sheet->setCellValue('A1', 'TỔNG HỢP DANH SÁCH VÒNG CHUNG KẾT');
         $sheet->mergeCells('A1:' . $lastColumn . '1');
-        $sheet->setCellValue('A2', 'Xuất lúc: ' . date('d/m/Y H:i') . ' — Tổng: ' . count($rows) . ' người');
+        // Khi chạm trần, nói rõ file bị cắt — nếu im lặng thì HO tưởng đã xuất đủ.
+        $subtitle = 'Xuất lúc: ' . date('d/m/Y H:i') . ' — Tổng: ' . count($rows) . ' người';
+        if (count($rows) >= self::EXPORT_MAX_ROWS) {
+            $subtitle .= ' — CẢNH BÁO: đã chạm trần ' . self::EXPORT_MAX_ROWS
+                . ' dòng, danh sách có thể còn thiếu. Hãy lọc hẹp hơn rồi xuất lại.';
+        }
+        $sheet->setCellValue('A2', $subtitle);
         $sheet->mergeCells('A2:' . $lastColumn . '2');
 
         foreach ($headers as $index => $label) {

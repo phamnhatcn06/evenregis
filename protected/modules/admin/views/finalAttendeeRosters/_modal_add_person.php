@@ -138,7 +138,7 @@ if (empty($defaultRoleId)) {
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="submit" form="form_add_person" class="btn btn-primary" id="btn_add_person_save">
+                <button type="button" form="form_add_person" class="btn btn-primary" id="btn_add_person_save">
                     <i class="fa fa-save me-1"></i>Thêm người
                 </button>
             </div>

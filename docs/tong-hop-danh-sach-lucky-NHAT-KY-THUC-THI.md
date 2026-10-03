@@ -1,7 +1,7 @@
 # Nhật ký thực thi — Tổng hợp danh sách VCK & cấp mã Lucky
 
 > Ghi lại toàn bộ công việc đã làm theo bản thiết kế [`tong-hop-danh-sach-lucky.md`](tong-hop-danh-sach-lucky.md).
-> Cập nhật: 2026-10-03. Phạm vi: slice **S0 → S13** (hết phạm vi thiết kế).
+> Cập nhật: 2026-10-04. Phạm vi: slice **S0 → S13** (hết phạm vi thiết kế) + vòng kiểm thử trước deploy (§11).
 
 ---
 
@@ -23,6 +23,7 @@
 | S11 — Xuất Excel theo bộ lọc | ✅ Xong |
 | S12 — Gộp dòng / Tách người / Huỷ tư cách | ✅ Xong |
 | S13 — Phân quyền + menu sidebar | ✅ Xong (xem §6.3) |
+| Kiểm thử trước deploy | ✅ Xong (xem §11) |
 
 **Dữ liệu trên môi trường local sau cùng:** 619 người, 619 mã lucky, 0 xung đột,
 0 mã bị khoá, dải số thẻ `MT` còn nguyên 0/999.
@@ -318,3 +319,94 @@ trả lời bằng chính việc thực thi:
   working tree nhưng **còn trong git history**. Nếu muốn dọn history thì cần làm riêng.
 - `protected/config/params.php` **không được git track** — an toàn, nhưng nhớ là file này quyết định
   FE gọi API ở đâu (`externalApiUrl`).
+
+---
+
+## 11. Vòng kiểm thử trước deploy (2026-10-04)
+
+Chạy một vòng kiểm thử riêng trước khi lên production: 3 agent QA đọc độc lập (BE / FE / tích hợp)
+cộng với kiểm thử **chạy thật qua HTTP** — việc chưa từng làm ở các slice trước.
+
+### 11.1 Cách kiểm mới: dựng web server thật
+
+Trước đây toàn bộ verify làm bằng render view trong CLI. Lần này dựng `php -S` trỏ vào repo, gieo
+session đăng nhập giả (chỉ cấp quyền `approveregistrations`, **không** cấp `finalattendeerosters`,
+để luật kế thừa của S13 phải tự chạy) rồi gọi bằng `curl`. Kết quả:
+
+| Ca | Kết quả |
+|----|---------|
+| Trang danh sách | HTTP 200, 4,0s, 619 người, có mã DHMT |
+| Mục menu "Tổng hợp VCK" | Hiện — chứng minh kế thừa quyền chạy thật, không cần sửa Portal |
+| Toàn bộ CSS/JS (kể cả `finalattendeerosters-admin.js`, toast, sweetalert) | 200 hết |
+| API key / URL External API / `login_pin` trong HTML | Không có |
+| Tài khoản không có quyền | HTTP **403**, menu **không** hiện |
+| Quyền `1 1 1 0` gọi `delete` | HTTP **403** (đúng: không có quyền xoá) |
+| Quyền `1 1 1 0` gọi `updateField` | Qua cổng quyền, dừng ở kiểm dữ liệu (422) — đúng mức quyền |
+| Xuất Excel | 200, 622 dòng = 3 dòng tiêu đề + **619 người**, 619 định danh DHMT, không lộ PIN |
+
+Bug cũ "Excel xuất trùng trang 1" coi như đã chốt: file xuất ra khớp đúng số người.
+
+### 11.2 Hai ca chưa ai kiểm được, nay đã kiểm — 25/26 PASS
+
+DB local không có người HO thêm tay lẫn người bị huỷ tư cách, nên hai nhánh này trước giờ chỉ được
+đọc code. Lần này tạo người thật qua API, kiểm, rồi dọn sạch:
+
+**Ca người HO thêm tay:** status MANUAL ✓, cấp mã ngay ✓, số thẻ `MT001` đúng dạng ✓, chức danh gõ
+tay được giữ ✓, ghi ngược sang `attendees` ✓, **đăng nhập cổng Fun Run bằng `DHMT`+mã ✓**, **quét QR
+✓**, response không chứa `login_pin` ✓, đồng bộ lại không xoá mềm dòng này ✓ và không đổi mã ✓.
+
+**Ca huỷ tư cách:** xoá mềm ✓, **mã lucky vẫn nằm trên dòng đã xoá ✓**, `attendees.lucky_number`
+**không** bị NULL ✓, attendee bị khoá ✓, **người bị huỷ không đăng nhập được nữa ✓**, quét QR cũng bị
+chặn ✓, cấp mã lại **không** trả mã bị khoá cho ai khác ✓, đối soát đếm đúng 1 mã bị khoá ✓ và
+**không** báo nhầm mã đó là "mã lạc" ✓.
+
+Idempotency kiểm lại riêng: chạy đồng bộ 2 lần liền → `updated: 0, unchanged: 619` cả hai lần.
+
+### 11.3 Lỗi thật tìm ra và đã sửa trong vòng này
+
+| # | Lỗi | Mức | Sửa |
+|---|-----|-----|-----|
+| 1 | **18/18 unit test BE lỗi hết.** `FinalAttendeeRosterService::__construct` nhận thêm `IAuditService` khi làm audit log, nhưng test vẫn gọi `new FinalAttendeeRosterService()` → `ArgumentCountError`. §4 của tài liệu này từng ghi "18 test PASS" — **điều đó đã sai kể từ lúc thêm audit log**. | Nghiêm trọng | Đưa bản giả `IAuditService` vào `setUp()`. Nay **18/18 PASS, 35 assertion**. |
+| 2 | **`auditLucky` báo nhầm mã bị khoá là "mã lạc trên attendees".** Truy vấn không `withTrashed()` nên mã của người đã huỷ tư cách không có trong tập đối chiếu → đối soát khuyên HO đi xoá mã đó khỏi `attendees`, mà làm vậy chính là giải phóng mã — đúng điều thiết kế cấm. Đây lại là lệnh được khuyến nghị chạy trước khi dùng thật. | Cao | Lấy thêm danh sách mã trên dòng đã xoá mềm, loại khỏi phép kiểm "mã lạc". |
+| 3 | **Cấp mã lỗi một người làm dừng cả lượt.** `generateUniqueLucky` ném exception thoát khỏi vòng lặp → người sau không được cấp, người trước đã cấp rồi, không ai biết dừng ở đâu. | Trung bình | Bọc từng người trong try/catch, ghi vào `conflicts` rồi đi tiếp. |
+| 4 | `Resource` đọc `$this->attendee->login_pin` khi `attendee_id` là NULL (cột cho phép NULL) → cảnh báo PHP, Laravel có thể biến thành lỗi 500. | Trung bình | Đọc null-safe. |
+| 5 | Cờ `also_deactivate_attendee` kiểm bằng 3 điều kiện lồng nhau, `"no"`/`"off"` lọt qua. | Thấp | Thay bằng `$request->boolean()`. |
+| 6 | Nút lưu trong modal "Sửa thông tin" và "Thêm người" là `type="submit"`, trái `rules/modal-submit.md`. | Thấp | Đổi sang `type="button"` + `wireSubmitButton()` nối nút với form (vẫn bấm Enter được). |
+| 7 | Xuất Excel chạm trần 10.000 dòng thì **cắt im lặng**, tiêu đề vẫn ghi như đủ. | Thấp | Thêm cảnh báo vào dòng tiêu đề khi chạm trần. |
+| 8 | JS ghép `attendee_id` thẳng vào `innerHTML`. | Thấp | Dựng bằng DOM API, không ghép chuỗi HTML. |
+
+### 11.4 Báo cáo của agent mà tôi kiểm lại và kết luận là SAI
+
+Ghi lại để sau này không ai đi sửa theo:
+
+- **"`merge()` làm mất mã vì set `lucky_number = null`"** — Sai. Chỉ xảy ra ở nhánh chuyển mã sang
+  dòng giữ lại, và **buộc** phải làm vậy vì `UNIQUE(lucky_number)` không cho hai dòng giữ cùng mã.
+  Mã không mất, nó nằm trên dòng giữ lại và vẫn được UNIQUE bảo vệ.
+- **"Đồng bộ khôi phục dòng mà không bật lại `attendees.is_active`"** — Sai. Nguồn VCK lọc
+  `is_active = 1`, nên một dòng chỉ được khôi phục khi attendee đã active sẵn.
+- **"View gọi `getData()` không try/catch → API chết là trang vỡ"** — Sai. `ApiDataProvider` bắt lỗi,
+  ghi log và trả mảng rỗng, không ném exception. Trang hiện bảng rỗng.
+- **"View gọi static method của Model là vi phạm MVC"** — Sai. Quy ước cấm View gọi Model để **lấy
+  dữ liệu**; đây là hàm nhãn/option thuần. Chính `CLAUDE.md` làm mẫu `getStatusLabel()` trong View.
+- **"`DELETE /destroy/{id}` trả 405"** — Lỗi của bài test, không phải của code. Route là
+  `POST destroy/{id}`, đúng quy ước các module khác, và FE gọi đúng POST.
+
+### 11.5 Hai thứ phát hiện thêm, KHÔNG thuộc tính năng này
+
+1. **CSRF tắt trên toàn ứng dụng.** `CHttpRequest::enableCsrfValidation` mặc định `false` và không
+   chỗ nào bật. Tôi đã POST thật vào `delete`/`updateField` chỉ với cookie session, **không** token —
+   và request được nhận. Nghĩa là mọi POST của **cả admin** (không riêng màn này) có thể bị site thứ
+   ba kích hoạt qua trình duyệt của người đang đăng nhập. Nguy hiểm nhất với `delete`.
+   Đáng lo thêm: `protected/tests/security/SecurityTest.php::testCsrfProtection` **không kiểm gì
+   thật** — nó assert trên hai biến hằng viết sẵn trong hàm, nên vẫn xanh và tạo cảm giác an toàn sai.
+   Bật CSRF là việc toàn ứng dụng (phải thêm token vào mọi form), nên tôi **không tự bật**.
+2. **Entry point `admin.php` chết.** Nó `require protected/config/admin.php`, file đó không tồn tại →
+   fatal error. Mọi thứ đang chạy qua `index.php`. Vô hại hiện tại, nhưng ai mở `admin.php` sẽ thấy
+   đường dẫn tuyệt đối của server trong thông báo lỗi.
+
+### 11.6 Rào chắn lớn nhất trước deploy
+
+**Toàn bộ code BE của tính năng chưa được commit.** `git status` còn 11 file `??` và 5 file `M`.
+Bảng DB local đã migrate và có dữ liệu, nên ở máy này mọi thứ chạy — nhưng deploy bằng `git pull`
+thì server **không có** `FinalAttendeeRosterService` trong khi provider vẫn bind vào nó. Ở FE thì
+job auto-commit đã commit sẵn.

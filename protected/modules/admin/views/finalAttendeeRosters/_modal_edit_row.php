@@ -133,7 +133,7 @@ $textFields = array(
                     <i class="fa fa-undo me-1"></i>Khôi phục toàn bộ về gốc
                 </button>
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="submit" form="form_edit_row" class="btn btn-primary" id="btn_edit_row_save">
+                <button type="button" form="form_edit_row" class="btn btn-primary" id="btn_edit_row_save">
                     <i class="fa fa-save me-1"></i>Lưu thay đổi
                 </button>
             </div>
