@@ -26,9 +26,9 @@
 | 10 | **Chức danh sửa tay** | Áp dụng cho **TẤT CẢ**: màn tổng hợp, Excel, bốc thăm, **in thẻ**, **email xác nhận** |
 | 11 | **Người bị huỷ tư cách sau migrate** | **XOÁ MỀM hẳn** (không dùng trạng thái `WITHDRAWN` cho ca này). **Mã lucky bỏ luôn — không tái sử dụng cho người khác** |
 | 12 | Tên bảng | **`final_attendee_rosters`** (log: **`final_attendee_roster_sync_logs`**) |
-| 13 | **Vai trò người HO thêm tay** | Chủ dự án chốt **"admin"**. ⚠️ Bảng `roles` **không có** record nào tên/`code` là `admin` (xem §9.3) ⇒ **cần chọn lại trong danh mục hiện có** — **câu hỏi chặn S10**. Dù chọn gì, `role_id` **phải cấu hình được** (`params.php`), **không hardcode** |
-| 14 | **Số thẻ người HO thêm tay** | Quy ước mới **`MT` + 3 số** (vd `MT001`), đánh số **theo từng sự kiện**, có lock chống race, **giới hạn 999** ⇒ tràn thì **báo lỗi rõ ràng**, không âm thầm trùng (§9.4) |
-| 15 | **Nút "Cấp số lucky" cũ** | **ẨN** ở `admin/runRegistrations/admin` ⇒ đường cấp mã duy nhất là qua bảng mới (§9.5) |
+| 13 | **Vai trò người HO thêm tay** | Chủ dự án chốt **"admin"**. ⚠️ Bảng `roles` **không có** record nào tên/`code` là `admin` (xem §9.4) ⇒ **cần chọn lại trong danh mục hiện có** — **câu hỏi chặn S10**. Dù chọn gì, `role_id` **phải cấu hình được** (`params.php`), **không hardcode** |
+| 14 | **Số thẻ người HO thêm tay** | Quy ước mới **`MT` + 3 số** (vd `MT001`), lấy **max hiện có + 1**, có lock chống race + retry, **giới hạn 999** ⇒ tràn thì **báo lỗi rõ ràng**, không âm thầm trùng (§9.5). ⚠️ **Scope đánh số** (theo sự kiện vs toàn hệ thống) còn **một câu hỏi** vì `badge_number` UNIQUE toàn bảng — khuyến nghị phương án B |
+| 15 | **Nút "Cấp số lucky" cũ** | **ẨN** ở `admin/runRegistrations/admin` ⇒ đường cấp mã duy nhất là qua bảng mới (§9.6) |
 
 ---
 
@@ -653,7 +653,7 @@ Response 201:
 ```json
 { "success": true, "data": {
   "roster": { "id": 1500, "status": 3, "lucky_number": "445566", "attendee_id": 4999 },
-  "attendee": { "id": 4999, "qr_token": "9f2c…", "badge_number": "MN0001", "is_active": 1 }
+  "attendee": { "id": 4999, "qr_token": "9f2c…", "badge_number": "MT001", "is_active": 1 }
 }, "message": "Đã thêm người và cấp mã lucky 445566 (định danh DHMT445566)." }
 ```
 - 422 thiếu trường bắt buộc (§9.1) hoặc đơn vị chưa có phiếu VCK và không tạo được.
@@ -704,14 +704,14 @@ Người HO thêm tay **phải đăng nhập được cổng chạy**. Vì cổn
 | `event_id` | từ request | ✅ | HO chọn |
 | `registration_id` | **phiếu VCK của đơn vị đó** | ✅ | Tra phiếu theo (`period_id`, `property_id`); **nếu chưa có ⇒ tái dùng `FinalAggregationService::ensureUnitRegistrations`** để tạo phiếu rỗng |
 | `property_id` | từ request | ✅ | HO chọn |
-| `role_id` | từ request; mặc định đọc từ **param cấu hình** `finalRosterManualRoleId` | ✅ | **Bắt buộc bởi BE** — xem §9.3 (⚠️ chưa chốt được giá trị) |
+| `role_id` | từ request; mặc định đọc từ **param cấu hình** `finalRosterManualRoleId` | ✅ | **Bắt buộc bởi BE** — xem §9.4 (⚠️ chưa chốt được giá trị) |
 | `full_name` | từ request | ✅ | |
 | `attendee_type` | `'manual'` | ✅ | Phân biệt với finalist/director/driver |
 | `is_active` | `1` | ✅ | Để cổng chạy cho đăng nhập |
 | `approval_status` | `APPROVED (1)` | ✅ | Người do HO thêm coi như đã duyệt |
 | `qr_token` | **sinh unique** `bin2hex(random_bytes(16))`, retry nếu trùng | ✅ | Để quét QR thẻ (`identifyByQr`) |
 | `lucky_number` | **cấp ngay trong transaction** (6 số, unique, check `withTrashed()`) | ✅ | Để đăng nhập `DHMT`+lucky |
-| `badge_number` | sinh theo quy ước **`MT` + 3 số** (`MT001`…), unique | ✅ | Phục vụ in thẻ — thiết kế ở §9.4 |
+| `badge_number` | sinh theo quy ước **`MT` + 3 số** (`MT001`…), unique | ✅ | Phục vụ in thẻ — thiết kế ở §9.5 |
 | `position`, `unit_label`, `shirt_size`, `id_card`, `staff_code`, `phone_number`, `gender`, `birthday` | từ request nếu có | ⬜ | |
 | `staff_id` | `NULL` | ⬜ | Người ngoài SMILE |
 | `created_by` | email HO | ⬜ | `AuthHandler::getUser()['email']` |
@@ -726,7 +726,7 @@ BEGIN TRANSACTION
        vẫn không có ⇒ ROLLBACK, 422
   3. Sinh qr_token unique (retry 3 lần)
   4. Sinh lucky_number unique 6 số — check attendees + final_attendee_rosters (withTrashed), retry 3 lần
-  4b. Sinh badge_number "MT" + 3 số theo §9.4 (trong cùng lock, retry nếu duplicate)
+  4b. Sinh badge_number "MT" + 3 số theo §9.5 (trong cùng lock, retry nếu duplicate)
   5. INSERT attendees {...§9.1, lucky_number, qr_token, badge_number}
   6. INSERT final_attendee_rosters {
         status = MANUAL (3),
@@ -752,7 +752,7 @@ COMMIT
   (vì đọc `attendees` theo `registration_id`).
 - **Xoá:** xoá mềm dòng roster + `attendees.is_active = 0`; mã lucky giữ lại, không tái sử dụng.
 
-### 9.3 ⚠️ `role_id` — bảng `roles` KHÔNG có vai trò "admin" (câu hỏi chặn S10)
+### 9.4 ⚠️ `role_id` — bảng `roles` KHÔNG có vai trò "admin" (câu hỏi chặn S10)
 
 Chủ dự án chốt dùng vai trò **"admin"**. Đã kiểm chứng code thật và **không tìm thấy** record nào
 như vậy:
@@ -800,7 +800,7 @@ phân loại người dự đại hội), **không phải** vai trò tài khoả
 - Nếu param rỗng/không hợp lệ ⇒ BE trả **422 "Vai trò không được để trống"** (đúng hành vi hiện
   tại của `/api/attendees/store`), FE hiện Toast lỗi rõ ràng, **không** tạo nửa vời.
 
-### 9.4 ⭐ Sinh `badge_number` theo quy ước `MT` + 3 số (quyết định #14)
+### 9.5 ⭐ Sinh `badge_number` theo quy ước `MT` + 3 số (quyết định #14)
 
 #### Hiện trạng `badge_number` (đã kiểm chứng)
 - `attendees.badge_number`: `string(20)`, **`->unique()`**, `nullable` — migration
@@ -861,7 +861,7 @@ UNLOCK
 > **không** bị bộ sinh này chạm tới — giữ nguyên hành vi hiện tại (`badge_number` do người dùng nhập
 > hoặc để rỗng).
 
-### 9.5 Ẩn nút "Cấp số lucky" cũ (quyết định #15)
+### 9.6 Ẩn nút "Cấp số lucky" cũ (quyết định #15)
 
 **Task thực thi (thuộc slice S8):**
 
@@ -1175,9 +1175,9 @@ sequenceDiagram
 | **S5** | FE: dropdown phụ thuộc Đơn vị → Bộ phận → Phòng ban (AJAX) | Chọn đơn vị ⇒ bộ phận tự nạp đúng | **S (4h)** | S4 |
 | **S6** | FE: `_modal_sync` (xem trước ⇒ ghi thật) + `actionSyncPreview`/`actionSync` + hiển thị `skipped_override`/`restored`/`soft_deleted`/`conflicts` | Bấm xem trước thấy số liệu; ghi thật dữ liệu vào bảng; trường đã sửa tay nằm trong danh sách bỏ qua | **M (1d)** | S2, S4 |
 | **S7** | BE+FE: `update/{id}` + `reset-field/{id}` + inline edit nhiều trường + `_modal_edit_row` + badge ✎ + tooltip "Gốc: …" + nút ↺ | Sửa 3 trường ⇒ `overridden_fields` đúng; khôi phục 1 trường ⇒ gỡ đúng tên; audit log có bản ghi; **không có đường sửa `lucky_number`** | **L (3d)** | S0, S4 |
-| **S8** | BE: `provisionLucky` theo người đã gộp + **ghi ngược `attendees`** + **idempotent tuyệt đối** + xử lý ca 2 mã (§6.4) + check trùng `withTrashed()` + lock/retry. Command `...:gen-lucky` + `...:audit-lucky`. FE: `_modal_gen_lucky` + `actionGenLucky`. **+ Ẩn nút "Cấp số lucky" cũ (§9.5)** + cảnh báo `confirm()` cho `run:gen-lucky` | Chạy 2 lần ⇒ lần 2 `provisioned=0` và **không UPDATE nào lên `lucky_number`**; người 2 bản ghi ⇒ **1 mã**; `attendees.lucky_number` bản đại diện đúng; **test cổng chạy: `DHMT`+mã login được**; ca 2 mã ⇒ ghi `conflict_flag` + log đúng người; **nút cũ không còn hiện và URL `runRegistrations/genLucky` trả 410** | **L (3d)** | S0, S1 |
+| **S8** | BE: `provisionLucky` theo người đã gộp + **ghi ngược `attendees`** + **idempotent tuyệt đối** + xử lý ca 2 mã (§6.4) + check trùng `withTrashed()` + lock/retry. Command `...:gen-lucky` + `...:audit-lucky`. FE: `_modal_gen_lucky` + `actionGenLucky`. **+ Ẩn nút "Cấp số lucky" cũ (§9.6)** + cảnh báo `confirm()` cho `run:gen-lucky` | Chạy 2 lần ⇒ lần 2 `provisioned=0` và **không UPDATE nào lên `lucky_number`**; người 2 bản ghi ⇒ **1 mã**; `attendees.lucky_number` bản đại diện đúng; **test cổng chạy: `DHMT`+mã login được**; ca 2 mã ⇒ ghi `conflict_flag` + log đúng người; **nút cũ không còn hiện và URL `runRegistrations/genLucky` trả 410** | **L (3d)** | S0, S1 |
 | **S9** | ⭐ **Write-back chức danh/nhãn thẻ** (quyết định #10): `writeBackToAttendee()` ghi thẳng Entity trong transaction + **re-apply tự chữa cuối mỗi lần sync** + audit log + cờ `WRITE_BACK_FULL_NAME`. Kiểm chứng thẻ & email | Sửa chức danh trên bảng mới ⇒ **`attendees.position` đổi** ⇒ **PDF/email xác nhận hiện chức danh mới**; chạy `syncWithStaffData` sau đó ⇒ `position` **không bị ghi đè**; `unit_label` ghi được dù attendee là `finalist` (bypass whitelist) | **M (1.5d)** | S7 |
-| **S10** | ⭐ **Thêm người thủ công + tạo `attendees` tối thiểu** (quyết định #9): `createManual()` một transaction, `ensureUnitRegistrations`, sinh `qr_token`+`lucky_number` unique, **`badge_number` `MT`+3 số (§9.4) có lock + retry + chặn tràn 999**, `role_id` **đọc từ param cấu hình (§9.3)**, `status=MANUAL`, `overridden_fields` = tất cả. FE `_modal_add_person` (có dropdown vai trò chọn sẵn mặc định) + `actionCreate` | Thêm 1 người ⇒ có **cả** dòng roster lẫn dòng `attendees`; **đăng nhập cổng chạy `DHMT`+mã thành công** + đặt PIN được; **chạy sync sau đó ⇒ người này KHÔNG bị xoá, KHÔNG bị ghi đè**; đơn vị chưa có phiếu VCK ⇒ phiếu được tạo; **thêm 2 người liên tiếp ⇒ `MT001`, `MT002` không trùng**; **giả lập max = 999 ⇒ trả 422 với thông điệp rõ ràng, không tạo bản ghi nào** | **M (1d)** | S8 + chốt §9.3 |
+| **S10** | ⭐ **Thêm người thủ công + tạo `attendees` tối thiểu** (quyết định #9): `createManual()` một transaction, `ensureUnitRegistrations`, sinh `qr_token`+`lucky_number` unique, **`badge_number` `MT`+3 số (§9.5) có lock + retry + chặn tràn 999**, `role_id` **đọc từ param cấu hình (§9.4)**, `status=MANUAL`, `overridden_fields` = tất cả. FE `_modal_add_person` (có dropdown vai trò chọn sẵn mặc định) + `actionCreate` | Thêm 1 người ⇒ có **cả** dòng roster lẫn dòng `attendees`; **đăng nhập cổng chạy `DHMT`+mã thành công** + đặt PIN được; **chạy sync sau đó ⇒ người này KHÔNG bị xoá, KHÔNG bị ghi đè**; đơn vị chưa có phiếu VCK ⇒ phiếu được tạo; **thêm 2 người liên tiếp ⇒ `MT001`, `MT002` không trùng**; **giả lập max = 999 ⇒ trả 422 với thông điệp rõ ràng, không tạo bản ghi nào** | **M (1d)** | S8 + chốt §9.4 |
 | **S11** | FE: xuất Excel theo bộ lọc (PHPExcel) | Tải file, kiểm đủ cột + đúng bộ lọc + cột "Đã sửa tay"/"Xung đột" | **M (1d)** | S4 |
 | **S12** | BE+FE: `merge` / `split` + `_modal_merge_split` + `destroy` (**xoá mềm giữ mã** + `also_deactivate_attendee`) + `clear-conflict` | Gộp 2 dòng ⇒ 1 dòng, mã theo §6.2; huỷ tư cách ⇒ dòng trashed **vẫn giữ mã**, cấp mã lại **không** cấp mã đó cho ai; cổng chạy chặn đăng nhập người đó | **M (1d)** | S7, S8 |
 | **S13** | Phân quyền: thêm `finalattendeerosters` vào `MControllers` + `roles.controllers`, gate controller + view, menu sidebar | HR không quyền update ⇒ không thấy nút sửa; URL trực tiếp ⇒ 403 | **S (4h)** | S4, S6, S7, S8, S10 |
@@ -1217,7 +1217,7 @@ sequenceDiagram
 
 ### 🔴 Nhóm 0 — CHẶN slice S10, cần trả lời trước khi build
 1. **`role_id` cho người HO thêm tay — chọn lại vai trò nào?**
-   Chủ dự án chốt "admin" nhưng bảng `roles` **không có** record đó (§9.3 — đã kiểm chứng migration,
+   Chủ dự án chốt "admin" nhưng bảng `roles` **không có** record đó (§9.4 — đã kiểm chứng migration,
    không có seeder, dump chỉ có 10 record). Vui lòng chọn **một** trong danh mục hiện có:
    - **`btc` — Ban tổ chức** (id 8) — gần nghĩa "BTC/HO" nhất
    - **`support` — Hỗ trợ đại hội** (id 1)
@@ -1229,7 +1229,7 @@ sequenceDiagram
    trò ở màn đăng ký, màu badge trên thẻ và các báo cáo theo vai trò. Tài liệu này không tự đề xuất.
 2. **`badge_number`: scope đánh số** — chọn **phương án B** (khuyến nghị: `MT001`→`MT999` duy nhất
    toàn hệ thống, không lặp) hay **phương án A** (mỗi sự kiện đánh lại từ `MT001`, phải thêm hậu tố
-   event vào chuỗi, **+2h**)? Xem §9.4.
+   event vào chuỗi, **+2h**)? Xem §9.5.
 3. **Đối soát tiền tố `MT`:** cần ai chạy
    `SELECT badge_number FROM attendees WHERE badge_number LIKE 'MT%'` trên DB thật để xác nhận không
    có dữ liệu cũ đụng tiền tố? (Code hiện **không có** bộ sinh `badge_number` nào ⇒ gần như chắc
@@ -1240,28 +1240,24 @@ sequenceDiagram
 5. **Quy trình thông báo thu hồi định danh** cho người bị NULL mã (ca §6.4): ai thông báo, bằng kênh
    nào? (Màn hình đã có badge + báo cáo; cần người chịu trách nhiệm.)
 6. Command `run:gen-lucky` cũ: đồng ý **giữ lại nhưng thêm cảnh báo + `confirm()`** (không xoá, để
-   còn đường cứu hộ) — xác nhận? (§9.5)
+   còn đường cứu hộ) — xác nhận? (§9.6)
 
 ### Nhóm B — vòng đời & lan toả dữ liệu
-4. **`full_name` có write-back về `attendees` không?** (Đề xuất: **tạm KHÔNG** —
+7. **`full_name` có write-back về `attendees` không?** (Đề xuất: **tạm KHÔNG** —
    `WRITE_BACK_FULL_NAME = false` — vì đổi tên trên `attendees` ảnh hưởng email/phiếu/đội thể thao.
    Nếu chủ dự án muốn tên sửa tay cũng lên thẻ ⇒ bật cờ, không phát sinh thêm ngày công.)
-5. **Có cần nút "Khôi phục về dữ liệu gốc"** cho trường đã override (từng trường + cả dòng)?
+8. **Có cần nút "Khôi phục về dữ liệu gốc"** cho trường đã override (từng trường + cả dòng)?
    (Đã đưa vào S7 — xác nhận để không làm thừa.)
-6. Có cần **UI lịch sử thay đổi theo trường** (ai sửa gì, lúc nào, giá trị cũ) không?
+9. Có cần **UI lịch sử thay đổi theo trường** (ai sửa gì, lúc nào, giá trị cũ) không?
    (Hiện chỉ `audit_logs` + `updated_by`/`updated_at`. Nếu cần UI ⇒ **+1 ngày**.)
-7. **Đồng bộ tự động theo lịch** (cron hằng ngày) hay chỉ bấm tay? (Đề xuất: bấm tay, vì cần HO xem
-   preview trước khi ghi.)
-8. Khi huỷ tư cách trên bảng mới, có **đồng thời set `attendees.is_active = 0`** không?
-   (Đề xuất: **có**, tham số `also_deactivate_attendee = true` — để cổng chạy chặn đăng nhập ngay.)
+10. **Đồng bộ tự động theo lịch** (cron hằng ngày) hay chỉ bấm tay? (Đề xuất: bấm tay, vì cần HO xem
+    preview trước khi ghi.)
+11. Khi huỷ tư cách trên bảng mới, có **đồng thời set `attendees.is_active = 0`** không?
+    (Đề xuất: **có**, tham số `also_deactivate_attendee = true` — để cổng chạy chặn đăng nhập ngay.)
 
 ### Nhóm C — vận hành
-9. Ai được sửa dữ liệu: **Admin HO + HR**? Đơn vị **không** — xác nhận?
-10. Có cần chức năng **reset PIN** cho người quên PIN trên màn này không? (~4h)
-11. **Có cần đóng băng danh sách** tại thời điểm bốc thăm? (Thêm cột `locked_at` + chặn mọi
+12. Ai được sửa dữ liệu: **Admin HO + HR**? Đơn vị **không** — xác nhận?
+13. Có cần chức năng **reset PIN** cho người quên PIN trên màn này không? (~4h)
+14. **Có cần đóng băng danh sách** tại thời điểm bốc thăm? (Thêm cột `locked_at` + chặn mọi
     sửa/đồng bộ sau khi khoá — ~4h.)
-12. **Excel chứa mã lucky** phát cho ai? Cần thêm cột nào (SĐT, email) để phân phát định danh?
-13. **Vai trò mặc định** (`role_id`) cho người HO thêm thủ công là vai trò nào? (BE **bắt buộc**
-    `role_id`; cần một giá trị mặc định cấu hình được, vd "Khách mời" / "Hỗ trợ".)
-14. **Quy ước `badge_number`** cho người thêm thủ công: `MN` + số thứ tự có phù hợp không, hay theo
-    quy ước sẵn có của module in thẻ?
+15. **Excel chứa mã lucky** phát cho ai? Cần thêm cột nào (SĐT, email) để phân phát định danh?
