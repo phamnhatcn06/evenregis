@@ -75,6 +75,179 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Xuất Excel toàn bộ dòng theo bộ lọc đang áp dụng.
+     */
+    public function actionExport()
+    {
+        if (!PermissionHelper::can('finalattendeerosters', 'read')) {
+            throw new CHttpException(403, 'Bạn không có quyền xuất danh sách này.');
+        }
+
+        $eventId  = $this->getIntParam('event_id');
+        $periodId = $this->getIntParam('period_id');
+
+        if (!$eventId || !$periodId) {
+            throw new CHttpException(422, 'Vui lòng chọn sự kiện và đợt Vòng Chung Kết.');
+        }
+
+        $rows  = $this->fetchAllForExport($this->buildFilterParams($eventId, $periodId));
+        $excel = $this->createPhpExcel();
+        $sheet = $excel->getActiveSheet();
+        $sheet->setTitle('Tong hop VCK');
+
+        $headers = array(
+            'Mã lucky', 'Định danh đăng nhập', 'Họ và tên', 'Mã nhân viên', 'Số CCCD', 'Ngày sinh',
+            'Số điện thoại', 'Đơn vị', 'Nhãn in thẻ', 'Bộ phận', 'Phòng ban',
+            'Chức danh hiển thị', 'Chức danh gốc (SMILE)', 'Size áo', 'Số thẻ',
+            'Loại', 'Trạng thái', 'Đã đặt PIN', 'Đã sửa tay', 'Xung đột',
+        );
+
+        $lastColumn = PHPExcel_Cell::stringFromColumnIndex(count($headers) - 1);
+
+        $sheet->setCellValue('A1', 'TỔNG HỢP DANH SÁCH VÒNG CHUNG KẾT');
+        $sheet->mergeCells('A1:' . $lastColumn . '1');
+        $sheet->setCellValue('A2', 'Xuất lúc: ' . date('d/m/Y H:i') . ' — Tổng: ' . count($rows) . ' người');
+        $sheet->mergeCells('A2:' . $lastColumn . '2');
+
+        foreach ($headers as $index => $label) {
+            $sheet->setCellValue(PHPExcel_Cell::stringFromColumnIndex($index) . '4', $label);
+        }
+        $sheet->getStyle('A4:' . $lastColumn . '4')->getFont()->setBold(true);
+
+        $fieldLabels = FinalAttendeeRosters::editableFields();
+        $rowIndex    = 5;
+
+        foreach ($rows as $item) {
+            $overridden = isset($item['overridden_fields']) && is_array($item['overridden_fields'])
+                ? $item['overridden_fields']
+                : array();
+
+            $overriddenLabels = array();
+            foreach ($overridden as $field) {
+                $overriddenLabels[] = isset($fieldLabels[$field]) ? $fieldLabels[$field] : $field;
+            }
+
+            $values = array(
+                $this->excelText($item, 'lucky_number'),
+                $this->excelText($item, 'login_identifier'),
+                $this->excelText($item, 'full_name'),
+                $this->excelText($item, 'staff_code'),
+                $this->excelText($item, 'id_card'),
+                $this->excelText($item, 'birthday'),
+                $this->excelText($item, 'phone_number'),
+                $this->excelText($item, 'property_name'),
+                $this->excelText($item, 'unit_label'),
+                $this->excelText($item, 'division_name'),
+                $this->excelText($item, 'department_name'),
+                $this->excelText($item, 'position_display'),
+                $this->excelText($item, 'position_name'),
+                $this->excelText($item, 'shirt_size'),
+                $this->excelText($item, 'badge_number'),
+                $this->excelTypeLabel($item),
+                $this->excelStatusLabel($item),
+                !empty($item['pin_is_set']) ? 'Đã đặt' : 'Chưa đặt',
+                implode(', ', $overriddenLabels),
+                !empty($item['conflict_flag'])
+                    ? FinalAttendeeRosters::getConflictLabel($item['conflict_flag'])
+                    : '',
+            );
+
+            foreach ($values as $index => $value) {
+                // Ghi dạng chuỗi tường minh: mã lucky, mã NV, CCCD, SĐT nếu để Excel tự nhận kiểu
+                // thì số 0 đứng đầu bị mất và mã dài bị đổi sang dạng khoa học.
+                $sheet->setCellValueExplicit(
+                    PHPExcel_Cell::stringFromColumnIndex($index) . $rowIndex,
+                    $value,
+                    PHPExcel_Cell_DataType::TYPE_STRING
+                );
+            }
+
+            $rowIndex++;
+        }
+
+        foreach (range(0, count($headers) - 1) as $index) {
+            $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($index))->setAutoSize(true);
+        }
+
+        $filename = 'TongHop_VCK_Lucky_' . $eventId . '_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save('php://output');
+        Yii::app()->end();
+    }
+
+    /**
+     * Lấy toàn bộ dòng theo bộ lọc, chia trang để không nạp hết vào bộ nhớ một lúc.
+     */
+    protected function fetchAllForExport($params)
+    {
+        $all   = array();
+        $page  = 1;
+        $chunk = array();
+
+        do {
+            $dataProvider = FinalAttendeeRosters::getApiDataProvider($params, self::EXPORT_CHUNK_SIZE);
+            $dataProvider->pagination->setCurrentPage($page - 1);
+
+            $chunk = $dataProvider->getData();
+            foreach ($chunk as $model) {
+                $all[] = $model->getAttributes();
+            }
+
+            $page++;
+
+            // Chặn trần để một bộ lọc quá rộng không kéo vô hạn và làm hết bộ nhớ.
+            if (count($all) >= self::EXPORT_MAX_ROWS) {
+                break;
+            }
+        } while (count($chunk) === self::EXPORT_CHUNK_SIZE);
+
+        return $all;
+    }
+
+    protected function excelText($item, $field)
+    {
+        return isset($item[$field]) && $item[$field] !== null ? (string) $item[$field] : '';
+    }
+
+    protected function excelTypeLabel($item)
+    {
+        $options = FinalAttendeeRosters::getTypeOptions();
+        $type    = isset($item['attendee_type']) ? $item['attendee_type'] : null;
+
+        return isset($options[$type]) ? $options[$type] : (string) $type;
+    }
+
+    protected function excelStatusLabel($item)
+    {
+        if (!empty($item['is_withdrawn'])) {
+            return 'Đã huỷ tư cách';
+        }
+
+        return (int) $item['status'] === FinalAttendeeRosters::STATUS_MANUAL
+            ? 'HO thêm tay'
+            : 'Đang tham dự';
+    }
+
+    /**
+     * Khởi tạo PHPExcel. Phải tạm bỏ autoload của Yii vì PHPExcel dùng autoload riêng.
+     */
+    protected function createPhpExcel()
+    {
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $excel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        return $excel;
+    }
+
+    /**
      * Trả giá trị dropdown Bộ phận / Phòng ban theo phạm vi đang chọn (JSON, cho dropdown phụ thuộc).
      *
      * Đi qua controller thay vì để JS gọi thẳng External API, để API key không bị nhúng vào HTML.
