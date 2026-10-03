@@ -2271,15 +2271,56 @@ class ReportAttendeeStatsController extends AdminController
      * Ghi 1 sheet danh sách vào chung kết.
      * @param bool $includeUnitCols true = kèm cột Mã ĐV + Đơn vị (dùng cho sheet tổng hợp)
      */
-    protected function writeFinalistSheet($sheet, $titleText, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, $includeUnitCols, $listContents = false, $contentFilter = null, $groupByUnit = true)
+    protected function writeFinalistSheet($sheet, $titleText, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, $includeUnitCols, $listContents = false, $contentFilter = null, $groupByUnit = true, $splitContents = false)
     {
         // $contentFilter: null = liệt kê mọi nội dung; hoặc mảng loại được phép
         // ('sports', 'competitions', 'talent', 'miss') cho cột "Nội dung".
         // $groupByUnit: false = danh sách phẳng, không chèn hàng tiêu đề đơn vị.
+        // $splitContents: true = tách mỗi nội dung thành 1 cột riêng (Nội dung 1, 2, ...)
+        //                 thay vì gộp vào 1 cột ngăn bằng dấu phẩy.
         $groupByUnit = $listContents && $groupByUnit;
+        $splitContents = $listContents && $splitContents;
         $allowContent = function ($type) use ($contentFilter) {
             return $contentFilter === null || in_array($type, $contentFilter, true);
         };
+
+        // Dựng danh sách nội dung của 1 người (dùng chung cho đếm cột và ghi dữ liệu)
+        $buildItems = function ($p) use ($sportColumns, $compColumns, $hasTalent, $hasMiss, $allowContent) {
+            $items = array();
+            if ($allowContent('sports')) {
+                foreach ($sportColumns as $sc) {
+                    if (isset($p['sports'][$sc['sport_id']])) $items[] = $sc['name'];
+                }
+            }
+            if ($allowContent('competitions')) {
+                foreach ($compColumns as $cc) {
+                    if (isset($p['competitions'][$cc['competition_id']])) $items[] = $cc['name'];
+                }
+            }
+            if ($allowContent('talent') && $hasTalent && !empty($p['talent'])) {
+                if (!empty($p['talent_entries'])) {
+                    foreach ($p['talent_entries'] as $te) {
+                        $label = 'Văn nghệ - ' . (isset($te['title']) && $te['title'] !== '' ? $te['title'] : 'Chưa đặt tên');
+                        if (!empty($te['is_alliance_team'])) $label .= ' (Liên quân)';
+                        $items[] = $label;
+                    }
+                } else {
+                    $items[] = 'Văn nghệ';
+                }
+            }
+            if ($allowContent('miss') && $hasMiss && !empty($p['miss'])) $items[] = 'Miss';
+            return $items;
+        };
+
+        // Số cột "Nội dung" khi tách: theo số nội dung nhiều nhất của 1 người (tối thiểu 1)
+        $splitCount = 0;
+        if ($splitContents) {
+            foreach ($people as $p) {
+                $n = count($buildItems($p));
+                if ($n > $splitCount) $splitCount = $n;
+            }
+            if ($splitCount < 1) $splitCount = 1;
+        }
         if ($includeUnitCols) {
             $fixedHeaders = array('STT', 'Mã ĐV', 'Đơn vị', 'Tên đơn vị trên thẻ', 'Họ và tên', 'Giới tính', 'Size áo', 'Mã NV', 'Chức danh', 'Bộ phận');
             $fixedWidths = array(6, 10, 30, 30, 26, 9, 8, 12, 30, 24);
