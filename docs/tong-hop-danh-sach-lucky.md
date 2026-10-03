@@ -844,9 +844,10 @@ nên cùng một `code` có thể tồn tại nhiều bản ghi theo sự kiện
   giá trị hiện do người dùng nhập tay.
 - ⇒ Tiền tố **`MT` chưa bị quy ước nào chiếm**. Các mã dạng `HNO028`, `EVE000001` thấy trong dump là
   `staff_code` / `code` của bảng khác, **không phải** `badge_number`.
-- ⚠️ **Việc cần làm trước khi build:** chạy đối soát trên DB thật
-  `SELECT badge_number FROM attendees WHERE badge_number LIKE 'MT%'` để chắc chắn không có dữ liệu
-  cũ đụng tiền tố. Nếu có ⇒ báo lại để chọn tiền tố khác.
+- ⚠️ **Việc cần làm trước khi bật tính năng:** đối soát dải `MT%` — làm **qua API, KHÔNG query DB
+  tay** (quyết định #16): gọi `GET /api/final-attendee-rosters/audit?scope=badge` (§8.12) để xác
+  nhận dải sạch. Nếu phát hiện giá trị `MT*` cũ **sai format** ⇒ báo lại để xử lý trước, vì nó làm
+  lệch bộ sinh max.
 
 #### Thiết kế sinh số
 
@@ -854,35 +855,24 @@ nên cùng một `code` có thể tồn tại nhiều bản ghi theo sự kiện
 |----------|-----------|-------|
 | Format | `MT` + **3 chữ số, zero-pad** (`MT001` … `MT999`) | Theo chốt của chủ dự án |
 | Cách lấy số | **max hiện có trong cùng event + 1** | Không cần thêm bảng sequence; tự phục hồi nếu có bản ghi bị xoá; đọc 1 query |
-| Scope đánh số | **Theo `event_id`** | Đúng yêu cầu. Mỗi đại hội đánh lại từ `MT001` |
-| ⚠️ Xung đột với UNIQUE toàn bảng | `attendees.badge_number` UNIQUE **toàn bảng**, nhưng đánh số **theo event** ⇒ sự kiện thứ hai sẽ sinh lại `MT001` và **ăn lỗi duplicate**. **Giải pháp: thêm hậu tố sự kiện vào chuỗi lưu** — `MT` + 3 số **+ `-{event_id}`** nếu event ≠ sự kiện mặc định; hoặc **chọn phương án B** (bên dưới) | Bắt buộc phải xử lý, không được bỏ qua |
-| Chống race (2 HO thêm cùng lúc) | **Cache lock** `far:badge:{event_id}` (TTL 10s) bao quanh bước "đọc max → insert", **cộng** retry 3 lần bắt duplicate key (SQLSTATE 23000) rồi tính lại max | Lock giảm va chạm; retry là lưới an toàn khi lock hết hạn/đa worker |
+| **Scope đánh số** | ✅ **Duy nhất TOÀN HỆ THỐNG** — `MT001` → `MT999`, **không** đánh lại theo sự kiện | `attendees.badge_number` UNIQUE **toàn bảng** ⇒ đánh số theo event sẽ sinh lại `MT001` ở sự kiện thứ hai và **ăn lỗi duplicate**. Số thẻ chỉ cần **duy nhất và in được**; việc báo cáo/lọc theo sự kiện dùng `event_id`, **không** dựa vào tiền tố số thẻ |
+| Chống race (2 HO thêm cùng lúc) | **Cache lock** `far:badge:global` (TTL 10s) bao quanh bước "đọc max → insert", **cộng** retry 3 lần bắt duplicate key (SQLSTATE 23000) rồi tính lại max | Lock giảm va chạm; retry là lưới an toàn khi lock hết hạn/đa worker |
 | Tràn 999 | **Báo lỗi rõ ràng** — BE trả **422** `"Đã dùng hết dải số thẻ MT001–MT999 cho sự kiện này. Vui lòng mở rộng quy ước số thẻ."`; FE hiện Toast đỏ. **Tuyệt đối không** âm thầm trùng số, không quay vòng về `MT001` | Số thẻ trùng ⇒ hai người cùng số thẻ in ra, không thể sửa sau khi in |
 | Đường nâng cấp | Chuyển sang **`MT` + 4 số** (`MT0001`…`MT9999`): chỉ sửa hằng `BADGE_NUMBER_PAD = 3 → 4` (cột `string(20)` thừa chỗ). Số cũ 3 chữ số **vẫn hợp lệ**, bộ sinh đọc max bằng regex chấp nhận cả hai độ dài | Nâng cấp không cần migration dữ liệu |
 
-#### Hai phương án giải xung đột "UNIQUE toàn bảng vs đánh số theo event" — chọn 1
+#### Ghi chú: phương án "đánh lại từ `MT001` mỗi sự kiện" đã bị LOẠI
 
-| | **A. `MT{3 số}` thuần + hậu tố event khi cần** | **B. ✅ `MT{3 số}` và scope số thực chất là toàn hệ thống** |
-|---|---|---|
-| Chuỗi lưu | `MT001` cho sự kiện hiện tại; `MT001-4` cho sự kiện khác | `MT001` → `MT999`, không bao giờ lặp |
-| Ưu | Mỗi sự kiện đánh lại từ 001, đọc thuận mắt | Không bao giờ đụng UNIQUE; code đơn giản nhất |
-| Nhược | Chuỗi không nhất quán, in thẻ nhìn lạ; logic max phức tạp hơn | Sự kiện thứ hai không bắt đầu từ `MT001` |
-
-> **Khuyến nghị: phương án B** — giữ `MT{3 số}` sạch, lấy max **toàn bảng** theo regex `^MT\d+$`
-> (`SELECT MAX(CAST(SUBSTRING(badge_number,3) AS UNSIGNED)) FROM attendees WHERE badge_number REGEXP '^MT[0-9]+$'`),
-> và **vẫn báo cáo/lọc theo event** bằng `event_id` chứ không bằng tiền tố số thẻ. Số thẻ chỉ cần
-> **duy nhất và in được**, không cần mang ý nghĩa sự kiện.
-> Chỉ vì người HO thêm tay là **ngoại lệ số lượng nhỏ** (vài chục người/kỳ), dải 999 thừa sức cho
-> nhiều kỳ đại hội.
-> ❓ Nếu chủ dự án **nhất định** muốn mỗi sự kiện đánh lại từ `MT001` ⇒ chọn A, phát sinh thêm ~2h
-> cho logic hậu tố + hiển thị.
+Phương án đó buộc phải thêm hậu tố sự kiện vào chuỗi lưu (vd `MT001-4`) để không vi phạm UNIQUE
+toàn bảng ⇒ chuỗi số thẻ không nhất quán, in thẻ nhìn lạ, logic max phức tạp hơn. **Đã loại.**
+Người HO thêm tay là ngoại lệ số lượng nhỏ (vài chục người/kỳ) nên dải 999 thừa sức cho nhiều kỳ
+đại hội.
 
 #### Giả mã
 ```
-LOCK far:badge:{event_id}   (TTL 10s)
+LOCK far:badge:global   (TTL 10s)   // lock toàn hệ thống, vì dải số là toàn hệ thống
   $max = SELECT MAX(CAST(SUBSTRING(badge_number, 3) AS UNSIGNED))
            FROM attendees
-          WHERE badge_number REGEXP '^MT[0-9]+$';        -- phương án B
+          WHERE badge_number REGEXP '^MT[0-9]+$';
   $next = (int) $max + 1;
   if ($next > 999) {
       throw 422 "Đã dùng hết dải số thẻ MT001–MT999 ... Vui lòng mở rộng quy ước số thẻ.";
