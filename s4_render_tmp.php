@@ -15,7 +15,10 @@ require_once __DIR__ . '/framework/yii.php';
 
 $config = require(__DIR__ . '/protected/config/main.php');
 $config['components']['errorHandler']['errorAction'] = null;
+unset($config['components']['log']);
 Yii::createWebApplication($config);
+
+Yii::app()->session->open(); // CLI khong tu mo session; view dung getFlashes()
 
 $ok = function ($label, $cond) { echo ($cond ? 'PASS' : 'FAIL') . " — $label\n"; };
 
@@ -39,6 +42,7 @@ $dp = FinalAttendeeRosters::getApiDataProvider(
     array('event_id' => $eventId, 'period_id' => $periodId),
     25
 );
+$dp->pagination->route = 'admin/finalAttendeeRosters/admin'; // CLI khong co action dang chay
 $rows = $dp->getData();
 $ok('DataProvider trả 25 dòng/trang', count($rows) === 25);
 $ok('tổng số bản ghi = 619', (int) $dp->getTotalItemCount() === 619);
@@ -61,7 +65,9 @@ $ok('originalValue đúng', $m->originalValue('position') === 'Chức danh gốc
 $ok('originalValue trường lạ trả null', $m->originalValue('khong_co') === null);
 
 echo "\n=== Render view ===\n";
-$controller = new FinalAttendeeRostersController('finalAttendeeRosters');
+Yii::import('application.modules.admin.controllers.FinalAttendeeRostersController');
+$adminModule = Yii::app()->getModule('admin');
+$controller = new FinalAttendeeRostersController('finalAttendeeRosters', $adminModule);
 $controller->layout = false;
 Yii::app()->controller = $controller;
 
