@@ -13,6 +13,10 @@ class FinalAttendeeRosters extends CFormModel
     /** Giá trị lọc "chưa xác định" cho bộ phận / phòng ban */
     const FILTER_NONE = '__none__';
 
+    /** Chế độ đồng bộ: xem trước (dry-run, không ghi) và ghi thật */
+    const SYNC_MODE_PREVIEW = 'preview';
+    const SYNC_MODE_APPLY   = 'apply';
+
     public $id;
     public $event_id;
     public $period_id;
