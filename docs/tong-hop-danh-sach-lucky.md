@@ -1200,6 +1200,11 @@ sequenceDiagram
 > So với bản revise 2 (≈19d): **+2.5 ngày** đúng bằng hai hạng mục mới (+1.5 write-back, +1.0 thêm
 > người thủ công). Thay đổi của quyết định #4 (xoá mềm + khoá mã) và #8 (mã bất biến) **không làm
 > tăng ngày công** — chỉ siết lại logic trong S2/S8/S12 và bổ sung tiêu chí verify.
+>
+> Ba quyết định #13/#14/#15 (vai trò, `badge_number` `MT`+3 số, ẩn nút cũ) **cũng không làm tăng
+> tổng** — bộ sinh `badge_number` + đọc param vai trò nằm trong S10 (1d đã có), việc ẩn nút cũ nằm
+> trong S8 (3d đã có). **Ngoại lệ:** nếu chọn **phương án A** cho scope số thẻ (mỗi sự kiện đánh lại
+> từ `MT001`, phải thêm hậu tố event) ⇒ **+2h**, tổng thành ≈ 21.75 ngày.
 
 **Mốc giao hàng gợi ý:**
 - **Mốc 1 (S0–S4, ~8d):** xem được danh sách VCK tổng hợp; đồng bộ chạy qua artisan.
