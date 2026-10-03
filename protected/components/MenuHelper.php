@@ -330,6 +330,15 @@ class MenuHelper
      */
     public static function getIcon($name)
     {
+        // Controller dùng chung icon với controller khác thì khai báo ở đây,
+        // khỏi nhân bản cả khối SVG.
+        $aliases = array(
+            'finalAttendeeRosters' => 'attendee',
+        );
+        if (isset($aliases[$name])) {
+            $name = $aliases[$name];
+        }
+
         return isset(self::$icons[$name]) ? self::$icons[$name] : self::$icons['default'];
     }
 
