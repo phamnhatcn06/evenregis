@@ -1,7 +1,7 @@
 # Nhật ký thực thi — Tổng hợp danh sách VCK & cấp mã Lucky
 
 > Ghi lại toàn bộ công việc đã làm theo bản thiết kế [`tong-hop-danh-sach-lucky.md`](tong-hop-danh-sach-lucky.md).
-> Cập nhật: 2026-10-03. Phạm vi: slice **S0 → S12** (còn S13).
+> Cập nhật: 2026-10-03. Phạm vi: slice **S0 → S13** (hết phạm vi thiết kế).
 
 ---
 
@@ -22,7 +22,7 @@
 | S10 — HO thêm người thủ công | ✅ Xong |
 | S11 — Xuất Excel theo bộ lọc | ✅ Xong |
 | S12 — Gộp dòng / Tách người / Huỷ tư cách | ✅ Xong |
-| **S13 — Phân quyền + menu sidebar** | ⬜ **Chưa làm** |
+| S13 — Phân quyền + menu sidebar | ✅ Xong (xem §6.3) |
 
 **Dữ liệu trên môi trường local sau cùng:** 619 người, 619 mã lucky, 0 xung đột,
 0 mã bị khoá, dải số thẻ `MT` còn nguyên 0/999.
@@ -31,15 +31,11 @@
 
 ## 2. Việc còn phải làm trước khi dùng thật
 
-1. **S13 — phân quyền (bắt buộc).** Thêm controller `finalattendeerosters` vào bảng `MControllers`
-   và `roles.controllers` để hiện menu sidebar và cấp quyền `create/update/delete`. Hiện chỉ vào
-   được bằng URL trực tiếp `/admin/finalAttendeeRosters/admin?event_id=3&period_id=4`, và chỉ tài
-   khoản có quyền `*` mới dùng được.
-2. **Deploy BE.** 13 endpoint `final-attendee-rosters/*` hiện **chỉ có ở local**. FE trỏ vào
+1. **Deploy BE.** 13 endpoint `final-attendee-rosters/*` hiện **chỉ có ở local**. FE trỏ vào
    `externalApiUrl` nào thì endpoint phải tồn tại ở đó.
-3. **Chạy đối soát một lần trên môi trường thật** trước khi cho HO thêm người thủ công:
+2. **Chạy đối soát một lần trên môi trường thật** trước khi cho HO thêm người thủ công:
    `php artisan final-attendee-roster:audit <event_id>` — xác nhận `Sai format = 0`.
-4. **Chưa kiểm được trên trình duyệt thật.** Toàn bộ verify làm bằng cách render view với dữ liệu
+3. **Chưa kiểm được trên trình duyệt thật.** Toàn bộ verify làm bằng cách render view với dữ liệu
    API thật (bắt được lỗi PHP, biến thiếu, HTML sai) nhưng **chưa kiểm CSS/layout và JS chạy thực
    tế**. Cần mở thử một lần ở môi trường có đăng nhập.
 
@@ -183,6 +179,36 @@ admin đều đọc được, và key đó gọi được *toàn bộ* External 
 
 > ⚠️ Pattern cũ này đang được dùng ở chỗ khác trong dự án (vd form đăng ký event → period).
 > Nếu cần, có thể rà và chuyển sang proxy tương tự — việc riêng, không thuộc phạm vi này.
+
+---
+
+### 6.3 S13 — phân quyền đi theo SSO, không qua `MControllers`
+
+Bản thiết kế nói thêm controller vào bảng `m_controllers` + `roles.controllers`. **Làm vậy không
+có tác dụng.** Đọc lại code thì bảng đó chỉ được `AdminController::dataTree()` dùng, mà `dataTree()`
+chỉ được `themes/hope-ui/views/layouts/column2.php` gọi — layout **không được màn hình nào dùng**
+(các controller admin kế thừa `Controller` nên chạy `//layouts/column1` → `//layouts/main`). Đây là
+code cũ còn sót. Menu thật được `MenuHelper::buildMenuTree()` dựng từ danh sách quyền SSO.
+
+Nên S13 làm ở hai chỗ:
+
+| File | Thay đổi |
+|------|----------|
+| `protected/components/AuthHandler.php` | thêm luật kế thừa `finalattendeerosters` ← `approveregistrations`, dự phòng `registrations`; `inheritRelatedPermissions` nay nhận **danh sách** parent theo thứ tự ưu tiên |
+| `protected/components/MenuHelper.php` | `appendFinalRosterItem()` dựng mục **"Tổng hợp VCK"**, đặt cùng nhóm với quyền nó kế thừa; `getIcon()` thêm bảng alias để dùng lại icon `attendee` |
+
+Cách này **không cần sửa Portal**. Hệ quả nghiệp vụ cần biết: **ai duyệt được đăng ký thì vào được
+màn hình này với đúng mức quyền đó** (duyệt `1 1 1 0` → sửa được, không xoá được). Nếu muốn siết
+riêng, Portal phát quyền `finalAttendeeRosters` của chính nó là luật kế thừa tự nhường chỗ —
+đã có test cho ca này.
+
+Mục menu **không hiện ngay** cho người đang đăng nhập: `CacheHelper::getMenu()` cache theo token,
+TTL 1 giờ. Đăng nhập lại là thấy, hoặc chờ tối đa 1 giờ.
+
+**Kiểm chứng:** harness tạm (không commit, chạy bằng `php` CLI) — **17/17 PASS**, phủ: 3 nhánh kế thừa, không ghi đè
+quyền Portal phát, không tự sinh quyền khi không có parent, wildcard `*` giữ nguyên, 2 luật cũ
+không vỡ, mục menu hiện/ẩn đúng theo quyền đọc, nhãn tiếng Việt, URL, icon riêng, nằm đúng nhóm,
+và không nhân đôi khi Portal đã phát mục này.
 
 ---
 
