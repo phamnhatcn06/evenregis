@@ -271,7 +271,7 @@ class AuthHandler extends CApplicationComponent
             return $permissions;
         }
 
-        // Define inheritance rules: child => parent
+        // Define inheritance rules: child => parent (hoặc danh sách parent theo thứ tự ưu tiên)
         $inheritanceRules = array(
             'registrationperiods' => 'events',
             'registrations' => 'events',
