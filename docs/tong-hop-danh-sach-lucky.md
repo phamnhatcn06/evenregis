@@ -767,10 +767,12 @@ COMMIT
   (vì đọc `attendees` theo `registration_id`).
 - **Xoá:** xoá mềm dòng roster + `attendees.is_active = 0`; mã lucky giữ lại, không tái sử dụng.
 
-### 9.4 ⚠️ `role_id` — bảng `roles` KHÔNG có vai trò "admin" (câu hỏi chặn S10)
+### 9.4 `role_id` = vai trò `btc` (Ban tổ chức) — quyết định #13
 
-Chủ dự án chốt dùng vai trò **"admin"**. Đã kiểm chứng code thật và **không tìm thấy** record nào
-như vậy:
+**Đã chốt: dùng vai trò `btc` — "Ban tổ chức".**
+
+Bối cảnh: ban đầu chủ dự án nêu "admin", nhưng đã kiểm chứng code thật và **không tìm thấy** record
+nào như vậy, nên đã chọn lại trong danh mục hiện có:
 
 - Migration `Modules/Registration/Database/Migrations/2026_05_05_100101_create_roles_table.php`:
   bảng `roles` có `name`, `code`, `color`, `icon`, `sort_order`, `description`, `event_id` —
@@ -796,24 +798,41 @@ như vậy:
 phân loại người dự đại hội), **không phải** vai trò tài khoản đăng nhập. Vai trò tài khoản
 (Admin HO / HR / BTC các ban) nằm ở `users.role` + permission JWT — **khác bảng**.
 
-> ❓ **CẦN CHỦ DỰ ÁN CHỌN LẠI** một trong 10 vai trò trên cho người HO thêm tay. Ba lựa chọn gần
-> nghĩa nhất: **`btc` (Ban tổ chức, id 8)** · **`support` (Hỗ trợ đại hội, id 1)** ·
-> **`guest` (Khách mời, id 6)**.
->
-> **Tài liệu này KHÔNG đề xuất tạo role mới.** Nếu chủ dự án muốn có vai trò riêng (vd "HO/Admin"),
-> đó là **việc phải xin phép trước** vì thêm record vào `roles` ảnh hưởng dropdown vai trò ở màn
-> đăng ký, màu badge trên thẻ, và các báo cáo theo vai trò.
+> ✅ **Vai trò được chọn: `btc` — "Ban tổ chức"** (id **8** ở môi trường hiện tại) — gần nghĩa
+> "BTC / HO" nhất trong 10 vai trò đang có. **Không tạo role mới.**
 
-**Ràng buộc kỹ thuật (áp dụng bất kể chọn gì):**
-- `role_id` **đọc từ cấu hình**, **không hardcode**:
-  - FE Yii: `Yii::app()->params['finalRosterManualRoleId']` (khai báo trong
-    `protected/config/params.php`).
-  - BE Laravel: `config('registration.final_roster_manual_role_id')` + biến `.env`
-    `FINAL_ROSTER_MANUAL_ROLE_ID`; BE lấy giá trị này khi request **không** gửi `role_id`.
-- Modal `_modal_add_person` vẫn có **dropdown vai trò** (nạp từ `roles`) và **chọn sẵn** giá trị
-  mặc định ⇒ HO đổi được từng ca.
-- Nếu param rỗng/không hợp lệ ⇒ BE trả **422 "Vai trò không được để trống"** (đúng hành vi hiện
-  tại của `/api/attendees/store`), FE hiện Toast lỗi rõ ràng, **không** tạo nửa vời.
+#### ⚠️ KHÔNG hardcode `id = 8` — cách resolve an toàn
+
+`roles.id` là auto-increment, **có thể khác nhau giữa các môi trường** (dev / staging / production),
+và bảng này còn có cột `event_id` (migration `2026_05_28_145239_add_event_id_to_roles_table.php`)
+nên cùng một `code` có thể tồn tại nhiều bản ghi theo sự kiện. Hardcode `8` là bẫy lỗi.
+
+**Thứ tự resolve (thực hiện ở BE, dừng ở bước đầu tiên thành công):**
+
+```
+0. Request có gửi role_id  → ưu tiên cao nhất (HO chọn tay ở modal), bỏ qua 1–3
+1. Theo code + đúng sự kiện: roles WHERE code = MANUAL_ROLE_CODE ('btc') AND event_id = {event_id}
+2. Theo code, bản dùng chung: roles WHERE code = MANUAL_ROLE_CODE AND event_id IS NULL
+3. Fallback param cấu hình: config('registration.final_roster_manual_role_id')
+      → verify id này có tồn tại trong `roles` (chưa xoá mềm) trước khi dùng
+```
+
+**Hằng & param cần khai báo:**
+- `MANUAL_ROLE_CODE = 'btc'` — hằng trên service (bản chất nghiệp vụ, ít đổi), override được bằng
+  `.env FINAL_ROSTER_MANUAL_ROLE_CODE`.
+- `FINAL_ROSTER_MANUAL_ROLE_ID` — **fallback id trực tiếp**, dùng khi môi trường nào không có `code`
+  chuẩn. BE đọc qua `config('registration.final_roster_manual_role_id')`.
+- FE Yii khai thêm `Yii::app()->params['finalRosterManualRoleId']` (trong
+  `protected/config/params.php`) để **chọn sẵn** giá trị trong dropdown; nếu rỗng thì FE tự tìm
+  option có `code = 'btc'` trong danh sách `roles` do controller truyền vào.
+
+**Hành vi UI & lỗi:**
+- Modal `_modal_add_person` giữ **dropdown vai trò** (nạp từ `roles`, controller truyền qua
+  `render()`), **chọn sẵn `btc`** ⇒ HO đổi được từng ca.
+- Không resolve được (cả 3 bước thất bại) ⇒ BE trả **422** với thông điệp tiếng Việt
+  *"Không xác định được vai trò mặc định (mã `btc`). Vui lòng chọn vai trò hoặc cấu hình
+  `FINAL_ROSTER_MANUAL_ROLE_ID`."* — **không** tạo nửa vời (đã trong transaction).
+- Ghi log cảnh báo khi phải dùng tới bước 3 (fallback) để phát hiện môi trường thiếu danh mục.
 
 ### 9.5 ⭐ Sinh `badge_number` theo quy ước `MT` + 3 số (quyết định #14)
 
