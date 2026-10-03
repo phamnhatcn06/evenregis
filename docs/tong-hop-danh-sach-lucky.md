@@ -988,9 +988,9 @@ còn lại chỉ là dữ liệu **lịch sử** do nút cũ đã cấp, xử l�
 ### Files cần tạo
 | File | Nội dung |
 |------|----------|
-| `protected/models/FinalAttendeeRosters.php` | `CFormModel`. Static: `getApiDataProvider($params)`, `getFilterOptions($eventId)`, `getStats($eventId)`, `syncViaApi($params)`, `provisionLuckyViaApi($eventId,$propertyId)`, `updateFieldsViaApi($id,$fields)`, `resetFieldsViaApi($id,$fields)`, `storeViaApi($data)`, `mergeViaApi()`, `splitViaApi()`, `deleteViaApi($id)`, `clearConflictViaApi($id)`. Hằng `STATUS_ACTIVE = 1`, `STATUS_MANUAL = 3`, `getStatusLabel()`, `EDITABLE_FIELDS`, `WRITE_BACK_FIELDS`. **Toàn bộ** `ApiClient` nằm ở đây |
-| `protected/components/ApiEndpoints.php` (sửa) | Nhóm `FINAL_ATTENDEE_ROSTER_*`: `LIST`, `FILTERS`, `STATS`, `SYNC`, `PROVISION_LUCKY`, `UPDATE`, `RESET_FIELD`, `STORE`, `MERGE`, `SPLIT`, `DESTROY`, `CLEAR_CONFLICT` |
-| `protected/modules/admin/controllers/FinalAttendeeRostersController.php` | `actionAdmin`, `actionSyncPreview` (JSON), `actionSync`, `actionGenLucky`, `actionUpdateField` (JSON), `actionResetField` (JSON), `actionCreate`, `actionMerge`, `actionSplit`, `actionDelete`, `actionClearConflict`, `actionExport` |
+| `protected/models/FinalAttendeeRosters.php` | `CFormModel`. Static: `getApiDataProvider($params)`, `getFilterOptions($eventId)`, `getStats($eventId)`, `syncViaApi($params)`, `provisionLuckyViaApi($eventId,$propertyId)`, `updateFieldsViaApi($id,$fields)`, `resetFieldsViaApi($id,$fields)`, `storeViaApi($data)`, `mergeViaApi()`, `splitViaApi()`, `deleteViaApi($id)`, `clearConflictViaApi($id)`, `getAudit($eventId, $scope)`. Hằng `STATUS_ACTIVE = 1`, `STATUS_MANUAL = 3`, `getStatusLabel()`, `EDITABLE_FIELDS`, `WRITE_BACK_FIELDS`. **Toàn bộ** `ApiClient` nằm ở đây |
+| `protected/components/ApiEndpoints.php` (sửa) | Nhóm `FINAL_ATTENDEE_ROSTER_*`: `LIST`, `FILTERS`, `STATS`, `SYNC`, `PROVISION_LUCKY`, `UPDATE`, `RESET_FIELD`, `STORE`, `MERGE`, `SPLIT`, `DESTROY`, `CLEAR_CONFLICT`, `AUDIT` |
+| `protected/modules/admin/controllers/FinalAttendeeRostersController.php` | `actionAdmin`, `actionSyncPreview` (JSON), `actionSync`, `actionGenLucky`, `actionUpdateField` (JSON), `actionResetField` (JSON), `actionCreate`, `actionMerge`, `actionSplit`, `actionDelete`, `actionClearConflict`, `actionAudit` (JSON, chỉ đọc), `actionExport` |
 | `.../views/finalAttendeeRosters/admin.php` | View chính |
 | `.../views/finalAttendeeRosters/_filters.php` | Partial bộ lọc |
 | `.../views/finalAttendeeRosters/_modal_sync.php` | Modal đồng bộ (chọn phạm vi + **bảng kết quả dry-run** + nút "Ghi thật") |
@@ -1023,6 +1023,12 @@ còn lại chỉ là dữ liệu **lịch sử** do nút cũ đã cấp, xử l�
   định danh `DHMT…`** vừa cấp để HO ghi lại ngay.
 - Nút **"Xuất Excel"**.
 - Dòng phụ: *"Đồng bộ lần cuối: 03/10/2026 14:22"*; nếu > 24h ⇒ badge vàng "Dữ liệu có thể đã cũ".
+- **Hai badge đối soát** (nguồn: `GET /api/final-attendee-rosters/audit`, §8.12 — gọi cùng lúc với
+  `stats` khi nạp trang):
+  - **"Đã dùng MT: 12/999"** — số thẻ `MT` đã dùng / dung lượng dải; **đỏ** nếu còn < 50 suất;
+    tooltip hiện `next_badge_number`. Nếu `invalid_format` không rỗng ⇒ badge đỏ kèm icon ⚠ và
+    tooltip *"Có N số thẻ MT sai format, có thể làm lệch bộ sinh — cần xử lý"*.
+  - **"Xung đột mã lucky: N"** — **đỏ** nếu `N > 0`; click mở danh sách người bị ảnh hưởng (§6.4).
 
 **Dải thống kê** (6 thẻ): Tổng số người · Đã có mã lucky · Chưa có mã lucky · Đã đặt PIN ·
 Đã sửa tay · **Xung đột mã** (đỏ nếu > 0).
