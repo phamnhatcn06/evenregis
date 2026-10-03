@@ -10,6 +10,12 @@ class FinalAttendeeRostersController extends AdminController
     /** Số dòng mỗi trang cho phép chọn */
     const PAGE_SIZES = array(25, 50, 100);
 
+    /** Số dòng mỗi lần gọi API khi xuất Excel */
+    const EXPORT_CHUNK_SIZE = 500;
+
+    /** Trần số dòng xuất ra, tránh một bộ lọc quá rộng làm hết bộ nhớ */
+    const EXPORT_MAX_ROWS = 10000;
+
     public function actionAdmin()
     {
         if (!PermissionHelper::can('finalattendeerosters', 'read')) {
