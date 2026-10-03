@@ -102,6 +102,32 @@ class EmailHelper
      * @param array $attInfo Thông tin người tham dự lấy từ Attendees::getByRegistrationId
      * @return string Đường dẫn/URL ảnh, hoặc chuỗi rỗng nếu không có
      */
+    /**
+     * Chức danh để hiển thị trong email: ưu tiên giá trị do đơn vị/HO nhập (`position`), sau đó
+     * mới tới chức danh gốc từ SMILE (`position_name`).
+     *
+     * Trước đây email đọc `position_name` trước, nên chức danh HO sửa tay ở màn Tổng hợp VCK
+     * không bao giờ hiện ra — trái với quy tắc hiển thị 3 lớp của hệ thống
+     * (sửa tay > đơn vị nhập > gốc SMILE).
+     *
+     * @param array|null $info Mảng thông tin attendee
+     * @return string
+     */
+    private static function resolveAttendeePosition($info)
+    {
+        if (empty($info) || !is_array($info)) {
+            return '';
+        }
+
+        foreach (array('position', 'position_name') as $field) {
+            if (isset($info[$field]) && trim((string) $info[$field]) !== '') {
+                return (string) $info[$field];
+            }
+        }
+
+        return '';
+    }
+
     private static function resolveAttendeePhoto($attInfo)
     {
         if (empty($attInfo) || !is_array($attInfo)) {
@@ -294,7 +320,7 @@ class EmailHelper
                             'attendee_name' => isset($fa['full_name']) ? $fa['full_name'] : '',
                             'staff_code' => isset($fa['staff_code']) ? $fa['staff_code'] : '',
                             'gender' => isset($fa['gender']) ? $fa['gender'] : null,
-                            'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+                            'position_name' => self::resolveAttendeePosition($fa),
                             'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
                             'start_working_date' => isset($fa['end_starting_date']) ? $fa['end_starting_date'] : '',
                             'photo_path' => self::resolveAttendeePhoto($fa),
@@ -324,7 +350,7 @@ class EmailHelper
                             'staff_code' => isset($fa['staff_code']) ? $fa['staff_code'] : '',
                             'candidate_number' => isset($fa['candidate_number']) ? $fa['candidate_number'] : '',
                             'contest_name' => isset($finalBeautyContents[$contestKey]['contest_name']) ? $finalBeautyContents[$contestKey]['contest_name'] : '',
-                            'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+                            'position_name' => self::resolveAttendeePosition($fa),
                             'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
                             'start_working_date' => isset($fa['end_starting_date']) ? $fa['end_starting_date'] : '',
                             'photo_path' => self::resolveAttendeePhoto($fa),
@@ -338,7 +364,7 @@ class EmailHelper
                                 'attendee_name' => isset($fa['full_name']) ? $fa['full_name'] : '',
                                 'staff_code' => isset($fa['staff_code']) ? $fa['staff_code'] : '',
                                 'gender' => isset($fa['gender']) ? $fa['gender'] : null,
-                                'position_name' => isset($fa['position_name']) ? $fa['position_name'] : (isset($fa['position']) ? $fa['position'] : ''),
+                                'position_name' => self::resolveAttendeePosition($fa),
                                 'division_name' => isset($fa['division_name']) ? $fa['division_name'] : '',
                                 'start_working_date' => isset($fa['end_starting_date']) ? $fa['end_starting_date'] : '',
                                 'photo_path' => self::resolveAttendeePhoto($fa),
@@ -439,7 +465,7 @@ class EmailHelper
                     'attendee_name' => isset($attendeeInfo['full_name']) ? $attendeeInfo['full_name'] : '',
                     'staff_code' => isset($attendeeInfo['staff_code']) ? $attendeeInfo['staff_code'] : '',
                     'gender' => isset($attendeeInfo['gender']) ? $attendeeInfo['gender'] : null,
-                    'position_name' => isset($attendeeInfo['position_name']) ? $attendeeInfo['position_name'] : '',
+                    'position_name' => self::resolveAttendeePosition($attendeeInfo),
                     'division_name' => isset($attendeeInfo['division_name']) ? $attendeeInfo['division_name'] : '',
                     'start_working_date' => isset($attendeeInfo['end_starting_date']) ? $attendeeInfo['end_starting_date'] : '',
                     'photo_path' => self::resolveAttendeePhoto($attendeeInfo),
@@ -583,7 +609,7 @@ class EmailHelper
                         $staffCode = $attInfo['staff_code'];
                     }
 
-                    $positionName = isset($attInfo['position_name']) ? $attInfo['position_name'] : '';
+                    $positionName = self::resolveAttendeePosition($attInfo);
                     if (empty($positionName)) {
                         $positionName = (string)($memberVal('attendee_position') ?: $memberVal('position'));
                     }
@@ -736,7 +762,7 @@ class EmailHelper
                             'attendee_name' => !empty($info['full_name']) ? $info['full_name'] : (!empty($tmName) ? $tmName : ('#' . $aid)),
                             'staff_code' => isset($info['staff_code']) ? $info['staff_code'] : '',
                             'gender' => isset($info['gender']) ? $info['gender'] : (isset($tm->gender) ? $tm->gender : null),
-                            'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
+                            'position_name' => self::resolveAttendeePosition($info),
                             'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
                             'start_working_date' => isset($info['end_starting_date']) ? $info['end_starting_date'] : '',
                             'photo_path' => self::resolveAttendeePhoto($info),
@@ -791,7 +817,7 @@ class EmailHelper
                     'staff_code' => isset($info['staff_code']) ? $info['staff_code'] : '',
                     'candidate_number' => $c->candidate_number,
                     'contest_name' => $c->contest_name,
-                    'position_name' => isset($info['position_name']) ? $info['position_name'] : '',
+                    'position_name' => self::resolveAttendeePosition($info),
                     'division_name' => isset($info['division_name']) ? $info['division_name'] : '',
                     'start_working_date' => isset($info['end_starting_date']) ? $info['end_starting_date'] : '',
                     'photo_path' => self::resolveAttendeePhoto($info),
