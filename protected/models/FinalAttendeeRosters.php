@@ -369,6 +369,32 @@ class FinalAttendeeRosters extends CFormModel
     }
 
     /**
+     * Lấy đúng một trang dữ liệu, chỉ định trang tường minh.
+     *
+     * Không dùng ApiDataProvider cho việc này: `CDataProvider::getPagination()` gọi
+     * `getTotalItemCount()` nên nạp luôn trang 1 và cache lại, khiến mọi lần `setCurrentPage()`
+     * sau đó không có tác dụng — vòng lặp xuất Excel sẽ lấy mãi một trang.
+     *
+     * @param array $params Tham số lọc
+     * @param int   $page    Trang, bắt đầu từ 1
+     * @param int   $perPage
+     * @return array Danh sách mảng thuộc tính
+     */
+    public static function fetchPage($params, $page = 1, $perPage = 500)
+    {
+        $result = ApiClient::get(ApiEndpoints::FINAL_ATTENDEE_ROSTER_LIST, array_merge($params, array(
+            'page'     => (int) $page,
+            'per_page' => (int) $perPage,
+        )));
+
+        if ($result['success'] && isset($result['data']['data']) && is_array($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+
+        return array();
+    }
+
+    /**
      * HO thêm người thủ công. BE tạo kèm bản ghi attendee tối thiểu, cấp luôn mã lucky và số thẻ.
      */
     public static function storeViaApi($data)

@@ -33,6 +33,8 @@ echo "=== Lấy dữ liệu xuất ===\n";
 $_GET = array('event_id' => 3, 'period_id' => 4);
 $params = $buildParams->invoke($controller, 3, 4);
 $all = $fetch->invoke($controller, $params);
+echo '  Số dòng lấy được: ' . count($all) . "
+";
 $ok('lấy đủ 619 người (chia trang 500/lần)', count($all) === 619);
 $ok('dòng là mảng thuộc tính', is_array($all[0]) && isset($all[0]['full_name']));
 $ok('có mã lucky', !empty($all[0]['lucky_number']));
