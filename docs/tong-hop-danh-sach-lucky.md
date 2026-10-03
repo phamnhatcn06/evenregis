@@ -1211,17 +1211,36 @@ sequenceDiagram
 
 ## 14. Câu hỏi còn tồn
 
-> Đã chốt và **xoá khỏi danh sách**: nhóm A #1 (ca 2 mã), #2 (người thủ công đăng nhập), #3 (sửa tay
-> `lucky_number`); nhóm B #6 (người bị huỷ), #8 (write-back), #9 (phạm vi chức danh); nhóm C #16
-> (tên bảng). Toàn bộ nằm ở **§0**.
+> Đã chốt và **xoá khỏi danh sách**: ca 2 mã, người thủ công đăng nhập, sửa tay `lucky_number`,
+> người bị huỷ, write-back, phạm vi chức danh, tên bảng, **ẩn nút cấp mã cũ**, **quy ước
+> `badge_number`**. Toàn bộ nằm ở **§0**.
+
+### 🔴 Nhóm 0 — CHẶN slice S10, cần trả lời trước khi build
+1. **`role_id` cho người HO thêm tay — chọn lại vai trò nào?**
+   Chủ dự án chốt "admin" nhưng bảng `roles` **không có** record đó (§9.3 — đã kiểm chứng migration,
+   không có seeder, dump chỉ có 10 record). Vui lòng chọn **một** trong danh mục hiện có:
+   - **`btc` — Ban tổ chức** (id 8) — gần nghĩa "BTC/HO" nhất
+   - **`support` — Hỗ trợ đại hội** (id 1)
+   - **`guest` — Khách mời** (id 6)
+   - *(hoặc một trong 7 vai trò còn lại: `sports`, `competition`, `director`, `deputy_director`,
+     `team_lead`, `miss`, `talent`)*
+
+   Nếu muốn **thêm vai trò mới** vào `roles` ⇒ cần **xin phép rõ ràng**, vì ảnh hưởng dropdown vai
+   trò ở màn đăng ký, màu badge trên thẻ và các báo cáo theo vai trò. Tài liệu này không tự đề xuất.
+2. **`badge_number`: scope đánh số** — chọn **phương án B** (khuyến nghị: `MT001`→`MT999` duy nhất
+   toàn hệ thống, không lặp) hay **phương án A** (mỗi sự kiện đánh lại từ `MT001`, phải thêm hậu tố
+   event vào chuỗi, **+2h**)? Xem §9.4.
+3. **Đối soát tiền tố `MT`:** cần ai chạy
+   `SELECT badge_number FROM attendees WHERE badge_number LIKE 'MT%'` trên DB thật để xác nhận không
+   có dữ liệu cũ đụng tiền tố? (Code hiện **không có** bộ sinh `badge_number` nào ⇒ gần như chắc
+   chắn rỗng, nhưng cần xác nhận.)
 
 ### Nhóm A — mã lucky
-1. **Giữ 6 chữ số** cho mã lucky (ràng buộc BIB `run_events.code + lucky_number`) — xác nhận?
-2. Sau khi bảng mới lên production, có **ẩn/vô hiệu nút "Cấp số lucky" cũ** ở
-   `admin/runRegistrations/admin` không? (Đề xuất: ẩn, vì nút cũ cấp mã theo bản ghi, không gộp người
-   ⇒ sẽ sinh thêm ca "một người 2 mã".)
-3. **Quy trình thông báo thu hồi định danh** cho người bị NULL mã (ca §6.4): ai thông báo, bằng kênh
+4. **Giữ 6 chữ số** cho mã lucky (ràng buộc BIB `run_events.code + lucky_number`) — xác nhận?
+5. **Quy trình thông báo thu hồi định danh** cho người bị NULL mã (ca §6.4): ai thông báo, bằng kênh
    nào? (Màn hình đã có badge + báo cáo; cần người chịu trách nhiệm.)
+6. Command `run:gen-lucky` cũ: đồng ý **giữ lại nhưng thêm cảnh báo + `confirm()`** (không xoá, để
+   còn đường cứu hộ) — xác nhận? (§9.5)
 
 ### Nhóm B — vòng đời & lan toả dữ liệu
 4. **`full_name` có write-back về `attendees` không?** (Đề xuất: **tạm KHÔNG** —
