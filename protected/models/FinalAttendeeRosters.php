@@ -334,6 +334,41 @@ class FinalAttendeeRosters extends CFormModel
     }
 
     /**
+     * Cấp mã lucky cho những người chưa có mã. Không bao giờ đổi mã đã cấp.
+     */
+    public static function provisionLuckyViaApi($eventId, $propertyId = null)
+    {
+        $ssoUser = AuthHandler::getUser();
+
+        return ApiClient::post(ApiEndpoints::FINAL_ATTENDEE_ROSTER_PROVISION_LUCKY, array(
+            'event_id'    => $eventId,
+            'property_id' => $propertyId,
+            'run_by'      => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
+    /**
+     * Đối soát dải số thẻ MT và mã lucky. Chỉ đọc.
+     */
+    public static function getAudit($eventId, $scope = 'all')
+    {
+        if (empty($eventId)) {
+            return null;
+        }
+
+        $result = ApiClient::get(ApiEndpoints::FINAL_ATTENDEE_ROSTER_AUDIT, array(
+            'event_id' => $eventId,
+            'scope'    => $scope,
+        ));
+
+        if ($result['success'] && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+
+        return null;
+    }
+
+    /**
      * Chuyển các dòng dữ liệu API thành model để view dùng.
      */
     public static function createFromApiList($rows)

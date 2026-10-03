@@ -29,6 +29,7 @@ class FinalAttendeeRostersController extends AdminController
 
         $dataProvider  = null;
         $stats         = null;
+        $audit         = null;
         $filterOptions = array('properties' => array(), 'divisions' => array(), 'departments' => array());
         $lastSyncedAt  = null;
 
@@ -47,6 +48,7 @@ class FinalAttendeeRostersController extends AdminController
             );
 
             $lastSyncedAt = $this->resolveLastSyncedAt($dataProvider);
+            $audit        = FinalAttendeeRosters::getAudit($eventId);
         }
 
         $this->render('admin', array(
@@ -58,6 +60,7 @@ class FinalAttendeeRostersController extends AdminController
             'stats'         => $stats,
             'filterOptions' => $filterOptions,
             'lastSyncedAt'  => $lastSyncedAt,
+            'audit'         => $audit,
             'pageSize'      => $this->resolvePageSize(),
             'pageSizes'     => self::PAGE_SIZES,
             'filters'       => $this->getFilterValues(),
@@ -164,6 +167,80 @@ class FinalAttendeeRostersController extends AdminController
             'message' => $message,
             'report'  => $report,
         ));
+    }
+
+    /**
+     * Cấp mã lucky cho những người chưa có mã (JSON).
+     */
+    public function actionGenLucky()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            $this->renderJson(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'), 400);
+            return;
+        }
+
+        if (!PermissionHelper::can('finalattendeerosters', 'create')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền cấp mã lucky.'), 403);
+            return;
+        }
+
+        $request = Yii::app()->request;
+        $eventId = (int) $request->getPost('event_id');
+
+        if (!$eventId) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn sự kiện.'), 422);
+            return;
+        }
+
+        $propertyId = $request->getPost('property_id');
+        $propertyId = $propertyId !== null && $propertyId !== '' ? (int) $propertyId : null;
+
+        $result = FinalAttendeeRosters::provisionLuckyViaApi($eventId, $propertyId);
+
+        if (!$result['success']) {
+            $status = isset($result['code']) && (int) $result['code'] >= 400 ? (int) $result['code'] : 500;
+            $this->renderJson(array(
+                'success' => false,
+                'message' => $result['error'] ?: 'Không thể cấp mã lucky.',
+            ), $status);
+            return;
+        }
+
+        $this->renderJson(array(
+            'success' => true,
+            'message' => isset($result['data']['message']) ? $result['data']['message'] : 'Đã cấp mã lucky.',
+            'report'  => isset($result['data']['data']) ? $result['data']['data'] : array(),
+        ));
+    }
+
+    /**
+     * Đối soát dải số thẻ và mã lucky (JSON, chỉ đọc).
+     */
+    public function actionAudit()
+    {
+        if (!PermissionHelper::can('finalattendeerosters', 'read')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền xem đối soát.'), 403);
+            return;
+        }
+
+        $eventId = $this->getIntParam('event_id');
+        if (!$eventId) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn sự kiện.'), 422);
+            return;
+        }
+
+        $scope = isset($_GET['scope']) && in_array($_GET['scope'], array('lucky', 'badge', 'all'), true)
+            ? $_GET['scope']
+            : 'all';
+
+        $data = FinalAttendeeRosters::getAudit($eventId, $scope);
+
+        if ($data === null) {
+            $this->renderJson(array('success' => false, 'message' => 'Không lấy được dữ liệu đối soát.'), 502);
+            return;
+        }
+
+        $this->renderJson(array('success' => true, 'audit' => $data));
     }
 
     /**
