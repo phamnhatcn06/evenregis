@@ -164,6 +164,54 @@ class MenuHelper
     }
 
     /**
+     * Thêm mục "Tổng hợp VCK" vào danh sách quyền menu.
+     *
+     * Portal chưa phát mục menu cho màn hình này, nhưng quyền CRUD đã được
+     * AuthHandler kế thừa từ quyền duyệt/đăng ký. Vì vậy mục menu được dựng
+     * tại đây và đặt cùng nhóm với quyền mà nó kế thừa, để không phải sửa Portal.
+     *
+     * @param array $permissions danh sách quyền menu lấy từ SSO
+     * @return array
+     */
+    private static function appendFinalRosterItem($permissions)
+    {
+        $controller = 'finalAttendeeRosters';
+
+        // Portal đã phát mục này thì không dựng thêm, tránh trùng.
+        foreach ($permissions as $perm) {
+            if (isset($perm['controller']) && strtolower($perm['controller']) === strtolower($controller)) {
+                return $permissions;
+            }
+        }
+
+        if (!PermissionHelper::canRead($controller)) {
+            return $permissions;
+        }
+
+        // Đặt cùng nhóm với quyền gốc để menu không mọc ra một nhóm lạ.
+        $root = 'events';
+        foreach (array('approveregistrations', 'registrations') as $parent) {
+            foreach ($permissions as $perm) {
+                if (isset($perm['controller']) && strtolower($perm['controller']) === $parent) {
+                    $root = isset($perm['root']) ? $perm['root'] : $root;
+                    break 2;
+                }
+            }
+        }
+
+        $permissions[] = array(
+            'name' => 'Tổng hợp VCK',
+            'module' => 'admin',
+            'controller' => $controller,
+            'action' => '*',
+            'root' => $root,
+            'sort' => 35,
+        );
+
+        return $permissions;
+    }
+
+    /**
      * Build single menu item from permission
      */
     private static function buildMenuItem($perm)
