@@ -32,6 +32,7 @@ Yii::app()->clientScript->registerScriptFile(
 
 $canCreate = PermissionHelper::can('finalattendeerosters', 'create');
 $canUpdate = PermissionHelper::can('finalattendeerosters', 'update');
+$canDelete = PermissionHelper::can('finalattendeerosters', 'delete');
 
 /** Dữ liệu cũ sau 24h thì nhắc HO đồng bộ lại */
 $isStale = $lastSyncedAt && (time() - $lastSyncedAt) > 86400;
@@ -46,6 +47,12 @@ $flashMessages = Yii::app()->user->getFlashes();
      data-filter-options-url="<?php echo $this->createUrl('filterOptions'); ?>"
      data-update-field-url="<?php echo $this->createUrl('updateField'); ?>"
      data-reset-field-url="<?php echo $this->createUrl('resetField'); ?>"
+     data-merge-url="<?php echo $this->createUrl('merge'); ?>"
+     data-split-url="<?php echo $this->createUrl('split'); ?>"
+     data-delete-url="<?php echo $this->createUrl('delete'); ?>"
+     data-clear-conflict-url="<?php echo $this->createUrl('clearConflict'); ?>"
+     data-list-url="<?php echo $this->createUrl('admin'); ?>"
+     data-search-url="<?php echo $this->createUrl('filterOptions'); ?>"
      data-can-update="<?php echo $canUpdate ? 1 : 0; ?>"
      data-field-labels="<?php echo CHtml::encode(CJSON::encode(FinalAttendeeRosters::editableFields())); ?>"
      data-flash="<?php echo CHtml::encode(CJSON::encode($flashMessages)); ?>"></div>
@@ -354,6 +361,11 @@ $flashMessages = Yii::app()->user->getFlashes();
                                         <span class="badge bg-danger" title="<?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>">
                                             <i class="fa fa-exclamation-triangle me-1"></i><?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>
                                         </span>
+                                        <?php if ($canUpdate): ?>
+                                            <button type="button" class="btn btn-link btn-sm p-0 ms-1 js-clear-conflict"
+                                                    data-roster-id="<?php echo (int) $row->id; ?>"
+                                                    title="Đánh dấu đã xử lý xung đột này">Đã xử lý</button>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                             </td>
@@ -386,6 +398,32 @@ $flashMessages = Yii::app()->user->getFlashes();
                                         title="Sửa thông tin người này">
                                     <i class="fa fa-pencil"></i>
                                 </button>
+
+                                <?php if (!$isWithdrawn): ?>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary js-merge-split"
+                                            data-roster-id="<?php echo (int) $row->id; ?>"
+                                            data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                            data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
+                                            data-staff-code="<?php echo CHtml::encode($row->staff_code); ?>"
+                                            data-attendee-ids="<?php echo CHtml::encode(CJSON::encode(
+                                                is_array($row->source_attendee_ids) ? $row->source_attendee_ids : array()
+                                            )); ?>"
+                                            title="Gộp dòng hoặc tách người">
+                                        <i class="fa fa-code-fork"></i>
+                                    </button>
+                                <?php endif; ?>
+
+                                <?php if ($canDelete && !$isWithdrawn): ?>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger js-withdraw"
+                                            data-roster-id="<?php echo (int) $row->id; ?>"
+                                            data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                            data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
+                                            title="Huỷ tư cách người này">
+                                        <i class="fa fa-user-times"></i>
+                                    </button>
+                                <?php endif; ?>
                             </td>
                             <?php endif; ?>
                         </tr>
@@ -421,6 +459,7 @@ $flashMessages = Yii::app()->user->getFlashes();
 
     <?php if ($canUpdate): ?>
         <?php $this->renderPartial('_modal_edit_row'); ?>
+        <?php $this->renderPartial('_modal_merge_split'); ?>
     <?php endif; ?>
 
     <?php if ($canCreate): ?>

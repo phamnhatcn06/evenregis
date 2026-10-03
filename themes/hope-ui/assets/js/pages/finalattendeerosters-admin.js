@@ -22,7 +22,277 @@
         bindGenLuckyModal();
         bindLuckyConflictBadge();
         bindAddPersonModal();
+        bindWithdraw(config);
+        bindClearConflict(config);
+        bindMergeSplitModal(config);
     });
+
+    /** Huỷ tư cách — luôn hỏi lại, và nói rõ mã lucky sẽ bị khoá chứ không mất. */
+    function bindWithdraw(config) {
+        var url = config.getAttribute('data-delete-url');
+
+        document.querySelectorAll('.js-withdraw').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var rosterId = button.getAttribute('data-roster-id');
+                var fullName = button.getAttribute('data-full-name');
+                var lucky = button.getAttribute('data-lucky');
+
+                var send = function () {
+                    var body = new FormData();
+                    body.append('id', rosterId);
+                    body.append('also_deactivate_attendee', 1);
+
+                    postWithButton(url, body, button, function (data) {
+                        if (typeof Toast !== 'undefined') {
+                            Toast.success(data.message);
+                        }
+                        window.setTimeout(function () { window.location.reload(); }, 800);
+                    });
+                };
+
+                if (typeof Swal === 'undefined') {
+                    send();
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Huỷ tư cách người này?',
+                    html: '<p style="text-align:left"><strong>' + escapeHtml(fullName) + '</strong>'
+                        + ' sẽ bị đưa khỏi danh sách và không đăng nhập được cổng chạy.</p>'
+                        + (lucky
+                            ? '<p style="text-align:left">Mã lucky <strong>' + escapeHtml(lucky)
+                                + '</strong> được giữ lại và <strong>không cấp cho người khác</strong>.</p>'
+                            : ''),
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Huỷ tư cách',
+                    cancelButtonText: 'Không'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        send();
+                    }
+                });
+            });
+        });
+    }
+
+    /** Đánh dấu xung đột đã xử lý. */
+    function bindClearConflict(config) {
+        var url = config.getAttribute('data-clear-conflict-url');
+
+        document.querySelectorAll('.js-clear-conflict').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var body = new FormData();
+                body.append('id', button.getAttribute('data-roster-id'));
+
+                postWithButton(url, body, button, function (data) {
+                    if (typeof Toast !== 'undefined') {
+                        Toast.success(data.message);
+                    }
+                    window.setTimeout(function () { window.location.reload(); }, 600);
+                });
+            });
+        });
+    }
+
+    /** Modal gộp dòng / tách người. */
+    function bindMergeSplitModal(config) {
+        var modalElement = document.getElementById('modal_merge_split');
+        if (!modalElement) {
+            return;
+        }
+
+        var mergeForm = document.getElementById('form_merge');
+        var splitForm = document.getElementById('form_split');
+        var mergeButton = document.getElementById('btn_merge_submit');
+        var splitButton = document.getElementById('btn_split_submit');
+        var searchInput = document.getElementById('merge_search');
+        var results = document.getElementById('merge_results');
+        var current = null;
+
+        document.querySelectorAll('.js-merge-split').forEach(function (button) {
+            button.addEventListener('click', function () {
+                current = {
+                    id: button.getAttribute('data-roster-id'),
+                    fullName: button.getAttribute('data-full-name'),
+                    lucky: button.getAttribute('data-lucky'),
+                    staffCode: button.getAttribute('data-staff-code'),
+                    attendeeIds: parseJson(button.getAttribute('data-attendee-ids')) || []
+                };
+
+                fillMergeSplit(current);
+                new bootstrap.Modal(modalElement).show();
+            });
+        });
+
+        // Đổi tab thì đổi nút hành động, để HO không bấm nhầm thao tác ngược lại.
+        modalElement.querySelectorAll('[data-bs-toggle="tab"]').forEach(function (tab) {
+            tab.addEventListener('shown.bs.tab', function (event) {
+                var isSplit = event.target.getAttribute('data-bs-target') === '#tab_split';
+                mergeButton.classList.toggle('d-none', isSplit);
+                splitButton.classList.toggle('d-none', !isSplit);
+            });
+        });
+
+        if (searchInput) {
+            var timer = null;
+            searchInput.addEventListener('input', function () {
+                window.clearTimeout(timer);
+                timer = window.setTimeout(function () {
+                    searchMergeCandidates(config, searchInput.value, current, results);
+                }, 350);
+            });
+        }
+
+        mergeButton.addEventListener('click', function () {
+            var mergeId = document.getElementById('merge_merge_id').value;
+            if (!mergeId) {
+                if (typeof Toast !== 'undefined') {
+                    Toast.error('Hãy tìm và chọn dòng cần gộp.');
+                }
+                return;
+            }
+
+            postWithButton(mergeForm.action, new FormData(mergeForm), mergeButton, function (data) {
+                closeModal(modalElement);
+                if (typeof Toast !== 'undefined') {
+                    Toast.success(data.message);
+                }
+                window.setTimeout(function () { window.location.reload(); }, 900);
+            });
+        });
+
+        splitButton.addEventListener('click', function () {
+            var checked = splitForm.querySelectorAll('input[name="attendee_ids_to_split[]"]:checked');
+            if (checked.length === 0) {
+                if (typeof Toast !== 'undefined') {
+                    Toast.error('Hãy chọn bản ghi cần tách ra.');
+                }
+                return;
+            }
+
+            var staffCode = document.getElementById('split_staff_code').value.trim();
+            var idCard = document.getElementById('split_id_card').value.trim();
+            if (!staffCode && !idCard) {
+                if (typeof Toast !== 'undefined') {
+                    Toast.error('Hãy điền mã nhân viên hoặc số CCCD cho người được tách.');
+                }
+                return;
+            }
+
+            postWithButton(splitForm.action, new FormData(splitForm), splitButton, function (data) {
+                closeModal(modalElement);
+                if (typeof Toast !== 'undefined') {
+                    Toast.success(data.message);
+                }
+                window.setTimeout(function () { window.location.reload(); }, 900);
+            });
+        });
+    }
+
+    function fillMergeSplit(row) {
+        setText('ms_row_name', row.fullName);
+        document.getElementById('merge_keep_id').value = row.id;
+        document.getElementById('merge_keep_label').value = row.fullName
+            + (row.lucky ? ' — mã ' + row.lucky : ' — chưa có mã');
+        document.getElementById('split_row_id').value = row.id;
+        document.getElementById('merge_merge_id').value = '';
+        document.getElementById('merge_search').value = '';
+        toggle('merge_selected', false);
+        toggle('merge_results', false);
+        document.getElementById('split_staff_code').value = '';
+        document.getElementById('split_id_card').value = '';
+
+        var container = document.getElementById('split_attendees');
+        container.innerHTML = '';
+
+        if (!row.attendeeIds || row.attendeeIds.length < 2) {
+            container.innerHTML = '<div class="text-muted small">'
+                + 'Dòng này chỉ gộp từ một bản ghi nên không có gì để tách.</div>';
+            return;
+        }
+
+        row.attendeeIds.forEach(function (id, index) {
+            var wrapper = document.createElement('div');
+            wrapper.className = 'form-check';
+            wrapper.innerHTML = '<input class="form-check-input" type="checkbox"'
+                + ' name="attendee_ids_to_split[]" value="' + id + '" id="split_att_' + id + '">'
+                + '<label class="form-check-label" for="split_att_' + id + '">'
+                + 'Bản ghi #' + id + (index === 0 ? ' (bản đại diện)' : '') + '</label>';
+            container.appendChild(wrapper);
+        });
+    }
+
+    /** Tìm dòng để gộp, dùng chính danh sách tổng hợp đang có. */
+    function searchMergeCandidates(config, keyword, current, results) {
+        if (!keyword || keyword.trim().length < 2 || !current) {
+            results.classList.add('d-none');
+            return;
+        }
+
+        var url = config.getAttribute('data-list-url');
+        var params = 'event_id=' + encodeURIComponent(config.getAttribute('data-event-id'))
+            + '&period_id=' + encodeURIComponent(config.getAttribute('data-period-id'))
+            + '&keyword=' + encodeURIComponent(keyword.trim())
+            + '&per_page=25&ajax_search=1';
+
+        fetch(url + (url.indexOf('?') === -1 ? '?' : '&') + params, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                var rows = (data && data.rows) || [];
+                results.innerHTML = '';
+
+                var candidates = rows.filter(function (item) {
+                    return String(item.id) !== String(current.id);
+                });
+
+                if (candidates.length === 0) {
+                    results.innerHTML = '<div class="list-group-item text-muted small">'
+                        + 'Không tìm thấy dòng nào khác khớp từ khoá.</div>';
+                    results.classList.remove('d-none');
+                    return;
+                }
+
+                candidates.forEach(function (item) {
+                    var button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'list-group-item list-group-item-action';
+                    button.innerHTML = escapeHtml(item.full_name)
+                        + (item.staff_code ? ' <span class="text-muted">(' + escapeHtml(item.staff_code) + ')</span>' : '')
+                        + (item.lucky_number
+                            ? ' <span class="badge bg-secondary">mã ' + escapeHtml(item.lucky_number) + '</span>'
+                            : ' <span class="badge bg-light text-dark">chưa có mã</span>');
+
+                    button.addEventListener('click', function () {
+                        document.getElementById('merge_merge_id').value = item.id;
+                        setText('merge_selected_name', item.full_name);
+                        toggle('merge_selected', true);
+                        results.classList.add('d-none');
+                    });
+
+                    results.appendChild(button);
+                });
+
+                results.classList.remove('d-none');
+            })
+            .catch(function () {
+                if (typeof Toast !== 'undefined') {
+                    Toast.error('Không tìm được danh sách để gộp.');
+                }
+            });
+    }
+
+    function closeModal(element) {
+        var modal = bootstrap.Modal.getInstance(element);
+        if (modal) {
+            modal.hide();
+        }
+    }
 
     /**
      * Modal thêm người thủ công.
