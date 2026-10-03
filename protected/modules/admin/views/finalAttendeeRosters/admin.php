@@ -11,6 +11,7 @@
  * @var array|null $stats
  * @var array $filterOptions
  * @var int|null $lastSyncedAt
+ * @var array|null $audit
  * @var int $pageSize
  * @var array $pageSizes
  * @var array $filters
@@ -82,10 +83,65 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 data-bs-toggle="modal" data-bs-target="#modal_sync">
                             <i class="fa fa-refresh me-1"></i>Đồng bộ từ danh sách VCK
                         </button>
+                        <button type="button" class="btn btn-warning"
+                                data-bs-toggle="modal" data-bs-target="#modal_gen_lucky"
+                                title="Chỉ cấp cho người chưa có mã. Mã đã cấp không bao giờ đổi.">
+                            <i class="fa fa-ticket me-1"></i>Cấp mã lucky
+                            <?php if ($stats && $stats['without_lucky'] > 0): ?>
+                                <span class="badge bg-danger ms-1"><?php echo number_format($stats['without_lucky']); ?></span>
+                            <?php endif; ?>
+                        </button>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
         </div>
+
+        <?php if ($audit !== null): ?>
+            <div class="mt-2">
+                <?php
+                $badge      = isset($audit['badge']) ? $audit['badge'] : null;
+                $luckyAudit = isset($audit['lucky']) ? $audit['lucky'] : null;
+                ?>
+
+                <?php if ($badge !== null): ?>
+                    <?php
+                    $invalidCount = count($badge['invalid_format']);
+                    $badgeClass   = ($invalidCount > 0 || $badge['remaining'] < 50)
+                        ? 'bg-danger'
+                        : 'bg-secondary';
+                    $badgeTitle   = $invalidCount > 0
+                        ? 'Có ' . $invalidCount . ' số thẻ ' . $badge['prefix']
+                            . ' sai format, có thể làm lệch bộ sinh — cần xử lý'
+                        : 'Số thẻ kế tiếp sẽ cấp: ' . ($badge['next_badge_number'] ?: 'hết dải');
+                    ?>
+                    <span class="badge <?php echo $badgeClass; ?>" title="<?php echo CHtml::encode($badgeTitle); ?>">
+                        <?php if ($invalidCount > 0): ?><i class="fa fa-exclamation-triangle me-1"></i><?php endif; ?>
+                        Đã dùng <?php echo CHtml::encode($badge['prefix']); ?>:
+                        <?php echo (int) $badge['used']; ?>/<?php echo (int) $badge['capacity']; ?>
+                    </span>
+                <?php endif; ?>
+
+                <?php if ($luckyAudit !== null): ?>
+                    <?php $conflictCount = count($luckyAudit['duplicate_person_multi_lucky']); ?>
+                    <span class="badge <?php echo $conflictCount > 0 ? 'bg-danger' : 'bg-secondary'; ?>"
+                          <?php if ($conflictCount > 0): ?>
+                              role="button" id="btn_show_lucky_conflicts"
+                              data-conflicts="<?php echo CHtml::encode(CJSON::encode($luckyAudit['duplicate_person_multi_lucky'])); ?>"
+                          <?php endif; ?>
+                          title="Người đang giữ nhiều mã lucky — cần xử lý trước khi phát định danh">
+                        Xung đột mã lucky: <?php echo $conflictCount; ?>
+                    </span>
+
+                    <?php if (count($luckyAudit['lucky_only_on_roster']) > 0): ?>
+                        <span class="badge bg-danger"
+                              title="Những người này có mã trong bảng nhưng chưa ghi ngược sang bản ghi gốc nên chưa đăng nhập được cổng chạy. Bấm Cấp mã lucky để tự chữa.">
+                            <i class="fa fa-exclamation-triangle me-1"></i>
+                            Chưa ghi ngược: <?php echo count($luckyAudit['lucky_only_on_roster']); ?>
+                        </span>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <?php if ($lastSyncedAt): ?>
             <div class="mt-2 small text-muted">
@@ -357,6 +413,11 @@ $flashMessages = Yii::app()->user->getFlashes();
     <?php endif; ?>
 
     <?php if ($canCreate): ?>
+        <?php $this->renderPartial('_modal_gen_lucky', array(
+            'eventId'       => $eventId,
+            'stats'         => $stats,
+            'filterOptions' => $filterOptions,
+        )); ?>
         <?php $this->renderPartial('_modal_sync', array(
             'eventId'       => $eventId,
             'periodId'      => $periodId,

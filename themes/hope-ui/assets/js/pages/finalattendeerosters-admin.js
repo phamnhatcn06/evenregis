@@ -19,7 +19,103 @@
         bindSyncModal();
         bindEditRowModal(config);
         bindCellReset(config);
+        bindGenLuckyModal();
+        bindLuckyConflictBadge();
     });
+
+    /** Modal cấp mã lucky. Chỉ cấp cho người chưa có mã, không có đường cấp lại. */
+    function bindGenLuckyModal() {
+        var form = document.getElementById('form_gen_lucky');
+        var button = document.getElementById('btn_gen_lucky_submit');
+
+        if (!form || !button) {
+            return;
+        }
+
+        button.addEventListener('click', function () {
+            postWithButton(form.action, new FormData(form), button, function (data) {
+                var modalElement = document.getElementById('modal_gen_lucky');
+                var modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+
+                if (typeof Toast !== 'undefined') {
+                    Toast.success(data.message);
+                }
+
+                // Có người giữ nhiều mã thì phải cho HO đọc danh sách trước khi trang reload,
+                // vì họ cần thông báo thu hồi định danh đã phát ra ngoài.
+                var conflicts = (data.report && data.report.conflicts) || [];
+                if (conflicts.length > 0 && typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Có ' + conflicts.length + ' người giữ nhiều mã',
+                        html: buildConflictHtml(conflicts),
+                        icon: 'warning',
+                        confirmButtonText: 'Tôi đã ghi lại'
+                    }).then(function () { window.location.reload(); });
+                    return;
+                }
+
+                window.setTimeout(function () { window.location.reload(); }, 800);
+            });
+        });
+    }
+
+    function buildConflictHtml(conflicts) {
+        var rows = conflicts.slice(0, 20).map(function (item) {
+            var dropped = (item.dropped_lucky || []).join(', ');
+            return '<li style="text-align:left">' + escapeHtml(item.full_name)
+                + (item.staff_code ? ' (' + escapeHtml(item.staff_code) + ')' : '')
+                + ': giữ mã <strong>' + escapeHtml(item.kept_lucky) + '</strong>'
+                + (dropped ? ', bỏ mã ' + escapeHtml(dropped) : '')
+                + '</li>';
+        }).join('');
+
+        var more = conflicts.length > 20
+            ? '<p class="text-muted">... và ' + (conflicts.length - 20) + ' người nữa.</p>'
+            : '';
+
+        return '<p style="text-align:left">Những người này cần được <strong>thông báo thu hồi</strong>'
+            + ' định danh cũ đã phát:</p><ul>' + rows + '</ul>' + more;
+    }
+
+    /** Badge "Xung đột mã lucky" bấm vào mở danh sách người bị ảnh hưởng. */
+    function bindLuckyConflictBadge() {
+        var badge = document.getElementById('btn_show_lucky_conflicts');
+        if (!badge) {
+            return;
+        }
+
+        badge.addEventListener('click', function () {
+            var conflicts = parseJson(badge.getAttribute('data-conflicts')) || [];
+            if (conflicts.length === 0 || typeof Swal === 'undefined') {
+                return;
+            }
+
+            var rows = conflicts.slice(0, 20).map(function (item) {
+                return '<li style="text-align:left">' + escapeHtml(item.full_name)
+                    + (item.staff_code ? ' (' + escapeHtml(item.staff_code) + ')' : '')
+                    + ': các mã ' + escapeHtml((item.lucky_numbers || []).join(', '))
+                    + (item.suggest_keep ? ' — đề xuất giữ <strong>' + escapeHtml(item.suggest_keep) + '</strong>' : '')
+                    + '</li>';
+            }).join('');
+
+            Swal.fire({
+                title: 'Người đang giữ nhiều mã lucky',
+                html: '<p style="text-align:left">Bấm <strong>Cấp mã lucky</strong> để hệ thống giữ mã'
+                    + ' cấp sớm nhất và bỏ các mã còn lại.</p><ul>' + rows + '</ul>',
+                icon: 'warning',
+                confirmButtonText: 'Đã hiểu'
+            });
+        });
+    }
+
+    function escapeHtml(value) {
+        var div = document.createElement('div');
+        div.textContent = value === null || value === undefined ? '' : String(value);
+        return div.innerHTML;
+    }
 
     /**
      * Modal sửa thủ công toàn bộ trường của một người.
