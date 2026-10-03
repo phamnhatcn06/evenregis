@@ -2195,6 +2195,8 @@ class ReportAttendeeStatsController extends AdminController
                 'title' => 'DANH SÁCH VÀO CHUNG KẾT THỂ THAO',
                 'filter' => function ($p) { return !empty($p['sports']); },
                 'content' => array('sports'),
+                // Tách mỗi nội dung thể thao thành 1 cột riêng (Nội dung 1, 2, ...)
+                'splitContents' => true,
             ),
             array(
                 'name' => 'Văn nghệ',
