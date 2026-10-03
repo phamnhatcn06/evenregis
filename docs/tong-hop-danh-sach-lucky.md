@@ -687,19 +687,93 @@ Response 201:
 ### 8.11 `POST /api/final-attendee-rosters/clear-conflict/{id}`
 Xoá `conflict_flag` sau khi HO đã xử lý (vd đã thông báo thu hồi định danh).
 
-### 8.12 Xuất Excel
+### 8.12 ⭐ `GET /api/final-attendee-rosters/audit` — đối soát (chỉ đọc, quyết định #16 & #18)
+
+#### Một endpoint hay hai?
+✅ **MỘT endpoint audit tổng hợp** (`scope = lucky | badge | all`), không tách hai.
+**Lý do:** cùng một bản chất (*rà soát tính toàn vẹn dải định danh trước khi phát hành*), cùng
+permission, cùng người dùng, cùng nơi hiển thị (header màn tổng hợp cần **cả hai** badge "Đã dùng
+MT: 12/999" và "Xung đột mã lucky: 2") ⇒ một lần gọi lấy đủ, tránh 2 request cho một màn. Tách hai
+endpoint chỉ làm trùng lặp khung response và tăng số chỗ phải phân quyền.
+
+#### Đặc tả
+| Mục | Giá trị |
+|-----|---------|
+| Method / Path | `GET /api/final-attendee-rosters/audit` |
+| Tính chất | **CHỈ ĐỌC** — không `INSERT`/`UPDATE`/`DELETE` bất kỳ bảng nào, không sinh mã |
+| Permission | **Cùng quyền với màn tổng hợp**: `finalattendeerosters.read`. FE gọi qua action `actionAudit` có `PermissionHelper::can('finalattendeerosters', 'read')` |
+| Params | `event_id` (bắt buộc), `scope` = `lucky` / `badge` / `all` (mặc định `all`), `limit` (số mẫu `MT*` trả về, mặc định 50, tối đa 500) |
+
+Response 200:
+```json
+{ "success": true, "data": {
+  "badge": {
+    "prefix": "MT",
+    "pad": 3,
+    "capacity": 999,
+    "used": 12,
+    "remaining": 987,
+    "max_number": 12,
+    "max_badge_number": "MT012",
+    "next_badge_number": "MT013",
+    "samples": ["MT001", "MT002", "MT012"],
+    "invalid_format": [
+      { "badge_number": "MT1", "attendee_id": 3301, "full_name": "...", "reason": "Thiếu zero-pad (không khớp ^MT\\d{3}$)" },
+      { "badge_number": "MT12A", "attendee_id": 3410, "full_name": "...", "reason": "Có ký tự không phải chữ số sau tiền tố" }
+    ],
+    "warning": "Phát hiện 2 số thẻ bắt đầu bằng MT nhưng sai format — có thể làm lệch bộ sinh max. Cần xử lý trước khi bật tính năng."
+  },
+  "lucky": {
+    "roster_total": 612,
+    "with_lucky": 600,
+    "without_lucky": 12,
+    "duplicate_person_multi_lucky": [
+      { "full_name": "...", "staff_code": "HN0123", "attendee_ids": [1003, 4821],
+        "lucky_numbers": ["123456", "778899"], "suggest_keep": "123456" }
+    ],
+    "orphan_lucky_on_attendees": [
+      { "attendee_id": 2200, "lucky_number": "334455",
+        "reason": "attendees có mã nhưng không thuộc dòng roster nào (do run:gen-lucky cũ)" }
+    ],
+    "lucky_only_on_roster": [
+      { "roster_id": 1455, "lucky_number": "556677",
+        "reason": "roster có mã nhưng attendees đại diện chưa được ghi ngược" }
+    ],
+    "trashed_locked": 5,
+    "warning": "Có 1 người đang giữ 2 mã lucky. Xem §6.4 trước khi phát định danh."
+  },
+  "checked_at": 1759500000
+}}
+```
+- 422 thiếu `event_id`.
+- Trường `invalid_format` là lý do chính của quyết định #16: một giá trị `MT*` nhập tay sai format
+  (vd `MT1`, `MT12A`) sẽ làm `MAX(CAST(SUBSTRING(...)))` trả số sai ⇒ bộ sinh cấp trùng. Endpoint
+  phát hiện trước, **không tự sửa**.
+
+#### Hai chỗ sử dụng
+1. **Chạy một lần trước khi bật tính năng** (checklist slice S10): gọi `scope=badge`, xác nhận
+   `invalid_format` rỗng và dải sạch. Có thể gọi từ trình duyệt/Postman, hoặc qua command
+   `final-attendee-roster:audit` (§8.14) cho người thạo CLI.
+2. **Hiển thị thường trực trên UI** (§10 header): badge **"Đã dùng MT: 12/999"**
+   (đỏ nếu `remaining < 50`) và badge **"Xung đột mã lucky: N"** (đỏ nếu `N > 0`, click mở danh
+   sách). Nhờ vậy HO biết **trước khi tràn**, không chờ tới lúc gặp 422.
+
+> Endpoint này **thay thế hoàn toàn** việc query DB tay. Tài liệu không còn bất kỳ bước nào yêu cầu
+> chạy SQL trực tiếp trên môi trường thật.
+
+### 8.13 Xuất Excel
 **FE tự sinh** bằng PHPExcel (pattern có ở `RunRegistrationsController`, `ReportsController`)
 ⇒ **không thêm endpoint BE**.
 
-### 8.13 Command artisan
+### 8.14 Command artisan
 ```
 php artisan final-attendee-roster:sync {event_id} {period_id} [--property=] [--dry-run]
 php artisan final-attendee-roster:gen-lucky {event_id} [--property=]
-php artisan final-attendee-roster:audit-lucky {event_id}    # đối soát ca 1 người 2 mã
+php artisan final-attendee-roster:audit {event_id} [--scope=lucky|badge|all]   # đối soát mã lucky + dải số thẻ MT (chỉ đọc, in báo cáo)
 ```
 > Chạy bằng MAMP php8.1 kèm cờ extension (xem `chung-ket-fun-run.md` §9).
 
-### 8.14 Endpoint cũ — không sửa
+### 8.15 Endpoint cũ — không sửa
 `POST /api/run-auth/gen-lucky` và `run:gen-lucky` **giữ nguyên** (cổng chạy đã verified).
 Khuyến nghị ẩn nút cũ ở `admin/runRegistrations/admin` (§13).
 
@@ -854,10 +928,10 @@ nên cùng một `code` có thể tồn tại nhiều bản ghi theo sự kiện
 | Hạng mục | Quyết định | Lý do |
 |----------|-----------|-------|
 | Format | `MT` + **3 chữ số, zero-pad** (`MT001` … `MT999`) | Theo chốt của chủ dự án |
-| Cách lấy số | **max hiện có trong cùng event + 1** | Không cần thêm bảng sequence; tự phục hồi nếu có bản ghi bị xoá; đọc 1 query |
+| Cách lấy số | **max hiện có (toàn hệ thống) + 1** | Không cần thêm bảng sequence; tự phục hồi nếu có bản ghi bị xoá; đọc 1 query |
 | **Scope đánh số** | ✅ **Duy nhất TOÀN HỆ THỐNG** — `MT001` → `MT999`, **không** đánh lại theo sự kiện | `attendees.badge_number` UNIQUE **toàn bảng** ⇒ đánh số theo event sẽ sinh lại `MT001` ở sự kiện thứ hai và **ăn lỗi duplicate**. Số thẻ chỉ cần **duy nhất và in được**; việc báo cáo/lọc theo sự kiện dùng `event_id`, **không** dựa vào tiền tố số thẻ |
 | Chống race (2 HO thêm cùng lúc) | **Cache lock** `far:badge:global` (TTL 10s) bao quanh bước "đọc max → insert", **cộng** retry 3 lần bắt duplicate key (SQLSTATE 23000) rồi tính lại max | Lock giảm va chạm; retry là lưới an toàn khi lock hết hạn/đa worker |
-| Tràn 999 | **Báo lỗi rõ ràng** — BE trả **422** `"Đã dùng hết dải số thẻ MT001–MT999 cho sự kiện này. Vui lòng mở rộng quy ước số thẻ."`; FE hiện Toast đỏ. **Tuyệt đối không** âm thầm trùng số, không quay vòng về `MT001` | Số thẻ trùng ⇒ hai người cùng số thẻ in ra, không thể sửa sau khi in |
+| Tràn 999 | **Báo lỗi rõ ràng** — BE trả **422** `"Đã dùng hết dải số thẻ MT001–MT999. Vui lòng mở rộng quy ước số thẻ (MT + 4 số)."`; FE hiện Toast đỏ. **Tuyệt đối không** âm thầm trùng số, không quay vòng về `MT001` | Số thẻ trùng ⇒ hai người cùng số thẻ in ra, không thể sửa sau khi in |
 | Đường nâng cấp | Chuyển sang **`MT` + 4 số** (`MT0001`…`MT9999`): chỉ sửa hằng `BADGE_NUMBER_PAD = 3 → 4` (cột `string(20)` thừa chỗ). Số cũ 3 chữ số **vẫn hợp lệ**, bộ sinh đọc max bằng regex chấp nhận cả hai độ dài | Nâng cấp không cần migration dữ liệu |
 
 #### Ghi chú: phương án "đánh lại từ `MT001` mỗi sự kiện" đã bị LOẠI
@@ -898,7 +972,7 @@ UNLOCK
 **Tác dụng:** sau khi ẩn, **đường cấp mã duy nhất** là `POST /api/final-attendee-rosters/provision-lucky`
 — luồng này **cấp mã theo người đã gộp** ⇒ **triệt tiêu nguồn gốc ca "một người 2 mã"** về sau. Ca
 còn lại chỉ là dữ liệu **lịch sử** do nút cũ đã cấp, xử lý một lần bằng
-`final-attendee-roster:audit-lucky` + quy trình thu hồi (§6.4).
+`final-attendee-roster:audit` + quy trình thu hồi (§6.4).
 
 **Command `run:gen-lucky` cũ — khuyến nghị:**
 - **KHÔNG xoá** (cổng chạy đã verified với nó; xoá làm mất đường cứu hộ khi bảng mới gặp sự cố).
@@ -1165,7 +1239,7 @@ sequenceDiagram
 | 1 | **Hai nguồn sự thật lệch nhau** | Hiện `last_synced_at` trên header + badge "Dữ liệu có thể đã cũ" nếu > 24h; nút đồng bộ luôn sẵn; mọi báo cáo bốc thăm **chỉ** đọc bảng mới |
 | 2 | ⚠️ **Quên `withTrashed()` khi check trùng mã** | Dòng trashed vẫn giữ mã (quyết định #11) ⇒ nếu sinh mã mà chỉ check dòng active sẽ **ăn lỗi duplicate key bất ngờ**. Bắt buộc `withTrashed()` ở **mọi** truy vấn kiểm tra trùng; đưa vào tiêu chí verify slice S8 |
 | 3 | ⚠️ **Đồng bộ xoá mất người HO thêm tay** | Bước "soft delete người không còn trong nguồn" **phải loại trừ `status = MANUAL`**. Bug dễ mắc ⇒ đưa vào tiêu chí verify slice S2 & S11 |
-| 4 | **Một người giữ 2 mã** (do `run:gen-lucky` cũ) | Giữ mã cấp sớm nhất (`lucky_provisioned_at` → `pin_set_at` → `attendees.id`), NULL mã kia, ghi `conflict_flag` + log ⇒ HO thông báo thu hồi. Chạy `final-attendee-roster:audit-lucky` **trước khi phát định danh** |
+| 4 | **Một người giữ 2 mã** (do `run:gen-lucky` cũ) | Giữ mã cấp sớm nhất (`lucky_provisioned_at` → `pin_set_at` → `attendees.id`), NULL mã kia, ghi `conflict_flag` + log ⇒ HO thông báo thu hồi. Chạy `final-attendee-roster:audit` **trước khi phát định danh** |
 | 5 | **Mã đã phát ra ngoài rồi bị NULL** | Người đó đăng nhập thất bại ⇒ quy trình thông báo thu hồi là **bắt buộc**; màn hình giữ badge đỏ tới khi HO bấm "Đã xử lý" |
 | 6 | **Người bị huỷ tư cách rồi được đưa lại** | Đồng bộ **restore** dòng cũ, **giữ nguyên mã** ⇒ định danh đã phát vẫn dùng được. Cần set lại `attendees.is_active = 1` (quy trình huỷ/thay người lo) |
 | 7 | **Người thay thế** | Người khác ⇒ dòng mới ⇒ mã mới. Phải chạy **đồng bộ + cấp mã** sau mỗi lần thay người, nếu không người thay **không đăng nhập được** |
@@ -1199,7 +1273,7 @@ sequenceDiagram
 | **S5** | FE: dropdown phụ thuộc Đơn vị → Bộ phận → Phòng ban (AJAX) | Chọn đơn vị ⇒ bộ phận tự nạp đúng | **S (4h)** | S4 |
 | **S6** | FE: `_modal_sync` (xem trước ⇒ ghi thật) + `actionSyncPreview`/`actionSync` + hiển thị `skipped_override`/`restored`/`soft_deleted`/`conflicts` | Bấm xem trước thấy số liệu; ghi thật dữ liệu vào bảng; trường đã sửa tay nằm trong danh sách bỏ qua | **M (1d)** | S2, S4 |
 | **S7** | BE+FE: `update/{id}` + `reset-field/{id}` + inline edit nhiều trường + `_modal_edit_row` + badge ✎ + tooltip "Gốc: …" + nút ↺ | Sửa 3 trường ⇒ `overridden_fields` đúng; khôi phục 1 trường ⇒ gỡ đúng tên; audit log có bản ghi; **không có đường sửa `lucky_number`** | **L (3d)** | S0, S4 |
-| **S8** | BE: `provisionLucky` theo người đã gộp + **ghi ngược `attendees`** + **idempotent tuyệt đối** + xử lý ca 2 mã (§6.4) + check trùng `withTrashed()` + lock/retry. Command `...:gen-lucky` + `...:audit-lucky`. FE: `_modal_gen_lucky` + `actionGenLucky`. **+ Ẩn nút "Cấp số lucky" cũ (§9.6)** + cảnh báo `confirm()` cho `run:gen-lucky` | Chạy 2 lần ⇒ lần 2 `provisioned=0` và **không UPDATE nào lên `lucky_number`**; người 2 bản ghi ⇒ **1 mã**; `attendees.lucky_number` bản đại diện đúng; **test cổng chạy: `DHMT`+mã login được**; ca 2 mã ⇒ ghi `conflict_flag` + log đúng người; **nút cũ không còn hiện và URL `runRegistrations/genLucky` trả 410** | **L (3d)** | S0, S1 |
+| **S8** | BE: `provisionLucky` theo người đã gộp + **ghi ngược `attendees`** + **idempotent tuyệt đối** + xử lý ca 2 mã (§6.4) + check trùng `withTrashed()` + lock/retry. Command `...:gen-lucky` + `...:audit`. FE: `_modal_gen_lucky` + `actionGenLucky`. **+ Ẩn nút "Cấp số lucky" cũ (§9.6)** + cảnh báo `confirm()` cho `run:gen-lucky` | Chạy 2 lần ⇒ lần 2 `provisioned=0` và **không UPDATE nào lên `lucky_number`**; người 2 bản ghi ⇒ **1 mã**; `attendees.lucky_number` bản đại diện đúng; **test cổng chạy: `DHMT`+mã login được**; ca 2 mã ⇒ ghi `conflict_flag` + log đúng người; **nút cũ không còn hiện và URL `runRegistrations/genLucky` trả 410** | **L (3d)** | S0, S1 |
 | **S9** | ⭐ **Write-back chức danh/nhãn thẻ** (quyết định #10): `writeBackToAttendee()` ghi thẳng Entity trong transaction + **re-apply tự chữa cuối mỗi lần sync** + audit log + cờ `WRITE_BACK_FULL_NAME`. Kiểm chứng thẻ & email | Sửa chức danh trên bảng mới ⇒ **`attendees.position` đổi** ⇒ **PDF/email xác nhận hiện chức danh mới**; chạy `syncWithStaffData` sau đó ⇒ `position` **không bị ghi đè**; `unit_label` ghi được dù attendee là `finalist` (bypass whitelist) | **M (1.5d)** | S7 |
 | **S10** | ⭐ **Thêm người thủ công + tạo `attendees` tối thiểu** (quyết định #9): `createManual()` một transaction, `ensureUnitRegistrations`, sinh `qr_token`+`lucky_number` unique, **`badge_number` `MT`+3 số (§9.5) có lock + retry + chặn tràn 999**, `role_id` **đọc từ param cấu hình (§9.4)**, `status=MANUAL`, `overridden_fields` = tất cả. FE `_modal_add_person` (có dropdown vai trò chọn sẵn mặc định) + `actionCreate` | Thêm 1 người ⇒ có **cả** dòng roster lẫn dòng `attendees`; **đăng nhập cổng chạy `DHMT`+mã thành công** + đặt PIN được; **chạy sync sau đó ⇒ người này KHÔNG bị xoá, KHÔNG bị ghi đè**; đơn vị chưa có phiếu VCK ⇒ phiếu được tạo; **thêm 2 người liên tiếp ⇒ `MT001`, `MT002` không trùng**; **giả lập max = 999 ⇒ trả 422 với thông điệp rõ ràng, không tạo bản ghi nào** | **M (1d)** | S8 + chốt §9.4 |
 | **S11** | FE: xuất Excel theo bộ lọc (PHPExcel) | Tải file, kiểm đủ cột + đúng bộ lọc + cột "Đã sửa tay"/"Xung đột" | **M (1d)** | S4 |
