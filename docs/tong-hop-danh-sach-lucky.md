@@ -4,7 +4,19 @@
 > Vòng Chung Kết (VCK) của tất cả đơn vị; đồng bộ (migrate) lặp lại được từ `attendees`; sửa thủ
 > công mọi trường với bảo vệ chống ghi đè theo từng trường; cấp mã lucky draw **duy nhất, một lần,
 > đi theo người suốt sự kiện**.
-> Cập nhật: 2026-10-03 (bản revise 3 — theo quyết định của chủ dự án).
+> Cập nhật: 2026-10-03 (bản revise 4 — **CHỐT**).
+>
+> ## ✅ TRẠNG THÁI: TOÀN BỘ CÂU HỎI CHẶN ĐÃ ĐƯỢC CHỐT — **slice S0 sẵn sàng triển khai**
+>
+> | | |
+> |---|---|
+> | Quyết định đã chốt | **18/18** (xem §0) |
+> | Câu hỏi còn tồn | **12 câu, KHÔNG câu nào chặn** (xem §14) |
+> | Slice bắt đầu được ngay | **S0** — migration `final_attendee_rosters` + `final_attendee_roster_sync_logs` + Entity + index/unique (§7) |
+> | Tổng ước lượng chốt | **≈ 21.5 ngày công** (+1.0 nếu làm S14 tuỳ chọn) |
+>
+> Thứ tự slice: `S0 → S1 → (S2 ∥ S3) → S4 → (S5 ∥ S6 ∥ S7 ∥ S8) → S9 → S10 → S11 → S12 → S13 → [S14]`
+> — chi tiết ở **§13**.
 > Liên quan: `docs/chung-ket-fun-run.md`, `docs/system-design.md`, memory `vck-final-aggregation`,
 > memory `replace-withdraw-attendee`.
 
@@ -26,9 +38,12 @@
 | 10 | **Chức danh sửa tay** | Áp dụng cho **TẤT CẢ**: màn tổng hợp, Excel, bốc thăm, **in thẻ**, **email xác nhận** |
 | 11 | **Người bị huỷ tư cách sau migrate** | **XOÁ MỀM hẳn** (không dùng trạng thái `WITHDRAWN` cho ca này). **Mã lucky bỏ luôn — không tái sử dụng cho người khác** |
 | 12 | Tên bảng | **`final_attendee_rosters`** (log: **`final_attendee_roster_sync_logs`**) |
-| 13 | **Vai trò người HO thêm tay** | Chủ dự án chốt **"admin"**. ⚠️ Bảng `roles` **không có** record nào tên/`code` là `admin` (xem §9.4) ⇒ **cần chọn lại trong danh mục hiện có** — **câu hỏi chặn S10**. Dù chọn gì, `role_id` **phải cấu hình được** (`params.php`), **không hardcode** |
-| 14 | **Số thẻ người HO thêm tay** | Quy ước mới **`MT` + 3 số** (vd `MT001`), lấy **max hiện có + 1**, có lock chống race + retry, **giới hạn 999** ⇒ tràn thì **báo lỗi rõ ràng**, không âm thầm trùng (§9.5). ⚠️ **Scope đánh số** (theo sự kiện vs toàn hệ thống) còn **một câu hỏi** vì `badge_number` UNIQUE toàn bảng — khuyến nghị phương án B |
+| 13 | **Vai trò người HO thêm tay** | **`btc` — "Ban tổ chức"** (id 8 ở môi trường hiện tại). **KHÔNG hardcode id**: resolve theo `code = 'btc'`, fallback param `finalRosterManualRoleId` / `FINAL_ROSTER_MANUAL_ROLE_ID` (§9.4) |
+| 14 | **Số thẻ người HO thêm tay** | **`MT` + 3 số** (`MT001`…`MT999`), **duy nhất toàn hệ thống** (không đánh lại theo sự kiện), max hiện có + 1, lock + retry, **tràn 999 ⇒ 422** báo lỗi rõ ràng (§9.5) |
 | 15 | **Nút "Cấp số lucky" cũ** | **ẨN** ở `admin/runRegistrations/admin` ⇒ đường cấp mã duy nhất là qua bảng mới (§9.6) |
+| 16 | **Đối soát dải `MT%`** | Làm **qua API, KHÔNG query DB tay** ⇒ endpoint chỉ-đọc `GET /api/final-attendee-rosters/audit` (§8.12) |
+| 17 | **Scope đánh số thẻ** | **Toàn hệ thống** (phương án B). Báo cáo/lọc vẫn theo `event_id`, **không** dựa vào tiền tố số thẻ |
+| 18 | **Endpoint audit** | **MỘT endpoint audit tổng hợp** cho cả `lucky` lẫn `badge` (§8.12) |
 
 ---
 
