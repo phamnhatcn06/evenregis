@@ -20,7 +20,7 @@ Yii::import('application.modules.admin.controllers.FinalAttendeeRostersControlle
 $action        = isset($argv[1]) ? $argv[1] : 'preview';
 $hasPermission = isset($argv[2]) ? (bool) (int) $argv[2] : true;
 $body          = isset($argv[3]) ? $argv[3] : '';
-$method        = isset($argv[4]) ? $argv[4] : 'POST';
+$method        = !empty($argv[4]) ? $argv[4] : 'POST';
 
 $_SERVER['REQUEST_METHOD'] = $method;
 Yii::app()->session['sso_permissions'] = $hasPermission
