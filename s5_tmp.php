@@ -13,6 +13,8 @@ $config = require(__DIR__ . '/protected/config/main.php');
 unset($config['components']['log']);
 $config['components']['errorHandler']['errorAction'] = null;
 Yii::createWebApplication($config);
+// CLI da in output nen header() se canh bao 'headers already sent' - khong lien quan code that
+Yii::app()->attachEventHandler('onError', function ($event) { $event->handled = true; });
 Yii::app()->session->open();
 Yii::import('application.modules.admin.controllers.FinalAttendeeRostersController');
 
@@ -43,7 +45,7 @@ $controller  = new FinalAttendeeRostersController('finalAttendeeRosters', $admin
 Yii::app()->controller = $controller;
 
 // Không có quyền
-Yii::app()->session['user_permissions'] = array();
+Yii::app()->session['sso_permissions'] = array();
 $_GET = array('event_id' => 3, 'period_id' => 4);
 try {
     ob_start();
@@ -56,7 +58,7 @@ try {
 }
 
 // Có quyền admin
-Yii::app()->session['user_permissions'] = array('*' => '1 1 1 1');
+Yii::app()->session['sso_permissions'] = array('*' => '1 1 1 1');
 $ok('PermissionHelper cho phép đọc', PermissionHelper::can('finalattendeerosters', 'read'));
 
 $call = function ($get) use ($controller) {
