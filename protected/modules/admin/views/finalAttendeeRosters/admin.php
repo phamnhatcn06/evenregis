@@ -12,6 +12,7 @@
  * @var array $filterOptions
  * @var int|null $lastSyncedAt
  * @var array|null $audit
+ * @var array $roleList
  * @var int $pageSize
  * @var array $pageSizes
  * @var array $filters
@@ -82,6 +83,10 @@ $flashMessages = Yii::app()->user->getFlashes();
                         <button type="button" class="btn btn-primary"
                                 data-bs-toggle="modal" data-bs-target="#modal_sync">
                             <i class="fa fa-refresh me-1"></i>Đồng bộ từ danh sách VCK
+                        </button>
+                        <button type="button" class="btn btn-success"
+                                data-bs-toggle="modal" data-bs-target="#modal_add_person">
+                            <i class="fa fa-user-plus me-1"></i>Thêm người
                         </button>
                         <button type="button" class="btn btn-warning"
                                 data-bs-toggle="modal" data-bs-target="#modal_gen_lucky"
@@ -413,6 +418,12 @@ $flashMessages = Yii::app()->user->getFlashes();
     <?php endif; ?>
 
     <?php if ($canCreate): ?>
+        <?php $this->renderPartial('_modal_add_person', array(
+            'eventId'       => $eventId,
+            'periodId'      => $periodId,
+            'filterOptions' => $filterOptions,
+            'roleList'      => $roleList,
+        )); ?>
         <?php $this->renderPartial('_modal_gen_lucky', array(
             'eventId'       => $eventId,
             'stats'         => $stats,

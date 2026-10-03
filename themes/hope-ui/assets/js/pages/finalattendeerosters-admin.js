@@ -21,7 +21,65 @@
         bindCellReset(config);
         bindGenLuckyModal();
         bindLuckyConflictBadge();
+        bindAddPersonModal();
     });
+
+    /**
+     * Modal thêm người thủ công.
+     *
+     * Sau khi lưu, hiện mã lucky và định danh DHMT trong hộp thoại chờ HO xác nhận đã ghi lại —
+     * nếu reload ngay thì HO mất thông tin cần phát cho người đó.
+     */
+    function bindAddPersonModal() {
+        var form = document.getElementById('form_add_person');
+        var button = document.getElementById('btn_add_person_save');
+
+        if (!form || !button) {
+            return;
+        }
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            postWithButton(form.action, new FormData(form), button, function (data) {
+                var modalElement = document.getElementById('modal_add_person');
+                var modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+
+                var row = data.row || {};
+
+                if (typeof Swal !== 'undefined' && row.lucky_number) {
+                    Swal.fire({
+                        title: 'Đã thêm ' + row.full_name,
+                        html: '<p style="text-align:left">Hãy ghi lại và phát cho người này:</p>'
+                            + '<ul style="text-align:left">'
+                            + '<li>Mã lucky: <strong>' + escapeHtml(row.lucky_number) + '</strong></li>'
+                            + '<li>Định danh đăng nhập: <strong>'
+                            + escapeHtml(row.login_identifier || ('DHMT' + row.lucky_number))
+                            + '</strong></li>'
+                            + (row.badge_number
+                                ? '<li>Số thẻ: <strong>' + escapeHtml(row.badge_number) + '</strong></li>'
+                                : '')
+                            + '</ul>',
+                        icon: 'success',
+                        confirmButtonText: 'Tôi đã ghi lại'
+                    }).then(function () {
+                        form.reset();
+                        window.location.reload();
+                    });
+                    return;
+                }
+
+                if (typeof Toast !== 'undefined') {
+                    Toast.success(data.message);
+                }
+                form.reset();
+                window.setTimeout(function () { window.location.reload(); }, 800);
+            });
+        });
+    }
 
     /** Modal cấp mã lucky. Chỉ cấp cho người chưa có mã, không có đường cấp lại. */
     function bindGenLuckyModal() {
