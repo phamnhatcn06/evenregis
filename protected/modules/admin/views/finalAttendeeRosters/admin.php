@@ -41,6 +41,7 @@ $flashMessages = Yii::app()->user->getFlashes();
      data-event-id="<?php echo (int) $eventId; ?>"
      data-period-id="<?php echo (int) $periodId; ?>"
      data-filters-url="<?php echo $this->createUrl('admin'); ?>"
+     data-filter-options-url="<?php echo $this->createUrl('filterOptions'); ?>"
      data-flash="<?php echo CHtml::encode(CJSON::encode($flashMessages)); ?>"></div>
 
 <div class="card mb-3">
