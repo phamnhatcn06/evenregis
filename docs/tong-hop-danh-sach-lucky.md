@@ -26,6 +26,9 @@
 | 10 | **Chức danh sửa tay** | Áp dụng cho **TẤT CẢ**: màn tổng hợp, Excel, bốc thăm, **in thẻ**, **email xác nhận** |
 | 11 | **Người bị huỷ tư cách sau migrate** | **XOÁ MỀM hẳn** (không dùng trạng thái `WITHDRAWN` cho ca này). **Mã lucky bỏ luôn — không tái sử dụng cho người khác** |
 | 12 | Tên bảng | **`final_attendee_rosters`** (log: **`final_attendee_roster_sync_logs`**) |
+| 13 | **Vai trò người HO thêm tay** | Chủ dự án chốt **"admin"**. ⚠️ Bảng `roles` **không có** record nào tên/`code` là `admin` (xem §9.3) ⇒ **cần chọn lại trong danh mục hiện có** — **câu hỏi chặn S10**. Dù chọn gì, `role_id` **phải cấu hình được** (`params.php`), **không hardcode** |
+| 14 | **Số thẻ người HO thêm tay** | Quy ước mới **`MT` + 3 số** (vd `MT001`), đánh số **theo từng sự kiện**, có lock chống race, **giới hạn 999** ⇒ tràn thì **báo lỗi rõ ràng**, không âm thầm trùng (§9.4) |
+| 15 | **Nút "Cấp số lucky" cũ** | **ẨN** ở `admin/runRegistrations/admin` ⇒ đường cấp mã duy nhất là qua bảng mới (§9.5) |
 
 ---
 
