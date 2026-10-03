@@ -13,7 +13,7 @@
 > | Quyết định đã chốt | **18/18** (xem §0) |
 > | Câu hỏi còn tồn | **12 câu, KHÔNG câu nào chặn** (xem §14) |
 > | Slice bắt đầu được ngay | **S0** — migration `final_attendee_rosters` + `final_attendee_roster_sync_logs` + Entity + index/unique (§7) |
-> | Tổng ước lượng chốt | **≈ 21.5 ngày công** (+1.0 nếu làm S14 tuỳ chọn) |
+> | Tổng ước lượng chốt | **≈ 22.0 ngày công** (+1.0 nếu làm S14 tuỳ chọn) |
 >
 > Thứ tự slice: `S0 → S1 → (S2 ∥ S3) → S4 → (S5 ∥ S6 ∥ S7 ∥ S8) → S9 → S10 → S11 → S12 → S13 → [S14]`
 > — chi tiết ở **§13**.
@@ -1279,9 +1279,9 @@ sequenceDiagram
 | **S5** | FE: dropdown phụ thuộc Đơn vị → Bộ phận → Phòng ban (AJAX) | Chọn đơn vị ⇒ bộ phận tự nạp đúng | **S (4h)** | S4 |
 | **S6** | FE: `_modal_sync` (xem trước ⇒ ghi thật) + `actionSyncPreview`/`actionSync` + hiển thị `skipped_override`/`restored`/`soft_deleted`/`conflicts` | Bấm xem trước thấy số liệu; ghi thật dữ liệu vào bảng; trường đã sửa tay nằm trong danh sách bỏ qua | **M (1d)** | S2, S4 |
 | **S7** | BE+FE: `update/{id}` + `reset-field/{id}` + inline edit nhiều trường + `_modal_edit_row` + badge ✎ + tooltip "Gốc: …" + nút ↺ | Sửa 3 trường ⇒ `overridden_fields` đúng; khôi phục 1 trường ⇒ gỡ đúng tên; audit log có bản ghi; **không có đường sửa `lucky_number`** | **L (3d)** | S0, S4 |
-| **S8** | BE: `provisionLucky` theo người đã gộp + **ghi ngược `attendees`** + **idempotent tuyệt đối** + xử lý ca 2 mã (§6.4) + check trùng `withTrashed()` + lock/retry. Command `...:gen-lucky` + `...:audit`. FE: `_modal_gen_lucky` + `actionGenLucky`. **+ Ẩn nút "Cấp số lucky" cũ (§9.6)** + cảnh báo `confirm()` cho `run:gen-lucky` | Chạy 2 lần ⇒ lần 2 `provisioned=0` và **không UPDATE nào lên `lucky_number`**; người 2 bản ghi ⇒ **1 mã**; `attendees.lucky_number` bản đại diện đúng; **test cổng chạy: `DHMT`+mã login được**; ca 2 mã ⇒ ghi `conflict_flag` + log đúng người; **nút cũ không còn hiện và URL `runRegistrations/genLucky` trả 410** | **L (3d)** | S0, S1 |
+| **S8** | BE: `provisionLucky` theo người đã gộp + **ghi ngược `attendees`** + **idempotent tuyệt đối** + xử lý ca 2 mã (§6.4) + check trùng `withTrashed()` + lock/retry. Command `...:gen-lucky`. **+ endpoint audit tổng hợp `GET /audit` (§8.12, chỉ đọc) + command `...:audit` + 2 badge đối soát trên header FE**. FE: `_modal_gen_lucky` + `actionGenLucky` + `actionAudit`. **+ Ẩn nút "Cấp số lucky" cũ (§9.6)** + cảnh báo `confirm()` cho `run:gen-lucky` | Chạy 2 lần ⇒ lần 2 `provisioned=0` và **không UPDATE nào lên `lucky_number`**; người 2 bản ghi ⇒ **1 mã**; `attendees.lucky_number` bản đại diện đúng; **test cổng chạy: `DHMT`+mã login được**; ca 2 mã ⇒ ghi `conflict_flag` + log đúng người; **nút cũ không còn hiện và URL `runRegistrations/genLucky` trả 410**; **`GET /audit` trả đúng `used/remaining/next_badge_number`, phát hiện được giá trị `MT*` sai format, và KHÔNG ghi gì vào DB** | **L (3.5d)** | S0, S1 |
 | **S9** | ⭐ **Write-back chức danh/nhãn thẻ** (quyết định #10): `writeBackToAttendee()` ghi thẳng Entity trong transaction + **re-apply tự chữa cuối mỗi lần sync** + audit log + cờ `WRITE_BACK_FULL_NAME`. Kiểm chứng thẻ & email | Sửa chức danh trên bảng mới ⇒ **`attendees.position` đổi** ⇒ **PDF/email xác nhận hiện chức danh mới**; chạy `syncWithStaffData` sau đó ⇒ `position` **không bị ghi đè**; `unit_label` ghi được dù attendee là `finalist` (bypass whitelist) | **M (1.5d)** | S7 |
-| **S10** | ⭐ **Thêm người thủ công + tạo `attendees` tối thiểu** (quyết định #9): `createManual()` một transaction, `ensureUnitRegistrations`, sinh `qr_token`+`lucky_number` unique, **`badge_number` `MT`+3 số (§9.5) có lock + retry + chặn tràn 999**, `role_id` **đọc từ param cấu hình (§9.4)**, `status=MANUAL`, `overridden_fields` = tất cả. FE `_modal_add_person` (có dropdown vai trò chọn sẵn mặc định) + `actionCreate` | Thêm 1 người ⇒ có **cả** dòng roster lẫn dòng `attendees`; **đăng nhập cổng chạy `DHMT`+mã thành công** + đặt PIN được; **chạy sync sau đó ⇒ người này KHÔNG bị xoá, KHÔNG bị ghi đè**; đơn vị chưa có phiếu VCK ⇒ phiếu được tạo; **thêm 2 người liên tiếp ⇒ `MT001`, `MT002` không trùng**; **giả lập max = 999 ⇒ trả 422 với thông điệp rõ ràng, không tạo bản ghi nào** | **M (1d)** | S8 + chốt §9.4 |
+| **S10** | ⭐ **Thêm người thủ công + tạo `attendees` tối thiểu** (quyết định #9): `createManual()` một transaction, `ensureUnitRegistrations`, sinh `qr_token`+`lucky_number` unique, **`badge_number` `MT`+3 số (§9.5) có lock + retry + chặn tràn 999**, `role_id` **resolve 3 bước theo `code = 'btc'` + fallback param, KHÔNG hardcode id (§9.4)**, `status=MANUAL`, `overridden_fields` = tất cả. FE `_modal_add_person` (có dropdown vai trò chọn sẵn mặc định) + `actionCreate` | Thêm 1 người ⇒ có **cả** dòng roster lẫn dòng `attendees`; **đăng nhập cổng chạy `DHMT`+mã thành công** + đặt PIN được; **chạy sync sau đó ⇒ người này KHÔNG bị xoá, KHÔNG bị ghi đè**; đơn vị chưa có phiếu VCK ⇒ phiếu được tạo; **thêm 2 người liên tiếp ⇒ `MT001`, `MT002` không trùng**; **`role_id` resolve ra `btc` dù id khác môi trường; xoá mềm record `btc` ⇒ rơi về fallback param và ghi log cảnh báo**; **giả lập max = 999 ⇒ trả 422 với thông điệp rõ ràng, không tạo bản ghi nào** | **M (1d)** | S8 |
 | **S11** | FE: xuất Excel theo bộ lọc (PHPExcel) | Tải file, kiểm đủ cột + đúng bộ lọc + cột "Đã sửa tay"/"Xung đột" | **M (1d)** | S4 |
 | **S12** | BE+FE: `merge` / `split` + `_modal_merge_split` + `destroy` (**xoá mềm giữ mã** + `also_deactivate_attendee`) + `clear-conflict` | Gộp 2 dòng ⇒ 1 dòng, mã theo §6.2; huỷ tư cách ⇒ dòng trashed **vẫn giữ mã**, cấp mã lại **không** cấp mã đó cho ai; cổng chạy chặn đăng nhập người đó | **M (1d)** | S7, S8 |
 | **S13** | Phân quyền: thêm `finalattendeerosters` vào `MControllers` + `roles.controllers`, gate controller + view, menu sidebar | HR không quyền update ⇒ không thấy nút sửa; URL trực tiếp ⇒ 403 | **S (4h)** | S4, S6, S7, S8, S10 |
@@ -1294,25 +1294,23 @@ sequenceDiagram
 
 | Nhóm | Ngày công |
 |------|-----------|
-| S0–S8 (nền + đồng bộ + danh sách + sửa tay + cấp mã) | 16.5 |
+| S0–S8 (nền + đồng bộ + danh sách + sửa tay + cấp mã + **audit**) | 17.0 |
 | **S9 — write-back thẻ/email (quyết định #10)** | **+1.5** |
 | **S10 — thêm người thủ công + attendees tối thiểu (quyết định #9)** | **+1.0** |
 | S11–S13 (Excel, gộp/tách/huỷ, phân quyền) | 2.5 |
-| **TỔNG** | **≈ 21.5 ngày công** |
-| S14 tuỳ chọn | +1.0 |
+| **TỌNG CHỐT** | **≈ 22.0 ngày công** |
+| S14 tuỳ chọn (`division_*` trên `attendees`) | +1.0 |
 
-> So với bản revise 2 (≈19d): **+2.5 ngày** đúng bằng hai hạng mục mới (+1.5 write-back, +1.0 thêm
-> người thủ công). Thay đổi của quyết định #4 (xoá mềm + khoá mã) và #8 (mã bất biến) **không làm
-> tăng ngày công** — chỉ siết lại logic trong S2/S8/S12 và bổ sung tiêu chí verify.
+> So với bản revise 3 (≈21.5d): **+0.5 ngày** cho **endpoint audit tổng hợp + command + 2 badge đối
+> soát trên UI** (quyết định #16 & #18), gộp vào **S8 (3d → 3.5d)**.
 >
-> Ba quyết định #13/#14/#15 (vai trò, `badge_number` `MT`+3 số, ẩn nút cũ) **cũng không làm tăng
-> tổng** — bộ sinh `badge_number` + đọc param vai trò nằm trong S10 (1d đã có), việc ẩn nút cũ nằm
-> trong S8 (3d đã có). **Ngoại lệ:** nếu chọn **phương án A** cho scope số thẻ (mỗi sự kiện đánh lại
-> từ `MT001`, phải thêm hậu tố event) ⇒ **+2h**, tổng thành ≈ 21.75 ngày.
+> Ba quyết định #13/#14/#17 **không làm tăng ngày công**: bộ sinh `badge_number` + resolve vai trò nằm
+> trong **S10 (1d đã có)**; chọn scope **toàn hệ thống** (phương án B) đã **loại bỏ** khoản **+2h** của
+> phương án hậu tố sự kiện. Việc ẩn nút cũ nằm trong S8.
 
 **Mốc giao hàng gợi ý:**
 - **Mốc 1 (S0–S4, ~8d):** xem được danh sách VCK tổng hợp; đồng bộ chạy qua artisan.
-- **Mốc 2 (S5–S8, ~7.5d):** đồng bộ + sửa tay + cấp mã lucky hoạt động đủ trên UI.
+- **Mốc 2 (S5–S8, ~8d):** đồng bộ + sửa tay + cấp mã lucky hoạt động đủ trên UI.
 - **Mốc 3 (S9–S10, ~2.5d):** chức danh lan toả sang thẻ/email; thêm người thủ công đăng nhập được.
 - **Mốc 4 (S11–S13, ~2.5d):** Excel, gộp/tách/huỷ, phân quyền — sẵn sàng production.
 
