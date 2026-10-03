@@ -601,6 +601,21 @@ class ApiEndpoints
     const RUN_AUTH_LOGIN = '/api/run-auth/login';
     const RUN_AUTH_GEN_LUCKY = '/api/run-auth/gen-lucky';
 
+    // Tong hop danh sach Vong Chung Ket + ma lucky
+    const FINAL_ATTENDEE_ROSTER_LIST = '/api/final-attendee-rosters';
+    const FINAL_ATTENDEE_ROSTER_FILTERS = '/api/final-attendee-rosters/filters';
+    const FINAL_ATTENDEE_ROSTER_STATS = '/api/final-attendee-rosters/stats';
+    const FINAL_ATTENDEE_ROSTER_SYNC = '/api/final-attendee-rosters/sync';
+    const FINAL_ATTENDEE_ROSTER_PROVISION_LUCKY = '/api/final-attendee-rosters/provision-lucky';
+    const FINAL_ATTENDEE_ROSTER_UPDATE = '/api/final-attendee-rosters/update/{id}';
+    const FINAL_ATTENDEE_ROSTER_RESET_FIELD = '/api/final-attendee-rosters/reset-field/{id}';
+    const FINAL_ATTENDEE_ROSTER_STORE = '/api/final-attendee-rosters/store';
+    const FINAL_ATTENDEE_ROSTER_MERGE = '/api/final-attendee-rosters/merge';
+    const FINAL_ATTENDEE_ROSTER_SPLIT = '/api/final-attendee-rosters/split';
+    const FINAL_ATTENDEE_ROSTER_DESTROY = '/api/final-attendee-rosters/destroy/{id}';
+    const FINAL_ATTENDEE_ROSTER_CLEAR_CONFLICT = '/api/final-attendee-rosters/clear-conflict/{id}';
+    const FINAL_ATTENDEE_ROSTER_AUDIT = '/api/final-attendee-rosters/audit';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
