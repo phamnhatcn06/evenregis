@@ -307,4 +307,12 @@ $flashMessages = Yii::app()->user->getFlashes();
             <?php endif; ?>
         </div>
     </div>
+
+    <?php if ($canCreate): ?>
+        <?php $this->renderPartial('_modal_sync', array(
+            'eventId'       => $eventId,
+            'periodId'      => $periodId,
+            'filterOptions' => $filterOptions,
+        )); ?>
+    <?php endif; ?>
 <?php endif; ?>
