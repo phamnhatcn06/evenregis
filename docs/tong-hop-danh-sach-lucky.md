@@ -752,6 +752,137 @@ COMMIT
   (vì đọc `attendees` theo `registration_id`).
 - **Xoá:** xoá mềm dòng roster + `attendees.is_active = 0`; mã lucky giữ lại, không tái sử dụng.
 
+### 9.3 ⚠️ `role_id` — bảng `roles` KHÔNG có vai trò "admin" (câu hỏi chặn S10)
+
+Chủ dự án chốt dùng vai trò **"admin"**. Đã kiểm chứng code thật và **không tìm thấy** record nào
+như vậy:
+
+- Migration `Modules/Registration/Database/Migrations/2026_05_05_100101_create_roles_table.php`:
+  bảng `roles` có `name`, `code`, `color`, `icon`, `sort_order`, `description`, `event_id` —
+  **không có seeder** nào trong repo (`Modules/*/Database/Seeders/`, `database/seeders/` đều không
+  chèn `roles`).
+- Dữ liệu thực tế lấy từ dump `docs/mt_registration_portal_struct.sql` (`INSERT INTO roles`) có
+  **đúng 10 record**, và **không có `admin`**:
+
+| id | `name` | `code` | Ghi chú |
+|----|--------|--------|---------|
+| 1 | Hỗ trợ đại hội | `support` | Nhân sự hỗ trợ |
+| 2 | Thi thể thao | `sports` | Vai trò thi đấu |
+| 3 | Thi nghiệp vụ | `competition` | Vai trò thi đấu |
+| 4 | Giám đốc | `director` | |
+| 5 | Phó Giám đốc | `deputy_director` | |
+| 6 | Khách mời | `guest` | |
+| 7 | Trưởng đoàn | `team_lead` | |
+| 8 | Ban tổ chức | `btc` | Gần nghĩa "BTC/HO" nhất |
+| 9 | Thi Miss | `miss` | Vai trò thi đấu |
+| 10 | Thi văn nghệ | `talent` | Vai trò thi đấu |
+
+**Nguyên nhân lệch kỳ vọng:** `roles` ở hệ này là **danh mục vai trò NGƯỜI THAM DỰ** (in trên thẻ,
+phân loại người dự đại hội), **không phải** vai trò tài khoản đăng nhập. Vai trò tài khoản
+(Admin HO / HR / BTC các ban) nằm ở `users.role` + permission JWT — **khác bảng**.
+
+> ❓ **CẦN CHỦ DỰ ÁN CHỌN LẠI** một trong 10 vai trò trên cho người HO thêm tay. Ba lựa chọn gần
+> nghĩa nhất: **`btc` (Ban tổ chức, id 8)** · **`support` (Hỗ trợ đại hội, id 1)** ·
+> **`guest` (Khách mời, id 6)**.
+>
+> **Tài liệu này KHÔNG đề xuất tạo role mới.** Nếu chủ dự án muốn có vai trò riêng (vd "HO/Admin"),
+> đó là **việc phải xin phép trước** vì thêm record vào `roles` ảnh hưởng dropdown vai trò ở màn
+> đăng ký, màu badge trên thẻ, và các báo cáo theo vai trò.
+
+**Ràng buộc kỹ thuật (áp dụng bất kể chọn gì):**
+- `role_id` **đọc từ cấu hình**, **không hardcode**:
+  - FE Yii: `Yii::app()->params['finalRosterManualRoleId']` (khai báo trong
+    `protected/config/params.php`).
+  - BE Laravel: `config('registration.final_roster_manual_role_id')` + biến `.env`
+    `FINAL_ROSTER_MANUAL_ROLE_ID`; BE lấy giá trị này khi request **không** gửi `role_id`.
+- Modal `_modal_add_person` vẫn có **dropdown vai trò** (nạp từ `roles`) và **chọn sẵn** giá trị
+  mặc định ⇒ HO đổi được từng ca.
+- Nếu param rỗng/không hợp lệ ⇒ BE trả **422 "Vai trò không được để trống"** (đúng hành vi hiện
+  tại của `/api/attendees/store`), FE hiện Toast lỗi rõ ràng, **không** tạo nửa vời.
+
+### 9.4 ⭐ Sinh `badge_number` theo quy ước `MT` + 3 số (quyết định #14)
+
+#### Hiện trạng `badge_number` (đã kiểm chứng)
+- `attendees.badge_number`: `string(20)`, **`->unique()`**, `nullable` — migration
+  `2026_05_05_100105_create_attendees_table.php`.
+- `AttendeeRequest` có `Rule::unique('attendees', 'badge_number')`; `AttendeeService::convertData`
+  chỉ gán `$input['badge_number'] ?? null` ⇒ **hệ thống chưa có bất kỳ bộ sinh số thẻ tự động nào**,
+  giá trị hiện do người dùng nhập tay.
+- ⇒ Tiền tố **`MT` chưa bị quy ước nào chiếm**. Các mã dạng `HNO028`, `EVE000001` thấy trong dump là
+  `staff_code` / `code` của bảng khác, **không phải** `badge_number`.
+- ⚠️ **Việc cần làm trước khi build:** chạy đối soát trên DB thật
+  `SELECT badge_number FROM attendees WHERE badge_number LIKE 'MT%'` để chắc chắn không có dữ liệu
+  cũ đụng tiền tố. Nếu có ⇒ báo lại để chọn tiền tố khác.
+
+#### Thiết kế sinh số
+
+| Hạng mục | Quyết định | Lý do |
+|----------|-----------|-------|
+| Format | `MT` + **3 chữ số, zero-pad** (`MT001` … `MT999`) | Theo chốt của chủ dự án |
+| Cách lấy số | **max hiện có trong cùng event + 1** | Không cần thêm bảng sequence; tự phục hồi nếu có bản ghi bị xoá; đọc 1 query |
+| Scope đánh số | **Theo `event_id`** | Đúng yêu cầu. Mỗi đại hội đánh lại từ `MT001` |
+| ⚠️ Xung đột với UNIQUE toàn bảng | `attendees.badge_number` UNIQUE **toàn bảng**, nhưng đánh số **theo event** ⇒ sự kiện thứ hai sẽ sinh lại `MT001` và **ăn lỗi duplicate**. **Giải pháp: thêm hậu tố sự kiện vào chuỗi lưu** — `MT` + 3 số **+ `-{event_id}`** nếu event ≠ sự kiện mặc định; hoặc **chọn phương án B** (bên dưới) | Bắt buộc phải xử lý, không được bỏ qua |
+| Chống race (2 HO thêm cùng lúc) | **Cache lock** `far:badge:{event_id}` (TTL 10s) bao quanh bước "đọc max → insert", **cộng** retry 3 lần bắt duplicate key (SQLSTATE 23000) rồi tính lại max | Lock giảm va chạm; retry là lưới an toàn khi lock hết hạn/đa worker |
+| Tràn 999 | **Báo lỗi rõ ràng** — BE trả **422** `"Đã dùng hết dải số thẻ MT001–MT999 cho sự kiện này. Vui lòng mở rộng quy ước số thẻ."`; FE hiện Toast đỏ. **Tuyệt đối không** âm thầm trùng số, không quay vòng về `MT001` | Số thẻ trùng ⇒ hai người cùng số thẻ in ra, không thể sửa sau khi in |
+| Đường nâng cấp | Chuyển sang **`MT` + 4 số** (`MT0001`…`MT9999`): chỉ sửa hằng `BADGE_NUMBER_PAD = 3 → 4` (cột `string(20)` thừa chỗ). Số cũ 3 chữ số **vẫn hợp lệ**, bộ sinh đọc max bằng regex chấp nhận cả hai độ dài | Nâng cấp không cần migration dữ liệu |
+
+#### Hai phương án giải xung đột "UNIQUE toàn bảng vs đánh số theo event" — chọn 1
+
+| | **A. `MT{3 số}` thuần + hậu tố event khi cần** | **B. ✅ `MT{3 số}` và scope số thực chất là toàn hệ thống** |
+|---|---|---|
+| Chuỗi lưu | `MT001` cho sự kiện hiện tại; `MT001-4` cho sự kiện khác | `MT001` → `MT999`, không bao giờ lặp |
+| Ưu | Mỗi sự kiện đánh lại từ 001, đọc thuận mắt | Không bao giờ đụng UNIQUE; code đơn giản nhất |
+| Nhược | Chuỗi không nhất quán, in thẻ nhìn lạ; logic max phức tạp hơn | Sự kiện thứ hai không bắt đầu từ `MT001` |
+
+> **Khuyến nghị: phương án B** — giữ `MT{3 số}` sạch, lấy max **toàn bảng** theo regex `^MT\d+$`
+> (`SELECT MAX(CAST(SUBSTRING(badge_number,3) AS UNSIGNED)) FROM attendees WHERE badge_number REGEXP '^MT[0-9]+$'`),
+> và **vẫn báo cáo/lọc theo event** bằng `event_id` chứ không bằng tiền tố số thẻ. Số thẻ chỉ cần
+> **duy nhất và in được**, không cần mang ý nghĩa sự kiện.
+> Chỉ vì người HO thêm tay là **ngoại lệ số lượng nhỏ** (vài chục người/kỳ), dải 999 thừa sức cho
+> nhiều kỳ đại hội.
+> ❓ Nếu chủ dự án **nhất định** muốn mỗi sự kiện đánh lại từ `MT001` ⇒ chọn A, phát sinh thêm ~2h
+> cho logic hậu tố + hiển thị.
+
+#### Giả mã
+```
+LOCK far:badge:{event_id}   (TTL 10s)
+  $max = SELECT MAX(CAST(SUBSTRING(badge_number, 3) AS UNSIGNED))
+           FROM attendees
+          WHERE badge_number REGEXP '^MT[0-9]+$';        -- phương án B
+  $next = (int) $max + 1;
+  if ($next > 999) {
+      throw 422 "Đã dùng hết dải số thẻ MT001–MT999 ... Vui lòng mở rộng quy ước số thẻ.";
+  }
+  $badge = 'MT' . str_pad($next, BADGE_NUMBER_PAD, '0', STR_PAD_LEFT);
+  // INSERT attendees ... (retry 3 lần: nếu duplicate key thì tính lại $max)
+UNLOCK
+```
+> Chỉ áp dụng cho người **HO thêm tay** (`attendee_type = 'manual'`). Người đến từ luồng đăng ký
+> **không** bị bộ sinh này chạm tới — giữ nguyên hành vi hiện tại (`badge_number` do người dùng nhập
+> hoặc để rỗng).
+
+### 9.5 Ẩn nút "Cấp số lucky" cũ (quyết định #15)
+
+**Task thực thi (thuộc slice S8):**
+
+| Việc | File |
+|------|------|
+| Ẩn nút + form POST `genLucky` | `protected/modules/admin/views/runRegistrations/admin.php` (khối `<form method="post" action="<?php echo $this->createUrl('genLucky'); ?>">` quanh dòng 32) |
+| Chặn cả đường vào trực tiếp URL | `protected/modules/admin/controllers/RunRegistrationsController.php` — `actionGenLucky` (dòng ~23) trả `CHttpException(410)` kèm thông điệp tiếng Việt chỉ sang màn mới, **giữ lại code** (không xoá) để rollback nhanh nếu cần |
+| Thêm dòng hướng dẫn thay thế | Cùng view: ghi chú *"Việc cấp mã lucky đã chuyển sang màn **Tổng hợp danh sách Vòng Chung Kết**"* + link `/admin/finalAttendeeRosters/admin` |
+
+**Tác dụng:** sau khi ẩn, **đường cấp mã duy nhất** là `POST /api/final-attendee-rosters/provision-lucky`
+— luồng này **cấp mã theo người đã gộp** ⇒ **triệt tiêu nguồn gốc ca "một người 2 mã"** về sau. Ca
+còn lại chỉ là dữ liệu **lịch sử** do nút cũ đã cấp, xử lý một lần bằng
+`final-attendee-roster:audit-lucky` + quy trình thu hồi (§6.4).
+
+**Command `run:gen-lucky` cũ — khuyến nghị:**
+- **KHÔNG xoá** (cổng chạy đã verified với nó; xoá làm mất đường cứu hộ khi bảng mới gặp sự cố).
+- **Thêm cảnh báo bắt buộc xác nhận:** in cảnh báo tiếng Việt *"Lệnh này cấp mã theo TỪNG BẢN GHI
+  attendee, có thể khiến một người nhận nhiều mã. Hãy dùng `final-attendee-roster:gen-lucky`. Tiếp
+  tục?"* + `$this->confirm()` (bỏ qua bằng `--force` cho script).
+- **Không** để lệnh này trong bất kỳ cron/script tự động nào.
+
 ---
 
 ## 10. Frontend Yii
