@@ -2312,14 +2312,15 @@ class ReportAttendeeStatsController extends AdminController
             return $items;
         };
 
-        // Số cột "Nội dung" khi tách: theo số nội dung nhiều nhất của 1 người (tối thiểu 1)
+        // Số cột "Nội dung" khi tách: tối thiểu 5 cột (Nội dung 1..5),
+        // tự mở rộng nếu có người tham gia nhiều hơn 5 nội dung.
         $splitCount = 0;
         if ($splitContents) {
             foreach ($people as $p) {
                 $n = count($buildItems($p));
                 if ($n > $splitCount) $splitCount = $n;
             }
-            if ($splitCount < 1) $splitCount = 1;
+            if ($splitCount < 5) $splitCount = 5;
         }
         if ($includeUnitCols) {
             $fixedHeaders = array('STT', 'Mã ĐV', 'Đơn vị', 'Tên đơn vị trên thẻ', 'Họ và tên', 'Giới tính', 'Size áo', 'Mã NV', 'Chức danh', 'Bộ phận');
