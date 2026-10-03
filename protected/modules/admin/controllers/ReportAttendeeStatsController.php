@@ -2227,7 +2227,8 @@ class ReportAttendeeStatsController extends AdminController
 
             $title = $cs['title'] . ($eventName !== '' ? ' - ' . mb_strtoupper($eventName, 'UTF-8') : '');
             $groupByUnit = !isset($cs['group']) || $cs['group'] !== false;
-            $this->writeFinalistSheet($sheet, $title, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true, $cs['content'], $groupByUnit);
+            $splitContents = isset($cs['splitContents']) ? $cs['splitContents'] : false;
+            $this->writeFinalistSheet($sheet, $title, $people, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true, $cs['content'], $groupByUnit, $splitContents);
         }
 
         // Các sheet tiếp theo: mỗi đơn vị 1 sheet
