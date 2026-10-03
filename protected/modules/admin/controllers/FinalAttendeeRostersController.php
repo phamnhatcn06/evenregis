@@ -42,7 +42,8 @@ class FinalAttendeeRostersController extends AdminController
             $filterOptions = FinalAttendeeRosters::getFilterOptions(
                 $eventId,
                 $periodId,
-                isset($params['property_id']) ? $params['property_id'] : null
+                isset($params['property_id']) ? $params['property_id'] : null,
+                isset($params['division_code']) ? $params['division_code'] : null
             );
 
             $lastSyncedAt = $this->resolveLastSyncedAt($dataProvider);
