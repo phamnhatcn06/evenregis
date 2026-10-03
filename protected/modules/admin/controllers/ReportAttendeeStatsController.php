@@ -2436,30 +2436,14 @@ class ReportAttendeeStatsController extends AdminController
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['position']);
             $sheet->setCellValueByColumnAndRow($colIndex++, $row, $p['department_name']);
             if ($listContents) {
-                $items = array();
-                if ($allowContent('sports')) {
-                    foreach ($sportColumns as $sc) {
-                        if (isset($p['sports'][$sc['sport_id']])) $items[] = $sc['name'];
+                $items = $buildItems($p);
+                if ($splitContents) {
+                    for ($i = 0; $i < $splitCount; $i++) {
+                        $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($items[$i]) ? $items[$i] : '');
                     }
+                } else {
+                    $sheet->setCellValueByColumnAndRow($colIndex++, $row, implode(', ', $items));
                 }
-                if ($allowContent('competitions')) {
-                    foreach ($compColumns as $cc) {
-                        if (isset($p['competitions'][$cc['competition_id']])) $items[] = $cc['name'];
-                    }
-                }
-                if ($allowContent('talent') && $hasTalent && $p['talent']) {
-                    if (!empty($p['talent_entries'])) {
-                        foreach ($p['talent_entries'] as $te) {
-                            $label = 'Văn nghệ - ' . (isset($te['title']) && $te['title'] !== '' ? $te['title'] : 'Chưa đặt tên');
-                            if (!empty($te['is_alliance_team'])) $label .= ' (Liên quân)';
-                            $items[] = $label;
-                        }
-                    } else {
-                        $items[] = 'Văn nghệ';
-                    }
-                }
-                if ($allowContent('miss') && $hasMiss && $p['miss']) $items[] = 'Miss';
-                $sheet->setCellValueByColumnAndRow($colIndex++, $row, implode(', ', $items));
             } else {
                 foreach ($sportColumns as $sc) {
                     $sheet->setCellValueByColumnAndRow($colIndex++, $row, isset($p['sports'][$sc['sport_id']]) ? 'x' : '');
