@@ -8,7 +8,7 @@
 class FinalAttendeeRostersController extends AdminController
 {
     /** Số dòng mỗi trang cho phép chọn */
-    const PAGE_SIZES = array(25, 50, 100);
+    const PAGE_SIZES = array(25, 50, 100, 200);
 
     /** Số dòng mỗi lần gọi API khi xuất Excel */
     const EXPORT_CHUNK_SIZE = 500;
@@ -109,7 +109,7 @@ class FinalAttendeeRostersController extends AdminController
         $headers = array(
             'Mã lucky', 'Định danh đăng nhập', 'Họ và tên', 'Mã nhân viên', 'Số CCCD', 'Ngày sinh',
             'Số điện thoại', 'Đơn vị', 'Nhãn in thẻ', 'Bộ phận', 'Phòng ban',
-            'Chức danh hiển thị', 'Chức danh gốc (SMILE)', 'Size áo', 'Số thẻ',
+            'Chức danh hiển thị', 'Chức danh gốc (SMILE)', 'Nội dung tham gia', 'Size áo', 'Số thẻ',
             'Loại', 'Trạng thái', 'Đã đặt PIN', 'Đã sửa tay', 'Xung đột',
         );
 
@@ -144,6 +144,23 @@ class FinalAttendeeRostersController extends AdminController
                 $overriddenLabels[] = isset($fieldLabels[$field]) ? $fieldLabels[$field] : $field;
             }
 
+            $contentNames = array();
+            if (!empty($item['content_names']) && is_array($item['content_names'])) {
+                $contentNames = $item['content_names'];
+            } elseif (!empty($item['participations']) && is_array($item['participations'])) {
+                foreach ($item['participations'] as $p) {
+                    if (is_array($p) && !empty($p['name'])) {
+                        $contentNames[] = $p['name'];
+                    } elseif (is_object($p) && !empty($p->name)) {
+                        $contentNames[] = $p->name;
+                    }
+                }
+            }
+            $contentStr = implode(', ', array_unique($contentNames));
+            if ($contentStr === '') {
+                $contentStr = $this->excelTypeLabel($item);
+            }
+
             $values = array(
                 $this->excelText($item, 'lucky_number'),
                 $this->excelText($item, 'login_identifier'),
@@ -158,6 +175,7 @@ class FinalAttendeeRostersController extends AdminController
                 $this->excelText($item, 'department_name'),
                 $this->excelText($item, 'position_display'),
                 $this->excelText($item, 'position_name'),
+                $contentStr,
                 $this->excelText($item, 'shirt_size'),
                 $this->excelText($item, 'badge_number'),
                 $this->excelTypeLabel($item),
@@ -606,6 +624,77 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Gán thủ công mã lucky cho một người (hỗ trợ toggle/swap nếu trùng).
+     */
+    public function actionSetLucky()
+    {
+        if (!$this->guardWrite('update')) {
+            return;
+        }
+
+        $id          = (int) Yii::app()->request->getPost('id');
+        $luckyNumber = trim((string) Yii::app()->request->getPost('lucky_number'));
+
+        if (!$id || $luckyNumber === '') {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng cung cấp mã người và số lucky.'), 422);
+            return;
+        }
+
+        $result = FinalAttendeeRosters::setLuckyViaApi($id, $luckyNumber);
+
+        if (!$result['success']) {
+            $status = isset($result['code']) && (int) $result['code'] >= 400 ? (int) $result['code'] : 500;
+            $this->renderJson(array(
+                'success' => false,
+                'message' => $result['error'] ?: 'Không thể gán mã lucky.',
+            ), $status);
+            return;
+        }
+
+        $data = isset($result['data']['data']) ? $result['data']['data'] : array();
+
+        $this->renderJson(array(
+            'success' => true,
+            'message' => isset($result['data']['message']) ? $result['data']['message'] : 'Đã cập nhật mã lucky.',
+            'data'    => $data,
+        ));
+    }
+
+    /**
+     * Kiểm tra người sở hữu mã lucky trong sự kiện (cho preview/warning swap).
+     */
+    public function actionCheckLucky()
+    {
+        if (!PermissionHelper::can('finalattendeerosters', 'read')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền.'), 403);
+            return;
+        }
+
+        $eventId     = (int) $this->getIntParam('event_id');
+        $luckyNumber = trim((string) Yii::app()->request->getParam('lucky_number'));
+        $excludeId   = $this->getIntParam('exclude_id');
+
+        if (!$eventId || $luckyNumber === '') {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu tham số.'), 422);
+            return;
+        }
+
+        $result = FinalAttendeeRosters::checkLuckyViaApi($eventId, $luckyNumber, $excludeId);
+
+        if (!$result['success']) {
+            $this->renderJson(array('success' => false, 'message' => 'Không thể kiểm tra mã lucky.'), 500);
+            return;
+        }
+
+        $data = isset($result['data']['data']) ? $result['data']['data'] : array('exists' => false, 'owner' => null);
+
+        $this->renderJson(array(
+            'success' => true,
+            'data'    => $data,
+        ));
+    }
+
+    /**
      * Kiểm tra POST + quyền cho các action ghi. Trả false nếu đã xuất lỗi.
      */
     protected function guardWrite($operation)
@@ -831,7 +920,7 @@ class FinalAttendeeRostersController extends AdminController
     {
         $size = $this->getIntParam('per_page');
 
-        return in_array($size, self::PAGE_SIZES, true) ? $size : self::PAGE_SIZES[0];
+        return in_array($size, self::PAGE_SIZES, true) ? $size : 50;
     }
 
     /**

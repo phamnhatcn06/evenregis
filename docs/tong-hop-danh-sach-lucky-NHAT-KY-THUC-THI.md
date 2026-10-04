@@ -410,3 +410,20 @@ Ghi lại để sau này không ai đi sửa theo:
 Bảng DB local đã migrate và có dữ liệu, nên ở máy này mọi thứ chạy — nhưng deploy bằng `git pull`
 thì server **không có** `FinalAttendeeRosterService` trong khi provider vẫn bind vào nó. Ở FE thì
 job auto-commit đã commit sẵn.
+
+### 11.7 Tinh chỉnh giao diện & Cột "Nội dung tham gia" (2026-10-04)
+
+- **Bỏ filter Bộ phận:** Xoá dropdown Bộ phận trên thanh bộ lọc hàng 1; phân bổ lại tỉ lệ lưới: Từ khoá (`col-lg-5 col-md-6`), Đơn vị (`col-lg-5 col-md-6`), Nút tìm kiếm (`col-lg-2 col-md-12`).
+- **Filter Đơn vị Select2:** Tích hợp thư viện Select2 trên dropdown Đơn vị (`#filter-property`) với ô tìm kiếm nhanh, nút xoá chọn (`allowClear: true`), styled đồng bộ chuẩn giao diện Hope UI Bootstrap 5. Cập nhật `bindDependentFilters` để reload danh sách Phòng ban theo Đơn vị vừa chọn.
+- **Thêm cột "Nội dung tham gia":**
+  - **BE:** Batch eager loading 1 SQL query duy nhất cho toàn bộ `final_attendee_contents` của các thí sinh trên trang (`FinalAttendeeRosterRepository.php`), bổ sung accessor `participations` (`type` và `name`) cùng `content_names` vào payload của `FinalAttendeeRosterResource.php`.
+  - **FE Model:** Thêm thuộc tính `$participations` và `$content_names` vào [`FinalAttendeeRosters.php`](file:///e:/eventregis/protected/models/FinalAttendeeRosters.php).
+  - **FE Table View:** Thêm cột "Nội dung tham gia" sau "Chức danh" trong [`admin.php`](file:///e:/eventregis/protected/modules/admin/views/finalAttendeeRosters/admin.php) với các pill badge màu sắc phong phú, micro-animation hover và icon tương ứng:
+    - Thể thao (Emerald / `fa-trophy`)
+    - Hội diễn văn nghệ (Purple / `fa-music`)
+    - Người đẹp / Miss (Rose / `fa-star`)
+    - Hội thi chung (Blue / `fa-flag-checkered`)
+    - Vai trò / Ghi chú (Amber / `fa-briefcase` / `fa-user-circle-o`)
+  - **Excel Export:** Bổ sung cột "Nội dung tham gia" vào file xuất Excel trong [`FinalAttendeeRostersController.php`](file:///e:/eventregis/protected/modules/admin/controllers/FinalAttendeeRostersController.php).
+  - **Empty state:** Cập nhật `colspan` bảng rỗng từ `8 : 7` lên `9 : 8`.
+

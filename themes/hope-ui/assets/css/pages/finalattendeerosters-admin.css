@@ -202,9 +202,9 @@
    KPI Stat Cards
    ========================================================================== */
 .far-kpi-card {
-    border-radius: var(--far-radius);
-    border: 1px solid var(--far-border-color);
-    box-shadow: var(--far-card-shadow);
+    border-radius: 14px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     background: #ffffff;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -214,48 +214,68 @@
 
 .far-kpi-card:hover {
     transform: translateY(-3px);
-    box-shadow: var(--far-card-shadow-hover);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     border-color: #cbd5e1;
 }
 
 .far-kpi-body {
-    padding: 18px 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.far-kpi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.far-kpi-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #475569;
+    line-height: 1.3;
+    margin: 0;
 }
 
 .far-kpi-icon-bubble {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    margin-bottom: 12px;
+    font-size: 15px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .far-kpi-bubble-primary {
-    background: var(--far-primary-soft);
-    color: var(--far-primary);
+    background: rgba(58, 87, 232, 0.12);
+    color: #3a57e8;
 }
 
 .far-kpi-bubble-success {
-    background: var(--far-success-soft);
-    color: var(--far-success);
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
 }
 
 .far-kpi-bubble-warning {
-    background: var(--far-warning-soft);
-    color: var(--far-warning);
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
 }
 
 .far-kpi-bubble-danger {
-    background: var(--far-danger-soft);
-    color: var(--far-danger);
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
 }
 
 .far-kpi-bubble-info {
-    background: var(--far-info-soft);
-    color: var(--far-info);
+    background: rgba(8, 177, 186, 0.12);
+    color: #0891b2;
 }
 
 .far-kpi-bubble-muted {
@@ -264,27 +284,66 @@
 }
 
 .far-kpi-val {
-    font-size: 26px;
-    font-weight: 700;
-    line-height: 1.1;
-    color: #1e293b;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #0f172a;
     letter-spacing: -0.5px;
+    margin-bottom: 8px;
 }
 
-.far-kpi-label {
-    font-size: 12.5px;
-    font-weight: 500;
-    color: #64748b;
-    margin-top: 4px;
+.far-kpi-footer {
+    margin-top: auto;
 }
 
+/* KPI Status Badges - Chữ đậm, tương phản cao, tuyệt đối không bị mờ */
 .far-kpi-status-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 12px;
-    display: inline-block;
-    margin-top: 6px;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    padding: 3px 10px !important;
+    border-radius: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    line-height: 1.3 !important;
+    border: 1px solid transparent !important;
+    white-space: nowrap !important;
+}
+
+.far-kpi-status-badge.badge-subtle-primary {
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border-color: #bfdbfe !important;
+}
+
+.far-kpi-status-badge.badge-subtle-success {
+    background: #ecfdf5 !important;
+    color: #047857 !important;
+    border-color: #a7f3d0 !important;
+}
+
+.far-kpi-status-badge.badge-subtle-warning {
+    background: #fffbeb !important;
+    color: #b45309 !important;
+    border-color: #fde68a !important;
+}
+
+.far-kpi-status-badge.badge-subtle-danger {
+    background: #fef2f2 !important;
+    color: #b91c1c !important;
+    border-color: #fecaca !important;
+}
+
+.far-kpi-status-badge.badge-subtle-info {
+    background: #f0fdfa !important;
+    color: #0f766e !important;
+    border-color: #99f6e4 !important;
+}
+
+.far-kpi-status-badge.badge-subtle-secondary {
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
 }
 
 /* ==========================================================================
@@ -468,6 +527,28 @@
     border: 1px dashed #cbd5e1;
 }
 
+.far-lucky-edit-btn {
+    border: none;
+    background: #e2e8f0;
+    color: #475569;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.far-lucky-edit-btn:hover {
+    background: #0d6efd;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
 .far-login-id {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 11.5px;
@@ -573,9 +654,177 @@
     transition: opacity 0.2s;
 }
 
-.far-cell-reset-btn:hover {
+/* Prominent Status Pills (Cột Trạng thái nổi bật) */
+.far-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.far-status-pill i {
+    font-size: 12px;
+}
+
+.far-status-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.far-status-pill-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+
+.far-status-pill-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+.far-status-pill-info {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+}
+
+.far-status-pill-secondary {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.far-conflict-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    box-shadow: 0 1px 3px rgba(185, 28, 28, 0.1);
+}
+
+/* Inline Editable Cells (Sửa trực tiếp chức danh trên bảng) */
+.far-inline-editable-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 100%;
+}
+
+.far-inline-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px dashed transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    max-width: 100%;
+}
+
+.far-inline-view:hover {
+    background: rgba(58, 87, 232, 0.08);
+    border-color: rgba(58, 87, 232, 0.4);
+}
+
+.far-inline-view:hover .far-inline-edit-btn {
     opacity: 1;
-    color: #b45309;
+    color: var(--far-primary);
+    transform: scale(1.15);
+}
+
+.far-inline-text {
+    font-weight: 600;
+    color: #1e293b;
+    word-break: break-word;
+    font-size: 13px;
+}
+
+.far-inline-edit-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 11.5px;
+    color: #94a3b8;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.far-inline-editor {
+    min-width: 190px;
+    max-width: 280px;
+}
+
+.far-inline-editor .input-group {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.far-inline-editor .far-inline-input {
+    font-size: 13px;
+    font-weight: 500;
+    border-color: #3a57e8;
+    padding: 5px 8px;
+}
+
+.far-inline-editor .far-inline-input:focus {
+    box-shadow: none;
+    border-color: #3a57e8;
+}
+
+.far-inline-editor .far-inline-save-btn,
+.far-inline-editor .far-inline-cancel-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+}
+
+.far-inline-editor .far-inline-save-btn {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+.far-inline-editor .far-inline-save-btn:hover {
+    background: #059669;
+    border-color: #059669;
+}
+
+.far-inline-editor .far-inline-cancel-btn {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+.far-inline-editor .far-inline-cancel-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
 }
 
 /* Subtle Badges */
@@ -677,6 +926,16 @@
     color: #ffffff;
 }
 
+.far-action-lucky {
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.far-action-lucky:hover {
+    background: #0d6efd;
+    color: #ffffff;
+}
+
 .far-action-merge {
     background: rgba(108, 93, 211, 0.1);
     color: #6c5dd3;
@@ -723,35 +982,104 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 14px 18px;
+    padding: 14px 20px;
     background: #ffffff;
     border-top: 1px solid #edf2f7;
 }
 
 .far-pagination-footer .pagination {
-    margin-bottom: 0;
-    gap: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex-wrap: wrap;
 }
 
+.far-pagination-footer .pagination li {
+    display: inline-flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Các nút bấm (hỗ trợ cả thẻ a và thẻ span do Yii CLinkPager sinh ra, cùng với .page-link) */
+.far-pagination-footer .pagination li a,
+.far-pagination-footer .pagination li span,
 .far-pagination-footer .pagination .page-item .page-link {
-    border-radius: 6px;
-    border-color: #e2e8f0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
     color: #475569;
     font-size: 13px;
-    font-weight: 500;
-    padding: 6px 12px;
-    transition: all 0.15s ease;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    user-select: none;
 }
 
-.far-pagination-footer .pagination .page-item.active .page-link {
-    background-color: var(--far-primary);
-    border-color: var(--far-primary);
-    color: #ffffff;
-    box-shadow: 0 2px 6px rgba(58, 87, 232, 0.3);
-}
-
+/* Hover trên nút bấm */
+.far-pagination-footer .pagination li a:hover,
 .far-pagination-footer .pagination .page-item .page-link:hover {
     background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: var(--far-primary, #3a57e8);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Trang đang chọn (active / selected) */
+.far-pagination-footer .pagination li.active a,
+.far-pagination-footer .pagination li.active span,
+.far-pagination-footer .pagination li.selected a,
+.far-pagination-footer .pagination li.selected span,
+.far-pagination-footer .pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #3a57e8 0%, #203ac5 100%) !important;
+    border-color: #3a57e8 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(58, 87, 232, 0.35);
+    cursor: default;
+    pointer-events: none;
+    transform: none;
+}
+
+/* Nút bị vô hiệu hóa (disabled / hidden) */
+.far-pagination-footer .pagination li.disabled a,
+.far-pagination-footer .pagination li.disabled span,
+.far-pagination-footer .pagination li.hidden,
+.far-pagination-footer .pagination .page-item.disabled .page-link {
+    background-color: #f8fafc;
+    border-color: #edf2f7;
+    color: #cbd5e1 !important;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Các nút điều hướng đầu, trước, sau, cuối */
+.far-pagination-footer .pagination li.first a,
+.far-pagination-footer .pagination li.first span,
+.far-pagination-footer .pagination li.previous a,
+.far-pagination-footer .pagination li.previous span,
+.far-pagination-footer .pagination li.next a,
+.far-pagination-footer .pagination li.next span,
+.far-pagination-footer .pagination li.last a,
+.far-pagination-footer .pagination li.last span {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 11px;
 }
 
 /* ==========================================================================
@@ -797,4 +1125,169 @@
         justify-content: flex-start;
         margin-top: 12px;
     }
+}
+
+/* ==========================================================================
+   Select2 Customization for Filter Property
+   ========================================================================== */
+.far-filter-card .select2-container {
+    width: 100% !important;
+}
+
+.far-filter-card .select2-container .select2-selection--single {
+    height: 41px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 6px 12px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.far-filter-card .select2-container--default .select2-selection--single:focus,
+.far-filter-card .select2-container--default.select2-container--open .select2-selection--single {
+    border-color: var(--far-primary);
+    box-shadow: 0 0 0 3px rgba(58, 87, 232, 0.15);
+    outline: none;
+}
+
+.far-filter-card .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #334155;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: normal;
+    padding-left: 0;
+    padding-right: 24px;
+}
+
+.far-filter-card .select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: #94a3b8;
+}
+
+.far-filter-card .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 39px;
+    right: 8px;
+    top: 1px;
+}
+
+.far-filter-card .select2-container--default .select2-selection--single .select2-selection__clear {
+    margin-right: 20px;
+    font-size: 16px;
+    line-height: 26px;
+    color: #94a3b8;
+}
+
+.far-filter-card .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+    color: #ef4444;
+}
+
+.select2-dropdown {
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    z-index: 1060 !important;
+}
+
+.select2-dropdown .select2-search--dropdown {
+    padding: 8px !important;
+}
+
+.select2-dropdown .select2-search__field {
+    border-radius: 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+}
+
+.select2-dropdown .select2-search__field:focus {
+    border-color: var(--far-primary) !important;
+    outline: none !important;
+}
+
+.select2-results__option {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    color: #334155 !important;
+}
+
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: var(--far-primary) !important;
+    color: #ffffff !important;
+}
+
+.select2-container--default .select2-results__option--selected {
+    background-color: rgba(58, 87, 232, 0.1) !important;
+    color: var(--far-primary) !important;
+    font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   Nội dung tham gia (Participation Content Pills)
+   ========================================================================== */
+.far-contents-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.far-content-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+}
+
+.far-content-pill:hover {
+    transform: translateY(-1px);
+}
+
+/* Thể thao: Xanh ngọc / Emerald */
+.far-content-sport {
+    background-color: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #047857;
+}
+
+/* Hội diễn / Tiết mục văn nghệ: Tím pastel / Purple */
+.far-content-talent {
+    background-color: #f5f3ff;
+    border-color: #ddd6fe;
+    color: #6d28d9;
+}
+
+/* Người đẹp / Miss: Hồng pastel / Rose */
+.far-content-beauty {
+    background-color: #fff1f2;
+    border-color: #fecdd3;
+    color: #be123c;
+}
+
+/* Hội thi / Vòng thi chung: Xanh dương / Blue */
+.far-content-competition {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+}
+
+/* Vai trò (Trưởng đoàn, Lái xe, HO thêm): Hổ phách / Amber */
+.far-content-role {
+    background-color: #fffbeb;
+    border-color: #fde68a;
+    color: #b45309;
+}
+
+/* Ghi chú / Khác: Xám slate */
+.far-content-default {
+    background-color: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #475569;
 }

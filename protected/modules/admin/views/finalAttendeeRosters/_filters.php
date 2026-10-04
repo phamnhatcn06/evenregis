@@ -16,12 +16,6 @@ foreach ($filterOptions['properties'] as $property) {
     $propertyOptions[$property['id']] = $property['name'];
 }
 
-$divisionOptions = array();
-foreach ($filterOptions['divisions'] as $division) {
-    $divisionOptions[$division['code']] = $division['name']
-        . (isset($division['count']) ? ' (' . $division['count'] . ')' : '');
-}
-
 $departmentOptions = array();
 foreach ($filterOptions['departments'] as $department) {
     $departmentOptions[$department['code']] = $department['name']
@@ -35,11 +29,6 @@ $activeTags  = array();
 if (!empty($filters['property_id']) && isset($propertyOptions[$filters['property_id']])) {
     $activeCount++;
     $activeTags[] = 'Đơn vị: ' . $propertyOptions[$filters['property_id']];
-}
-if (!empty($filters['division_code'])) {
-    $activeCount++;
-    $divName = isset($divisionOptions[$filters['division_code']]) ? $divisionOptions[$filters['division_code']] : $filters['division_code'];
-    $activeTags[] = 'Bộ phận: ' . $divName;
 }
 if (!empty($filters['department_code'])) {
     $activeCount++;
@@ -117,7 +106,7 @@ $hasAdvanced = !empty($filters['department_code'])
 
             <!-- Hàng 1: Tìm kiếm nhanh & cơ cấu chính -->
             <div class="row g-2 align-items-end">
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-5 col-md-6">
                     <label class="form-label small fw-semibold text-muted mb-1">Từ khoá tìm kiếm</label>
                     <div class="far-input-with-icon">
                         <i class="fa fa-search"></i>
@@ -128,25 +117,16 @@ $hasAdvanced = !empty($filters['department_code'])
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-5 col-md-6">
                     <label class="form-label small fw-semibold text-muted mb-1">Đơn vị</label>
                     <?php echo CHtml::dropDownList('property_id', $filters['property_id'], $propertyOptions, array(
-                        'class' => 'form-select',
+                        'class' => 'form-select js-select2',
                         'empty' => '-- Tất cả đơn vị --',
                         'id'    => 'filter-property',
                     )); ?>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <label class="form-label small fw-semibold text-muted mb-1">Bộ phận</label>
-                    <?php echo CHtml::dropDownList('division_code', $filters['division_code'], $divisionOptions, array(
-                        'class' => 'form-select',
-                        'empty' => '-- Tất cả bộ phận --',
-                        'id'    => 'filter-division',
-                    )); ?>
-                </div>
-
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-2 col-md-12">
                     <button type="submit" class="far-btn far-btn-primary w-100 justify-content-center">
                         <i class="fa fa-search"></i>
                         <span>Tìm kiếm</span>

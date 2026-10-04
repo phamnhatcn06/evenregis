@@ -23,14 +23,21 @@ $this->Tabletitle  = 'Tổng hợp danh sách Vòng Chung Kết';
 
 // Đăng ký CSS và JS chuyên biệt
 Yii::app()->clientScript->registerCssFile(
-    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.1'
+    Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css'
+);
+Yii::app()->clientScript->registerCssFile(
+    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.5'
+);
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js',
+    CClientScript::POS_END
 );
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/plugins/toast.js',
     CClientScript::POS_END
 );
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/finalattendeerosters-admin.js',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/finalattendeerosters-admin.js?v=2.5',
     CClientScript::POS_END
 );
 
@@ -56,6 +63,8 @@ $flashMessages = Yii::app()->user->getFlashes();
      data-split-url="<?php echo $this->createUrl('split'); ?>"
      data-delete-url="<?php echo $this->createUrl('delete'); ?>"
      data-clear-conflict-url="<?php echo $this->createUrl('clearConflict'); ?>"
+     data-set-lucky-url="<?php echo $this->createUrl('setLucky'); ?>"
+     data-check-lucky-url="<?php echo $this->createUrl('checkLucky'); ?>"
      data-list-url="<?php echo $this->createUrl('admin'); ?>"
      data-search-url="<?php echo $this->createUrl('filterOptions'); ?>"
      data-can-update="<?php echo $canUpdate ? 1 : 0; ?>"
@@ -301,14 +310,18 @@ $flashMessages = Yii::app()->user->getFlashes();
             <div class="col-xl-2 col-md-4 col-6">
                 <div class="far-kpi-card">
                     <div class="far-kpi-body">
-                        <div class="far-kpi-icon-bubble <?php echo $card['bubbleClass']; ?>">
-                            <i class="fa <?php echo $card['icon']; ?>"></i>
+                        <div class="far-kpi-header">
+                            <span class="far-kpi-label"><?php echo $card['label']; ?></span>
+                            <div class="far-kpi-icon-bubble <?php echo $card['bubbleClass']; ?>">
+                                <i class="fa <?php echo $card['icon']; ?>"></i>
+                            </div>
                         </div>
                         <div class="far-kpi-val"><?php echo number_format($card['value']); ?></div>
-                        <div class="far-kpi-label"><?php echo $card['label']; ?></div>
-                        <span class="badge <?php echo $card['statusBadge']; ?> far-kpi-status-badge">
-                            <?php echo $card['statusText']; ?>
-                        </span>
+                        <div class="far-kpi-footer">
+                            <span class="badge <?php echo $card['statusBadge']; ?> far-kpi-status-badge">
+                                <?php echo $card['statusText']; ?>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -351,13 +364,11 @@ $flashMessages = Yii::app()->user->getFlashes();
                             <th style="width: 50px;" class="text-center">STT</th>
                             <th style="width: 140px;">Mã lucky</th>
                             <th style="min-width: 220px;">Họ và tên</th>
-                            <th style="width: 110px;">Mã NV</th>
                             <th style="min-width: 160px;">Đơn vị</th>
-                            <th style="min-width: 140px;">Chức danh</th>
-                            <th style="width: 90px;" class="text-center">Size áo</th>
-                            <th style="width: 125px;">Loại</th>
-                            <th style="width: 95px;" class="text-center">Mã PIN</th>
-                            <th style="width: 140px;">Trạng thái</th>
+                            <th style="min-width: 180px;">Chức danh</th>
+                            <th style="min-width: 190px;">Nội dung tham gia</th>
+                            <th style="width: 85px;" class="text-center">Size áo</th>
+                            <th style="width: 150px;" class="text-center">Trạng thái</th>
                             <?php if ($canUpdate): ?>
                                 <th style="width: 110px;" class="text-end pe-3">Thao tác</th>
                             <?php endif; ?>
@@ -404,9 +415,21 @@ $flashMessages = Yii::app()->user->getFlashes();
                             <!-- Mã lucky & Định danh -->
                             <td>
                                 <?php if ($row->lucky_number): ?>
-                                    <div class="far-lucky-badge">
-                                        <i class="fa fa-ticket"></i>
-                                        <span><?php echo CHtml::encode($row->lucky_number); ?></span>
+                                    <div class="d-flex align-items-center gap-1 mb-1">
+                                        <div class="far-lucky-badge mb-0">
+                                            <i class="fa fa-ticket"></i>
+                                            <span><?php echo CHtml::encode($row->lucky_number); ?></span>
+                                        </div>
+                                        <?php if ($canUpdate && !$isWithdrawn): ?>
+                                            <button type="button" class="far-lucky-edit-btn js-set-lucky"
+                                                    data-roster-id="<?php echo (int) $row->id; ?>"
+                                                    data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                                    data-unit="<?php echo CHtml::encode($row->property_name); ?>"
+                                                    data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
+                                                    title="Sửa / Hoán đổi mã lucky">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="far-login-id">
                                         <span><?php echo CHtml::encode($row->login_identifier); ?></span>
@@ -417,9 +440,21 @@ $flashMessages = Yii::app()->user->getFlashes();
                                         </button>
                                     </div>
                                 <?php else: ?>
-                                    <span class="far-lucky-badge-empty">
-                                        <i class="fa fa-hourglass-o me-1"></i>Chưa cấp
-                                    </span>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="far-lucky-badge-empty">
+                                            <i class="fa fa-hourglass-o me-1"></i>Chưa cấp
+                                        </span>
+                                        <?php if ($canUpdate && !$isWithdrawn): ?>
+                                            <button type="button" class="far-lucky-edit-btn js-set-lucky"
+                                                    data-roster-id="<?php echo (int) $row->id; ?>"
+                                                    data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                                    data-unit="<?php echo CHtml::encode($row->property_name); ?>"
+                                                    data-lucky=""
+                                                    title="Gán mã lucky thủ công">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
                                 <?php endif; ?>
                             </td>
 
@@ -448,6 +483,11 @@ $flashMessages = Yii::app()->user->getFlashes();
                                             <?php else: ?>
                                                 <span class="text-muted"><i class="fa fa-user-plus me-1"></i>Thêm thủ công</span>
                                             <?php endif; ?>
+                                            <?php if (!empty($row->staff_code)): ?>
+                                                <span class="text-muted ms-2" title="Mã nhân viên">
+                                                    <i class="fa fa-id-badge me-1"></i><?php echo CHtml::encode($row->staff_code); ?>
+                                                </span>
+                                            <?php endif; ?>
                                         </div>
                                         <?php if (!empty($overridden)): ?>
                                             <div class="mt-1">
@@ -461,17 +501,6 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 </div>
                             </td>
 
-                            <!-- Mã NV -->
-                            <td>
-                                <?php echo $this->renderPartial('_cell', array(
-                                    'row'        => $row,
-                                    'field'      => 'staff_code',
-                                    'value'      => $row->staff_code,
-                                    'overridden' => $overridden,
-                                    'canUpdate'  => $canUpdate,
-                                ), true); ?>
-                            </td>
-
                             <!-- Đơn vị -->
                             <td>
                                 <?php echo $this->renderPartial('_cell', array(
@@ -483,15 +512,80 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 ), true); ?>
                             </td>
 
-                            <!-- Chức danh -->
+                            <!-- Chức danh (sửa trực tiếp tại chỗ) -->
                             <td>
                                 <?php echo $this->renderPartial('_cell', array(
                                     'row'        => $row,
                                     'field'      => 'position',
-                                    'value'      => $row->position_display,
+                                    'value'      => $row->position_display ?: $row->position,
                                     'overridden' => $overridden,
                                     'canUpdate'  => $canUpdate,
+                                    'isEditable' => true,
                                 ), true); ?>
+                            </td>
+
+                            <!-- Nội dung tham gia -->
+                            <td>
+                                <?php
+                                $participations = is_array($row->participations) ? $row->participations : array();
+                                if (empty($participations) && !empty($row->content_names) && is_array($row->content_names)) {
+                                    foreach ($row->content_names as $cname) {
+                                        $participations[] = array('type' => 'competition', 'name' => $cname);
+                                    }
+                                }
+                                ?>
+                                <?php if (!empty($participations)): ?>
+                                    <div class="far-contents-list">
+                                        <?php foreach ($participations as $part):
+                                            $pType = is_array($part) && isset($part['type']) ? $part['type'] : (is_object($part) && isset($part->type) ? $part->type : 'competition');
+                                            $pName = is_array($part) && isset($part['name']) ? $part['name'] : (is_object($part) && isset($part->name) ? $part->name : (string) $part);
+
+                                            $pillClass = 'far-content-default';
+                                            $iconClass = 'fa-tag';
+                                            if ($pType === 'sport') {
+                                                $pillClass = 'far-content-sport';
+                                                $iconClass = 'fa-trophy';
+                                            } elseif ($pType === 'talent') {
+                                                $pillClass = 'far-content-talent';
+                                                $iconClass = 'fa-music';
+                                            } elseif ($pType === 'beauty') {
+                                                $pillClass = 'far-content-beauty';
+                                                $iconClass = 'fa-star';
+                                            } elseif ($pType === 'competition') {
+                                                $pillClass = 'far-content-competition';
+                                                $iconClass = 'fa-flag-checkered';
+                                            } elseif ($pType === 'role') {
+                                                $pillClass = 'far-content-role';
+                                                $iconClass = 'fa-briefcase';
+                                            }
+                                        ?>
+                                            <span class="far-content-pill <?php echo $pillClass; ?>" title="<?php echo CHtml::encode($pName); ?>">
+                                                <i class="fa <?php echo $iconClass; ?>"></i>
+                                                <span><?php echo CHtml::encode($pName); ?></span>
+                                            </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <?php
+                                    $roleText = '';
+                                    if ($row->attendee_type && $row->attendee_type !== 'contestant') {
+                                        $typeOpts = FinalAttendeeRosters::getTypeOptions();
+                                        $roleText = isset($typeOpts[$row->attendee_type]) ? $typeOpts[$row->attendee_type] : $row->attendee_type;
+                                    } elseif ($row->note) {
+                                        $roleText = $row->note;
+                                    }
+                                    ?>
+                                    <?php if ($roleText !== ''): ?>
+                                        <div class="far-contents-list">
+                                            <span class="far-content-pill far-content-role" title="<?php echo CHtml::encode($roleText); ?>">
+                                                <i class="fa fa-user-circle-o"></i>
+                                                <span><?php echo CHtml::encode($roleText); ?></span>
+                                            </span>
+                                        </div>
+                                    <?php else: ?>
+                                        <span class="text-muted small">-</span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </td>
 
                             <!-- Size áo -->
@@ -511,59 +605,30 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 <?php endif; ?>
                             </td>
 
-                            <!-- Loại người tham dự -->
-                            <td>
-                                <?php
-                                $typeBadges = array(
-                                    'finalist' => array('label' => 'Vào chung kết', 'class' => 'badge-subtle-primary', 'icon' => 'fa-star'),
-                                    'director' => array('label' => 'Giám đốc',       'class' => 'badge-subtle-warning', 'icon' => 'fa-briefcase'),
-                                    'driver'   => array('label' => 'Lái xe',         'class' => 'badge-subtle-secondary', 'icon' => 'fa-car'),
-                                    'manual'   => array('label' => 'HO thêm tay',    'class' => 'badge-subtle-info', 'icon' => 'fa-user-plus'),
-                                );
-                                if (isset($typeBadges[$row->attendee_type])) {
-                                    $tb = $typeBadges[$row->attendee_type];
-                                    echo '<span class="badge ' . $tb['class'] . '"><i class="fa ' . $tb['icon'] . ' me-1"></i>' . CHtml::encode($tb['label']) . '</span>';
-                                } else {
-                                    echo FinalAttendeeRosters::getTypeBadge($row->attendee_type);
-                                }
-                                ?>
-                            </td>
-
-                            <!-- Mã PIN -->
-                            <td class="text-center">
-                                <?php if ($row->pin_is_set): ?>
-                                    <span class="badge badge-subtle-success" title="Người này đã tự đặt mã PIN">
-                                        <i class="fa fa-check-circle me-1"></i>Đã đặt
-                                    </span>
-                                <?php else: ?>
-                                    <span class="badge badge-subtle-secondary" title="Chưa tạo mã PIN bảo vệ">
-                                        <i class="fa fa-circle-o me-1"></i>Chưa đặt
-                                    </span>
-                                <?php endif; ?>
-                            </td>
-
                             <!-- Trạng thái -->
-                            <td>
+                            <td class="text-center">
                                 <?php if ($isWithdrawn): ?>
-                                    <span class="badge badge-subtle-danger">
-                                        <span class="far-status-dot bg-danger"></span>Đã huỷ
+                                    <span class="far-status-pill far-status-pill-danger">
+                                        <i class="fa fa-ban"></i> Đã huỷ
                                     </span>
                                 <?php elseif ($row->status == FinalAttendeeRosters::STATUS_ACTIVE): ?>
-                                    <span class="badge badge-subtle-success">
-                                        <span class="far-status-dot bg-success"></span>Tham dự
+                                    <span class="far-status-pill far-status-pill-success">
+                                        <i class="fa fa-check-circle"></i> Tham dự
                                     </span>
                                 <?php elseif ($row->status == FinalAttendeeRosters::STATUS_MANUAL): ?>
-                                    <span class="badge badge-subtle-info">
-                                        <span class="far-status-dot bg-info"></span>HO thêm
+                                    <span class="far-status-pill far-status-pill-info">
+                                        <i class="fa fa-user-plus"></i> HO thêm
                                     </span>
                                 <?php else: ?>
-                                    <?php echo FinalAttendeeRosters::getStatusLabel($row->status, $isWithdrawn); ?>
+                                    <span class="far-status-pill far-status-pill-secondary">
+                                        <?php echo CHtml::encode($row->status); ?>
+                                    </span>
                                 <?php endif; ?>
 
                                 <?php if ($row->conflict_flag): ?>
-                                    <div class="mt-1 d-flex align-items-center gap-1">
-                                        <span class="badge badge-subtle-danger" title="<?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>">
-                                            <i class="fa fa-exclamation-triangle me-1"></i><?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>
+                                    <div class="mt-1 d-flex align-items-center justify-content-center gap-1">
+                                        <span class="far-conflict-pill" title="<?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>">
+                                            <i class="fa fa-exclamation-triangle"></i><?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>
                                         </span>
                                         <?php if ($canUpdate): ?>
                                             <button type="button" class="btn btn-link btn-sm p-0 text-danger js-clear-conflict"
@@ -609,6 +674,18 @@ $flashMessages = Yii::app()->user->getFlashes();
 
                                     <?php if (!$isWithdrawn): ?>
                                         <button type="button"
+                                                class="far-action-btn far-action-lucky js-set-lucky"
+                                                data-roster-id="<?php echo (int) $row->id; ?>"
+                                                data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                                data-unit="<?php echo CHtml::encode($row->property_name); ?>"
+                                                data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
+                                                title="Gán / Hoán đổi mã lucky">
+                                            <i class="fa fa-ticket"></i>
+                                        </button>
+                                    <?php endif; ?>
+
+                                    <?php if (!$isWithdrawn): ?>
+                                        <button type="button"
                                                 class="far-action-btn far-action-merge js-merge-split"
                                                 data-roster-id="<?php echo (int) $row->id; ?>"
                                                 data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
@@ -640,7 +717,7 @@ $flashMessages = Yii::app()->user->getFlashes();
 
                         <?php if (empty($rows)): ?>
                         <tr>
-                            <td colspan="<?php echo $canUpdate ? 11 : 10; ?>" class="far-empty-state">
+                            <td colspan="<?php echo $canUpdate ? 9 : 8; ?>" class="far-empty-state">
                                 <div class="far-empty-icon">
                                     <i class="fa fa-inbox"></i>
                                 </div>
@@ -669,8 +746,20 @@ $flashMessages = Yii::app()->user->getFlashes();
                 $pageLimit  = min($dataProvider->pagination->offset + $dataProvider->pagination->pageSize, $totalCount);
                 ?>
                 <div class="far-pagination-footer">
-                    <div class="small text-muted">
-                        Hiển thị từ <strong><?php echo number_format($pageOffset); ?></strong> đến <strong><?php echo number_format($pageLimit); ?></strong> / Tổng cộng <strong><?php echo number_format($totalCount); ?></strong> người
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="small text-muted">
+                            Hiển thị từ <strong><?php echo number_format($pageOffset); ?></strong> đến <strong><?php echo number_format($pageLimit); ?></strong> / Tổng cộng <strong><?php echo number_format($totalCount); ?></strong> người
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted fw-semibold text-nowrap">Hiển thị:</span>
+                            <select class="form-select form-select-sm js-per-page-select" style="width: auto; font-weight: 600;">
+                                <?php foreach ($pageSizes as $size): ?>
+                                    <option value="<?php echo $size; ?>" <?php echo (int) $size === (int) $pageSize ? 'selected' : ''; ?>>
+                                        <?php echo $size; ?> dòng / trang
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
                     <?php $this->widget('CLinkPager', array(
                         'pages'                => $dataProvider->pagination,
@@ -692,6 +781,7 @@ $flashMessages = Yii::app()->user->getFlashes();
     <?php if ($canUpdate): ?>
         <?php $this->renderPartial('_modal_edit_row'); ?>
         <?php $this->renderPartial('_modal_merge_split'); ?>
+        <?php $this->renderPartial('_modal_set_lucky'); ?>
     <?php endif; ?>
 
     <?php if ($canCreate): ?>

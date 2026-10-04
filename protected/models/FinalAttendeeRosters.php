@@ -75,6 +75,9 @@ class FinalAttendeeRosters extends CFormModel
     public $deleted_at;
     public $is_withdrawn;
 
+    public $participations;
+    public $content_names;
+
     /**
      * Trường HO được sửa thủ công. Phải khớp với EDITABLE_FIELDS ở BE.
      * `lucky_number` cố ý KHÔNG có trong danh sách — mã đã cấp không bao giờ đổi.
@@ -120,7 +123,7 @@ class FinalAttendeeRosters extends CFormModel
                  attendee_type, shirt_size, note, sort_order, lucky_number, login_identifier,
                  lucky_provisioned_at, pin_is_set, qr_token, badge_number, overridden_fields, has_override,
                  source_snapshot, conflict_flag, status, last_synced_at, created_by, updated_by, deleted_by,
-                 created_at, updated_at, deleted_at, is_withdrawn',
+                 created_at, updated_at, deleted_at, is_withdrawn, participations, content_names',
                 'safe'
             ),
         );
@@ -136,6 +139,8 @@ class FinalAttendeeRosters extends CFormModel
             'division_name'    => 'Bộ phận',
             'department_name'  => 'Phòng ban',
             'position_display' => 'Chức danh',
+            'participations'   => 'Nội dung tham gia',
+            'content_names'    => 'Nội dung tham gia',
             'shirt_size'       => 'Size áo',
             'attendee_type'    => 'Loại',
             'lucky_number'     => 'Mã lucky',
@@ -415,6 +420,37 @@ class FinalAttendeeRosters extends CFormModel
             'auth_email' => isset($ssoUser['email']) ? $ssoUser['email'] : null,
         ));
     }
+
+    /**
+     * Gán thủ công mã lucky cho một người (hỗ trợ toggle/swap nếu trùng).
+     */
+    public static function setLuckyViaApi($id, $luckyNumber)
+    {
+        $ssoUser = AuthHandler::getUser();
+
+        return ApiClient::post(ApiEndpoints::FINAL_ATTENDEE_ROSTER_SET_LUCKY, array(
+            'id'           => (int) $id,
+            'lucky_number' => (string) $luckyNumber,
+            'updated_by'   => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
+    /**
+     * Kiểm tra người sở hữu mã lucky trong sự kiện.
+     */
+    public static function checkLuckyViaApi($eventId, $luckyNumber, $excludeId = null)
+    {
+        $params = array(
+            'event_id'     => (int) $eventId,
+            'lucky_number' => (string) $luckyNumber,
+        );
+        if ($excludeId) {
+            $params['exclude_id'] = (int) $excludeId;
+        }
+
+        return ApiClient::get(ApiEndpoints::FINAL_ATTENDEE_ROSTER_CHECK_LUCKY, $params);
+    }
+
 
     /**
      * Lấy đúng một trang dữ liệu, chỉ định trang tường minh.

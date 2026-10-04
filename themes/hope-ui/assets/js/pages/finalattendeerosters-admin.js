@@ -15,16 +15,20 @@
 
         showFlashMessages(config);
         bindCopyButtons();
+        initSelect2();
         bindDependentFilters(config);
         bindSyncModal();
         bindEditRowModal(config);
         bindCellReset(config);
+        bindInlineEdit(config);
         bindGenLuckyModal();
         bindLuckyConflictBadge();
         bindAddPersonModal();
         bindWithdraw(config);
         bindClearConflict(config);
         bindMergeSplitModal(config);
+        bindPerPageSelect();
+        bindSetLuckyModal(config);
     });
 
     /** Huỷ tư cách — luôn hỏi lại, và nói rõ mã lucky sẽ bị khoá chứ không mất. */
@@ -637,6 +641,259 @@
         });
     }
 
+    /**
+     * Sửa trực tiếp trường (inline edit) ngay trên bảng, ví dụ Chức danh.
+     */
+    function bindInlineEdit(config) {
+        var canUpdate = config.getAttribute('data-can-update') === '1';
+        if (!canUpdate) {
+            return;
+        }
+
+        var updateUrl = config.getAttribute('data-update-field-url');
+        if (!updateUrl) {
+            return;
+        }
+
+        var wrappers = document.querySelectorAll('.js-inline-editable');
+        if (!wrappers || wrappers.length === 0) {
+            return;
+        }
+
+        wrappers.forEach(function (wrapper) {
+            var view = wrapper.querySelector('.js-inline-view');
+            var editor = wrapper.querySelector('.js-inline-editor');
+            var input = wrapper.querySelector('.js-inline-input');
+            var saveBtn = wrapper.querySelector('.js-inline-save');
+            var cancelBtn = wrapper.querySelector('.js-inline-cancel');
+            var textSpan = wrapper.querySelector('.js-inline-text');
+            var rosterId = wrapper.getAttribute('data-roster-id');
+            var field = wrapper.getAttribute('data-field');
+
+            if (!view || !editor || !input) {
+                return;
+            }
+
+            var isSaving = false;
+
+            function openEditor() {
+                // Đóng các ô khác đang mở trước
+                wrappers.forEach(function (other) {
+                    if (other !== wrapper) {
+                        var otherEd = other.querySelector('.js-inline-editor');
+                        var otherVw = other.querySelector('.js-inline-view');
+                        if (otherEd && !otherEd.classList.contains('d-none')) {
+                            otherEd.classList.add('d-none');
+                            if (otherVw) otherVw.classList.remove('d-none');
+                        }
+                    }
+                });
+
+                view.classList.add('d-none');
+                editor.classList.remove('d-none');
+                input.value = wrapper.getAttribute('data-value') || '';
+                input.focus();
+                input.select();
+            }
+
+            function closeEditor() {
+                if (isSaving) return;
+                editor.classList.add('d-none');
+                view.classList.remove('d-none');
+                input.value = wrapper.getAttribute('data-value') || '';
+            }
+
+            function saveValue(onDone) {
+                if (isSaving) return;
+                var newVal = input.value.trim();
+                var curVal = (wrapper.getAttribute('data-value') || '').trim();
+
+                if (newVal === curVal) {
+                    closeEditor();
+                    if (typeof onDone === 'function') onDone();
+                    return;
+                }
+
+                isSaving = true;
+                input.disabled = true;
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                }
+                if (cancelBtn) cancelBtn.disabled = true;
+
+                var body = new FormData();
+                body.append('id', rosterId);
+                body.append('fields[' + field + ']', newVal);
+
+                fetch(updateUrl, {
+                    method: 'POST',
+                    body: body,
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin'
+                })
+                    .then(function (response) {
+                        return response.json().then(function (data) {
+                            return { ok: response.ok, data: data };
+                        });
+                    })
+                    .then(function (result) {
+                        isSaving = false;
+                        input.disabled = false;
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = '<i class="fa fa-check"></i>';
+                        }
+                        if (cancelBtn) cancelBtn.disabled = false;
+
+                        if (!result.ok || !result.data.success) {
+                            if (typeof Toast !== 'undefined') {
+                                Toast.error(result.data.message || 'Không thể cập nhật chức danh.');
+                            }
+                            return;
+                        }
+
+                        if (typeof Toast !== 'undefined') {
+                            Toast.success(result.data.message || 'Đã cập nhật chức danh.');
+                        }
+
+                        // Cập nhật giá trị hiển thị & attribute
+                        wrapper.setAttribute('data-value', newVal);
+                        textSpan.textContent = newVal !== '' ? newVal : '-';
+                        view.classList.add('far-cell-overridden');
+
+                        // Cập nhật dữ liệu dòng trong nút sửa modal (nếu có)
+                        updateModalRowData(rosterId, field, newVal);
+
+                        // Đảm bảo nút khôi phục gốc hiển thị nếu có giá trị gốc
+                        ensureResetButton(wrapper, field, rosterId, config);
+
+                        closeEditor();
+                        if (typeof onDone === 'function') onDone();
+                    })
+                    .catch(function () {
+                        isSaving = false;
+                        input.disabled = false;
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = '<i class="fa fa-check"></i>';
+                        }
+                        if (cancelBtn) cancelBtn.disabled = false;
+                        if (typeof Toast !== 'undefined') {
+                            Toast.error('Lỗi kết nối server.');
+                        }
+                    });
+            }
+
+            // Click vào ô (trừ nút reset) để mở editor
+            view.addEventListener('click', function (e) {
+                if (e.target.closest('.js-cell-reset')) {
+                    return;
+                }
+                openEditor();
+            });
+
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    saveValue();
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    closeEditor();
+                });
+            }
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveValue();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeEditor();
+                } else if (e.key === 'Tab' && !e.shiftKey) {
+                    e.preventDefault();
+                    saveValue(function () {
+                        focusNextInlineEditor(wrapper);
+                    });
+                }
+            });
+
+            // Click ra ngoài thì tự lưu nếu có sửa đổi, hoặc đóng nếu không đổi
+            document.addEventListener('mousedown', function (e) {
+                if (!wrapper.contains(e.target) && !editor.classList.contains('d-none')) {
+                    var newVal = input.value.trim();
+                    var curVal = (wrapper.getAttribute('data-value') || '').trim();
+                    if (newVal !== curVal) {
+                        saveValue();
+                    } else {
+                        closeEditor();
+                    }
+                }
+            });
+        });
+    }
+
+    function focusNextInlineEditor(currentWrapper) {
+        var all = Array.prototype.slice.call(document.querySelectorAll('.js-inline-editable'));
+        var idx = all.indexOf(currentWrapper);
+        if (idx !== -1 && idx + 1 < all.length) {
+            var next = all[idx + 1];
+            var nextView = next.querySelector('.js-inline-view');
+            if (nextView) {
+                nextView.click();
+            }
+        }
+    }
+
+    function updateModalRowData(rosterId, field, newVal) {
+        document.querySelectorAll('.js-edit-row').forEach(function (btn) {
+            var raw = btn.getAttribute('data-row');
+            if (!raw) return;
+            var row = parseJson(raw);
+            if (row && String(row.id) === String(rosterId)) {
+                row[field] = newVal;
+                if (!Array.isArray(row.overridden_fields)) {
+                    row.overridden_fields = [];
+                }
+                if (row.overridden_fields.indexOf(field) === -1) {
+                    row.overridden_fields.push(field);
+                }
+                btn.setAttribute('data-row', JSON.stringify(row));
+            }
+        });
+    }
+
+    function ensureResetButton(wrapper, field, rosterId, config) {
+        var view = wrapper.querySelector('.js-inline-view');
+        if (!view || view.querySelector('.js-cell-reset')) {
+            return;
+        }
+        if (wrapper.getAttribute('data-has-origin') !== '1') {
+            return;
+        }
+        var original = wrapper.getAttribute('data-original') || '';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'far-cell-reset-btn js-cell-reset';
+        btn.setAttribute('data-field', field);
+        btn.setAttribute('data-roster-id', rosterId);
+        btn.setAttribute('data-field-label', field);
+        btn.setAttribute('title', 'Khôi phục về giá trị gốc: ' + original);
+        btn.innerHTML = '<i class="fa fa-undo"></i>';
+
+        btn.addEventListener('click', function (event) {
+            event.stopPropagation();
+            var fieldLabels = parseJson(config.getAttribute('data-field-labels')) || {};
+            confirmReset([field], { id: rosterId }, fieldLabels, config, null);
+        });
+
+        view.appendChild(btn);
+    }
+
     /** Khôi phục về gốc là thao tác mất dữ liệu đã sửa nên luôn hỏi lại bằng SweetAlert. */
     function confirmReset(fields, row, fieldLabels, config, resetAllButton) {
         if (!row || !row.id || !fields || fields.length === 0) {
@@ -1030,16 +1287,35 @@
     }
 
     /**
-     * Dropdown phụ thuộc: Đơn vị -> Bộ phận -> Phòng ban, nạp bằng AJAX, không reload trang.
+     * Khởi tạo Select2 cho ô lọc Đơn vị (có tìm kiếm, xoá nhanh, giao diện Hope UI).
+     */
+    function initSelect2() {
+        if (typeof jQuery !== 'undefined' && jQuery.fn && jQuery.fn.select2) {
+            var $property = jQuery('#filter-property');
+            if ($property.length && !$property.hasClass('select2-hidden-accessible')) {
+                $property.select2({
+                    placeholder: '-- Tất cả đơn vị --',
+                    allowClear: true,
+                    width: '100%',
+                    language: {
+                        noResults: function () { return 'Không tìm thấy đơn vị'; },
+                        searching: function () { return 'Đang tìm...'; }
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Dropdown phụ thuộc: Đơn vị -> Phòng ban, nạp bằng AJAX, không reload trang.
      *
      * Gọi qua action của Yii (không gọi thẳng External API) để API key không bị nhúng vào HTML.
      */
     function bindDependentFilters(config) {
         var property = document.getElementById('filter-property');
-        var division = document.getElementById('filter-division');
         var department = document.getElementById('filter-department');
 
-        if (!property || !division || !department) {
+        if (!property) {
             return;
         }
 
@@ -1051,28 +1327,23 @@
             return;
         }
 
-        property.addEventListener('change', function () {
-            // Đổi đơn vị thì mã bộ phận/phòng ban cũ gần như chắc chắn không còn thuộc đơn vị mới;
-            // giữ lại sẽ ra danh sách rỗng, HO dễ hiểu nhầm là "đơn vị này không có ai".
-            reload({ resetDivision: true, resetDepartment: true });
-        });
+        function onPropertyChange() {
+            if (!department) return;
+            reload();
+        }
 
-        division.addEventListener('change', function () {
-            reload({ resetDivision: false, resetDepartment: true });
-        });
+        property.addEventListener('change', onPropertyChange);
+        if (typeof jQuery !== 'undefined') {
+            jQuery(property).on('change', onPropertyChange);
+        }
 
-        function reload(options) {
+        function reload() {
             var params = [
                 'event_id=' + encodeURIComponent(eventId),
                 'period_id=' + encodeURIComponent(periodId || ''),
                 'property_id=' + encodeURIComponent(property.value || '')
             ];
 
-            // Nạp lại phòng ban theo bộ phận đang chọn; nếu vừa đổi đơn vị thì bỏ bộ phận cũ.
-            var divisionCode = options.resetDivision ? '' : (division.value || '');
-            params.push('division_code=' + encodeURIComponent(divisionCode));
-
-            setLoading(division, options.resetDivision);
             setLoading(department, true);
 
             fetch(url + (url.indexOf('?') === -1 ? '?' : '&') + params.join('&'), {
@@ -1090,19 +1361,12 @@
                         throw new Error((data && data.message) || 'Lỗi không xác định');
                     }
 
-                    if (options.resetDivision) {
-                        fillSelect(division, data.divisions, '-- Tất cả bộ phận --', '');
-                    } else {
-                        restorePrompt(division, '-- Tất cả bộ phận --', divisionCode);
-                    }
-
                     fillSelect(department, data.departments, '-- Tất cả phòng ban --', '');
                 })
                 .catch(function (error) {
-                    restorePrompt(division, '-- Tất cả bộ phận --', divisionCode);
                     restorePrompt(department, '-- Tất cả phòng ban --', '');
                     if (typeof Toast !== 'undefined') {
-                        Toast.error('Không tải được danh sách bộ phận / phòng ban. ' + error.message);
+                        Toast.error('Không tải được danh sách phòng ban. ' + error.message);
                     }
                 });
         }
@@ -1150,5 +1414,227 @@
         option.value = value;
         option.textContent = label;
         return option;
+    }
+
+    /** Điều chỉnh số bản ghi / trang từ dropdown */
+    function bindPerPageSelect() {
+        document.querySelectorAll('.js-per-page-select').forEach(function (select) {
+            select.addEventListener('change', function () {
+                var newSize = select.value;
+                var href = window.location.href;
+                if (window.URL) {
+                    try {
+                        var url = new URL(href);
+                        url.searchParams.set('per_page', newSize);
+                        url.searchParams.delete('page'); // Reset về trang 1
+                        window.location.href = url.toString();
+                        return;
+                    } catch (e) {}
+                }
+                var sep = href.indexOf('?') === -1 ? '?' : '&';
+                window.location.href = href + sep + 'per_page=' + encodeURIComponent(newSize);
+            });
+        });
+    }
+
+    /** Modal thiết lập mã lucky thủ công và toggle hoán đổi khi trùng */
+    function bindSetLuckyModal(config) {
+        var modalElement = document.getElementById('modal_set_lucky');
+        if (!modalElement) {
+            return;
+        }
+
+        var bsModal = null;
+        var setLuckyUrl = config.getAttribute('data-set-lucky-url');
+        var checkLuckyUrl = config.getAttribute('data-check-lucky-url');
+        var eventId = config.getAttribute('data-event-id');
+
+        var targetNameEl = document.getElementById('set_lucky_target_name');
+        var targetUnitEl = document.getElementById('set_lucky_target_unit');
+        var targetCurrentEl = document.getElementById('set_lucky_target_current');
+        var idInput = document.getElementById('set_lucky_id');
+        var currentValInput = document.getElementById('set_lucky_current_val');
+        var luckyInput = document.getElementById('set_lucky_input');
+        var statusBox = document.getElementById('set_lucky_status_box');
+        var submitBtn = document.getElementById('btn_submit_lucky');
+        var submitText = document.getElementById('btn_submit_lucky_text');
+
+        var checkTimeout = null;
+        var currentTarget = null;
+
+        // Bắt sự kiện click nút gán / đổi mã lucky
+        document.querySelectorAll('.js-set-lucky').forEach(function (button) {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                currentTarget = {
+                    id: button.getAttribute('data-roster-id'),
+                    fullName: button.getAttribute('data-full-name') || '',
+                    unit: button.getAttribute('data-unit') || '',
+                    lucky: button.getAttribute('data-lucky') || ''
+                };
+
+                targetNameEl.textContent = currentTarget.fullName;
+                targetUnitEl.textContent = currentTarget.unit || '-';
+                idInput.value = currentTarget.id;
+                currentValInput.value = currentTarget.lucky;
+
+                if (currentTarget.lucky) {
+                    targetCurrentEl.innerHTML = '<span class="badge bg-success text-white fw-bold"><i class="fa fa-ticket me-1"></i>' + escapeHtml(currentTarget.lucky) + '</span>';
+                    luckyInput.value = currentTarget.lucky;
+                } else {
+                    targetCurrentEl.innerHTML = '<span class="badge bg-secondary">Chưa cấp</span>';
+                    luckyInput.value = '';
+                }
+
+                statusBox.className = 'mb-3 d-none';
+                statusBox.innerHTML = '';
+                submitText.textContent = 'Lưu mã lucky';
+
+                if (!bsModal) {
+                    bsModal = new bootstrap.Modal(modalElement);
+                }
+                bsModal.show();
+
+                setTimeout(function () {
+                    luckyInput.focus();
+                    luckyInput.select();
+                }, 350);
+            });
+        });
+
+        // Kiểm tra real-time với debounce
+        function checkLuckyDebounced() {
+            if (checkTimeout) {
+                clearTimeout(checkTimeout);
+            }
+
+            var val = (luckyInput.value || '').trim();
+            if (!val) {
+                statusBox.className = 'mb-3 d-none';
+                statusBox.innerHTML = '';
+                submitText.textContent = 'Lưu mã lucky';
+                return;
+            }
+
+            // Chuẩn hoá sơ bộ để check (nếu số 1-3 chữ số)
+            var checkVal = val;
+            if (/^\d{1,3}$/.test(val) && parseInt(val, 10) > 0) {
+                checkVal = ('000' + parseInt(val, 10)).slice(-3);
+            }
+
+            var currentVal = (currentValInput.value || '').trim();
+            if (checkVal === currentVal) {
+                statusBox.className = 'mb-3';
+                statusBox.innerHTML = '<div class="alert alert-info py-2 px-3 small mb-0"><i class="fa fa-info-circle me-1"></i> Đây là mã hiện tại của người này.</div>';
+                submitText.textContent = 'Giữ nguyên mã';
+                return;
+            }
+
+            statusBox.className = 'mb-3';
+            statusBox.innerHTML = '<div class="text-muted small"><i class="fa fa-spinner fa-spin me-1"></i> Đang kiểm tra mã ' + escapeHtml(checkVal) + '...</div>';
+
+            checkTimeout = setTimeout(function () {
+                var url = checkLuckyUrl
+                    + (checkLuckyUrl.indexOf('?') === -1 ? '?' : '&')
+                    + 'event_id=' + encodeURIComponent(eventId)
+                    + '&lucky_number=' + encodeURIComponent(checkVal)
+                    + '&exclude_id=' + encodeURIComponent(idInput.value);
+
+                fetch(url, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin'
+                })
+                    .then(function (res) { return res.json(); })
+                    .then(function (res) {
+                        if (!res.success || !res.data) {
+                            statusBox.className = 'mb-3 d-none';
+                            return;
+                        }
+
+                        var data = res.data;
+                        if (data.exists && data.owner) {
+                            var owner = data.owner;
+                            var ownerDesc = escapeHtml(owner.full_name);
+                            if (owner.property_name) {
+                                ownerDesc += ' (' + escapeHtml(owner.property_name) + ')';
+                            }
+                            if (owner.is_withdrawn) {
+                                ownerDesc += ' [Đã huỷ tư cách]';
+                            }
+
+                            statusBox.className = 'mb-3';
+                            statusBox.innerHTML = '<div class="alert alert-warning py-2 px-3 small mb-0 border-0" style="background: rgba(245, 158, 11, 0.15); color: #92400e;">'
+                                + '<div class="d-flex align-items-start gap-2">'
+                                + '<i class="fa fa-exchange fa-lg mt-1 text-warning"></i>'
+                                + '<div>'
+                                + 'Mã <strong>' + escapeHtml(owner.lucky_number) + '</strong> đang thuộc về <strong>' + ownerDesc + '</strong>.<br>'
+                                + 'Khi xác nhận, hệ thống sẽ <strong>hoán đổi mã (toggle/swap)</strong> giữa 2 người.'
+                                + '</div></div></div>';
+                            submitText.innerHTML = '<i class="fa fa-exchange me-1"></i> Hoán đổi mã';
+                        } else {
+                            statusBox.className = 'mb-3';
+                            statusBox.innerHTML = '<div class="alert alert-success py-2 px-3 small mb-0 border-0" style="background: rgba(16, 185, 129, 0.12); color: #065f46;">'
+                                + '<i class="fa fa-check-circle me-1"></i> Mã <strong>' + escapeHtml(checkVal) + '</strong> đang trống, có thể gán trực tiếp.'
+                                + '</div>';
+                            submitText.textContent = 'Gán mã lucky';
+                        }
+                    })
+                    .catch(function () {
+                        statusBox.className = 'mb-3 d-none';
+                    });
+            }, 250);
+        }
+
+        luckyInput.addEventListener('input', checkLuckyDebounced);
+
+        // Submit form
+        submitBtn.addEventListener('click', function () {
+            var val = (luckyInput.value || '').trim();
+            if (!val) {
+                if (typeof Toast !== 'undefined') {
+                    Toast.error('Vui lòng nhập mã lucky.');
+                }
+                luckyInput.focus();
+                return;
+            }
+
+            var body = new FormData();
+            body.append('id', idInput.value);
+            body.append('lucky_number', val);
+
+            postWithButton(setLuckyUrl, body, submitBtn, function (data) {
+                if (bsModal) {
+                    bsModal.hide();
+                }
+
+                if (typeof Toast !== 'undefined') {
+                    Toast.success(data.message || 'Đã cập nhật mã lucky.');
+                }
+
+                // Tải lại trang sau 600ms để đồng bộ toàn bộ KPI cards, filter counts và bảng
+                window.setTimeout(function () {
+                    window.location.reload();
+                }, 600);
+            });
+        });
+
+        // Bấm Enter trong input để submit
+        luckyInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitBtn.click();
+            }
+        });
+    }
+
+    function escapeHtml(text) {
+        if (text === null || text === undefined) {
+            return '';
+        }
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 })();

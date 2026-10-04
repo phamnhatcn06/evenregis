@@ -615,6 +615,8 @@ class ApiEndpoints
     const FINAL_ATTENDEE_ROSTER_DESTROY = '/api/final-attendee-rosters/destroy/{id}';
     const FINAL_ATTENDEE_ROSTER_CLEAR_CONFLICT = '/api/final-attendee-rosters/clear-conflict/{id}';
     const FINAL_ATTENDEE_ROSTER_AUDIT = '/api/final-attendee-rosters/audit';
+    const FINAL_ATTENDEE_ROSTER_SET_LUCKY = '/api/final-attendee-rosters/set-lucky';
+    const FINAL_ATTENDEE_ROSTER_CHECK_LUCKY = '/api/final-attendee-rosters/check-lucky';
 
     public static function url($endpoint, $params = array())
     {
