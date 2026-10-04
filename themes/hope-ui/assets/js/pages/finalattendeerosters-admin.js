@@ -985,6 +985,11 @@
                 }
 
                 copyToClipboard(text).then(function () {
+                    var originalHtml = button.innerHTML;
+                    button.innerHTML = '<i class="fa fa-check text-success"></i>';
+                    window.setTimeout(function () {
+                        button.innerHTML = originalHtml;
+                    }, 1200);
                     if (typeof Toast !== 'undefined') {
                         Toast.success('Đã sao chép: ' + text);
                     }

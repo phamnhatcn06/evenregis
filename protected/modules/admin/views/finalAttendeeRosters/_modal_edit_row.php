@@ -1,6 +1,6 @@
 <?php
 /**
- * Modal sửa thủ công toàn bộ trường của một người.
+ * Modal sửa thủ công toàn bộ trường của một người — Giao diện hiện đại.
  *
  * Form rỗng khi render; JS nạp dữ liệu dòng đang sửa vào các input khi mở modal.
  * Cố ý KHÔNG có input cho `lucky_number` — mã đã cấp không bao giờ đổi.
@@ -26,18 +26,22 @@ $textFields = array(
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fa fa-pencil me-1"></i>Sửa thông tin:
-                    <span id="edit_row_name" class="fw-normal"></span>
+                    <span class="far-kpi-icon-bubble far-kpi-bubble-primary mb-0 me-2" style="width: 34px; height: 34px; font-size: 15px;">
+                        <i class="fa fa-pencil"></i>
+                    </span>
+                    <span>Sửa thông tin: <span id="edit_row_name" class="fw-bold text-primary"></span></span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
 
             <div class="modal-body">
-                <div class="alert alert-warning py-2 small">
-                    <i class="fa fa-exclamation-triangle me-1"></i>
-                    Trường bạn sửa ở đây sẽ <strong>không bị đồng bộ ghi đè</strong> về sau.
-                    Riêng <strong>Chức danh</strong> và <strong>Nhãn in thẻ</strong> còn áp dụng
-                    cả trên <strong>thẻ tham dự</strong> và <strong>email xác nhận</strong>.
+                <div class="alert alert-warning py-2 small mb-3 border-0 d-flex align-items-center" style="background: rgba(241, 106, 27, 0.1); color: #92400e;">
+                    <i class="fa fa-exclamation-triangle fa-lg me-2 flex-shrink-0"></i>
+                    <div>
+                        Trường bạn sửa ở đây sẽ <strong>không bị đồng bộ ghi đè</strong> về sau.
+                        Riêng <strong>Chức danh</strong> và <strong>Nhãn in thẻ</strong> còn áp dụng
+                        cả trên <strong>thẻ tham dự</strong> và <strong>email xác nhận</strong>.
+                    </div>
                 </div>
 
                 <form id="form_edit_row" method="post" action="<?php echo $this->createUrl('updateField'); ?>">
@@ -46,9 +50,9 @@ $textFields = array(
                     <div class="row g-3">
                         <?php foreach ($textFields as $field => $label): ?>
                         <div class="col-md-6">
-                            <label class="form-label" for="edit_<?php echo $field; ?>">
+                            <label class="form-label small fw-semibold text-muted mb-1" for="edit_<?php echo $field; ?>">
                                 <?php echo $label; ?>
-                                <span class="badge bg-warning text-dark ms-1 d-none"
+                                <span class="badge badge-subtle-warning ms-1 d-none"
                                       id="badge_<?php echo $field; ?>">đã sửa tay</span>
                             </label>
                             <div class="input-group">
@@ -63,14 +67,14 @@ $textFields = array(
                                     <i class="fa fa-undo"></i>
                                 </button>
                             </div>
-                            <div class="form-text d-none" id="origin_<?php echo $field; ?>"></div>
+                            <div class="form-text d-none text-muted small" id="origin_<?php echo $field; ?>"></div>
                         </div>
                         <?php endforeach; ?>
 
                         <div class="col-md-6">
-                            <label class="form-label" for="edit_shirt_size">
+                            <label class="form-label small fw-semibold text-muted mb-1" for="edit_shirt_size">
                                 Size áo
-                                <span class="badge bg-warning text-dark ms-1 d-none" id="badge_shirt_size">đã sửa tay</span>
+                                <span class="badge badge-subtle-warning ms-1 d-none" id="badge_shirt_size">đã sửa tay</span>
                             </label>
                             <div class="input-group">
                                 <?php echo CHtml::dropDownList('fields[shirt_size]', '', FinalAttendeeRosters::getShirtSizeOptions(), array(
@@ -84,13 +88,13 @@ $textFields = array(
                                     <i class="fa fa-undo"></i>
                                 </button>
                             </div>
-                            <div class="form-text d-none" id="origin_shirt_size"></div>
+                            <div class="form-text d-none text-muted small" id="origin_shirt_size"></div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label" for="edit_attendee_type">
+                            <label class="form-label small fw-semibold text-muted mb-1" for="edit_attendee_type">
                                 Loại người tham dự
-                                <span class="badge bg-warning text-dark ms-1 d-none" id="badge_attendee_type">đã sửa tay</span>
+                                <span class="badge badge-subtle-warning ms-1 d-none" id="badge_attendee_type">đã sửa tay</span>
                             </label>
                             <div class="input-group">
                                 <?php echo CHtml::dropDownList('fields[attendee_type]', '', FinalAttendeeRosters::getTypeOptions(), array(
@@ -104,13 +108,13 @@ $textFields = array(
                                     <i class="fa fa-undo"></i>
                                 </button>
                             </div>
-                            <div class="form-text d-none" id="origin_attendee_type"></div>
+                            <div class="form-text d-none text-muted small" id="origin_attendee_type"></div>
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label" for="edit_note">
+                            <label class="form-label small fw-semibold text-muted mb-1" for="edit_note">
                                 Ghi chú
-                                <span class="badge bg-warning text-dark ms-1 d-none" id="badge_note">đã sửa tay</span>
+                                <span class="badge badge-subtle-warning ms-1 d-none" id="badge_note">đã sửa tay</span>
                             </label>
                             <div class="input-group">
                                 <textarea class="form-control js-edit-field" id="edit_note"
@@ -120,12 +124,12 @@ $textFields = array(
                                     <i class="fa fa-undo"></i>
                                 </button>
                             </div>
-                            <div class="form-text d-none" id="origin_note"></div>
+                            <div class="form-text d-none text-muted small" id="origin_note"></div>
                         </div>
                     </div>
                 </form>
 
-                <div class="mt-3 small text-muted" id="edit_row_meta"></div>
+                <div class="mt-3 small text-muted p-2 bg-light rounded-3 border" id="edit_row_meta"></div>
             </div>
 
             <div class="modal-footer">
@@ -133,8 +137,9 @@ $textFields = array(
                     <i class="fa fa-undo me-1"></i>Khôi phục toàn bộ về gốc
                 </button>
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" form="form_edit_row" class="btn btn-primary" id="btn_edit_row_save">
-                    <i class="fa fa-save me-1"></i>Lưu thay đổi
+                <button type="button" form="form_edit_row" class="far-btn far-btn-primary" id="btn_edit_row_save">
+                    <i class="fa fa-save"></i>
+                    <span>Lưu thay đổi</span>
                 </button>
             </div>
         </div>

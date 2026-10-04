@@ -1,6 +1,6 @@
 <?php
 /**
- * Màn Tổng hợp danh sách Vòng Chung Kết (VCK) + mã lucky — danh sách chỉ đọc.
+ * Màn Tổng hợp danh sách Vòng Chung Kết (VCK) + mã lucky — Giao diện hiện đại.
  *
  * @var FinalAttendeeRostersController $this
  * @var int $eventId
@@ -21,6 +21,10 @@
 $this->breadcrumbs = array('Tổng hợp danh sách Vòng Chung Kết');
 $this->Tabletitle  = 'Tổng hợp danh sách Vòng Chung Kết';
 
+// Đăng ký CSS và JS chuyên biệt
+Yii::app()->clientScript->registerCssFile(
+    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.1'
+);
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/plugins/toast.js',
     CClientScript::POS_END
@@ -40,6 +44,7 @@ $isStale = $lastSyncedAt && (time() - $lastSyncedAt) > 86400;
 $flashMessages = Yii::app()->user->getFlashes();
 ?>
 
+<!-- Cấu hình JS -->
 <div id="final-attendee-roster-config"
      data-event-id="<?php echo (int) $eventId; ?>"
      data-period-id="<?php echo (int) $periodId; ?>"
@@ -57,117 +62,159 @@ $flashMessages = Yii::app()->user->getFlashes();
      data-field-labels="<?php echo CHtml::encode(CJSON::encode(FinalAttendeeRosters::editableFields())); ?>"
      data-flash="<?php echo CHtml::encode(CJSON::encode($flashMessages)); ?>"></div>
 
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label">Sự kiện <span class="text-danger">*</span></label>
-                <form method="get" action="<?php echo $this->createUrl('admin'); ?>" id="form-event">
-                    <?php echo CHtml::dropDownList('event_id', $eventId, $eventList, array(
-                        'class'    => 'form-select',
-                        'empty'    => '-- Chọn sự kiện --',
-                        'onchange' => 'this.form.submit()',
-                    )); ?>
-                </form>
+<!-- Header Card: Lựa chọn sự kiện / đợt & Nút thao tác nhanh -->
+<div class="far-header-card mb-3">
+    <div class="card-body p-3 p-md-4">
+        <div class="row g-3 align-items-center">
+            <!-- Tiêu đề & Chọn sự kiện / đợt -->
+            <div class="col-xl-6 col-lg-5">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="far-title-icon">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1 fw-bold text-dark" style="font-size: 18px; letter-spacing: -0.3px;">
+                            Tổng Hợp Danh Sách Vòng Chung Kết
+                        </h4>
+                        <div class="small text-muted">
+                            Đồng bộ danh sách, cấp mã lucky, ghép BIB và bảo vệ dữ liệu VCK
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-2 far-select-group">
+                    <div class="col-sm-6">
+                        <label class="form-label">Sự kiện <span class="text-danger">*</span></label>
+                        <form method="get" action="<?php echo $this->createUrl('admin'); ?>" id="form-event">
+                            <?php echo CHtml::dropDownList('event_id', $eventId, $eventList, array(
+                                'class'    => 'form-select',
+                                'empty'    => '-- Chọn sự kiện --',
+                                'onchange' => 'this.form.submit()',
+                            )); ?>
+                        </form>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Đợt Vòng Chung Kết <span class="text-danger">*</span></label>
+                        <form method="get" action="<?php echo $this->createUrl('admin'); ?>" id="form-period">
+                            <input type="hidden" name="event_id" value="<?php echo (int) $eventId; ?>">
+                            <?php echo CHtml::dropDownList('period_id', $periodId, $periodList, array(
+                                'class'    => 'form-select',
+                                'empty'    => $eventId ? '-- Chọn đợt Vòng Chung Kết --' : '-- Chọn sự kiện trước --',
+                                'disabled' => $eventId ? null : 'disabled',
+                                'onchange' => 'this.form.submit()',
+                            )); ?>
+                        </form>
+                    </div>
+                </div>
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label">Đợt Vòng Chung Kết <span class="text-danger">*</span></label>
-                <form method="get" action="<?php echo $this->createUrl('admin'); ?>" id="form-period">
-                    <input type="hidden" name="event_id" value="<?php echo (int) $eventId; ?>">
-                    <?php echo CHtml::dropDownList('period_id', $periodId, $periodList, array(
-                        'class'    => 'form-select',
-                        'empty'    => $eventId ? '-- Chọn đợt Vòng Chung Kết --' : '-- Chọn sự kiện trước --',
-                        'disabled' => $eventId ? null : 'disabled',
-                        'onchange' => 'this.form.submit()',
-                    )); ?>
-                </form>
-            </div>
-
-            <div class="col-md-4 text-end">
+            <!-- Toolbar nút hành động -->
+            <div class="col-xl-6 col-lg-7">
                 <?php if ($eventId && $periodId): ?>
-                    <?php if ($canCreate): ?>
-                        <button type="button" class="btn btn-primary"
-                                data-bs-toggle="modal" data-bs-target="#modal_sync">
-                            <i class="fa fa-refresh me-1"></i>Đồng bộ từ danh sách VCK
-                        </button>
-                        <button type="button" class="btn btn-success"
-                                data-bs-toggle="modal" data-bs-target="#modal_add_person">
-                            <i class="fa fa-user-plus me-1"></i>Thêm người
-                        </button>
-                        <button type="button" class="btn btn-warning"
-                                data-bs-toggle="modal" data-bs-target="#modal_gen_lucky"
-                                title="Chỉ cấp cho người chưa có mã. Mã đã cấp không bao giờ đổi.">
-                            <i class="fa fa-ticket me-1"></i>Cấp mã lucky
-                            <?php if ($stats && $stats['without_lucky'] > 0): ?>
-                                <span class="badge bg-danger ms-1"><?php echo number_format($stats['without_lucky']); ?></span>
-                            <?php endif; ?>
-                        </button>
-                    <?php endif; ?>
-                    <a href="<?php echo $this->createUrl('export', array_merge(
-                        array('event_id' => $eventId, 'period_id' => $periodId),
-                        array_filter($filters, function ($value) { return $value !== null && $value !== ''; })
-                    )); ?>" class="btn btn-success" title="Xuất đúng những dòng đang lọc">
-                        <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
-                    </a>
+                    <div class="far-actions-bar">
+                        <?php if ($canCreate): ?>
+                            <button type="button" class="far-btn far-btn-primary"
+                                    data-bs-toggle="modal" data-bs-target="#modal_sync"
+                                    title="Đồng bộ danh sách từ kết quả sơ khảo">
+                                <i class="fa fa-refresh"></i>
+                                <span>Đồng bộ từ VCK</span>
+                            </button>
+
+                            <button type="button" class="far-btn far-btn-success"
+                                    data-bs-toggle="modal" data-bs-target="#modal_add_person"
+                                    title="Thêm người thủ công ngoài danh sách VCK">
+                                <i class="fa fa-user-plus"></i>
+                                <span>Thêm người</span>
+                            </button>
+
+                            <button type="button" class="far-btn far-btn-warning text-white"
+                                    data-bs-toggle="modal" data-bs-target="#modal_gen_lucky"
+                                    title="Chỉ cấp cho người chưa có mã. Mã đã cấp không bao giờ đổi.">
+                                <i class="fa fa-ticket"></i>
+                                <span>Cấp mã lucky</span>
+                                <?php if ($stats && $stats['without_lucky'] > 0): ?>
+                                    <span class="badge bg-danger ms-1 px-2 py-1 rounded-pill">
+                                        <?php echo number_format($stats['without_lucky']); ?>
+                                    </span>
+                                <?php endif; ?>
+                            </button>
+                        <?php endif; ?>
+
+                        <a href="<?php echo $this->createUrl('export', array_merge(
+                            array('event_id' => $eventId, 'period_id' => $periodId),
+                            array_filter($filters, function ($value) { return $value !== null && $value !== ''; })
+                        )); ?>" class="far-btn far-btn-outline-excel" title="Xuất đúng những dòng đang lọc ra file Excel">
+                            <i class="fa fa-file-excel-o"></i>
+                            <span>Xuất Excel</span>
+                        </a>
+                    </div>
+                <?php else: ?>
+                    <div class="text-lg-end text-muted small">
+                        <i class="fa fa-info-circle me-1 text-primary"></i>Chọn sự kiện và đợt để kích hoạt các thao tác đồng bộ & cấp mã
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
 
-        <?php if ($audit !== null): ?>
-            <div class="mt-2">
-                <?php
-                $badge      = isset($audit['badge']) ? $audit['badge'] : null;
-                $luckyAudit = isset($audit['lucky']) ? $audit['lucky'] : null;
-                ?>
-
-                <?php if ($badge !== null): ?>
-                    <?php
-                    $invalidCount = count($badge['invalid_format']);
-                    $badgeClass   = ($invalidCount > 0 || $badge['remaining'] < 50)
-                        ? 'bg-danger'
-                        : 'bg-secondary';
-                    $badgeTitle   = $invalidCount > 0
-                        ? 'Có ' . $invalidCount . ' số thẻ ' . $badge['prefix']
-                            . ' sai format, có thể làm lệch bộ sinh — cần xử lý'
-                        : 'Số thẻ kế tiếp sẽ cấp: ' . ($badge['next_badge_number'] ?: 'hết dải');
-                    ?>
-                    <span class="badge <?php echo $badgeClass; ?>" title="<?php echo CHtml::encode($badgeTitle); ?>">
-                        <?php if ($invalidCount > 0): ?><i class="fa fa-exclamation-triangle me-1"></i><?php endif; ?>
-                        Đã dùng <?php echo CHtml::encode($badge['prefix']); ?>:
-                        <?php echo (int) $badge['used']; ?>/<?php echo (int) $badge['capacity']; ?>
+        <!-- Audit Ribbon: Trạng thái dải thẻ, xung đột & đồng bộ -->
+        <?php if ($eventId && $periodId): ?>
+            <div class="far-info-ribbon">
+                <!-- Đồng bộ lần cuối -->
+                <div class="far-chip far-chip-neutral">
+                    <i class="fa fa-clock-o text-muted"></i>
+                    <span>
+                        Đồng bộ lần cuối:
+                        <strong><?php echo $lastSyncedAt ? date('d/m/Y H:i', $lastSyncedAt) : 'Chưa đồng bộ'; ?></strong>
                     </span>
-                <?php endif; ?>
-
-                <?php if ($luckyAudit !== null): ?>
-                    <?php $conflictCount = count($luckyAudit['duplicate_person_multi_lucky']); ?>
-                    <span class="badge <?php echo $conflictCount > 0 ? 'bg-danger' : 'bg-secondary'; ?>"
-                          <?php if ($conflictCount > 0): ?>
-                              role="button" id="btn_show_lucky_conflicts"
-                              data-conflicts="<?php echo CHtml::encode(CJSON::encode($luckyAudit['duplicate_person_multi_lucky'])); ?>"
-                          <?php endif; ?>
-                          title="Người đang giữ nhiều mã lucky — cần xử lý trước khi phát định danh">
-                        Xung đột mã lucky: <?php echo $conflictCount; ?>
-                    </span>
-
-                    <?php if (count($luckyAudit['lucky_only_on_roster']) > 0): ?>
-                        <span class="badge bg-danger"
-                              title="Những người này có mã trong bảng nhưng chưa ghi ngược sang bản ghi gốc nên chưa đăng nhập được cổng chạy. Bấm Cấp mã lucky để tự chữa.">
-                            <i class="fa fa-exclamation-triangle me-1"></i>
-                            Chưa ghi ngược: <?php echo count($luckyAudit['lucky_only_on_roster']); ?>
+                    <?php if ($isStale): ?>
+                        <span class="badge bg-warning text-dark ms-1" title="Dữ liệu đồng bộ đã quá 24h, nên đồng bộ lại">
+                            <i class="fa fa-exclamation-triangle me-1"></i>Có thể đã cũ
                         </span>
                     <?php endif; ?>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
+                </div>
 
-        <?php if ($lastSyncedAt): ?>
-            <div class="mt-2 small text-muted">
-                Đồng bộ lần cuối: <?php echo date('d/m/Y H:i', $lastSyncedAt); ?>
-                <?php if ($isStale): ?>
-                    <span class="badge bg-warning text-dark ms-1">
-                        <i class="fa fa-exclamation-triangle me-1"></i>Dữ liệu có thể đã cũ
-                    </span>
+                <!-- Thẻ tham dự MT -->
+                <?php if ($audit !== null && isset($audit['badge'])): ?>
+                    <?php
+                    $badge        = $audit['badge'];
+                    $invalidCount = count($badge['invalid_format']);
+                    $isBadgeWarn  = ($invalidCount > 0 || $badge['remaining'] < 50);
+                    ?>
+                    <div class="far-chip <?php echo $isBadgeWarn ? 'far-chip-danger' : 'far-chip-neutral'; ?>"
+                         title="<?php echo $invalidCount > 0 ? ('Có ' . $invalidCount . ' số thẻ sai format!') : ('Số thẻ kế tiếp: ' . ($badge['next_badge_number'] ?: 'Hết dải')); ?>">
+                        <i class="fa <?php echo $invalidCount > 0 ? 'fa-exclamation-triangle' : 'fa-id-card-o'; ?>"></i>
+                        <span>
+                            Số thẻ <strong><?php echo CHtml::encode($badge['prefix']); ?></strong>:
+                            <?php echo (int) $badge['used']; ?>/<?php echo (int) $badge['capacity']; ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Xung đột mã lucky -->
+                <?php if ($audit !== null && isset($audit['lucky'])): ?>
+                    <?php
+                    $luckyAudit    = $audit['lucky'];
+                    $conflictCount = count($luckyAudit['duplicate_person_multi_lucky']);
+                    $unsyncedCount = count($luckyAudit['lucky_only_on_roster']);
+                    ?>
+                    <div class="far-chip <?php echo $conflictCount > 0 ? 'far-chip-danger' : 'far-chip-neutral'; ?>"
+                         <?php if ($conflictCount > 0): ?>
+                             role="button" id="btn_show_lucky_conflicts"
+                             data-conflicts="<?php echo CHtml::encode(CJSON::encode($luckyAudit['duplicate_person_multi_lucky'])); ?>"
+                         <?php endif; ?>
+                         title="Người giữ nhiều mã lucky — cần xử lý trước khi phát định danh">
+                        <i class="fa <?php echo $conflictCount > 0 ? 'fa-exclamation-circle' : 'fa-check-circle text-success'; ?>"></i>
+                        <span>Xung đột lucky: <strong><?php echo $conflictCount; ?></strong></span>
+                    </div>
+
+                    <?php if ($unsyncedCount > 0): ?>
+                        <div class="far-chip far-chip-danger"
+                             title="Có mã trong bảng nhưng chưa ghi ngược sang bản ghi gốc. Bấm Cấp mã lucky để tự chữa.">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            <span>Chưa ghi ngược: <strong><?php echo $unsyncedCount; ?></strong></span>
+                        </div>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
@@ -175,51 +222,116 @@ $flashMessages = Yii::app()->user->getFlashes();
 </div>
 
 <?php if (!$eventId || !$periodId): ?>
-    <div class="alert alert-info">
-        <i class="fa fa-info-circle me-1"></i>
-        Vui lòng chọn <strong>sự kiện</strong> và <strong>đợt Vòng Chung Kết</strong> để xem danh sách tổng hợp.
+    <!-- Màn hình chào khi chưa chọn sự kiện / đợt -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-5 text-center">
+            <div class="far-empty-icon mx-auto mb-3" style="width: 76px; height: 76px; font-size: 32px; background: rgba(58, 87, 232, 0.1); color: var(--far-primary);">
+                <i class="fa fa-calendar-check-o"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">Chào mừng đến cổng Tổng Hợp Danh Sách VCK</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 580px;">
+                Vui lòng chọn <strong>Sự kiện</strong> và <strong>Đợt Vòng Chung Kết</strong> ở thanh chọn bên trên để tải danh sách đại biểu, quản lý mã lucky và theo dõi dữ liệu đăng ký.
+            </p>
+            <div class="d-inline-flex gap-2 p-2 bg-light rounded-pill border px-3">
+                <span class="badge bg-primary rounded-pill px-3 py-2 d-flex align-items-center">
+                    <i class="fa fa-arrow-up me-2"></i>Chọn sự kiện & đợt ở thanh trên
+                </span>
+            </div>
+        </div>
     </div>
 <?php else: ?>
 
+    <!-- 6 KPI Stat Cards -->
     <?php if ($stats !== null): ?>
-    <div class="row g-2 mb-3">
         <?php
-        $cards = array(
-            array('label' => 'Tổng số người', 'value' => $stats['total'], 'icon' => 'fa-users', 'class' => 'text-primary'),
-            array('label' => 'Đã có mã lucky', 'value' => $stats['with_lucky'], 'icon' => 'fa-ticket', 'class' => 'text-success'),
-            array('label' => 'Chưa có mã lucky', 'value' => $stats['without_lucky'], 'icon' => 'fa-hourglass-half', 'class' => $stats['without_lucky'] > 0 ? 'text-danger' : 'text-muted'),
-            array('label' => 'Đã đặt PIN', 'value' => $stats['pin_set'], 'icon' => 'fa-lock', 'class' => 'text-info'),
-            array('label' => 'Đã sửa tay', 'value' => $stats['with_override'], 'icon' => 'fa-pencil', 'class' => 'text-warning'),
-            array('label' => 'Xung đột cần soát', 'value' => $stats['conflicts'], 'icon' => 'fa-exclamation-triangle', 'class' => $stats['conflicts'] > 0 ? 'text-danger' : 'text-muted'),
+        $pctLucky = ($stats['total'] > 0) ? round(($stats['with_lucky'] / $stats['total']) * 100) : 0;
+        $kpiCards = array(
+            array(
+                'label'       => 'Tổng số người',
+                'value'       => $stats['total'],
+                'icon'        => 'fa-users',
+                'bubbleClass' => 'far-kpi-bubble-primary',
+                'statusText'  => 'Danh sách VCK',
+                'statusBadge' => 'badge-subtle-primary',
+            ),
+            array(
+                'label'       => 'Đã có mã lucky',
+                'value'       => $stats['with_lucky'],
+                'icon'        => 'fa-ticket',
+                'bubbleClass' => 'far-kpi-bubble-success',
+                'statusText'  => $pctLucky . '% hoàn tất',
+                'statusBadge' => 'badge-subtle-success',
+            ),
+            array(
+                'label'       => 'Chưa có mã lucky',
+                'value'       => $stats['without_lucky'],
+                'icon'        => 'fa-hourglass-half',
+                'bubbleClass' => $stats['without_lucky'] > 0 ? 'far-kpi-bubble-danger' : 'far-kpi-bubble-muted',
+                'statusText'  => $stats['without_lucky'] > 0 ? 'Cần cấp ngay' : 'Đã đủ mã',
+                'statusBadge' => $stats['without_lucky'] > 0 ? 'badge-subtle-danger' : 'badge-subtle-secondary',
+            ),
+            array(
+                'label'       => 'Đã đặt mã PIN',
+                'value'       => $stats['pin_set'],
+                'icon'        => 'fa-shield',
+                'bubbleClass' => 'far-kpi-bubble-info',
+                'statusText'  => 'Bảo vệ cổng Fun Run',
+                'statusBadge' => 'badge-subtle-info',
+            ),
+            array(
+                'label'       => 'Đã sửa thủ công',
+                'value'       => $stats['with_override'],
+                'icon'        => 'fa-pencil',
+                'bubbleClass' => 'far-kpi-bubble-warning',
+                'statusText'  => 'Bảo vệ khi đồng bộ',
+                'statusBadge' => 'badge-subtle-warning',
+            ),
+            array(
+                'label'       => 'Xung đột cần soát',
+                'value'       => $stats['conflicts'],
+                'icon'        => 'fa-exclamation-triangle',
+                'bubbleClass' => $stats['conflicts'] > 0 ? 'far-kpi-bubble-danger' : 'far-kpi-bubble-muted',
+                'statusText'  => $stats['conflicts'] > 0 ? 'Cần xử lý' : '0 cảnh báo',
+                'statusBadge' => $stats['conflicts'] > 0 ? 'badge-subtle-danger' : 'badge-subtle-secondary',
+            ),
         );
-        foreach ($cards as $card):
         ?>
-        <div class="col-md-2 col-6">
-            <div class="card h-100">
-                <div class="card-body py-3 text-center">
-                    <div class="<?php echo $card['class']; ?>">
-                        <i class="fa <?php echo $card['icon']; ?> fa-lg"></i>
+        <div class="row g-2 mb-3">
+            <?php foreach ($kpiCards as $card): ?>
+            <div class="col-xl-2 col-md-4 col-6">
+                <div class="far-kpi-card">
+                    <div class="far-kpi-body">
+                        <div class="far-kpi-icon-bubble <?php echo $card['bubbleClass']; ?>">
+                            <i class="fa <?php echo $card['icon']; ?>"></i>
+                        </div>
+                        <div class="far-kpi-val"><?php echo number_format($card['value']); ?></div>
+                        <div class="far-kpi-label"><?php echo $card['label']; ?></div>
+                        <span class="badge <?php echo $card['statusBadge']; ?> far-kpi-status-badge">
+                            <?php echo $card['statusText']; ?>
+                        </span>
                     </div>
-                    <div class="h4 mb-0 mt-1"><?php echo number_format($card['value']); ?></div>
-                    <div class="small text-muted"><?php echo $card['label']; ?></div>
                 </div>
             </div>
+            <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
-    </div>
 
-    <?php if ($stats['withdrawn'] > 0 && (string) $filters['with_trashed'] !== '1'): ?>
-        <div class="alert alert-secondary py-2 small">
-            <i class="fa fa-user-times me-1"></i>
-            Có <strong><?php echo number_format($stats['withdrawn']); ?></strong> người đã huỷ tư cách đang bị ẩn.
-            <a href="<?php echo $this->createUrl('admin', array_merge(
-                array('event_id' => $eventId, 'period_id' => $periodId, 'with_trashed' => 1),
-                array_filter($filters, function ($v) { return $v !== null && $v !== ''; })
-            )); ?>">Hiện họ</a>
-        </div>
-    <?php endif; ?>
+        <?php if ($stats['withdrawn'] > 0 && (string) $filters['with_trashed'] !== '1'): ?>
+            <div class="alert alert-secondary py-2 px-3 small d-flex align-items-center justify-content-between mb-3 border-0 rounded-3">
+                <div>
+                    <i class="fa fa-user-times text-danger me-2"></i>
+                    Có <strong><?php echo number_format($stats['withdrawn']); ?></strong> người đã huỷ tư cách đang bị ẩn.
+                </div>
+                <a href="<?php echo $this->createUrl('admin', array_merge(
+                    array('event_id' => $eventId, 'period_id' => $periodId, 'with_trashed' => 1),
+                    array_filter($filters, function ($v) { return $v !== null && $v !== ''; })
+                )); ?>" class="btn btn-sm btn-outline-dark py-0 px-2" style="font-size: 12px;">
+                    Hiện danh sách này
+                </a>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 
+    <!-- Bộ lọc -->
     <?php $this->renderPartial('_filters', array(
         'eventId'       => $eventId,
         'periodId'      => $periodId,
@@ -229,26 +341,25 @@ $flashMessages = Yii::app()->user->getFlashes();
         'pageSizes'     => $pageSizes,
     )); ?>
 
-    <div class="card">
+    <!-- Bảng danh sách chính -->
+    <div class="far-table-card">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-light">
+            <div class="far-table-responsive">
+                <table class="far-table align-middle">
+                    <thead>
                         <tr>
-                            <th style="width:50px;">STT</th>
-                            <th style="width:140px;">Mã lucky</th>
-                            <th>Họ và tên</th>
-                            <th style="width:110px;">Mã NV</th>
-                            <th>Đơn vị</th>
-                            <th>Bộ phận</th>
-                            <th>Phòng ban</th>
-                            <th>Chức danh</th>
-                            <th style="width:80px;">Size áo</th>
-                            <th style="width:110px;">Loại</th>
-                            <th style="width:90px;">PIN</th>
-                            <th style="width:150px;">Trạng thái</th>
+                            <th style="width: 50px;" class="text-center">STT</th>
+                            <th style="width: 140px;">Mã lucky</th>
+                            <th style="min-width: 220px;">Họ và tên</th>
+                            <th style="width: 110px;">Mã NV</th>
+                            <th style="min-width: 160px;">Đơn vị</th>
+                            <th style="min-width: 140px;">Chức danh</th>
+                            <th style="width: 90px;" class="text-center">Size áo</th>
+                            <th style="width: 125px;">Loại</th>
+                            <th style="width: 95px;" class="text-center">Mã PIN</th>
+                            <th style="width: 140px;">Trạng thái</th>
                             <?php if ($canUpdate): ?>
-                                <th style="width:90px;">Thao tác</th>
+                                <th style="width: 110px;" class="text-end pe-3">Thao tác</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
@@ -257,83 +368,122 @@ $flashMessages = Yii::app()->user->getFlashes();
                         $rows  = $dataProvider->getData();
                         $index = $dataProvider->pagination ? $dataProvider->pagination->offset : 0;
 
+                        $avatarColors = array(
+                            'linear-gradient(135deg, #3a57e8 0%, #203ac5 100%)',
+                            'linear-gradient(135deg, #08b1ba 0%, #057d84 100%)',
+                            'linear-gradient(135deg, #1aaa4d 0%, #118138 100%)',
+                            'linear-gradient(135deg, #6c5dd3 0%, #4e3fc4 100%)',
+                            'linear-gradient(135deg, #f16a1b 0%, #c44f0b 100%)',
+                            'linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%)',
+                        );
+
                         foreach ($rows as $row):
                             $index++;
                             $isWithdrawn = !empty($row->is_withdrawn);
                             $overridden  = is_array($row->overridden_fields) ? $row->overridden_fields : array();
-                        ?>
-                        <tr class="<?php echo $isWithdrawn ? 'table-secondary opacity-75' : ''; ?>">
-                            <td><?php echo $index; ?></td>
 
+                            // Tính initials cho avatar
+                            $fullNameClean = trim((string) $row->full_name);
+                            $nameParts     = preg_split('/\s+/u', $fullNameClean);
+                            $initials      = '';
+                            if (count($nameParts) >= 2) {
+                                $firstChar = mb_substr($nameParts[0], 0, 1, 'UTF-8');
+                                $lastChar  = mb_substr(end($nameParts), 0, 1, 'UTF-8');
+                                $initials  = mb_strtoupper($firstChar . $lastChar, 'UTF-8');
+                            } else {
+                                $initials = mb_strtoupper(mb_substr($fullNameClean, 0, 2, 'UTF-8'), 'UTF-8');
+                            }
+                            $avatarBg = $avatarColors[((int) $row->id) % count($avatarColors)];
+                        ?>
+                        <tr class="<?php echo $isWithdrawn ? 'table-secondary' : ''; ?>">
+                            <!-- STT -->
+                            <td class="text-center text-muted small fw-semibold">
+                                <?php echo $index; ?>
+                            </td>
+
+                            <!-- Mã lucky & Định danh -->
                             <td>
                                 <?php if ($row->lucky_number): ?>
-                                    <div class="fw-bold"><?php echo CHtml::encode($row->lucky_number); ?></div>
-                                    <div class="small text-muted">
-                                        <?php echo CHtml::encode($row->login_identifier); ?>
-                                        <button type="button" class="btn btn-link btn-sm p-0 ms-1 js-copy"
+                                    <div class="far-lucky-badge">
+                                        <i class="fa fa-ticket"></i>
+                                        <span><?php echo CHtml::encode($row->lucky_number); ?></span>
+                                    </div>
+                                    <div class="far-login-id">
+                                        <span><?php echo CHtml::encode($row->login_identifier); ?></span>
+                                        <button type="button" class="far-copy-btn js-copy"
                                                 data-copy="<?php echo CHtml::encode($row->login_identifier); ?>"
-                                                title="Sao chép định danh">
+                                                title="Sao chép định danh đăng nhập">
                                             <i class="fa fa-copy"></i>
                                         </button>
                                     </div>
                                 <?php else: ?>
-                                    <span class="badge bg-secondary">Chưa cấp</span>
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-                                <?php echo $this->renderPartial('_cell', array(
-                                    'row'        => $row,
-                                    'field'      => 'full_name',
-                                    'value'      => $row->full_name,
-                                    'overridden' => $overridden,
-                                    'canUpdate'  => $canUpdate,
-                                ), true); ?>
-                                <?php if ($row->attendee_id): ?>
-                                    <div class="small">
-                                        <a href="<?php echo $this->createUrl('/admin/attendees/view', array('id' => $row->attendee_id)); ?>"
-                                           target="_blank">Xem bản ghi gốc</a>
-                                    </div>
-                                <?php endif; ?>
-                                <?php if (!empty($overridden)): ?>
-                                    <span class="badge bg-warning text-dark mt-1">
-                                        <i class="fa fa-pencil me-1"></i>Đã sửa tay (<?php echo count($overridden); ?> trường)
+                                    <span class="far-lucky-badge-empty">
+                                        <i class="fa fa-hourglass-o me-1"></i>Chưa cấp
                                     </span>
                                 <?php endif; ?>
                             </td>
 
-                            <td><?php echo $this->renderPartial('_cell', array(
-                                'row' => $row, 'field' => 'staff_code', 'value' => $row->staff_code, 'overridden' => $overridden,
-                                    'canUpdate'  => $canUpdate,
-                            ), true); ?></td>
-
-                            <td><?php echo $this->renderPartial('_cell', array(
-                                'row' => $row, 'field' => 'property_name', 'value' => $row->property_name, 'overridden' => $overridden,
-                                    'canUpdate'  => $canUpdate,
-                            ), true); ?></td>
-
+                            <!-- Họ và tên + Avatar + Bản ghi gốc -->
                             <td>
-                                <?php if (trim((string) $row->division_name) === ''): ?>
-                                    <span class="badge bg-warning text-dark">Chưa xác định</span>
-                                <?php else: ?>
-                                    <?php echo $this->renderPartial('_cell', array(
-                                        'row' => $row, 'field' => 'division_name', 'value' => $row->division_name, 'overridden' => $overridden,
-                                    'canUpdate'  => $canUpdate,
-                                    ), true); ?>
-                                <?php endif; ?>
+                                <div class="far-user-cell">
+                                    <div class="far-avatar" style="background: <?php echo $avatarBg; ?>;">
+                                        <?php echo CHtml::encode($initials ?: 'VCK'); ?>
+                                    </div>
+                                    <div class="far-user-meta">
+                                        <div class="far-user-name">
+                                            <?php echo $this->renderPartial('_cell', array(
+                                                'row'        => $row,
+                                                'field'      => 'full_name',
+                                                'value'      => $row->full_name,
+                                                'overridden' => $overridden,
+                                                'canUpdate'  => $canUpdate,
+                                            ), true); ?>
+                                        </div>
+                                        <div class="far-user-sub">
+                                            <?php if ($row->attendee_id): ?>
+                                                <a href="<?php echo $this->createUrl('/admin/attendees/view', array('id' => $row->attendee_id)); ?>"
+                                                   target="_blank" title="Xem hồ sơ đăng ký gốc">
+                                                    <i class="fa fa-external-link me-1"></i>Bản ghi gốc #<?php echo (int) $row->attendee_id; ?>
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-muted"><i class="fa fa-user-plus me-1"></i>Thêm thủ công</span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php if (!empty($overridden)): ?>
+                                            <div class="mt-1">
+                                                <span class="badge badge-subtle-warning" style="font-size: 10px;"
+                                                      title="Các trường đã sửa tay: <?php echo CHtml::encode(implode(', ', $overridden)); ?>">
+                                                    <i class="fa fa-pencil me-1"></i>Đã sửa tay (<?php echo count($overridden); ?>)
+                                                </span>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             </td>
 
+                            <!-- Mã NV -->
                             <td>
-                                <?php if (trim((string) $row->department_name) === ''): ?>
-                                    <span class="badge bg-warning text-dark">Chưa xác định</span>
-                                <?php else: ?>
-                                    <?php echo $this->renderPartial('_cell', array(
-                                        'row' => $row, 'field' => 'department_name', 'value' => $row->department_name, 'overridden' => $overridden,
+                                <?php echo $this->renderPartial('_cell', array(
+                                    'row'        => $row,
+                                    'field'      => 'staff_code',
+                                    'value'      => $row->staff_code,
+                                    'overridden' => $overridden,
                                     'canUpdate'  => $canUpdate,
-                                    ), true); ?>
-                                <?php endif; ?>
+                                ), true); ?>
                             </td>
 
+                            <!-- Đơn vị -->
+                            <td>
+                                <?php echo $this->renderPartial('_cell', array(
+                                    'row'        => $row,
+                                    'field'      => 'property_name',
+                                    'value'      => $row->property_name,
+                                    'overridden' => $overridden,
+                                    'canUpdate'  => $canUpdate,
+                                ), true); ?>
+                            </td>
+
+                            <!-- Chức danh -->
                             <td>
                                 <?php echo $this->renderPartial('_cell', array(
                                     'row'        => $row,
@@ -344,86 +494,145 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 ), true); ?>
                             </td>
 
-                            <td><?php echo CHtml::encode($row->shirt_size ?: '-'); ?></td>
-
-                            <td><?php echo FinalAttendeeRosters::getTypeBadge($row->attendee_type); ?></td>
-
-                            <td>
-                                <?php echo $row->pin_is_set
-                                    ? '<span class="badge bg-success">Đã đặt</span>'
-                                    : '<span class="badge bg-secondary">Chưa đặt</span>'; ?>
+                            <!-- Size áo -->
+                            <td class="text-center">
+                                <?php if ($row->shirt_size): ?>
+                                    <span class="far-size-pill fw-bold text-dark px-2 py-1">
+                                        <?php echo $this->renderPartial('_cell', array(
+                                            'row'        => $row,
+                                            'field'      => 'shirt_size',
+                                            'value'      => $row->shirt_size,
+                                            'overridden' => $overridden,
+                                            'canUpdate'  => $canUpdate,
+                                        ), true); ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                <?php endif; ?>
                             </td>
 
+                            <!-- Loại người tham dự -->
                             <td>
-                                <?php echo FinalAttendeeRosters::getStatusLabel($row->status, $isWithdrawn); ?>
+                                <?php
+                                $typeBadges = array(
+                                    'finalist' => array('label' => 'Vào chung kết', 'class' => 'badge-subtle-primary', 'icon' => 'fa-star'),
+                                    'director' => array('label' => 'Giám đốc',       'class' => 'badge-subtle-warning', 'icon' => 'fa-briefcase'),
+                                    'driver'   => array('label' => 'Lái xe',         'class' => 'badge-subtle-secondary', 'icon' => 'fa-car'),
+                                    'manual'   => array('label' => 'HO thêm tay',    'class' => 'badge-subtle-info', 'icon' => 'fa-user-plus'),
+                                );
+                                if (isset($typeBadges[$row->attendee_type])) {
+                                    $tb = $typeBadges[$row->attendee_type];
+                                    echo '<span class="badge ' . $tb['class'] . '"><i class="fa ' . $tb['icon'] . ' me-1"></i>' . CHtml::encode($tb['label']) . '</span>';
+                                } else {
+                                    echo FinalAttendeeRosters::getTypeBadge($row->attendee_type);
+                                }
+                                ?>
+                            </td>
+
+                            <!-- Mã PIN -->
+                            <td class="text-center">
+                                <?php if ($row->pin_is_set): ?>
+                                    <span class="badge badge-subtle-success" title="Người này đã tự đặt mã PIN">
+                                        <i class="fa fa-check-circle me-1"></i>Đã đặt
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge badge-subtle-secondary" title="Chưa tạo mã PIN bảo vệ">
+                                        <i class="fa fa-circle-o me-1"></i>Chưa đặt
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+
+                            <!-- Trạng thái -->
+                            <td>
+                                <?php if ($isWithdrawn): ?>
+                                    <span class="badge badge-subtle-danger">
+                                        <span class="far-status-dot bg-danger"></span>Đã huỷ
+                                    </span>
+                                <?php elseif ($row->status == FinalAttendeeRosters::STATUS_ACTIVE): ?>
+                                    <span class="badge badge-subtle-success">
+                                        <span class="far-status-dot bg-success"></span>Tham dự
+                                    </span>
+                                <?php elseif ($row->status == FinalAttendeeRosters::STATUS_MANUAL): ?>
+                                    <span class="badge badge-subtle-info">
+                                        <span class="far-status-dot bg-info"></span>HO thêm
+                                    </span>
+                                <?php else: ?>
+                                    <?php echo FinalAttendeeRosters::getStatusLabel($row->status, $isWithdrawn); ?>
+                                <?php endif; ?>
+
                                 <?php if ($row->conflict_flag): ?>
-                                    <div class="mt-1">
-                                        <span class="badge bg-danger" title="<?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>">
+                                    <div class="mt-1 d-flex align-items-center gap-1">
+                                        <span class="badge badge-subtle-danger" title="<?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>">
                                             <i class="fa fa-exclamation-triangle me-1"></i><?php echo CHtml::encode(FinalAttendeeRosters::getConflictLabel($row->conflict_flag)); ?>
                                         </span>
                                         <?php if ($canUpdate): ?>
-                                            <button type="button" class="btn btn-link btn-sm p-0 ms-1 js-clear-conflict"
+                                            <button type="button" class="btn btn-link btn-sm p-0 text-danger js-clear-conflict"
                                                     data-roster-id="<?php echo (int) $row->id; ?>"
-                                                    title="Đánh dấu đã xử lý xung đột này">Đã xử lý</button>
+                                                    title="Đánh dấu đã xử lý xung đột này">
+                                                <i class="fa fa-check-square-o"></i>
+                                            </button>
                                         <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                             </td>
 
+                            <!-- Thao tác -->
                             <?php if ($canUpdate): ?>
-                            <td>
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-primary js-edit-row"
-                                        data-row="<?php echo CHtml::encode(CJSON::encode(array(
-                                            'id'                => $row->id,
-                                            'full_name'         => $row->full_name,
-                                            'staff_code'        => $row->staff_code,
-                                            'id_card'           => $row->id_card,
-                                            'phone_number'      => $row->phone_number,
-                                            'email'             => $row->email,
-                                            'property_name'     => $row->property_name,
-                                            'unit_label'        => $row->unit_label,
-                                            'division_name'     => $row->division_name,
-                                            'department_name'   => $row->department_name,
-                                            'position'          => $row->position,
-                                            'shirt_size'        => $row->shirt_size,
-                                            'attendee_type'     => $row->attendee_type,
-                                            'note'              => $row->note,
-                                            'overridden_fields' => $overridden,
-                                            'source_snapshot'   => is_array($row->source_snapshot) ? $row->source_snapshot : array(),
-                                            'lucky_number'      => $row->lucky_number,
-                                            'updated_by'        => $row->updated_by,
-                                            'last_synced_at'    => $row->last_synced_at,
-                                        ))); ?>"
-                                        title="Sửa thông tin người này">
-                                    <i class="fa fa-pencil"></i>
-                                </button>
-
-                                <?php if (!$isWithdrawn): ?>
+                            <td class="text-end pe-3">
+                                <div class="far-action-group">
                                     <button type="button"
-                                            class="btn btn-sm btn-outline-secondary js-merge-split"
-                                            data-roster-id="<?php echo (int) $row->id; ?>"
-                                            data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
-                                            data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
-                                            data-staff-code="<?php echo CHtml::encode($row->staff_code); ?>"
-                                            data-attendee-ids="<?php echo CHtml::encode(CJSON::encode(
-                                                is_array($row->source_attendee_ids) ? $row->source_attendee_ids : array()
-                                            )); ?>"
-                                            title="Gộp dòng hoặc tách người">
-                                        <i class="fa fa-code-fork"></i>
+                                            class="far-action-btn far-action-edit js-edit-row"
+                                            data-row="<?php echo CHtml::encode(CJSON::encode(array(
+                                                'id'                => $row->id,
+                                                'full_name'         => $row->full_name,
+                                                'staff_code'        => $row->staff_code,
+                                                'id_card'           => $row->id_card,
+                                                'phone_number'      => $row->phone_number,
+                                                'email'             => $row->email,
+                                                'property_name'     => $row->property_name,
+                                                'unit_label'        => $row->unit_label,
+                                                'division_name'     => $row->division_name,
+                                                'department_name'   => $row->department_name,
+                                                'position'          => $row->position,
+                                                'shirt_size'        => $row->shirt_size,
+                                                'attendee_type'     => $row->attendee_type,
+                                                'note'              => $row->note,
+                                                'overridden_fields' => $overridden,
+                                                'source_snapshot'   => is_array($row->source_snapshot) ? $row->source_snapshot : array(),
+                                                'lucky_number'      => $row->lucky_number,
+                                                'updated_by'        => $row->updated_by,
+                                                'last_synced_at'    => $row->last_synced_at,
+                                            ))); ?>"
+                                            title="Sửa thông tin">
+                                        <i class="fa fa-pencil"></i>
                                     </button>
-                                <?php endif; ?>
 
-                                <?php if ($canDelete && !$isWithdrawn): ?>
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-danger js-withdraw"
-                                            data-roster-id="<?php echo (int) $row->id; ?>"
-                                            data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
-                                            data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
-                                            title="Huỷ tư cách người này">
-                                        <i class="fa fa-user-times"></i>
-                                    </button>
-                                <?php endif; ?>
+                                    <?php if (!$isWithdrawn): ?>
+                                        <button type="button"
+                                                class="far-action-btn far-action-merge js-merge-split"
+                                                data-roster-id="<?php echo (int) $row->id; ?>"
+                                                data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                                data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
+                                                data-staff-code="<?php echo CHtml::encode($row->staff_code); ?>"
+                                                data-attendee-ids="<?php echo CHtml::encode(CJSON::encode(
+                                                    is_array($row->source_attendee_ids) ? $row->source_attendee_ids : array()
+                                                )); ?>"
+                                                title="Gộp dòng hoặc tách người">
+                                            <i class="fa fa-code-fork"></i>
+                                        </button>
+                                    <?php endif; ?>
+
+                                    <?php if ($canDelete && !$isWithdrawn): ?>
+                                        <button type="button"
+                                                class="far-action-btn far-action-withdraw js-withdraw"
+                                                data-roster-id="<?php echo (int) $row->id; ?>"
+                                                data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                                data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
+                                                title="Huỷ tư cách người này">
+                                            <i class="fa fa-user-times"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                             <?php endif; ?>
                         </tr>
@@ -431,9 +640,20 @@ $flashMessages = Yii::app()->user->getFlashes();
 
                         <?php if (empty($rows)): ?>
                         <tr>
-                            <td colspan="<?php echo $canUpdate ? 13 : 12; ?>" class="text-center text-muted py-4">
-                                <i class="fa fa-inbox fa-2x mb-2 d-block"></i>
-                                Không có dữ liệu. Hãy bấm <strong>Đồng bộ từ danh sách VCK</strong> để nạp danh sách.
+                            <td colspan="<?php echo $canUpdate ? 11 : 10; ?>" class="far-empty-state">
+                                <div class="far-empty-icon">
+                                    <i class="fa fa-inbox"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-1">Chưa có dữ liệu danh sách</h5>
+                                <p class="text-muted small mb-3">
+                                    Chưa có bản ghi nào phù hợp bộ lọc hoặc sự kiện chưa được đồng bộ dữ liệu.
+                                </p>
+                                <?php if ($canCreate): ?>
+                                    <button type="button" class="far-btn far-btn-primary" data-bs-toggle="modal" data-bs-target="#modal_sync">
+                                        <i class="fa fa-refresh"></i>
+                                        <span>Đồng bộ từ danh sách VCK ngay</span>
+                                    </button>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endif; ?>
@@ -441,22 +661,34 @@ $flashMessages = Yii::app()->user->getFlashes();
                 </table>
             </div>
 
+            <!-- Phân trang -->
             <?php if ($dataProvider->pagination): ?>
-                <div class="d-flex justify-content-between align-items-center mt-3">
+                <?php
+                $totalCount = $dataProvider->getTotalItemCount();
+                $pageOffset = $dataProvider->pagination->offset + 1;
+                $pageLimit  = min($dataProvider->pagination->offset + $dataProvider->pagination->pageSize, $totalCount);
+                ?>
+                <div class="far-pagination-footer">
                     <div class="small text-muted">
-                        Tổng <strong><?php echo number_format($dataProvider->getTotalItemCount()); ?></strong> người
+                        Hiển thị từ <strong><?php echo number_format($pageOffset); ?></strong> đến <strong><?php echo number_format($pageLimit); ?></strong> / Tổng cộng <strong><?php echo number_format($totalCount); ?></strong> người
                     </div>
                     <?php $this->widget('CLinkPager', array(
                         'pages'                => $dataProvider->pagination,
-                        'htmlOptions'          => array('class' => 'pagination mb-0'),
+                        'htmlOptions'          => array('class' => 'pagination pagination-sm mb-0'),
                         'header'               => '',
                         'selectedPageCssClass' => 'active',
+                        'hiddenPageCssClass'   => 'disabled',
+                        'firstPageLabel'       => '<i class="fa fa-angle-double-left"></i>',
+                        'prevPageLabel'        => '<i class="fa fa-angle-left"></i>',
+                        'nextPageLabel'        => '<i class="fa fa-angle-right"></i>',
+                        'lastPageLabel'        => '<i class="fa fa-angle-double-right"></i>',
                     )); ?>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 
+    <!-- Modals -->
     <?php if ($canUpdate): ?>
         <?php $this->renderPartial('_modal_edit_row'); ?>
         <?php $this->renderPartial('_modal_merge_split'); ?>

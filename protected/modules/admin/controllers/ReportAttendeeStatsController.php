@@ -2186,6 +2186,9 @@ class ReportAttendeeStatsController extends AdminController
         } else {
             $summaryTitle = 'DANH SÁCH VÀO CHUNG KẾT' . ($eventName !== '' ? ' - ' . mb_strtoupper($eventName, 'UTF-8') : '');
             $this->writeFinalistSheet($summary, $summaryTitle, $allPeople, $sportColumns, $compColumns, $hasTalent, $hasMiss, true, true);
+
+            // Ô tổng hợp số lượng ở cuối sheet Tổng hợp
+            $this->writeFinalSummaryBox($summary, $allPeople);
         }
 
         // Các sheet theo từng nội dung (cùng số cột với sheet tổng hợp)

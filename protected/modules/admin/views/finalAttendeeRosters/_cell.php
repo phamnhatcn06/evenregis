@@ -26,19 +26,19 @@ $tooltip    = 'Đã sửa tay — Gốc: '
     . (trim((string) $original) !== '' ? $original : '(để trống)');
 $canRestore = isset($canUpdate) ? $canUpdate : false;
 ?>
-<span class="js-cell d-inline-block ps-2 border-start border-3 border-warning"
+<span class="js-cell far-cell-overridden"
       data-field="<?php echo CHtml::encode($field); ?>"
       data-roster-id="<?php echo (int) $row->id; ?>"
       data-original="<?php echo CHtml::encode((string) $original); ?>"
       title="<?php echo CHtml::encode($tooltip); ?>">
-    <?php echo CHtml::encode($display); ?>
-    <i class="fa fa-pencil text-warning ms-1 small"></i>
+    <span><?php echo CHtml::encode($display); ?></span>
+    <i class="fa fa-pencil text-warning ms-1" style="font-size: 11px;"></i>
     <?php if ($canRestore && $hasOrigin): ?>
-        <button type="button" class="btn btn-link btn-sm p-0 ms-1 js-cell-reset"
+        <button type="button" class="far-cell-reset-btn js-cell-reset"
                 data-field="<?php echo CHtml::encode($field); ?>"
                 data-roster-id="<?php echo (int) $row->id; ?>"
                 data-field-label="<?php echo CHtml::encode($field); ?>"
-                title="Khôi phục về giá trị gốc">
+                title="Khôi phục về giá trị gốc: <?php echo CHtml::encode($original); ?>">
             <i class="fa fa-undo"></i>
         </button>
     <?php endif; ?>
