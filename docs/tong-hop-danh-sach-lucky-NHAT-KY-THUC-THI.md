@@ -427,3 +427,25 @@ job auto-commit đã commit sẵn.
   - **Excel Export:** Bổ sung cột "Nội dung tham gia" vào file xuất Excel trong [`FinalAttendeeRostersController.php`](file:///e:/eventregis/protected/modules/admin/controllers/FinalAttendeeRostersController.php).
   - **Empty state:** Cập nhật `colspan` bảng rỗng từ `8 : 7` lên `9 : 8`.
 
+### 11.8 Đổi Cột Đơn vị sang `badge_org_name` & Hiển thị Tên Môn Thể thao, Văn nghệ, Nghiệp vụ (2026-10-04)
+
+- **Nội dung tham gia:**
+  - **Môn thể thao (`sport`):** Trước đây dữ liệu lưu mã đội viết tắt (ví dụ: `HNO`, `VPTD`, `SIEUTHI`, `CIENCO`, `BVPD`). Cập nhật query trong [`FinalAttendeeRosterRepository.php`](file:///E:/even_API/MTRegistrationPortal/Modules/Registration/Repositories/FinalAttendeeRosterRepository.php) và accessor trong [`FinalAttendeeRoster.php`](file:///E:/even_API/MTRegistrationPortal/Modules/Registration/Entities/FinalAttendeeRoster.php): Join bảng `final_attendee_contents` với `sport_teams` và `sports` (`sport_teams.sport_id = sports.id`) để lấy tên môn thể thao chi tiết thực tế (VD: `Bóng đá nữ`, `Pickleball đôi nam`, `Kéo co phối hợp Nam - Nữ`, `Cầu lông đơn nam`, `Bơi ếch Nam - cự ly 40m`...).
+  - **Hội diễn văn nghệ (`talent`):** Hiển thị tên tiết mục / thể loại văn nghệ đã đăng ký (VD: `Mùa vàng`, `Nét đẹp Chăm Pa`, `Mashup...`).
+  - **Nghiệp vụ / Hội thi tay nghề (`competition`):** Hiển thị tên môn thi nghiệp vụ (VD: `Bếp`, `Buồng`, `Dịch vụ Ẩm thực`, `Kinh doanh – Lễ tân – Marketing`, `Kế toán - Nhân sự`, `An ninh – Kỹ thuật – CNTT`).
+  - **Thi sắc đẹp (`beauty`):** Hiển thị `Thi sắc đẹp`.
+
+- **Cột Đơn vị lấy từ `badge_org_name`:**
+  - **Database Migration:** Thêm cột `badge_org_name VARCHAR(255) NULL AFTER property_name` vào bảng `final_attendee_rosters` (`2026_10_04_150000_add_badge_org_name_to_final_attendee_rosters_table.php`).
+  - **Backfill:** Cập nhật đồng bộ dữ liệu cho 619 bản ghi hiện có từ `attendees.badge_org_name` (fallback `unit_label` hoặc `property_name`).
+  - **BE API (`MTRegistrationPortal`):**
+    - [`FinalAttendeeRoster.php`](file:///E:/even_API/MTRegistrationPortal/Modules/Registration/Entities/FinalAttendeeRoster.php): Bổ sung `badge_org_name` vào `$fillable`, `EDITABLE_FIELDS`, `SYNCABLE_FIELDS`, `WRITE_BACK_FIELDS` và accessor `getBadgeOrgNameAttribute()`.
+    - [`FinalAttendeeRosterResource.php`](file:///E:/even_API/MTRegistrationPortal/Modules/Registration/Http/Resources/FinalAttendeeRosterResource.php): Trả trường `badge_org_name` trong response JSON.
+    - [`FinalAttendeeRosterService.php`](file:///E:/even_API/MTRegistrationPortal/Modules/Registration/Services/FinalAttendeeRosterService.php): Trích xuất `badge_org_name` trong `extractRawAttendee()` và danh sách các trường có thể sửa tay.
+  - **FE (`eventregis`):**
+    - [`FinalAttendeeRosters.php`](file:///e:/eventregis/protected/models/FinalAttendeeRosters.php): Khai báo thuộc tính `$badge_org_name`, rules, attributeLabels, editableFields, writeBackFields.
+    - [`admin.php`](file:///e:/eventregis/protected/modules/admin/views/finalAttendeeRosters/admin.php): Cột "Đơn vị" hiển thị `$row->badge_org_name` (fallback `property_name` / `unit_label`); dữ liệu modal sửa và modal gán lucky chuyển sang dùng `badge_org_name`.
+    - [`_modal_edit_row.php`](file:///e:/eventregis/protected/modules/admin/views/finalAttendeeRosters/_modal_edit_row.php): Cập nhật ô nhập Đơn vị trỏ vào trường `badge_org_name`.
+    - [`FinalAttendeeRostersController.php`](file:///e:/eventregis/protected/modules/admin/controllers/FinalAttendeeRostersController.php): Xuất file Excel cột "Đơn vị" ưu tiên lấy `badge_org_name`.
+
+

@@ -503,13 +503,16 @@ $flashMessages = Yii::app()->user->getFlashes();
 
                             <!-- Đơn vị -->
                             <td>
-                                <?php echo $this->renderPartial('_cell', array(
+                                <?php
+                                $unitDisplay = !empty($row->badge_org_name) ? $row->badge_org_name : (!empty($row->property_name) ? $row->property_name : $row->unit_label);
+                                echo $this->renderPartial('_cell', array(
                                     'row'        => $row,
-                                    'field'      => 'property_name',
-                                    'value'      => $row->property_name,
+                                    'field'      => 'badge_org_name',
+                                    'value'      => $unitDisplay,
                                     'overridden' => $overridden,
                                     'canUpdate'  => $canUpdate,
-                                ), true); ?>
+                                ), true);
+                                ?>
                             </td>
 
                             <!-- Chức danh (sửa trực tiếp tại chỗ) -->
@@ -655,6 +658,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                                                 'phone_number'      => $row->phone_number,
                                                 'email'             => $row->email,
                                                 'property_name'     => $row->property_name,
+                                                'badge_org_name'    => !empty($row->badge_org_name) ? $row->badge_org_name : (!empty($row->property_name) ? $row->property_name : $row->unit_label),
                                                 'unit_label'        => $row->unit_label,
                                                 'division_name'     => $row->division_name,
                                                 'department_name'   => $row->department_name,
@@ -677,7 +681,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                                                 class="far-action-btn far-action-lucky js-set-lucky"
                                                 data-roster-id="<?php echo (int) $row->id; ?>"
                                                 data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
-                                                data-unit="<?php echo CHtml::encode($row->property_name); ?>"
+                                                data-unit="<?php echo CHtml::encode(!empty($row->badge_org_name) ? $row->badge_org_name : $row->property_name); ?>"
                                                 data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
                                                 title="Gán / Hoán đổi mã lucky">
                                             <i class="fa fa-ticket"></i>

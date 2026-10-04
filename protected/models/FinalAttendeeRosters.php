@@ -37,6 +37,7 @@ class FinalAttendeeRosters extends CFormModel
     public $property_id;
     public $property_code;
     public $property_name;
+    public $badge_org_name;
     public $unit_label;
     public $division_code;
     public $division_name;
@@ -92,7 +93,8 @@ class FinalAttendeeRosters extends CFormModel
             'gender'          => 'Giới tính',
             'phone_number'    => 'Số điện thoại',
             'email'           => 'Email',
-            'property_name'   => 'Đơn vị',
+            'property_name'   => 'Đơn vị gốc',
+            'badge_org_name'  => 'Đơn vị',
             'unit_label'      => 'Nhãn in thẻ',
             'division_code'   => 'Mã bộ phận',
             'division_name'   => 'Bộ phận',
@@ -109,7 +111,7 @@ class FinalAttendeeRosters extends CFormModel
     /** Trường sửa tay sẽ được ghi ngược sang attendees (hiện trên thẻ in và email) */
     public static function writeBackFields()
     {
-        return array('position', 'unit_label', 'shirt_size', 'phone_number', 'note');
+        return array('position', 'unit_label', 'badge_org_name', 'shirt_size', 'phone_number', 'note');
     }
 
     public function rules()
@@ -118,7 +120,7 @@ class FinalAttendeeRosters extends CFormModel
             array(
                 'id, event_id, period_id, attendee_id, source_attendee_ids, registration_id, dedup_key,
                  dedup_source, full_name, staff_code, id_card, birthday, gender, phone_number, email,
-                 property_id, property_code, property_name, unit_label, division_code, division_name,
+                 property_id, property_code, property_name, badge_org_name, unit_label, division_code, division_name,
                  department_code, department_name, position, position_code, position_name, position_display,
                  attendee_type, shirt_size, note, sort_order, lucky_number, login_identifier,
                  lucky_provisioned_at, pin_is_set, qr_token, badge_number, overridden_fields, has_override,
@@ -135,7 +137,8 @@ class FinalAttendeeRosters extends CFormModel
             'full_name'        => 'Họ và tên',
             'staff_code'       => 'Mã nhân viên',
             'id_card'          => 'Số CCCD',
-            'property_name'    => 'Đơn vị',
+            'badge_org_name'   => 'Đơn vị',
+            'property_name'    => 'Đơn vị gốc',
             'division_name'    => 'Bộ phận',
             'department_name'  => 'Phòng ban',
             'position_display' => 'Chức danh',

@@ -16,6 +16,13 @@ class FinalAttendeeRostersController extends AdminController
     /** Trần số dòng xuất ra, tránh một bộ lọc quá rộng làm hết bộ nhớ */
     const EXPORT_MAX_ROWS = 10000;
 
+    /**
+     * Không coi action nào là public cho controller này.
+     * Màn này cần phân quyền, nên "admin" phải qua check quyền ở beforeAction
+     * thay vì được bỏ qua như danh sách publicActions mặc định của AdminController.
+     */
+    protected $publicActions = array();
+
     public function actionAdmin()
     {
         if (!PermissionHelper::can('finalattendeerosters', 'read')) {
@@ -169,7 +176,7 @@ class FinalAttendeeRostersController extends AdminController
                 $this->excelText($item, 'id_card'),
                 $this->excelText($item, 'birthday'),
                 $this->excelText($item, 'phone_number'),
-                $this->excelText($item, 'property_name'),
+                !empty($item['badge_org_name']) ? $item['badge_org_name'] : (!empty($item['property_name']) ? $item['property_name'] : $this->excelText($item, 'unit_label')),
                 $this->excelText($item, 'unit_label'),
                 $this->excelText($item, 'division_name'),
                 $this->excelText($item, 'department_name'),
