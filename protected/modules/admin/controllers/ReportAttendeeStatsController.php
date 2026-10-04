@@ -2860,6 +2860,58 @@ class ReportAttendeeStatsController extends AdminController
     }
 
     /**
+     * Ghi ô tổng hợp số lượng ở cuối sheet Tổng hợp:
+     *  1. Tổng số người tham gia
+     *  2. Tổng số người tham gia thể thao
+     *  3. Tổng số người tham gia văn nghệ
+     *  4. Tổng số người tham gia nghiệp vụ
+     *  5. Tổng số người tham gia thi miss
+     */
+    protected function writeFinalSummaryBox($sheet, $people)
+    {
+        $totalAll = count($people);
+        $totalSport = 0;
+        $totalTalent = 0;
+        $totalComp = 0;
+        $totalMiss = 0;
+        foreach ($people as $p) {
+            if (!empty($p['sports'])) $totalSport++;
+            if (!empty($p['talent'])) $totalTalent++;
+            if (!empty($p['competitions'])) $totalComp++;
+            if (!empty($p['miss'])) $totalMiss++;
+        }
+
+        $rows = array(
+            array('1. Tổng số người tham gia', $totalAll),
+            array('2. Tổng số người tham gia thể thao', $totalSport),
+            array('3. Tổng số người tham gia văn nghệ', $totalTalent),
+            array('4. Tổng số người tham gia nghiệp vụ', $totalComp),
+            array('5. Tổng số người tham gia thi miss', $totalMiss),
+        );
+
+        // Bắt đầu cách bảng dữ liệu 1 dòng trống
+        $startRow = $sheet->getHighestRow() + 2;
+        $row = $startRow;
+        foreach ($rows as $r) {
+            $sheet->setCellValueByColumnAndRow(0, $row, $r[0]);
+            $sheet->mergeCellsByColumnAndRow(0, $row, 2, $row);
+            $sheet->setCellValueByColumnAndRow(3, $row, $r[1]);
+            $row++;
+        }
+        $endRow = $row - 1;
+
+        // Định dạng: nhãn căn trái, số căn phải, viền mảnh, chữ đậm
+        $sheet->getStyle('A' . $startRow . ':D' . $endRow)->applyFromArray(array(
+            'font' => array('bold' => true),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+        ));
+        $sheet->getStyle('A' . $startRow . ':C' . $endRow)->getAlignment()
+            ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('D' . $startRow . ':D' . $endRow)->getAlignment()
+            ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+    }
+
+    /**
      * Hiển thị giới tính: 1 = Nam, 0 = Nữ
      */
     protected function formatGender($gender)
