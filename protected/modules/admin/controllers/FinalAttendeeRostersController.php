@@ -116,7 +116,7 @@ class FinalAttendeeRostersController extends AdminController
         $headers = array(
             'Mã lucky', 'Định danh đăng nhập', 'Họ và tên', 'Mã nhân viên', 'Số CCCD', 'Ngày sinh',
             'Số điện thoại', 'Đơn vị', 'Nhãn in thẻ', 'Bộ phận', 'Phòng ban',
-            'Chức danh hiển thị', 'Chức danh gốc (SMILE)', 'Nội dung tham gia', 'Size áo', 'Số thẻ',
+            'Chức danh', 'Chức danh gốc (SMILE)', 'Nội dung tham gia', 'Size áo', 'Số thẻ',
             'Loại', 'Trạng thái', 'Đã đặt PIN', 'Đã sửa tay', 'Xung đột',
         );
 
@@ -180,7 +180,7 @@ class FinalAttendeeRostersController extends AdminController
                 $this->excelText($item, 'unit_label'),
                 $this->excelText($item, 'division_name'),
                 $this->excelText($item, 'department_name'),
-                $this->excelText($item, 'position_display'),
+                $this->excelText($item, 'position'),
                 $this->excelText($item, 'position_name'),
                 $contentStr,
                 $this->excelText($item, 'shirt_size'),

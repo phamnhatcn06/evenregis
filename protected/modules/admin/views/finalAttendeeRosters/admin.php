@@ -560,7 +560,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 <?php echo $this->renderPartial('_cell', array(
                                     'row'        => $row,
                                     'field'      => 'position',
-                                    'value'      => $row->position_display ?: $row->position,
+                                    'value'      => $row->position,
                                     'overridden' => $overridden,
                                     'canUpdate'  => $canUpdate,
                                     'isEditable' => true,
