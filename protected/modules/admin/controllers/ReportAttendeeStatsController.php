@@ -2353,6 +2353,8 @@ class ReportAttendeeStatsController extends AdminController
                     'position' => isset($att->position) ? $att->position : '',
                     'property_name' => isset($att->property_name) ? $att->property_name : '',
                     'is_active' => isset($att->is_active) ? (int) $att->is_active : 1,
+                    'staff_code' => isset($att->staff_code) ? trim((string) $att->staff_code) : '',
+                    'id_card' => isset($att->id_card) ? trim((string) $att->id_card) : '',
                 );
             }
         }
