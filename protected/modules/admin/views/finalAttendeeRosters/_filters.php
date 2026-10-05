@@ -49,6 +49,10 @@ if ($filters['attendee_type'] !== null && $filters['attendee_type'] !== '') {
     $typeOpts = FinalAttendeeRosters::getTypeOptions();
     $activeTags[] = 'Loại: ' . (isset($typeOpts[$filters['attendee_type']]) ? $typeOpts[$filters['attendee_type']] : $filters['attendee_type']);
 }
+if (!empty($filters['content_type'])) {
+    $activeCount++;
+    $activeTags[] = 'Nội dung: ' . (isset($contentOptions[$filters['content_type']]) ? $contentOptions[$filters['content_type']] : $filters['content_type']);
+}
 if ($filters['has_lucky'] !== null && $filters['has_lucky'] !== '') {
     $activeCount++;
     $activeTags[] = $filters['has_lucky'] ? 'Đã có mã lucky' : 'Chưa có mã lucky';
