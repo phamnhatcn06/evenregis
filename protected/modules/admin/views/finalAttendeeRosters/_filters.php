@@ -169,6 +169,16 @@ $hasAdvanced = !empty($filters['department_code'])
                             )); ?>
                         </div>
 
+                        <?php if (!empty($contentOptions)): ?>
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label small fw-semibold text-muted mb-1">Nội dung tham gia</label>
+                            <?php echo CHtml::dropDownList('content_type', $filters['content_type'], $contentOptions, array(
+                                'class' => 'form-select form-select-sm',
+                                'empty' => '-- Tất cả nội dung --',
+                            )); ?>
+                        </div>
+                        <?php endif; ?>
+
                         <div class="col-lg-2 col-md-4">
                             <label class="form-label small fw-semibold text-muted mb-1">Mã lucky</label>
                             <?php echo CHtml::dropDownList('has_lucky', $filters['has_lucky'], FinalAttendeeRosters::getLuckyFilterOptions(), array(
