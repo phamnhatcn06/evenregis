@@ -440,6 +440,11 @@ class AuthHandler extends CApplicationComponent
         $session[self::SESSION_PERMISSIONS_KEY] = $crudPermissions;
         $session['sso_menu_permissions'] = $menuPermissions;
 
+        // Quyền vừa được nạp lại từ Portal, nên bỏ menu/quyền đã cache của token này
+        // để sidebar dựng lại theo quyền mới, tránh hiển thị mục cũ đã bị gỡ quyền.
+        CacheHelper::clearMenuCache();
+        CacheHelper::clearPermsCache();
+
         Yii::log('Permissions loaded: ' . count($crudPermissions) . ' CRUD, ' . count($menuPermissions) . ' menu items', CLogger::LEVEL_INFO, 'auth');
 
         return true;
