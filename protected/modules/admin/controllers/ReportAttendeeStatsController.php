@@ -2472,6 +2472,21 @@ class ReportAttendeeStatsController extends AdminController
                     $members = $fTeam['members'];
                 }
 
+                // Chỉ giữ VĐV thoả CẢ hai điều kiện:
+                // (1) attendee còn active (is_active = 1);
+                // (2) còn active ở đăng ký VCK (có trong tập finalist VCK) — nếu sự kiện có đợt VCK.
+                $members = array_values(array_filter($members, function ($m) use ($attendeeMap, $vckActiveAttendeeIds, $applyVckFilter) {
+                    $attId = isset($m['attendee_id']) ? $m['attendee_id'] : null;
+                    if ($attId === null) return false;
+                    if (isset($attendeeMap[$attId]) && $attendeeMap[$attId]['is_active'] === 0) {
+                        return false;
+                    }
+                    if ($applyVckFilter && !isset($vckActiveAttendeeIds[$attId])) {
+                        return false;
+                    }
+                    return true;
+                }));
+
                 $teamRows[] = array(
                     'team_name' => $teamName,
                     'property_code' => $propCode,
