@@ -2368,6 +2368,14 @@ class ReportAttendeeStatsController extends AdminController
         $applyVckFilter = !empty($finalPeriodId);
         $vckActiveAttendeeIds = array();
         if ($applyVckFilter) {
+            // Tập danh tính của finalist VCK để bắc cầu gốc↔finalist khi backend không
+            // resolve được source_attendee_ids (người không có staff_code/id_card).
+            $finStaffCodes = array();
+            $finIdCards = array();
+            $finNames = array();
+            $normName = function ($s) {
+                return mb_strtolower(trim(preg_replace('/\s+/u', ' ', (string) $s)), 'UTF-8');
+            };
             foreach (RegistrationPeriods::getFinalAttendees($finalPeriodId) as $fa) {
                 if (isset($fa['id']) && $fa['id'] !== null) {
                     $vckActiveAttendeeIds[$fa['id']] = true;
@@ -2378,6 +2386,23 @@ class ReportAttendeeStatsController extends AdminController
                             $vckActiveAttendeeIds[$srcId] = true;
                         }
                     }
+                }
+                $sc = isset($fa['staff_code']) ? trim((string) $fa['staff_code']) : '';
+                $ic = isset($fa['id_card']) ? trim((string) $fa['id_card']) : '';
+                $nm = isset($fa['full_name']) ? $normName($fa['full_name']) : '';
+                if ($sc !== '') $finStaffCodes[$sc] = true;
+                if ($ic !== '') $finIdCards[$ic] = true;
+                if ($nm !== '') $finNames[$nm] = true;
+            }
+            // Bổ sung attendee gốc khớp danh tính finalist (staff_code → id_card → tên).
+            foreach ($attendeeMap as $aid => $info) {
+                if (isset($vckActiveAttendeeIds[$aid])) continue;
+                if ($info['staff_code'] !== '' && isset($finStaffCodes[$info['staff_code']])) {
+                    $vckActiveAttendeeIds[$aid] = true;
+                } elseif ($info['id_card'] !== '' && isset($finIdCards[$info['id_card']])) {
+                    $vckActiveAttendeeIds[$aid] = true;
+                } elseif ($info['full_name'] !== '' && isset($finNames[$normName($info['full_name'])])) {
+                    $vckActiveAttendeeIds[$aid] = true;
                 }
             }
         }
