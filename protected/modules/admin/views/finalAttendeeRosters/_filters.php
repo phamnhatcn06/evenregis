@@ -22,6 +22,15 @@ foreach ($filterOptions['departments'] as $department) {
         . (isset($department['count']) ? ' (' . $department['count'] . ')' : '');
 }
 
+// Nội dung tham gia: BE đã trả đúng thứ tự sơ đồ (Thể thao → Nghiệp vụ → Văn nghệ → Miss),
+// key là content_type (sport/competition/talent/beauty).
+$contentOptions = array();
+if (!empty($filterOptions['contents'])) {
+    foreach ($filterOptions['contents'] as $content) {
+        $contentOptions[$content['type']] = $content['name'];
+    }
+}
+
 // Đếm số tiêu chí lọc đang được áp dụng
 $activeCount = 0;
 $activeTags  = array();
