@@ -76,6 +76,7 @@ if (!empty($filters['with_trashed'])) {
 }
 
 $hasAdvanced = !empty($filters['department_code'])
+    || !empty($filters['content_type'])
     || ($filters['attendee_type'] !== null && $filters['attendee_type'] !== '')
     || ($filters['has_lucky'] !== null && $filters['has_lucky'] !== '')
     || ($filters['has_override'] !== null && $filters['has_override'] !== '')
