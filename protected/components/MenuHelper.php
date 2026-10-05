@@ -93,7 +93,6 @@ class MenuHelper
         //     );
         // }
         // print_r($permissions);die();
-        $permissions = self::appendFinalRosterItem($permissions);
 
         // Group permissions by root
         $grouped = array();
