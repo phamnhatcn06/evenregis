@@ -26,7 +26,7 @@ Yii::app()->clientScript->registerCssFile(
     Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css'
 );
 Yii::app()->clientScript->registerCssFile(
-    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.6'
+    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.7'
 );
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js',
@@ -364,6 +364,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                             <th style="width: 50px;" class="text-center">STT</th>
                             <th style="width: 140px;">Mã lucky</th>
                             <th style="min-width: 220px;">Họ và tên</th>
+                            <th style="min-width: 130px;">Số điện thoại</th>
                             <th style="min-width: 160px;">Đơn vị</th>
                             <th style="min-width: 180px;">Chức danh</th>
                             <th style="min-width: 190px;">Nội dung tham gia</th>
@@ -514,6 +515,30 @@ $flashMessages = Yii::app()->user->getFlashes();
                                         <?php endif; ?>
                                     </div>
                                 </div>
+                            </td>
+
+                            <!-- Số điện thoại -->
+                            <td>
+                                <?php if (!empty($row->phone_number) || in_array('phone_number', $overridden, true)): ?>
+                                    <div class="d-inline-flex align-items-center text-nowrap">
+                                        <?php if (!empty($row->phone_number)): ?>
+                                            <a href="tel:<?php echo CHtml::encode($row->phone_number); ?>" class="far-phone-btn me-1" title="Gọi <?php echo CHtml::encode($row->phone_number); ?>">
+                                                <i class="fa fa-phone"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                        <span class="far-phone-text">
+                                            <?php echo $this->renderPartial('_cell', array(
+                                                'row'        => $row,
+                                                'field'      => 'phone_number',
+                                                'value'      => $row->phone_number,
+                                                'overridden' => $overridden,
+                                                'canUpdate'  => $canUpdate,
+                                            ), true); ?>
+                                        </span>
+                                    </div>
+                                <?php else: ?>
+                                    <span class="text-muted small">-</span>
+                                <?php endif; ?>
                             </td>
 
                             <!-- Đơn vị -->
@@ -736,7 +761,7 @@ $flashMessages = Yii::app()->user->getFlashes();
 
                         <?php if (empty($rows)): ?>
                         <tr>
-                            <td colspan="<?php echo $canUpdate ? 9 : 8; ?>" class="far-empty-state">
+                            <td colspan="<?php echo $canUpdate ? 10 : 9; ?>" class="far-empty-state">
                                 <div class="far-empty-icon">
                                     <i class="fa fa-inbox"></i>
                                 </div>

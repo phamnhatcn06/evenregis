@@ -112,7 +112,7 @@ $hasAdvanced = !empty($filters['department_code'])
                         <i class="fa fa-search"></i>
                         <?php echo CHtml::textField('keyword', $filters['keyword'], array(
                             'class'       => 'form-control',
-                            'placeholder' => 'Họ tên, mã nhân viên, CCCD, mã lucky...',
+                            'placeholder' => 'Họ tên, SĐT, mã NV, CCCD, mã lucky...',
                         )); ?>
                     </div>
                 </div>

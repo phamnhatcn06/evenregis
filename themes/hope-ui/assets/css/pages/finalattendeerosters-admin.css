@@ -676,6 +676,35 @@
     text-decoration: underline;
 }
 
+/* Phone Number Column */
+.far-phone-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: rgba(58, 87, 232, 0.08);
+    color: var(--far-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.far-phone-btn:hover {
+    background: var(--far-primary);
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+.far-phone-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+    letter-spacing: 0.2px;
+}
+
 /* Overridden Fields Indicator */
 .far-cell-overridden {
     display: inline-flex;
