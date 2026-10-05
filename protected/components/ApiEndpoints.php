@@ -103,6 +103,31 @@ class ApiEndpoints
     const DAIHOI_MATCHES_LIVE = '/api/daihoi/matches/live';
     const DAIHOI_MATCHES_RECENT = '/api/daihoi/matches/recent';
     const DAIHOI_RANKINGS = '/api/daihoi/rankings';
+    const DAIHOI_SLIDES = '/api/daihoi/slides';
+    const DAIHOI_ALBUMS = '/api/daihoi/albums';
+    const DAIHOI_ALBUM_ITEMS = '/api/daihoi/albums/{id}/items';
+
+    // Slideshow (Daihoi Admin - REST style)
+    const SLIDESHOW_LIST = '/api/admin/slideshows';
+    const SLIDESHOW_STORE = '/api/admin/slideshows';
+    const SLIDESHOW_DETAIL = '/api/admin/slideshows/{id}';
+    const SLIDESHOW_UPDATE = '/api/admin/slideshows/{id}';
+    const SLIDESHOW_DESTROY = '/api/admin/slideshows/{id}';
+    const SLIDESHOW_REORDER = '/api/admin/slideshows/reorder';
+
+    // Media Albums (Daihoi Admin - REST style)
+    const MEDIA_ALBUM_LIST = '/api/admin/media-albums';
+    const MEDIA_ALBUM_STORE = '/api/admin/media-albums';
+    const MEDIA_ALBUM_DETAIL = '/api/admin/media-albums/{id}';
+    const MEDIA_ALBUM_UPDATE = '/api/admin/media-albums/{id}';
+    const MEDIA_ALBUM_DESTROY = '/api/admin/media-albums/{id}';
+
+    // Media Items (Daihoi Admin - REST style)
+    const MEDIA_ITEM_LIST = '/api/admin/media-items';
+    const MEDIA_ITEM_STORE = '/api/admin/media-items';
+    const MEDIA_ITEM_DETAIL = '/api/admin/media-items/{id}';
+    const MEDIA_ITEM_UPDATE = '/api/admin/media-items/{id}';
+    const MEDIA_ITEM_DESTROY = '/api/admin/media-items/{id}';
 
     // Event
     const EVENT_LIST = '/api/events';

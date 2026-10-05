@@ -131,4 +131,37 @@ class Daihoi
         $url = ApiEndpoints::url(ApiEndpoints::NEWS_DETAIL, array('id' => $id));
         return self::unwrap(ApiClient::get($url), array());
     }
+
+    /**
+     * Danh sách slide hero đang hiển thị (đã lọc is_active + khung thời gian).
+     * @return array
+     */
+    public static function getSlides()
+    {
+        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_SLIDES), array());
+    }
+
+    /**
+     * Danh sách album Thư viện đang hiển thị.
+     * @param int $limit
+     * @return array
+     */
+    public static function getAlbums($limit = 8)
+    {
+        return self::unwrap(
+            ApiClient::get(ApiEndpoints::DAIHOI_ALBUMS, array('per_page' => $limit, 'page' => 1)),
+            array()
+        );
+    }
+
+    /**
+     * Danh sách ảnh/video trong một album.
+     * @param int $albumId
+     * @return array
+     */
+    public static function getAlbumItems($albumId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::DAIHOI_ALBUM_ITEMS, array('id' => $albumId));
+        return self::unwrap(ApiClient::get($url), array());
+    }
 }
