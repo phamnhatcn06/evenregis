@@ -268,7 +268,7 @@ class FinalAttendeeRosters extends CFormModel
      */
     public static function getFilterOptions($eventId, $periodId = null, $propertyId = null, $divisionCode = null)
     {
-        $empty = array('properties' => array(), 'divisions' => array(), 'departments' => array());
+        $empty = array('properties' => array(), 'divisions' => array(), 'departments' => array(), 'contents' => array());
 
         if (empty($eventId)) {
             return $empty;
