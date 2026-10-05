@@ -284,9 +284,6 @@ class AuthHandler extends CApplicationComponent
             'talentrounds' => 'events',
             'sportteams' => 'events',
             'competitionregistrations' => 'events',
-            // Màn hình tổng hợp danh sách vòng chung kết do HO vận hành, nên đi theo
-            // quyền duyệt đăng ký; nếu đơn vị chưa có quyền duyệt thì lấy quyền đăng ký.
-            'finalattendeerosters' => array('approveregistrations', 'registrations'),
         );
 
         foreach ($inheritanceRules as $child => $parents) {

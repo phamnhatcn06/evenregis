@@ -437,7 +437,7 @@ job auto-commit đã commit sẵn.
 
 - **Cột Đơn vị lấy từ `badge_org_name`:**
   - **Database Migration:** Thêm cột `badge_org_name VARCHAR(255) NULL AFTER property_name` vào bảng `final_attendee_rosters` (`2026_10_04_150000_add_badge_org_name_to_final_attendee_rosters_table.php`).
-  - **Backfill:** Cập nhật đồng bộ dữ liệu cho 619 bản ghi hiện có từ `attendees.badge_org_name` (fallback `unit_label` hoặc `property_name`).
+  - **Backfill tự động trong Migration:** Phương thức `up()` của migration chứa sẵn câu lệnh `UPDATE ... JOIN attendees` để khi chạy `php artisan migrate` ở bất kỳ môi trường nào (staging/production), dữ liệu `badge_org_name` sẽ tự động được đồng bộ 100% từ bảng `attendees` (fallback sang `unit_label` hoặc `property_name`).
   - **BE API (`MTRegistrationPortal`):**
     - [`FinalAttendeeRoster.php`](file:///E:/even_API/MTRegistrationPortal/Modules/Registration/Entities/FinalAttendeeRoster.php): Bổ sung `badge_org_name` vào `$fillable`, `EDITABLE_FIELDS`, `SYNCABLE_FIELDS`, `WRITE_BACK_FIELDS` và accessor `getBadgeOrgNameAttribute()`.
     - [`FinalAttendeeRosterResource.php`](file:///E:/even_API/MTRegistrationPortal/Modules/Registration/Http/Resources/FinalAttendeeRosterResource.php): Trả trường `badge_org_name` trong response JSON.
