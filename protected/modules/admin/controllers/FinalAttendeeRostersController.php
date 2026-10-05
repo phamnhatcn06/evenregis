@@ -911,7 +911,7 @@ class FinalAttendeeRostersController extends AdminController
     protected function getFilterValues()
     {
         $keys = array(
-            'property_id', 'division_code', 'department_code', 'attendee_type',
+            'property_id', 'division_code', 'department_code', 'attendee_type', 'content_type',
             'has_lucky', 'has_override', 'conflict_flag', 'keyword', 'with_trashed',
         );
 
