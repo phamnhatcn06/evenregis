@@ -587,6 +587,53 @@
     gap: 10px;
 }
 
+.far-avatar-wrap {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+}
+
+.far-avatar-wrap .far-avatar-link {
+    display: block;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.far-avatar-wrap .far-avatar-img {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 10px;
+    background-color: #f1f5f9;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    display: block;
+}
+
+.far-avatar-wrap .far-avatar-link:hover .far-avatar-img {
+    transform: scale(1.18);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    position: relative;
+    z-index: 5;
+}
+
+.far-avatar-wrap.has-avatar .far-avatar-initials {
+    display: none;
+}
+
+.far-avatar-wrap.has-avatar.has-error .far-avatar-link {
+    display: none !important;
+}
+
+.far-avatar-wrap.has-avatar.has-error .far-avatar-initials {
+    display: flex !important;
+}
+
 .far-avatar {
     width: 36px;
     height: 36px;

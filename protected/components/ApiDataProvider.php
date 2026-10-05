@@ -13,6 +13,7 @@ class ApiDataProvider extends CDataProvider
 
     private $_data;
     private $_totalItemCount;
+    private $_fetchedKey;
 
     public function __construct($endpoint, $config = array())
     {
@@ -22,19 +23,35 @@ class ApiDataProvider extends CDataProvider
         }
     }
 
+    public function getPagination($className = 'CPagination')
+    {
+        $pagination = parent::getPagination($className);
+        if ($pagination instanceof CPagination && $this->_totalItemCount === null) {
+            $pagination->validateCurrentPage = false;
+        }
+        return $pagination;
+    }
+
+    public function getData($refresh = false)
+    {
+        if ($refresh) {
+            $this->_data = null;
+            $this->_totalItemCount = null;
+            $this->_fetchedKey = null;
+        }
+        return parent::getData($refresh);
+    }
+
     protected function fetchData()
     {
-        if ($this->_data !== null) {
-            return $this->_data;
-        }
-
         $pagination = $this->getPagination();
         $sort = $this->getSort();
 
         $params = $this->params;
 
         if ($pagination !== false) {
-            $params['page'] = $pagination->getCurrentPage() + 1;
+            $pagination->validateCurrentPage = false;
+            $params['page'] = $pagination->getCurrentPage(true) + 1;
             $params['per_page'] = $pagination->getPageSize();
         }
 
@@ -49,6 +66,11 @@ class ApiDataProvider extends CDataProvider
             }
         }
 
+        $cacheKey = md5(serialize(array($this->endpoint, $params)));
+        if ($this->_fetchedKey === $cacheKey && $this->_data !== null) {
+            return $this->_data;
+        }
+
         $result = ApiClient::get($this->endpoint, $params);
 
         if ($result['success'] && isset($result['data'])) {
@@ -57,19 +79,27 @@ class ApiDataProvider extends CDataProvider
             if (isset($responseData['data'])) {
                 $this->_data = $this->createModels($responseData['data']);
                 $this->_totalItemCount = isset($responseData['pagination']['total'])
-                    ? $responseData['pagination']['total']
-                    : count($responseData['data']);
+                    ? (int) $responseData['pagination']['total']
+                    : (isset($responseData['total']) ? (int) $responseData['total'] : count($responseData['data']));
             } else {
                 $this->_data = $this->createModels($responseData);
                 $this->_totalItemCount = count($responseData);
             }
 
+            $this->_fetchedKey = $cacheKey;
+
             if ($pagination !== false) {
                 $pagination->setItemCount($this->_totalItemCount);
+                $pagination->validateCurrentPage = true;
             }
         } else {
             $this->_data = array();
             $this->_totalItemCount = 0;
+            $this->_fetchedKey = $cacheKey;
+            if ($pagination !== false) {
+                $pagination->setItemCount(0);
+                $pagination->validateCurrentPage = true;
+            }
             Yii::log('API Error: ' . $result['error'], CLogger::LEVEL_ERROR, 'api');
         }
 

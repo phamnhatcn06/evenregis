@@ -26,7 +26,7 @@ Yii::app()->clientScript->registerCssFile(
     Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css'
 );
 Yii::app()->clientScript->registerCssFile(
-    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.5'
+    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.6'
 );
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js',
@@ -461,8 +461,23 @@ $flashMessages = Yii::app()->user->getFlashes();
                             <!-- Họ và tên + Avatar + Bản ghi gốc -->
                             <td>
                                 <div class="far-user-cell">
-                                    <div class="far-avatar" style="background: <?php echo $avatarBg; ?>;">
-                                        <?php echo CHtml::encode($initials ?: 'VCK'); ?>
+                                    <?php $avatarUrl = method_exists($row, 'getAvatarUrl') ? $row->getAvatarUrl() : ''; ?>
+                                    <div class="far-avatar-wrap <?php echo $avatarUrl ? 'has-avatar' : ''; ?>">
+                                        <?php if ($avatarUrl): ?>
+                                            <a href="<?php echo CHtml::encode($avatarUrl); ?>"
+                                               target="_blank"
+                                               class="far-avatar-link"
+                                               title="Xem ảnh chân dung: <?php echo CHtml::encode($row->full_name); ?>">
+                                                <img src="<?php echo CHtml::encode($avatarUrl); ?>"
+                                                     alt="<?php echo CHtml::encode($row->full_name); ?>"
+                                                     class="far-avatar far-avatar-img"
+                                                     loading="lazy"
+                                                     onerror="var w = this.closest('.far-avatar-wrap'); if(w) w.classList.add('has-error');">
+                                            </a>
+                                        <?php endif; ?>
+                                        <div class="far-avatar far-avatar-initials" style="background: <?php echo $avatarBg; ?>;" title="<?php echo CHtml::encode($row->full_name); ?>">
+                                            <?php echo CHtml::encode($initials ?: 'VCK'); ?>
+                                        </div>
                                     </div>
                                     <div class="far-user-meta">
                                         <div class="far-user-name">
@@ -745,8 +760,8 @@ $flashMessages = Yii::app()->user->getFlashes();
             <!-- Phân trang -->
             <?php if ($dataProvider->pagination): ?>
                 <?php
-                $totalCount = $dataProvider->getTotalItemCount();
-                $pageOffset = $dataProvider->pagination->offset + 1;
+                $totalCount = (int) $dataProvider->getTotalItemCount();
+                $pageOffset = $totalCount > 0 ? min($dataProvider->pagination->offset + 1, $totalCount) : 0;
                 $pageLimit  = min($dataProvider->pagination->offset + $dataProvider->pagination->pageSize, $totalCount);
                 ?>
                 <div class="far-pagination-footer">

@@ -78,6 +78,24 @@ class FinalAttendeeRosters extends CFormModel
 
     public $participations;
     public $content_names;
+    public $portrait_path;
+    public $photo_path;
+
+    /**
+     * Đường dẫn ảnh đại diện / chân dung của người tham dự.
+     */
+    public function getAvatarUrl()
+    {
+        $path = !empty($this->portrait_path) ? $this->portrait_path : (!empty($this->photo_path) ? $this->photo_path : '');
+        if (!$path) {
+            return '';
+        }
+        if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
+            return $path;
+        }
+        $baseUrl = (Yii::app() && method_exists(Yii::app(), 'getBaseUrl')) ? Yii::app()->baseUrl : '';
+        return rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
+    }
 
     /**
      * Trường HO được sửa thủ công. Phải khớp với EDITABLE_FIELDS ở BE.
