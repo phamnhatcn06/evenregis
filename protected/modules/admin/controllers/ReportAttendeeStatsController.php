@@ -2357,6 +2357,29 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
+        // VĐV còn active ở đăng ký Vòng chung kết (VCK) của các đơn vị.
+        // Finalist VCK là attendee MỚI (attendee_type='finalist'); thành viên đội thể thao lại
+        // trỏ attendee GỐC vòng loại, nên dựng tập id attendee gốc từ source_attendee_ids của
+        // các finalist còn active (endpoint final-attendees đã lọc is_active=1) để giao với
+        // danh sách thành viên đội. Chỉ áp dụng khi sự kiện có cấu hình đợt VCK.
+        $finalPeriodId = RegistrationPeriods::getFinalPeriodIdForEvent($eventId);
+        $applyVckFilter = !empty($finalPeriodId);
+        $vckActiveAttendeeIds = array();
+        if ($applyVckFilter) {
+            foreach (RegistrationPeriods::getFinalAttendees($finalPeriodId) as $fa) {
+                if (isset($fa['id']) && $fa['id'] !== null) {
+                    $vckActiveAttendeeIds[$fa['id']] = true;
+                }
+                if (!empty($fa['source_attendee_ids']) && is_array($fa['source_attendee_ids'])) {
+                    foreach ($fa['source_attendee_ids'] as $srcId) {
+                        if ($srcId !== null && $srcId !== '') {
+                            $vckActiveAttendeeIds[$srcId] = true;
+                        }
+                    }
+                }
+            }
+        }
+
         // Thành viên đội, group theo đội
         $membersByTeam = array();
         foreach (SportTeamMembers::getRawListByEvent($eventId) as $sm) {
