@@ -28,5 +28,9 @@
 - [ ] Smoke test trình duyệt (chưa chạy)
 
 ## Phase 3 — Hoàn thiện
-- [ ] S10 — Dashboard mức lấp đầy + rà edge case + audit log
-- [ ] S11 — Test tải đồng thời FCFS (bắt buộc): tổng active ≤ quota; hoàn suất không lệch số
+- [x] S11 — Test tải đồng thời FCFS ✅ Tour: 20 claim song song / quota 5 → đúng 5×200 + 15×409, registered_count=5. Run: 12 claim / quota 3 → đúng 3×200 + 9×409. KHÔNG oversell. Audit log đã ghi ở mọi claim/cancel.
+- [ ] S10 — (nên có) Dashboard mức lấp đầy realtime — CHƯA làm (tùy chọn)
+
+## Còn lại
+- [ ] Smoke test trình duyệt: cổng public (2 khối, đăng ký, xin hủy) + admin (CRUD, duyệt hủy, export) — cần chạy app thực
+- [ ] Portal cấp quyền SSO `toursessions`/`tourregistrations` cho role không phải admin (nếu cần)
