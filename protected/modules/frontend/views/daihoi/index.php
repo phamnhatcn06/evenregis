@@ -55,6 +55,7 @@ $portalUrl = $base . '/run';
 
 // ----- Menu điều hướng (anchor trong trang) -----
 $navItems = array(
+    array('#dang-ky', 'Đăng ký'),
     array('#noi-dung', 'Chương trình'),
     array('#hom-nay', 'Lịch trình'),
     array('#ket-qua', 'Kết quả'),
