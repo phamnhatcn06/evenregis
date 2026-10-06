@@ -119,10 +119,22 @@ $stages = ($dataProvider !== null) ? $dataProvider->getData() : array();
                                     <i class="fa fa-random"></i> Bốc bảng
                                 </button>
                             <?php endif; ?>
-                            <?php if ($isBracket && !$isLocked): ?>
+                            <?php if ($stage->format === SportStages::FORMAT_SINGLE_ELIMINATION && !$isLocked): ?>
                                 <button type="button" class="btn btn-sm btn-primary btn-draw"
                                         data-id="<?php echo $stage->id; ?>" data-type="bracket">
                                     <i class="fa fa-sitemap"></i> Bốc nhánh
+                                </button>
+                            <?php endif; ?>
+                            <?php if ($isGroup && !$isLocked): ?>
+                                <button type="button" class="btn btn-sm btn-outline-success btn-standings"
+                                        data-id="<?php echo $stage->id; ?>">
+                                    <i class="fa fa-list-ol"></i> Tính BXH
+                                </button>
+                            <?php endif; ?>
+                            <?php if ($stage->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT && !$isLocked): ?>
+                                <button type="button" class="btn btn-sm btn-primary btn-genko"
+                                        data-id="<?php echo $stage->id; ?>">
+                                    <i class="fa fa-sitemap"></i> Sinh nhánh từ bảng
                                 </button>
                             <?php endif; ?>
                             <a href="<?php echo $this->createUrl('view', array('id' => $stage->id)); ?>"
