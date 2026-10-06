@@ -15,6 +15,13 @@ $this->menu = array(
         'icon' => 'fa-times-circle',
         'id' => 'btn_cancel_requests',
     ),
+    array(
+        'label' => 'Dashboard',
+        'url' => $this->createUrl('/admin/activityDashboard/index', $eventId ? array('event_id' => $eventId) : array()),
+        'color' => 'secondary',
+        'icon' => 'fa-dashboard',
+        'id' => 'btn_dashboard',
+    ),
 );
 $this->Tabletitle = 'Danh sách đăng ký bộ môn chạy';
 $canUpdate = PermissionHelper::can('runregistrations', 'update');
