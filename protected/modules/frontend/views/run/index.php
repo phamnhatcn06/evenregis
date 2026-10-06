@@ -39,7 +39,11 @@ $tourRejectAt = (!empty($tourMine) && isset($tourMine['status']) && $tourMine['s
      data-run-cancel-name="<?php echo CHtml::encode($runNoticeName); ?>"
      data-tour-cancel-approved="<?php echo $tourNoticeAt > 0 ? '1' : '0'; ?>"
      data-tour-cancel-reviewed-at="<?php echo $tourNoticeAt; ?>"
-     data-tour-cancel-name="<?php echo CHtml::encode($tourNoticeName); ?>"></div>
+     data-tour-cancel-name="<?php echo CHtml::encode($tourNoticeName); ?>"
+     data-run-cancel-rejected="<?php echo $runRejectAt > 0 ? '1' : '0'; ?>"
+     data-run-reject-reviewed-at="<?php echo $runRejectAt; ?>"
+     data-tour-cancel-rejected="<?php echo $tourRejectAt > 0 ? '1' : '0'; ?>"
+     data-tour-reject-reviewed-at="<?php echo $tourRejectAt; ?>"></div>
 
 <div class="row g-4">
     <div class="col-lg-6">
