@@ -509,6 +509,12 @@ class ApiEndpoints
     const SPORT_STAGE_TEAM_UPDATE = '/api/sport-stage-teams/update/{id}';
     const SPORT_STAGE_TEAM_DESTROY = '/api/sport-stage-teams/destroy/{id}';
 
+    // Sport Draw (bốc thăm chia bảng / chia cặp)
+    const SPORT_DRAW_PREVIEW = '/api/sport-draw/preview/{stageId}';
+    const SPORT_DRAW_GROUPS = '/api/sport-draw/groups/{stageId}';
+    const SPORT_DRAW_BRACKET = '/api/sport-draw/bracket/{stageId}';
+    const SPORT_DRAW_LOCK = '/api/sport-draw/lock/{stageId}';
+
     // Alliance Team Orgs
     const ALLIANCE_TEAM_ORG_LIST = '/api/alliance-team-orgs';
     const ALLIANCE_TEAM_ORG_STORE = '/api/alliance-team-orgs/store';
