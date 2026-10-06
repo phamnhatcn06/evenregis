@@ -18,6 +18,7 @@ class RunEvents extends CFormModel
     public $remaining;
     public $open_at;
     public $close_at;
+    public $cancel_until;
     public $status;
     public $sort_order;
     public $is_active;
