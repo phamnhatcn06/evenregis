@@ -51,9 +51,14 @@ CRUD cự ly Fun Run và đợt Tham quan: tên, quota, trạng thái, cửa s�
 Bảng người đăng ký theo từng cự ly / đợt, lọc, export Excel (PHPExcel). Tham quan xuất danh sách theo đợt.
 **AC:** Cột gồm BIB (Fun Run), đơn vị, SĐT, thời điểm đăng ký.
 
-### F7 — Admin: sửa/hủy ca đặc biệt (backoffice-only)
-BTC có quyền sửa hoặc hủy một đăng ký cho trường hợp đặc biệt.
-**AC:** Chỉ admin có quyền; ghi audit log. Hủy → **hoàn suất** (giảm `registered_count`) để người khác đăng ký được *(giả định — chờ xác nhận, xem Boundaries)*.
+### F7 — Admin: duyệt yêu cầu hủy
+BTC xem danh sách các yêu cầu hủy (`cancel_requested`) kèm lý do → **xác nhận hủy** hoặc **từ chối**.
+**AC:**
+- Chỉ admin có quyền; ghi audit log (ai duyệt, thời điểm, lý do).
+- Xác nhận hủy → đăng ký chuyển `cancelled` (soft-delete bản ghi: set `deleted_at`, lưu `cancel_reason`, `cancelled_by`, `cancelled_at`) và **hoàn suất** (giảm `registered_count` của cự ly/đợt tương ứng, trong transaction) → suất mở lại cho người khác.
+- Sau khi hủy, finalist đó được đăng ký lại nội dung đó (vì bản ghi active cũ đã soft-delete, UNIQUE không còn chặn).
+- Từ chối → quay về `active`, nút khóa lại như cũ.
+- Nếu **đã qua đợt đăng ký** (cổng đóng) mà vẫn hoàn suất: BTC có thể mở lại một đợt đăng ký mới (điều chỉnh `open_at/close_at` ở F5) để suất hoàn được dùng tiếp.
 
 ### F8 — Dashboard mức lấp đầy (nên có)
 Thanh tiến độ đã đăng ký / tổng cho mỗi cự ly & đợt.
