@@ -4,7 +4,7 @@
 
 ## Phase 1 — Nền tảng & Fun Run
 - [x] S1 — BE: migration cột hủy + `cancel_until` cho `run_events`/`run_registrations`; đổi UNIQUE → (attendee_id, deleted_at) ✅ verified
-- [ ] S2 — BE: seed lại Fun Run — bỏ 21km, thêm 5km(320)/10km(90)/15km(40)
+- [x] S2 — BE: seed lại Fun Run — 5km(320)/10km(90)/15km(40), event_id=3 ✅ (run_events trước đó rỗng, không có 21km)
 - [ ] S3 — BE: API xin hủy + duyệt/từ chối hủy + hoàn suất (atomic) cho Run
 - [ ] S4 — FE cổng public: nút "Xin hủy" + modal lý do, ẩn/hiện theo `cancel_until`, đăng ký lại sau hủy
 - [ ] S5 — FE admin: field `cancel_until` + danh sách yêu cầu hủy (Duyệt/Từ chối)
