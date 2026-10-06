@@ -126,6 +126,49 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    /* ===== Tính bảng xếp hạng ===== */
+    document.querySelectorAll('.btn-standings').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            postJson(buildUrl(standingsUrlTpl, id), function (d) {
+                if (d.success) {
+                    Toast.success(d.message || 'Đã tính bảng xếp hạng');
+                    setTimeout(function () { location.reload(); }, 800);
+                } else {
+                    Toast.error(d.message || 'Không thể tính BXH');
+                }
+            });
+        });
+    });
+
+    /* ===== Sinh nhánh từ bảng ===== */
+    document.querySelectorAll('.btn-genko').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            Swal.fire({
+                title: 'Sinh sơ đồ loại trực tiếp từ vòng bảng?',
+                text: 'Lấy các đội đi tiếp theo BXH hiện tại. Sơ đồ KO cũ sẽ bị thay thế.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'Sinh nhánh',
+                cancelButtonText: 'Hủy'
+            }).then(function (result) {
+                if (!result.isConfirmed) {
+                    return;
+                }
+                postJson(buildUrl(genkoUrlTpl, id), function (d) {
+                    if (d.success) {
+                        Toast.success(d.message || 'Đã sinh sơ đồ');
+                        setTimeout(function () { location.reload(); }, 800);
+                    } else {
+                        Toast.error(d.message || 'Không thể sinh sơ đồ');
+                    }
+                });
+            });
+        });
+    });
+
     /* ===== Khoá kết quả ===== */
     document.querySelectorAll('.btn-lock').forEach(function (btn) {
         btn.addEventListener('click', function () {
