@@ -84,7 +84,7 @@ Thanh tiến độ đã đăng ký / tổng cho mỗi cự ly & đợt.
 
 **`run_events`** (điều chỉnh): **XÓA hẳn** bản ghi 21km (chưa từng mở đăng ký nên không có dữ liệu cần giữ); seed 5km(320)/10km(90)/15km(40). `open_at/close_at` dùng chung cấp nội dung. Thêm cột **`cancel_until`** INT UNSIGNED NULL (mốc chặn xin hủy).
 
-**`run_registrations`** (bổ sung cột cho luồng hủy): thêm `status` (active/cancel_requested/cancelled), `cancel_reason` VARCHAR NULL, `cancel_requested_at` INT NULL, `cancelled_by` VARCHAR NULL, `cancelled_at` INT NULL, `deleted_at` INT UNSIGNED NULL. Đổi UNIQUE sang `UNIQUE(attendee_id, deleted_at)` (xem ghi chú UNIQUE bên dưới).
+**`run_registrations`** (bổ sung cột cho luồng hủy): thêm `status` (active/cancel_requested/cancelled), `cancel_reason` VARCHAR NULL, `cancel_requested_at` INT NULL, `cancelled_by` VARCHAR NULL, `cancelled_at` INT NULL, `cancel_reviewed_at` INT NULL, `deleted_at` INT UNSIGNED NULL. Đổi UNIQUE sang `UNIQUE(attendee_id, deleted_at)` (xem ghi chú UNIQUE bên dưới).
 
 **`tour_sessions`** (mới):
 | Cột | Kiểu | Ghi chú |
