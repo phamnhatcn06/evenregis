@@ -16,8 +16,8 @@
 - [ ] Smoke test trình duyệt cổng public + admin (chưa chạy)
 
 ## Phase 2 — Module Tham quan (mirror Run)
-- [ ] S6 — BE: migration + entity `tour_sessions` & `tour_registrations` + seed 3 đợt ×86
-- [ ] S7 — BE: TourSessionService + TourRegistrationService (claim FCFS + hủy), không BIB
+- [x] S6 — BE: module `Modules/Tour` + migration `tour_sessions`/`tour_registrations` + seed 3 đợt ×86 ✅ verified
+- [x] S7 — BE: TourSessionService + TourRegistrationService (claim FCFS + hủy), không BIB ✅ verified (claim/409/hủy/duyệt+hoàn suất/đăng ký lại)
 - [ ] S8 — FE cổng public: endpoint + model Tour; thêm khối "Đi tham quan" (độc lập Fun Run)
 - [ ] S9 — FE admin: CRUD đợt + danh sách theo đợt + export + duyệt hủy + phân quyền
 
