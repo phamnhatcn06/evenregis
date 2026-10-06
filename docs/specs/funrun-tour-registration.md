@@ -38,7 +38,8 @@ Hiển thị 3 đợt cùng địa điểm, khác khung giờ, mỗi đợt **86
 Hiển thị nội dung đã đăng ký: Fun Run (cự ly + BIB), Tham quan (đợt + khung giờ). Cho đăng ký nốt nội dung còn lại nếu chưa.
 **AC:**
 - Người dùng **không tự sửa** lựa chọn (không đổi cự ly/đợt trực tiếp).
-- Người dùng có nút **"Xin hủy đăng ký"** cho từng nội dung đã đăng ký → bắt buộc nhập **lý do hủy** → gửi yêu cầu. Trạng thái đăng ký chuyển `cancel_requested`, hiển thị "Đang chờ duyệt hủy", nút bị khóa.
+- Nút **"Xin hủy đăng ký"** chỉ hiển thị khi **hiện tại ≤ `cancel_until`** (mốc chặn hủy, set ở cấp nội dung — F5). Quá mốc này nút ẩn, không cho xin hủy. Nếu `cancel_until` không set → mặc định theo cửa sổ đăng ký đang mở.
+- Click → bắt buộc nhập **lý do hủy** → gửi yêu cầu. Trạng thái đăng ký chuyển `cancel_requested`, hiển thị "Đang chờ duyệt hủy", nút bị khóa.
 - Chưa được admin duyệt thì **chưa hoàn suất** và **chưa được đăng ký lại**.
 
 ### F5 — Admin: quản lý danh mục suất
