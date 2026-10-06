@@ -108,6 +108,29 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Tính bảng xếp hạng vòng tròn (AJAX).
+     */
+    public function actionStandings($id)
+    {
+        $this->requirePost();
+        $result = SportStages::computeStandings($id);
+        if ($result['success']) {
+            $this->jsonResponse(true, 'Đã tính bảng xếp hạng.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể tính bảng xếp hạng.'));
+    }
+
+    /**
+     * Sinh sơ đồ loại trực tiếp từ kết quả vòng bảng (AJAX).
+     */
+    public function actionGenerateKnockout($id)
+    {
+        $this->requirePost();
+        $result = SportStages::generateKnockout($id);
+        $this->handleDrawResult($result);
+    }
+
+    /**
      * Khoá kết quả bốc thăm (AJAX).
      */
     public function actionLock($id)
