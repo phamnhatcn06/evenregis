@@ -201,6 +201,71 @@ class RunController extends CController
         Yii::app()->end();
     }
 
+    /** Đăng ký 1 đợt tham quan (AJAX). Trả JSON {success, message}. */
+    public function actionRegisterTour()
+    {
+        header('Content-Type: application/json');
+
+        if (!$this->isLoggedIn()) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'));
+            Yii::app()->end();
+        }
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+
+        $attendeeId = $this->session()['run_attendee_id'];
+        $tourSessionId = isset($_POST['tour_session_id']) ? (int) $_POST['tour_session_id'] : 0;
+
+        $res = TourRegistrations::claimViaApi($tourSessionId, $attendeeId);
+
+        if ($res['success']) {
+            echo CJSON::encode(array(
+                'success' => true,
+                'message' => isset($res['data']['message']) ? $res['data']['message'] : 'Đăng ký thành công!',
+            ));
+        } else {
+            echo CJSON::encode(array(
+                'success' => false,
+                'message' => $res['error'] ?: 'Không thể đăng ký. Vui lòng thử lại.',
+            ));
+        }
+        Yii::app()->end();
+    }
+
+    /** Người dùng xin hủy đăng ký tham quan (AJAX). Trả JSON {success, message}. */
+    public function actionCancelRequestTour()
+    {
+        header('Content-Type: application/json');
+
+        if (!$this->isLoggedIn()) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'));
+            Yii::app()->end();
+        }
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+
+        $attendeeId = $this->session()['run_attendee_id'];
+        $reason = trim(isset($_POST['reason']) ? $_POST['reason'] : '');
+        if ($reason === '') {
+            echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng nhập lý do hủy.'));
+            Yii::app()->end();
+        }
+
+        $res = TourRegistrations::requestCancelViaApi($attendeeId, $reason);
+
+        echo CJSON::encode(array(
+            'success' => (bool) $res['success'],
+            'message' => $res['success']
+                ? (isset($res['data']['message']) ? $res['data']['message'] : 'Đã gửi yêu cầu hủy.')
+                : ($res['error'] ?: 'Không gửi được yêu cầu hủy.'),
+        ));
+        Yii::app()->end();
+    }
+
     public function actionLogout()
     {
         $s = $this->session();
