@@ -7,12 +7,13 @@
 - [x] S2 — BE: seed lại Fun Run — 5km(320)/10km(90)/15km(40), event_id=3 ✅ (run_events trước đó rỗng, không có 21km)
 - [x] S3 — BE: API xin hủy + duyệt/từ chối hủy + hoàn suất (atomic) cho Run ✅ verified (claim/409/xin hủy/duyệt+hoàn suất/đăng ký lại/cancel_until 422)
 - [x] S4 — FE cổng public: nút "Xin hủy" + modal lý do, ẩn/hiện theo `cancel_until`, thông báo duyệt/từ chối (Toast 1 lần), đăng ký lại sau hủy ✅ (lint sạch; cần smoke test trình duyệt)
-- [ ] S5 — FE admin: field `cancel_until` + danh sách yêu cầu hủy (Duyệt/Từ chối)
+- [x] S5 — FE admin: field `cancel_until` + màn "Yêu cầu hủy" (Duyệt/Từ chối, SweetAlert) ✅ (lint sạch; cần smoke test trình duyệt)
 
-### ✅ Checkpoint A — Fun Run đầy đủ
-- [ ] FCFS không oversell (test đồng thời)
-- [ ] Hủy hoàn suất đúng, đăng ký lại được
-- [ ] `cancel_until` chặn đúng cả FE lẫn BE
+### Checkpoint A — Fun Run đầy đủ
+- [~] FCFS không oversell — lõi verified qua service test; test tải đồng thời để ở S11
+- [x] Hủy hoàn suất đúng, đăng ký lại được — verified S3
+- [x] `cancel_until` chặn đúng — BE verified (422); FE ẩn nút theo mốc
+- [ ] Smoke test trình duyệt cổng public + admin (chưa chạy)
 
 ## Phase 2 — Module Tham quan (mirror Run)
 - [ ] S6 — BE: migration + entity `tour_sessions` & `tour_registrations` + seed 3 đợt ×86
