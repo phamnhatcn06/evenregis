@@ -54,6 +54,56 @@ class RunRegistrationsController extends AdminController
         $this->redirect(array('admin', 'event_id' => $eventId));
     }
 
+    /** Danh sách yêu cầu hủy chờ duyệt theo sự kiện. */
+    public function actionCancelRequests()
+    {
+        $eventId = isset($_GET['event_id']) && $_GET['event_id'] !== '' ? (int) $_GET['event_id'] : null;
+
+        $requests = $eventId ? RunRegistrations::listCancelRequests($eventId) : array();
+
+        $this->render('cancelRequests', array(
+            'eventId'   => $eventId,
+            'eventList' => $this->getEventList(),
+            'requests'  => $requests,
+        ));
+    }
+
+    /** Duyệt hủy một đăng ký (POST). */
+    public function actionApproveCancel($id)
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+        }
+        if (!PermissionHelper::can('runregistrations', 'update')) {
+            throw new CHttpException(403, 'Bạn không có quyền thực hiện thao tác này.');
+        }
+        $res = RunRegistrations::approveCancelViaApi((int) $id);
+        if ($res['success']) {
+            Yii::app()->user->setFlash('success', isset($res['data']['message']) ? $res['data']['message'] : 'Đã duyệt hủy và hoàn suất.');
+        } else {
+            Yii::app()->user->setFlash('error', $res['error'] ?: 'Không thể duyệt hủy.');
+        }
+        $this->redirect(array('cancelRequests', 'event_id' => Yii::app()->request->getParam('event_id')));
+    }
+
+    /** Từ chối hủy một đăng ký (POST). */
+    public function actionRejectCancel($id)
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+        }
+        if (!PermissionHelper::can('runregistrations', 'update')) {
+            throw new CHttpException(403, 'Bạn không có quyền thực hiện thao tác này.');
+        }
+        $res = RunRegistrations::rejectCancelViaApi((int) $id);
+        if ($res['success']) {
+            Yii::app()->user->setFlash('success', isset($res['data']['message']) ? $res['data']['message'] : 'Đã từ chối yêu cầu hủy.');
+        } else {
+            Yii::app()->user->setFlash('error', $res['error'] ?: 'Không thể từ chối yêu cầu hủy.');
+        }
+        $this->redirect(array('cancelRequests', 'event_id' => Yii::app()->request->getParam('event_id')));
+    }
+
     public function actionExport($event_id)
     {
         $eventId = (int) $event_id;
