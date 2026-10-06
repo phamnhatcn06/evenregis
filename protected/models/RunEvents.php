@@ -48,6 +48,7 @@ class RunEvents extends CFormModel
             'remaining'        => 'Còn lại',
             'open_at'          => 'Mở lúc',
             'close_at'         => 'Đóng lúc',
+            'cancel_until'     => 'Hạn chót xin hủy',
             'status'           => 'Trạng thái',
             'sort_order'       => 'Thứ tự',
             'is_active'        => 'Kích hoạt',
