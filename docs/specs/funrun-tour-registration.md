@@ -34,9 +34,12 @@ Hiển thị 3 đợt cùng địa điểm, khác khung giờ, mỗi đợt **86
 - **Không cấp BIB/vé**, chỉ ghi nhận đợt.
 - Độc lập với Fun Run: 1 người được đăng ký cả Fun Run lẫn Tham quan.
 
-### F4 — Màn kết quả / đã đăng ký
-Hiển thị nội dung đã đăng ký: Fun Run (cự ly + BIB), Tham quan (đợt + khung giờ), nhãn "Đã khóa — không thể thay đổi". Cho đăng ký nốt nội dung còn lại nếu chưa.
-**AC:** Chỉ đọc với người dùng; không có nút sửa/hủy.
+### F4 — Màn kết quả / đã đăng ký + Xin hủy
+Hiển thị nội dung đã đăng ký: Fun Run (cự ly + BIB), Tham quan (đợt + khung giờ). Cho đăng ký nốt nội dung còn lại nếu chưa.
+**AC:**
+- Người dùng **không tự sửa** lựa chọn (không đổi cự ly/đợt trực tiếp).
+- Người dùng có nút **"Xin hủy đăng ký"** cho từng nội dung đã đăng ký → bắt buộc nhập **lý do hủy** → gửi yêu cầu. Trạng thái đăng ký chuyển `cancel_requested`, hiển thị "Đang chờ duyệt hủy", nút bị khóa.
+- Chưa được admin duyệt thì **chưa hoàn suất** và **chưa được đăng ký lại**.
 
 ### F5 — Admin: quản lý danh mục suất
 CRUD cự ly Fun Run và đợt Tham quan: tên, quota, trạng thái, cửa sổ thời gian.
