@@ -117,9 +117,10 @@ Ràng buộc: `UNIQUE(attendee_id, deleted_at)` tên `uq_tour_registrations_atte
 **Ghi chú UNIQUE + cho đăng ký lại sau hủy:** dùng cặp `(attendee_id, deleted_at)` — bản ghi active có `deleted_at = NULL` nên 2 bản active của cùng người sẽ trùng (chặn đăng ký 2 lần). Khi hủy được duyệt, set `deleted_at = timestamp` → bản ghi cũ hết trùng → finalist được tạo bản active mới. *(Lưu ý MySQL: nhiều NULL trong cột UNIQUE không bị coi là trùng, nên pattern này chỉ enforce "1 active" khi có đúng 1 hàng NULL — là mong muốn ở đây. Áp dụng tương tự cho `run_registrations`.)*
 
 ### API contracts (ApiEndpoints + Model methods, controller trả HTTP status thật)
-- Fun Run: tái dùng `RUN_EVENT_*`, `RUN_REGISTRATION_*`, `RUN_AUTH_*`.
-- Tham quan (mới): `TOUR_SESSION_LIST/LIST_OPEN/STORE/DETAIL/UPDATE/DESTROY`, `TOUR_REGISTRATION_CLAIM/MINE/LIST`.
+- Fun Run: tái dùng `RUN_EVENT_*`, `RUN_REGISTRATION_*`, `RUN_AUTH_*` + thêm `RUN_REGISTRATION_CANCEL_REQUEST` (người dùng xin hủy), `RUN_REGISTRATION_CANCEL_APPROVE`/`CANCEL_REJECT` (admin), `RUN_REGISTRATION_CANCEL_LIST` (danh sách chờ duyệt).
+- Tham quan (mới): `TOUR_SESSION_LIST/LIST_OPEN/STORE/DETAIL/UPDATE/DESTROY`, `TOUR_REGISTRATION_CLAIM/MINE/LIST`, `TOUR_REGISTRATION_CANCEL_REQUEST/CANCEL_APPROVE/CANCEL_REJECT/CANCEL_LIST`.
 - Mã HTTP: 200 OK, 409 hết chỗ / đã đăng ký nội dung đó, 422 ngoài giờ/đóng cổng, 401 PIN sai, 429 khóa.
+- Xin hủy: người dùng gửi `attendee_id` + `reason` → đánh dấu `cancel_requested` (chưa hoàn suất). Admin approve → transaction: soft-delete bản ghi + `registered_count - 1`.
 
 ### FCFS an toàn (điểm sống còn)
 Atomic update trong transaction, KHÔNG SELECT-rồi-UPDATE:
