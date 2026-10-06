@@ -13,6 +13,8 @@
 
         notifyApprovedOnce(config, 'run');
         notifyApprovedOnce(config, 'tour');
+        notifyRejectedOnce(config, 'run');
+        notifyRejectedOnce(config, 'tour');
 
         bindRegister(config);
         bindCancelForms();
