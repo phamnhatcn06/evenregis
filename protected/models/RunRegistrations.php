@@ -47,6 +47,15 @@ class RunRegistrations extends CFormModel
         return null;
     }
 
+    /** Người dùng xin hủy đăng ký (kèm lý do). Trả mảng ApiClient chuẩn. */
+    public static function requestCancelViaApi($attendeeId, $reason)
+    {
+        return ApiClient::post(ApiEndpoints::RUN_REGISTRATION_CANCEL_REQUEST, array(
+            'attendee_id' => $attendeeId,
+            'reason'      => $reason,
+        ));
+    }
+
     /** Danh sách đăng ký theo sự kiện (admin). Trả mảng assoc. */
     public static function listByEvent($eventId)
     {
