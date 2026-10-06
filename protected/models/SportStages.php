@@ -141,6 +141,18 @@ class SportStages extends BaseSportStages
         return ApiClient::post($url, array('auth_email' => self::authEmail()));
     }
 
+    public static function computeStandings($stageId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_STANDINGS, array('stageId' => $stageId));
+        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+    }
+
+    public static function generateKnockout($stageId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_GENERATE_KNOCKOUT, array('stageId' => $stageId));
+        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+    }
+
     public static function fetchDrawPreview($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PREVIEW, array('stageId' => $stageId));
