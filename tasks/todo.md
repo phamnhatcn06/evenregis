@@ -19,9 +19,13 @@
 - [x] S6 — BE: module `Modules/Tour` + migration `tour_sessions`/`tour_registrations` + seed 3 đợt ×86 ✅ verified
 - [x] S7 — BE: TourSessionService + TourRegistrationService (claim FCFS + hủy), không BIB ✅ verified (claim/409/hủy/duyệt+hoàn suất/đăng ký lại)
 - [x] S8 — FE cổng public: endpoint + model Tour; portal gộp 2 khối (Fun Run + Tham quan độc lập); đăng ký + xin hủy + thông báo duyệt/từ chối cả 2 ✅ (lint sạch; cần smoke test)
-- [ ] S9 — FE admin: CRUD đợt + danh sách theo đợt + export + duyệt hủy + phân quyền
+- [x] S9 — FE admin: CRUD đợt (tourSessions) + danh sách theo đợt + export + duyệt hủy (tourRegistrations) ✅ lint sạch, routes verified. Phân quyền: key SSO `toursessions`/`tourregistrations` (admin `*` pass; role khác cần Portal cấp)
 
-### ✅ Checkpoint B — 2 module song song hoàn chỉnh
+### Checkpoint B — 2 module song song hoàn chỉnh
+- [x] Module Tour BE + routes verified
+- [x] Cổng public gộp 2 khối độc lập
+- [x] Admin Tour CRUD + export + duyệt hủy
+- [ ] Smoke test trình duyệt (chưa chạy)
 
 ## Phase 3 — Hoàn thiện
 - [ ] S10 — Dashboard mức lấp đầy + rà edge case + audit log
