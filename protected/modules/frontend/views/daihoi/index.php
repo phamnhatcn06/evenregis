@@ -319,6 +319,35 @@ if (empty($albumList)) {
       </div></div>
     </section>
 
+    <!-- SECTION 1B: CTA ĐĂNG KÝ HOẠT ĐỘNG (Giải chạy + Tham quan) -->
+    <section class="container py-2 py-md-3" id="dang-ky">
+      <div class="card border-0 rounded-4 shadow overflow-hidden" style="background:linear-gradient(135deg,#065f46 0%,#0f766e 55%,#0e7490 100%);">
+        <div class="card-body p-4 p-md-5 text-white">
+          <div class="row align-items-center g-3">
+            <div class="col-lg-8">
+              <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill bg-white/20 border border-white/25 fw-bold text-uppercase mb-2" style="font-size:11px;">
+                <span class="material-symbols-outlined" style="font-size:15px;">how_to_reg</span> Dành cho danh sách Vòng Chung Kết
+              </div>
+              <h2 class="fw-black text-uppercase lh-sm mb-2" style="font-size:calc(1.2rem + 1vw);">Đăng ký Giải chạy &amp; Đi tham quan</h2>
+              <p class="text-light mb-3" style="font-size:14px;max-width:640px;">
+                Chọn cự ly chạy Fun Run (5km / 10km / 15km) và đợt đi tham quan. Số suất giới hạn,
+                đăng ký theo thứ tự &mdash; ai nhanh người đó được. Đăng nhập bằng mã định danh &amp; mã PIN cá nhân.
+              </p>
+              <div class="d-flex flex-wrap gap-3">
+                <span class="d-inline-flex align-items-center gap-1" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">sprint</span> Fun Run 3 cự ly</span>
+                <span class="d-inline-flex align-items-center gap-1" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">directions_bus</span> Tham quan 3 đợt</span>
+              </div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+              <a class="btn btn-light fw-bold rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 shadow text-dark" href="<?php echo $e($portalUrl); ?>" style="font-size:14px;">
+                <span>Đăng ký ngay</span><span class="material-symbols-outlined fs-6">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- SECTION 2: NỘI DUNG TRỌNG ĐIỂM -->
     <section class="container py-4 py-lg-5" id="noi-dung">
       <div class="row align-items-end justify-content-between mb-4 g-3">
