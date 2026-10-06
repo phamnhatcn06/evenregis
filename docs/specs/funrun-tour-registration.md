@@ -95,6 +95,7 @@ Thanh tiến độ đã đăng ký / tổng cho mỗi cự ly & đợt.
 | quota | INT UNSIGNED | 86 |
 | registered_count | INT UNSIGNED | default 0 |
 | open_at / close_at | INT UNSIGNED | cấp nội dung (chung 3 đợt) |
+| cancel_until | INT UNSIGNED NULL | mốc chặn xin hủy (cấp nội dung) |
 | status | VARCHAR | open/closed |
 | sort_order, is_active | INT | |
 | created_at/updated_at/deleted_at | INT UNSIGNED | soft delete |
