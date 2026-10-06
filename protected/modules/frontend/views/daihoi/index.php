@@ -451,7 +451,7 @@ if (empty($albumList)) {
                     <p class="text-muted mb-0 small"><?php echo $e($todayItemPlace); ?></p>
                   </div>
                   <div class="col-12 col-sm-4 text-sm-end">
-                    <a class="btn btn-dark btn-sm rounded-pill px-3 py-1 fw-bold" href="#ket-qua" style="font-size:12.5px;">Theo dõi chi tiết</a>
+                    <a class="btn btn-dark btn-sm rounded-pill px-3 py-1 fw-bold" href="<?php echo $e($base); ?>/daihoi/schedule" style="font-size:12.5px;">Theo dõi chi tiết</a>
                   </div>
                 </div>
               </div>
