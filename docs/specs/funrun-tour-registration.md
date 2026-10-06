@@ -46,6 +46,7 @@ Hiển thị nội dung đã đăng ký: Fun Run (cự ly + BIB), Tham quan (đ�
 CRUD cự ly Fun Run và đợt Tham quan: tên, quota, trạng thái, cửa sổ thời gian.
 **AC:**
 - Cửa sổ `open_at/close_at` set ở **cấp nội dung** (1 mốc chung cho toàn Fun Run, 1 cho toàn Tham quan) — không set riêng từng cự ly/đợt.
+- **`cancel_until`** (mốc chặn hủy) cũng set ở cấp nội dung: sau mốc này không cho người dùng xin hủy nữa. Phải nằm trong khoảng cửa sổ đăng ký.
 - Chặn hạ quota xuống dưới số đã đăng ký (`registered_count`).
 
 ### F6 — Admin: danh sách & export
