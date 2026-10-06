@@ -3,7 +3,7 @@
 > Chi tiết: [tasks/plan.md](plan.md) · Spec: [docs/specs/funrun-tour-registration.md](../docs/specs/funrun-tour-registration.md)
 
 ## Phase 1 — Nền tảng & Fun Run
-- [ ] S1 — BE: migration cột hủy + `cancel_until` cho `run_events`/`run_registrations`; đổi UNIQUE → (attendee_id, deleted_at)
+- [x] S1 — BE: migration cột hủy + `cancel_until` cho `run_events`/`run_registrations`; đổi UNIQUE → (attendee_id, deleted_at) ✅ verified
 - [ ] S2 — BE: seed lại Fun Run — bỏ 21km, thêm 5km(320)/10km(90)/15km(40)
 - [ ] S3 — BE: API xin hủy + duyệt/từ chối hủy + hoàn suất (atomic) cho Run
 - [ ] S4 — FE cổng public: nút "Xin hủy" + modal lý do, ẩn/hiện theo `cancel_until`, đăng ký lại sau hủy
