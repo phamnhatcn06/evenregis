@@ -169,9 +169,12 @@ UPDATE tour_sessions
 - **Hủy CÓ hoàn suất** (giảm registered_count trong transaction). Quy trình: người dùng xin hủy + lý do → admin duyệt → hoàn suất. Nếu đã qua đợt, BTC mở lại đợt đăng ký mới để dùng suất hoàn.
 - **Xóa hẳn** cự ly 21km (chưa mở đăng ký, không có dữ liệu cần giữ).
 
+### Đã chốt (bổ sung)
+- **Quota chặn theo TỪNG nội dung con** (mỗi cự ly / mỗi đợt có quota riêng) — KHÔNG có giới hạn tổng. Số finalist có thể lớn hơn tổng suất, ai nhanh người đó được (FCFS).
+- Admin duyệt **và** từ chối hủy đều phải **thông báo cho người đăng ký** (xem F7).
+
 ### Ask First
-- Tổng suất Fun Run 450 và Tham quan 258 so với số finalist thực tế — nếu thiếu suất là đúng ý đồ FCFS (xác nhận khi seed).
-- Khi admin **từ chối** yêu cầu hủy, có cần thông báo lại cho người dùng (hiển thị trạng thái/Toast) không.
+- (Không còn điểm chặn.)
 
 ### Never Do
 - Không mở endpoint sửa/hủy cho người dùng cuối.
