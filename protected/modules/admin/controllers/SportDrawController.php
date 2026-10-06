@@ -3,6 +3,26 @@
 class SportDrawController extends AdminController
 {
     /**
+     * Bốc thăm là một phần của quản lý thể thao → dùng chung quyền 'sport'
+     * thay vì yêu cầu một permission 'sportdraw' riêng từ Portal.
+     */
+    public function beforeAction($action)
+    {
+        if (!Controller::beforeAction($action)) {
+            return false;
+        }
+
+        $actionId = strtolower($action->id);
+        $operation = $this->mapActionToOperation($actionId);
+
+        if ($operation && !PermissionHelper::can('sport', $operation)) {
+            throw new CHttpException(403, 'Bạn không có quyền thực hiện thao tác này.');
+        }
+
+        return true;
+    }
+
+    /**
      * Màn hình chính: chọn sự kiện + nội dung → danh sách giai đoạn + bốc thăm.
      */
     public function actionIndex()
