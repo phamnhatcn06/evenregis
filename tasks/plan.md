@@ -119,6 +119,6 @@ S4/S5 (FE) có thể làm song song sau S3. S9 phụ thuộc S7. Test tải S11 
 - **Hoàn suất đồng thời**: approveCancel phải `registered_count-1` atomic trong transaction, tránh âm.
 - **Tách module Tour**: chi phí nhân bản — chấp nhận theo quyết định user; giữ code mirror để dễ bảo trì.
 
-## 6. Điểm chờ xác nhận (không chặn bắt đầu S1)
-- Quota tổng vs số finalist (xác nhận khi seed S2/S6).
-- Khi admin từ chối hủy có cần báo lại người dùng (Toast/trạng thái) — xử lý ở S4/S5.
+## 6. Điểm đã chốt (bổ sung sau review plan)
+- **Quota chặn theo từng nội dung con**, không chặn tổng — đúng với thiết kế hiện tại (mỗi `run_events`/`tour_sessions` có quota riêng). Không cần logic giới hạn tổng.
+- Admin **duyệt và từ chối hủy** đều báo cho người đăng ký → thêm cột `cancel_reviewed_at`; S4/S8 hiển thị thông báo (Toast/nhãn + lý do) trên màn kết quả khi người dùng đăng nhập lại; S5/S9 set `cancel_reviewed_at` khi admin xử lý.
