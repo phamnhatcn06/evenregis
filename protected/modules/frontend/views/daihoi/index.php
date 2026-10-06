@@ -219,6 +219,9 @@ if (empty($albumList)) {
             <span class="material-symbols-outlined fs-5 text-secondary">notifications</span>
             <span class="position-absolute top-0 start-100 translate-middle p-1 bg-primary border border-light rounded-circle"></span>
           </button>
+          <a class="btn btn-sm fw-bold px-3 py-1 rounded-pill d-none d-md-inline-flex align-items-center gap-1 shadow-sm text-white" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">how_to_reg</span> Đăng ký hoạt động
+          </a>
           <a class="btn btn-primary btn-sm fw-bold px-3 py-1 rounded-pill d-none d-sm-inline-flex align-items-center shadow-sm" href="<?php echo $e($loginUrl); ?>" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;font-size:13px;">
             <?php echo $e($loginLabel); ?>
           </a>
