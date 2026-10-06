@@ -632,6 +632,22 @@ class ApiEndpoints
     const RUN_REGISTRATION_CANCEL_APPROVE = '/api/run-registrations/cancel/approve/{id}';
     const RUN_REGISTRATION_CANCEL_REJECT = '/api/run-registrations/cancel/reject/{id}';
 
+    // Tour (Cổng đăng ký đi tham quan) — đăng nhập dùng chung RUN_AUTH_*
+    const TOUR_SESSION_LIST = '/api/tour-sessions';
+    const TOUR_SESSION_LIST_OPEN = '/api/tour-sessions/list-open';
+    const TOUR_SESSION_STORE = '/api/tour-sessions/store';
+    const TOUR_SESSION_DETAIL = '/api/tour-sessions/detail/{id}';
+    const TOUR_SESSION_UPDATE = '/api/tour-sessions/update/{id}';
+    const TOUR_SESSION_DESTROY = '/api/tour-sessions/destroy/{id}';
+
+    const TOUR_REGISTRATION_LIST = '/api/tour-registrations';
+    const TOUR_REGISTRATION_CLAIM = '/api/tour-registrations/claim';
+    const TOUR_REGISTRATION_MINE = '/api/tour-registrations/mine';
+    const TOUR_REGISTRATION_CANCEL_REQUEST = '/api/tour-registrations/cancel-request';
+    const TOUR_REGISTRATION_CANCEL_REQUESTS = '/api/tour-registrations/cancel-requests';
+    const TOUR_REGISTRATION_CANCEL_APPROVE = '/api/tour-registrations/cancel/approve/{id}';
+    const TOUR_REGISTRATION_CANCEL_REJECT = '/api/tour-registrations/cancel/reject/{id}';
+
     const RUN_AUTH_IDENTIFY = '/api/run-auth/identify';
     const RUN_AUTH_IDENTIFY_BY_QR = '/api/run-auth/identify-by-qr';
     const RUN_AUTH_SET_PIN = '/api/run-auth/set-pin';
