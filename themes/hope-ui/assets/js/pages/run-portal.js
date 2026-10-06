@@ -141,4 +141,19 @@
             Toast.info('Yêu cầu hủy ' + label + (name ? ' "' + name + '"' : '') + ' đã được duyệt. Suất đã được hoàn, bạn có thể đăng ký lại.', 8000);
         }
     }
+
+    function notifyRejectedOnce(config, type) {
+        if (config.getAttribute('data-' + type + '-cancel-rejected') !== '1') { return; }
+        var reviewedAt = config.getAttribute('data-' + type + '-reject-reviewed-at') || '0';
+        var key = type + '_cancel_rejected_seen_' + reviewedAt;
+        try {
+            if (localStorage.getItem(key)) { return; }
+            localStorage.setItem(key, '1');
+        } catch (e) { /* bỏ qua nếu localStorage bị chặn */ }
+
+        var label = type === 'tour' ? 'đợt tham quan' : 'nội dung chạy';
+        if (typeof Toast !== 'undefined') {
+            Toast.warning('Yêu cầu hủy ' + label + ' của bạn đã bị từ chối. Đăng ký vẫn còn hiệu lực.', 8000);
+        }
+    }
 })();
