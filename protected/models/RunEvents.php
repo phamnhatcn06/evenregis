@@ -34,7 +34,7 @@ class RunEvents extends CFormModel
             array('code', 'length', 'max' => 30),
             array('status', 'in', 'range' => array(self::STATUS_OPEN, self::STATUS_CLOSED)),
             // Cho phép gán tự do khi map từ API
-            array('id, event_id, name, code, quota, registered_count, remaining, open_at, close_at, status, sort_order, is_active, created_at, updated_at', 'safe'),
+            array('id, event_id, name, code, quota, registered_count, remaining, open_at, close_at, cancel_until, status, sort_order, is_active, created_at, updated_at', 'safe'),
         );
     }
 
