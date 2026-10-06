@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var groupsUrlTpl = cfg.getAttribute('data-draw-groups-url');
     var bracketUrlTpl = cfg.getAttribute('data-draw-bracket-url');
     var lockUrlTpl = cfg.getAttribute('data-lock-url');
+    var standingsUrlTpl = cfg.getAttribute('data-standings-url');
+    var genkoUrlTpl = cfg.getAttribute('data-generate-knockout-url');
 
     var GROUP_FORMATS = ['round_robin', 'round_robin_knockout'];
     var BRACKET_FORMATS = ['single_elimination', 'round_robin_knockout'];
