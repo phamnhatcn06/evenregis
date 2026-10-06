@@ -17,7 +17,15 @@ $registerUrl = $this->createUrl('/frontend/run/register');
     </a>
 </div>
 
-<div id="run-config" data-register-url="<?php echo $registerUrl; ?>"></div>
+<?php
+$noticeReviewedAt = (!empty($cancelledNotice) && !empty($cancelledNotice['cancel_reviewed_at'])) ? (int) $cancelledNotice['cancel_reviewed_at'] : 0;
+$noticeName = (!empty($cancelledNotice) && !empty($cancelledNotice['run_event_name'])) ? $cancelledNotice['run_event_name'] : '';
+?>
+<div id="run-config"
+     data-register-url="<?php echo $registerUrl; ?>"
+     data-cancel-approved="<?php echo $noticeReviewedAt > 0 ? '1' : '0'; ?>"
+     data-cancel-reviewed-at="<?php echo $noticeReviewedAt; ?>"
+     data-cancel-event-name="<?php echo CHtml::encode($noticeName); ?>"></div>
 
 <?php if (empty($events)): ?>
     <div class="alert alert-warning">Hiện chưa có nội dung chạy nào được mở đăng ký.</div>
