@@ -1,8 +1,8 @@
 <?php
 // [TEMP] test parseUrl — xoá sau khi dùng
 defined('YII_DEBUG') or define('YII_DEBUG', true);
-$config = require(__DIR__ . '/protected/config/main.php');
 require_once(__DIR__ . '/framework/yii.php');
+$config = require(__DIR__ . '/protected/config/main.php');
 Yii::createWebApplication($config);
 $um = Yii::app()->getUrlManager();
 
