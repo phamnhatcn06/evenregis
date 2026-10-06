@@ -38,6 +38,25 @@
         });
     });
 
+    function notifyCancelApprovedOnce(config) {
+        if (config.getAttribute('data-cancel-approved') !== '1') {
+            return;
+        }
+        var reviewedAt = config.getAttribute('data-cancel-reviewed-at') || '0';
+        var key = 'run_cancel_approved_seen_' + reviewedAt;
+        try {
+            if (localStorage.getItem(key)) {
+                return;
+            }
+            localStorage.setItem(key, '1');
+        } catch (e) { /* bỏ qua nếu localStorage bị chặn */ }
+
+        var name = config.getAttribute('data-cancel-event-name') || '';
+        if (typeof Toast !== 'undefined') {
+            Toast.info('Yêu cầu hủy' + (name ? ' nội dung "' + name + '"' : '') + ' đã được duyệt. Suất đã được hoàn, bạn có thể đăng ký lại.', 8000);
+        }
+    }
+
     function submitRegister(btn, url, runEventId) {
         var original = btn.innerHTML;
         btn.disabled = true;
