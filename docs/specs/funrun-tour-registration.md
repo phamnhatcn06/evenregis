@@ -160,10 +160,13 @@ UPDATE tour_sessions
 - Controller trả HTTP status thật để FE phân biệt lỗi.
 - Ghi audit_logs cho claim và cho thao tác sửa/hủy của BTC.
 
+### Đã chốt
+- **Hủy CÓ hoàn suất** (giảm registered_count trong transaction). Quy trình: người dùng xin hủy + lý do → admin duyệt → hoàn suất. Nếu đã qua đợt, BTC mở lại đợt đăng ký mới để dùng suất hoàn.
+- **Xóa hẳn** cự ly 21km (chưa mở đăng ký, không có dữ liệu cần giữ).
+
 ### Ask First
-- **Hủy có hoàn suất không** (F7): spec đang giả định CÓ hoàn (giảm registered_count). Cần user xác nhận trước khi code F7.
-- Xử lý dữ liệu đăng ký cự ly 21km cũ (nếu đã tồn tại): xóa / migrate / giữ nguyên.
-- Tổng suất Fun Run 450 và Tham quan 258 so với số finalist thực tế — nếu thiếu suất là đúng ý đồ FCFS.
+- Tổng suất Fun Run 450 và Tham quan 258 so với số finalist thực tế — nếu thiếu suất là đúng ý đồ FCFS (xác nhận khi seed).
+- Khi admin **từ chối** yêu cầu hủy, có cần thông báo lại cho người dùng (hiển thị trạng thái/Toast) không.
 
 ### Never Do
 - Không mở endpoint sửa/hủy cho người dùng cuối.
