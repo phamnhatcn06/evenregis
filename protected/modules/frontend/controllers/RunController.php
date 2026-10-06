@@ -123,6 +123,18 @@ class RunController extends CController
         $tourSessions = $tourMine ? array() : TourSessions::listOpen($eventId);
         $tourCancelledNotice = TourRegistrations::findLatestCancelled($attendeeId);
 
+        $eventInfo = null;
+        if (!empty($eventId)) {
+            try {
+                $eventInfo = Events::fetchFromApi($eventId);
+            } catch (Exception $e) {}
+        }
+        if (!$eventInfo) {
+            try {
+                $eventInfo = Daihoi::getEvent();
+            } catch (Exception $e) {}
+        }
+
         $this->render('index', array(
             'fullName'            => $this->session()['run_full_name'],
             'runMine'             => $runMine,
@@ -131,6 +143,7 @@ class RunController extends CController
             'tourMine'            => $tourMine,
             'tourSessions'        => $tourSessions,
             'tourCancelledNotice' => $tourCancelledNotice,
+            'eventInfo'           => $eventInfo,
         ));
     }
 

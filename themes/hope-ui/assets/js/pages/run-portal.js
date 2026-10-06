@@ -18,7 +18,55 @@
 
         bindRegister(config);
         bindCancelForms();
+        initCountdown();
     });
+
+    function initCountdown() {
+        var countdownEl = document.getElementById('run-portal-countdown');
+        if (!countdownEl) { return; }
+
+        var targetTimestamp = parseInt(countdownEl.getAttribute('data-target') || '0', 10);
+        if (!targetTimestamp || isNaN(targetTimestamp)) { return; }
+
+        var daysEl = document.getElementById('cd-days');
+        var hoursEl = document.getElementById('cd-hours');
+        var minsEl = document.getElementById('cd-mins');
+        var secsEl = document.getElementById('cd-secs');
+
+        function updateClock() {
+            var now = Math.floor(Date.now() / 1000);
+            var remaining = targetTimestamp - now;
+
+            if (remaining <= 0) {
+                if (daysEl) daysEl.textContent = '00';
+                if (hoursEl) hoursEl.textContent = '00';
+                if (minsEl) minsEl.textContent = '00';
+                if (secsEl) secsEl.textContent = '00';
+
+                var livePill = document.querySelector('.countdown-live-pill');
+                if (livePill) {
+                    livePill.innerHTML = '<i class="bi bi-clock-history me-1"></i> ĐÃ HẾT THỜI GIAN';
+                    livePill.style.background = 'rgba(100, 116, 139, 0.35)';
+                    livePill.style.borderColor = 'rgba(148, 163, 184, 0.4)';
+                    livePill.style.color = '#cbd5e1';
+                }
+                return;
+            }
+
+            var days = Math.floor(remaining / 86400);
+            var hours = Math.floor((remaining % 86400) / 3600);
+            var mins = Math.floor((remaining % 3600) / 60);
+            var secs = remaining % 60;
+
+            if (daysEl) daysEl.textContent = days < 10 ? '0' + days : days;
+            if (hoursEl) hoursEl.textContent = hours < 10 ? '0' + hours : hours;
+            if (minsEl) minsEl.textContent = mins < 10 ? '0' + mins : mins;
+            if (secsEl) secsEl.textContent = secs < 10 ? '0' + secs : secs;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    }
 
     function registerUrlFor(config, type) {
         return type === 'tour'
