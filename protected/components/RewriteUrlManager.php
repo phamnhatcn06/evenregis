@@ -21,7 +21,10 @@ class RewriteUrlManager extends CUrlManager
             'login' => 'site/login',
         );
 
-        $this->rules = array_merge($defaultRules, is_array($this->rules) ? $this->rules : array());
+        // Rule khai báo trong config (main.php) phải được ưu tiên TRƯỚC các catch-all
+        // generic (vd '<controller>/<action>'), nếu không mọi route nhiều đoạn như
+        // 'run/<action>' sẽ bị catch-all nuốt và không giải quyết được.
+        $this->rules = array_merge(is_array($this->rules) ? $this->rules : array(), $defaultRules);
         parent::processRules();
     }
 }
