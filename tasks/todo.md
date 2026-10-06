@@ -18,7 +18,7 @@
 ## Phase 2 — Module Tham quan (mirror Run)
 - [x] S6 — BE: module `Modules/Tour` + migration `tour_sessions`/`tour_registrations` + seed 3 đợt ×86 ✅ verified
 - [x] S7 — BE: TourSessionService + TourRegistrationService (claim FCFS + hủy), không BIB ✅ verified (claim/409/hủy/duyệt+hoàn suất/đăng ký lại)
-- [ ] S8 — FE cổng public: endpoint + model Tour; thêm khối "Đi tham quan" (độc lập Fun Run)
+- [x] S8 — FE cổng public: endpoint + model Tour; portal gộp 2 khối (Fun Run + Tham quan độc lập); đăng ký + xin hủy + thông báo duyệt/từ chối cả 2 ✅ (lint sạch; cần smoke test)
 - [ ] S9 — FE admin: CRUD đợt + danh sách theo đợt + export + duyệt hủy + phân quyền
 
 ### ✅ Checkpoint B — 2 module song song hoàn chỉnh
