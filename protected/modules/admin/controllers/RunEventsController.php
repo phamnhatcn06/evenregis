@@ -106,8 +106,9 @@ class RunEventsController extends AdminController
     protected function bindModel(RunEvents $model, array $post)
     {
         $model->setAttributes($post);
-        $model->open_at  = $this->toTimestamp(isset($post['open_at']) ? $post['open_at'] : null);
-        $model->close_at = $this->toTimestamp(isset($post['close_at']) ? $post['close_at'] : null);
+        $model->open_at      = $this->toTimestamp(isset($post['open_at']) ? $post['open_at'] : null);
+        $model->close_at     = $this->toTimestamp(isset($post['close_at']) ? $post['close_at'] : null);
+        $model->cancel_until = $this->toTimestamp(isset($post['cancel_until']) ? $post['cancel_until'] : null);
     }
 
     protected function toTimestamp($value)
