@@ -8,6 +8,13 @@ $this->menu = array(
         'icon' => 'fa-th',
         'id' => 'btn_events',
     ),
+    array(
+        'label' => 'Yêu cầu hủy',
+        'url' => $this->createUrl('cancelRequests', $eventId ? array('event_id' => $eventId) : array()),
+        'color' => 'warning',
+        'icon' => 'fa-times-circle',
+        'id' => 'btn_cancel_requests',
+    ),
 );
 $this->Tabletitle = 'Danh sách đăng ký bộ môn chạy';
 $canUpdate = PermissionHelper::can('runregistrations', 'update');
