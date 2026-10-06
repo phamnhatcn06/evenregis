@@ -16,6 +16,10 @@ $runNoticeAt = (!empty($runCancelledNotice) && !empty($runCancelledNotice['cance
 $runNoticeName = (!empty($runCancelledNotice) && !empty($runCancelledNotice['run_event_name'])) ? $runCancelledNotice['run_event_name'] : '';
 $tourNoticeAt = (!empty($tourCancelledNotice) && !empty($tourCancelledNotice['cancel_reviewed_at'])) ? (int) $tourCancelledNotice['cancel_reviewed_at'] : 0;
 $tourNoticeName = (!empty($tourCancelledNotice) && !empty($tourCancelledNotice['tour_session_name'])) ? $tourCancelledNotice['tour_session_name'] : '';
+
+// Yêu cầu hủy bị TỪ CHỐI: đăng ký đang active trở lại nhưng đã có mốc xử lý + còn lý do.
+$runRejectAt = (!empty($runMine) && isset($runMine['status']) && $runMine['status'] === 'active' && !empty($runMine['cancel_reviewed_at']) && !empty($runMine['cancel_reason'])) ? (int) $runMine['cancel_reviewed_at'] : 0;
+$tourRejectAt = (!empty($tourMine) && isset($tourMine['status']) && $tourMine['status'] === 'active' && !empty($tourMine['cancel_reviewed_at']) && !empty($tourMine['cancel_reason'])) ? (int) $tourMine['cancel_reviewed_at'] : 0;
 ?>
 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
     <div>
