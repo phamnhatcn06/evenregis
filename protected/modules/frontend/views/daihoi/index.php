@@ -712,8 +712,8 @@ if (empty($albumList)) {
           <h4 class="fw-bold text-dark text-uppercase small mb-3">Danh mục sự kiện</h4>
           <ul class="list-unstyled d-flex flex-column gap-2 small">
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#noi-dung">Nội dung trọng điểm</a></li>
-            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#hom-nay">Lịch thi đấu bộ môn</a></li>
-            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#ket-qua">Kết quả thi đấu</a></li>
+            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/daihoi/agenda">Lịch trình Đại hội</a></li>
+            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/daihoi/schedule">Lịch thi đấu &amp; kết quả</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#tin-tuc">Tin nhanh hoạt động</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#thu-vien">Thư viện ảnh &amp; video</a></li>
           </ul>
