@@ -123,7 +123,7 @@ Ràng buộc: `UNIQUE(attendee_id, deleted_at)` tên `uq_tour_registrations_atte
 - Fun Run: tái dùng `RUN_EVENT_*`, `RUN_REGISTRATION_*`, `RUN_AUTH_*` + thêm `RUN_REGISTRATION_CANCEL_REQUEST` (người dùng xin hủy), `RUN_REGISTRATION_CANCEL_APPROVE`/`CANCEL_REJECT` (admin), `RUN_REGISTRATION_CANCEL_LIST` (danh sách chờ duyệt).
 - Tham quan (mới): `TOUR_SESSION_LIST/LIST_OPEN/STORE/DETAIL/UPDATE/DESTROY`, `TOUR_REGISTRATION_CLAIM/MINE/LIST`, `TOUR_REGISTRATION_CANCEL_REQUEST/CANCEL_APPROVE/CANCEL_REJECT/CANCEL_LIST`.
 - Mã HTTP: 200 OK, 409 hết chỗ / đã đăng ký nội dung đó, 422 ngoài giờ/đóng cổng, 401 PIN sai, 429 khóa.
-- Xin hủy: người dùng gửi `attendee_id` + `reason` → đánh dấu `cancel_requested` (chưa hoàn suất). Admin approve → transaction: soft-delete bản ghi + `registered_count - 1`.
+- Xin hủy: người dùng gửi `attendee_id` + `reason` → BE kiểm tra **hiện tại ≤ `cancel_until`** (quá mốc → 422), rồi đánh dấu `cancel_requested` (chưa hoàn suất). Admin approve → transaction: soft-delete bản ghi + `registered_count - 1`.
 
 ### FCFS an toàn (điểm sống còn)
 Atomic update trong transaction, KHÔNG SELECT-rồi-UPDATE:
