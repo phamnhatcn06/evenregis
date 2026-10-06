@@ -12,6 +12,8 @@
         }
         var registerUrl = config.getAttribute('data-register-url');
 
+        notifyCancelApprovedOnce(config);
+
         var buttons = document.querySelectorAll('.btn-run-register');
         buttons.forEach(function (btn) {
             btn.addEventListener('click', function () {
