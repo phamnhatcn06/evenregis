@@ -47,6 +47,19 @@ class RunRegistrations extends CFormModel
         return null;
     }
 
+    /** Bản ghi hủy đã được duyệt gần nhất của 1 người (để báo trên cổng) hoặc null. */
+    public static function findLatestCancelled($attendeeId)
+    {
+        $result = ApiClient::get(ApiEndpoints::RUN_REGISTRATION_MINE, array(
+            'attendee_id'      => $attendeeId,
+            'latest_cancelled' => 1,
+        ));
+        if ($result['success'] && isset($result['data']['data']) && !empty($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        return null;
+    }
+
     /** Người dùng xin hủy đăng ký (kèm lý do). Trả mảng ApiClient chuẩn. */
     public static function requestCancelViaApi($attendeeId, $reason)
     {
