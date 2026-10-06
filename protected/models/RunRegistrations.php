@@ -78,4 +78,28 @@ class RunRegistrations extends CFormModel
         }
         return array();
     }
+
+    /** Danh sách yêu cầu hủy chờ duyệt theo sự kiện (admin). Trả mảng assoc. */
+    public static function listCancelRequests($eventId)
+    {
+        $result = ApiClient::get(ApiEndpoints::RUN_REGISTRATION_CANCEL_REQUESTS, array('event_id' => $eventId));
+        if ($result['success'] && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        return array();
+    }
+
+    /** Admin duyệt hủy một đăng ký. Trả mảng ApiClient chuẩn. */
+    public static function approveCancelViaApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::RUN_REGISTRATION_CANCEL_APPROVE, array('id' => $id));
+        return ApiClient::post($url, array());
+    }
+
+    /** Admin từ chối hủy một đăng ký. Trả mảng ApiClient chuẩn. */
+    public static function rejectCancelViaApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::RUN_REGISTRATION_CANCEL_REJECT, array('id' => $id));
+        return ApiClient::post($url, array());
+    }
 }
