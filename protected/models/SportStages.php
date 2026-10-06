@@ -36,6 +36,25 @@ class SportStages extends BaseSportStages
         return parent::model($className);
     }
 
+    /**
+     * Gán cả các public property (field chỉ có từ API, không phải cột DB)
+     * ngoài các attribute AR mặc định.
+     */
+    public function setAttributes($values, $safeOnly = true)
+    {
+        if (is_array($values)) {
+            $extra = array('format', 'num_groups', 'teams_per_group', 'advance_per_group',
+                'bracket_size', 'draw_status', 'draw_seed', 'drawn_by', 'drawn_at',
+                'sport_name', 'event_name');
+            foreach ($extra as $name) {
+                if (array_key_exists($name, $values)) {
+                    $this->$name = $values[$name];
+                }
+            }
+        }
+        parent::setAttributes($values, $safeOnly);
+    }
+
     public function rules()
     {
         $rules = parent::rules();
