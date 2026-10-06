@@ -57,6 +57,50 @@ $slotName = function ($teamId, $source) use ($teamMap) {
     </div>
 
     <?php
+    // ===== Bảng xếp hạng =====
+    $standings = isset($preview['standings']) ? $preview['standings'] : array();
+    $standingsByGroup = array();
+    foreach ($standings as $s) {
+        $standingsByGroup[$s['group_label']][] = $s;
+    }
+    ksort($standingsByGroup);
+    ?>
+    <?php if (!empty($standingsByGroup)): ?>
+        <h5 class="mb-3">Bảng xếp hạng</h5>
+        <div class="row">
+            <?php foreach ($standingsByGroup as $label => $rows): ?>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header fw-bold">Bảng <?php echo CHtml::encode($label); ?></div>
+                        <table class="table table-sm table-bordered mb-0 text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th><th class="text-start">Đội</th><th>Trận</th>
+                                    <th>T</th><th>H</th><th>B</th><th>HS</th><th>Điểm</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($rows as $r): ?>
+                                <tr>
+                                    <td><?php echo (int) $r['rank']; ?></td>
+                                    <td class="text-start"><?php echo CHtml::encode($teamMap[$r['team_id']] ?? ('#' . $r['team_id'])); ?></td>
+                                    <td><?php echo (int) $r['played']; ?></td>
+                                    <td><?php echo (int) $r['won']; ?></td>
+                                    <td><?php echo (int) $r['drawn']; ?></td>
+                                    <td><?php echo (int) $r['lost']; ?></td>
+                                    <td><?php echo ((int) $r['points_scored']) . ':' . ((int) $r['points_conceded']); ?></td>
+                                    <td class="fw-bold"><?php echo (int) $r['points']; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php
     // ===== Vòng bảng (round-robin) =====
     $groups = array();
     foreach ($teams as $t) {
