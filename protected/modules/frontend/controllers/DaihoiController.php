@@ -68,6 +68,32 @@ class DaihoiController extends FrontEndController
         ));
     }
 
+    /**
+     * Trang Lịch trình đại hội đầy đủ (toàn bộ agenda theo ngày).
+     */
+    public function actionAgenda()
+    {
+        $this->frontTitle = 'Lịch trình Đại hội';
+        $this->render('agenda', array(
+            'event' => Daihoi::getEvent(),
+            'agenda' => Daihoi::getAgenda(),
+        ));
+    }
+
+    /**
+     * Trang Lịch thi đấu: trận đang diễn ra, sắp/vừa diễn ra và bảng xếp hạng.
+     */
+    public function actionSchedule()
+    {
+        $this->frontTitle = 'Lịch thi đấu';
+        $this->render('schedule', array(
+            'event' => Daihoi::getEvent(),
+            'liveMatches' => Daihoi::getLiveMatches(),
+            'recentMatches' => Daihoi::getRecentMatches(),
+            'rankings' => Daihoi::getRankings(10),
+        ));
+    }
+
     public function actionJsonLive()
     {
         $this->renderJson(Daihoi::getLiveMatches());
