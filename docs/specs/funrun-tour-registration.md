@@ -79,7 +79,9 @@ Thanh tiến độ đã đăng ký / tổng cho mỗi cự ly & đợt.
 
 ### Data models (BE Laravel, quy ước CLAUDE.md: snake_case, unix timestamp INT UNSIGNED, soft delete danh mục)
 
-**`run_events`** (điều chỉnh): đóng/xóa mềm bản ghi 21km; seed 5km(320)/10km(90)/15km(40). `open_at/close_at` dùng chung cấp nội dung.
+**`run_events`** (điều chỉnh): **XÓA hẳn** bản ghi 21km (chưa từng mở đăng ký nên không có dữ liệu cần giữ); seed 5km(320)/10km(90)/15km(40). `open_at/close_at` dùng chung cấp nội dung.
+
+**`run_registrations`** (bổ sung cột cho luồng hủy): thêm `status` (active/cancel_requested/cancelled), `cancel_reason` VARCHAR NULL, `cancel_requested_at` INT NULL, `cancelled_by` VARCHAR NULL, `cancelled_at` INT NULL, `deleted_at` INT UNSIGNED NULL. Đổi UNIQUE sang `UNIQUE(attendee_id, deleted_at)` (xem ghi chú UNIQUE bên dưới).
 
 **`tour_sessions`** (mới):
 | Cột | Kiểu | Ghi chú |
