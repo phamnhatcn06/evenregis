@@ -1,102 +1,124 @@
-# Kế hoạch triển khai — Thay thế / Huỷ tư cách người đăng ký
+# Kế hoạch triển khai — Cổng đăng ký Fun Run & Đi tham quan
 
-> Màn hình: `admin/approveRegistrations/view` (mở từ `admin/approveRegistrations/admin`)
-> Ngày lập: 2026-08-10 · Nguồn quyết định: [[replace-withdraw-attendee]]
+> Spec: [docs/specs/funrun-tour-registration.md](../docs/specs/funrun-tour-registration.md)
+> Ngày: 2026-10-06 · Nhánh đề xuất: `feature/funrun-tour-registration`
 
----
+## 1. Bối cảnh codebase (đã khảo sát)
 
-## 1. Bối cảnh & ràng buộc kiến trúc
+**2 repo:**
+- **FE Yii** `e:\eventregis` — carrier model (CFormModel) gọi External API; không có DB trực tiếp.
+- **BE Laravel** `E:\even_API\MTRegistrationPortal` — module hóa (`Modules/Run/...`), DB thật, trả `['code','message','data']`.
 
-- Yii chỉ là **frontend**; mọi dữ liệu đi qua **External API** (`ApiClient` + `ApiEndpoints`). Không có DB trực tiếp, **không có transaction đa-bước** phía frontend.
-- Quyết định: **orchestrate phía controller** bằng các endpoint sẵn có. Để giảm rủi ro dữ liệu nửa vời, áp dụng **thứ tự thao tác an toàn** (tạo mới trước, gỡ cũ sau; nếu bước tạo lỗi thì dừng, không đụng dữ liệu người bị thay) + ghi log mỗi bước.
-- Endpoint tái sử dụng (đã tồn tại): `ATTENDEE_STORE/UPDATE/DETAIL/UPLOAD_DOCUMENTS/BULK_STORE`, `SPORT_TEAM_LIST_BY_PROPERTY`, `SPORT_TEAM_MEMBER_LIST/STORE/DESTROY/COUNT_BY_ATTENDEE`, `SPORT_TEAM_UPDATE/DESTROY`, `COMPETITION_REGISTRATION_LIST/STORE/DESTROY`, `COMPETITION_ASSIGN_NUMBERS`, `ATTENDEE_ROLE_LIST/STORE/DESTROY`, `BADGE_LIST/UPDATE/DESTROY`, `STAFF_LIST/DETAIL/BEFORE_JUNE_2026`.
-- **Huỷ tư cách** (đã chốt) = ghi `is_active = 0` **và** set `deleted_at` (thời điểm huỷ) trên attendee. Không thêm cột `participation_status`.
+**Module Run hiện có (TÁI DÙNG cho Fun Run):**
 
-## 2. Quyết định nghiệp vụ đã chốt
+| Lớp | FE Yii | BE Laravel |
+|-----|--------|------------|
+| Auth | `models/RunAuth.php` | `Modules/Run/Services/RunAuthService.php`, `Http/Controllers/RunAuthController.php` |
+| Nội dung (suất) | `models/RunEvents.php`, `modules/admin/controllers/RunEventsController.php`, `views/runEvents/*` | `Entities/RunEvent.php`, `Services/RunEventService.php`, `Http/Controllers/RunEventController.php`, migration `...create_run_events_table.php` |
+| Đăng ký | `models/RunRegistrations.php`, `modules/frontend/controllers/RunController.php`, `views/run/*`, `modules/admin/controllers/RunRegistrationsController.php`, `views/runRegistrations/admin.php` | `Entities/RunRegistration.php`, `Services/RunRegistrationService.php` (lõi FCFS atomic), `Http/Controllers/RunRegistrationController.php`, migration `...create_run_registrations_table.php` |
+| Endpoint | `components/ApiEndpoints.php` dòng 619–635 | `Modules/Run/Routes/api.php` |
 
-| # | Nội dung |
-|---|----------|
-| Thể thao (thay thế) | Hiện toàn bộ đội của người bị thay, checkbox. Tích → người thay vào đúng vị trí (kế thừa jersey_number/position/is_captain). Không tích → huỷ cả đội. Không kiểm tra sĩ số min/max. |
-| Nghiệp vụ (thay thế) | Kế thừa **toàn bộ** tự động, **cấp số báo danh mới**. |
-| Trạng thái duyệt | Người thay **kế thừa approved luôn**. |
-| Huỷ tư cách | Hiện toàn bộ đội, checkbox: tích → huỷ cả đội; không tích → chỉ gỡ người (giữ đội). Captain bị gỡ → cảnh báo chọn captain mới/để trống. Gỡ luôn competition_registrations + attendee_roles. |
+**Lõi FCFS (đã verify, `RunRegistrationService::claim`):** `DB::transaction` → `UPDATE run_events SET registered_count+1 WHERE id=? AND deleted_at IS NULL AND status='open' AND registered_count<quota AND open_at<=now AND close_at>=now` → affected!=1 ⇒ phân nhánh 409/422 → INSERT → `catch QueryException` bắt trùng UNIQUE(attendee_id) ⇒ 409. **Nhân bản y nguyên cho Tour.**
 
-## 3. Còn mở (không chặn Slice 1–5)
+**Khác biệt cần thêm so với Run hiện tại:**
+1. Bỏ ràng buộc 1-người-1-nội-dung-toàn-cục → giữ riêng từng module (Fun Run 1, Tour 1, độc lập) — vốn đã tách bảng nên tự nhiên đúng.
+2. Thêm **luồng hủy** (xin hủy + lý do → admin duyệt → hoàn suất) cho CẢ Run và Tour.
+3. Thêm cột **`cancel_until`** (cấp nội dung) + đổi UNIQUE → `(attendee_id, deleted_at)` để đăng ký lại được sau hủy.
+4. Fun Run: xóa 21km, seed 5/10/15km.
 
-Q1 văn nghệ/sắc đẹp · Q2 bàn ăn/tiệc · Q6 người thay đã tham dự (chặn/cảnh báo) · Q9 phân quyền + cấm khi sự kiện đã bắt đầu · Xử lý badge đã in (Slice 5).
+## 2. Nguyên tắc cắt lát
+- Vertical slice: mỗi lát chạy xuyên BE (migration+service+controller+route) → FE (model+controller+view+JS) → verify.
+- Risk-first: lõi hủy + UNIQUE mới + hoàn suất là rủi ro cao nhất → làm sớm, có test đồng thời.
+- Tour mirror Run: sau khi Run có đủ tính năng hủy, nhân bản sang Tour rẻ hơn.
 
-## 4. File tác động
+## 3. Các lát cắt (vertical slices)
 
-**Controller:** `protected/modules/admin/controllers/ApproveRegistrationsController.php` (thêm actions)
-**Model:** `protected/models/Attendees.php`, `SportTeams.php`, `SportTeamMembers.php`, `CompetitionRegistrations.php`, `AttendeeRoles.php`, `Badges.php` (bổ sung method orchestrate qua API)
-**View chính:** `protected/modules/admin/views/approveRegistrations/view.php` (thêm nút + include partial)
-**Partial mới:** `_modal_replace_attendee.php`, `_modal_withdraw_attendee.php`
-**JS mới:** `themes/hope-ui/assets/js/pages/approveregistrations-view.js`
-**Tái sử dụng UI:** `protected/modules/admin/views/registrations/_modal_edit_attendee.php`
+### Phase 1 — Nền tảng & điều chỉnh Fun Run
 
----
+**S1 — Migration cột hủy + cancel_until cho Run (BE)**
+- Objective: Run hỗ trợ hủy & chặn-hủy-theo-giờ, cho đăng ký lại sau hủy.
+- Files (BE): migration mới `..._add_cancel_columns_to_run_tables.php` — thêm `cancel_until` vào `run_events`; thêm `status`(default 'active'), `cancel_reason`, `cancel_requested_at`, `cancelled_by`, `cancelled_at`, `deleted_at` vào `run_registrations`; đổi index `uq_run_registrations_attendee` → `(attendee_id, deleted_at)`. Cập nhật `Entities/RunEvent.php`, `RunRegistration.php` ($fillable, casts, SoftDeletes/scope).
+- AC: migrate up/down chạy sạch; UNIQUE mới cho phép 1 active + nhiều cancelled; `cancel_until` nullable.
+- Verify: `php artisan migrate`; thử insert 2 active cùng attendee → lỗi; 1 active + 1 cancelled (deleted_at set) → OK.
 
-## 5. Vertical slices
+**S2 — Seed lại nội dung Fun Run (BE)**
+- Objective: bỏ 21km, có 5km(320)/10km(90)/15km(40).
+- Files (BE): `Database/Seeders/RunDatabaseSeeder.php` (hoặc migration data) — xóa bản ghi 21km, seed 3 cự ly mới với code prefix BIB.
+- AC: `run_events` chỉ còn 3 cự ly đúng quota; không còn 21km.
+- Verify: query DB.
+- Ask-first khi chạy: xác nhận quota tổng 450 so với số finalist.
 
-### Slice 1 — Bản kê nội dung (read-only) + nút thao tác
-**Mục tiêu:** Trên mỗi dòng attendee ở `view.php`, thêm nút "Thay thế" và "Huỷ tư cách" (ẩn theo quyền `attendee:update`). Thêm endpoint controller `actionParticipationSummary($attendee_id)` trả JSON: danh sách đội (kèm team_id, sport_name, jersey_number, position, is_captain, sĩ số hiện tại, is_alliance), danh sách cuộc thi, danh sách vai trò.
-**Model:** `Attendees::getParticipationSummary($attendeeId, $eventId, $propertyId)` gom dữ liệu từ `SPORT_TEAM_LIST_BY_PROPERTY` + `SPORT_TEAM_MEMBER_LIST` + `COMPETITION_REGISTRATION_LIST` + `ATTENDEE_ROLE_LIST`.
-**Acceptance:**
-- [ ] Nút hiển thị đúng theo quyền, mọi trạng thái phiếu (submitted/approved/rejected).
-- [ ] Gọi summary trả đúng đội/cuộc thi/vai trò của attendee đó.
-- [ ] Modal (rỗng) mở được, JS tách file, không inline JS.
-**Verify thủ công:** mở 1 attendee có ≥1 đội + ≥1 cuộc thi → thấy đúng danh sách.
+**S3 — BE: xin hủy + duyệt hủy + hoàn suất cho Run**
+- Objective: API luồng hủy hoàn chỉnh.
+- Files (BE): `RunRegistrationService` thêm `requestCancel($attendeeId,$reason)` (check `cancel_until`, set `cancel_requested`), `approveCancel($id,$authEmail)` (transaction: soft-delete + `registered_count-1` atomic, audit), `rejectCancel($id)`; `listCancelRequests($eventId)`. Controller + routes `api.php`: `cancel-request`, `cancel/approve`, `cancel/reject`, `cancel-requests`. Trả HTTP status thật.
+- AC: xin hủy sau `cancel_until` → 422; duyệt hủy giảm đúng registered_count trong transaction; sau duyệt đăng ký lại được.
+- Verify: unit test service các nhánh; test đồng thời approve + claim slot vừa hoàn.
 
-### Slice 2 — Huỷ tư cách cơ bản (không xử lý đội đặc biệt)
-**Mục tiêu:** `actionWithdrawAttendee` — nhận `attendee_id`, `reason`. Gỡ toàn bộ `competition_registrations` + `attendee_roles` của người đó (DESTROY), đánh dấu attendee huỷ tư cách (`participation_status`/`is_active=0` + note + who/when), ghi log `APPROVE_ATTENDEE_LOG_STORE`. Chưa xử lý team (Slice 3).
-**Modal:** `_modal_withdraw_attendee.php` — hiển thị tác động (từ summary) + ô lý do bắt buộc + nút submit chuẩn `modal-submit.md`. Xác nhận cuối bằng SweetAlert2.
-**Acceptance:**
-- [ ] Given người có cuộc thi/vai trò, When huỷ tư cách, Then các bản ghi đó bị gỡ, attendee bị đánh dấu huỷ, log ghi email người thực hiện.
-- [ ] Lý do rỗng → chặn.
-- [ ] Toast báo kết quả, không dùng Bootstrap Alert.
+**S4 — FE Fun Run: hiển thị hủy + đăng ký lại (cổng public)**
+- Objective: người dùng xin hủy từ màn kết quả.
+- Files (FE): `RunRegistrations.php` thêm `requestCancelViaApi`; `RunController::actionCancelRequest` (AJAX JSON); `views/run/result.php` thêm nút "Xin hủy" (ẩn/hiện theo `cancel_until` truyền từ controller) + modal nhập lý do (tách partial `_modal_cancel.php`); JS `run-result.js` (submit modal có loading, SweetAlert xác nhận, Toast). `ApiEndpoints` thêm hằng cancel Run.
+- AC: nút chỉ hiện khi còn trong hạn hủy; gửi lý do → trạng thái "đang chờ duyệt", nút khóa.
+- Verify: thủ công trên cổng.
 
-### Slice 3 — Xử lý đội khi huỷ tư cách
-**Mục tiêu:** Trong modal huỷ, liệt kê các đội với checkbox "huỷ cả đội". Khi submit: đội được tích → `SPORT_TEAM_DESTROY` (+ gỡ members); đội không tích → chỉ `SPORT_TEAM_MEMBER_DESTROY` cho người đó. Nếu người bị gỡ là captain của đội không tích → yêu cầu chọn: gán captain mới (dropdown thành viên còn lại → `SPORT_TEAM_MEMBER_UPDATE is_captain=1`) / để trống.
-**Acceptance:**
-- [ ] Đội tích huỷ → team `status=CANCELLED`/destroy, các member soft delete.
-- [ ] Đội không tích → chỉ gỡ đúng người, đội giữ nguyên.
-- [ ] Captain bị gỡ ở đội giữ lại → cảnh báo + áp dụng lựa chọn captain mới/để trống.
-- [ ] Đội liên quân: xử lý theo cùng lựa chọn tích/không tích (cảnh báo ảnh hưởng đơn vị khác, không tự huỷ nếu không tích).
+**S5 — FE admin Fun Run: duyệt hủy + cột cancel_until**
+- Objective: BTC duyệt/từ chối hủy; cấu hình mốc chặn hủy.
+- Files (FE): `runEvents/_form.php` thêm field `cancel_until` (datetime→unix); `RunEvents.php` map `cancel_until`; `RunRegistrationsController` + view: tab/danh sách "Yêu cầu hủy" với nút Duyệt/Từ chối (POST, SweetAlert), hiển thị lý do. `ApiEndpoints` + model methods tương ứng.
+- AC: hạ quota < registered_count bị chặn; duyệt hủy → suất hoàn phản ánh ngay.
+- Verify: thủ công.
 
-### Slice 4 — Thay thế + kế thừa
-**Mục tiêu:** `actionReplaceAttendee` — nhận thông tin người thay (SMILE `staff_id` hoặc nhập thủ công), ảnh + hồ sơ, danh sách `team_ids` được tích, `reason`.
-Luồng: (1) validate; (2) `ATTENDEE_STORE` tạo B cùng registration_id/event_id/property_id, `approval_status=APPROVED` (kế thừa); (3) upload ảnh/hồ sơ `ATTENDEE_UPLOAD_DOCUMENTS`; (4) với mỗi team tích → `SPORT_TEAM_MEMBER_STORE` cho B (copy jersey/position/is_captain) rồi `SPORT_TEAM_MEMBER_DESTROY` của A; team không tích → `SPORT_TEAM_DESTROY`; (5) với mỗi competition của A → `COMPETITION_REGISTRATION_STORE` cho B rồi gọi cấp số mới (`COMPETITION_ASSIGN_NUMBERS` hoặc để backend cấp), destroy đăng ký của A; (6) copy `attendee_roles`; (7) đánh dấu A huỷ tư cách + ghi bảng/log lịch sử thay thế.
-**Modal:** `_modal_replace_attendee.php` — cột trái thông tin A + checkbox đội kế thừa; cột phải tab SMILE / thủ công + upload ảnh/hồ sơ (tái sử dụng `_modal_edit_attendee.php`); ô lý do.
-**Acceptance:**
-- [ ] B được tạo, approved, có ảnh + hồ sơ.
-- [ ] B vào đúng đội tích với cùng jersey/position/is_captain; đội không tích bị huỷ.
-- [ ] B có đăng ký đủ cuộc thi của A với **số báo danh mới**.
-- [ ] B nhận đúng vai trò của A; A bị đánh dấu huỷ tư cách; có log lịch sử thay thế.
-- [ ] Nếu bước tạo B lỗi → dừng, không đụng dữ liệu A.
+**— Checkpoint A: Fun Run đầy đủ (đăng ký + hủy + hoàn suất + cancel_until) —**
+- [ ] FCFS không oversell (test đồng thời)
+- [ ] Hủy hoàn suất đúng, đăng ký lại được
+- [ ] cancel_until chặn đúng cả FE lẫn BE
 
-### Slice 5 — Xử lý thẻ / QR (badge)
-**Mục tiêu:** Khi A đã có badge (`badge_printed=1`/`print_count>0`): cảnh báo trong cả 2 modal; khi thực thi → vô hiệu QR/badge của A (`BADGE_UPDATE` cờ revoked hoặc `BADGE_DESTROY`), và với thay thế → đánh dấu B cần sinh badge.
-**Acceptance:**
-- [ ] Cảnh báo "thẻ đã in" hiển thị khi phù hợp.
-- [ ] Badge của A bị vô hiệu; B được đánh dấu cần in.
+### Phase 2 — Module Tham quan (mirror Run)
 
-### Slice 6 — Phân quyền, thống kê, hoàn thiện
-**Mục tiêu:** Kiểm tra `PermissionHelper::can('attendee','update')` ở đầu các action; cập nhật logic đếm (loại người huỷ/thay khỏi thống kê `countUniqueRegistered`); QA hồi quy; xử lý các câu hỏi mở đã chốt.
+**S6 — BE: migration + entity tour_sessions & tour_registrations**
+- Files (BE): module `Modules/Tour` (hoặc trong Run nếu muốn gọn — nhưng spec chốt tách): migrations tạo 2 bảng theo spec (có `cancel_until`, cột hủy, UNIQUE(attendee_id, deleted_at)); Entities; ServiceProvider/Routes đăng ký module; seeder 3 đợt ×86.
+- AC: migrate sạch; seed 3 đợt.
+- Verify: query DB.
 
----
+**S7 — BE: TourSessionService + TourRegistrationService (claim FCFS + hủy)**
+- Files (BE): nhân bản lõi từ Run (claim atomic, requestCancel/approveCancel/reject, listByEvent, listCancelRequests); controllers + `Routes/api.php`; audit. Không cấp BIB.
+- AC: tương đương S3 cho Tour; không có bib_number.
+- Verify: unit test + test đồng thời.
 
-## 6. Thứ tự & phụ thuộc
+**S8 — FE Tham quan: endpoint + model + cổng public**
+- Files (FE): `ApiEndpoints` thêm nhóm `TOUR_*`; models `TourSessions.php`, `TourRegistrations.php` (mirror Run); mở rộng cổng public — thêm khối "Đi tham quan" vào `views/run/index.php` & `result.php` (hiển thị cả 2 nội dung độc lập), hoặc action/route tour trong cùng `RunController`. JS cập nhật. Dùng chung session login `run_attendee_id`.
+- AC: 1 người đăng ký được cả Fun Run lẫn Tham quan; mỗi nội dung 1 lựa chọn; xin hủy độc lập.
+- Verify: thủ công toàn luồng.
 
-1 → 2 → 3 → 4 → 5 → 6. Slice 4 phụ thuộc 1 (summary) và tái sử dụng logic team của 3.
+**S9 — FE admin Tham quan: CRUD đợt + danh sách + export + duyệt hủy**
+- Files (FE): `admin/controllers/TourSessionsController.php` + views (mirror runEvents); `TourRegistrationsController.php` + view danh sách theo đợt + export PHPExcel (tái dùng helper); tab yêu cầu hủy. Phân quyền: thêm controller vào `MControllers` + `roles.controllers`; cấu hình menu.
+- AC: export danh sách theo đợt; phân quyền hiển thị menu.
+- Verify: thủ công + kiểm tra quyền.
 
-## 7. Rủi ro & phụ thuộc backend
+**— Checkpoint B: Tham quan đầy đủ, 2 module song song —**
 
-- **R1 (Cao) Không nguyên tử:** giảm thiểu bằng thứ tự "tạo trước, gỡ sau" + log; cân nhắc đề nghị backend bổ sung endpoint `attendees/replace` & `attendees/withdraw` chạy transaction (nice-to-have).
-- **PHỤ THUỘC:** cần backend xác nhận (a) attendee có field đánh dấu huỷ tư cách (`participation_status` hay dùng `is_active`); (b) cơ chế cấp số báo danh mới cho 1 đăng ký lẻ; (c) cờ revoke badge. → Xác nhận trước khi bắt đầu Slice 2 & 4 & 5.
+### Phase 3 — Hoàn thiện
 
-## 8. Checkpoint
+**S10 — Dashboard mức lấp đầy + rà soát edge case + audit**
+- Files: trang/tab thống kê thanh tiến độ mỗi cự ly & đợt; rà double-tab, hết giờ, đóng cổng; đảm bảo audit_logs đủ cho claim & cancel.
+- Verify: checklist edge case.
 
-- **Sau Slice 1:** summary chính xác, UI nút/modal khung hoạt động.
-- **Sau Slice 3:** luồng huỷ tư cách hoàn chỉnh, xử lý team đúng.
-- **Sau Slice 4:** luồng thay thế hoàn chỉnh + kế thừa đúng.
-- **Sau Slice 6:** phân quyền + thống kê + QA hồi quy xong.
+**S11 — Test tải đồng thời FCFS (bắt buộc)**
+- Objective: mô phỏng nhiều request claim cùng lúc trên 1 cự ly/đợt sắp đầy.
+- AC: tổng đăng ký active ≤ quota tuyệt đối; hoàn suất khi hủy không gây lệch số.
+- Verify: script test đồng thời (BE).
+
+## 4. Thứ tự & phụ thuộc
+```
+S1 → S2 → S3 → S4 → S5 → [Checkpoint A]
+                         → S6 → S7 → S8 → S9 → [Checkpoint B]
+                                              → S10 → S11
+```
+S4/S5 (FE) có thể làm song song sau S3. S9 phụ thuộc S7. Test tải S11 cần S3 & S7.
+
+## 5. Rủi ro
+- **UNIQUE(attendee_id, deleted_at)**: nhiều hàng cancelled đều NULL ở deleted_at nếu set sai → phải set deleted_at = timestamp thực khi hủy (không để NULL). Test kỹ.
+- **Hoàn suất đồng thời**: approveCancel phải `registered_count-1` atomic trong transaction, tránh âm.
+- **Tách module Tour**: chi phí nhân bản — chấp nhận theo quyết định user; giữ code mirror để dễ bảo trì.
+
+## 6. Điểm chờ xác nhận (không chặn bắt đầu S1)
+- Quota tổng vs số finalist (xác nhận khi seed S2/S6).
+- Khi admin từ chối hủy có cần báo lại người dùng (Toast/trạng thái) — xử lý ở S4/S5.
