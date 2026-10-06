@@ -29,7 +29,7 @@ class RunEvents extends CFormModel
     {
         return array(
             array('name, code, quota', 'required'),
-            array('quota, registered_count, sort_order, is_active, open_at, close_at, event_id', 'numerical', 'integerOnly' => true),
+            array('quota, registered_count, sort_order, is_active, open_at, close_at, cancel_until, event_id', 'numerical', 'integerOnly' => true),
             array('name', 'length', 'max' => 255),
             array('code', 'length', 'max' => 30),
             array('status', 'in', 'range' => array(self::STATUS_OPEN, self::STATUS_CLOSED)),
