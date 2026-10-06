@@ -113,29 +113,28 @@ class RunController extends CController
         $attendeeId = $this->session()['run_attendee_id'];
         $eventId = $this->session()['run_event_id'];
 
-        // Đã đăng ký rồi -> hiện phiếu + BIB.
-        $mine = RunRegistrations::findMine($attendeeId);
-        if ($mine) {
-            $this->render('result', array(
-                'mine'     => $mine,
-                'fullName' => $this->session()['run_full_name'],
-            ));
-            return;
-        }
+        // Fun Run: phiếu đã đăng ký (nếu có) hoặc danh sách cự ly đang mở.
+        $runMine = RunRegistrations::findMine($attendeeId);
+        $runEvents = $runMine ? array() : RunEvents::listOpen($eventId);
+        $runCancelledNotice = RunRegistrations::findLatestCancelled($attendeeId);
 
-        $events = RunEvents::listOpen($eventId);
-
-        // Thông báo: yêu cầu hủy gần nhất đã được BTC duyệt (suất đã hoàn) -> báo 1 lần trên cổng.
-        $cancelledNotice = RunRegistrations::findLatestCancelled($attendeeId);
+        // Tham quan: độc lập với Fun Run.
+        $tourMine = TourRegistrations::findMine($attendeeId);
+        $tourSessions = $tourMine ? array() : TourSessions::listOpen($eventId);
+        $tourCancelledNotice = TourRegistrations::findLatestCancelled($attendeeId);
 
         $this->render('index', array(
-            'events'          => $events,
-            'fullName'        => $this->session()['run_full_name'],
-            'cancelledNotice' => $cancelledNotice,
+            'fullName'            => $this->session()['run_full_name'],
+            'runMine'             => $runMine,
+            'runEvents'           => $runEvents,
+            'runCancelledNotice'  => $runCancelledNotice,
+            'tourMine'            => $tourMine,
+            'tourSessions'        => $tourSessions,
+            'tourCancelledNotice' => $tourCancelledNotice,
         ));
     }
 
-    /** Đăng ký 1 nội dung (AJAX). Trả JSON {success, message, bib}. */
+    /** Đăng ký 1 cự ly chạy (AJAX). Trả JSON {success, message, bib}. */
     public function actionRegister()
     {
         header('Content-Type: application/json');
