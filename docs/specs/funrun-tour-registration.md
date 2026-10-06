@@ -151,6 +151,7 @@ UPDATE tour_sessions
 - **Integration:** endpoint claim trả đúng HTTP status; list-open lọc đúng; admin hạ quota < registered_count bị chặn.
 - **Tải/đồng thời (bắt buộc):** mô phỏng nhiều request claim cùng lúc trên 1 đợt sắp đầy → tổng đăng ký không bao giờ > quota.
 - **E2E:** login finalist → đăng ký Fun Run → đăng ký Tham quan → màn kết quả khóa; đăng ký lại bị chặn.
+- **E2E hủy:** xin hủy + lý do → trạng thái `cancel_requested`, suất chưa hoàn → admin duyệt → suất hoàn (registered_count -1) → finalist đăng ký lại được; admin từ chối → quay về `active`.
 
 ## Boundaries
 
