@@ -125,9 +125,13 @@ class RunController extends CController
 
         $events = RunEvents::listOpen($eventId);
 
+        // Thông báo: yêu cầu hủy gần nhất đã được BTC duyệt (suất đã hoàn) -> báo 1 lần trên cổng.
+        $cancelledNotice = RunRegistrations::findLatestCancelled($attendeeId);
+
         $this->render('index', array(
-            'events'   => $events,
-            'fullName' => $this->session()['run_full_name'],
+            'events'          => $events,
+            'fullName'        => $this->session()['run_full_name'],
+            'cancelledNotice' => $cancelledNotice,
         ));
     }
 
