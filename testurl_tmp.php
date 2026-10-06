@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/framework/yii.php';
-Yii::import('application.components.RewriteUrlManager', true);
+require_once __DIR__ . '/protected/components/RewriteUrlManager.php';
 class FakeReq extends CHttpRequest {
     public $pi = 'run';
     public function getPathInfo() { return $this->pi; }
