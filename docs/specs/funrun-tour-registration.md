@@ -60,6 +60,7 @@ BTC xem danh sách các yêu cầu hủy (`cancel_requested`) kèm lý do → **
 - Xác nhận hủy → đăng ký chuyển `cancelled` (soft-delete bản ghi: set `deleted_at`, lưu `cancel_reason`, `cancelled_by`, `cancelled_at`) và **hoàn suất** (giảm `registered_count` của cự ly/đợt tương ứng, trong transaction) → suất mở lại cho người khác.
 - Sau khi hủy, finalist đó được đăng ký lại nội dung đó (vì bản ghi active cũ đã soft-delete, UNIQUE không còn chặn).
 - Từ chối → quay về `active`, nút khóa lại như cũ.
+- **Thông báo cho người đăng ký ở cả 2 chiều** (duyệt hủy / từ chối hủy): hiển thị trạng thái + kết quả trên màn kết quả của người dùng khi họ đăng nhập lại (Toast/nhãn trạng thái + lý do nếu có). Lưu `cancel_reviewed_at` để phân biệt đã xử lý.
 - Nếu **đã qua đợt đăng ký** (cổng đóng) mà vẫn hoàn suất: BTC có thể mở lại một đợt đăng ký mới (điều chỉnh `open_at/close_at` ở F5) để suất hoàn được dùng tiếp.
 
 ### F8 — Dashboard mức lấp đầy (nên có)
