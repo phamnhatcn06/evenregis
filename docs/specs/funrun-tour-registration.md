@@ -110,8 +110,9 @@ Thanh tiến độ đã đăng ký / tổng cho mỗi cự ly & đợt.
 | status | VARCHAR(20) | active / cancel_requested / cancelled |
 | cancel_reason | VARCHAR(255) NULL | lý do người dùng xin hủy |
 | cancel_requested_at | INT UNSIGNED NULL | |
-| cancelled_by | VARCHAR NULL | email admin duyệt hủy |
+| cancelled_by | VARCHAR NULL | email admin duyệt/từ chối hủy |
 | cancelled_at | INT UNSIGNED NULL | |
+| cancel_reviewed_at | INT UNSIGNED NULL | mốc admin đã xử lý (duyệt/từ chối) — để báo cho người dùng |
 | registered_at | INT UNSIGNED | |
 | created_at/updated_at | INT UNSIGNED | |
 | deleted_at | INT UNSIGNED NULL | set khi hủy được duyệt |
