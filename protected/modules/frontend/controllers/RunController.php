@@ -170,6 +170,38 @@ class RunController extends CController
         Yii::app()->end();
     }
 
+    /** Người dùng xin hủy đăng ký (AJAX). Trả JSON {success, message}. */
+    public function actionCancelRequest()
+    {
+        header('Content-Type: application/json');
+
+        if (!$this->isLoggedIn()) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'));
+            Yii::app()->end();
+        }
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+
+        $attendeeId = $this->session()['run_attendee_id'];
+        $reason = trim(isset($_POST['reason']) ? $_POST['reason'] : '');
+        if ($reason === '') {
+            echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng nhập lý do hủy.'));
+            Yii::app()->end();
+        }
+
+        $res = RunRegistrations::requestCancelViaApi($attendeeId, $reason);
+
+        echo CJSON::encode(array(
+            'success' => (bool) $res['success'],
+            'message' => $res['success']
+                ? (isset($res['data']['message']) ? $res['data']['message'] : 'Đã gửi yêu cầu hủy.')
+                : ($res['error'] ?: 'Không gửi được yêu cầu hủy.'),
+        ));
+        Yii::app()->end();
+    }
+
     public function actionLogout()
     {
         $s = $this->session();
