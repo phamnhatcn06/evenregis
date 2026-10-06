@@ -63,6 +63,18 @@
 
     <div class="row mt-2">
         <div class="col-md-6">
+            <label class="control-label">Hạn chót xin hủy</label>
+            <?php echo CHtml::activeTextField($model, 'cancel_until', array(
+                'type' => 'datetime-local',
+                'class' => 'form-control',
+                'value' => $model->cancel_until ? date('Y-m-d\TH:i', (int) $model->cancel_until) : '',
+            )); ?>
+            <small class="text-muted">Sau mốc này người đăng ký không thể xin hủy. Để trống nếu cho hủy đến khi đóng đăng ký.</small>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-md-6">
             <?php echo $form->dropDownListGroup($model, 'status', array(
                 'widgetOptions' => array(
                     'data' => array(
