@@ -236,6 +236,7 @@ if (empty($albumList)) {
           <?php foreach ($navItems as $it): ?>
             <a class="badge bg-light text-dark fw-bold text-decoration-none px-3 py-2 border rounded-pill" href="<?php echo $e($it[0]); ?>"><?php echo $e($it[1]); ?></a>
           <?php endforeach; ?>
+          <a class="badge text-white fw-bold text-decoration-none px-3 py-2 rounded-pill" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);">Đăng ký hoạt động</a>
           <a class="badge bg-primary text-white fw-bold text-decoration-none px-3 py-2 rounded-pill" href="<?php echo $e($loginUrl); ?>"><?php echo $e($loginLabel); ?></a>
         </div>
       </div>
