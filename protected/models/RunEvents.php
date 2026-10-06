@@ -78,6 +78,7 @@ class RunEvents extends CFormModel
             'quota'      => $this->quota,
             'open_at'    => $this->open_at,
             'close_at'   => $this->close_at,
+            'cancel_until' => $this->cancel_until,
             'status'     => $this->status ?: self::STATUS_OPEN,
             'sort_order' => $this->sort_order ?: 0,
             'is_active'  => ($this->is_active === null || $this->is_active === '') ? 1 : $this->is_active,
