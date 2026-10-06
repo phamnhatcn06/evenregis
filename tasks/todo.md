@@ -29,7 +29,7 @@
 
 ## Phase 3 — Hoàn thiện
 - [x] S11 — Test tải đồng thời FCFS ✅ Tour: 20 claim song song / quota 5 → đúng 5×200 + 15×409, registered_count=5. Run: 12 claim / quota 3 → đúng 3×200 + 9×409. KHÔNG oversell. Audit log đã ghi ở mọi claim/cancel.
-- [ ] S10 — (nên có) Dashboard mức lấp đầy realtime — CHƯA làm (tùy chọn)
+- [x] S10 — Dashboard mức lấp đầy realtime: ActivityDashboardController + view (thanh tiến độ mỗi cự ly/đợt, tổng hợp), link từ menu admin Run & Tour ✅ lint sạch
 
 ## Còn lại
 - [ ] Smoke test trình duyệt: cổng public (2 khối, đăng ký, xin hủy) + admin (CRUD, duyệt hủy, export) — cần chạy app thực
