@@ -6,7 +6,7 @@
 - [x] S1 — BE: migration cột hủy + `cancel_until` cho `run_events`/`run_registrations`; đổi UNIQUE → (attendee_id, deleted_at) ✅ verified
 - [x] S2 — BE: seed lại Fun Run — 5km(320)/10km(90)/15km(40), event_id=3 ✅ (run_events trước đó rỗng, không có 21km)
 - [x] S3 — BE: API xin hủy + duyệt/từ chối hủy + hoàn suất (atomic) cho Run ✅ verified (claim/409/xin hủy/duyệt+hoàn suất/đăng ký lại/cancel_until 422)
-- [ ] S4 — FE cổng public: nút "Xin hủy" + modal lý do, ẩn/hiện theo `cancel_until`, đăng ký lại sau hủy
+- [x] S4 — FE cổng public: nút "Xin hủy" + modal lý do, ẩn/hiện theo `cancel_until`, thông báo duyệt/từ chối (Toast 1 lần), đăng ký lại sau hủy ✅ (lint sạch; cần smoke test trình duyệt)
 - [ ] S5 — FE admin: field `cancel_until` + danh sách yêu cầu hủy (Duyệt/Từ chối)
 
 ### ✅ Checkpoint A — Fun Run đầy đủ
