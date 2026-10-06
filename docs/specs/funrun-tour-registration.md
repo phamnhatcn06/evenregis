@@ -103,10 +103,18 @@ Thanh tiến độ đã đăng ký / tổng cho mỗi cự ly & đợt.
 | id | BIGINT PK | |
 | tour_session_id | BIGINT | FK tour_sessions |
 | attendee_id | BIGINT | FK attendees |
+| status | VARCHAR(20) | active / cancel_requested / cancelled |
+| cancel_reason | VARCHAR(255) NULL | lý do người dùng xin hủy |
+| cancel_requested_at | INT UNSIGNED NULL | |
+| cancelled_by | VARCHAR NULL | email admin duyệt hủy |
+| cancelled_at | INT UNSIGNED NULL | |
 | registered_at | INT UNSIGNED | |
 | created_at/updated_at | INT UNSIGNED | |
+| deleted_at | INT UNSIGNED NULL | set khi hủy được duyệt |
 
-Ràng buộc: `UNIQUE(attendee_id)` tên `uq_tour_registrations_attendee` (1 người/1 đợt); FK `fk_tour_registrations_session`, `fk_tour_registrations_attendee`. Không ghi `deleted_at` ở bảng đăng ký (không cho hủy mềm từ người dùng).
+Ràng buộc: `UNIQUE(attendee_id, deleted_at)` tên `uq_tour_registrations_attendee` (1 bản ghi active/người); FK `fk_tour_registrations_session`, `fk_tour_registrations_attendee`.
+
+**Ghi chú UNIQUE + cho đăng ký lại sau hủy:** dùng cặp `(attendee_id, deleted_at)` — bản ghi active có `deleted_at = NULL` nên 2 bản active của cùng người sẽ trùng (chặn đăng ký 2 lần). Khi hủy được duyệt, set `deleted_at = timestamp` → bản ghi cũ hết trùng → finalist được tạo bản active mới. *(Lưu ý MySQL: nhiều NULL trong cột UNIQUE không bị coi là trùng, nên pattern này chỉ enforce "1 active" khi có đúng 1 hàng NULL — là mong muốn ở đây. Áp dụng tương tự cho `run_registrations`.)*
 
 ### API contracts (ApiEndpoints + Model methods, controller trả HTTP status thật)
 - Fun Run: tái dùng `RUN_EVENT_*`, `RUN_REGISTRATION_*`, `RUN_AUTH_*`.
