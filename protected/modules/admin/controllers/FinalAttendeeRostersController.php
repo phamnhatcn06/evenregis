@@ -234,6 +234,10 @@ class FinalAttendeeRostersController extends AdminController
             $chunk = FinalAttendeeRosters::fetchPage($params, $page, self::EXPORT_CHUNK_SIZE);
 
             foreach ($chunk as $item) {
+                // Chỉ xuất người đang trong danh sách active, bỏ qua người đã huỷ tư cách.
+                if (!empty($item['is_withdrawn'])) {
+                    continue;
+                }
                 $all[] = $item;
             }
 
