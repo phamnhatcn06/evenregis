@@ -29,6 +29,8 @@ $stages = ($dataProvider !== null) ? $dataProvider->getData() : array();
      data-config-url="<?php echo $this->createUrl('config', array('id' => '__ID__')); ?>"
      data-draw-groups-url="<?php echo $this->createUrl('drawGroups', array('id' => '__ID__')); ?>"
      data-draw-bracket-url="<?php echo $this->createUrl('drawBracket', array('id' => '__ID__')); ?>"
+     data-standings-url="<?php echo $this->createUrl('standings', array('id' => '__ID__')); ?>"
+     data-generate-knockout-url="<?php echo $this->createUrl('generateKnockout', array('id' => '__ID__')); ?>"
      data-lock-url="<?php echo $this->createUrl('lock', array('id' => '__ID__')); ?>">
 </div>
 
