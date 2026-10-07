@@ -54,7 +54,7 @@
                                    id="set_lucky_input"
                                    class="form-control text-center fw-bold fs-4 border-start-0"
                                    style="letter-spacing: 2px; color: #0d6efd;"
-                                   placeholder="VD: 088"
+                                   placeholder="VD: 0088"
                                    maxlength="10"
                                    autocomplete="off"
                                    autofocus>
