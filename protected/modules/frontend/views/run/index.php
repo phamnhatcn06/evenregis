@@ -41,32 +41,39 @@ $countdownType = 'close';
 $countdownBadgeText = 'Đang mở đăng ký';
 $countdownTitle = 'Thời gian đăng ký còn lại';
 
-$futureCloseAts = array();
-$futureOpenAts = array();
+// Mốc mở (chưa tới giờ mở) và mốc đóng của các nội dung ĐANG mở.
+// Quy ước: chưa mở -> đếm ngược tới giờ MỞ; đã mở -> đếm ngược tới giờ ĐÓNG.
+$futureOpenAts = array();   // open_at còn ở tương lai (chưa mở)
+$openCloseAts = array();    // close_at của nội dung đang mở (đã qua open_at, chưa tới close_at)
+
+$collectWindow = function ($row) use ($now, &$futureOpenAts, &$openCloseAts) {
+    $oAt = !empty($row['open_at']) ? (is_numeric($row['open_at']) ? (int)$row['open_at'] : strtotime($row['open_at'])) : 0;
+    $cAt = !empty($row['close_at']) ? (is_numeric($row['close_at']) ? (int)$row['close_at'] : strtotime($row['close_at'])) : 0;
+
+    if ($oAt > $now) {
+        // Chưa đến giờ mở.
+        $futureOpenAts[] = $oAt;
+    } elseif ($cAt > $now) {
+        // Đã mở và còn trong hạn.
+        $openCloseAts[] = $cAt;
+    }
+};
 
 if (!empty($runEvents)) {
-    foreach ($runEvents as $e) {
-        $cAt = !empty($e['close_at']) ? (is_numeric($e['close_at']) ? (int)$e['close_at'] : strtotime($e['close_at'])) : 0;
-        if ($cAt > $now) { $futureCloseAts[] = $cAt; }
-        $oAt = !empty($e['open_at']) ? (is_numeric($e['open_at']) ? (int)$e['open_at'] : strtotime($e['open_at'])) : 0;
-        if ($oAt > $now) { $futureOpenAts[] = $oAt; }
-    }
+    foreach ($runEvents as $e) { $collectWindow($e); }
 }
 if (!empty($tourSessions)) {
-    foreach ($tourSessions as $s) {
-        $cAt = !empty($s['close_at']) ? (is_numeric($s['close_at']) ? (int)$s['close_at'] : strtotime($s['close_at'])) : 0;
-        if ($cAt > $now) { $futureCloseAts[] = $cAt; }
-        $oAt = !empty($s['open_at']) ? (is_numeric($s['open_at']) ? (int)$s['open_at'] : strtotime($s['open_at'])) : 0;
-        if ($oAt > $now) { $futureOpenAts[] = $oAt; }
-    }
+    foreach ($tourSessions as $s) { $collectWindow($s); }
 }
 
-if (!empty($futureCloseAts)) {
-    $countdownTarget = min($futureCloseAts);
+if (!empty($openCloseAts)) {
+    // Có nội dung đang mở -> đếm ngược tới thời điểm đóng gần nhất.
+    $countdownTarget = min($openCloseAts);
     $countdownType = 'close';
     $countdownBadgeText = 'Đang mở đăng ký';
     $countdownTitle = 'Thời gian đăng ký còn lại';
 } elseif (!empty($futureOpenAts)) {
+    // Chưa mở -> đếm ngược tới thời điểm mở gần nhất.
     $countdownTarget = min($futureOpenAts);
     $countdownType = 'open';
     $countdownBadgeText = 'Sắp mở đăng ký';
