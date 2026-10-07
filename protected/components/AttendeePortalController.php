@@ -17,6 +17,8 @@ class AttendeePortalController extends CController
     const SESSION_ATTENDEE_ID = 'portal_attendee_id';
     const SESSION_FULL_NAME   = 'portal_full_name';
     const SESSION_EVENT_ID    = 'portal_event_id';
+    /** Đã xác nhận đủ hồ sơ (năm sinh, giới tính) trong phiên đăng nhập này. */
+    const SESSION_PROFILE_OK  = 'portal_profile_ok';
 
     protected function session()
     {
