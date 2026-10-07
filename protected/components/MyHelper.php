@@ -928,8 +928,8 @@ class MyHelper
     {
         // Thuộc tính dùng chung (font, cỡ chữ, canh giữa) cho cả hai loại phôi.
         $name     = array('pos_x' => 0, 'font' => 'fontten',      'size' => 69, 'align' => 'C');
-        $position = array('pos_x' => 0, 'font' => 'fontchucdanh', 'size' => 19, 'align' => 'C');
-        $unit     = array('pos_x' => 0, 'font' => 'fontdonvi',    'size' => 18, 'align' => 'C');
+        $position = array('pos_x' => 0, 'font' => 'fontchucdanh', 'size' => 26, 'align' => 'C');
+        $unit     = array('pos_x' => 0, 'font' => 'fontdonvi',    'size' => 24, 'align' => 'C');
 
         return array(
             // Ảnh chân dung vừa đúng ô tròn trong suốt của phôi (đo từ alpha), overscan 4px cho kín viền.
