@@ -65,6 +65,8 @@ class AttendeePortalController extends CController
         $s[self::SESSION_ATTENDEE_ID] = isset($data['attendee_id']) ? $data['attendee_id'] : null;
         $s[self::SESSION_FULL_NAME]   = isset($data['full_name']) ? $data['full_name'] : '';
         $s[self::SESSION_EVENT_ID]    = isset($data['event_id']) ? $data['event_id'] : null;
+        // Mỗi lần đăng nhập phải xác nhận lại hồ sơ.
+        $s[self::SESSION_PROFILE_OK]  = false;
     }
 
     /** Xóa phiên cổng cá nhân. */
@@ -74,7 +76,53 @@ class AttendeePortalController extends CController
         unset(
             $s[self::SESSION_ATTENDEE_ID],
             $s[self::SESSION_FULL_NAME],
-            $s[self::SESSION_EVENT_ID]
+            $s[self::SESSION_EVENT_ID],
+            $s[self::SESSION_PROFILE_OK]
         );
+    }
+
+    /**
+     * Người dùng đã xác nhận đủ hồ sơ trong phiên này chưa. Chưa xác nhận thì popup hồ sơ
+     * luôn hiện (kể cả reload) và các chức năng đăng ký bị chặn.
+     */
+    public function isProfileConfirmed()
+    {
+        return !empty($this->session()[self::SESSION_PROFILE_OK]);
+    }
+
+    protected function markProfileConfirmed()
+    {
+        $this->session()[self::SESSION_PROFILE_OK] = true;
+    }
+
+    /**
+     * Dữ liệu cho popup hồ sơ (partial `/portal/_modal_profile`). Chỉ gọi API khi popup
+     * cần hiện; đã xác nhận trong phiên thì trả null để view bỏ qua popup.
+     */
+    protected function profileModalData()
+    {
+        if ($this->isProfileConfirmed()) {
+            return null;
+        }
+        $profile = RunAuth::getProfile($this->currentAttendeeId());
+        return array(
+            'saveProfileUrl' => $this->createUrl('/frontend/portal/saveProfile'),
+            'logoutUrl'      => $this->createUrl('/frontend/portal/logout'),
+            'profile'        => $profile,
+            'fullName'       => $this->currentFullName(),
+        );
+    }
+
+    /** Chặn các action AJAX đăng ký khi chưa xác nhận hồ sơ. Trả true nếu đã chặn (đã echo JSON). */
+    protected function denyIfProfileNotConfirmed()
+    {
+        if ($this->isProfileConfirmed()) {
+            return false;
+        }
+        echo CJSON::encode(array(
+            'success' => false,
+            'message' => 'Vui lòng xác nhận thông tin cá nhân (năm sinh, giới tính) trước khi đăng ký.',
+        ));
+        return true;
     }
 }
