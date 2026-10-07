@@ -70,7 +70,7 @@ class PortalController extends AttendeePortalController
                 }
             } elseif ($formStep === 'login') {
                 $pin = isset($_POST['pin']) ? $_POST['pin'] : '';
-                $res = RunAuth::login($identifier, $pin);
+                $res = RunAuth::login($identifier, $pin, $propertyId !== '' ? $propertyId : null);
                 if ($res['success'] && isset($res['data']['data'])) {
                     $this->loginSession($res['data']['data']);
                     Yii::app()->user->setFlash('success', 'Đăng nhập thành công.');
