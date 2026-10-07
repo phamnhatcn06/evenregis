@@ -1034,7 +1034,7 @@ class MyHelper
         }
 
         $idPart   = isset($row['id']) ? (int) $row['id'] : 0;
-        $namePart = self::cleanString(isset($row['full_name']) ? $row['full_name'] : 'nguoi');
+        $namePart = UrlTransliterate::cleanString(isset($row['full_name']) ? $row['full_name'] : 'nguoi');
         $path     = $outDir . $namePart . '-' . $idPart . '.png';
 
         imagepng($combined, $path);
