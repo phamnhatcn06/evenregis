@@ -124,6 +124,7 @@ class FinalAttendeeRosters extends CFormModel
             'shirt_size'      => 'Size áo',
             'note'            => 'Ghi chú',
             'sort_order'      => 'Thứ tự',
+            'is_btc'          => 'Ban tổ chức',
         );
     }
 
