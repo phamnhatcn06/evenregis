@@ -62,6 +62,9 @@ class RunController extends AttendeePortalController
             echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
             Yii::app()->end();
         }
+        if ($this->denyIfProfileNotConfirmed()) {
+            Yii::app()->end();
+        }
 
         $attendeeId = $this->currentAttendeeId();
         $runEventId = isset($_POST['run_event_id']) ? (int) $_POST['run_event_id'] : 0;
@@ -97,6 +100,9 @@ class RunController extends AttendeePortalController
             echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
             Yii::app()->end();
         }
+        if ($this->denyIfProfileNotConfirmed()) {
+            Yii::app()->end();
+        }
 
         $attendeeId = $this->currentAttendeeId();
         $reason = trim(isset($_POST['reason']) ? $_POST['reason'] : '');
@@ -127,6 +133,9 @@ class RunController extends AttendeePortalController
         }
         if (!Yii::app()->request->isPostRequest) {
             echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+        if ($this->denyIfProfileNotConfirmed()) {
             Yii::app()->end();
         }
 
@@ -160,6 +169,9 @@ class RunController extends AttendeePortalController
         }
         if (!Yii::app()->request->isPostRequest) {
             echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+        if ($this->denyIfProfileNotConfirmed()) {
             Yii::app()->end();
         }
 
