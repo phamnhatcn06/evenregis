@@ -502,6 +502,39 @@ class FinalAttendeeRosters extends CFormModel
     }
 
     /**
+     * Lấy một dòng roster theo id (mảng thuộc tính), dùng cho xuất ảnh thẻ.
+     */
+    public static function fetchOne($id)
+    {
+        $rows = self::fetchPage(array('id' => (int) $id, 'with_trashed' => 1), 1, 1);
+
+        return !empty($rows) ? $rows[0] : null;
+    }
+
+    /**
+     * Chuẩn hoá một dòng roster (mảng từ API) thành dữ liệu dựng ảnh thẻ VCK.
+     * Gom các trường MyHelper::FinalRosterBadge cần, kèm URL ảnh chân dung tuyệt đối.
+     */
+    public static function toBadgeData($row)
+    {
+        $model = new self;
+        $model->setAttributes($row, false);
+
+        return array(
+            'id'             => isset($row['id']) ? (int) $row['id'] : 0,
+            'full_name'      => isset($row['full_name']) ? $row['full_name'] : '',
+            'position_display' => isset($row['position_display']) ? $row['position_display'] : '',
+            'position'       => isset($row['position']) ? $row['position'] : '',
+            'badge_org_name' => isset($row['badge_org_name']) ? $row['badge_org_name'] : '',
+            'unit_label'     => isset($row['unit_label']) ? $row['unit_label'] : '',
+            'property_code'  => isset($row['property_code']) ? $row['property_code'] : '',
+            'lucky_number'   => isset($row['lucky_number']) ? $row['lucky_number'] : '',
+            'is_btc'         => !empty($row['is_btc']) ? 1 : 0,
+            'avatar_url'     => $model->getAvatarUrl(),
+        );
+    }
+
+    /**
      * HO thêm người thủ công. BE tạo kèm bản ghi attendee tối thiểu, cấp luôn mã lucky và số thẻ.
      */
     public static function storeViaApi($data)
