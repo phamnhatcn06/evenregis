@@ -934,9 +934,11 @@ class MyHelper
         return array(
             // Ảnh chân dung vừa đúng ô tròn trong suốt của phôi (đo từ alpha), overscan 4px cho kín viền.
             // BTC: tròn 415 tâm (531,666). KS: tròn 397 tâm (531,659).
+            // gravity = vị trí cắt dọc (0=trên, 0.5=giữa, 1=dưới). Để 0.2 ưu tiên phần đầu →
+            // khuôn mặt rơi xuống giữa ô tròn thay vì nằm sát mép trên.
             'photo' => array(
-                'btc'     => array('pos_x' => 319, 'pos_y' => 454, 'width' => 423, 'height' => 423),
-                'default' => array('pos_x' => 329, 'pos_y' => 455, 'width' => 405, 'height' => 405),
+                'btc'     => array('pos_x' => 319, 'pos_y' => 454, 'width' => 423, 'height' => 423, 'gravity' => 0.2),
+                'default' => array('pos_x' => 329, 'pos_y' => 455, 'width' => 405, 'height' => 405, 'gravity' => 0.2),
             ),
 
             // Mặt trước: vị trí dòng (pos_y) + màu chữ khác nhau theo loại phôi.
