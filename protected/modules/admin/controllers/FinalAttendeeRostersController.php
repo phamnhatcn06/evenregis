@@ -251,8 +251,8 @@ class FinalAttendeeRostersController extends AdminController
             throw new CHttpException(500, 'Không tạo được ảnh thẻ. Kiểm tra phôi thẻ và ảnh chân dung.');
         }
 
-        $downloadName = 'The_VCK_' . (!empty($row['lucky_number']) ? $row['lucky_number'] : $id) . '.png';
-        $this->sendFileThenDelete($path, $downloadName, 'image/png');
+        // Tên file tải về = tên người + mã lucky (đúng như tên file đã sinh).
+        $this->sendFileThenDelete($path, basename($path), 'image/png');
     }
 
     /**
