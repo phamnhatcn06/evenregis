@@ -1034,7 +1034,7 @@ class MyHelper
                 );
                 imagedestroy($qr);
             }
-            self::drawText($back, 'MT' . $lucky, $layout['back']['lucky']);
+            self::drawText($back, 'MT' . $lucky, $isBtc ? $layout['back']['lucky_btc'] : $layout['back']['lucky']);
         }
 
         // ---- Gộp cạnh nhau: trước | sau ----
