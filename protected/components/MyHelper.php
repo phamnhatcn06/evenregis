@@ -1022,6 +1022,7 @@ class MyHelper
         } elseif (!empty($row['position'])) {
             $position = $row['position'];
         }
+        $position = mb_strtoupper(trim($position), 'UTF-8');
         $unit = '';
         if (!empty($row['badge_org_name'])) {
             $unit = $row['badge_org_name'];
