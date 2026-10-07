@@ -6,6 +6,8 @@
 $this->pageTitle = 'Cổng Cá Nhân Đại Biểu';
 $loginUrl = $this->createUrl('/frontend/portal/login');
 $returnUrl = isset($returnUrl) ? $returnUrl : '';
+$units = isset($units) && is_array($units) ? $units : array();
+$propertyId = isset($propertyId) ? (string) $propertyId : '';
 
 // Đăng ký JS cho xử lý mã PIN và QR scanner
 Yii::app()->clientScript->registerScriptFile(
