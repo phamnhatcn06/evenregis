@@ -1160,7 +1160,7 @@ class MyHelper
      * Sinh QR code thành GD resource vuông kích thước $size.
      * Dùng extension qrcode (protected/extensions/qrcode/QRCode.php).
      */
-    protected static function makeQrResource($data, $size)
+    protected static function makeQrResource($data, $size, $bgHex = '#FFFFFF')
     {
         $classFile = Yii::getPathOfAlias('ext.qrcode.QRCode') . '.php';
         if (!class_exists('QRCode', false) && is_file($classFile)) {
