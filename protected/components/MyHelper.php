@@ -1483,7 +1483,7 @@ class MyHelper
     }
 
     public
-    static function modifyImage($img, $name, $text = array(), $imageInsert, $des, $childDes)
+    static function modifyImage($img, $name, $text, $imageInsert, $des, $childDes)
     {
         $baseFolder = Yii::app()->basePath . '/../uploads/';
         if (!is_dir($baseFolder)) {
