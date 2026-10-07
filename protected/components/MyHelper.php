@@ -946,13 +946,13 @@ class MyHelper
             'front' => array(
                 'btc' => array(
                     'name'     => array_merge($name,     array('pos_y' => 1001, 'color' => '#FFFFFF')),
-                    'position' => array_merge($position, array('pos_y' => 1151, 'color' => '#FFFFFF')),
-                    'unit'     => array_merge($unit,     array('pos_y' => 1236, 'color' => '#FFFFFF')),
+                    'position' => array_merge($position, array('pos_y' => 1131, 'color' => '#FFFFFF')),
+                    'unit'     => array_merge($unit,     array('pos_y' => 1216, 'color' => '#FFFFFF')),
                 ),
                 'default' => array(
                     'name'     => array_merge($name,     array('pos_y' => 986,  'color' => '#000000')),
-                    'position' => array_merge($position, array('pos_y' => 1136, 'color' => '#000000')),
-                    'unit'     => array_merge($unit,     array('pos_y' => 1221, 'color' => '#000000')),
+                    'position' => array_merge($position, array('pos_y' => 1116, 'color' => '#000000')),
+                    'unit'     => array_merge($unit,     array('pos_y' => 1201, 'color' => '#000000')),
                 ),
             ),
 
