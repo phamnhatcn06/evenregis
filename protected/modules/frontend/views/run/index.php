@@ -295,4 +295,13 @@ if (!empty($tourMine) && !empty($tourMine['can_request_cancel']) && $tourMine['s
         'title'     => 'Xin hủy đăng ký tham quan',
     ));
 }
+
+// Modal bổ sung / xác nhận ngày sinh + giới tính (bật tự động khi vào cổng).
+$this->renderPartial('_modal_profile', array(
+    'saveProfileUrl' => $saveProfileUrl,
+    'fullName'       => $fullName,
+    'birthday'       => $profileBirthday,
+    'gender'         => $profileGender,
+    'isComplete'     => $profileComplete,
+));
 ?>
