@@ -82,10 +82,15 @@ class PortalController extends AttendeePortalController
             }
         }
 
+        // Dropdown đơn vị chỉ cần ở bước nhập định danh tay (không cần cho bước PIN/QR).
+        $units = ($step === 'identify') ? RunAuth::listUnits() : array();
+
         $this->render('login', array(
             'step'       => $step,
             'identifier' => $identifier,
             'fullName'   => $fullName,
+            'propertyId' => $propertyId,
+            'units'      => $units,
             'returnUrl'  => $returnUrl,
         ));
     }
