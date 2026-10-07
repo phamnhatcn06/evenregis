@@ -959,11 +959,13 @@ class MyHelper
             // Toạ độ đo trực tiếp từ phôi: BTC có ô QR 303×303 tại (380,936); pill ~center (531,1316).
             'back' => array(
                 'btc' => array(
-                    'qr'    => array('pos_x' => 394, 'pos_y' => 950, 'size' => 275),
+                    // Phôi BTC đã có ô vuông trắng → QR nền trắng khớp luôn.
+                    'qr'    => array('pos_x' => 394, 'pos_y' => 950, 'size' => 275, 'bg' => '#FFFFFF'),
                     'lucky' => array('pos_x' => 0, 'pos_y' => 1287, 'font' => 'fontten', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
                 ),
                 'default' => array(
-                    'qr'    => array('pos_x' => 381, 'pos_y' => 937, 'size' => 300),
+                    // Phôi KS nền trắng → QR nền xám nhạt để không trùng màu với khung thẻ.
+                    'qr'    => array('pos_x' => 381, 'pos_y' => 937, 'size' => 300, 'bg' => '#E6E6E6'),
                     'lucky' => array('pos_x' => 0, 'pos_y' => 1286, 'font' => 'fontten', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
                 ),
             ),
