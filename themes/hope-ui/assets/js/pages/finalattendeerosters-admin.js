@@ -26,6 +26,7 @@
         bindAddPersonModal();
         bindWithdraw(config);
         bindClearConflict(config);
+        bindToggleBtc(config);
         bindMergeSplitModal(config);
         bindPerPageSelect();
         bindSetLuckyModal(config);

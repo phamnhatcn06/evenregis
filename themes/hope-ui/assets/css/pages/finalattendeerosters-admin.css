@@ -1367,3 +1367,47 @@
     border-color: #e2e8f0;
     color: #475569;
 }
+
+/* Nút bật/tắt đánh dấu Ban tổ chức (BTC) trong bảng danh sách */
+.far-btc-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 3px 11px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+/* Đang là BTC: xanh lá đặc, rõ ràng */
+.far-btc-toggle.is-btc-on {
+    background-color: #dcfce7;
+    border-color: #86efac;
+    color: #15803d;
+}
+
+.far-btc-toggle.is-btc-on:hover {
+    background-color: #bbf7d0;
+}
+
+/* Chưa phải BTC: xám nhạt, mời bấm để bật */
+.far-btc-toggle.is-btc-off {
+    background-color: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+}
+
+.far-btc-toggle.is-btc-off:hover {
+    background-color: #e2e8f0;
+    color: #475569;
+}
+
+.far-btc-toggle:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
