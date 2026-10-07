@@ -19,7 +19,48 @@
         bindRegister(config);
         bindCancelForms();
         initCountdown();
+        initProfile();
     });
+
+    // Popup bổ sung / xác nhận ngày sinh + giới tính. Tự bật khi vào cổng.
+    function initProfile() {
+        var modalEl = document.getElementById('modalProfile');
+        var form = document.getElementById('form-profile');
+        if (!modalEl || !form || typeof bootstrap === 'undefined') { return; }
+
+        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn = document.getElementById('btn-submit-profile');
+            var original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: new FormData(form)
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    modal.hide();
+                    if (typeof Toast !== 'undefined') { Toast.success(data.message || 'Đã lưu thông tin.'); }
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = original;
+                    if (typeof Toast !== 'undefined') { Toast.error(data.message || 'Không lưu được thông tin.'); }
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = original;
+                if (typeof Toast !== 'undefined') { Toast.error('Lỗi kết nối máy chủ. Vui lòng thử lại.'); }
+            });
+        });
+    }
 
     function initCountdown() {
         var countdownEl = document.getElementById('run-portal-countdown');
