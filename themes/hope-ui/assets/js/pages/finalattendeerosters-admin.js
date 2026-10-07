@@ -102,6 +102,66 @@
         });
     }
 
+    /**
+     * Bật/tắt đánh dấu Ban tổ chức (BTC) ngay trên bảng.
+     *
+     * Dùng chung endpoint sửa trường (updateField) với fields[is_btc] = 0/1 nên không cần
+     * action riêng. Cập nhật giao diện tại chỗ, không reload cả trang cho nhẹ.
+     */
+    function bindToggleBtc(config) {
+        var url = config.getAttribute('data-update-field-url');
+        if (!url) {
+            return;
+        }
+
+        document.querySelectorAll('.js-toggle-btc').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var rosterId = button.getAttribute('data-roster-id');
+                var next = button.getAttribute('data-is-btc') === '1' ? 0 : 1;
+
+                var body = new FormData();
+                body.append('id', rosterId);
+                body.append('fields[is_btc]', next);
+
+                postWithButton(url, body, button, function (data) {
+                    applyBtcState(button, next);
+                    updateModalBtc(rosterId, next);
+                    if (typeof Toast !== 'undefined') {
+                        Toast.success(data.message
+                            || (next ? 'Đã đánh dấu là Ban tổ chức.' : 'Đã bỏ đánh dấu Ban tổ chức.'));
+                    }
+                });
+            });
+        });
+    }
+
+    /** Vẽ lại nút BTC theo trạng thái mới (postWithButton đã khôi phục innerHTML trước khi gọi về). */
+    function applyBtcState(button, isBtc) {
+        var on = !!isBtc;
+        button.setAttribute('data-is-btc', on ? 1 : 0);
+        button.classList.toggle('is-btc-on', on);
+        button.classList.toggle('is-btc-off', !on);
+        button.title = on ? 'Bấm để bỏ đánh dấu Ban tổ chức' : 'Bấm để đánh dấu là Ban tổ chức';
+        button.innerHTML = on
+            ? '<i class="fa fa-check-circle"></i><span>BTC</span>'
+            : '<i class="fa fa-circle-o"></i><span>Không</span>';
+    }
+
+    /** Đồng bộ giá trị is_btc vào data-row của nút sửa để modal mở sau đó hiển thị đúng. */
+    function updateModalBtc(rosterId, isBtc) {
+        document.querySelectorAll('.js-edit-row').forEach(function (btn) {
+            var raw = btn.getAttribute('data-row');
+            if (!raw) {
+                return;
+            }
+            var row = parseJson(raw);
+            if (row && String(row.id) === String(rosterId)) {
+                row.is_btc = isBtc;
+                btn.setAttribute('data-row', JSON.stringify(row));
+            }
+        });
+    }
+
     /** Modal gộp dòng / tách người. */
     function bindMergeSplitModal(config) {
         var modalElement = document.getElementById('modal_merge_split');
