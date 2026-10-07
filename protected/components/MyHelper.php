@@ -1263,7 +1263,7 @@ class MyHelper
     /** Khoảng cách (px) giữa hai mặt thẻ khi ghép cạnh nhau. */
     const BADGE_GAP = 30;
 
-    /** Ghép hai canvas cạnh nhau (trái | khoảng trắng | phải) thành một canvas mới. */
+    /** Ghép hai canvas cạnh nhau (trái | khoảng TRONG SUỐT | phải) thành một canvas mới. */
     protected static function combineSideBySide($left, $right, $gap = self::BADGE_GAP)
     {
         $lw = imagesx($left);
@@ -1275,8 +1275,12 @@ class MyHelper
         $h = max($lh, $rh);
 
         $out = imagecreatetruecolor($w, $h);
-        $white = imagecolorallocate($out, 255, 255, 255);
-        imagefilledrectangle($out, 0, 0, $w, $h, $white);
+        // Nền trong suốt để khoảng giữa hai mặt không bị màu trắng.
+        imagealphablending($out, false);
+        imagesavealpha($out, true);
+        $transparent = imagecolorallocatealpha($out, 0, 0, 0, 127);
+        imagefilledrectangle($out, 0, 0, $w, $h, $transparent);
+        imagealphablending($out, true);
         imagecopy($out, $left, 0, 0, 0, 0, $lw, $lh);
         imagecopy($out, $right, $lw + $gap, 0, 0, 0, $rw, $rh);
         return $out;
