@@ -800,7 +800,7 @@ $flashMessages = Yii::app()->user->getFlashes();
 
                         <?php if (empty($rows)): ?>
                         <tr>
-                            <td colspan="<?php echo $canUpdate ? 10 : 9; ?>" class="far-empty-state">
+                            <td colspan="<?php echo $canUpdate ? 11 : 10; ?>" class="far-empty-state">
                                 <div class="far-empty-icon">
                                     <i class="fa fa-inbox"></i>
                                 </div>
