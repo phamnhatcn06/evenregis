@@ -293,12 +293,8 @@ if (!empty($tourMine) && !empty($tourMine['can_request_cancel']) && $tourMine['s
     ));
 }
 
-// Modal bổ sung / xác nhận ngày sinh + giới tính (bật tự động khi vào cổng).
-$this->renderPartial('_modal_profile', array(
-    'saveProfileUrl' => $saveProfileUrl,
-    'fullName'       => $fullName,
-    'birthday'       => $profileBirthday,
-    'gender'         => $profileGender,
-    'isComplete'     => $profileComplete,
-));
+// Popup xác nhận hồ sơ (chỉ có khi chưa xác nhận trong phiên đăng nhập này).
+if (!empty($profileModal)) {
+    $this->renderPartial('/portal/_modal_profile', $profileModal);
+}
 ?>
