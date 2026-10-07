@@ -1001,7 +1001,8 @@ class MyHelper
         $photo = self::fetchPortraitResource(
             isset($row['avatar_url']) ? $row['avatar_url'] : '',
             $photoCfg['width'],
-            $photoCfg['height']
+            $photoCfg['height'],
+            isset($photoCfg['gravity']) ? $photoCfg['gravity'] : 0.5
         );
         if ($photo) {
             imagecopy(
