@@ -947,7 +947,7 @@ class MyHelper
                 'btc' => array(
                     'name'     => array_merge($name,     array('pos_y' => 1001, 'color' => '#FFFFFF')),
                     'position' => array_merge($position, array('pos_y' => 1151, 'color' => '#FFFFFF')),
-                    'unit'     => array_merge($unit,     array('pos_y' => 1253, 'color' => '#FFFFFF')),
+                    'unit'     => array_merge($unit,     array('pos_y' => 1236, 'color' => '#FFFFFF')),
                 ),
                 'default' => array(
                     'name'     => array_merge($name,     array('pos_y' => 986,  'color' => '#000000')),
