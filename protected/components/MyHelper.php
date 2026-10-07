@@ -1028,20 +1028,21 @@ class MyHelper
         // ---- Mặt sau: phôi → QR → text MT+lucky ----
         self::overlayPng($back, $backTpl);
 
-        $lucky = isset($row['lucky_number']) ? trim((string) $row['lucky_number']) : '';
+        $backCfg = $isBtc ? $layout['back']['btc'] : $layout['back']['default'];
+        $lucky   = isset($row['lucky_number']) ? trim((string) $row['lucky_number']) : '';
         if ($lucky !== '') {
             $qrUrl = rtrim($loginBaseUrl, '/') . '/portal/login?lucky=' . rawurlencode($lucky);
-            $qr    = self::makeQrResource($qrUrl, $layout['back']['qr']['size']);
+            $qr    = self::makeQrResource($qrUrl, $backCfg['qr']['size']);
             if ($qr) {
                 imagecopy(
                     $back, $qr,
-                    $layout['back']['qr']['pos_x'], $layout['back']['qr']['pos_y'],
+                    $backCfg['qr']['pos_x'], $backCfg['qr']['pos_y'],
                     0, 0,
                     imagesx($qr), imagesy($qr)
                 );
                 imagedestroy($qr);
             }
-            self::drawText($back, 'MT' . $lucky, $isBtc ? $layout['back']['lucky_btc'] : $layout['back']['lucky']);
+            self::drawText($back, 'MT' . $lucky, $backCfg['lucky']);
         }
 
         // ---- Gộp cạnh nhau: trước | sau ----
