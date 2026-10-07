@@ -961,7 +961,7 @@ class MyHelper
                 'btc' => array(
                     // Phôi BTC đã có ô vuông trắng → QR nền trắng khớp luôn.
                     'qr'    => array('pos_x' => 394, 'pos_y' => 950, 'size' => 275, 'bg' => '#FFFFFF'),
-                    'lucky' => array('pos_x' => 0, 'pos_y' => 1287, 'font' => 'fontten', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
+                    'lucky' => array('pos_x' => 0, 'pos_y' => 1298, 'font' => 'fontchucdanh', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
                 ),
                 'default' => array(
                     // Phôi KS nền trắng → QR nền xám nhạt để không trùng màu với khung thẻ.
