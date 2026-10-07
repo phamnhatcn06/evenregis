@@ -945,14 +945,14 @@ class MyHelper
             // Mặt trước: vị trí dòng (pos_y) + màu chữ khác nhau theo loại phôi.
             'front' => array(
                 'btc' => array(
-                    'name'     => array_merge($name,     array('pos_y' => 988,  'color' => '#FFFFFF')),
-                    'position' => array_merge($position, array('pos_y' => 1136, 'color' => '#FFFFFF')),
-                    'unit'     => array_merge($unit,     array('pos_y' => 1175, 'color' => '#FFFFFF')),
+                    'name'     => array_merge($name,     array('pos_y' => 1001, 'color' => '#FFFFFF')),
+                    'position' => array_merge($position, array('pos_y' => 1151, 'color' => '#FFFFFF')),
+                    'unit'     => array_merge($unit,     array('pos_y' => 1222, 'color' => '#FFFFFF')),
                 ),
                 'default' => array(
-                    'name'     => array_merge($name,     array('pos_y' => 973,  'color' => '#000000')),
-                    'position' => array_merge($position, array('pos_y' => 1121, 'color' => '#000000')),
-                    'unit'     => array_merge($unit,     array('pos_y' => 1160, 'color' => '#000000')),
+                    'name'     => array_merge($name,     array('pos_y' => 986,  'color' => '#000000')),
+                    'position' => array_merge($position, array('pos_y' => 1136, 'color' => '#000000')),
+                    'unit'     => array_merge($unit,     array('pos_y' => 1207, 'color' => '#000000')),
                 ),
             ),
 
