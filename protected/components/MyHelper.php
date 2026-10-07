@@ -948,10 +948,17 @@ class MyHelper
                 ),
             ),
 
+            // Mặt sau: QR đặt vào ô vuông trắng của phôi, mã MT+lucky đặt vào pill trắng bên dưới.
+            // Toạ độ đo trực tiếp từ phôi: BTC có ô QR 303×303 tại (380,936); pill ~center (531,1316).
             'back' => array(
-                'qr'         => array('pos_x' => 281, 'pos_y' => 420, 'size' => 500),
-                'lucky_btc'  => array('pos_x' => 0, 'pos_y' => 980, 'font' => 'lato-black', 'size' => 56, 'align' => 'C', 'color' => '#FFFFFF'),
-                'lucky'      => array('pos_x' => 0, 'pos_y' => 980, 'font' => 'lato-black', 'size' => 56, 'align' => 'C', 'color' => '#000000'),
+                'btc' => array(
+                    'qr'    => array('pos_x' => 394, 'pos_y' => 950, 'size' => 275),
+                    'lucky' => array('pos_x' => 0, 'pos_y' => 1287, 'font' => 'fontten', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
+                ),
+                'default' => array(
+                    'qr'    => array('pos_x' => 381, 'pos_y' => 937, 'size' => 300),
+                    'lucky' => array('pos_x' => 0, 'pos_y' => 1286, 'font' => 'fontten', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
+                ),
             ),
         );
     }
