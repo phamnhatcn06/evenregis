@@ -36,10 +36,6 @@ class RunController extends AttendeePortalController
             } catch (Exception $e) {}
         }
 
-        // Ngày sinh + giới tính (lưu ở final_attendee_rosters): popup bật khi vào cổng
-        // để người dùng bổ sung (nếu thiếu) hoặc xác nhận (nếu đã có).
-        $profile = RunAuth::getProfile($attendeeId);
-
         $this->render('index', array(
             'fullName'            => $this->currentFullName(),
             'runMine'             => $runMine,
