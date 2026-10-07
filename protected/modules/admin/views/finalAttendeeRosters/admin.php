@@ -26,7 +26,7 @@ Yii::app()->clientScript->registerCssFile(
     Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css'
 );
 Yii::app()->clientScript->registerCssFile(
-    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.7'
+    Yii::app()->theme->baseUrl . '/assets/css/pages/finalattendeerosters-admin.css?v=2.8'
 );
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js',
