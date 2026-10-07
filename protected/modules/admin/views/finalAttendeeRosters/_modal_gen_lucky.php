@@ -65,7 +65,7 @@ $withoutLucky = $stats ? (int) $stats['without_lucky'] : 0;
                             'id'    => 'gen_lucky_property_id',
                         )); ?>
                         <div class="form-text">
-                            <i class="fa fa-info-circle me-1"></i>Mã lucky cũng là định danh đăng nhập cổng chạy (<code>DHMT</code> + mã) và dùng để ghép số BIB.
+                            <i class="fa fa-info-circle me-1"></i>Mã lucky cũng là định danh đăng nhập cổng chạy (<code>MT</code> + mã) và dùng để ghép số BIB.
                         </div>
                     </div>
                 </form>
