@@ -197,6 +197,35 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="auth-field-label" for="portal-unit-select">
+                            <span><i class="bi bi-buildings text-primary me-1"></i> Đơn vị của bạn</span>
+                            <span class="text-danger fw-normal small">Bắt buộc</span>
+                        </label>
+
+                        <div class="auth-input-group">
+                            <div class="auth-input-icon">
+                                <i class="bi bi-diagram-3"></i>
+                            </div>
+                            <select name="property_id"
+                                    id="portal-unit-select"
+                                    class="auth-text-input"
+                                    required>
+                                <option value="">-- Chọn đơn vị của bạn --</option>
+                                <?php foreach ($units as $unit): ?>
+                                    <option value="<?php echo CHtml::encode($unit['id']); ?>"
+                                        <?php echo ((string) $unit['id'] === $propertyId) ? 'selected' : ''; ?>>
+                                        <?php echo CHtml::encode($unit['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="auth-field-hint">
+                            <i class="bi bi-shield-check text-success"></i> Chọn đúng đơn vị để xác thực — tránh nhập nhầm mã của người khác.
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn-auth-primary">
                         <span>Tiếp tục xác thực</span>
                         <i class="bi bi-arrow-right btn-arrow-icon"></i>
