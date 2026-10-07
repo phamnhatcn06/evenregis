@@ -14,6 +14,7 @@ class PortalController extends AttendeePortalController
      */
     public function actionLogin()
     {
+        $this->layout = '//layouts/portal_login';
         $returnUrl = $this->resolveReturnUrl();
 
         if ($this->isLoggedIn()) {
