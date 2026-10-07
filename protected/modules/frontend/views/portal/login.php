@@ -292,6 +292,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                     <input type="hidden" name="step" value="setpin">
                     <input type="hidden" name="return" value="<?php echo CHtml::encode($returnUrl); ?>">
                     <input type="hidden" name="identifier" value="<?php echo CHtml::encode($identifier); ?>">
+                    <input type="hidden" name="property_id" value="<?php echo CHtml::encode($propertyId); ?>">
                     <input type="hidden" name="pin" id="pin-new" required>
                     <input type="hidden" name="pin_confirm" id="pin-confirm" required>
 
