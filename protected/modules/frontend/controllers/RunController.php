@@ -37,7 +37,7 @@ class RunController extends AttendeePortalController
         }
 
         $this->render('index', array(
-            'fullName'            => $this->session()['run_full_name'],
+            'fullName'            => $this->currentFullName(),
             'runMine'             => $runMine,
             'runEvents'           => $runEvents,
             'runCancelledNotice'  => $runCancelledNotice,
