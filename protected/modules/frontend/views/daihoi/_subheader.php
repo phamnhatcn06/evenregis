@@ -3,14 +3,17 @@
  * Header dùng chung cho các trang con của Đại hội (Lịch trình, Lịch thi đấu).
  *
  * @var string $eventName  Tên sự kiện hiển thị cạnh logo
- * @var string $active     Trang đang mở: 'agenda' | 'schedule'
+ * @var string $active     Trang đang mở: 'agenda' | 'welcome' | 'schedule' | 'tour' | 'gala'
  */
 $base = Yii::app()->request->baseUrl;
 $e = function ($s) { return CHtml::encode($s); };
 $logo = $base . '/themes/hope-ui/logo_daihoi.png';
 $tabs = array(
-    'agenda' => array('url' => $base . '/daihoi/agenda', 'label' => 'Lịch trình', 'icon' => 'calendar_month'),
-    'schedule' => array('url' => $base . '/daihoi/schedule', 'label' => 'Lịch thi đấu', 'icon' => 'emoji_events'),
+    'agenda' => array('url' => $base . '/agenda-tong-the', 'label' => 'Agenda', 'icon' => 'calendar_month'),
+    'welcome' => array('url' => $base . '/tiec-welcome', 'label' => 'Khai mạc & Miss', 'icon' => 'celebration'),
+    'schedule' => array('url' => $base . '/lich-thi-the-thao', 'label' => 'Thi đấu', 'icon' => 'emoji_events'),
+    'tour' => array('url' => $base . '/lich-tham-quan', 'label' => 'Tham quan', 'icon' => 'tour'),
+    'gala' => array('url' => $base . '/tiec-gala', 'label' => 'Bế mạc', 'icon' => 'nightlife'),
 );
 $active = isset($active) ? $active : '';
 $eventName = isset($eventName) && $eventName !== '' ? $eventName : 'Đại hội Mường Thanh 2026';
