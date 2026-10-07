@@ -1223,8 +1223,8 @@ class MyHelper
     }
 
     /**
-     * Vẽ text TTF lên canvas theo cấu hình layout (hỗ trợ align L/C/R và màu hex).
-     * $cfg: pos_x, pos_y, font, size, align, color.
+     * Vẽ text TTF lên canvas theo cấu hình layout (hỗ trợ align L/C/R, màu hex, in đậm giả).
+     * $cfg: pos_x, pos_y, font, size, align, color, bold.
      */
     protected static function drawText($canvas, $text, $cfg)
     {
