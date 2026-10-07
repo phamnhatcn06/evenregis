@@ -36,6 +36,10 @@ class RunController extends AttendeePortalController
             } catch (Exception $e) {}
         }
 
+        // Ngày sinh + giới tính (lưu ở final_attendee_rosters): popup bật khi vào cổng
+        // để người dùng bổ sung (nếu thiếu) hoặc xác nhận (nếu đã có).
+        $profile = RunAuth::getProfile($attendeeId);
+
         $this->render('index', array(
             'fullName'            => $this->currentFullName(),
             'runMine'             => $runMine,
@@ -45,7 +49,37 @@ class RunController extends AttendeePortalController
             'tourSessions'        => $tourSessions,
             'tourCancelledNotice' => $tourCancelledNotice,
             'eventInfo'           => $eventInfo,
+            'profile'             => $profile,
         ));
+    }
+
+    /** Lưu ngày sinh + giới tính của người đang đăng nhập (AJAX). Trả JSON {success, message}. */
+    public function actionSaveProfile()
+    {
+        header('Content-Type: application/json');
+
+        if (!$this->isLoggedIn()) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'));
+            Yii::app()->end();
+        }
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+
+        $attendeeId = $this->currentAttendeeId();
+        $birthday = trim(isset($_POST['birthday']) ? $_POST['birthday'] : '');
+        $gender = isset($_POST['gender']) && $_POST['gender'] !== '' ? (int) $_POST['gender'] : null;
+
+        $res = RunAuth::saveProfile($attendeeId, $birthday, $gender, $this->currentFullName());
+
+        echo CJSON::encode(array(
+            'success' => (bool) $res['success'],
+            'message' => $res['success']
+                ? (isset($res['data']['message']) ? $res['data']['message'] : 'Đã lưu thông tin.')
+                : ($res['error'] ?: 'Không lưu được thông tin.'),
+        ));
+        Yii::app()->end();
     }
 
     /** Đăng ký 1 cự ly chạy (AJAX). Trả JSON {success, message, bib}. */
