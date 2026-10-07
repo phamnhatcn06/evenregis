@@ -157,6 +157,14 @@ $flashMessages = Yii::app()->user->getFlashes();
                             <i class="fa fa-file-excel-o"></i>
                             <span>Xuất Excel</span>
                         </a>
+
+                        <a href="<?php echo $this->createUrl('exportImagesBatch', array_merge(
+                            array('event_id' => $eventId, 'period_id' => $periodId),
+                            array_filter($filters, function ($value) { return $value !== null && $value !== ''; })
+                        )); ?>" class="far-btn far-btn-outline-primary" title="Xuất ảnh thẻ VCK (trước + sau) cho các dòng đang lọc, đóng gói ZIP theo mã đơn vị">
+                            <i class="fa fa-id-card-o"></i>
+                            <span>Xuất ảnh thẻ (ZIP)</span>
+                        </a>
                     </div>
                 <?php else: ?>
                     <div class="text-lg-end text-muted small">
