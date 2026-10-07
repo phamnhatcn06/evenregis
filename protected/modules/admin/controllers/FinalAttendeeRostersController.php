@@ -114,7 +114,7 @@ class FinalAttendeeRostersController extends AdminController
         $sheet->setTitle('Tong hop VCK');
 
         $headers = array(
-            'Mã lucky', 'Định danh đăng nhập', 'Họ và tên', 'Mã nhân viên', 'Số CCCD', 'Ngày sinh',
+            'ID', 'Mã lucky', 'Định danh đăng nhập', 'Họ và tên', 'Mã nhân viên', 'Số CCCD', 'Ngày sinh',
             'Số điện thoại', 'Đơn vị', 'Nhãn in thẻ', 'Bộ phận', 'Phòng ban',
             'Chức danh', 'Chức danh gốc (SMILE)', 'Nội dung tham gia', 'Size áo', 'Số thẻ',
             'Loại', 'Trạng thái', 'Đã đặt PIN', 'Đã sửa tay', 'Xung đột',
