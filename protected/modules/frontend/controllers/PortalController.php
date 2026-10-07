@@ -58,7 +58,7 @@ class PortalController extends AttendeePortalController
                     Yii::app()->user->setFlash('error', 'Xác nhận mã PIN không khớp.');
                     $step = 'setpin';
                 } else {
-                    $res = RunAuth::setPin($identifier, $pin);
+                    $res = RunAuth::setPin($identifier, $pin, $propertyId !== '' ? $propertyId : null);
                     if ($res['success'] && isset($res['data']['data'])) {
                         $this->loginSession($res['data']['data']);
                         Yii::app()->user->setFlash('success', 'Đặt mã PIN & đăng nhập thành công.');
