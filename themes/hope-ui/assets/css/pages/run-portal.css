@@ -491,3 +491,94 @@
         font-size: 0.6rem;
     }
 }
+
+/* ==========================================================================
+   PIN / OTP 6-Digit Input Boxes
+   ========================================================================== */
+.pin-code-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 0.75rem 0 1.25rem;
+}
+
+.pin-digit-box {
+    width: 48px;
+    height: 56px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    color: #1e293b;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    caret-color: #2563eb;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
+
+.pin-digit-box::-webkit-outer-spin-button,
+.pin-digit-box::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.pin-digit-box:focus {
+    outline: none;
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    transform: translateY(-2px);
+}
+
+.pin-digit-box.is-filled {
+    border-color: #3b82f6;
+    background-color: #ffffff;
+}
+
+.pin-toggle-btn {
+    font-size: 0.82rem;
+    color: #64748b;
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.pin-toggle-btn:hover {
+    color: #2563eb;
+}
+
+@media (max-width: 440px) {
+    .pin-code-group {
+        gap: 6px !important;
+    }
+
+    .pin-digit-box {
+        width: 40px;
+        height: 48px;
+        font-size: 1.35rem;
+        border-radius: 9px;
+    }
+}
+
+@media (max-width: 360px) {
+    .pin-code-group {
+        gap: 4px !important;
+    }
+
+    .pin-digit-box {
+        width: 36px;
+        height: 44px;
+        font-size: 1.2rem;
+        border-radius: 8px;
+    }
+}
