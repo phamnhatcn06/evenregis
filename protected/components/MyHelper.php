@@ -909,6 +909,341 @@ class MyHelper
         $imageModify = MyHelper::insertText($imageModify, $name, array('pos_x' => 620, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 50, 'align' => 'L'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
     }
 
+    // =============================================================================
+    // Xuất ảnh thẻ Vòng Chung Kết (VCK) — gộp mặt trước + mặt sau vào 1 file PNG.
+    //
+    // Dùng GD trực tiếp (không qua insertText/insertImage) để kiểm soát hoàn toàn và
+    // tránh `echo $image->log` trong insertText làm hỏng luồng tải file.
+    // =============================================================================
+
+    /** Thư mục chứa phôi thẻ */
+    const BADGE_TEMPLATE_DIR = 'phoianh/';
+
+    /** Toạ độ & cỡ chữ mặc định cho thẻ VCK (canvas 1063×1418, ảnh 582×582 tại x240 y390) */
+    public static function finalBadgeLayout()
+    {
+        return array(
+            'photo' => array('pos_x' => 240, 'pos_y' => 390, 'width' => 582, 'height' => 582),
+            'front' => array(
+                'name'     => array('pos_x' => 0, 'pos_y' => 1010, 'font' => 'lato-black',  'size' => 48, 'align' => 'C', 'color' => '#000000'),
+                'position' => array('pos_x' => 0, 'pos_y' => 1085, 'font' => 'lato-medium', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
+                'unit'     => array('pos_x' => 0, 'pos_y' => 1130, 'font' => 'lato-medium', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
+            ),
+            'back' => array(
+                'qr'    => array('pos_x' => 281, 'pos_y' => 420, 'size' => 500),
+                'lucky' => array('pos_x' => 0, 'pos_y' => 980, 'font' => 'lato-black', 'size' => 56, 'align' => 'C', 'color' => '#000000'),
+            ),
+        );
+    }
+
+    /**
+     * Tạo ảnh thẻ VCK cho một người, gộp mặt trước + mặt sau cạnh nhau vào 1 file PNG.
+     *
+     * @param array  $row          Một dòng roster: full_name, position_display/position,
+     *                             badge_org_name/unit_label, lucky_number, is_btc, property_code,
+     *                             và avatar_url (URL ảnh chân dung).
+     * @param string $loginBaseUrl URL gốc trang đăng nhập cổng cá nhân (QR = base?lucky=<lucky>).
+     * @return string|false        Đường dẫn file PNG đã tạo, hoặc false nếu lỗi.
+     */
+    public static function FinalRosterBadge($row, $loginBaseUrl)
+    {
+        $baseFolder   = Yii::app()->basePath . '/../uploads/';
+        $templateDir  = $baseFolder . self::BADGE_TEMPLATE_DIR;
+        $layout       = self::finalBadgeLayout();
+        $isBtc        = !empty($row['is_btc']);
+
+        $frontTpl = $templateDir . ($isBtc ? 'phoi_the_btc_mt.png' : 'phoi_the_ks_mt.png');
+        $backTpl  = $templateDir . ($isBtc ? 'phoi_the_btc_ms.png' : 'phoi_the_ks_ms.png');
+        $blankTpl = $templateDir . 'blank_image.png';
+
+        $front = self::loadPngCanvas($blankTpl);
+        $back  = self::loadPngCanvas($blankTpl);
+        if (!$front || !$back) {
+            return false;
+        }
+
+        // ---- Mặt trước: ảnh chân dung → phôi → text ----
+        $photo = self::fetchPortraitResource(
+            isset($row['avatar_url']) ? $row['avatar_url'] : '',
+            $layout['photo']['width'],
+            $layout['photo']['height']
+        );
+        if ($photo) {
+            imagecopy(
+                $front, $photo,
+                $layout['photo']['pos_x'], $layout['photo']['pos_y'],
+                0, 0,
+                $layout['photo']['width'], $layout['photo']['height']
+            );
+            imagedestroy($photo);
+        }
+        self::overlayPng($front, $frontTpl);
+
+        $fullName = isset($row['full_name']) ? mb_strtoupper(trim($row['full_name']), 'UTF-8') : '';
+        $position = '';
+        if (!empty($row['position_display'])) {
+            $position = $row['position_display'];
+        } elseif (!empty($row['position'])) {
+            $position = $row['position'];
+        }
+        $unit = '';
+        if (!empty($row['badge_org_name'])) {
+            $unit = $row['badge_org_name'];
+        } elseif (!empty($row['unit_label'])) {
+            $unit = $row['unit_label'];
+        }
+
+        self::drawText($front, $fullName, $layout['front']['name']);
+        self::drawText($front, $position, $layout['front']['position']);
+        self::drawText($front, $unit, $layout['front']['unit']);
+
+        // ---- Mặt sau: phôi → QR → text MT+lucky ----
+        self::overlayPng($back, $backTpl);
+
+        $lucky = isset($row['lucky_number']) ? trim((string) $row['lucky_number']) : '';
+        if ($lucky !== '') {
+            $qrUrl = rtrim($loginBaseUrl, '/') . '/portal/login?lucky=' . rawurlencode($lucky);
+            $qr    = self::makeQrResource($qrUrl, $layout['back']['qr']['size']);
+            if ($qr) {
+                imagecopy(
+                    $back, $qr,
+                    $layout['back']['qr']['pos_x'], $layout['back']['qr']['pos_y'],
+                    0, 0,
+                    imagesx($qr), imagesy($qr)
+                );
+                imagedestroy($qr);
+            }
+            self::drawText($back, 'MT' . $lucky, $layout['back']['lucky']);
+        }
+
+        // ---- Gộp cạnh nhau: trước | sau ----
+        $combined = self::combineSideBySide($front, $back);
+        imagedestroy($front);
+        imagedestroy($back);
+        if (!$combined) {
+            return false;
+        }
+
+        // Chia thư mục theo mã đơn vị
+        $propertyCode = isset($row['property_code']) && $row['property_code'] !== ''
+            ? self::cleanString($row['property_code'])
+            : 'khac';
+        $outDir = $baseFolder . 'final_badges/' . $propertyCode . '/';
+        if (!is_dir($outDir)) {
+            mkdir($outDir, 0755, true);
+        }
+
+        $idPart   = isset($row['id']) ? (int) $row['id'] : 0;
+        $namePart = self::cleanString(isset($row['full_name']) ? $row['full_name'] : 'nguoi');
+        $path     = $outDir . $namePart . '-' . $idPart . '.png';
+
+        imagepng($combined, $path);
+        imagedestroy($combined);
+
+        return is_file($path) ? $path : false;
+    }
+
+    /** Nạp một ảnh PNG thành canvas truecolor có alpha để chỉnh sửa. */
+    protected static function loadPngCanvas($path)
+    {
+        if (!is_file($path)) {
+            return false;
+        }
+        $src = @imagecreatefrompng($path);
+        if (!$src) {
+            return false;
+        }
+        $w = imagesx($src);
+        $h = imagesy($src);
+        $canvas = imagecreatetruecolor($w, $h);
+        imagealphablending($canvas, false);
+        imagesavealpha($canvas, true);
+        $white = imagecolorallocate($canvas, 255, 255, 255);
+        imagefilledrectangle($canvas, 0, 0, $w, $h, $white);
+        imagealphablending($canvas, true);
+        imagecopy($canvas, $src, 0, 0, 0, 0, $w, $h);
+        imagedestroy($src);
+        return $canvas;
+    }
+
+    /** Đè một ảnh phôi PNG (giữ alpha) lên canvas tại (0,0). */
+    protected static function overlayPng($canvas, $templatePath)
+    {
+        if (!is_file($templatePath)) {
+            return;
+        }
+        $overlay = @imagecreatefrompng($templatePath);
+        if (!$overlay) {
+            return;
+        }
+        imagealphablending($canvas, true);
+        imagecopy($canvas, $overlay, 0, 0, 0, 0, imagesx($overlay), imagesy($overlay));
+        imagedestroy($overlay);
+    }
+
+    /**
+     * Tải ảnh chân dung từ URL và cắt/thu về đúng kích thước (cover, giữ tỷ lệ, crop giữa).
+     * Trả về GD resource hoặc false.
+     */
+    protected static function fetchPortraitResource($url, $targetW, $targetH)
+    {
+        if (!$url) {
+            return false;
+        }
+        $bytes = @file_get_contents(urldecode($url));
+        if ($bytes === false || $bytes === '') {
+            return false;
+        }
+        $src = @imagecreatefromstring($bytes);
+        if (!$src) {
+            return false;
+        }
+
+        $srcW = imagesx($src);
+        $srcH = imagesy($src);
+        $scale = max($targetW / $srcW, $targetH / $srcH);
+        $cropW = (int) round($targetW / $scale);
+        $cropH = (int) round($targetH / $scale);
+        $srcX  = (int) round(($srcW - $cropW) / 2);
+        $srcY  = (int) round(($srcH - $cropH) / 2);
+
+        $dst = imagecreatetruecolor($targetW, $targetH);
+        imagecopyresampled($dst, $src, 0, 0, $srcX, $srcY, $targetW, $targetH, $cropW, $cropH);
+        imagedestroy($src);
+        return $dst;
+    }
+
+    /**
+     * Sinh QR code thành GD resource vuông kích thước $size.
+     * Dùng extension qrcode (protected/extensions/qrcode/QRCode.php).
+     */
+    protected static function makeQrResource($data, $size)
+    {
+        $classFile = Yii::getPathOfAlias('ext.qrcode.QRCode') . '.php';
+        if (!class_exists('QRCode', false) && is_file($classFile)) {
+            require_once($classFile);
+        }
+        if (!class_exists('QRCode', false)) {
+            return false;
+        }
+
+        $tmp = Yii::app()->basePath . '/../uploads/final_badges/_tmp_qr_' . substr(md5($data . microtime()), 0, 10) . '.png';
+        $dir = dirname($tmp);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        try {
+            $qr = new QRCode($data);
+            $qr->error_correct = 'M';
+            $qr->module_size   = 10;
+            $qr->image_type    = 'P';
+            $qr->create($tmp);
+        } catch (Exception $e) {
+            Yii::log('Lỗi sinh QR thẻ VCK: ' . $e->getMessage(), CLogger::LEVEL_ERROR);
+            return false;
+        }
+
+        if (!is_file($tmp)) {
+            return false;
+        }
+        $raw = @imagecreatefrompng($tmp);
+        @unlink($tmp);
+        if (!$raw) {
+            return false;
+        }
+
+        $dst = imagecreatetruecolor($size, $size);
+        $white = imagecolorallocate($dst, 255, 255, 255);
+        imagefilledrectangle($dst, 0, 0, $size, $size, $white);
+        imagecopyresampled($dst, $raw, 0, 0, 0, 0, $size, $size, imagesx($raw), imagesy($raw));
+        imagedestroy($raw);
+        return $dst;
+    }
+
+    /**
+     * Vẽ text TTF lên canvas theo cấu hình layout (hỗ trợ align L/C/R và màu hex).
+     * $cfg: pos_x, pos_y, font, size, align, color.
+     */
+    protected static function drawText($canvas, $text, $cfg)
+    {
+        $text = trim((string) $text);
+        if ($text === '') {
+            return;
+        }
+
+        $fontPath = self::badgeFontPath($cfg['font']);
+        if (!$fontPath) {
+            return;
+        }
+
+        $color = isset($cfg['color']) ? $cfg['color'] : '#000000';
+        $rgb   = self::hexToRgb($color);
+        $col   = imagecolorallocate($canvas, $rgb[0], $rgb[1], $rgb[2]);
+
+        $size  = $cfg['size'];
+        $align = isset($cfg['align']) ? $cfg['align'] : 'L';
+        $box   = imagettfbbox($size, 0, $fontPath, $text);
+        $textW = abs($box[2] - $box[0]);
+
+        $x = (int) $cfg['pos_x'];
+        if ($align === 'C') {
+            $x = (int) round((imagesx($canvas) - $textW) / 2);
+        } elseif ($align === 'R') {
+            $x = imagesx($canvas) - $textW - (int) $cfg['pos_x'];
+        }
+
+        // pos_y là toạ độ đỉnh chữ (giống imagemod); baseline = pos_y + chiều cao chữ.
+        $ascent = abs($box[7]);
+        $y = (int) $cfg['pos_y'] + $ascent;
+
+        imagettftext($canvas, $size, 0, $x, $y, $col, $fontPath, $text);
+    }
+
+    /** Đường dẫn file font, fallback về times.ttf nếu font chỉ định không tồn tại. */
+    protected static function badgeFontPath($font)
+    {
+        $path = Yii::app()->basePath . '/../fonts/' . $font . '.ttf';
+        if (is_file($path)) {
+            return $path;
+        }
+        $fallback = Yii::app()->basePath . '/data/fonts/times.ttf';
+        return is_file($fallback) ? $fallback : false;
+    }
+
+    /** '#RRGGBB' → array(r,g,b). */
+    protected static function hexToRgb($hex)
+    {
+        $hex = ltrim($hex, '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        return array(
+            hexdec(substr($hex, 0, 2)),
+            hexdec(substr($hex, 2, 2)),
+            hexdec(substr($hex, 4, 2)),
+        );
+    }
+
+    /** Ghép hai canvas cạnh nhau (trái | phải) thành một canvas mới. */
+    protected static function combineSideBySide($left, $right)
+    {
+        $lw = imagesx($left);
+        $lh = imagesy($left);
+        $rw = imagesx($right);
+        $rh = imagesy($right);
+
+        $w = $lw + $rw;
+        $h = max($lh, $rh);
+
+        $out = imagecreatetruecolor($w, $h);
+        $white = imagecolorallocate($out, 255, 255, 255);
+        imagefilledrectangle($out, 0, 0, $w, $h, $white);
+        imagecopy($out, $left, 0, 0, 0, 0, $lw, $lh);
+        imagecopy($out, $right, $lw, 0, 0, 0, $rw, $rh);
+        return $out;
+    }
+
     public static function downloadImage($name, $imageUrl, $folderPath)
     {
         $baseFolder = Yii::app()->basePath . '/../uploads/';
