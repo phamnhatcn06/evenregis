@@ -195,7 +195,8 @@ $countdownDeadlineDate = date('H:i d/m/Y', $countdownTarget);
      data-run-cancel-rejected="<?php echo $runRejectAt > 0 ? '1' : '0'; ?>"
      data-run-reject-reviewed-at="<?php echo $runRejectAt; ?>"
      data-tour-cancel-rejected="<?php echo $tourRejectAt > 0 ? '1' : '0'; ?>"
-     data-tour-reject-reviewed-at="<?php echo $tourRejectAt; ?>"></div>
+     data-tour-reject-reviewed-at="<?php echo $tourRejectAt; ?>"
+     data-profile-complete="<?php echo $profileComplete; ?>"></div>
 
 <!-- Hero Banner: Countdown thời gian đăng ký & Hướng dẫn -->
 <div class="run-countdown-banner">
