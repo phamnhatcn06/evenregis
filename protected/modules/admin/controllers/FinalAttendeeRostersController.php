@@ -169,6 +169,7 @@ class FinalAttendeeRostersController extends AdminController
             }
 
             $values = array(
+                $this->excelText($item, 'id'),
                 $this->excelText($item, 'lucky_number'),
                 $this->excelText($item, 'login_identifier'),
                 $this->excelText($item, 'full_name'),
