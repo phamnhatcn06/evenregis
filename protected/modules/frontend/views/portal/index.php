@@ -7,6 +7,11 @@ $this->pageTitle = 'Cổng Cá Nhân Đại Biểu';
 
 $logoutUrl = $this->createUrl('/frontend/portal/logout');
 
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/portal-profile.js',
+    CClientScript::POS_END
+);
+
 // Danh mục tính năng
 $features = array(
     array(
