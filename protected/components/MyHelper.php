@@ -1026,7 +1026,7 @@ class MyHelper
 
         // Chia thư mục theo mã đơn vị
         $propertyCode = isset($row['property_code']) && $row['property_code'] !== ''
-            ? self::cleanString($row['property_code'])
+            ? UrlTransliterate::cleanString($row['property_code'])
             : 'khac';
         $outDir = $baseFolder . 'final_badges/' . $propertyCode . '/';
         if (!is_dir($outDir)) {
