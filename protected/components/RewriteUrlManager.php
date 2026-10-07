@@ -11,7 +11,9 @@ class RewriteUrlManager extends CUrlManager
             // Cổng đăng ký hoạt động (Fun Run + Tham quan) — phải đứng TRƯỚC catch-all
             // '<controller>/<action>' bên dưới, nếu không 'run/<action>' sẽ bị nuốt.
             // Đặt ở đây (thay vì main.php) để deploy được qua file này khi main.php không track.
-            'run' => 'frontend/run/login',
+            'portal' => 'frontend/portal/login',
+            'portal/<action:\w+>' => 'frontend/portal/<action>',
+            'run' => 'frontend/run/index',
             'run/<action:\w+>' => 'frontend/run/<action>',
 
             // Admin module routes
