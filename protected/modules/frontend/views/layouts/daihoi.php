@@ -30,7 +30,7 @@ $dh = $base . '/public/daihoi';
   <script src="<?php echo $dh; ?>/daihoi-config.js"></script>
 
   <!-- Style tùy biến trang chủ -->
-  <link rel="stylesheet" href="<?php echo $dh; ?>/daihoi-home.css" />
+  <link rel="stylesheet" href="<?php echo $dh; ?>/daihoi-home.css?v=<?php echo @filemtime(Yii::getPathOfAlias('webroot') . '/public/daihoi/daihoi-home.css') ?: time(); ?>" />
 </head>
 <body class="min-vh-100 d-flex flex-column bg-slate-50 text-slate-900">
   <?php echo $content; ?>

@@ -248,21 +248,21 @@ if (empty($albumList)) {
   <!-- MAIN -->
   <main class="flex-grow-1">
 
-    <!-- SECTION 1: HERO SLIDER -->
-    <section class="container py-3 py-md-4">
-      <div class="row"><div class="col-12">
-        <div class="hero-slider-wrap position-relative w-100 rounded-4 overflow-hidden shadow-lg bg-dark">
-          <div class="w-100 h-100 position-relative overflow-hidden">
-            <?php foreach ($slideList as $si => $sld):
-                $th = $slideThemes[$sld['theme']];
-                $first = ($si === 0);
-            ?>
-            <div class="hero-slide position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end transition-opacity duration-700 <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>"<?php echo $sld['image'] ? '' : ' style="background:' . $e($th['bg']) . ';"'; ?>>
-              <?php if ($sld['image']): ?>
-                <img alt="<?php echo $e($sld['title']); ?>" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" src="<?php echo $e($sld['image']); ?>">
-              <?php endif; ?>
-              <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-              <div class="position-relative z-1 p-4 p-md-5 text-white" style="max-width:820px;">
+    <!-- SECTION 1: HERO SLIDER (FULL WIDTH) -->
+    <section class="hero-slider-section position-relative w-100 overflow-hidden">
+      <div class="hero-slider-wrap position-relative w-100 overflow-hidden bg-dark">
+        <div class="w-100 h-100 position-relative overflow-hidden">
+          <?php foreach ($slideList as $si => $sld):
+              $th = $slideThemes[$sld['theme']];
+              $first = ($si === 0);
+          ?>
+          <div class="hero-slide position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end transition-opacity duration-700 <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>"<?php echo $sld['image'] ? '' : ' style="background:' . $e($th['bg']) . ';"'; ?>>
+            <?php if ($sld['image']): ?>
+              <img alt="<?php echo $e($sld['title']); ?>" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" src="<?php echo $e($sld['image']); ?>">
+            <?php endif; ?>
+            <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+            <div class="container h-100 position-relative z-1 d-flex align-items-end pb-4 pb-md-5">
+              <div class="text-white py-2" style="max-width:850px;">
                 <?php if ($sld['subtitle'] !== ''): ?>
                 <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill bg-white/20 backdrop-blur-md border border-white/25 text-white fw-bold text-uppercase mb-2" style="font-size:11px;">
                   <span class="rounded-circle d-inline-block" style="width:8px;height:8px;background-color:<?php echo $e($th['dot']); ?>;"></span> <?php echo $e($sld['subtitle']); ?>
@@ -281,43 +281,45 @@ if (empty($albumList)) {
                 <?php endif; ?>
               </div>
             </div>
-            <?php endforeach; ?>
           </div>
-          <!-- Controls -->
-          <button aria-label="Trước" class="position-absolute top-50 start-0 translate-middle-y ms-2 ms-md-3 btn btn-dark btn-sm rounded-circle p-2 text-white bg-black/40 border border-white/20 backdrop-blur-sm z-2" id="slider-prev" type="button"><span class="material-symbols-outlined fs-5">arrow_back</span></button>
-          <button aria-label="Sau" class="position-absolute top-50 end-0 translate-middle-y me-2 me-md-3 btn btn-dark btn-sm rounded-circle p-2 text-white bg-black/40 border border-white/20 backdrop-blur-sm z-2" id="slider-next" type="button"><span class="material-symbols-outlined fs-5">arrow_forward</span></button>
-          <!-- Indicators -->
-          <div class="position-absolute bottom-0 end-0 m-3 m-md-4 d-flex align-items-center gap-2 bg-black/50 px-3 py-1 rounded-pill border border-white/20 backdrop-blur-md z-2">
-            <div class="d-flex align-items-center gap-1" id="slider-dots">
-              <?php for ($si = 0; $si < $slideCount; $si++): ?>
-              <button class="slider-dot rounded-pill border-0 transition" data-slide="<?php echo $si; ?>" style="height:6px;width:<?php echo $si === 0 ? '24px' : '8px'; ?>;background-color:<?php echo $si === 0 ? '#2dd4bf' : 'rgba(255,255,255,0.4)'; ?>;"></button>
-              <?php endfor; ?>
-            </div>
-            <span class="text-white-50 font-monospace small ps-1" id="slider-counter" style="font-size:11px;">01 / <?php echo str_pad($slideCount, 2, '0', STR_PAD_LEFT); ?></span>
-          </div>
+          <?php endforeach; ?>
         </div>
+        <!-- Controls -->
+        <button aria-label="Trước" class="position-absolute top-50 start-0 translate-middle-y ms-2 ms-md-4 btn btn-dark btn-sm rounded-circle p-2 text-white bg-black/40 border border-white/20 backdrop-blur-sm z-2" id="slider-prev" type="button"><span class="material-symbols-outlined fs-5">arrow_back</span></button>
+        <button aria-label="Sau" class="position-absolute top-50 end-0 translate-middle-y me-2 me-md-4 btn btn-dark btn-sm rounded-circle p-2 text-white bg-black/40 border border-white/20 backdrop-blur-sm z-2" id="slider-next" type="button"><span class="material-symbols-outlined fs-5">arrow_forward</span></button>
+        <!-- Indicators -->
+        <div class="position-absolute bottom-0 end-0 m-3 m-md-4 me-xl-5 mb-xl-4 d-flex align-items-center gap-2 bg-black/50 px-3 py-1 rounded-pill border border-white/20 backdrop-blur-md z-2">
+          <div class="d-flex align-items-center gap-1" id="slider-dots">
+            <?php for ($si = 0; $si < $slideCount; $si++): ?>
+            <button class="slider-dot rounded-pill border-0 transition" data-slide="<?php echo $si; ?>" style="height:6px;width:<?php echo $si === 0 ? '24px' : '8px'; ?>;background-color:<?php echo $si === 0 ? '#2dd4bf' : 'rgba(255,255,255,0.4)'; ?>;"></button>
+            <?php endfor; ?>
+          </div>
+          <span class="text-white-50 font-monospace small ps-1" id="slider-counter" style="font-size:11px;">01 / <?php echo str_pad($slideCount, 2, '0', STR_PAD_LEFT); ?></span>
+        </div>
+      </div>
+    </section>
 
-        <!-- Ticker -->
-        <div class="card mt-3 border rounded-3 shadow-sm bg-white p-2 p-md-3">
-          <div class="row align-items-center g-2">
-            <div class="col-12 d-flex align-items-center gap-2">
-              <span class="badge bg-primary-subtle text-primary border border-primary-subtle text-uppercase px-2 py-1 fw-bold" style="font-size:11px;">
-                <span class="spinner-grow spinner-grow-sm text-primary me-1" style="width:8px;height:8px;"></span> Cập nhật
-              </span>
-              <p class="mb-0 text-secondary text-truncate" style="font-size:13.5px;">
-                <?php if (!empty($matches)):
-                    $m0 = $matches[0]; ?>
-                  <strong class="text-dark"><?php echo $e($val($m0, array('sport_name', 'category'), 'Thi đấu')); ?>:</strong>
-                  <?php echo $e($val($m0, array('home_name', 'home', 'team_a'), '')); ?> vs <?php echo $e($val($m0, array('away_name', 'away', 'team_b'), '')); ?>
-                  <?php $v = $val($m0, array('venue', 'location'), ''); echo $v ? ' • ' . $e($v) : ''; ?>
-                <?php else: ?>
-                  <strong class="text-dark">Đại hội Mường Thanh <?php echo $e($eventYear); ?></strong> • Theo dõi lịch thi đấu và kết quả cập nhật liên tục.
-                <?php endif; ?>
-              </p>
-            </div>
+    <!-- TICKER -->
+    <section class="container pt-3 pt-md-4 pb-1">
+      <div class="card border rounded-3 shadow-sm bg-white p-2 p-md-3">
+        <div class="row align-items-center g-2">
+          <div class="col-12 d-flex align-items-center gap-2">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle text-uppercase px-2 py-1 fw-bold" style="font-size:11px;">
+              <span class="spinner-grow spinner-grow-sm text-primary me-1" style="width:8px;height:8px;"></span> Cập nhật
+            </span>
+            <p class="mb-0 text-secondary text-truncate" style="font-size:13.5px;">
+              <?php if (!empty($matches)):
+                  $m0 = $matches[0]; ?>
+                <strong class="text-dark"><?php echo $e($val($m0, array('sport_name', 'category'), 'Thi đấu')); ?>:</strong>
+                <?php echo $e($val($m0, array('home_name', 'home', 'team_a'), '')); ?> vs <?php echo $e($val($m0, array('away_name', 'away', 'team_b'), '')); ?>
+                <?php $v = $val($m0, array('venue', 'location'), ''); echo $v ? ' • ' . $e($v) : ''; ?>
+              <?php else: ?>
+                <strong class="text-dark">Đại hội Mường Thanh <?php echo $e($eventYear); ?></strong> • Theo dõi lịch thi đấu và kết quả cập nhật liên tục.
+              <?php endif; ?>
+            </p>
           </div>
         </div>
-      </div></div>
+      </div>
     </section>
 
     <!-- SECTION 1B: CTA ĐĂNG KÝ HOẠT ĐỘNG (Giải chạy + Tham quan) -->

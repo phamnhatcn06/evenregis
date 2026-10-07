@@ -35,16 +35,22 @@ body {
 
 /* Chiều cao hero slider theo breakpoint (responsive) */
 .hero-slider-wrap {
-  height: 340px;
+  height: 380px;
 }
 @media (min-width: 576px) {
-  .hero-slider-wrap { height: 400px; }
+  .hero-slider-wrap { height: 450px; }
 }
-@media (min-width: 992px) {
+@media (min-width: 768px) {
   .hero-slider-wrap { height: 500px; }
 }
+@media (min-width: 992px) {
+  .hero-slider-wrap { height: 560px; }
+}
 @media (min-width: 1200px) {
-  .hero-slider-wrap { height: 540px; }
+  .hero-slider-wrap { height: 620px; }
+}
+@media (min-width: 1400px) {
+  .hero-slider-wrap { height: 640px; }
 }
 
 /* Hiệu ứng hover card */
