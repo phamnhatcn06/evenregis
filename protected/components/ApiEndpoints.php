@@ -648,6 +648,7 @@ class ApiEndpoints
     const TOUR_REGISTRATION_CANCEL_APPROVE = '/api/tour-registrations/cancel/approve/{id}';
     const TOUR_REGISTRATION_CANCEL_REJECT = '/api/tour-registrations/cancel/reject/{id}';
 
+    const RUN_AUTH_LIST_UNITS = '/api/run-auth/list-units';
     const RUN_AUTH_IDENTIFY = '/api/run-auth/identify';
     const RUN_AUTH_IDENTIFY_BY_QR = '/api/run-auth/identify-by-qr';
     const RUN_AUTH_SET_PIN = '/api/run-auth/set-pin';
