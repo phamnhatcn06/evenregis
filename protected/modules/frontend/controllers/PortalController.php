@@ -25,17 +25,21 @@ class PortalController extends AttendeePortalController
         $step = 'identify';
         $identifier = '';
         $fullName = '';
+        $propertyId = '';
 
         if (Yii::app()->request->isPostRequest) {
             $formStep = isset($_POST['step']) ? $_POST['step'] : 'identify';
             $identifier = trim(isset($_POST['identifier']) ? $_POST['identifier'] : '');
+            $propertyId = trim(isset($_POST['property_id']) ? $_POST['property_id'] : '');
 
             if ($formStep === 'identify' || $formStep === 'qr') {
                 if ($formStep === 'qr') {
+                    // Quét QR thẻ vật lý đã chứng minh danh tính nên không cần chọn đơn vị.
                     $qrValue = trim(isset($_POST['qr_value']) ? $_POST['qr_value'] : '');
+                    $propertyId = '';
                     $res = RunAuth::identifyByQr($qrValue);
                 } else {
-                    $res = RunAuth::identify($identifier);
+                    $res = RunAuth::identify($identifier, $propertyId);
                 }
                 if ($res['success'] && isset($res['data']['data'])) {
                     $data = $res['data']['data'];
