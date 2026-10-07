@@ -62,7 +62,7 @@ class RunController extends AttendeePortalController
             Yii::app()->end();
         }
 
-        $attendeeId = $this->session()['run_attendee_id'];
+        $attendeeId = $this->currentAttendeeId();
         $runEventId = isset($_POST['run_event_id']) ? (int) $_POST['run_event_id'] : 0;
 
         $res = RunRegistrations::claimViaApi($runEventId, $attendeeId);
@@ -97,7 +97,7 @@ class RunController extends AttendeePortalController
             Yii::app()->end();
         }
 
-        $attendeeId = $this->session()['run_attendee_id'];
+        $attendeeId = $this->currentAttendeeId();
         $reason = trim(isset($_POST['reason']) ? $_POST['reason'] : '');
         if ($reason === '') {
             echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng nhập lý do hủy.'));
@@ -129,7 +129,7 @@ class RunController extends AttendeePortalController
             Yii::app()->end();
         }
 
-        $attendeeId = $this->session()['run_attendee_id'];
+        $attendeeId = $this->currentAttendeeId();
         $tourSessionId = isset($_POST['tour_session_id']) ? (int) $_POST['tour_session_id'] : 0;
 
         $res = TourRegistrations::claimViaApi($tourSessionId, $attendeeId);
@@ -162,7 +162,7 @@ class RunController extends AttendeePortalController
             Yii::app()->end();
         }
 
-        $attendeeId = $this->session()['run_attendee_id'];
+        $attendeeId = $this->currentAttendeeId();
         $reason = trim(isset($_POST['reason']) ? $_POST['reason'] : '');
         if ($reason === '') {
             echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng nhập lý do hủy.'));
@@ -178,12 +178,5 @@ class RunController extends AttendeePortalController
                 : ($res['error'] ?: 'Không gửi được yêu cầu hủy.'),
         ));
         Yii::app()->end();
-    }
-
-    public function actionLogout()
-    {
-        $s = $this->session();
-        unset($s['run_attendee_id'], $s['run_full_name'], $s['run_event_id']);
-        $this->redirect(array('login'));
     }
 }
