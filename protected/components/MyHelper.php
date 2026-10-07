@@ -1359,7 +1359,7 @@ class MyHelper
         }
     }
 
-    public static function resizeImage($imageGeneral, $size = array(), $des, $name, $rotate = false, $crop = false, $autoheight = false)
+    public static function resizeImage($imageGeneral, $size, $des, $name, $rotate = false, $crop = false, $autoheight = false)
     {
         $baseFolder = Yii::app()->basePath . '/../uploads/';
         $folder = $baseFolder . $des . '/';
