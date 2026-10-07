@@ -1518,10 +1518,10 @@
                 return;
             }
 
-            // Chuẩn hoá sơ bộ để check (nếu số 1-3 chữ số)
+            // Chuẩn hoá sơ bộ để check (nếu số 1-4 chữ số)
             var checkVal = val;
-            if (/^\d{1,3}$/.test(val) && parseInt(val, 10) > 0) {
-                checkVal = ('000' + parseInt(val, 10)).slice(-3);
+            if (/^\d{1,4}$/.test(val) && parseInt(val, 10) > 0) {
+                checkVal = ('0000' + parseInt(val, 10)).slice(-4);
             }
 
             var currentVal = (currentValInput.value || '').trim();
