@@ -1399,7 +1399,7 @@ class MyHelper
     }
 
     public
-    static function insertTextPNG($imageGeneral, $text, $position = array(), $des, $name, $isModify, $color = '#000000')
+    static function insertTextPNG($imageGeneral, $text, $position, $des, $name, $isModify, $color = '#000000')
     {
         $baseFolder = Yii::app()->basePath . '/../uploads/';
         $folder = $baseFolder . $des . '/';
