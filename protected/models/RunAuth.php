@@ -52,7 +52,10 @@ class RunAuth extends CFormModel
         return ApiClient::post(ApiEndpoints::RUN_AUTH_GEN_LUCKY, array('event_id' => $eventId));
     }
 
-    /** Ngày sinh + giới tính (từ final_attendee_rosters) của người đang đăng nhập, hoặc null. */
+    /**
+     * Hồ sơ người đang đăng nhập (từ final_attendee_rosters), hoặc null:
+     * full_name, position, unit_name, birth_year, gender (0=Nữ, 1=Nam), is_complete.
+     */
     public static function getProfile($attendeeId)
     {
         $result = ApiClient::get(ApiEndpoints::RUN_AUTH_PROFILE, array('attendee_id' => $attendeeId));
