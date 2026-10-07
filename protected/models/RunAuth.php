@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Xác thực cổng chạy (định danh DHMT + lucky + PIN). Carrier gọi External API.
+ * Xác thực cổng chạy (định danh MT + lucky + PIN). Carrier gọi External API.
  * Mỗi hàm trả mảng chuẩn ApiClient (success/code/data/error) để controller xử lý.
  */
 class RunAuth extends CFormModel
