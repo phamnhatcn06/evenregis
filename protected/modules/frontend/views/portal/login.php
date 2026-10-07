@@ -59,7 +59,7 @@ if ($step === 'identify') {
                                    placeholder="VD: MT0088" value="<?php echo CHtml::encode($identifier); ?>"
                                    style="letter-spacing: 0.05em;" autofocus required>
                             <div class="form-text text-muted small mt-1">
-                                Nhập mã định danh được Ban tổ chức cung cấp (bắt đầu bằng DHMT).
+                                Nhập mã định danh được Ban tổ chức cung cấp (bắt đầu bằng MT).
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold rounded-3 shadow-sm">
