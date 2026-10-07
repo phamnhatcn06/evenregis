@@ -16,6 +16,10 @@ Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/pages/run-portal.js',
     CClientScript::POS_END
 );
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/portal-profile.js',
+    CClientScript::POS_END
+);
 
 $registerRunUrl = $this->createUrl('/frontend/run/register');
 $registerTourUrl = $this->createUrl('/frontend/run/registerTour');
