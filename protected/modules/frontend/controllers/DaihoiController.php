@@ -94,6 +94,86 @@ class DaihoiController extends FrontEndController
         ));
     }
 
+    /**
+     * Chương trình Khai mạc Đại hội, thi Miss và Văn nghệ (Tiệc Welcome).
+     */
+    public function actionTiecWelcome()
+    {
+        $this->frontTitle = 'Khai mạc, thi Miss & Văn nghệ';
+        $this->render('program', array(
+            'event' => Daihoi::getEvent(),
+            'agenda' => Daihoi::getAgenda(),
+            'active' => 'welcome',
+            'config' => array(
+                'eyebrow' => 'Lễ khai mạc Đại hội',
+                'title' => 'Khai mạc, thi Miss & Văn nghệ',
+                'subtitle' => 'Chương trình Lễ khai mạc Đại hội, Chung kết thi Miss và đêm Văn nghệ chào mừng.',
+                'icon' => 'celebration',
+                'accent' => '#7c3aed',
+                'info' => array(
+                    array('icon' => 'event', 'label' => 'Sự kiện', 'value' => 'Tiệc Welcome - Khai mạc'),
+                    array('icon' => 'schedule', 'label' => 'Thời gian', 'value' => '17:30 - 20:00, ngày 27/10/2026'),
+                    array('icon' => 'location_on', 'label' => 'Địa điểm', 'value' => 'Hội trường tầng 2'),
+                ),
+                'keywords' => array('khai mạc', 'miss', 'văn nghệ', 'welcome', 'ceremony', 'gala'),
+                'emptyText' => 'Chương trình chi tiết sẽ được Ban Tổ chức cập nhật.',
+            ),
+        ));
+    }
+
+    /**
+     * Lịch tham quan và Tour Itinerary.
+     */
+    public function actionLichThamQuan()
+    {
+        $this->frontTitle = 'Lịch tham quan & Tour';
+        $this->render('program', array(
+            'event' => Daihoi::getEvent(),
+            'agenda' => Daihoi::getAgenda(),
+            'active' => 'tour',
+            'config' => array(
+                'eyebrow' => 'Trải nghiệm Đại hội',
+                'title' => 'Lịch tham quan & Tour',
+                'subtitle' => 'Hành trình tham quan và lịch trình tour dành cho Quý Đại biểu trong khuôn khổ Đại hội.',
+                'icon' => 'tour',
+                'accent' => '#0d9488',
+                'info' => array(
+                    array('icon' => 'event', 'label' => 'Hoạt động', 'value' => 'Tham quan & Tour Itinerary'),
+                    array('icon' => 'place', 'label' => 'Điểm đến', 'value' => 'Theo thông báo của Ban Tổ chức'),
+                ),
+                'keywords' => array('tham quan', 'tour', 'itinerary', 'di chuyển', 'trải nghiệm'),
+                'emptyText' => 'Lịch tham quan chi tiết sẽ được Ban Tổ chức cập nhật.',
+            ),
+        ));
+    }
+
+    /**
+     * Chương trình Bế mạc Đại hội (Tiệc Gala).
+     */
+    public function actionTiecGala()
+    {
+        $this->frontTitle = 'Bế mạc Đại hội - Tiệc Gala';
+        $this->render('program', array(
+            'event' => Daihoi::getEvent(),
+            'agenda' => Daihoi::getAgenda(),
+            'active' => 'gala',
+            'config' => array(
+                'eyebrow' => 'Lễ bế mạc Đại hội',
+                'title' => 'Bế mạc Đại hội - Tiệc Gala',
+                'subtitle' => 'Chương trình Lễ bế mạc và đêm Tiệc Gala tổng kết Đại hội.',
+                'icon' => 'nightlife',
+                'accent' => '#be123c',
+                'info' => array(
+                    array('icon' => 'event', 'label' => 'Sự kiện', 'value' => 'Tiệc Gala - Bế mạc'),
+                    array('icon' => 'schedule', 'label' => 'Thời gian', 'value' => '17:30 - 20:00, ngày 29/10/2026'),
+                    array('icon' => 'location_on', 'label' => 'Địa điểm', 'value' => 'Hội trường tầng 2'),
+                ),
+                'keywords' => array('bế mạc', 'gala', 'tổng kết', 'closing'),
+                'emptyText' => 'Chương trình chi tiết sẽ được Ban Tổ chức cập nhật.',
+            ),
+        ));
+    }
+
     public function actionJsonLive()
     {
         $this->renderJson(Daihoi::getLiveMatches());
