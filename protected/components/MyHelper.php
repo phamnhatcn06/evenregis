@@ -1013,9 +1013,10 @@ class MyHelper
             $unit = $row['unit_label'];
         }
 
-        self::drawText($front, $fullName, $layout['front']['name']);
-        self::drawText($front, $position, $layout['front']['position']);
-        self::drawText($front, $unit, $layout['front']['unit']);
+        $frontCfg = $isBtc ? $layout['front']['btc'] : $layout['front']['default'];
+        self::drawText($front, $fullName, $frontCfg['name']);
+        self::drawText($front, $position, $frontCfg['position']);
+        self::drawText($front, $unit, $frontCfg['unit']);
 
         // ---- Mặt sau: phôi → QR → text MT+lucky ----
         self::overlayPng($back, $backTpl);
