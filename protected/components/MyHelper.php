@@ -965,8 +965,8 @@ class MyHelper
                     'lucky' => array('pos_x' => 0, 'pos_y' => 1298, 'font' => 'fontchucdanh', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
                 ),
                 'default' => array(
-                    // Phôi KS nền trắng → QR nền xám nhạt để không trùng màu với khung thẻ.
-                    'qr'    => array('pos_x' => 381, 'pos_y' => 937, 'size' => 300, 'bg' => '#E6E6E6'),
+                    // Phôi KS nền trắng → QR nền trắng để hoà vào nền phôi.
+                    'qr'    => array('pos_x' => 381, 'pos_y' => 937, 'size' => 300, 'bg' => '#FFFFFF'),
                     'lucky' => array('pos_x' => 0, 'pos_y' => 1298, 'font' => 'fontchucdanh', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
                 ),
             ),
