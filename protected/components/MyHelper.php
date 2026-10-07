@@ -929,10 +929,15 @@ class MyHelper
         // Thuộc tính dùng chung (font, cỡ chữ, canh giữa) cho cả hai loại phôi.
         $name     = array('pos_x' => 0, 'font' => 'fontten',      'size' => 69, 'align' => 'C');
         $position = array('pos_x' => 0, 'font' => 'fontchucdanh', 'size' => 19, 'align' => 'C');
-        $unit     = array('pos_x' => 0, 'font' => 'fontdonvi',    'size' => 21, 'align' => 'C');
+        $unit     = array('pos_x' => 0, 'font' => 'fontdonvi',    'size' => 18, 'align' => 'C');
 
         return array(
-            'photo' => array('pos_x' => 240, 'pos_y' => 390, 'width' => 582, 'height' => 582),
+            // Ảnh chân dung vừa đúng ô tròn trong suốt của phôi (đo từ alpha), overscan 4px cho kín viền.
+            // BTC: tròn 415 tâm (531,666). KS: tròn 397 tâm (531,659).
+            'photo' => array(
+                'btc'     => array('pos_x' => 319, 'pos_y' => 454, 'width' => 423, 'height' => 423),
+                'default' => array('pos_x' => 329, 'pos_y' => 455, 'width' => 405, 'height' => 405),
+            ),
 
             // Mặt trước: vị trí dòng (pos_y) + màu chữ khác nhau theo loại phôi.
             'front' => array(
