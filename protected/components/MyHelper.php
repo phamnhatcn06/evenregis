@@ -263,35 +263,275 @@ class MyHelper
     public static function removeVietnameseAccents($str)
     {
         $accents = array(
-            'à', 'á', 'ạ', 'ả', 'ã', 'â', 'ầ', 'ấ', 'ậ', 'ẩ', 'ẫ', 'ă', 'ằ', 'ắ', 'ặ', 'ẳ', 'ẵ',
-            'è', 'é', 'ẹ', 'ẻ', 'ẽ', 'ê', 'ề', 'ế', 'ệ', 'ể', 'ễ',
-            'ì', 'í', 'ị', 'ỉ', 'ĩ',
-            'ò', 'ó', 'ọ', 'ỏ', 'õ', 'ô', 'ồ', 'ố', 'ộ', 'ổ', 'ỗ', 'ơ', 'ờ', 'ớ', 'ợ', 'ở', 'ỡ',
-            'ù', 'ú', 'ụ', 'ủ', 'ũ', 'ư', 'ừ', 'ứ', 'ự', 'ử', 'ữ',
-            'ỳ', 'ý', 'ỵ', 'ỷ', 'ỹ',
+            'à',
+            'á',
+            'ạ',
+            'ả',
+            'ã',
+            'â',
+            'ầ',
+            'ấ',
+            'ậ',
+            'ẩ',
+            'ẫ',
+            'ă',
+            'ằ',
+            'ắ',
+            'ặ',
+            'ẳ',
+            'ẵ',
+            'è',
+            'é',
+            'ẹ',
+            'ẻ',
+            'ẽ',
+            'ê',
+            'ề',
+            'ế',
+            'ệ',
+            'ể',
+            'ễ',
+            'ì',
+            'í',
+            'ị',
+            'ỉ',
+            'ĩ',
+            'ò',
+            'ó',
+            'ọ',
+            'ỏ',
+            'õ',
+            'ô',
+            'ồ',
+            'ố',
+            'ộ',
+            'ổ',
+            'ỗ',
+            'ơ',
+            'ờ',
+            'ớ',
+            'ợ',
+            'ở',
+            'ỡ',
+            'ù',
+            'ú',
+            'ụ',
+            'ủ',
+            'ũ',
+            'ư',
+            'ừ',
+            'ứ',
+            'ự',
+            'ử',
+            'ữ',
+            'ỳ',
+            'ý',
+            'ỵ',
+            'ỷ',
+            'ỹ',
             'đ',
-            'À', 'Á', 'Ạ', 'Ả', 'Ã', 'Â', 'Ầ', 'Ấ', 'Ậ', 'Ẩ', 'Ẫ', 'Ă', 'Ằ', 'Ắ', 'Ặ', 'Ẳ', 'Ẵ',
-            'È', 'É', 'Ẹ', 'Ẻ', 'Ẽ', 'Ê', 'Ề', 'Ế', 'Ệ', 'Ể', 'Ễ',
-            'Ì', 'Í', 'Ị', 'Ỉ', 'Ĩ',
-            'Ò', 'Ó', 'Ọ', 'Ỏ', 'Õ', 'Ô', 'Ồ', 'Ố', 'Ộ', 'Ổ', 'Ỗ', 'Ơ', 'Ờ', 'Ớ', 'Ợ', 'Ở', 'Ỡ',
-            'Ù', 'Ú', 'Ụ', 'Ủ', 'Ũ', 'Ư', 'Ừ', 'Ứ', 'Ự', 'Ử', 'Ữ',
-            'Ỳ', 'Ý', 'Ỵ', 'Ỷ', 'Ỹ',
+            'À',
+            'Á',
+            'Ạ',
+            'Ả',
+            'Ã',
+            'Â',
+            'Ầ',
+            'Ấ',
+            'Ậ',
+            'Ẩ',
+            'Ẫ',
+            'Ă',
+            'Ằ',
+            'Ắ',
+            'Ặ',
+            'Ẳ',
+            'Ẵ',
+            'È',
+            'É',
+            'Ẹ',
+            'Ẻ',
+            'Ẽ',
+            'Ê',
+            'Ề',
+            'Ế',
+            'Ệ',
+            'Ể',
+            'Ễ',
+            'Ì',
+            'Í',
+            'Ị',
+            'Ỉ',
+            'Ĩ',
+            'Ò',
+            'Ó',
+            'Ọ',
+            'Ỏ',
+            'Õ',
+            'Ô',
+            'Ồ',
+            'Ố',
+            'Ộ',
+            'Ổ',
+            'Ỗ',
+            'Ơ',
+            'Ờ',
+            'Ớ',
+            'Ợ',
+            'Ở',
+            'Ỡ',
+            'Ù',
+            'Ú',
+            'Ụ',
+            'Ủ',
+            'Ũ',
+            'Ư',
+            'Ừ',
+            'Ứ',
+            'Ự',
+            'Ử',
+            'Ữ',
+            'Ỳ',
+            'Ý',
+            'Ỵ',
+            'Ỷ',
+            'Ỹ',
             'Đ',
         );
         $noAccents = array(
-            'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
-            'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e',
-            'i', 'i', 'i', 'i', 'i',
-            'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o',
-            'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u',
-            'y', 'y', 'y', 'y', 'y',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'a',
+            'e',
+            'e',
+            'e',
+            'e',
+            'e',
+            'e',
+            'e',
+            'e',
+            'e',
+            'e',
+            'e',
+            'i',
+            'i',
+            'i',
+            'i',
+            'i',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'u',
+            'u',
+            'u',
+            'u',
+            'u',
+            'u',
+            'u',
+            'u',
+            'u',
+            'u',
+            'u',
+            'y',
+            'y',
+            'y',
+            'y',
+            'y',
             'd',
-            'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A',
-            'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E',
-            'I', 'I', 'I', 'I', 'I',
-            'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O',
-            'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U',
-            'Y', 'Y', 'Y', 'Y', 'Y',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'A',
+            'E',
+            'E',
+            'E',
+            'E',
+            'E',
+            'E',
+            'E',
+            'E',
+            'E',
+            'E',
+            'E',
+            'I',
+            'I',
+            'I',
+            'I',
+            'I',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'O',
+            'U',
+            'U',
+            'U',
+            'U',
+            'U',
+            'U',
+            'U',
+            'U',
+            'U',
+            'U',
+            'U',
+            'Y',
+            'Y',
+            'Y',
+            'Y',
+            'Y',
             'D',
         );
         return str_replace($accents, $noAccents, $str);
@@ -355,6 +595,590 @@ class MyHelper
             throw new Exception("SMTP error: " . $e->getMessage());
         } catch (Swift_RfcComplianceException $e) {
             throw new Exception("Email format error: " . $e->getMessage());
+        }
+    }
+
+    public static function RoundImage($path, $name, $size = array())
+    {
+        $filename = $path;
+        $image_s = imagecreatefromstring(file_get_contents($filename));
+        $width = imagesx($image_s);
+        $height = imagesy($image_s);
+        $newwidth = $size['width'];
+        $newheight = $size['height'];
+        $image = imagecreatetruecolor($newwidth, $newheight);
+        imagealphablending($image, true);
+        imagecopyresampled($image, $image_s, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+        //create masking
+        $mask = imagecreatetruecolor($newwidth, $newheight);
+        $transparent = imagecolorallocate($mask, 255, 0, 0);
+        imagecolortransparent($mask, $transparent);
+        imagefilledellipse($mask, $newwidth / 2, $newheight / 2, $newwidth, $newheight, $transparent);
+        $red = imagecolorallocate($mask, 0, 0, 0);
+        imagecopymerge($image, $mask, 0, 0, 0, 0, $newwidth, $newheight, 100);
+        imagecolortransparent($image, $red);
+        imagefill($image, 0, 0, $red);
+        //output, save and free memory
+        //header('Content-type: image/png');
+        //imagepng($image);
+        $baseFolder = Yii::app()->basePath . '/../uploads/nhan-vien/';
+        if (!is_dir($baseFolder)) {
+            mkdir($baseFolder);
+        }
+        $newName = self::cleanString($name) . '-' . substr(md5(self::RandomString()), 28, 5);
+        $des = $baseFolder . $newName . '.png';
+        imagepng($image, $des);
+        imagedestroy($image);
+        imagedestroy($mask);
+        return  $des;
+    }
+
+    public static function ImageVDBundle($hotel_id, $hotel, $eventSlug, $imageUrl, $name, $txtJob, $jobTit, $barcode_code, $isBTC = false, $id = 0, $data = [])
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        //            Create First Image
+        $imageModify = MyHelper::createFirstPicPNG($baseFolder . 'phoianh/blank_image_vd.png', $name, $eventSlug, $hotel_id);
+
+        // //            Insert Image To B1.
+        // $imageToInsert = MyHelper::downloadImage($name, $imageUrl, 'nhan-vien');
+        // //                Resize image:
+        // $imageInsert = MyHelper::resizeImage($imageToInsert, array('width' => 582, 'height' => 582), 'nhan-vien', $name, false, false, true);
+
+        // // @unlink($imageToInsert);
+        // // $roundImage = MyHelper::RoundImage($imageInsert, $name, array('width' => 540, 'height' => 540));
+        // // @unlink($imageInsert);
+        // $pos_y = 0;
+        // if ($hotel_id == '9999'  || $isBTC == true) {
+        //     $pos_y = 386;
+        // } else {
+        //     $pos_y = 395;
+        // }
+        // $imageModify = MyHelper::insertImage($firstImage,  $imageInsert, array('pos_x' => 240, 'pos_y' => $pos_y), $eventSlug .
+        //     '/hotel_' . $hotel_id, $name);
+        // @unlink($imageInsert);
+
+        if ($hotel_id == '9999' || $isBTC == true) {
+            $backgroundImage = $baseFolder . 'phoianh/phoi_vd.png';
+        } else {
+            $backgroundImage  = $baseFolder . 'phoianh/phoi_the_ks.png';
+        }
+
+
+        $pos_y = 0;
+        if ($hotel_id == '9999') {
+            $pos_y = 462;
+        } else {
+            $pos_y = 454;
+        }
+        $imageModify = MyHelper::insertImagePNG($imageModify, $backgroundImage, array('pos_x' => 0, 'pos_y' => 0), $eventSlug .
+            '/hotel_' . $hotel_id, $name);
+        // @unlink($imageInsert);
+        // Name
+        $pos_y = 0;
+        if (isset($data->Gender) && $data->Gender == true) {
+            $sign = 'ÔNG:';
+        } else {
+            $sign = 'BÀ:';
+        }
+        $name = mb_strtoupper($name);
+        $txtInsert =  $sign . ' ' . mb_strtoupper($name);
+        $pos_y = 575;
+        $imageModify = MyHelper::insertTextPNG($imageModify, $txtInsert, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 30, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+
+        // Hotel
+        $pos_y = 0;
+        $txt = $jobTit . ' ';
+        $txt = str_replace('  ', ' ', $txt);
+        $arrText = explode('\n', $txt);
+        $i = 0;
+        foreach ($arrText as $txtHotel) {
+            if ($i == 0) {
+                $pos_y = 634;
+            } else {
+                $pos_y += 50;
+            }
+            $imageModify = MyHelper::insertTextPNG($imageModify, $txtHotel, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 27, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+            $i++;
+        }
+        // Count Year
+        $pos_y = 0;
+        $txt =  'Đã có ' . $barcode_code . ' năm đồng hành và phát triển \n cùng tập đoàn Mường Thanh';
+        //
+        // $txt = str_replace('Ẩ', 'ẩ', $txt);
+        $arrText = explode('\n', $txt);
+        $j = 0;
+        foreach ($arrText as $txt) {
+            $txt = mb_strtoupper($txt);
+            if ($j == 0) {
+                $pos_y = 740;
+            } else {
+                $pos_y += 40;
+            }
+            $imageModify = MyHelper::insertTextPNG($imageModify, $txt, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-medium', 'font-size' => 22, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+            $j++;
+        }
+        // $imageModify = MyHelper::insertText($imageModify, $txt, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-medium', 'font-size' => 24, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+
+        // $pos_y = 0;
+        // if ($hotel_id == '9999' || $isBTC == 1) {
+        //     $text = 'HTXV ' . $barcode_code;
+        //     $pos_y = 1123;
+        //     $imageModify = MyHelper::insertText($imageModify, $text, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 42, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, true);
+        // } else {
+        //     $text = 'HTXV ' . $barcode_code;
+        //     $pos_y = 1042;
+        //     $imageModify = MyHelper::insertText($imageModify, $text, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 50, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, true);
+        // }
+
+
+
+
+        //            ## Insert job title:
+        // $pos_y = 0;
+        // if ($hotel_id == '9999') {
+        //     $pos_y = 1090;
+        // } else {
+        //     $pos_y = 1090;
+        // }
+        // $imageModify = MyHelper::insertText($imageModify, $jobTit, array('pos_x' => 400, 'pos_y' => $pos_y, 'font' => 'lato-medium', 'font-size' => 30), $eventSlug . '/hotel_' . $hotel_id, $name, true);
+        //                ## Insert Hotel:
+
+
+
+        $imageModify = MyHelper::resizeImage($imageModify, array('width' => 887, 'height' => 1182), $eventSlug .
+            '/hotel_' . $hotel_id, $name, false, false, true);
+        //                Resolution:
+        // /$imageModify = MyHelper::resolutionImage($imageModify, array('width' => 300, 'height' => 300), $eventSlug . '/hotel_' . $hotel_id, $name);
+    }
+
+
+    public static function ImageVDGBBundle($hotel_id, $hotel, $eventSlug, $imageUrl, $name, $txtJob, $jobTit, $barcode_code, $isBTC = false, $id = 0)
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        //            Create First Image
+        $imageModify = MyHelper::createFirstPicPNG($baseFolder . 'phoianh/blank_vd_gan_bo.png', $name, $eventSlug, $hotel_id);
+        $backgroundImage = $baseFolder . 'phoianh/vinh_danh_gan_bo.png';
+        $pos_y = 0;
+        if ($hotel_id == '9999') {
+            $pos_y = 462;
+        } else {
+            $pos_y = 454;
+        }
+        $imageModify = MyHelper::insertImagePNG($imageModify, $backgroundImage, array('pos_x' => 0, 'pos_y' => 0), $eventSlug .
+            '/hotel_' . $hotel_id, $name);
+        // @unlink($imageInsert);
+        // Name
+        $pos_y = 0;
+        // $name = mb_strtoupper($name);
+        $txtInsert =  $name;
+        $pos_y = 1518;
+        $imageModify = MyHelper::insertTextPNG($imageModify, $txtInsert, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'UVNThuTu_0', 'font-size' => 160, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false, '#b07909');
+
+        // Hotel
+        $pos_y = 0;
+        $txt = $jobTit . ' ';
+        $txt = str_replace('  ', ' ', $txt);
+        $arrText = explode('\n', $txt);
+        $i = 0;
+        foreach ($arrText as $txtHotel) {
+            if ($i == 0) {
+                $pos_y = 1760;
+            } else {
+                $pos_y += 50;
+            }
+            $txtHotel = mb_strtoupper($txtHotel);
+            $imageModify = MyHelper::insertTextPNG($imageModify, $txtHotel, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 40, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+            $i++;
+        }
+    }
+
+    public static function ImageBundle($hotel_id, $hotel, $eventSlug, $imageUrl, $name, $txtJob, $jobTit, $barcode_code, $isBTC = false, $id = 0)
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        //            Create First Image
+        $firstImage = MyHelper::createFirstPic($baseFolder . 'phoianh/blank_image.png', $name, $eventSlug, $hotel_id);
+
+        //            Insert Image To B1.
+        $imageToInsert = MyHelper::downloadImage($name, $imageUrl, 'nhan-vien');
+        //                Resize image:
+        $imageInsert = MyHelper::resizeImage($imageToInsert, array('width' => 582, 'height' => 582), 'nhan-vien', $name, false, false, true);
+
+        // @unlink($imageToInsert);
+        // $roundImage = MyHelper::RoundImage($imageInsert, $name, array('width' => 540, 'height' => 540));
+        // @unlink($imageInsert);
+        $pos_y = 0;
+        if ($hotel_id == '9999'  || $isBTC == true) {
+            $pos_y = 386;
+        } else {
+            $pos_y = 395;
+        }
+        $imageModify = MyHelper::insertImage($firstImage,  $imageInsert, array('pos_x' => 240, 'pos_y' => $pos_y), $eventSlug .
+            '/hotel_' . $hotel_id, $name);
+        // @unlink($imageInsert);
+
+        if ($hotel_id == '9999' || $isBTC == true) {
+            $backgroundImage = $baseFolder . 'phoianh/phoi_the_btc.png';
+        } else {
+            $backgroundImage  = $baseFolder . 'phoianh/phoi_the_ks.png';
+        }
+
+
+        $pos_y = 0;
+        if ($hotel_id == '9999') {
+            $pos_y = 462;
+        } else {
+            $pos_y = 454;
+        }
+        $imageModify = MyHelper::insertImage($imageModify, $backgroundImage, array('pos_x' => 0, 'pos_y' => 0), $eventSlug .
+            '/hotel_' . $hotel_id, $name);
+        @unlink($imageInsert);
+        $pos_y = 0;
+        if ($hotel_id == '9999' || $isBTC == 1) {
+            $text = 'HTXV ' . $barcode_code;
+            $pos_y = 1123;
+            $imageModify = MyHelper::insertText($imageModify, $text, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 42, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, true);
+        } else {
+            $text = 'HTXV ' . $barcode_code;
+            $pos_y = 1042;
+            $imageModify = MyHelper::insertText($imageModify, $text, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 50, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, true);
+        }
+
+        $pos_y = 0;
+        $name = mb_strtoupper($name);
+        if ($hotel_id == '9999' || $isBTC == 1) {
+            $pos_y = 1199;
+            $imageModify = MyHelper::insertText($imageModify, $name, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 36, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false, '#FFFFFF');
+        } else {
+            $pos_y = 1137;
+            $imageModify = MyHelper::insertText($imageModify, $name, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 36, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+        }
+
+
+        //            ## Insert job title:
+        // $pos_y = 0;
+        // if ($hotel_id == '9999') {
+        //     $pos_y = 1090;
+        // } else {
+        //     $pos_y = 1090;
+        // }
+        // $imageModify = MyHelper::insertText($imageModify, $jobTit, array('pos_x' => 400, 'pos_y' => $pos_y, 'font' => 'lato-medium', 'font-size' => 30), $eventSlug . '/hotel_' . $hotel_id, $name, true);
+        //                ## Insert Hotel:
+        $pos_y = 0;
+        $txt =  $jobTit . ' ';
+        $txt = str_replace('  ', ' ', $txt);
+        // $txt = str_replace('Ẩ', 'ẩ', $txt);
+        if ($hotel_id == '9999' || $isBTC == 1) {
+            $pos_y = 1260;
+            $imageModify = MyHelper::insertText($imageModify, $txt, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 27, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false, '#FFFFFF');
+        } else {
+            $pos_y = 1217;
+            $imageModify = MyHelper::insertText($imageModify, $txt, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 27, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+        }
+
+
+        $pos_y = 0;
+
+        $txt = $hotel;
+        $txt = str_replace('  ', ' ', $txt);
+        $txt = str_replace('KS MT ', 'Mường Thanh ', $txt);
+
+        if ($hotel_id == '9999'  || $isBTC == 1) {
+            $pos_y = 1310;
+            $imageModify = MyHelper::insertText($imageModify, $txt, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 27, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false, '#FFFFFF');
+        } else {
+            $pos_y = 1280;
+            $imageModify = MyHelper::insertText($imageModify, $txt, array('pos_x' => 0, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 27, 'align' => 'C'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+        }
+        $imageModify = MyHelper::resizeImage($imageModify, array('width' => 887, 'height' => 1182), $eventSlug .
+            '/hotel_' . $hotel_id, $name, false, false, true);
+        //                Resolution:
+        // /$imageModify = MyHelper::resolutionImage($imageModify, array('width' => 300, 'height' => 300), $eventSlug . '/hotel_' . $hotel_id, $name);
+    }
+
+    public static function ImageBundleGolf($hotel_id, $hotel, $eventSlug, $imageUrl, $name, $txtJob, $jobTit, $barcode_code, $isBTC = false, $id = 0)
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        //            Create First Image
+        $firstImage = MyHelper::createFirstPic($baseFolder . 'phoianh/blank_golf.png', $name, $eventSlug, $hotel_id);
+        $backgroundImage  = $baseFolder . 'phoianh/phoi_golf.png';
+        $imageModify = MyHelper::insertImage($firstImage, $backgroundImage, array('pos_x' => 0, 'pos_y' => 0), $eventSlug .
+            '/hotel_' . $hotel_id, $name);
+        $pos_y = 0;
+        $name = mb_strtoupper($name);
+        $pos_y = 1150;
+        $imageModify = MyHelper::insertText($imageModify, $name, array('pos_x' => 620, 'pos_y' => $pos_y, 'font' => 'lato-black', 'font-size' => 50, 'align' => 'L'), $eventSlug . '/hotel_' . $hotel_id, $name, false);
+    }
+
+    public static function downloadImage($name, $imageUrl, $folderPath)
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        if (!is_dir($baseFolder)) {
+            mkdir($baseFolder);
+        }
+        $folder = $baseFolder . $folderPath . '/';
+        if (!is_dir($folder)) {
+            mkdir($folder);
+        }
+        if (@file_get_contents(urldecode($imageUrl)) === false) {
+            return 'no-videopic.jpg';
+        } else {
+            $img = file_get_contents(urldecode($imageUrl));
+            $name = self::cleanString($name);
+            $uni = $name . '-' . substr(md5(time()), 28, 5) . '.png';
+            $path = $folder . $uni;
+            file_put_contents($path, $img);
+            $im = imagecreatefromstring($img);
+            return $path;
+        }
+    }
+
+    public static function createFirstPic($imageGeneral, $name, $folder, $hotelId)
+    {
+        $path = '';
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        if (!is_dir($baseFolder)) {
+            mkdir($baseFolder);
+        }
+        $folder = $baseFolder . $folder . '/';
+        if (!is_dir($folder)) {
+            mkdir($folder);
+        }
+        $folder = $folder . 'hotel_' . $hotelId . '/';
+        if (!is_dir($folder)) {
+            mkdir($folder, 0755, true);
+        }
+        $path = $folder . self::cleanString($name) . '-' . substr(md5(time()), 28, 5) . '.jpg';
+        copy($imageGeneral, $path);
+        return $path;
+    }
+
+    public static function createFirstPicPNG($imageGeneral, $name, $folder, $hotelId)
+    {
+        $path = '';
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        if (!is_dir($baseFolder)) {
+            mkdir($baseFolder);
+        }
+        $folder = $baseFolder . $folder . '/';
+        if (!is_dir($folder)) {
+            mkdir($folder);
+        }
+        $folder = $folder . 'hotel_' . $hotelId . '/';
+        if (!is_dir($folder)) {
+            mkdir($folder, 0755, true);
+        }
+        $path = $folder . self::cleanString($name) . '-' . substr(md5(time()), 28, 5) . '.png';
+        copy($imageGeneral, $path);
+        return $path;
+    }
+
+    public static function insertImage($imageGeneral, $imageInsert, $position = array(), $des, $name)
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        $folder = $baseFolder . $des . '/';
+        $image = Yii::app()->imagemod->load($imageGeneral);
+        if ($image->uploaded) {
+            $image->image_resize = false;
+            $image->image_watermark = $imageInsert;
+            $image->image_watermark_position = 'L';
+            $image->image_watermark_x = $position['pos_x'];
+            $image->image_watermark_y = $position['pos_y'];
+            $image->image_watermark_no_zoom_in = true;
+            $image->image_greyscale = false;
+            $newName = self::cleanString($name) . '-' . substr(md5(self::RandomString()), 28, 5);
+            $image->file_new_name_body = $newName;
+            $path = $folder . $newName . '.jpg';
+            $image->Process($folder);
+            if ($image->processed) {
+                @unlink($imageGeneral); //delete original image
+                return $path;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public static function insertImagePNG($imageGeneral, $imageInsert, $position = array(), $des, $name)
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        $folder = $baseFolder . $des . '/';
+        $image = Yii::app()->imagemod->load($imageGeneral);
+        if ($image->uploaded) {
+            $image->image_resize = false;
+            $image->image_watermark = $imageInsert;
+            $image->image_watermark_position = 'L';
+            $image->image_watermark_x = $position['pos_x'];
+            $image->image_watermark_y = $position['pos_y'];
+            $image->image_watermark_no_zoom_in = true;
+            $image->image_greyscale = false;
+            $newName = self::cleanString($name) . '-' . substr(md5(self::RandomString()), 28, 5);
+            $image->file_new_name_body = $newName;
+            $path = $folder . $newName . '.png';
+            $image->Process($folder);
+            if ($image->processed) {
+                @unlink($imageGeneral); //delete original image
+                return $path;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public static function resizeImage($imageGeneral, $size = array(), $des, $name, $rotate = false, $crop = false, $autoheight = false)
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        $folder = $baseFolder . $des . '/';
+        $image = Yii::app()->imagemod->load($imageGeneral);
+        if ($image->uploaded) {
+            $image->image_resize = true;
+            if ($crop) {
+                $image->image_ratio_crop = 'T';
+            }
+            $image->image_x = $size['width'];
+            if ($autoheight) {
+                $image->image_ratio_y = true;
+            } else {
+                $image->image_y = $size['height'];
+            }
+            if ($rotate) {
+                $image->image_rotate = '90';
+            }
+            $newName = self::cleanString($name) . '-' . substr(md5(self::RandomString()), 28, 5);
+            $image->file_new_name_body = $newName;
+            $path = $folder . $newName . '.' . $image->file_src_name_ext;
+            $image->Process($folder);
+            if ($image->processed) {
+                @unlink($imageGeneral); //delete original image
+                return $path;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public static function resolutionImage($imageGeneral, $size = array(), $des, $name)
+    {
+        $image = file_get_contents($imageGeneral);
+        $image = substr_replace($image, pack("Cnn", 0x01, 300, 300), 13, 5);
+        $image = file_put_contents($imageGeneral, $image);
+    }
+
+    public
+    static function insertTextPNG($imageGeneral, $text, $position = array(), $des, $name, $isModify, $color = '#000000')
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        $folder = $baseFolder . $des . '/';
+        $image = Yii::app()->imagemod->load($imageGeneral);
+        if ($image->uploaded) {
+            $image->image_resize = false;
+            $image->image_overlay_opacity = 0;
+            if ($isModify) {
+                $image->image_text = mb_strtoupper($text, 'UTF-8') . ' ';
+            } else {
+                $image->image_text = $text;
+            }
+
+            $image->image_text_color = $color;
+            $image->image_text_size = $position['font-size'];
+            $image->image_text_x = $position['pos_x'];
+            $image->image_text_y = $position['pos_y'];
+            $image->image_text_padding = 5;
+            // $image->image_text_padding_x  = 30;
+            $image->image_text_font = Yii::app()->basePath . "/../fonts/" . $position['font'] . ".ttf";
+            if (isset($position['align']) && $position['align'] != '') {
+                $image->image_text_alignment = $position['align'];
+            }
+            $image->image_text_line_spacing = 3;
+            $name = self::cleanString($name);
+            $newName = self::cleanString($name) . '-' . substr(md5(self::RandomString()), 28, 5);
+            $image->file_new_name_body = $newName;
+            $path = $folder . $newName . '.png';
+            $image->Process($folder);
+
+            if ($image->processed) {
+                // echo $image->log;
+                @unlink($imageGeneral); //delete original image
+                return $path;
+            } else {
+                return false;
+            }
+        }
+    }
+
+
+    public
+    static function insertText($imageGeneral, $text, $position = array(), $des, $name, $isModify, $color = '#000000')
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        $folder = $baseFolder . $des . '/';
+        $image = Yii::app()->imagemod->load($imageGeneral);
+        if ($image->uploaded) {
+            $image->image_resize = false;
+            $image->image_overlay_opacity = 0;
+            if ($isModify) {
+                $image->image_text = mb_strtoupper($text, 'UTF-8') . ' ';
+            } else {
+                $image->image_text = $text;
+            }
+
+            $image->image_text_color = $color;
+            $image->image_text_size = $position['font-size'];
+            $image->image_text_x = $position['pos_x'];
+            $image->image_text_y = $position['pos_y'];
+            $image->image_text_padding = 5;
+            // $image->image_text_padding_x  = 30;
+            $image->image_text_font = Yii::app()->basePath . "/../fonts/" . $position['font'] . ".ttf";
+            if (isset($position['align']) && $position['align'] != '') {
+                $image->image_text_alignment = $position['align'];
+            }
+            $image->image_text_line_spacing = 3;
+            $name = self::cleanString($name);
+            $newName = self::cleanString($name) . '-' . substr(md5(self::RandomString()), 28, 5);
+            $image->file_new_name_body = $newName;
+            $path = $folder . $newName . '.jpg';
+            $image->Process($folder);
+            echo $image->log;
+            if ($image->processed) {
+                @unlink($imageGeneral); //delete original image
+                return $path;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public
+    static function modifyImage($img, $name, $text = array(), $imageInsert, $des, $childDes)
+    {
+        $baseFolder = Yii::app()->basePath . '/../uploads/';
+        if (!is_dir($baseFolder)) {
+            mkdir($baseFolder);
+        }
+        $folder = $baseFolder . $des . '/';
+        if (!is_dir($folder)) {
+            mkdir($folder);
+        }
+        $folder = $folder . 'hotel_' . $childDes . '/';
+        if (!is_dir($folder)) {
+            mkdir($folder, 0755, true);
+        }
+        $image = Yii::app()->imagemod->load($img);
+        if ($image->uploaded) {
+            $image->image_resize = false;
+            $image->image_text = mb_strtoupper($text['name'], 'UTF-8');
+            $image->image_text_color = '#ffffff';
+            $image->image_text_size = 30;
+            $image->image_text_position = 'br';
+            $image->image_text_font = Yii::app()->basePath . "/../fonts/HJAvantGardeBold_0.ttf";
+            $name = self::cleanString($name);
+            $uni = $name . '-' . substr(md5(self::RandomString()), 28, 5);
+            $image->file_new_name_body = $uni;
+            if ($image->processed) {
+                return 1;
+                $image->clean(); //delete original image
+            } else {
+                return 0;
+            }
         }
     }
 }
