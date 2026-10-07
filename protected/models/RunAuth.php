@@ -6,9 +6,22 @@
  */
 class RunAuth extends CFormModel
 {
-    public static function identify($identifier)
+    /** Danh sách đơn vị VCK cho dropdown đăng nhập (mỗi phần tử: id, code, name). */
+    public static function listUnits()
     {
-        return ApiClient::post(ApiEndpoints::RUN_AUTH_IDENTIFY, array('identifier' => $identifier));
+        $result = ApiClient::get(ApiEndpoints::RUN_AUTH_LIST_UNITS);
+        if ($result['success'] && isset($result['data']['data']) && is_array($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        return array();
+    }
+
+    public static function identify($identifier, $propertyId = null)
+    {
+        return ApiClient::post(ApiEndpoints::RUN_AUTH_IDENTIFY, array(
+            'identifier'  => $identifier,
+            'property_id' => $propertyId,
+        ));
     }
 
     public static function identifyByQr($qrValue)
@@ -16,14 +29,22 @@ class RunAuth extends CFormModel
         return ApiClient::post(ApiEndpoints::RUN_AUTH_IDENTIFY_BY_QR, array('qr_value' => $qrValue));
     }
 
-    public static function setPin($identifier, $pin)
+    public static function setPin($identifier, $pin, $propertyId = null)
     {
-        return ApiClient::post(ApiEndpoints::RUN_AUTH_SET_PIN, array('identifier' => $identifier, 'pin' => $pin));
+        return ApiClient::post(ApiEndpoints::RUN_AUTH_SET_PIN, array(
+            'identifier'  => $identifier,
+            'pin'         => $pin,
+            'property_id' => $propertyId,
+        ));
     }
 
-    public static function login($identifier, $pin)
+    public static function login($identifier, $pin, $propertyId = null)
     {
-        return ApiClient::post(ApiEndpoints::RUN_AUTH_LOGIN, array('identifier' => $identifier, 'pin' => $pin));
+        return ApiClient::post(ApiEndpoints::RUN_AUTH_LOGIN, array(
+            'identifier'  => $identifier,
+            'pin'         => $pin,
+            'property_id' => $propertyId,
+        ));
     }
 
     public static function genLucky($eventId)
