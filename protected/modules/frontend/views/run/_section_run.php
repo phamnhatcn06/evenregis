@@ -140,9 +140,9 @@
                     // Progress bar color
                     $barCls = $percent >= 100 ? 'bg-danger' : ($percent >= 85 ? 'bg-warning' : 'bg-primary');
 
-                    // Icon cự ly
-                    $nameLower = mb_strtolower($e['name'], 'UTF-8');
-                    $distIcon = (strpos($nameLower, '21') !== false) ? '21K' : ((strpos($nameLower, '10') !== false) ? '10K' : '5K');
+                    // Icon cự ly: tách số km từ code ("5K" -> 5) hoặc tên ("Chạy 15km" -> 15).
+                    $distNum = preg_replace('/\D/', '', !empty($e['code']) ? $e['code'] : $e['name']);
+                    $distIcon = ($distNum !== '' ? $distNum : '•') . 'K';
                 ?>
                     <div class="portal-option-card <?php echo $isDisabled ? 'option-disabled' : ''; ?>">
                         <div class="d-flex align-items-start justify-content-between gap-2">
