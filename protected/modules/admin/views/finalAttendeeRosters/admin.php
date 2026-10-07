@@ -377,6 +377,7 @@ $flashMessages = Yii::app()->user->getFlashes();
                             <th style="min-width: 180px;">Chức danh</th>
                             <th style="min-width: 190px;">Nội dung tham gia</th>
                             <th style="width: 85px;" class="text-center">Size áo</th>
+                            <th style="width: 110px;" class="text-center">Là BTC?</th>
                             <th style="width: 150px;" class="text-center">Trạng thái</th>
                             <?php if ($canUpdate): ?>
                                 <th style="width: 110px;" class="text-end pe-3">Thao tác</th>
