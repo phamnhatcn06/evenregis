@@ -709,12 +709,20 @@ $flashMessages = Yii::app()->user->getFlashes();
                                                 'overridden_fields' => $overridden,
                                                 'source_snapshot'   => is_array($row->source_snapshot) ? $row->source_snapshot : array(),
                                                 'lucky_number'      => $row->lucky_number,
+                                                'is_btc'            => (int) $row->is_btc,
                                                 'updated_by'        => $row->updated_by,
                                                 'last_synced_at'    => $row->last_synced_at,
                                             ))); ?>"
                                             title="Sửa thông tin">
                                         <i class="fa fa-pencil"></i>
                                     </button>
+
+                                    <a href="<?php echo $this->createUrl('exportImage', array('id' => (int) $row->id)); ?>"
+                                       class="far-action-btn far-action-export"
+                                       target="_blank" rel="noopener"
+                                       title="Xuất ảnh thẻ VCK (mặt trước + mặt sau)">
+                                        <i class="fa fa-id-card-o"></i>
+                                    </a>
 
                                     <?php if (!$isWithdrawn): ?>
                                         <button type="button"
