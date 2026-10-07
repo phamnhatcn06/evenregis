@@ -102,8 +102,47 @@ class PortalController extends AttendeePortalController
         $this->layout = '//layouts/portal';
 
         $this->render('index', array(
-            'fullName' => $this->currentFullName(),
+            'fullName'     => $this->currentFullName(),
+            'profileModal' => $this->profileModalData(),
         ));
+    }
+
+    /**
+     * Lưu năm sinh + giới tính từ popup hồ sơ (AJAX). Lưu thành công mới đánh dấu đã xác
+     * nhận trong phiên, mở khóa các chức năng đăng ký. Trả JSON {success, message}.
+     */
+    public function actionSaveProfile()
+    {
+        header('Content-Type: application/json');
+
+        if (!$this->isLoggedIn()) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'));
+            Yii::app()->end();
+        }
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+
+        $birthYear = isset($_POST['birth_year']) && $_POST['birth_year'] !== '' ? (int) $_POST['birth_year'] : null;
+        $gender = isset($_POST['gender']) && $_POST['gender'] !== '' ? (int) $_POST['gender'] : null;
+        if ($birthYear === null || $gender === null) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng chọn đầy đủ năm sinh và giới tính.'));
+            Yii::app()->end();
+        }
+
+        $res = RunAuth::saveProfile($this->currentAttendeeId(), $birthYear, $gender, $this->currentFullName());
+        if ($res['success']) {
+            $this->markProfileConfirmed();
+        }
+
+        echo CJSON::encode(array(
+            'success' => (bool) $res['success'],
+            'message' => $res['success']
+                ? (isset($res['data']['message']) ? $res['data']['message'] : 'Đã lưu thông tin.')
+                : ($res['error'] ?: 'Không lưu được thông tin.'),
+        ));
+        Yii::app()->end();
     }
 
     public function actionLogout()
