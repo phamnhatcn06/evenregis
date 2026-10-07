@@ -1123,7 +1123,7 @@ class MyHelper
      * Tải ảnh chân dung từ URL và cắt/thu về đúng kích thước (cover, giữ tỷ lệ, crop giữa).
      * Trả về GD resource hoặc false.
      */
-    protected static function fetchPortraitResource($url, $targetW, $targetH)
+    protected static function fetchPortraitResource($url, $targetW, $targetH, $vGravity = 0.5)
     {
         if (!$url) {
             return false;
@@ -1143,7 +1143,9 @@ class MyHelper
         $cropW = (int) round($targetW / $scale);
         $cropH = (int) round($targetH / $scale);
         $srcX  = (int) round(($srcW - $cropW) / 2);
-        $srcY  = (int) round(($srcH - $cropH) / 2);
+        // Cắt dọc theo gravity: 0 = lấy phần trên (đầu), 0.5 = giữa, 1 = dưới.
+        $vGravity = max(0, min(1, (float) $vGravity));
+        $srcY  = (int) round(($srcH - $cropH) * $vGravity);
 
         $dst = imagecreatetruecolor($targetW, $targetH);
         imagecopyresampled($dst, $src, 0, 0, $srcX, $srcY, $targetW, $targetH, $cropW, $cropH);
