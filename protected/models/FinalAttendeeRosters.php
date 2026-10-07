@@ -142,7 +142,7 @@ class FinalAttendeeRosters extends CFormModel
                  dedup_source, full_name, staff_code, id_card, birthday, gender, phone_number, email,
                  property_id, property_code, property_name, badge_org_name, unit_label, division_code, division_name,
                  department_code, department_name, position, position_code, position_name, position_display,
-                 attendee_type, shirt_size, note, sort_order, lucky_number, login_identifier,
+                 attendee_type, shirt_size, note, sort_order, is_btc, lucky_number, login_identifier,
                  lucky_provisioned_at, pin_is_set, qr_token, badge_number, overridden_fields, has_override,
                  source_snapshot, conflict_flag, status, last_synced_at, created_by, updated_by, deleted_by,
                  created_at, updated_at, deleted_at, is_withdrawn, participations, content_names',
