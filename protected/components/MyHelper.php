@@ -927,9 +927,10 @@ class MyHelper
     public static function finalBadgeLayout()
     {
         // Thuộc tính dùng chung (font, cỡ chữ, canh giữa) cho cả hai loại phôi.
-        $name     = array('pos_x' => 0, 'font' => 'fontten',      'size' => 69, 'align' => 'C');
-        $position = array('pos_x' => 0, 'font' => 'fontchucdanh', 'size' => 26, 'align' => 'C');
-        $unit     = array('pos_x' => 0, 'font' => 'fontdonvi',    'size' => 24, 'align' => 'C');
+        // Cỡ chữ theo chiều cao glyph thật: tên 100px (83pt), chức danh 40px (25pt), đơn vị 35px (28pt).
+        $name     = array('pos_x' => 0, 'font' => 'fontten',      'size' => 83, 'align' => 'C');
+        $position = array('pos_x' => 0, 'font' => 'fontchucdanh', 'size' => 25, 'align' => 'C');
+        $unit     = array('pos_x' => 0, 'font' => 'fontdonvi',    'size' => 28, 'align' => 'C');
 
         return array(
             // Ảnh chân dung vừa đúng ô tròn trong suốt của phôi (đo từ alpha), overscan 4px cho kín viền.
