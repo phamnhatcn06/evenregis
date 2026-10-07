@@ -21,6 +21,12 @@ $registerRunUrl = $this->createUrl('/frontend/run/register');
 $registerTourUrl = $this->createUrl('/frontend/run/registerTour');
 $cancelRunUrl = $this->createUrl('/frontend/run/cancelRequest');
 $cancelTourUrl = $this->createUrl('/frontend/run/cancelRequestTour');
+$saveProfileUrl = $this->createUrl('/frontend/run/saveProfile');
+
+// Ngày sinh + giới tính của đại biểu (final_attendee_rosters). Popup bật khi vào cổng.
+$profileBirthday = (!empty($profile) && !empty($profile['birthday'])) ? $profile['birthday'] : '';
+$profileGender = (!empty($profile) && isset($profile['gender']) && $profile['gender'] !== null) ? (int) $profile['gender'] : '';
+$profileComplete = (!empty($profile) && !empty($profile['is_complete'])) ? 1 : 0;
 
 // Dữ liệu thông báo hủy-đã-duyệt cho JS (báo 1 lần qua localStorage).
 $runNoticeAt = (!empty($runCancelledNotice) && !empty($runCancelledNotice['cancel_reviewed_at'])) ? (int) $runCancelledNotice['cancel_reviewed_at'] : 0;
