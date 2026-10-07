@@ -517,21 +517,49 @@ class FinalAttendeeRosters extends CFormModel
      */
     public static function toBadgeData($row)
     {
-        $model = new self;
-        $model->setAttributes($row, false);
-
         return array(
-            'id'             => isset($row['id']) ? (int) $row['id'] : 0,
-            'full_name'      => isset($row['full_name']) ? $row['full_name'] : '',
+            'id'               => isset($row['id']) ? (int) $row['id'] : 0,
+            'full_name'        => isset($row['full_name']) ? $row['full_name'] : '',
             'position_display' => isset($row['position_display']) ? $row['position_display'] : '',
-            'position'       => isset($row['position']) ? $row['position'] : '',
-            'badge_org_name' => isset($row['badge_org_name']) ? $row['badge_org_name'] : '',
-            'unit_label'     => isset($row['unit_label']) ? $row['unit_label'] : '',
-            'property_code'  => isset($row['property_code']) ? $row['property_code'] : '',
-            'lucky_number'   => isset($row['lucky_number']) ? $row['lucky_number'] : '',
-            'is_btc'         => !empty($row['is_btc']) ? 1 : 0,
-            'avatar_url'     => $model->getAvatarUrl(),
+            'position'         => isset($row['position']) ? $row['position'] : '',
+            'badge_org_name'   => isset($row['badge_org_name']) ? $row['badge_org_name'] : '',
+            'unit_label'       => isset($row['unit_label']) ? $row['unit_label'] : '',
+            'property_code'    => isset($row['property_code']) ? $row['property_code'] : '',
+            'lucky_number'     => isset($row['lucky_number']) ? $row['lucky_number'] : '',
+            'is_btc'           => !empty($row['is_btc']) ? 1 : 0,
+            'avatar_url'       => self::resolvePortraitSource($row),
         );
+    }
+
+    /**
+     * Nguồn ảnh chân dung dùng để dựng thẻ: ưu tiên file local (đọc trực tiếp nhanh & chắc),
+     * nếu là URL http thì giữ nguyên để tải qua mạng.
+     */
+    protected static function resolvePortraitSource($row)
+    {
+        $path = '';
+        if (!empty($row['portrait_path'])) {
+            $path = $row['portrait_path'];
+        } elseif (!empty($row['photo_path'])) {
+            $path = $row['photo_path'];
+        }
+        if ($path === '') {
+            return '';
+        }
+        if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
+            return $path;
+        }
+
+        // Đường dẫn tương đối: trỏ tới file trên webroot của FE.
+        $webroot = Yii::app()->basePath . '/../';
+        $local   = $webroot . ltrim($path, '/');
+        if (is_file($local)) {
+            return $local;
+        }
+
+        // Không thấy file local thì dựng URL tuyệt đối để tải qua HTTP.
+        $baseUrl = rtrim((string) Yii::app()->getBaseUrl(true), '/');
+        return $baseUrl . '/' . ltrim($path, '/');
     }
 
     /**
