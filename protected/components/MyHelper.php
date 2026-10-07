@@ -919,19 +919,39 @@ class MyHelper
     /** Thư mục chứa phôi thẻ */
     const BADGE_TEMPLATE_DIR = 'phoianh/';
 
-    /** Toạ độ & cỡ chữ mặc định cho thẻ VCK (canvas 1063×1418, ảnh 582×582 tại x240 y390) */
+    /**
+     * Toạ độ & cỡ chữ cho thẻ VCK (canvas 1063×1418, ảnh 582×582 tại x240 y390).
+     * Toạ độ pos_y là ĐỈNH chữ. Cỡ chữ & vị trí đo trực tiếp từ phôi mẫu docs/the/.
+     * Thẻ BTC nền tối → chữ trắng; thẻ KS (ĐVTV) nền sáng → chữ đen.
+     */
     public static function finalBadgeLayout()
     {
+        // Thuộc tính dùng chung (font, cỡ chữ, canh giữa) cho cả hai loại phôi.
+        $name     = array('pos_x' => 0, 'font' => 'fontten',      'size' => 69, 'align' => 'C');
+        $position = array('pos_x' => 0, 'font' => 'fontchucdanh', 'size' => 19, 'align' => 'C');
+        $unit     = array('pos_x' => 0, 'font' => 'fontdonvi',    'size' => 21, 'align' => 'C');
+
         return array(
             'photo' => array('pos_x' => 240, 'pos_y' => 390, 'width' => 582, 'height' => 582),
+
+            // Mặt trước: vị trí dòng (pos_y) + màu chữ khác nhau theo loại phôi.
             'front' => array(
-                'name'     => array('pos_x' => 0, 'pos_y' => 1010, 'font' => 'fontten',      'size' => 48, 'align' => 'C', 'color' => '#000000'),
-                'position' => array('pos_x' => 0, 'pos_y' => 1085, 'font' => 'fontchucdanh', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
-                'unit'     => array('pos_x' => 0, 'pos_y' => 1130, 'font' => 'fontdonvi',    'size' => 34, 'align' => 'C', 'color' => '#000000'),
+                'btc' => array(
+                    'name'     => array_merge($name,     array('pos_y' => 1002, 'color' => '#FFFFFF')),
+                    'position' => array_merge($position, array('pos_y' => 1141, 'color' => '#FFFFFF')),
+                    'unit'     => array_merge($unit,     array('pos_y' => 1204, 'color' => '#FFFFFF')),
+                ),
+                'default' => array(
+                    'name'     => array_merge($name,     array('pos_y' => 987,  'color' => '#000000')),
+                    'position' => array_merge($position, array('pos_y' => 1126, 'color' => '#000000')),
+                    'unit'     => array_merge($unit,     array('pos_y' => 1183, 'color' => '#000000')),
+                ),
             ),
+
             'back' => array(
-                'qr'    => array('pos_x' => 281, 'pos_y' => 420, 'size' => 500),
-                'lucky' => array('pos_x' => 0, 'pos_y' => 980, 'font' => 'lato-black', 'size' => 56, 'align' => 'C', 'color' => '#000000'),
+                'qr'         => array('pos_x' => 281, 'pos_y' => 420, 'size' => 500),
+                'lucky_btc'  => array('pos_x' => 0, 'pos_y' => 980, 'font' => 'lato-black', 'size' => 56, 'align' => 'C', 'color' => '#FFFFFF'),
+                'lucky'      => array('pos_x' => 0, 'pos_y' => 980, 'font' => 'lato-black', 'size' => 56, 'align' => 'C', 'color' => '#000000'),
             ),
         );
     }
