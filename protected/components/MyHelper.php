@@ -995,17 +995,18 @@ class MyHelper
         }
 
         // ---- Mặt trước: ảnh chân dung → phôi → text ----
+        $photoCfg = $isBtc ? $layout['photo']['btc'] : $layout['photo']['default'];
         $photo = self::fetchPortraitResource(
             isset($row['avatar_url']) ? $row['avatar_url'] : '',
-            $layout['photo']['width'],
-            $layout['photo']['height']
+            $photoCfg['width'],
+            $photoCfg['height']
         );
         if ($photo) {
             imagecopy(
                 $front, $photo,
-                $layout['photo']['pos_x'], $layout['photo']['pos_y'],
+                $photoCfg['pos_x'], $photoCfg['pos_y'],
                 0, 0,
-                $layout['photo']['width'], $layout['photo']['height']
+                $photoCfg['width'], $photoCfg['height']
             );
             imagedestroy($photo);
         }
