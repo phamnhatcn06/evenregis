@@ -111,6 +111,25 @@ $textFields = array(
                             <div class="form-text d-none text-muted small" id="origin_attendee_type"></div>
                         </div>
 
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold text-muted mb-1" for="edit_is_btc">
+                                Ban tổ chức
+                                <span class="badge badge-subtle-warning ms-1 d-none" id="badge_is_btc">đã sửa tay</span>
+                            </label>
+                            <div class="input-group">
+                                <?php echo CHtml::dropDownList('fields[is_btc]', '', array(0 => 'Không', 1 => 'Ban tổ chức'), array(
+                                    'class'      => 'form-select js-edit-field',
+                                    'id'         => 'edit_is_btc',
+                                    'data-field' => 'is_btc',
+                                )); ?>
+                                <button type="button" class="btn btn-outline-secondary js-reset-field d-none"
+                                        data-field="is_btc" title="Khôi phục về giá trị gốc">
+                                    <i class="fa fa-undo"></i>
+                                </button>
+                            </div>
+                            <div class="form-text text-muted small">Quyết định dùng phôi thẻ BTC hay KS khi xuất ảnh.</div>
+                        </div>
+
                         <div class="col-12">
                             <label class="form-label small fw-semibold text-muted mb-1" for="edit_note">
                                 Ghi chú
