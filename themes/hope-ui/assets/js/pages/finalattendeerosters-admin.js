@@ -359,7 +359,7 @@
                             + '<ul style="text-align:left">'
                             + '<li>Mã lucky: <strong>' + escapeHtml(row.lucky_number) + '</strong></li>'
                             + '<li>Định danh đăng nhập: <strong>'
-                            + escapeHtml(row.login_identifier || ('DHMT' + row.lucky_number))
+                            + escapeHtml(row.login_identifier || ('MT' + row.lucky_number))
                             + '</strong></li>'
                             + (row.badge_number
                                 ? '<li>Số thẻ: <strong>' + escapeHtml(row.badge_number) + '</strong></li>'
