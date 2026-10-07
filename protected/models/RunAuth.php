@@ -65,12 +65,12 @@ class RunAuth extends CFormModel
         return null;
     }
 
-    /** Lưu ngày sinh (Y-m-d) + giới tính (0=Nữ, 1=Nam). Trả mảng chuẩn ApiClient. */
-    public static function saveProfile($attendeeId, $birthday, $gender, $authEmail = null)
+    /** Lưu năm sinh + giới tính (0=Nữ, 1=Nam). Trả mảng chuẩn ApiClient. */
+    public static function saveProfile($attendeeId, $birthYear, $gender, $authEmail = null)
     {
         return ApiClient::post(ApiEndpoints::RUN_AUTH_SAVE_PROFILE, array(
             'attendee_id' => $attendeeId,
-            'birthday'    => $birthday,
+            'birth_year'  => $birthYear,
             'gender'      => $gender,
             'auth_email'  => $authEmail,
         ));
