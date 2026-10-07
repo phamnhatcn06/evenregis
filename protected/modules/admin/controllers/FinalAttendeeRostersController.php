@@ -224,6 +224,129 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Xuất ảnh thẻ VCK (gộp mặt trước + mặt sau) cho một người, trả file PNG để tải.
+     */
+    public function actionExportImage($id)
+    {
+        if (!PermissionHelper::can('finalattendeerosters', 'read')) {
+            throw new CHttpException(403, 'Bạn không có quyền xuất ảnh thẻ.');
+        }
+
+        $id = (int) $id;
+        if (!$id) {
+            throw new CHttpException(422, 'Thiếu mã dòng cần xuất ảnh.');
+        }
+
+        $row = FinalAttendeeRosters::fetchOne($id);
+        if ($row === null) {
+            throw new CHttpException(404, 'Không tìm thấy người tham dự.');
+        }
+
+        $path = MyHelper::FinalRosterBadge(
+            FinalAttendeeRosters::toBadgeData($row),
+            $this->resolvePortalBaseUrl()
+        );
+
+        if (!$path || !is_file($path)) {
+            throw new CHttpException(500, 'Không tạo được ảnh thẻ. Kiểm tra phôi thẻ và ảnh chân dung.');
+        }
+
+        $downloadName = 'The_VCK_' . (!empty($row['lucky_number']) ? $row['lucky_number'] : $id) . '.png';
+        $this->sendFileThenDelete($path, $downloadName, 'image/png');
+    }
+
+    /**
+     * Xuất ảnh thẻ VCK hàng loạt theo bộ lọc hiện tại, đóng gói ZIP (chia thư mục theo mã đơn vị).
+     */
+    public function actionExportImagesBatch()
+    {
+        if (!PermissionHelper::can('finalattendeerosters', 'read')) {
+            throw new CHttpException(403, 'Bạn không có quyền xuất ảnh thẻ.');
+        }
+
+        $eventId  = $this->getIntParam('event_id');
+        $periodId = $this->getIntParam('period_id');
+        if (!$eventId || !$periodId) {
+            throw new CHttpException(422, 'Vui lòng chọn sự kiện và đợt Vòng Chung Kết.');
+        }
+
+        if (!class_exists('ZipArchive')) {
+            throw new CHttpException(500, 'Máy chủ chưa bật extension Zip (php-zip).');
+        }
+
+        $rows         = $this->fetchAllForExport($this->buildFilterParams($eventId, $periodId));
+        $loginBaseUrl = $this->resolvePortalBaseUrl();
+
+        $zipPath = Yii::app()->basePath . '/../uploads/final_badges/_zip_'
+            . $eventId . '_' . date('Ymd_His') . '_' . substr(md5(uniqid('', true)), 0, 6) . '.zip';
+        $zipDir = dirname($zipPath);
+        if (!is_dir($zipDir)) {
+            mkdir($zipDir, 0755, true);
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new CHttpException(500, 'Không mở được file ZIP để ghi.');
+        }
+
+        $created = array();
+        foreach ($rows as $row) {
+            $badge = MyHelper::FinalRosterBadge(
+                FinalAttendeeRosters::toBadgeData($row),
+                $loginBaseUrl
+            );
+            if ($badge && is_file($badge)) {
+                $folder = basename(dirname($badge));
+                $zip->addFile($badge, $folder . '/' . basename($badge));
+                $created[] = $badge;
+            }
+        }
+
+        $count = $zip->numFiles;
+        $zip->close();
+
+        // Dọn file ảnh tạm sau khi đã nén vào ZIP.
+        foreach ($created as $file) {
+            @unlink($file);
+        }
+
+        if ($count === 0) {
+            @unlink($zipPath);
+            throw new CHttpException(500, 'Không tạo được ảnh thẻ nào. Kiểm tra phôi thẻ và ảnh chân dung.');
+        }
+
+        $downloadName = 'The_VCK_' . $eventId . '_' . date('Ymd_His') . '.zip';
+        $this->sendFileThenDelete($zipPath, $downloadName, 'application/zip');
+    }
+
+    /**
+     * URL gốc trang đăng nhập cổng cá nhân (để nhúng vào QR). Cho phép cấu hình đè qua params.
+     */
+    protected function resolvePortalBaseUrl()
+    {
+        $params = Yii::app()->params;
+        if (!empty($params['portalPublicUrl'])) {
+            return rtrim($params['portalPublicUrl'], '/');
+        }
+
+        return rtrim((string) Yii::app()->getBaseUrl(true), '/');
+    }
+
+    /**
+     * Gửi file xuống trình duyệt rồi xoá file tạm trên máy chủ.
+     */
+    protected function sendFileThenDelete($path, $downloadName, $contentType)
+    {
+        header('Content-Type: ' . $contentType);
+        header('Content-Disposition: attachment; filename="' . $downloadName . '"');
+        header('Content-Length: ' . filesize($path));
+        header('Cache-Control: max-age=0');
+        readfile($path);
+        @unlink($path);
+        Yii::app()->end();
+    }
+
+    /**
      * Lấy toàn bộ dòng theo bộ lọc, chia trang để không nạp hết vào bộ nhớ một lúc.
      */
     protected function fetchAllForExport($params)
