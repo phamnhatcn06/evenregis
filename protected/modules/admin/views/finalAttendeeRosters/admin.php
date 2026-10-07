@@ -657,6 +657,28 @@ $flashMessages = Yii::app()->user->getFlashes();
                                 <?php endif; ?>
                             </td>
 
+                            <!-- Là BTC? -->
+                            <td class="text-center">
+                                <?php $isBtc = (int) $row->is_btc === 1; ?>
+                                <?php if ($canUpdate && !$isWithdrawn): ?>
+                                    <button type="button"
+                                            class="far-btc-toggle js-toggle-btc <?php echo $isBtc ? 'is-btc-on' : 'is-btc-off'; ?>"
+                                            data-roster-id="<?php echo (int) $row->id; ?>"
+                                            data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                            data-is-btc="<?php echo $isBtc ? 1 : 0; ?>"
+                                            title="<?php echo $isBtc ? 'Bấm để bỏ đánh dấu Ban tổ chức' : 'Bấm để đánh dấu là Ban tổ chức'; ?>">
+                                        <i class="fa <?php echo $isBtc ? 'fa-check-circle' : 'fa-circle-o'; ?>"></i>
+                                        <span><?php echo $isBtc ? 'BTC' : 'Không'; ?></span>
+                                    </button>
+                                <?php elseif ($isBtc): ?>
+                                    <span class="far-status-pill far-status-pill-info">
+                                        <i class="fa fa-star"></i> BTC
+                                    </span>
+                                <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                <?php endif; ?>
+                            </td>
+
                             <!-- Trạng thái -->
                             <td class="text-center">
                                 <?php if ($isWithdrawn): ?>
