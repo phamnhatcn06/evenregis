@@ -364,6 +364,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                     <input type="hidden" name="step" value="login">
                     <input type="hidden" name="return" value="<?php echo CHtml::encode($returnUrl); ?>">
                     <input type="hidden" name="identifier" value="<?php echo CHtml::encode($identifier); ?>">
+                    <input type="hidden" name="property_id" value="<?php echo CHtml::encode($propertyId); ?>">
                     <input type="hidden" name="pin" id="pin-login" required>
 
                     <div class="mb-4 text-center">
