@@ -1196,11 +1196,27 @@ class MyHelper
             return false;
         }
 
-        $dst = imagecreatetruecolor($size, $size);
-        $white = imagecolorallocate($dst, 255, 255, 255);
-        imagefilledrectangle($dst, 0, 0, $size, $size, $white);
-        imagecopyresampled($dst, $raw, 0, 0, 0, 0, $size, $size, imagesx($raw), imagesy($raw));
+        // Thu QR về đúng kích thước trước, rồi thay nền trắng bằng màu nền yêu cầu
+        // (vùng yên lặng + ô sáng → màu nền; ô tối → đen) để QR không trùng màu khung thẻ.
+        $scaled = imagecreatetruecolor($size, $size);
+        imagecopyresampled($scaled, $raw, 0, 0, 0, 0, $size, $size, imagesx($raw), imagesy($raw));
         imagedestroy($raw);
+
+        $rgb   = self::hexToRgb($bgHex);
+        $dst   = imagecreatetruecolor($size, $size);
+        $bg    = imagecolorallocate($dst, $rgb[0], $rgb[1], $rgb[2]);
+        $black = imagecolorallocate($dst, 0, 0, 0);
+        imagefilledrectangle($dst, 0, 0, $size, $size, $bg);
+        for ($y = 0; $y < $size; $y++) {
+            for ($x = 0; $x < $size; $x++) {
+                $c = imagecolorat($scaled, $x, $y);
+                $lum = 0.299 * (($c >> 16) & 255) + 0.587 * (($c >> 8) & 255) + 0.114 * ($c & 255);
+                if ($lum < 128) {
+                    imagesetpixel($dst, $x, $y, $black);
+                }
+            }
+        }
+        imagedestroy($scaled);
         return $dst;
     }
 
