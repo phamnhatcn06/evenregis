@@ -1225,22 +1225,25 @@ class MyHelper
         );
     }
 
-    /** Ghép hai canvas cạnh nhau (trái | phải) thành một canvas mới. */
-    protected static function combineSideBySide($left, $right)
+    /** Khoảng cách (px) giữa hai mặt thẻ khi ghép cạnh nhau. */
+    const BADGE_GAP = 30;
+
+    /** Ghép hai canvas cạnh nhau (trái | khoảng trắng | phải) thành một canvas mới. */
+    protected static function combineSideBySide($left, $right, $gap = self::BADGE_GAP)
     {
         $lw = imagesx($left);
         $lh = imagesy($left);
         $rw = imagesx($right);
         $rh = imagesy($right);
 
-        $w = $lw + $rw;
+        $w = $lw + $gap + $rw;
         $h = max($lh, $rh);
 
         $out = imagecreatetruecolor($w, $h);
         $white = imagecolorallocate($out, 255, 255, 255);
         imagefilledrectangle($out, 0, 0, $w, $h, $white);
         imagecopy($out, $left, 0, 0, 0, 0, $lw, $lh);
-        imagecopy($out, $right, $lw, 0, 0, 0, $rw, $rh);
+        imagecopy($out, $right, $lw + $gap, 0, 0, 0, $rw, $rh);
         return $out;
     }
 
