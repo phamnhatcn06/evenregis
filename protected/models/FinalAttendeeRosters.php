@@ -53,6 +53,7 @@ class FinalAttendeeRosters extends CFormModel
     public $shirt_size;
     public $note;
     public $sort_order;
+    public $is_btc;
 
     public $lucky_number;
     public $login_identifier;
