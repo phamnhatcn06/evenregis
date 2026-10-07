@@ -1044,7 +1044,7 @@ class MyHelper
         $lucky   = isset($row['lucky_number']) ? trim((string) $row['lucky_number']) : '';
         if ($lucky !== '') {
             $qrUrl = rtrim($loginBaseUrl, '/') . '/portal/login?lucky=' . rawurlencode($lucky);
-            $qr    = self::makeQrResource($qrUrl, $backCfg['qr']['size']);
+            $qr    = self::makeQrResource($qrUrl, $backCfg['qr']['size'], isset($backCfg['qr']['bg']) ? $backCfg['qr']['bg'] : '#FFFFFF');
             if ($qr) {
                 imagecopy(
                     $back, $qr,
