@@ -925,9 +925,9 @@ class MyHelper
         return array(
             'photo' => array('pos_x' => 240, 'pos_y' => 390, 'width' => 582, 'height' => 582),
             'front' => array(
-                'name'     => array('pos_x' => 0, 'pos_y' => 1010, 'font' => 'lato-black',  'size' => 48, 'align' => 'C', 'color' => '#000000'),
-                'position' => array('pos_x' => 0, 'pos_y' => 1085, 'font' => 'lato-medium', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
-                'unit'     => array('pos_x' => 0, 'pos_y' => 1130, 'font' => 'lato-medium', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
+                'name'     => array('pos_x' => 0, 'pos_y' => 1010, 'font' => 'fontten',      'size' => 48, 'align' => 'C', 'color' => '#000000'),
+                'position' => array('pos_x' => 0, 'pos_y' => 1085, 'font' => 'fontchucdanh', 'size' => 34, 'align' => 'C', 'color' => '#000000'),
+                'unit'     => array('pos_x' => 0, 'pos_y' => 1130, 'font' => 'fontdonvi',    'size' => 34, 'align' => 'C', 'color' => '#000000'),
             ),
             'back' => array(
                 'qr'    => array('pos_x' => 281, 'pos_y' => 420, 'size' => 500),
