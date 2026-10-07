@@ -1259,6 +1259,13 @@ class MyHelper
         $y = (int) $cfg['pos_y'] + $ascent;
 
         imagettftext($canvas, $size, 0, $x, $y, $col, $fontPath, $text);
+
+        // In đậm giả: vẽ thêm vài lượt lệch 1px để nét dày lên (font không có bản bold riêng).
+        if (!empty($cfg['bold'])) {
+            imagettftext($canvas, $size, 0, $x + 1, $y, $col, $fontPath, $text);
+            imagettftext($canvas, $size, 0, $x, $y + 1, $col, $fontPath, $text);
+            imagettftext($canvas, $size, 0, $x + 1, $y + 1, $col, $fontPath, $text);
+        }
     }
 
     /** Đường dẫn file font, fallback về times.ttf nếu font chỉ định không tồn tại. */
