@@ -1075,9 +1075,10 @@ class MyHelper
             mkdir($outDir, 0755, true);
         }
 
-        $idPart   = isset($row['id']) ? (int) $row['id'] : 0;
-        $namePart = UrlTransliterate::cleanString(isset($row['full_name']) ? $row['full_name'] : 'nguoi');
-        $path     = $outDir . $namePart . '-' . $idPart . '.png';
+        // Tên file = tên người + mã lucky (vd "nguyen-van-a-mt0088.png"); thiếu lucky thì dùng id.
+        $namePart   = UrlTransliterate::cleanString(isset($row['full_name']) ? $row['full_name'] : 'nguoi');
+        $suffixPart = $lucky !== '' ? 'mt' . $lucky : (isset($row['id']) ? (string) (int) $row['id'] : '0');
+        $path       = $outDir . $namePart . '-' . UrlTransliterate::cleanString($suffixPart) . '.png';
 
         imagepng($combined, $path);
         imagedestroy($combined);
