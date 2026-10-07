@@ -92,7 +92,8 @@ class AttendeePortalController extends CController
 
     protected function markProfileConfirmed()
     {
-        $this->session()[self::SESSION_PROFILE_OK] = true;
+        $s = $this->session();
+        $s[self::SESSION_PROFILE_OK] = true;
     }
 
     /**
