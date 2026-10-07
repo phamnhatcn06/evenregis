@@ -1333,7 +1333,7 @@ class MyHelper
         }
     }
 
-    public static function insertImagePNG($imageGeneral, $imageInsert, $position = array(), $des, $name)
+    public static function insertImagePNG($imageGeneral, $imageInsert, $position, $des, $name)
     {
         $baseFolder = Yii::app()->basePath . '/../uploads/';
         $folder = $baseFolder . $des . '/';
