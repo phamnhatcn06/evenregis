@@ -652,6 +652,8 @@ class ApiEndpoints
     const RUN_AUTH_IDENTIFY_BY_QR = '/api/run-auth/identify-by-qr';
     const RUN_AUTH_SET_PIN = '/api/run-auth/set-pin';
     const RUN_AUTH_LOGIN = '/api/run-auth/login';
+    const RUN_AUTH_PROFILE = '/api/run-auth/profile';
+    const RUN_AUTH_SAVE_PROFILE = '/api/run-auth/save-profile';
     const RUN_AUTH_GEN_LUCKY = '/api/run-auth/gen-lucky';
 
     // Tong hop danh sach Vong Chung Ket + ma lucky
