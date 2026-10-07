@@ -160,7 +160,10 @@ $countdownDeadlineDate = date('H:i d/m/Y', $countdownTarget);
             </span>
         <?php endif; ?>
 
-        <a href="<?php echo $this->createUrl('/frontend/run/logout'); ?>" class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-md-2" title="Đăng xuất khỏi cổng">
+        <a href="<?php echo $this->createUrl('/frontend/portal/index'); ?>" class="btn btn-outline-secondary btn-sm rounded-pill px-3 ms-md-2" title="Về trang chủ cá nhân">
+            <i class="bi bi-grid-fill me-1"></i> Trang chủ
+        </a>
+        <a href="<?php echo $this->createUrl('/frontend/portal/logout'); ?>" class="btn btn-outline-danger btn-sm rounded-pill px-3" title="Đăng xuất khỏi cổng">
             <i class="bi bi-box-arrow-right me-1"></i> Thoát
         </a>
     </div>
