@@ -242,6 +242,13 @@ $features = array(
     </div>
 </div>
 
+<?php
+// Popup xác nhận hồ sơ (chỉ có khi chưa xác nhận trong phiên đăng nhập này).
+if (!empty($profileModal)) {
+    $this->renderPartial('_modal_profile', $profileModal);
+}
+?>
+
 <!-- Logout confirmation script with SweetAlert2 -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
