@@ -1391,7 +1391,7 @@ class MyHelper
         }
     }
 
-    public static function resolutionImage($imageGeneral, $size = array(), $des, $name)
+    public static function resolutionImage($imageGeneral, $size, $des, $name)
     {
         $image = file_get_contents($imageGeneral);
         $image = substr_replace($image, pack("Cnn", 0x01, 300, 300), 13, 5);
