@@ -56,7 +56,7 @@ if ($step === 'identify') {
                                 <i class="bi bi-person-vcard text-primary me-1"></i> Định danh đăng nhập
                             </label>
                             <input type="text" name="identifier" class="form-control form-control-lg text-center fw-bold rounded-3"
-                                   placeholder="VD: DHMT123456" value="<?php echo CHtml::encode($identifier); ?>"
+                                   placeholder="VD: MT0088" value="<?php echo CHtml::encode($identifier); ?>"
                                    style="letter-spacing: 0.05em;" autofocus required>
                             <div class="form-text text-muted small mt-1">
                                 Nhập mã định danh được Ban tổ chức cung cấp (bắt đầu bằng DHMT).
