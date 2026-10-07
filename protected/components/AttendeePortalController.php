@@ -11,7 +11,7 @@
  */
 class AttendeePortalController extends CController
 {
-    public $layout = '//layouts/frontend';
+    public $layout = '//layouts/portal';
 
     /** Các khóa session dùng chung cho cổng cá nhân. */
     const SESSION_ATTENDEE_ID = 'portal_attendee_id';

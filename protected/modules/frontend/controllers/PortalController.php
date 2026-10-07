@@ -90,6 +90,7 @@ class PortalController extends AttendeePortalController
     public function actionIndex()
     {
         $this->requireLogin();
+        $this->layout = '//layouts/portal';
 
         $this->render('index', array(
             'fullName' => $this->currentFullName(),

@@ -9,7 +9,14 @@
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/css/font-awesome/font-awesome.min.css" rel="stylesheet">
     <style>
         body {
-            padding-top: 70px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+        }
+
+        .frontend-content {
+            flex: 1 0 auto;
         }
 
         .navbar-brand {
@@ -19,13 +26,15 @@
 </head>
 
 <body>
-    <div class="container">
-        <?php echo $content; ?>
-    </div>
+    <main class="frontend-content">
+        <div class="container">
+            <?php echo $content; ?>
+        </div>
+    </main>
 
-    <footer class="bg-light py-4 mt-5">
+    <footer class="bg-light py-4 mt-auto border-top">
         <div class="container text-center">
-            <p class="mb-0">&copy; <?php echo date('Y'); ?> <?php echo Yii::app()->name; ?>. All rights reserved.</p>
+            <p class="mb-0 text-muted">&copy; <?php echo date('Y'); ?> <?php echo Yii::app()->name; ?>. All rights reserved.</p>
         </div>
     </footer>
 
