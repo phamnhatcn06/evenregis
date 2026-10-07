@@ -60,7 +60,7 @@
                                    autofocus>
                         </div>
                         <div class="form-text small text-muted mt-1">
-                            <i class="fa fa-info-circle me-1"></i>Hệ thống tự động chuẩn hoá thành 3 chữ số (VD: <code>88</code> &rarr; <code>088</code>).
+                            <i class="fa fa-info-circle me-1"></i>Hệ thống tự động chuẩn hoá thành 4 chữ số (VD: <code>88</code> &rarr; <code>0088</code>).
                         </div>
                     </div>
 
