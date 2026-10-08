@@ -229,8 +229,10 @@ if (!empty($regOpenAts) && !empty($regCloseAts)) {
      data-tour-cancel-rejected="<?php echo $tourRejectAt > 0 ? '1' : '0'; ?>"
      data-tour-reject-reviewed-at="<?php echo $tourRejectAt; ?>"
      data-save-emergency-url="<?php echo $saveEmergencyUrl; ?>"
+     data-save-shirt-size-url="<?php echo $saveShirtSizeUrl; ?>"
      data-has-run="<?php echo !empty($runMine) ? '1' : '0'; ?>"
-     data-has-emergency="<?php echo $hasEmergencyInfo ? '1' : '0'; ?>"></div>
+     data-has-emergency="<?php echo $hasEmergencyInfo ? '1' : '0'; ?>"
+     data-needs-shirt-size="<?php echo $needsShirtSize ? '1' : '0'; ?>"></div>
 
 <!-- Hero Banner: Countdown thời gian đăng ký & Hướng dẫn -->
 <div class="run-countdown-banner">
