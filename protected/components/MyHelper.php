@@ -1218,6 +1218,11 @@ class MyHelper
         if (!$raw) {
             return false;
         }
+        // Ảnh QR lib xuất ra là ảnh palette → imagecolorat trả CHỈ SỐ palette, không phải RGB.
+        // Chuyển sang truecolor để tính luminance khi lấy mẫu ô cho đúng.
+        if (function_exists('imagepalettetotruecolor')) {
+            imagepalettetotruecolor($raw);
+        }
 
         // Vẽ lại QR theo lưới ô (module) thay vì phóng/thu bằng nội suy: ảnh gốc được sinh
         // với module_size cố định nên suy ra số ô, rồi lấy mẫu tâm từng ô và vẽ ô vuông đặc
