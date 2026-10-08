@@ -29,7 +29,7 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
 <div class="card mb-3">
     <div class="card-body">
         <form method="get" action="<?php echo $this->createUrl('admin'); ?>" class="row g-2 align-items-end">
-            <div class="col-md-5">
+            <div class="col-md-3">
                 <label class="form-label">Sự kiện</label>
                 <?php echo CHtml::dropDownList('event_id', $eventId, $eventList, array(
                     'class' => 'form-select',
@@ -37,13 +37,45 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                     'onchange' => 'this.form.submit()',
                 )); ?>
             </div>
-            <div class="col-md-7 text-end">
-                <?php if ($eventId): ?>
-                    <a href="<?php echo $this->createUrl('export', array('event_id' => $eventId)); ?>" class="btn btn-success">
-                        <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
-                    </a>
-                <?php endif; ?>
+            <?php if ($eventId): ?>
+            <div class="col-md-3">
+                <label class="form-label">Tìm kiếm</label>
+                <?php echo CHtml::textField('q', $filters['q'], array(
+                    'class' => 'form-control',
+                    'placeholder' => 'Tên / BIB / SĐT / Mã VĐV',
+                )); ?>
             </div>
+            <div class="col-md-2">
+                <label class="form-label">Cự ly</label>
+                <?php echo CHtml::dropDownList('cu_ly', $filters['cu_ly'], $cuLyOptions, array(
+                    'class' => 'form-select',
+                    'empty' => '-- Tất cả --',
+                )); ?>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Giới tính</label>
+                <?php echo CHtml::dropDownList('gender', $filters['gender'], array('1' => 'Nam', '0' => 'Nữ'), array(
+                    'class' => 'form-select',
+                    'empty' => '-- Tất cả --',
+                )); ?>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Đơn vị</label>
+                <?php echo CHtml::dropDownList('unit', $filters['unit'], $unitOptions, array(
+                    'class' => 'form-select',
+                    'empty' => '-- Tất cả --',
+                )); ?>
+            </div>
+            <div class="col-12 d-flex gap-2 mt-2">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-filter me-1"></i>Lọc</button>
+                <a href="<?php echo $this->createUrl('admin', array('event_id' => $eventId)); ?>" class="btn btn-outline-secondary">
+                    <i class="fa fa-times me-1"></i>Xóa lọc
+                </a>
+                <a href="<?php echo $this->createUrl('export', array('event_id' => $eventId)); ?>" class="btn btn-success ms-auto">
+                    <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                </a>
+            </div>
+            <?php endif; ?>
         </form>
     </div>
 </div>
