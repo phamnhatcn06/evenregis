@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cổng đăng nhập cá nhân người tham dự - Đại hội Mường Thanh 2026 Ninh Bình.
  * Giao diện hiện đại, sang trọng, đẳng cấp sự kiện với trải nghiệm tương tác mượt mà.
@@ -50,9 +51,9 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
         <div class="portal-brand-showcase">
             <!-- Logo biểu trưng chính thức Đại hội Mường Thanh Ninh Bình 2026 -->
             <div class="portal-logo-wrapper">
-                <img src="<?php echo Yii::app()->theme->baseUrl; ?>/logo_daihoi.png" 
-                     alt="Đại hội Mường Thanh Ninh Bình 2026" 
-                     class="portal-logo-img">
+                <img src="<?php echo Yii::app()->theme->baseUrl; ?>/logo_daihoi.png"
+                    alt="Đại hội Mường Thanh Ninh Bình 2026"
+                    class="portal-logo-img">
             </div>
 
             <!-- Huy hiệu cổng chính thức -->
@@ -84,7 +85,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                     </div>
                     <div class="destination-chips d-none d-sm-flex">
                         <span class="destination-chip">
-                            <i class="bi bi-trophy text-warning"></i> Fun Run 3km & 5km
+                            <i class="bi bi-trophy text-warning"></i> Fun Run 5km & 10km & 15km
                         </span>
                         <span class="destination-chip">
                             <i class="bi bi-compass text-info"></i> Quần thể Di sản Tràng An
@@ -181,26 +182,26 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                             <span><i class="bi bi-person-badge text-primary me-1"></i> Mã định danh Đại biểu</span>
                             <span class="text-muted fw-normal small">Ví dụ: <strong>MT0088</strong></span>
                         </label>
-                        
+
                         <div class="auth-input-group">
                             <div class="auth-input-icon">
                                 <i class="bi bi-upc-scan"></i>
                             </div>
-                            <input type="text" 
-                                   name="identifier" 
-                                   id="portal-identifier-input"
-                                   class="auth-text-input"
-                                   placeholder="NHẬP MÃ ĐẠI BIỂU..." 
-                                   value="<?php echo CHtml::encode($identifier); ?>"
-                                   maxlength="20"
-                                   autocomplete="off"
-                                   spellcheck="false"
-                                   autofocus 
-                                   required>
-                            <button type="button" 
-                                    class="auth-input-action-btn" 
-                                    id="btn-paste-identifier" 
-                                    title="Dán mã từ bộ nhớ tạm">
+                            <input type="text"
+                                name="identifier"
+                                id="portal-identifier-input"
+                                class="auth-text-input"
+                                placeholder="NHẬP MÃ ĐẠI BIỂU..."
+                                value="<?php echo CHtml::encode($identifier); ?>"
+                                maxlength="20"
+                                autocomplete="off"
+                                spellcheck="false"
+                                autofocus
+                                required>
+                            <button type="button"
+                                class="auth-input-action-btn"
+                                id="btn-paste-identifier"
+                                title="Dán mã từ bộ nhớ tạm">
                                 <i class="bi bi-clipboard"></i> Dán
                             </button>
                         </div>
@@ -221,9 +222,9 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                                 <i class="bi bi-diagram-3"></i>
                             </div>
                             <select name="property_id"
-                                    id="portal-unit-select"
-                                    class="auth-text-input"
-                                    required>
+                                id="portal-unit-select"
+                                class="auth-text-input"
+                                required>
                                 <option value="">-- Chọn đơn vị của bạn --</option>
                                 <?php foreach ($units as $unit): ?>
                                     <option value="<?php echo CHtml::encode($unit['id']); ?>"
@@ -287,7 +288,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                     </div>
                 </div>
 
-            <!-- BƯỚC 2: THIẾT LẬP MÃ PIN (CHO ĐẠI BIỂU MỚI) -->
+                <!-- BƯỚC 2: THIẾT LẬP MÃ PIN (CHO ĐẠI BIỂU MỚI) -->
             <?php elseif ($step === 'setpin'): ?>
                 <div class="auth-user-banner banner-success">
                     <div class="user-banner-avatar">
@@ -338,7 +339,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                             <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]" class="pin-digit-box" autocomplete="one-time-code">
                             <input type="password" inputmode="numeric" maxlength="1" pattern="[0-9]" class="pin-digit-box" autocomplete="one-time-code">
                         </div>
-                        
+
                         <div class="d-flex align-items-center justify-content-center gap-2">
                             <button type="button" class="pin-toggle-btn" data-target-group="group-setpin-confirm">
                                 <i class="bi bi-eye"></i> Hiện mã PIN
@@ -359,7 +360,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                     </div>
                 </form>
 
-            <!-- BƯỚC 3: NHẬP PIN ĐĂNG NHẬP (CHO ĐẠI BIỂU ĐÃ CÓ PIN) -->
+                <!-- BƯỚC 3: NHẬP PIN ĐĂNG NHẬP (CHO ĐẠI BIỂU ĐÃ CÓ PIN) -->
             <?php else: ?>
                 <div class="auth-user-banner">
                     <div class="user-banner-avatar">
