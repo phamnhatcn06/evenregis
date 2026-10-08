@@ -104,6 +104,53 @@ class SlideshowController extends AdminController
         ));
     }
 
+    /**
+     * Nhận file ảnh từ dropzone (AJAX), lưu vào webroot/uploads/slideshows/Y/m
+     * và trả JSON { success, url } để JS gán vào hidden field image/mobile_image.
+     */
+    public function actionUploadImage()
+    {
+        header('Content-Type: application/json');
+
+        $fieldKey = 'file';
+        if (!isset($_FILES[$fieldKey]) || $_FILES[$fieldKey]['error'] !== UPLOAD_ERR_OK) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Không nhận được tệp tải lên.'));
+            Yii::app()->end();
+        }
+
+        $file = $_FILES[$fieldKey];
+        $allowedExt = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($ext, $allowedExt)) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Định dạng ảnh không hợp lệ (chỉ JPG, PNG, GIF, WEBP).'));
+            Yii::app()->end();
+        }
+
+        $maxSize = 5 * 1024 * 1024;
+        if ($file['size'] > $maxSize) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Ảnh vượt quá dung lượng cho phép (5MB).'));
+            Yii::app()->end();
+        }
+
+        $relativeDir = '/uploads/slideshows/' . date('Y/m');
+        $uploadDir = Yii::getPathOfAlias('webroot') . $relativeDir;
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Không thể tạo thư mục lưu ảnh.'));
+            Yii::app()->end();
+        }
+
+        $filename = 'slide_' . uniqid() . '.' . $ext;
+        $targetPath = $uploadDir . '/' . $filename;
+
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            echo CJSON::encode(array('success' => true, 'url' => $relativeDir . '/' . $filename));
+        } else {
+            echo CJSON::encode(array('success' => false, 'message' => 'Không thể lưu ảnh lên máy chủ.'));
+        }
+        Yii::app()->end();
+    }
+
     protected function loadModelById($id)
     {
         $model = Slideshow::fetchFromApi($id);
