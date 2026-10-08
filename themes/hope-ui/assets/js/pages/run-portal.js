@@ -18,7 +18,9 @@
 
         bindRegister(config);
         bindCancelForms();
+        bindShirtSizeForm();
         bindEmergencyForm();
+        maybePromptShirtSize(config);
         maybePromptEmergency(config);
         initCountdown();
     });
