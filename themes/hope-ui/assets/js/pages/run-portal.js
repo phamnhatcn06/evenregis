@@ -123,6 +123,10 @@
         .then(function (res) { return res.json(); })
         .then(function (data) {
             if (data.success) {
+                // Chỉ nội dung chạy mới có bước khai thông tin khẩn cấp.
+                if (field === 'run_event_id') {
+                    try { localStorage.setItem(EMERGENCY_PROMPT_KEY, '1'); } catch (e) { /* bỏ qua */ }
+                }
                 Swal.fire({
                     title: 'Thành công!',
                     html: data.bib ? ('Số BIB của bạn: <strong>' + data.bib + '</strong>') : (data.message || 'Đăng ký thành công!'),
