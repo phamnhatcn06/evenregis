@@ -64,6 +64,7 @@ $flashMessages = Yii::app()->user->getFlashes();
      data-delete-url="<?php echo $this->createUrl('delete'); ?>"
      data-clear-conflict-url="<?php echo $this->createUrl('clearConflict'); ?>"
      data-set-lucky-url="<?php echo $this->createUrl('setLucky'); ?>"
+     data-reset-pin-url="<?php echo $this->createUrl('resetPin'); ?>"
      data-check-lucky-url="<?php echo $this->createUrl('checkLucky'); ?>"
      data-list-url="<?php echo $this->createUrl('admin'); ?>"
      data-search-url="<?php echo $this->createUrl('filterOptions'); ?>"
