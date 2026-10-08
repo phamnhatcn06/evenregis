@@ -184,12 +184,72 @@
         });
     }
 
+    // Size áo Fun Run là BẮT BUỘC: tự bật popup (không cho bỏ qua) khi người này đã
+    // đăng ký chạy nhưng chưa chọn size. Backdrop tĩnh đã do PHP đặt sẵn.
+    function maybePromptShirtSize(config) {
+        if (config.getAttribute('data-needs-shirt-size') !== '1') { return; }
+        var modalEl = document.getElementById('modalShirtSize');
+        if (!modalEl || typeof bootstrap === 'undefined') { return; }
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+
+    // Lưu size áo Fun Run qua AJAX (bắt buộc).
+    function bindShirtSizeForm() {
+        var form = document.getElementById('form-shirt-size');
+        if (!form) { return; }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var select = document.getElementById('shirt_size');
+            if (select && !select.value) {
+                if (typeof Toast !== 'undefined') { Toast.warning('Vui lòng chọn size áo.'); }
+                return;
+            }
+
+            var btn = document.getElementById('btn-submit-shirt-size');
+            var original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: new FormData(form)
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    var modalEl = document.getElementById('modalShirtSize');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) { modal.hide(); }
+                    if (typeof Toast !== 'undefined') { Toast.success(data.message || 'Đã lưu size áo Fun Run.'); }
+                    setTimeout(function () { window.location.reload(); }, 1000);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = original;
+                    if (typeof Toast !== 'undefined') { Toast.error(data.message || 'Không lưu được size áo.'); }
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = original;
+                if (typeof Toast !== 'undefined') { Toast.error('Lỗi kết nối máy chủ. Vui lòng thử lại.'); }
+            });
+        });
+    }
+
     // Tự bật popup khai thông tin khẩn cấp ngay sau khi đăng ký chạy thành công
     // (trang vừa reload). Chỉ bật khi người này CHƯA khai thông tin nào.
     function maybePromptEmergency(config) {
         var pending = false;
         try { pending = localStorage.getItem(EMERGENCY_PROMPT_KEY) === '1'; } catch (e) { /* bỏ qua */ }
         if (!pending) { return; }
+
+        // Ưu tiên bước chọn size áo (bắt buộc) trước — giữ cờ để bật emergency sau khi
+        // người dùng chọn xong size và trang reload lại.
+        if (config.getAttribute('data-needs-shirt-size') === '1') { return; }
+
         try { localStorage.removeItem(EMERGENCY_PROMPT_KEY); } catch (e) { /* bỏ qua */ }
 
         if (config.getAttribute('data-has-run') !== '1') { return; }
