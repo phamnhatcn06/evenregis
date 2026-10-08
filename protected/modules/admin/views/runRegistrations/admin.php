@@ -97,7 +97,11 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
         <?php if (!$eventId): ?>
             <div class="alert alert-info mb-0">Vui lòng chọn sự kiện để xem danh sách đăng ký.</div>
         <?php elseif (empty($registrations)): ?>
-            <div class="alert alert-warning mb-0">Chưa có ai đăng ký cho sự kiện này.</div>
+            <?php if ($totalCount > 0): ?>
+                <div class="alert alert-warning mb-0">Không có kết quả phù hợp với bộ lọc.</div>
+            <?php else: ?>
+                <div class="alert alert-warning mb-0">Chưa có ai đăng ký cho sự kiện này.</div>
+            <?php endif; ?>
         <?php else: ?>
             <div class="table-responsive">
                 <table class="table table-bordered table-striped align-middle">
