@@ -1146,7 +1146,7 @@ class FinalAttendeeRostersController extends AdminController
     protected function getFilterValues()
     {
         $keys = array(
-            'property_id', 'division_code', 'department_code', 'attendee_type', 'content_type',
+            'division_code', 'department_code', 'attendee_type', 'content_type',
             'has_lucky', 'has_override', 'conflict_flag', 'keyword', 'with_trashed',
         );
 
@@ -1154,6 +1154,9 @@ class FinalAttendeeRostersController extends AdminController
         foreach ($keys as $key) {
             $values[$key] = isset($_GET[$key]) && $_GET[$key] !== '' ? $_GET[$key] : null;
         }
+
+        // Đơn vị cho chọn nhiều: chuẩn hoá về mảng id (int), rỗng thì để null cho các chỗ lọc bỏ qua.
+        $values['property_id'] = $this->getPropertyIdValues();
 
         return $values;
     }
