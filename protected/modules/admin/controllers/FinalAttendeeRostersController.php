@@ -64,10 +64,15 @@ class FinalAttendeeRostersController extends AdminController
             $dataProvider = FinalAttendeeRosters::getApiDataProvider($params, $pageSize);
             $stats        = FinalAttendeeRosters::getStats($eventId, $periodId);
 
+            // Phòng ban phụ thuộc đơn vị: chỉ thu hẹp khi chọn đúng MỘT đơn vị; chọn nhiều thì để rộng.
+            $scopeProperty = (isset($params['property_id']) && is_array($params['property_id']) && count($params['property_id']) === 1)
+                ? $params['property_id'][0]
+                : null;
+
             $filterOptions = FinalAttendeeRosters::getFilterOptions(
                 $eventId,
                 $periodId,
-                isset($params['property_id']) ? $params['property_id'] : null,
+                $scopeProperty,
                 isset($params['division_code']) ? $params['division_code'] : null
             );
 
