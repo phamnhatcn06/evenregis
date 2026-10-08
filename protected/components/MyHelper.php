@@ -974,6 +974,23 @@ class MyHelper
     }
 
     /**
+     * Tên thư mục đơn vị để gom ảnh thẻ: ưu tiên prefix/mã đơn vị (property_code),
+     * thiếu thì dùng tên đơn vị (badge_org_name / property_name / unit_label), cuối cùng "khac".
+     */
+    public static function finalBadgeUnitFolder($row)
+    {
+        foreach (array('property_code', 'badge_org_name', 'property_name', 'unit_label') as $key) {
+            if (!empty($row[$key])) {
+                $slug = UrlTransliterate::cleanString($row[$key]);
+                if ($slug !== '') {
+                    return $slug;
+                }
+            }
+        }
+        return 'khac';
+    }
+
+    /**
      * Tạo ảnh thẻ VCK cho một người, gộp mặt trước + mặt sau cạnh nhau vào 1 file PNG.
      *
      * @param array  $row          Một dòng roster: full_name, position_display/position,
