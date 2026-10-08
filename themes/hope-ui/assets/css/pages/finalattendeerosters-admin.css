@@ -1022,6 +1022,16 @@
     color: #ffffff;
 }
 
+.far-action-reset-pin {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.far-action-reset-pin:hover {
+    background: #d97706;
+    color: #ffffff;
+}
+
 .far-action-withdraw {
     background: rgba(192, 50, 33, 0.1);
     color: #c03221;
