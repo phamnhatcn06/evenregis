@@ -11,6 +11,7 @@ class RunRegistrations extends CFormModel
     public $attendee_id;
     public $bib_number;
     public $age_group_label;
+    public $shirt_size;
     public $registered_at;
     public $full_name;
     public $unit_label;
