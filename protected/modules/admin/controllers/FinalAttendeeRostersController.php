@@ -334,6 +334,19 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Tên đơn vị của một dòng (ưu tiên tên hiển thị trên thẻ → tên property → nhãn đơn vị).
+     */
+    protected function resolveUnitName($row)
+    {
+        foreach (array('badge_org_name', 'property_name', 'unit_label') as $key) {
+            if (!empty($row[$key])) {
+                return trim((string) $row[$key]);
+            }
+        }
+        return '';
+    }
+
+    /**
      * URL gốc trang đăng nhập cổng cá nhân (để nhúng vào QR). Cho phép cấu hình đè qua params.
      */
     protected function resolvePortalBaseUrl()
