@@ -1066,11 +1066,10 @@ class MyHelper
             return false;
         }
 
-        // Chia thư mục theo mã đơn vị
-        $propertyCode = isset($row['property_code']) && $row['property_code'] !== ''
-            ? UrlTransliterate::cleanString($row['property_code'])
-            : 'khac';
-        $outDir = $baseFolder . 'final_badges/' . $propertyCode . '/';
+        // Chia thư mục theo ĐƠN VỊ: ưu tiên prefix/mã đơn vị, thiếu thì lấy tên đơn vị, cuối cùng mới "khac".
+        // Nhờ vậy xuất nhiều đơn vị cùng lúc thì mỗi người vào đúng thư mục đơn vị của mình.
+        $unitFolder = self::finalBadgeUnitFolder($row);
+        $outDir = $baseFolder . 'final_badges/' . $unitFolder . '/';
         if (!is_dir($outDir)) {
             mkdir($outDir, 0755, true);
         }
