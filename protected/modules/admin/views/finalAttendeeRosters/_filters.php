@@ -35,9 +35,16 @@ if (!empty($filterOptions['contents'])) {
 $activeCount = 0;
 $activeTags  = array();
 
-if (!empty($filters['property_id']) && isset($propertyOptions[$filters['property_id']])) {
+$selectedProperties = is_array($filters['property_id'])
+    ? $filters['property_id']
+    : (!empty($filters['property_id']) ? array($filters['property_id']) : array());
+if (!empty($selectedProperties)) {
     $activeCount++;
-    $activeTags[] = 'Đơn vị: ' . $propertyOptions[$filters['property_id']];
+    $names = array();
+    foreach ($selectedProperties as $pid) {
+        $names[] = isset($propertyOptions[$pid]) ? $propertyOptions[$pid] : $pid;
+    }
+    $activeTags[] = 'Đơn vị: ' . implode(', ', $names);
 }
 if (!empty($filters['department_code'])) {
     $activeCount++;
