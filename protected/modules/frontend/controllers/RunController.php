@@ -123,6 +123,41 @@ class RunController extends AttendeePortalController
         Yii::app()->end();
     }
 
+    /** Lưu size áo Fun Run cho đăng ký chạy (AJAX, bắt buộc). */
+    public function actionSaveShirtSize()
+    {
+        header('Content-Type: application/json');
+
+        if (!$this->isLoggedIn()) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'));
+            Yii::app()->end();
+        }
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+        if ($this->denyIfProfileNotConfirmed()) {
+            Yii::app()->end();
+        }
+
+        $attendeeId = $this->currentAttendeeId();
+        $shirtSize = trim(isset($_POST['shirt_size']) ? $_POST['shirt_size'] : '');
+        if ($shirtSize === '') {
+            echo CJSON::encode(array('success' => false, 'message' => 'Vui lòng chọn size áo.'));
+            Yii::app()->end();
+        }
+
+        $res = RunRegistrations::saveShirtSizeViaApi($attendeeId, $shirtSize);
+
+        echo CJSON::encode(array(
+            'success' => (bool) $res['success'],
+            'message' => $res['success']
+                ? (isset($res['data']['message']) ? $res['data']['message'] : 'Đã lưu size áo Fun Run.')
+                : ($res['error'] ?: 'Không lưu được size áo. Vui lòng thử lại.'),
+        ));
+        Yii::app()->end();
+    }
+
     /** Người dùng xin hủy đăng ký (AJAX). Trả JSON {success, message}. */
     public function actionCancelRequest()
     {
