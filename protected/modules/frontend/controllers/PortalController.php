@@ -80,6 +80,21 @@ class PortalController extends AttendeePortalController
                 Yii::app()->user->setFlash('error', $res['error'] ?: 'Mã PIN không đúng.');
                 $step = 'login';
             }
+        } elseif (isset($_GET['token']) && trim($_GET['token']) !== '') {
+            // Quét QR thẻ bằng camera điện thoại sẽ mở thẳng URL ...?token=<qr_token>.
+            // Thẻ vật lý đã chứng minh danh tính nên bỏ qua bước nhập mã + chọn đơn vị,
+            // nhận diện ngay rồi vào màn đặt PIN (lần đầu) hoặc nhập PIN (đã có).
+            $res = RunAuth::identifyByQr(trim($_GET['token']));
+            if ($res['success'] && isset($res['data']['data'])) {
+                $data = $res['data']['data'];
+                $fullName = isset($data['full_name']) ? $data['full_name'] : '';
+                if (!empty($data['identifier'])) {
+                    $identifier = $data['identifier'];
+                }
+                $step = !empty($data['pin_is_set']) ? 'login' : 'setpin';
+            } else {
+                Yii::app()->user->setFlash('error', $res['error'] ?: 'Không nhận diện được thẻ. Vui lòng thử lại.');
+            }
         }
 
         // Dropdown đơn vị chỉ cần ở bước nhập định danh tay (không cần cho bước PIN/QR).
