@@ -173,9 +173,9 @@ class RunRegistrationsController extends AdminController
         $sheet->setTitle('Dang ky chay');
 
         $sheet->setCellValue('A1', 'DANH SÁCH ĐĂNG KÝ BỘ MÔN CHẠY');
-        $sheet->mergeCells('A1:G1');
+        $sheet->mergeCells('A1:I1');
 
-        $headers = array('A' => 'STT', 'B' => 'Số BIB', 'C' => 'Họ và tên', 'D' => 'Đơn vị', 'E' => 'Số điện thoại', 'F' => 'Cự ly', 'G' => 'Nội dung');
+        $headers = array('A' => 'STT', 'B' => 'Số BIB', 'C' => 'Họ và tên', 'D' => 'Đơn vị', 'E' => 'Số điện thoại', 'F' => 'Năm sinh', 'G' => 'Giới tính', 'H' => 'Cự ly', 'I' => 'Nội dung');
         foreach ($headers as $col => $label) {
             $sheet->setCellValue($col . '3', $label);
         }
@@ -183,17 +183,23 @@ class RunRegistrationsController extends AdminController
         $row = 4;
         $stt = 1;
         foreach ($rows as $r) {
+            $genderLabel = '';
+            if (isset($r['gender']) && $r['gender'] !== null && $r['gender'] !== '') {
+                $genderLabel = ((int) $r['gender'] === 1) ? 'Nam' : 'Nữ';
+            }
             $sheet->setCellValue('A' . $row, $stt++);
             $sheet->setCellValue('B' . $row, isset($r['bib_number']) ? $r['bib_number'] : '');
             $sheet->setCellValue('C' . $row, isset($r['full_name']) ? $r['full_name'] : '');
             $sheet->setCellValue('D' . $row, isset($r['unit_label']) ? $r['unit_label'] : '');
             $sheet->setCellValue('E' . $row, isset($r['phone_number']) ? $r['phone_number'] : '');
-            $sheet->setCellValue('F' . $row, isset($r['run_event_name']) ? $r['run_event_name'] : '');
-            $sheet->setCellValue('G' . $row, !empty($r['age_group_label']) ? $r['age_group_label'] : '');
+            $sheet->setCellValue('F' . $row, !empty($r['birth_year']) ? $r['birth_year'] : '');
+            $sheet->setCellValue('G' . $row, $genderLabel);
+            $sheet->setCellValue('H' . $row, isset($r['run_event_name']) ? $r['run_event_name'] : '');
+            $sheet->setCellValue('I' . $row, !empty($r['age_group_label']) ? $r['age_group_label'] : '');
             $row++;
         }
 
-        foreach (range('A', 'G') as $col) {
+        foreach (range('A', 'I') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
