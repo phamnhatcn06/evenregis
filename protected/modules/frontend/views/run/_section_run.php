@@ -56,6 +56,12 @@
                             <td><i class="bi bi-flag-fill text-primary me-2"></i> Cự ly thi đấu:</td>
                             <td><span class="fw-bold text-primary"><?php echo CHtml::encode(isset($runMine['run_event_name']) ? $runMine['run_event_name'] : ''); ?></span></td>
                         </tr>
+                        <?php if (!empty($runMine['age_group_label'])): ?>
+                        <tr>
+                            <td><i class="bi bi-people-fill text-primary me-2"></i> Nội dung:</td>
+                            <td><span class="fw-bold text-primary"><?php echo CHtml::encode($runMine['age_group_label']); ?></span></td>
+                        </tr>
+                        <?php endif; ?>
                         <?php if (!empty($runMine['full_name'])): ?>
                             <tr>
                                 <td><i class="bi bi-person-fill text-secondary me-2"></i> Vận động viên:</td>
