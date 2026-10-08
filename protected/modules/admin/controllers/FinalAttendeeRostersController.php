@@ -334,11 +334,13 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
-     * Tên đơn vị của một dòng (ưu tiên tên hiển thị trên thẻ → tên property → nhãn đơn vị).
+     * Tên ĐƠN VỊ của một dòng, dùng để đặt tên file ZIP. Ưu tiên tên đơn vị thật (property_name)
+     * vì badge_org_name là tên tổ chức in trên thẻ, có thể KHÁC nhau theo từng người trong cùng
+     * một đơn vị (chi nhánh...) → nếu dùng nó sẽ ra nhiều tên khác nhau và không gộp được.
      */
     protected function resolveUnitName($row)
     {
-        foreach (array('badge_org_name', 'property_name', 'unit_label') as $key) {
+        foreach (array('property_name', 'unit_label', 'badge_org_name') as $key) {
             if (!empty($row[$key])) {
                 return trim((string) $row[$key]);
             }
