@@ -627,6 +627,7 @@ class ApiEndpoints
     const RUN_REGISTRATION_LIST = '/api/run-registrations';
     const RUN_REGISTRATION_CLAIM = '/api/run-registrations/claim';
     const RUN_REGISTRATION_MINE = '/api/run-registrations/mine';
+    const RUN_REGISTRATION_SAVE_EMERGENCY = '/api/run-registrations/save-emergency';
     const RUN_REGISTRATION_CANCEL_REQUEST = '/api/run-registrations/cancel-request';
     const RUN_REGISTRATION_CANCEL_REQUESTS = '/api/run-registrations/cancel-requests';
     const RUN_REGISTRATION_CANCEL_APPROVE = '/api/run-registrations/cancel/approve/{id}';
