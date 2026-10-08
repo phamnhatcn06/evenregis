@@ -277,60 +277,90 @@ class FinalAttendeeRostersController extends AdminController
         $rows         = $this->fetchAllForExport($this->buildFilterParams($eventId, $periodId));
         $loginBaseUrl = $this->resolvePortalBaseUrl();
 
-        $zipPath = Yii::app()->basePath . '/../uploads/final_badges/_zip_'
-            . $eventId . '_' . date('Ymd_His') . '_' . substr(md5(uniqid('', true)), 0, 6) . '.zip';
-        $zipDir = dirname($zipPath);
-        if (!is_dir($zipDir)) {
-            mkdir($zipDir, 0755, true);
+        $workDir = Yii::app()->basePath . '/../uploads/final_badges';
+        if (!is_dir($workDir)) {
+            mkdir($workDir, 0755, true);
         }
 
-        $zip = new ZipArchive();
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            throw new CHttpException(500, 'Không mở được file ZIP để ghi.');
-        }
-
-        $created   = array();
-        $unitNames = array();
+        // Dựng ảnh thẻ, gom theo ĐƠN VỊ: mỗi đơn vị một nhóm (tên để đặt tên ZIP + danh sách file).
+        $groups  = array();
+        $created = array();
         foreach ($rows as $row) {
             $badge = MyHelper::FinalRosterBadge(
                 FinalAttendeeRosters::toBadgeData($row),
                 $loginBaseUrl
             );
-            if ($badge && is_file($badge)) {
-                $folder = basename(dirname($badge));
-                $zip->addFile($badge, $folder . '/' . basename($badge));
-                $created[] = $badge;
-
-                $unitName = $this->resolveUnitName($row);
-                if ($unitName !== '') {
-                    $unitNames[$unitName] = true;
-                }
+            if (!$badge || !is_file($badge)) {
+                continue;
             }
+            $created[] = $badge;
+
+            // Slug tên đơn vị để đặt tên ZIP; thiếu tên thì dùng tên thư mục đơn vị đã chia.
+            $unitName = $this->resolveUnitName($row);
+            $slug     = $unitName !== '' ? MyHelper::toSlug($unitName) : '';
+            if ($slug === '') {
+                $slug = basename(dirname($badge));
+            }
+            if (!isset($groups[$slug])) {
+                $groups[$slug] = array();
+            }
+            $groups[$slug][] = $badge;
         }
 
-        $count = $zip->numFiles;
-        $zip->close();
+        if (empty($groups)) {
+            foreach ($created as $file) {
+                @unlink($file);
+            }
+            throw new CHttpException(500, 'Không tạo được ảnh thẻ nào. Kiểm tra phôi thẻ và ảnh chân dung.');
+        }
 
-        // Dọn file ảnh tạm sau khi đã nén vào ZIP.
+        $stamp     = date('Ymd_His') . '_' . substr(md5(uniqid('', true)), 0, 6);
+        $unitZips  = array(); // slug => đường dẫn ZIP con
+        foreach ($groups as $slug => $files) {
+            $unitZipPath = $workDir . '/_unit_' . $slug . '_' . $stamp . '.zip';
+            $uz = new ZipArchive();
+            if ($uz->open($unitZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                continue;
+            }
+            foreach ($files as $file) {
+                $uz->addFile($file, basename($file));
+            }
+            $uz->close();
+            $unitZips[$slug] = $unitZipPath;
+        }
+
+        // Dọn ảnh tạm sau khi đã nén vào ZIP con.
         foreach ($created as $file) {
             @unlink($file);
         }
 
-        if ($count === 0) {
-            @unlink($zipPath);
-            throw new CHttpException(500, 'Không tạo được ảnh thẻ nào. Kiểm tra phôi thẻ và ảnh chân dung.');
+        // Một đơn vị → tải thẳng ZIP đơn vị đó (vd benh-vien-phu-dien.zip).
+        if (count($unitZips) === 1) {
+            $slug = (string) key($unitZips);
+            $this->sendFileThenDelete($unitZips[$slug], $slug . '.zip', 'application/zip');
+            return;
         }
 
-        // Nếu tất cả thẻ thuộc cùng một đơn vị → đặt tên file ZIP theo slug tên đơn vị
-        // (vd "Bệnh viện Phủ Diễn" → benh-vien-phu-dien.zip). Nhiều đơn vị → tên chung.
-        $downloadName = 'The_VCK_' . $eventId . '_' . date('Ymd_His') . '.zip';
-        if (count($unitNames) === 1) {
-            $slug = MyHelper::toSlug((string) key($unitNames));
-            if ($slug !== '') {
-                $downloadName = $slug . '.zip';
+        // Nhiều đơn vị → gói các ZIP đơn vị vào 1 ZIP ngoài để tải một lần.
+        $outerPath = $workDir . '/_zip_' . $eventId . '_' . $stamp . '.zip';
+        $outer = new ZipArchive();
+        if ($outer->open($outerPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            foreach ($unitZips as $p) {
+                @unlink($p);
             }
+            throw new CHttpException(500, 'Không mở được file ZIP để ghi.');
         }
-        $this->sendFileThenDelete($zipPath, $downloadName, 'application/zip');
+        foreach ($unitZips as $slug => $path) {
+            $outer->addFile($path, $slug . '.zip');
+        }
+        $outer->close();
+
+        foreach ($unitZips as $p) {
+            @unlink($p);
+        }
+
+        $downloadName = 'The_VCK_' . $eventId . '_' . date('Ymd_His') . '.zip';
+        $this->sendFileThenDelete($outerPath, $downloadName, 'application/zip');
     }
 
     /**
