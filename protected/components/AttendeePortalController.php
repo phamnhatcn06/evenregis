@@ -101,7 +101,17 @@ class AttendeePortalController extends CController
      */
     public function isProfileConfirmed()
     {
-        return !empty($this->session()[self::SESSION_PROFILE_OK]);
+        if (!empty($this->session()[self::SESSION_PROFILE_OK])) {
+            return true;
+        }
+        // Đã khai đủ năm sinh + giới tính ở lần đăng nhập trước -> coi như đã xác nhận,
+        // không bắt xác nhận lại (popup chỉ hiện 1 lần cho tới khi hồ sơ đầy đủ).
+        $profile = $this->loadProfile();
+        if (is_array($profile) && !empty($profile['is_complete'])) {
+            $this->markProfileConfirmed();
+            return true;
+        }
+        return false;
     }
 
     protected function markProfileConfirmed()
