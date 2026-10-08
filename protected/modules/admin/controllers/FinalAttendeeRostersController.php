@@ -1196,6 +1196,27 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Danh sách đơn vị đang lọc (chọn nhiều), chuẩn hoá về mảng id int không trùng.
+     * Chấp nhận cả dạng mảng (property_id[]) lẫn một giá trị đơn, trả null nếu rỗng.
+     */
+    protected function getPropertyIdValues()
+    {
+        if (!isset($_GET['property_id'])) {
+            return null;
+        }
+
+        $raw = is_array($_GET['property_id']) ? $_GET['property_id'] : array($_GET['property_id']);
+        $ids = array();
+        foreach ($raw as $value) {
+            if ($value !== '' && $value !== null) {
+                $ids[(int) $value] = (int) $value;
+            }
+        }
+
+        return empty($ids) ? null : array_values($ids);
+    }
+
+    /**
      * Danh mục vai trò người tham dự, cho dropdown ở modal thêm người.
      */
     protected function getRoleList()
