@@ -116,9 +116,9 @@ class RunRegistrationsController extends AdminController
         $sheet->setTitle('Dang ky chay');
 
         $sheet->setCellValue('A1', 'DANH SÁCH ĐĂNG KÝ BỘ MÔN CHẠY');
-        $sheet->mergeCells('A1:F1');
+        $sheet->mergeCells('A1:G1');
 
-        $headers = array('A' => 'STT', 'B' => 'Số BIB', 'C' => 'Họ và tên', 'D' => 'Đơn vị', 'E' => 'Số điện thoại', 'F' => 'Nội dung');
+        $headers = array('A' => 'STT', 'B' => 'Số BIB', 'C' => 'Họ và tên', 'D' => 'Đơn vị', 'E' => 'Số điện thoại', 'F' => 'Cự ly', 'G' => 'Nội dung');
         foreach ($headers as $col => $label) {
             $sheet->setCellValue($col . '3', $label);
         }
@@ -132,10 +132,11 @@ class RunRegistrationsController extends AdminController
             $sheet->setCellValue('D' . $row, isset($r['unit_label']) ? $r['unit_label'] : '');
             $sheet->setCellValue('E' . $row, isset($r['phone_number']) ? $r['phone_number'] : '');
             $sheet->setCellValue('F' . $row, isset($r['run_event_name']) ? $r['run_event_name'] : '');
+            $sheet->setCellValue('G' . $row, !empty($r['age_group_label']) ? $r['age_group_label'] : '');
             $row++;
         }
 
-        foreach (range('A', 'F') as $col) {
+        foreach (range('A', 'G') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
