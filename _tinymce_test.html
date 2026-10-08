@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thử TinyMCE</title>
+<script src="/themes/hope-ui/assets/vendor/tinymce/tinymce.min.js"></script>
+</head>
+<body style="padding:20px;font-family:sans-serif;">
+<h3>Nội dung</h3>
+<textarea id="News_content">&lt;h2&gt;Tin tức đại hội&lt;/h2&gt;&lt;p&gt;Nội dung mẫu để kiểm tra trình soạn thảo.&lt;/p&gt;</textarea>
+<script>
+tinymce.init({
+  target: document.getElementById('News_content'),
+  language: 'vi',
+  language_url: '/themes/hope-ui/assets/vendor/tinymce/langs/vi.js',
+  height: 500,
+  menubar: 'edit insert view format table tools',
+  plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount insertdatetime charmap quickbars',
+  toolbar: 'undo redo | blocks | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | removeformat | code preview fullscreen',
+  toolbar_mode: 'sliding',
+  branding: false,
+  promotion: false
+});
+</script>
+</body>
+</html>
