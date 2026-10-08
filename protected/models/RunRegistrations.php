@@ -64,6 +64,21 @@ class RunRegistrations extends CFormModel
         return null;
     }
 
+    /**
+     * Lưu thông tin khẩn cấp (tùy chọn) cho đăng ký chạy của 1 người.
+     * Trả mảng ApiClient chuẩn (success/code/data/error).
+     */
+    public static function saveEmergencyViaApi($attendeeId, array $info)
+    {
+        return ApiClient::post(ApiEndpoints::RUN_REGISTRATION_SAVE_EMERGENCY, array(
+            'attendee_id'             => $attendeeId,
+            'emergency_contact_name'  => isset($info['emergency_contact_name']) ? $info['emergency_contact_name'] : null,
+            'emergency_contact_phone' => isset($info['emergency_contact_phone']) ? $info['emergency_contact_phone'] : null,
+            'medical_conditions'      => isset($info['medical_conditions']) ? $info['medical_conditions'] : null,
+            'medications'             => isset($info['medications']) ? $info['medications'] : null,
+        ));
+    }
+
     /** Người dùng xin hủy đăng ký (kèm lý do). Trả mảng ApiClient chuẩn. */
     public static function requestCancelViaApi($attendeeId, $reason)
     {
