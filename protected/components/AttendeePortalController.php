@@ -129,7 +129,7 @@ class AttendeePortalController extends CController
         if ($this->isProfileConfirmed()) {
             return null;
         }
-        $profile = RunAuth::getProfile($this->currentAttendeeId());
+        $profile = $this->loadProfile();
         return array(
             'saveProfileUrl' => $this->createUrl('/frontend/portal/saveProfile'),
             'logoutUrl'      => $this->createUrl('/frontend/portal/logout'),
