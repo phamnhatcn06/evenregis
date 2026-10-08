@@ -47,6 +47,14 @@ class RunAuth extends CFormModel
         ));
     }
 
+    /** Admin reset PIN theo định danh (MT + lucky). Trả mảng chuẩn ApiClient. */
+    public static function resetPin($identifier)
+    {
+        return ApiClient::post(ApiEndpoints::RUN_AUTH_RESET_PIN, array(
+            'identifier' => $identifier,
+        ));
+    }
+
     public static function genLucky($eventId)
     {
         return ApiClient::post(ApiEndpoints::RUN_AUTH_GEN_LUCKY, array('event_id' => $eventId));
