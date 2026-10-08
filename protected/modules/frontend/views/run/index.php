@@ -25,6 +25,15 @@ $registerRunUrl = $this->createUrl('/frontend/run/register');
 $registerTourUrl = $this->createUrl('/frontend/run/registerTour');
 $cancelRunUrl = $this->createUrl('/frontend/run/cancelRequest');
 $cancelTourUrl = $this->createUrl('/frontend/run/cancelRequestTour');
+$saveEmergencyUrl = $this->createUrl('/frontend/run/saveEmergency');
+
+// Cổng đã có thông tin khẩn cấp hay chưa (để JS quyết định tự bật popup sau khi đăng ký).
+$hasEmergencyInfo = !empty($runMine) && (
+    !empty($runMine['emergency_contact_name'])
+    || !empty($runMine['emergency_contact_phone'])
+    || !empty($runMine['medical_conditions'])
+    || !empty($runMine['medications'])
+);
 
 // Dữ liệu thông báo hủy-đã-duyệt cho JS (báo 1 lần qua localStorage).
 $runNoticeAt = (!empty($runCancelledNotice) && !empty($runCancelledNotice['cancel_reviewed_at'])) ? (int) $runCancelledNotice['cancel_reviewed_at'] : 0;
