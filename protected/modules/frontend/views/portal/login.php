@@ -59,7 +59,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
             <div class="d-block mb-2">
                 <span class="portal-event-badge mb-0">
                     <span class="portal-pulse-dot"></span>
-                    Cổng Đại Biểu Chính Thức • Ninh Bình 2026
+                    Cổng Thông tin đại hội Chính Thức • Ninh Bình 2026
                 </span>
             </div>
 
