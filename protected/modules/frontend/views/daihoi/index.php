@@ -49,7 +49,7 @@ if ($eventYear === '') {
 }
 $logo = $base . '/themes/hope-ui/logo_daihoi.png';
 $loginUrl = !empty($hasAdminAccess) ? $base . '/admin/default/index' : $base . '/login';
-$loginLabel = !empty($hasAdminAccess) ? 'Vào quản trị' : 'Cổng Đại Biểu';
+$loginLabel = !empty($hasAdminAccess) ? 'Vào quản trị' : 'Cổng Thông tin đại hội';
 // Cổng đăng ký hoạt động (Giải chạy Fun Run + Đi tham quan) cho danh sách Vòng Chung Kết.
 $portalUrl = $base . '/run';
 
