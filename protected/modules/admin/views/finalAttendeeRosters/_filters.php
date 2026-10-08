@@ -139,11 +139,14 @@ $hasAdvanced = !empty($filters['department_code'])
                 </div>
 
                 <div class="col-lg-5 col-md-6">
-                    <label class="form-label small fw-semibold text-muted mb-1">Đơn vị</label>
-                    <?php echo CHtml::dropDownList('property_id', $filters['property_id'], $propertyOptions, array(
-                        'class' => 'form-select js-select2',
-                        'empty' => '-- Tất cả đơn vị --',
-                        'id'    => 'filter-property',
+                    <label class="form-label small fw-semibold text-muted mb-1">
+                        Đơn vị
+                        <span class="text-muted fw-normal" style="font-size: 11px;">(chọn nhiều để lọc / xuất ảnh cùng lúc)</span>
+                    </label>
+                    <?php echo CHtml::listBox('property_id', $selectedProperties, $propertyOptions, array(
+                        'class'    => 'form-select js-select2',
+                        'id'       => 'filter-property',
+                        'multiple' => 'multiple',
                     )); ?>
                 </div>
 
