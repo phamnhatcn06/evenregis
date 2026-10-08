@@ -1453,10 +1453,17 @@
         }
 
         function reload() {
+            // Phòng ban chỉ thu hẹp theo đơn vị khi đang chọn ĐÚNG MỘT đơn vị; chọn nhiều thì để rộng.
+            var selected = property.multiple
+                ? Array.prototype.slice.call(property.selectedOptions).map(function (o) { return o.value; })
+                : [property.value];
+            selected = selected.filter(function (v) { return v !== '' && v != null; });
+            var singleProperty = selected.length === 1 ? selected[0] : '';
+
             var params = [
                 'event_id=' + encodeURIComponent(eventId),
                 'period_id=' + encodeURIComponent(periodId || ''),
-                'property_id=' + encodeURIComponent(property.value || '')
+                'property_id=' + encodeURIComponent(singleProperty)
             ];
 
             setLoading(department, true);
