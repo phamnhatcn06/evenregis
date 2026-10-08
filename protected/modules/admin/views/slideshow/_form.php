@@ -120,3 +120,9 @@ $dropzones = array(
 
 <?php $this->endWidget(); ?>
 </div><!-- form -->
+<?php
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/slideshow-form.js',
+    CClientScript::POS_END
+);
+?>
