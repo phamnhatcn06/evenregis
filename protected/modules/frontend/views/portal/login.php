@@ -66,8 +66,8 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
 
             <!-- Tiêu đề & Thông điệp Đại hội (Ẩn bớt mô tả dài trên mobile để ưu tiên khung đăng nhập) -->
             <h1 class="portal-hero-title mb-2 mb-lg-3">
-                Hành Trình Di Sản<br>
-                <span class="text-gradient">Rực Cháy Đam Mê</span>
+                Hội Tụ Bản Sắc<br>
+                <span class="text-gradient">Dẫn Dắt Tương Lai</span>
             </h1>
 
             <p class="portal-hero-subtitle d-none d-lg-block">
