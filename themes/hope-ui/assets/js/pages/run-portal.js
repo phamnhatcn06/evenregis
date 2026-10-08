@@ -18,8 +18,12 @@
 
         bindRegister(config);
         bindCancelForms();
+        bindEmergencyForm();
+        maybePromptEmergency(config);
         initCountdown();
     });
+
+    var EMERGENCY_PROMPT_KEY = 'run_emergency_prompt_pending';
 
     function initCountdown() {
         var countdownEl = document.getElementById('run-portal-countdown');
