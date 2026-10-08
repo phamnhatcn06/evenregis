@@ -74,6 +74,18 @@
                                 <td><?php echo CHtml::encode($runMine['unit_label']); ?></td>
                             </tr>
                         <?php endif; ?>
+                        <?php if (!empty($runMine['birth_year'])): ?>
+                            <tr>
+                                <td><i class="bi bi-calendar3 text-secondary me-2"></i> Năm sinh:</td>
+                                <td><?php echo CHtml::encode($runMine['birth_year']); ?></td>
+                            </tr>
+                        <?php endif; ?>
+                        <?php if (isset($runMine['gender']) && $runMine['gender'] !== null && $runMine['gender'] !== ''): ?>
+                            <tr>
+                                <td><i class="bi bi-gender-ambiguous text-secondary me-2"></i> Giới tính:</td>
+                                <td><?php echo ((int) $runMine['gender'] === 1) ? 'Nam' : 'Nữ'; ?></td>
+                            </tr>
+                        <?php endif; ?>
                         <tr>
                             <td><i class="bi bi-calendar-check text-success me-2"></i> Đăng ký lúc:</td>
                             <td><span class="text-muted"><?php echo $regTime; ?></span></td>
