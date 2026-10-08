@@ -271,8 +271,14 @@ class BeautyContestantsController extends AdminController
             $rowNum++;
         }
 
-        foreach (range('A', 'K') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        // Dùng độ rộng cố định thay vì setAutoSize(true) — autosize tính toán
+        // rất tốn CPU/RAM với nhiều dòng, dễ gây segfault/timeout/500 trên server.
+        $columnWidths = array(
+            'A' => 6, 'B' => 24, 'C' => 24, 'D' => 24, 'E' => 24, 'F' => 14,
+            'G' => 14, 'H' => 16, 'I' => 24, 'J' => 32, 'K' => 16,
+        );
+        foreach ($columnWidths as $columnID => $width) {
+            $sheet->getColumnDimension($columnID)->setWidth($width);
         }
 
         $filename = "Danh_sach_thi_sinh_Miss_" . date('Ymd_His') . ".xlsx";
