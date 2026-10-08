@@ -16,11 +16,15 @@ class RunRegistrations extends CFormModel
     public $unit_label;
     public $phone_number;
     public $lucky_number;
+    public $emergency_contact_name;
+    public $emergency_contact_phone;
+    public $medical_conditions;
+    public $medications;
 
     public function rules()
     {
         return array(
-            array('id, run_event_id, run_event_name, attendee_id, bib_number, age_group_label, registered_at, full_name, unit_label, phone_number, lucky_number', 'safe'),
+            array('id, run_event_id, run_event_name, attendee_id, bib_number, age_group_label, registered_at, full_name, unit_label, phone_number, lucky_number, emergency_contact_name, emergency_contact_phone, medical_conditions, medications', 'safe'),
         );
     }
 
