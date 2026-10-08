@@ -165,7 +165,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
                     <h3 class="auth-card-title">Xác Thực Mã PIN</h3>
                     <p class="auth-card-subtitle">Nhập mã PIN 6 số đã đăng ký để vào cổng cá nhân</p>
                 <?php else: ?>
-                    <h3 class="auth-card-title">Đăng Nhập Cổng Đại Biểu</h3>
+                    <h3 class="auth-card-title">Đăng Nhập Cổng Thông tin đại hội</h3>
                     <p class="auth-card-subtitle">Nhập mã định danh trên thẻ hoặc quét QR để tiếp tục</p>
                 <?php endif; ?>
             </div>
