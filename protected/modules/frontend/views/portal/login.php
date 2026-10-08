@@ -401,7 +401,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
 
                     <button type="submit" class="btn-auth-primary mb-3">
                         <i class="bi bi-box-arrow-in-right fs-5"></i>
-                        <span>Đăng Nhập Cổng Đại Biểu</span>
+                        <span>Đăng Nhập Cổng Thông tin đại hội</span>
                     </button>
 
                     <div class="text-center">
