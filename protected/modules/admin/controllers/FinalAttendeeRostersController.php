@@ -289,7 +289,8 @@ class FinalAttendeeRostersController extends AdminController
             throw new CHttpException(500, 'Không mở được file ZIP để ghi.');
         }
 
-        $created = array();
+        $created   = array();
+        $unitNames = array();
         foreach ($rows as $row) {
             $badge = MyHelper::FinalRosterBadge(
                 FinalAttendeeRosters::toBadgeData($row),
@@ -299,6 +300,11 @@ class FinalAttendeeRostersController extends AdminController
                 $folder = basename(dirname($badge));
                 $zip->addFile($badge, $folder . '/' . basename($badge));
                 $created[] = $badge;
+
+                $unitName = $this->resolveUnitName($row);
+                if ($unitName !== '') {
+                    $unitNames[$unitName] = true;
+                }
             }
         }
 
@@ -315,7 +321,15 @@ class FinalAttendeeRostersController extends AdminController
             throw new CHttpException(500, 'Không tạo được ảnh thẻ nào. Kiểm tra phôi thẻ và ảnh chân dung.');
         }
 
+        // Nếu tất cả thẻ thuộc cùng một đơn vị → đặt tên file ZIP theo slug tên đơn vị
+        // (vd "Bệnh viện Phủ Diễn" → benh-vien-phu-dien.zip). Nhiều đơn vị → tên chung.
         $downloadName = 'The_VCK_' . $eventId . '_' . date('Ymd_His') . '.zip';
+        if (count($unitNames) === 1) {
+            $slug = MyHelper::toSlug((string) key($unitNames));
+            if ($slug !== '') {
+                $downloadName = $slug . '.zip';
+            }
+        }
         $this->sendFileThenDelete($zipPath, $downloadName, 'application/zip');
     }
 
