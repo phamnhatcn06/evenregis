@@ -10,14 +10,71 @@ class RunRegistrationsController extends AdminController
     {
         $eventId = isset($_GET['event_id']) && $_GET['event_id'] !== '' ? (int) $_GET['event_id'] : null;
 
-        $registrations = $eventId ? RunRegistrations::listByEvent($eventId) : array();
+        $allRegistrations = $eventId ? RunRegistrations::listByEvent($eventId) : array();
         $cancelRequestCount = $eventId ? count(RunRegistrations::listCancelRequests($eventId)) : 0;
+
+        // Giá trị lọc hiện tại.
+        $filters = array(
+            'q'       => isset($_GET['q']) ? trim($_GET['q']) : '',
+            'cu_ly'   => isset($_GET['cu_ly']) ? trim($_GET['cu_ly']) : '',
+            'gender'  => isset($_GET['gender']) && $_GET['gender'] !== '' ? (string) $_GET['gender'] : '',
+            'unit'    => isset($_GET['unit']) ? trim($_GET['unit']) : '',
+        );
+
+        // Danh sách tuỳ chọn cho dropdown (lấy từ TOÀN BỘ dữ liệu, trước khi lọc).
+        $cuLyOptions = array();
+        $unitOptions = array();
+        foreach ($allRegistrations as $r) {
+            if (!empty($r['run_event_name'])) {
+                $cuLyOptions[$r['run_event_name']] = $r['run_event_name'];
+            }
+            if (!empty($r['unit_label'])) {
+                $unitOptions[$r['unit_label']] = $r['unit_label'];
+            }
+        }
+        ksort($cuLyOptions);
+        ksort($unitOptions);
+
+        // Áp dụng lọc.
+        $registrations = array_filter($allRegistrations, function ($r) use ($filters) {
+            if ($filters['cu_ly'] !== '' && (!isset($r['run_event_name']) || $r['run_event_name'] !== $filters['cu_ly'])) {
+                return false;
+            }
+            if ($filters['unit'] !== '' && (!isset($r['unit_label']) || $r['unit_label'] !== $filters['unit'])) {
+                return false;
+            }
+            if ($filters['gender'] !== '') {
+                $g = isset($r['gender']) && $r['gender'] !== null ? (string) $r['gender'] : '';
+                if ($g !== $filters['gender']) {
+                    return false;
+                }
+            }
+            if ($filters['q'] !== '') {
+                $needle = function_exists('mb_strtolower') ? mb_strtolower($filters['q'], 'UTF-8') : strtolower($filters['q']);
+                $haystack = implode(' ', array(
+                    isset($r['full_name']) ? $r['full_name'] : '',
+                    isset($r['bib_number']) ? $r['bib_number'] : '',
+                    isset($r['phone_number']) ? $r['phone_number'] : '',
+                    isset($r['lucky_number']) ? $r['lucky_number'] : '',
+                ));
+                $haystack = function_exists('mb_strtolower') ? mb_strtolower($haystack, 'UTF-8') : strtolower($haystack);
+                if (strpos($haystack, $needle) === false) {
+                    return false;
+                }
+            }
+            return true;
+        });
+        $registrations = array_values($registrations);
 
         $this->render('admin', array(
             'eventId'            => $eventId,
             'eventList'          => $this->getEventList(),
             'registrations'      => $registrations,
+            'totalCount'         => count($allRegistrations),
             'cancelRequestCount' => $cancelRequestCount,
+            'filters'            => $filters,
+            'cuLyOptions'        => $cuLyOptions,
+            'unitOptions'        => $unitOptions,
         ));
     }
 
