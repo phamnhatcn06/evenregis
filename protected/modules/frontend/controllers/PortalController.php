@@ -158,7 +158,7 @@ class PortalController extends AttendeePortalController
      */
     private function resolveReturnUrl()
     {
-        $default = array('/frontend/portal/index');
+        $default = Yii::app()->createUrl('/frontend/portal/index');
         $return = isset($_GET['return']) ? trim($_GET['return']) : '';
         if ($return === '' && isset($_POST['return'])) {
             $return = trim($_POST['return']);
