@@ -80,6 +80,49 @@
                         </tr>
                     </table>
 
+                    <?php
+                    $emName  = isset($runMine['emergency_contact_name']) ? $runMine['emergency_contact_name'] : '';
+                    $emPhone = isset($runMine['emergency_contact_phone']) ? $runMine['emergency_contact_phone'] : '';
+                    $emCond  = isset($runMine['medical_conditions']) ? $runMine['medical_conditions'] : '';
+                    $emMed   = isset($runMine['medications']) ? $runMine['medications'] : '';
+                    $hasEmergency = ($emName !== '' || $emPhone !== '' || $emCond !== '' || $emMed !== '');
+                    ?>
+                    <div class="emergency-info-box mt-3 p-3 rounded border bg-light">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold text-dark small">
+                                <i class="bi bi-heart-pulse-fill text-danger me-1"></i> Thông tin khẩn cấp
+                            </span>
+                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal" data-bs-target="#modalEmergency">
+                                <i class="bi bi-pencil-square me-1"></i> <?php echo $hasEmergency ? 'Chỉnh sửa' : 'Bổ sung'; ?>
+                            </button>
+                        </div>
+                        <?php if ($hasEmergency): ?>
+                            <table class="bib-info-table mb-0">
+                                <tr>
+                                    <td><i class="bi bi-person-lines-fill text-secondary me-2"></i> Người liên hệ:</td>
+                                    <td><?php echo $emName !== '' ? CHtml::encode($emName) : '<span class="text-muted">Chưa cung cấp</span>'; ?></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="bi bi-telephone-fill text-secondary me-2"></i> Số điện thoại:</td>
+                                    <td><?php echo $emPhone !== '' ? CHtml::encode($emPhone) : '<span class="text-muted">Chưa cung cấp</span>'; ?></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="bi bi-clipboard2-pulse text-secondary me-2"></i> Bệnh nền:</td>
+                                    <td><?php echo $emCond !== '' ? nl2br(CHtml::encode($emCond)) : '<span class="text-muted">Không có / chưa cung cấp</span>'; ?></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="bi bi-capsule text-secondary me-2"></i> Thuốc đang dùng:</td>
+                                    <td><?php echo $emMed !== '' ? nl2br(CHtml::encode($emMed)) : '<span class="text-muted">Không có / chưa cung cấp</span>'; ?></td>
+                                </tr>
+                            </table>
+                        <?php else: ?>
+                            <div class="text-muted small mb-0">
+                                Bạn chưa cung cấp thông tin khẩn cấp. Thông tin này không bắt buộc nhưng giúp Ban tổ chức hỗ trợ bạn khi cần.
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
                     <?php if ($isPending): ?>
                         <div class="alert alert-warning d-flex align-items-center mb-0 p-2 small">
                             <i class="bi bi-hourglass-split fs-5 me-2 text-warning"></i>
