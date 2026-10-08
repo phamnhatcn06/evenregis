@@ -20,9 +20,23 @@ class AttendeePortalController extends CController
     /** Đã xác nhận đủ hồ sơ (năm sinh, giới tính) trong phiên đăng nhập này. */
     const SESSION_PROFILE_OK  = 'portal_profile_ok';
 
+    /** Cache hồ sơ trong 1 request để tránh gọi API nhiều lần. */
+    private $_profile = null;
+    private $_profileLoaded = false;
+
     protected function session()
     {
         return Yii::app()->session;
+    }
+
+    /** Lấy hồ sơ người đang đăng nhập (gọi API tối đa 1 lần mỗi request). */
+    protected function loadProfile()
+    {
+        if (!$this->_profileLoaded) {
+            $this->_profile = RunAuth::getProfile($this->currentAttendeeId());
+            $this->_profileLoaded = true;
+        }
+        return $this->_profile;
     }
 
     public function isLoggedIn()
