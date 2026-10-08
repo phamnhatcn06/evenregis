@@ -128,6 +128,26 @@ if ($countdownTarget <= 0) {
 }
 
 $countdownDeadlineDate = date('H:i d/m/Y', $countdownTarget);
+
+// Thời hạn đăng ký Fun Run: từ mốc mở sớm nhất tới mốc đóng muộn nhất của các cự ly.
+// Khi người dùng đã đăng ký (không còn danh sách cự ly) thì dùng câu mặc định do BTC quy định.
+$regOpenAts = array();
+$regCloseAts = array();
+if (!empty($runEvents)) {
+    foreach ($runEvents as $e) {
+        $o = !empty($e['open_at']) ? (is_numeric($e['open_at']) ? (int)$e['open_at'] : strtotime($e['open_at'])) : 0;
+        $c = !empty($e['close_at']) ? (is_numeric($e['close_at']) ? (int)$e['close_at'] : strtotime($e['close_at'])) : 0;
+        if ($o > 0) { $regOpenAts[] = $o; }
+        if ($c > 0) { $regCloseAts[] = $c; }
+    }
+}
+if (!empty($regOpenAts) && !empty($regCloseAts)) {
+    $registrationWindowText = 'Thời hạn đăng ký: từ ' . date('H\hi', min($regOpenAts)) . ' ngày ' . date('d/m/Y', min($regOpenAts))
+        . ' tới ' . date('H\hi', max($regCloseAts)) . ' ngày ' . date('d/m/Y', max($regCloseAts))
+        . ' (hoặc có thể kết thúc sớm hơn khi đủ chỉ tiêu).';
+} else {
+    $registrationWindowText = 'Thời hạn đăng ký: từ 10h00 ngày 10/10/2026 tới 23h59 ngày 13/10/2026 (hoặc có thể kết thúc sớm hơn khi đủ chỉ tiêu).';
+}
 ?>
 
 <!-- Header & Thông tin đại biểu -->
