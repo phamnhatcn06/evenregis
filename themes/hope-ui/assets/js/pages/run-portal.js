@@ -182,6 +182,61 @@
         });
     }
 
+    // Tự bật popup khai thông tin khẩn cấp ngay sau khi đăng ký chạy thành công
+    // (trang vừa reload). Chỉ bật khi người này CHƯA khai thông tin nào.
+    function maybePromptEmergency(config) {
+        var pending = false;
+        try { pending = localStorage.getItem(EMERGENCY_PROMPT_KEY) === '1'; } catch (e) { /* bỏ qua */ }
+        if (!pending) { return; }
+        try { localStorage.removeItem(EMERGENCY_PROMPT_KEY); } catch (e) { /* bỏ qua */ }
+
+        if (config.getAttribute('data-has-run') !== '1') { return; }
+        if (config.getAttribute('data-has-emergency') === '1') { return; }
+
+        var modalEl = document.getElementById('modalEmergency');
+        if (!modalEl || typeof bootstrap === 'undefined') { return; }
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+
+    // Lưu thông tin khẩn cấp qua AJAX (tất cả trường tùy chọn).
+    function bindEmergencyForm() {
+        var form = document.getElementById('form-emergency');
+        if (!form) { return; }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn = document.getElementById('btn-submit-emergency');
+            var original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: new FormData(form)
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    var modalEl = document.getElementById('modalEmergency');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) { modal.hide(); }
+                    if (typeof Toast !== 'undefined') { Toast.success(data.message || 'Đã lưu thông tin khẩn cấp.'); }
+                    setTimeout(function () { window.location.reload(); }, 1000);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = original;
+                    if (typeof Toast !== 'undefined') { Toast.error(data.message || 'Không lưu được thông tin.'); }
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = original;
+                if (typeof Toast !== 'undefined') { Toast.error('Lỗi kết nối máy chủ. Vui lòng thử lại.'); }
+            });
+        });
+    }
+
     function notifyApprovedOnce(config, type) {
         if (config.getAttribute('data-' + type + '-cancel-approved') !== '1') { return; }
         var reviewedAt = config.getAttribute('data-' + type + '-cancel-reviewed-at') || '0';
