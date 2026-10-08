@@ -1219,27 +1219,44 @@ class MyHelper
             return false;
         }
 
-        // Thu QR về đúng kích thước trước, rồi thay nền trắng bằng màu nền yêu cầu
-        // (vùng yên lặng + ô sáng → màu nền; ô tối → đen) để QR không trùng màu khung thẻ.
-        $scaled = imagecreatetruecolor($size, $size);
-        imagecopyresampled($scaled, $raw, 0, 0, 0, 0, $size, $size, imagesx($raw), imagesy($raw));
-        imagedestroy($raw);
+        // Vẽ lại QR theo lưới ô (module) thay vì phóng/thu bằng nội suy: ảnh gốc được sinh
+        // với module_size cố định nên suy ra số ô, rồi lấy mẫu tâm từng ô và vẽ ô vuông đặc
+        // vào ảnh đích. Cách này giữ QR sắc nét, quét tốt kể cả khi dữ liệu dài (QR nhiều ô);
+        // vùng yên lặng + ô sáng → màu nền, ô tối → đen (để QR không trùng màu khung thẻ).
+        $moduleSize = 10; // = QRCode::module_size đã set ở trên
+        $rawW       = imagesx($raw);
+        $totalMods  = max(1, (int) round($rawW / $moduleSize)); // gồm cả vùng yên lặng 2 bên
 
         $rgb   = self::hexToRgb($bgHex);
         $dst   = imagecreatetruecolor($size, $size);
         $bg    = imagecolorallocate($dst, $rgb[0], $rgb[1], $rgb[2]);
         $black = imagecolorallocate($dst, 0, 0, 0);
         imagefilledrectangle($dst, 0, 0, $size, $size, $bg);
-        for ($y = 0; $y < $size; $y++) {
-            for ($x = 0; $x < $size; $x++) {
-                $c = imagecolorat($scaled, $x, $y);
+
+        $cell = $size / $totalMods; // số pixel đích cho mỗi ô (có thể là số thực)
+        for ($my = 0; $my < $totalMods; $my++) {
+            $sy = (int) floor($my * $moduleSize + $moduleSize / 2);
+            if ($sy >= imagesy($raw)) {
+                $sy = imagesy($raw) - 1;
+            }
+            for ($mx = 0; $mx < $totalMods; $mx++) {
+                $sx = (int) floor($mx * $moduleSize + $moduleSize / 2);
+                if ($sx >= $rawW) {
+                    $sx = $rawW - 1;
+                }
+                $c   = imagecolorat($raw, $sx, $sy);
                 $lum = 0.299 * (($c >> 16) & 255) + 0.587 * (($c >> 8) & 255) + 0.114 * ($c & 255);
                 if ($lum < 128) {
-                    imagesetpixel($dst, $x, $y, $black);
+                    // round ở cả 2 cạnh để các ô liền nhau không bị hở khe.
+                    $x1 = (int) round($mx * $cell);
+                    $y1 = (int) round($my * $cell);
+                    $x2 = (int) round(($mx + 1) * $cell) - 1;
+                    $y2 = (int) round(($my + 1) * $cell) - 1;
+                    imagefilledrectangle($dst, $x1, $y1, $x2, $y2, $black);
                 }
             }
         }
-        imagedestroy($scaled);
+        imagedestroy($raw);
         return $dst;
     }
 
