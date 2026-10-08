@@ -222,7 +222,10 @@ if (!empty($regOpenAts) && !empty($regCloseAts)) {
      data-run-cancel-rejected="<?php echo $runRejectAt > 0 ? '1' : '0'; ?>"
      data-run-reject-reviewed-at="<?php echo $runRejectAt; ?>"
      data-tour-cancel-rejected="<?php echo $tourRejectAt > 0 ? '1' : '0'; ?>"
-     data-tour-reject-reviewed-at="<?php echo $tourRejectAt; ?>"></div>
+     data-tour-reject-reviewed-at="<?php echo $tourRejectAt; ?>"
+     data-save-emergency-url="<?php echo $saveEmergencyUrl; ?>"
+     data-has-run="<?php echo !empty($runMine) ? '1' : '0'; ?>"
+     data-has-emergency="<?php echo $hasEmergencyInfo ? '1' : '0'; ?>"></div>
 
 <!-- Hero Banner: Countdown thời gian đăng ký & Hướng dẫn -->
 <div class="run-countdown-banner">
