@@ -215,3 +215,33 @@
         }
     });
 })();
+
+// Khởi tạo Select2 cho dropdown chọn đơn vị (có ô tìm kiếm)
+(function () {
+    'use strict';
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof window.jQuery === 'undefined' || typeof window.jQuery.fn.select2 === 'undefined') {
+            return;
+        }
+
+        var $ = window.jQuery;
+        var $select = $('#portal-unit-select');
+        if ($select.length === 0) {
+            return;
+        }
+
+        $select.select2({
+            width: '100%',
+            placeholder: '-- Chọn đơn vị của bạn --',
+            language: {
+                noResults: function () {
+                    return 'Không tìm thấy đơn vị phù hợp';
+                },
+                searching: function () {
+                    return 'Đang tìm kiếm...';
+                }
+            }
+        });
+    });
+})();
