@@ -26,6 +26,11 @@ $registerTourUrl = $this->createUrl('/frontend/run/registerTour');
 $cancelRunUrl = $this->createUrl('/frontend/run/cancelRequest');
 $cancelTourUrl = $this->createUrl('/frontend/run/cancelRequestTour');
 $saveEmergencyUrl = $this->createUrl('/frontend/run/saveEmergency');
+$saveShirtSizeUrl = $this->createUrl('/frontend/run/saveShirtSize');
+$sizeGuideImg = Yii::app()->theme->baseUrl . '/assets/images/size_ao_fun_run.jpg';
+
+// Đã đăng ký chạy nhưng CHƯA chọn size áo -> bắt buộc chọn (tự bật popup, không cho bỏ qua).
+$needsShirtSize = !empty($runMine) && empty($runMine['shirt_size']);
 
 // Cổng đã có thông tin khẩn cấp hay chưa (để JS quyết định tự bật popup sau khi đăng ký).
 $hasEmergencyInfo = !empty($runMine) && (
