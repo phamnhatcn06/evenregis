@@ -9,6 +9,19 @@ $returnUrl = isset($returnUrl) ? $returnUrl : '';
 $units = isset($units) && is_array($units) ? $units : array();
 $propertyId = isset($propertyId) ? (string) $propertyId : '';
 
+// Đăng ký Select2 cho dropdown chọn đơn vị (tìm kiếm nhanh)
+Yii::app()->clientScript->registerCssFile(
+    Yii::app()->theme->baseUrl . '/assets/vendor/select2/css/select2.min.css'
+);
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/vendor/jquery/jquery.min.js',
+    CClientScript::POS_END
+);
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/vendor/select2/js/select2.min.js',
+    CClientScript::POS_END
+);
+
 // Đăng ký JS cho xử lý mã PIN và QR scanner
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/pages/portal-login.js',
