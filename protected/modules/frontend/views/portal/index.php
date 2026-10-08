@@ -122,7 +122,7 @@ $features = array(
                     Xin chào, <span class="hero-name-highlight"><?php echo CHtml::encode($fullName); ?></span> 👋
                 </h2>
                 <p class="portal-hero-subtitle">
-                    Chào mừng Quý Đại biểu đến với Cổng tiện ích cá nhân Đại hội Mường Thanh 2026. Lựa chọn các dịch vụ bên dưới để bắt đầu trải nghiệm tiện ích tự phục vụ.
+                    Chào mừng anh/chị đến với Cổng thông tin Đại hội Mường Thanh 2026. Nơi cung cấp toàn bộ thông tin liên quan đến Đại hội. Anh chị vui lòng sử dụng các chức năng bên dưới.
                 </p>
                 <div class="portal-hero-badges">
                     <div class="hero-badge-item">
