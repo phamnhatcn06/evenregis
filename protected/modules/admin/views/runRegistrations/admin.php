@@ -57,6 +57,18 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
     </div>
 </div>
 
+<?php if ($eventId && $cancelRequestCount > 0): ?>
+    <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+        <span>
+            <i class="fa fa-exclamation-triangle me-1"></i>
+            Có <strong><?php echo $cancelRequestCount; ?></strong> yêu cầu hủy cần xử lý.
+        </span>
+        <a href="<?php echo $this->createUrl('cancelRequests', array('event_id' => $eventId)); ?>" class="btn btn-sm btn-warning">
+            <i class="fa fa-times-circle me-1"></i>Xử lý ngay
+        </a>
+    </div>
+<?php endif; ?>
+
 <div class="card">
     <div class="card-body">
         <?php if (!$eventId): ?>
