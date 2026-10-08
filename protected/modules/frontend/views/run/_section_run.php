@@ -84,7 +84,7 @@
                             <i class="bi bi-x-circle me-1"></i> Xin hủy đăng ký cự ly này
                         </button>
                         <small class="text-muted text-center d-block mt-1" style="font-size: 0.76rem;">
-                            <i class="bi bi-info-circle me-1"></i> Sau khi BTC duyệt hủy, bạn có thể chọn đăng ký cự ly khác.
+                            <i class="bi bi-info-circle me-1"></i> Sau khi BTC duyệt hủy, bạn có thể chọn đăng ký cự ly khác nếu còn chỉ tiêu và trong thời hạn đăng ký.
                         </small>
                     <?php else: ?>
                         <div class="alert alert-secondary d-flex align-items-center mb-0 py-2 px-3 small border-0 bg-light">
