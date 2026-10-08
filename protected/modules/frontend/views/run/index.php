@@ -332,6 +332,16 @@ if (!empty($tourMine) && !empty($tourMine['can_request_cancel']) && $tourMine['s
     ));
 }
 
+// Size áo Fun Run (bắt buộc) — chỉ có khi đã có đăng ký chạy đang hiệu lực.
+if (!empty($runMine)) {
+    $this->renderPartial('_modal_shirt_size', array(
+        'runMine'   => $runMine,
+        'saveUrl'   => $saveShirtSizeUrl,
+        'guideImg'  => $sizeGuideImg,
+        'mandatory' => $needsShirtSize,
+    ));
+}
+
 // Thông tin khẩn cấp (tùy chọn) — chỉ có khi đã có đăng ký chạy đang hiệu lực.
 if (!empty($runMine)) {
     $this->renderPartial('_modal_emergency', array(
