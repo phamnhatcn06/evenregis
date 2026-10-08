@@ -526,6 +526,7 @@ class FinalAttendeeRosters extends CFormModel
             'unit_label'       => isset($row['unit_label']) ? $row['unit_label'] : '',
             'property_code'    => isset($row['property_code']) ? $row['property_code'] : '',
             'lucky_number'     => isset($row['lucky_number']) ? $row['lucky_number'] : '',
+            'qr_token'         => isset($row['qr_token']) ? $row['qr_token'] : '',
             'is_btc'           => !empty($row['is_btc']) ? 1 : 0,
             'avatar_url'       => self::resolvePortraitSource($row),
         );
