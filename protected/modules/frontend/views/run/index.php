@@ -325,6 +325,14 @@ if (!empty($tourMine) && !empty($tourMine['can_request_cancel']) && $tourMine['s
     ));
 }
 
+// Thông tin khẩn cấp (tùy chọn) — chỉ có khi đã có đăng ký chạy đang hiệu lực.
+if (!empty($runMine)) {
+    $this->renderPartial('_modal_emergency', array(
+        'runMine' => $runMine,
+        'saveUrl' => $saveEmergencyUrl,
+    ));
+}
+
 // Popup xác nhận hồ sơ (chỉ có khi chưa xác nhận trong phiên đăng nhập này).
 if (!empty($profileModal)) {
     $this->renderPartial('/portal/_modal_profile', $profileModal);
