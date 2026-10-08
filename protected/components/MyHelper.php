@@ -1060,8 +1060,11 @@ class MyHelper
 
         $backCfg = $isBtc ? $layout['back']['btc'] : $layout['back']['default'];
         $lucky   = isset($row['lucky_number']) ? trim((string) $row['lucky_number']) : '';
-        if ($lucky !== '') {
-            $qrUrl = rtrim($loginBaseUrl, '/') . '/portal/login?lucky=' . rawurlencode($lucky);
+        $qrToken = isset($row['qr_token']) ? trim((string) $row['qr_token']) : '';
+        // QR mã hoá qr_token (không đoán được) để quét thẻ vào thẳng màn nhập PIN,
+        // không cần nhập mã định danh hay chọn đơn vị.
+        if ($qrToken !== '') {
+            $qrUrl = rtrim($loginBaseUrl, '/') . '/portal/login?token=' . rawurlencode($qrToken);
             $qr    = self::makeQrResource($qrUrl, $backCfg['qr']['size'], isset($backCfg['qr']['bg']) ? $backCfg['qr']['bg'] : '#FFFFFF');
             if ($qr) {
                 imagecopy(
@@ -1072,6 +1075,8 @@ class MyHelper
                 );
                 imagedestroy($qr);
             }
+        }
+        if ($lucky !== '') {
             self::drawText($back, 'MT' . $lucky, $backCfg['lucky']);
         }
 
