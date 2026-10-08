@@ -796,6 +796,54 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Admin reset PIN đăng nhập cổng cá nhân cho một người.
+     *
+     * Dùng khi người tham dự quên PIN: xoá PIN hiện tại + gỡ khoá tạm để họ đặt lại PIN mới
+     * ở lần đăng nhập kế tiếp. Resolve mã định danh từ dòng (theo lucky_number) ở phía server
+     * để không tin mã client gửi lên.
+     */
+    public function actionResetPin()
+    {
+        if (!$this->guardWrite('update')) {
+            return;
+        }
+
+        $id = (int) Yii::app()->request->getPost('id');
+        if (!$id) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu mã dòng cần reset PIN.'), 422);
+            return;
+        }
+
+        $row = FinalAttendeeRosters::fetchOne($id);
+        if ($row === null) {
+            $this->renderJson(array('success' => false, 'message' => 'Không tìm thấy người tham dự.'), 404);
+            return;
+        }
+
+        $lucky = isset($row['lucky_number']) ? trim((string) $row['lucky_number']) : '';
+        if ($lucky === '') {
+            $this->renderJson(array('success' => false, 'message' => 'Người này chưa được cấp mã định danh nên không có PIN để reset.'), 422);
+            return;
+        }
+
+        $result = RunAuth::resetPin($lucky);
+
+        if (!$result['success']) {
+            $status = isset($result['code']) && (int) $result['code'] >= 400 ? (int) $result['code'] : 500;
+            $this->renderJson(array(
+                'success' => false,
+                'message' => $result['error'] ?: 'Không thể reset PIN.',
+            ), $status);
+            return;
+        }
+
+        $this->renderJson(array(
+            'success' => true,
+            'message' => isset($result['data']['message']) ? $result['data']['message'] : 'Đã reset PIN.',
+        ));
+    }
+
+    /**
      * Kiểm tra người sở hữu mã lucky trong sự kiện (cho preview/warning swap).
      */
     public function actionCheckLucky()
