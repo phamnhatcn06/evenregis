@@ -25,7 +25,7 @@ class RunRegistrations extends CFormModel
     public function rules()
     {
         return array(
-            array('id, run_event_id, run_event_name, attendee_id, bib_number, age_group_label, registered_at, full_name, unit_label, phone_number, lucky_number, emergency_contact_name, emergency_contact_phone, medical_conditions, medications', 'safe'),
+            array('id, run_event_id, run_event_name, attendee_id, bib_number, age_group_label, shirt_size, registered_at, full_name, unit_label, phone_number, lucky_number, emergency_contact_name, emergency_contact_phone, medical_conditions, medications', 'safe'),
         );
     }
 
