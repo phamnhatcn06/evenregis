@@ -71,7 +71,7 @@ $isRunPortal = (strpos($returnStr, 'run') !== false);
             </h1>
 
             <p class="portal-hero-subtitle d-none d-lg-block">
-                Chào mừng Quý Đại biểu tham dự ngày hội văn hóa, thể thao và tay nghề nghiệp vụ quy mô lớn nhất toàn tập đoàn Mường Thanh.
+                Chào mừng Quý Đại biểu tham dự ngày hội văn hóa, thể thao và tay nghề nghiệp vụ quy mô lớn nhất toàn Tập đoàn Mường Thanh.
             </p>
 
             <!-- Banner thông tin chuyển tiếp (Hiển thị khi đăng nhập để vào /run hoặc tính năng cụ thể) -->
