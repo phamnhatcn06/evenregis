@@ -80,6 +80,18 @@ class RunRegistrations extends CFormModel
         ));
     }
 
+    /**
+     * Lưu size áo Fun Run (bắt buộc) cho đăng ký chạy của 1 người.
+     * Trả mảng ApiClient chuẩn (success/code/data/error).
+     */
+    public static function saveShirtSizeViaApi($attendeeId, $shirtSize)
+    {
+        return ApiClient::post(ApiEndpoints::RUN_REGISTRATION_SAVE_SHIRT_SIZE, array(
+            'attendee_id' => $attendeeId,
+            'shirt_size'  => $shirtSize,
+        ));
+    }
+
     /** Người dùng xin hủy đăng ký (kèm lý do). Trả mảng ApiClient chuẩn. */
     public static function requestCancelViaApi($attendeeId, $reason)
     {
