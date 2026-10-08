@@ -237,7 +237,7 @@ if (!empty($regOpenAts) && !empty($regCloseAts)) {
                         <i class="bi bi-ticket-perforated-fill text-info"></i> Tự động cấp số BIB
                     </div>
                     <div class="portal-rule-item">
-                        <i class="bi bi-calendar-event text-success"></i> Hạn chót: <?php echo $countdownDeadlineDate; ?>
+                        <i class="bi bi-calendar-event text-success"></i> <?php echo CHtml::encode($registrationWindowText); ?>
                     </div>
                 </div>
             </div>
