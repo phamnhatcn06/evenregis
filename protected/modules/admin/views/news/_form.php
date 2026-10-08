@@ -7,6 +7,10 @@
 $theme = Yii::app()->theme->baseUrl;
 $cs = Yii::app()->clientScript;
 
+// Flatpickr cho ô ngày xuất bản
+$cs->registerCssFile($theme . '/assets/vendor/flatpickr/dist/flatpickr.min.css');
+$cs->registerScriptFile($theme . '/assets/vendor/flatpickr/dist/flatpickr.min.js', CClientScript::POS_END);
+
 // TinyMCE (self-hosted, không dùng CDN)
 $cs->registerScriptFile($theme . '/assets/vendor/tinymce/tinymce.min.js', CClientScript::POS_END);
 $cs->registerScriptFile($theme . '/assets/js/pages/news-form.js', CClientScript::POS_END);
