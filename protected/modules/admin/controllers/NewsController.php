@@ -94,6 +94,55 @@ class NewsController extends AdminController
 		$this->redirect(array('admin'));
 	}
 
+	/**
+	 * Nhận file ảnh (AJAX) từ TinyMCE hoặc ô chọn ảnh đại diện,
+	 * lưu vào webroot/uploads/news/Y/m và trả JSON { success, url, location }.
+	 * Trường `location` dùng cho TinyMCE images_upload_handler.
+	 */
+	public function actionUploadImage()
+	{
+		header('Content-Type: application/json');
+
+		$fieldKey = isset($_FILES['file']) ? 'file' : 'image';
+		if (!isset($_FILES[$fieldKey]) || $_FILES[$fieldKey]['error'] !== UPLOAD_ERR_OK) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không nhận được tệp tải lên.'));
+			Yii::app()->end();
+		}
+
+		$file = $_FILES[$fieldKey];
+		$allowedExt = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+		$ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+		if (!in_array($ext, $allowedExt)) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Định dạng ảnh không hợp lệ (chỉ JPG, PNG, GIF, WEBP).'));
+			Yii::app()->end();
+		}
+
+		$maxSize = 5 * 1024 * 1024;
+		if ($file['size'] > $maxSize) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Ảnh vượt quá dung lượng cho phép (5MB).'));
+			Yii::app()->end();
+		}
+
+		$relativeDir = '/uploads/news/' . date('Y/m');
+		$uploadDir = Yii::getPathOfAlias('webroot') . $relativeDir;
+		if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không thể tạo thư mục lưu ảnh.'));
+			Yii::app()->end();
+		}
+
+		$filename = 'news_' . uniqid() . '.' . $ext;
+		$targetPath = $uploadDir . '/' . $filename;
+
+		if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+			$url = $relativeDir . '/' . $filename;
+			echo CJSON::encode(array('success' => true, 'url' => $url, 'location' => $url));
+		} else {
+			echo CJSON::encode(array('success' => false, 'message' => 'Không thể lưu ảnh lên máy chủ.'));
+		}
+		Yii::app()->end();
+	}
+
 	public function actionAdmin()
 	{
 		$model = new News('search');
