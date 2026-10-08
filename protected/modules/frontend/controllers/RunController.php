@@ -87,6 +87,42 @@ class RunController extends AttendeePortalController
         Yii::app()->end();
     }
 
+    /** Lưu thông tin khẩn cấp cho đăng ký chạy (AJAX, tất cả trường tùy chọn). */
+    public function actionSaveEmergency()
+    {
+        header('Content-Type: application/json');
+
+        if (!$this->isLoggedIn()) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'));
+            Yii::app()->end();
+        }
+        if (!Yii::app()->request->isPostRequest) {
+            echo CJSON::encode(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            Yii::app()->end();
+        }
+        if ($this->denyIfProfileNotConfirmed()) {
+            Yii::app()->end();
+        }
+
+        $attendeeId = $this->currentAttendeeId();
+        $info = array(
+            'emergency_contact_name'  => trim(isset($_POST['emergency_contact_name']) ? $_POST['emergency_contact_name'] : ''),
+            'emergency_contact_phone' => trim(isset($_POST['emergency_contact_phone']) ? $_POST['emergency_contact_phone'] : ''),
+            'medical_conditions'      => trim(isset($_POST['medical_conditions']) ? $_POST['medical_conditions'] : ''),
+            'medications'             => trim(isset($_POST['medications']) ? $_POST['medications'] : ''),
+        );
+
+        $res = RunRegistrations::saveEmergencyViaApi($attendeeId, $info);
+
+        echo CJSON::encode(array(
+            'success' => (bool) $res['success'],
+            'message' => $res['success']
+                ? (isset($res['data']['message']) ? $res['data']['message'] : 'Đã lưu thông tin khẩn cấp.')
+                : ($res['error'] ?: 'Không lưu được thông tin. Vui lòng thử lại.'),
+        ));
+        Yii::app()->end();
+    }
+
     /** Người dùng xin hủy đăng ký (AJAX). Trả JSON {success, message}. */
     public function actionCancelRequest()
     {
