@@ -84,6 +84,58 @@
         });
     }
 
+    /** Admin reset PIN đăng nhập — luôn hỏi lại, nói rõ hậu quả. */
+    function bindResetPin(config) {
+        var url = config.getAttribute('data-reset-pin-url');
+        if (!url) {
+            return;
+        }
+
+        document.querySelectorAll('.js-reset-pin').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var rosterId = button.getAttribute('data-roster-id');
+                var fullName = button.getAttribute('data-full-name');
+                var lucky = button.getAttribute('data-lucky');
+
+                var send = function () {
+                    var body = new FormData();
+                    body.append('id', rosterId);
+
+                    postWithButton(url, body, button, function (data) {
+                        if (typeof Toast !== 'undefined') {
+                            Toast.success(data.message);
+                        }
+                        window.setTimeout(function () { window.location.reload(); }, 800);
+                    });
+                };
+
+                if (typeof Swal === 'undefined') {
+                    send();
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Reset mã PIN?',
+                    html: '<p style="text-align:left">Xoá mã PIN hiện tại của <strong>' + escapeHtml(fullName) + '</strong>'
+                        + (lucky ? ' (mã <strong>' + escapeHtml(lucky) + '</strong>)' : '')
+                        + '.</p>'
+                        + '<p style="text-align:left">Người dùng sẽ <strong>tự đặt PIN mới</strong> ở lần đăng nhập kế tiếp.'
+                        + ' Mã định danh đăng nhập <strong>không thay đổi</strong>.</p>',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Reset PIN',
+                    cancelButtonText: 'Không'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        send();
+                    }
+                });
+            });
+        });
+    }
+
     /** Đánh dấu xung đột đã xử lý. */
     function bindClearConflict(config) {
         var url = config.getAttribute('data-clear-conflict-url');
