@@ -85,6 +85,7 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                             <th>Họ và tên</th>
                             <th>Đơn vị</th>
                             <th>Số điện thoại</th>
+                            <th>Cự ly</th>
                             <th>Nội dung</th>
                         </tr>
                     </thead>
@@ -97,6 +98,7 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                                 <td><?php echo CHtml::encode(isset($r['unit_label']) ? $r['unit_label'] : ''); ?></td>
                                 <td><?php echo CHtml::encode(isset($r['phone_number']) ? $r['phone_number'] : ''); ?></td>
                                 <td><?php echo CHtml::encode(isset($r['run_event_name']) ? $r['run_event_name'] : ''); ?></td>
+                                <td><?php echo CHtml::encode(!empty($r['age_group_label']) ? $r['age_group_label'] : '—'); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
