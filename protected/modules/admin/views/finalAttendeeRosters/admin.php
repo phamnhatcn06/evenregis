@@ -783,6 +783,17 @@ $flashMessages = Yii::app()->user->getFlashes();
                                         </button>
                                     <?php endif; ?>
 
+                                    <?php if (!$isWithdrawn && $row->lucky_number && $row->pin_is_set): ?>
+                                        <button type="button"
+                                                class="far-action-btn far-action-reset-pin js-reset-pin"
+                                                data-roster-id="<?php echo (int) $row->id; ?>"
+                                                data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                                data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
+                                                title="Reset mã PIN đăng nhập">
+                                            <i class="fa fa-key"></i>
+                                        </button>
+                                    <?php endif; ?>
+
                                     <?php if ($canDelete && !$isWithdrawn): ?>
                                         <button type="button"
                                                 class="far-action-btn far-action-withdraw js-withdraw"
