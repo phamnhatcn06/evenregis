@@ -108,18 +108,28 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                             <th>Họ và tên</th>
                             <th>Đơn vị</th>
                             <th>Số điện thoại</th>
+                            <th>Năm sinh</th>
+                            <th>Giới tính</th>
                             <th>Cự ly</th>
                             <th>Nội dung</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($registrations as $i => $r): ?>
+                            <?php
+                            $genderLabel = '—';
+                            if (isset($r['gender']) && $r['gender'] !== null && $r['gender'] !== '') {
+                                $genderLabel = ((int) $r['gender'] === 1) ? 'Nam' : 'Nữ';
+                            }
+                            ?>
                             <tr>
                                 <td><?php echo $i + 1; ?></td>
                                 <td><span class="badge bg-primary"><?php echo CHtml::encode(isset($r['bib_number']) ? $r['bib_number'] : ''); ?></span></td>
                                 <td><?php echo CHtml::encode(isset($r['full_name']) ? $r['full_name'] : ''); ?></td>
-                                <td><?php echo CHtml::encode(isset($r['unit_label']) ? $r['unit_label'] : ''); ?></td>
+                                <td><?php echo CHtml::encode(!empty($r['unit_label']) ? $r['unit_label'] : '—'); ?></td>
                                 <td><?php echo CHtml::encode(isset($r['phone_number']) ? $r['phone_number'] : ''); ?></td>
+                                <td><?php echo CHtml::encode(!empty($r['birth_year']) ? $r['birth_year'] : '—'); ?></td>
+                                <td><?php echo CHtml::encode($genderLabel); ?></td>
                                 <td><?php echo CHtml::encode(isset($r['run_event_name']) ? $r['run_event_name'] : ''); ?></td>
                                 <td><?php echo CHtml::encode(!empty($r['age_group_label']) ? $r['age_group_label'] : '—'); ?></td>
                             </tr>
@@ -127,7 +137,7 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                     </tbody>
                 </table>
             </div>
-            <p class="text-muted mb-0">Tổng: <strong><?php echo count($registrations); ?></strong> người đã đăng ký.</p>
+            <p class="text-muted mb-0">Hiển thị: <strong><?php echo count($registrations); ?></strong> / Tổng: <strong><?php echo $totalCount; ?></strong> người đã đăng ký.</p>
         <?php endif; ?>
     </div>
 </div>
