@@ -46,21 +46,35 @@
     'widgetOptions' => array('htmlOptions' => array('class' => 'input w-full border mt-2', 'rows' => 3)),
 )); ?>
 
+<?php
+$uploadUrl = $this->createUrl('uploadImage');
+$dropzones = array(
+    array('attr' => 'image', 'label' => 'Ảnh nền (desktop)', 'hint' => 'Kéo & thả hoặc bấm để chọn ảnh nền desktop'),
+    array('attr' => 'mobile_image', 'label' => 'Ảnh nền (mobile)', 'hint' => 'Tuỳ chọn — ảnh nền hiển thị trên điện thoại'),
+);
+?>
 <div class="row">
-    <div class="col-md-6">
-        <?php echo $form->textFieldGroup($model, 'image', array(
-            'maxlength' => 500,
-            'hint' => 'URL ảnh nền (desktop)',
-            'widgetOptions' => array('htmlOptions' => array('class' => 'input w-full border mt-2')),
-        )); ?>
+    <?php foreach ($dropzones as $dz): $attr = $dz['attr']; $value = $model->$attr; ?>
+    <div class="col-md-6 mb-3">
+        <label class="form-label"><?php echo CHtml::encode($dz['label']); ?></label>
+        <div class="slide-dropzone border rounded text-center p-3"
+             data-target="<?php echo $attr; ?>"
+             data-upload-url="<?php echo $uploadUrl; ?>"
+             style="cursor:pointer;background:#f8f9fa;border-style:dashed !important;">
+            <div class="slide-dropzone-preview mb-2" style="min-height:120px;display:flex;align-items:center;justify-content:center;">
+                <?php if (!empty($value)): ?>
+                    <img src="<?php echo CHtml::encode($value); ?>" alt="preview" style="max-height:140px;max-width:100%;">
+                <?php else: ?>
+                    <span class="text-muted"><i class="fa fa-cloud-upload fa-2x d-block mb-2"></i><?php echo CHtml::encode($dz['hint']); ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="slide-dropzone-status small text-muted"></div>
+            <input type="file" class="slide-dropzone-input d-none" accept="image/*">
+        </div>
+        <?php echo CHtml::activeHiddenField($model, $attr, array('class' => 'slide-dropzone-value', 'id' => 'Slideshow_' . $attr)); ?>
+        <?php echo $form->error($model, $attr); ?>
     </div>
-    <div class="col-md-6">
-        <?php echo $form->textFieldGroup($model, 'mobile_image', array(
-            'maxlength' => 500,
-            'hint' => 'URL ảnh nền cho mobile (tuỳ chọn)',
-            'widgetOptions' => array('htmlOptions' => array('class' => 'input w-full border mt-2')),
-        )); ?>
-    </div>
+    <?php endforeach; ?>
 </div>
 
 <div class="row">
