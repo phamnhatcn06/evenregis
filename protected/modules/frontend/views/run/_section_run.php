@@ -92,6 +92,34 @@
                         </tr>
                     </table>
 
+                    <?php $shirtSize = isset($runMine['shirt_size']) ? $runMine['shirt_size'] : ''; ?>
+                    <div class="shirt-size-box mt-3 p-3 rounded border bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-dark small">
+                                <i class="bi bi-person-arms-up text-primary me-1"></i> Size áo Fun Run
+                            </span>
+                            <?php if ($shirtSize !== ''): ?>
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal" data-bs-target="#modalShirtSize">
+                                    <i class="bi bi-pencil-square me-1"></i> Đổi size
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($shirtSize !== ''): ?>
+                            <div class="mt-2">
+                                <span class="badge bg-primary fs-6 px-3 py-2"><?php echo CHtml::encode($shirtSize); ?></span>
+                                <span class="text-muted small ms-2">Áo dành riêng cho nội dung Fun Run</span>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-warning"
+                                        data-bs-toggle="modal" data-bs-target="#modalShirtSize">
+                                    <i class="bi bi-exclamation-triangle me-1"></i> Bạn chưa chọn size áo — bấm để chọn
+                                </button>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
                     <?php
                     $emName  = isset($runMine['emergency_contact_name']) ? $runMine['emergency_contact_name'] : '';
                     $emPhone = isset($runMine['emergency_contact_phone']) ? $runMine['emergency_contact_phone'] : '';
