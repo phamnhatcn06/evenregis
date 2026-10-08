@@ -1407,9 +1407,10 @@
         if (typeof jQuery !== 'undefined' && jQuery.fn && jQuery.fn.select2) {
             var $property = jQuery('#filter-property');
             if ($property.length && !$property.hasClass('select2-hidden-accessible')) {
+                // Ô Đơn vị cho chọn nhiều: không bật allowClear (select2 chỉ cho allowClear ở
+                // chế độ chọn đơn), mỗi tag đã có sẵn nút xoá riêng.
                 $property.select2({
                     placeholder: '-- Tất cả đơn vị --',
-                    allowClear: true,
                     width: '100%',
                     language: {
                         noResults: function () { return 'Không tìm thấy đơn vị'; },
