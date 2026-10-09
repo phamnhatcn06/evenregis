@@ -18,6 +18,13 @@ $registrationWindowText = isset($registrationWindowText) ? $registrationWindowTe
         </span>
     </div>
 
+    <?php if ($registrationWindowText !== ''): ?>
+        <div class="d-flex align-items-start gap-2 px-3 px-md-4 py-2 border-bottom bg-light text-secondary small">
+            <i class="bi bi-calendar-event text-success mt-1"></i>
+            <span><?php echo CHtml::encode($registrationWindowText); ?></span>
+        </div>
+    <?php endif; ?>
+
     <div class="p-3 p-md-4">
         <?php if (!empty($runMine)): ?>
             <?php
