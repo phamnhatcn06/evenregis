@@ -1316,6 +1316,241 @@
         }
     }
 
+    /**
+     * Modal gửi thông tin tài khoản theo đơn vị.
+     *
+     * Mở modal -> tải danh sách đơn vị theo đúng bộ lọc hiện tại (gửi kèm query string hiện tại) ->
+     * HO tick chọn -> gửi lần lượt từng đơn vị một email kèm PDF. Kết quả trả về theo từng đơn vị.
+     */
+    function bindSendAccountsModal(config) {
+        var modalElement = document.getElementById('modal_send_accounts');
+        if (!modalElement) {
+            return;
+        }
+
+        var unitsUrl = config.getAttribute('data-account-units-url');
+        var sendUrl = config.getAttribute('data-send-accounts-url');
+        var sendButton = document.getElementById('btn_send_accounts');
+        var checkAll = document.getElementById('send_accounts_check_all');
+        var tbody = document.getElementById('send_accounts_tbody');
+        var selectedCountEl = document.getElementById('send_accounts_selected_count');
+
+        var loaded = false;
+
+        modalElement.addEventListener('shown.bs.modal', function () {
+            if (!loaded) {
+                loadUnits();
+            }
+        });
+
+        if (checkAll) {
+            checkAll.addEventListener('change', function () {
+                tbody.querySelectorAll('.js-unit-check').forEach(function (cb) {
+                    cb.checked = checkAll.checked;
+                });
+                updateSelected();
+            });
+        }
+
+        if (sendButton) {
+            sendButton.addEventListener('click', sendAccounts);
+        }
+
+        function appendQuery(url) {
+            var search = window.location.search || '';
+            if (!search) {
+                return url;
+            }
+            return url + (url.indexOf('?') === -1 ? '?' : '&') + search.replace(/^\?/, '');
+        }
+
+        function loadUnits() {
+            toggle('send_accounts_loading', true);
+            toggle('send_accounts_empty', false);
+            toggle('send_accounts_list_wrap', false);
+            toggle('send_accounts_result', false);
+
+            fetch(appendQuery(unitsUrl), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    toggle('send_accounts_loading', false);
+                    if (!data || !data.success) {
+                        toggle('send_accounts_empty', true);
+                        if (typeof Toast !== 'undefined') {
+                            Toast.error((data && data.message) || 'Không tải được danh sách đơn vị.');
+                        }
+                        return;
+                    }
+
+                    if (data.debug_mode) {
+                        setText('send_accounts_debug_email', data.debug_email || '');
+                        toggle('send_accounts_debug_banner', true);
+                    }
+
+                    loaded = true;
+                    renderUnits(data.units || []);
+                })
+                .catch(function () {
+                    toggle('send_accounts_loading', false);
+                    toggle('send_accounts_empty', true);
+                    if (typeof Toast !== 'undefined') {
+                        Toast.error('Lỗi kết nối server.');
+                    }
+                });
+        }
+
+        function renderUnits(units) {
+            tbody.innerHTML = '';
+
+            if (!units.length) {
+                toggle('send_accounts_empty', true);
+                sendButton.disabled = true;
+                return;
+            }
+
+            units.forEach(function (unit) {
+                var tr = document.createElement('tr');
+
+                var tdCheck = document.createElement('td');
+                tdCheck.className = 'text-center';
+                var cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.className = 'form-check-input js-unit-check';
+                cb.value = unit.property_id;
+                cb.checked = true;
+                cb.addEventListener('change', updateSelected);
+                tdCheck.appendChild(cb);
+
+                var tdName = document.createElement('td');
+                var nameStrong = document.createElement('div');
+                nameStrong.className = 'fw-semibold';
+                nameStrong.textContent = unit.name || 'Đơn vị';
+                tdName.appendChild(nameStrong);
+                if (unit.code) {
+                    var codeSmall = document.createElement('div');
+                    codeSmall.className = 'small text-muted';
+                    codeSmall.textContent = 'Mã: ' + unit.code;
+                    tdName.appendChild(codeSmall);
+                }
+
+                var tdCount = document.createElement('td');
+                tdCount.className = 'text-center';
+                tdCount.textContent = unit.count;
+
+                var tdEmail = document.createElement('td');
+                if (unit.has_email) {
+                    tdEmail.className = 'small';
+                    tdEmail.textContent = unit.email;
+                } else {
+                    tdEmail.innerHTML = '<span class="badge bg-warning text-dark"><i class="fa fa-exclamation-triangle me-1"></i>Chưa có email</span>';
+                }
+
+                tr.appendChild(tdCheck);
+                tr.appendChild(tdName);
+                tr.appendChild(tdCount);
+                tr.appendChild(tdEmail);
+                tbody.appendChild(tr);
+            });
+
+            toggle('send_accounts_list_wrap', true);
+            updateSelected();
+        }
+
+        function updateSelected() {
+            var checks = tbody.querySelectorAll('.js-unit-check');
+            var selected = tbody.querySelectorAll('.js-unit-check:checked');
+            setText('send_accounts_selected_count', selected.length);
+            sendButton.disabled = selected.length === 0;
+            if (checkAll) {
+                checkAll.checked = checks.length > 0 && selected.length === checks.length;
+            }
+        }
+
+        function sendAccounts() {
+            var selected = [];
+            tbody.querySelectorAll('.js-unit-check:checked').forEach(function (cb) {
+                selected.push(cb.value);
+            });
+            if (!selected.length) {
+                return;
+            }
+
+            var body = new FormData();
+            body.append('event_id', document.getElementById('send_accounts_event_id').value);
+            body.append('period_id', document.getElementById('send_accounts_period_id').value);
+            selected.forEach(function (id) {
+                body.append('property_ids[]', id);
+            });
+
+            var originalHtml = sendButton.innerHTML;
+            sendButton.disabled = true;
+            sendButton.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang gửi...';
+
+            fetch(appendQuery(sendUrl), {
+                method: 'POST',
+                body: body,
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            })
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        return { ok: response.ok, data: data };
+                    });
+                })
+                .then(function (result) {
+                    sendButton.innerHTML = originalHtml;
+                    sendButton.disabled = false;
+
+                    if (!result.ok || !result.data.success) {
+                        if (typeof Toast !== 'undefined') {
+                            Toast.error((result.data && result.data.message) || 'Không gửi được.');
+                        }
+                        return;
+                    }
+
+                    renderResult(result.data.report || []);
+                    if (typeof Toast !== 'undefined') {
+                        Toast.success(result.data.message);
+                    }
+                })
+                .catch(function () {
+                    sendButton.innerHTML = originalHtml;
+                    sendButton.disabled = false;
+                    if (typeof Toast !== 'undefined') {
+                        Toast.error('Lỗi kết nối server.');
+                    }
+                });
+        }
+
+        function renderResult(report) {
+            var list = document.getElementById('send_accounts_result_list');
+            list.innerHTML = '';
+
+            report.forEach(function (item) {
+                var li = document.createElement('li');
+                var label = item.unit + ' (' + item.count + ' người): ';
+                if (item.status === 'sent') {
+                    li.className = 'text-success';
+                    li.textContent = '✓ ' + label + 'đã gửi tới ' + (item.recipient || '')
+                        + (item.has_pdf ? '' : ' (không có PDF)')
+                        + (item.note ? ' — ' + item.note : '');
+                } else if (item.status === 'skipped') {
+                    li.className = 'text-warning';
+                    li.textContent = '• ' + label + 'bỏ qua — ' + (item.reason || '');
+                } else {
+                    li.className = 'text-danger';
+                    li.textContent = '✕ ' + label + 'lỗi — ' + (item.reason || '');
+                }
+                list.appendChild(li);
+            });
+
+            toggle('send_accounts_result', true);
+        }
+    }
+
     /** Flash message từ PHP hiển thị bằng Toast, không dùng Bootstrap Alert. */
     function showFlashMessages(config) {
         var raw = config.getAttribute('data-flash');
