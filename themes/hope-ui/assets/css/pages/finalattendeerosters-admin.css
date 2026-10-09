@@ -129,6 +129,12 @@
     border: none;
 }
 
+.far-btn-info {
+    background: linear-gradient(135deg, #0ab6c4 0%, #0893a0 100%);
+    color: #ffffff !important;
+    border: none;
+}
+
 .far-btn-outline-excel {
     background: #ffffff;
     color: #1aaa4d !important;
