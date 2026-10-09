@@ -1,20 +1,33 @@
 <?php
 /**
  * Khối đăng ký Đi tham quan (Tour) — Giao diện chuyên nghiệp, tích hợp icon & Tour Boarding Pass.
- * Tham số: $tourMine, $tourSessions, $fullName (optional)
+ * Tham số: $tourMine, $tourSessions, $fullName (optional), $window (optional)
  */
+$window = isset($window) ? $window : array('state' => 'open', 'target' => 0, 'label' => '');
+$regOpen = ($window['state'] === 'open');
+$tourImg = Yii::app()->theme->baseUrl . '/assets/images/tour-trang-an.jpg';
 ?>
 <div class="activity-card h-100">
-    <div class="activity-card-header-tour d-flex justify-content-between align-items-center">
+    <div class="activity-card-header-tour d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
             <h5 class="mb-0 text-white fw-bold d-flex align-items-center">
                 <i class="bi bi-bus-front-fill me-2"></i> Đi tham quan
             </h5>
             <small class="text-white-50">Khám phá danh thắng & trải nghiệm Đại hội</small>
         </div>
+        <?php $this->renderPartial('_card_countdown', array('window' => $window)); ?>
         <span class="activity-badge">
             <i class="bi bi-check-circle me-1"></i> Tối đa 1 đợt
         </span>
+    </div>
+
+    <!-- Ảnh giới thiệu tour Di sản Tràng An -->
+    <div class="tour-hero-banner">
+        <img src="<?php echo $tourImg; ?>" alt="Tour tham quan Di sản Tràng An" loading="lazy">
+        <div class="tour-hero-overlay">
+            <span class="tour-hero-badge"><i class="bi bi-geo-alt-fill me-1"></i> Di sản Tràng An</span>
+            <div class="tour-hero-title">Tour tham quan 1/2 ngày · Miễn phí</div>
+        </div>
     </div>
 
     <div class="p-3 p-md-4">
