@@ -31,8 +31,15 @@ function renderFillBar($name, $extra, $registered, $quota)
 // Tổng hợp nhanh.
 $sumReg = 0;
 $sumQuota = 0;
-foreach ($runEvents as $e) { $sumReg += (int) $e->registered_count; $sumQuota += (int) $e->quota; }
-foreach ($tourSessions as $s) { $sumReg += (int) $s->registered_count; $sumQuota += (int) $s->quota; }
+foreach ($runEvents as $e) { 
+    $reserved = isset($e->reserved_slots) ? (int) $e->reserved_slots : 0;
+    $sumReg += ($reserved + (int) $e->registered_count); 
+    $sumQuota += (int) $e->quota; 
+}
+foreach ($tourSessions as $s) { 
+    $sumReg += (int) $s->registered_count; 
+    $sumQuota += (int) $s->quota; 
+}
 ?>
 <div class="card mb-3">
     <div class="card-body">
@@ -64,8 +71,11 @@ foreach ($tourSessions as $s) { $sumReg += (int) $s->registered_count; $sumQuota
             <div class="card-body">
                 <?php if (empty($runEvents)): ?>
                     <div class="alert alert-warning mb-0">Chưa có cự ly nào.</div>
-                <?php else: foreach ($runEvents as $e): ?>
-                    <?php renderFillBar($e->name, $e->code, $e->registered_count, $e->quota); ?>
+                <?php else: foreach ($runEvents as $e): 
+                    $reserved = isset($e->reserved_slots) ? (int) $e->reserved_slots : 0;
+                    $totalReg = $reserved + (int) $e->registered_count;
+                ?>
+                    <?php renderFillBar($e->name, $e->code, $totalReg, $e->quota); ?>
                 <?php endforeach; endif; ?>
             </div>
         </div>

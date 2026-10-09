@@ -22,7 +22,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <?php echo $form->dropDownListGroup($model, 'event_id', array(
                 'widgetOptions' => array(
                     'data' => $eventList,
@@ -35,10 +35,20 @@
                 'widgetOptions' => array('htmlOptions' => array('class' => 'form-control', 'type' => 'number', 'min' => 0)),
             )); ?>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
+            <?php echo $form->textFieldGroup($model, 'reserved_slots', array(
+                'widgetOptions' => array('htmlOptions' => array('class' => 'form-control', 'type' => 'number', 'min' => 0, 'placeholder' => 'VD: 45')),
+            )); ?>
+        </div>
+        <div class="col-md-2">
             <?php echo $form->textFieldGroup($model, 'sort_order', array(
                 'widgetOptions' => array('htmlOptions' => array('class' => 'form-control', 'type' => 'number', 'min' => 0)),
             )); ?>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-12">
+            <small class="text-muted"><i class="fa fa-info-circle me-1"></i>Số suất giữ lại dành riêng cho VIP/BTC. Ví dụ: Quota 320, giữ 45 suất thì hiển thị ban đầu 45/320 đã đăng ký, người đăng ký công khai đầu tiên sẽ nhận slot 46 (BIB ví dụ 5046).</small>
         </div>
     </div>
 

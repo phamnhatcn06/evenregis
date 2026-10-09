@@ -34,9 +34,14 @@ $this->Tabletitle = 'Danh sách nội dung chạy';
                     'header' => 'Giới hạn',
                     'type' => 'raw',
                     'value' => function ($data) {
-                        $remaining = isset($data->remaining) ? (int) $data->remaining : max(0, (int) $data->quota - (int) $data->registered_count);
+                        $quota = (int) $data->quota;
+                        $reserved = isset($data->reserved_slots) ? (int) $data->reserved_slots : 0;
+                        $publicReg = (int) $data->registered_count;
+                        $totalReg = $reserved + $publicReg;
+                        $remaining = isset($data->remaining) ? (int) $data->remaining : max(0, $quota - $totalReg);
                         $cls = $remaining <= 0 ? 'bg-danger' : ($remaining <= 5 ? 'bg-warning text-dark' : 'bg-success');
-                        return (int) $data->registered_count . ' / ' . (int) $data->quota
+                        $reservedTag = $reserved > 0 ? ' <small class="text-muted" title="Suất giữ lại VIP/BTC">(giữ ' . $reserved . ')</small>' : '';
+                        return $totalReg . ' / ' . $quota . $reservedTag
                             . ' <span class="badge ' . $cls . '">còn ' . $remaining . '</span>';
                     },
                 ),

@@ -234,9 +234,11 @@ $regOpen = ($window['state'] === 'open');
             <div class="run-events-list">
                 <?php foreach ($runEvents as $e):
                     $quota = (int) $e['quota'];
-                    $registered = (int) $e['registered_count'];
-                    $remaining = (int) $e['remaining'];
-                    $percent = ($quota > 0) ? min(100, round(($registered / $quota) * 100)) : 0;
+                    $reservedSlots = isset($e['reserved_slots']) ? (int) $e['reserved_slots'] : 0;
+                    $publicRegistered = (int) $e['registered_count'];
+                    $totalRegistered = $reservedSlots + $publicRegistered;
+                    $remaining = max(0, $quota - $totalRegistered);
+                    $percent = ($quota > 0) ? min(100, round(($totalRegistered / $quota) * 100)) : 0;
                     $isFull = ($remaining <= 0);
                     $isNotStarted = !empty($e['not_started']);
                     $isEnded = !empty($e['ended']);
@@ -276,7 +278,7 @@ $regOpen = ($window['state'] === 'open');
                                             <i class="bi <?php echo $isFull ? 'bi-x-circle' : 'bi-check2'; ?> me-1"></i><?php echo $statusText; ?>
                                         </span>
                                         <span class="text-muted small" style="font-size: 0.75rem;">
-                                            (<?php echo $registered; ?>/<?php echo $quota; ?> đã đăng ký)
+                                            (<?php echo $totalRegistered; ?>/<?php echo $quota; ?> đã đăng ký)
                                         </span>
                                     </div>
 

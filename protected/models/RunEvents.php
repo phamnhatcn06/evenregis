@@ -14,6 +14,7 @@ class RunEvents extends CFormModel
     public $name;
     public $code;
     public $quota;
+    public $reserved_slots;
     public $registered_count;
     public $remaining;
     public $open_at;
@@ -29,12 +30,12 @@ class RunEvents extends CFormModel
     {
         return array(
             array('name, code, quota', 'required'),
-            array('quota, registered_count, sort_order, is_active, open_at, close_at, cancel_until, event_id', 'numerical', 'integerOnly' => true),
+            array('quota, reserved_slots, registered_count, sort_order, is_active, open_at, close_at, cancel_until, event_id', 'numerical', 'integerOnly' => true),
             array('name', 'length', 'max' => 255),
             array('code', 'length', 'max' => 30),
             array('status', 'in', 'range' => array(self::STATUS_OPEN, self::STATUS_CLOSED)),
             // Cho phép gán tự do khi map từ API
-            array('id, event_id, name, code, quota, registered_count, remaining, open_at, close_at, cancel_until, status, sort_order, is_active, created_at, updated_at', 'safe'),
+            array('id, event_id, name, code, quota, reserved_slots, registered_count, remaining, open_at, close_at, cancel_until, status, sort_order, is_active, created_at, updated_at', 'safe'),
         );
     }
 
@@ -44,6 +45,7 @@ class RunEvents extends CFormModel
             'name'             => 'Tên nội dung',
             'code'             => 'Mã (prefix BIB)',
             'quota'            => 'Giới hạn số lượng',
+            'reserved_slots'   => 'Số suất giữ lại (VIP/BTC)',
             'registered_count' => 'Đã đăng ký',
             'remaining'        => 'Còn lại',
             'open_at'          => 'Mở lúc',
@@ -72,16 +74,17 @@ class RunEvents extends CFormModel
     public function storeViaApi()
     {
         $data = array(
-            'event_id'   => $this->event_id,
-            'name'       => $this->name,
-            'code'       => $this->code,
-            'quota'      => $this->quota,
-            'open_at'    => $this->open_at,
-            'close_at'   => $this->close_at,
-            'cancel_until' => $this->cancel_until,
-            'status'     => $this->status ?: self::STATUS_OPEN,
-            'sort_order' => $this->sort_order ?: 0,
-            'is_active'  => ($this->is_active === null || $this->is_active === '') ? 1 : $this->is_active,
+            'event_id'       => $this->event_id,
+            'name'           => $this->name,
+            'code'           => $this->code,
+            'quota'          => $this->quota,
+            'reserved_slots' => $this->reserved_slots ?: 0,
+            'open_at'        => $this->open_at,
+            'close_at'       => $this->close_at,
+            'cancel_until'   => $this->cancel_until,
+            'status'         => $this->status ?: self::STATUS_OPEN,
+            'sort_order'     => $this->sort_order ?: 0,
+            'is_active'      => ($this->is_active === null || $this->is_active === '') ? 1 : $this->is_active,
         );
         return ApiClient::post(ApiEndpoints::RUN_EVENT_STORE, $data);
     }
@@ -90,16 +93,17 @@ class RunEvents extends CFormModel
     {
         $url = ApiEndpoints::url(ApiEndpoints::RUN_EVENT_UPDATE, array('id' => $this->id));
         $data = array(
-            'event_id'   => $this->event_id,
-            'name'       => $this->name,
-            'code'       => $this->code,
-            'quota'      => $this->quota,
-            'open_at'    => $this->open_at,
-            'close_at'   => $this->close_at,
-            'cancel_until' => $this->cancel_until,
-            'status'     => $this->status,
-            'sort_order' => $this->sort_order,
-            'is_active'  => $this->is_active,
+            'event_id'       => $this->event_id,
+            'name'           => $this->name,
+            'code'           => $this->code,
+            'quota'          => $this->quota,
+            'reserved_slots' => $this->reserved_slots ?: 0,
+            'open_at'        => $this->open_at,
+            'close_at'       => $this->close_at,
+            'cancel_until'   => $this->cancel_until,
+            'status'         => $this->status,
+            'sort_order'     => $this->sort_order,
+            'is_active'      => $this->is_active,
         );
         return ApiClient::post($url, $data);
     }

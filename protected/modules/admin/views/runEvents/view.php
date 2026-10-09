@@ -10,13 +10,18 @@ $this->menu = array(
 );
 $this->Tabletitle = 'Chi tiết nội dung chạy';
 
-$remaining = $model->remaining !== null ? (int) $model->remaining : max(0, (int) $model->quota - (int) $model->registered_count);
+$quota = (int) $model->quota;
+$reserved = isset($model->reserved_slots) ? (int) $model->reserved_slots : 0;
+$publicReg = (int) $model->registered_count;
+$totalReg = $reserved + $publicReg;
+$remaining = $model->remaining !== null ? (int) $model->remaining : max(0, $quota - $totalReg);
 
 $attributes = array(
     array('label' => 'Tên nội dung', 'value' => $model->name),
     array('label' => 'Mã (prefix BIB)', 'value' => $model->code),
-    array('label' => 'Giới hạn (quota)', 'value' => (int) $model->quota),
-    array('label' => 'Đã đăng ký', 'value' => (int) $model->registered_count),
+    array('label' => 'Giới hạn (quota)', 'value' => $quota),
+    array('label' => 'Suất giữ lại (VIP/BTC)', 'value' => $reserved),
+    array('label' => 'Đã đăng ký (Tổng)', 'value' => $totalReg . ' (Công khai: ' . $publicReg . ')'),
     array('label' => 'Còn lại', 'value' => $remaining),
     array('label' => 'Mở lúc', 'value' => $model->open_at ? date('d/m/Y H:i', (int) $model->open_at) : '—'),
     array('label' => 'Đóng lúc', 'value' => $model->close_at ? date('d/m/Y H:i', (int) $model->close_at) : '—'),
