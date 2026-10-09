@@ -27,51 +27,57 @@
 
     var EMERGENCY_PROMPT_KEY = 'run_emergency_prompt_pending';
 
+    // Đếm ngược theo từng card (Fun Run / Tham quan). Khi hết giờ của 1 mốc thì
+    // reload trang để PHP tính lại trạng thái (chưa mở -> đang mở -> đã đóng),
+    // đồng thời ẩn/hiện form đăng ký cho đúng khung thời gian.
     function initCountdown() {
-        var countdownEl = document.getElementById('run-portal-countdown');
-        if (!countdownEl) { return; }
+        var cards = document.querySelectorAll('.card-countdown[data-target]');
+        if (!cards.length) { return; }
 
-        var targetTimestamp = parseInt(countdownEl.getAttribute('data-target') || '0', 10);
-        if (!targetTimestamp || isNaN(targetTimestamp)) { return; }
+        var reloaded = false;
 
-        var daysEl = document.getElementById('cd-days');
-        var hoursEl = document.getElementById('cd-hours');
-        var minsEl = document.getElementById('cd-mins');
-        var secsEl = document.getElementById('cd-secs');
+        function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-        function updateClock() {
+        function tick() {
             var now = Math.floor(Date.now() / 1000);
-            var remaining = targetTimestamp - now;
 
-            if (remaining <= 0) {
-                if (daysEl) daysEl.textContent = '00';
-                if (hoursEl) hoursEl.textContent = '00';
-                if (minsEl) minsEl.textContent = '00';
-                if (secsEl) secsEl.textContent = '00';
+            cards.forEach(function (el) {
+                var target = parseInt(el.getAttribute('data-target') || '0', 10);
+                if (!target || isNaN(target)) { return; }
 
-                var livePill = document.querySelector('.countdown-live-pill');
-                if (livePill) {
-                    livePill.innerHTML = '<i class="bi bi-clock-history me-1"></i> ĐÃ HẾT THỜI GIAN';
-                    livePill.style.background = 'rgba(100, 116, 139, 0.35)';
-                    livePill.style.borderColor = 'rgba(148, 163, 184, 0.4)';
-                    livePill.style.color = '#cbd5e1';
+                var remaining = target - now;
+                if (remaining <= 0) {
+                    setDigits(el, 0, 0, 0, 0);
+                    // Mốc vừa kết thúc -> tải lại 1 lần để cập nhật trạng thái/giao diện.
+                    if (!reloaded) {
+                        reloaded = true;
+                        setTimeout(function () { window.location.reload(); }, 800);
+                    }
+                    return;
                 }
-                return;
-            }
 
-            var days = Math.floor(remaining / 86400);
-            var hours = Math.floor((remaining % 86400) / 3600);
-            var mins = Math.floor((remaining % 3600) / 60);
-            var secs = remaining % 60;
-
-            if (daysEl) daysEl.textContent = days < 10 ? '0' + days : days;
-            if (hoursEl) hoursEl.textContent = hours < 10 ? '0' + hours : hours;
-            if (minsEl) minsEl.textContent = mins < 10 ? '0' + mins : mins;
-            if (secsEl) secsEl.textContent = secs < 10 ? '0' + secs : secs;
+                setDigits(el,
+                    Math.floor(remaining / 86400),
+                    Math.floor((remaining % 86400) / 3600),
+                    Math.floor((remaining % 3600) / 60),
+                    remaining % 60
+                );
+            });
         }
 
-        updateClock();
-        setInterval(updateClock, 1000);
+        function setDigits(el, d, h, m, s) {
+            var dEl = el.querySelector('.cc-d');
+            var hEl = el.querySelector('.cc-h');
+            var mEl = el.querySelector('.cc-m');
+            var sEl = el.querySelector('.cc-s');
+            if (dEl) dEl.textContent = pad(d);
+            if (hEl) hEl.textContent = pad(h);
+            if (mEl) mEl.textContent = pad(m);
+            if (sEl) sEl.textContent = pad(s);
+        }
+
+        tick();
+        setInterval(tick, 1000);
     }
 
     function registerUrlFor(config, type) {
