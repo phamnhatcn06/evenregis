@@ -725,6 +725,7 @@ a:hover > .portal-feature-card {
     color: #92400e;
     font-size: 0.9rem;
     line-height: 1.5;
+    min-height: 72px;
 }
 .reg-window-highlight i {
     color: #f59e0b;
