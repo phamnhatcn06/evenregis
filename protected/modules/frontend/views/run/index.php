@@ -217,6 +217,7 @@ $tourWindow = $computeWindow($tourSessions);
             'tourMine'     => $tourMine,
             'tourSessions' => $tourSessions,
             'fullName'     => $fullName,
+            'window'       => $tourWindow,
         )); ?>
     </div>
 </div>
