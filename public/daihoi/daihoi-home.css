@@ -106,7 +106,7 @@ nav a.nav-link:hover::after {
 }
 @media (min-width: 1366px) {
   .hero-slider-wrap {
-    max-height: 850px;
+    max-height: 920px;
   }
 }
 
@@ -123,20 +123,15 @@ nav a.nav-link:hover::after {
   pointer-events: auto;
 }
 
-/* Background image preserving 16:9 ratio */
+/* Background image preserving 16:9 ratio and auto-fitting frame */
 .hero-slide .slide-bg-img {
   width: 100%;
   height: 100%;
-  max-height: 600px;
+  max-height: 100%;
   object-fit: cover;
   object-position: center;
   transform: scale(1);
   transition: transform 7s ease-out;
-}
-@media (min-width: 1366px) {
-  .hero-slide .slide-bg-img {
-    max-height: 850px;
-  }
 }
 .hero-slide.active .slide-bg-img {
   transform: scale(1.02);
