@@ -285,7 +285,7 @@ if (empty($albumList)) {
 
     <!-- SECTION 1: HERO SLIDER (FULL WIDTH) -->
     <section class="hero-slider-section position-relative w-100 overflow-hidden">
-      <div class="hero-slider-wrap position-relative w-100 overflow-hidden bg-dark" style="aspect-ratio:16/9;max-height:920px;">
+      <div class="hero-slider-wrap position-relative w-100 overflow-hidden bg-dark">
         <!-- Slide Countdown Progress Bar -->
         <div class="slider-progress-track">
           <div class="slider-progress-bar" id="slider-progress-bar"></div>
