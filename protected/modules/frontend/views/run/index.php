@@ -265,4 +265,9 @@ if (!empty($runMine)) {
 if (!empty($profileModal)) {
     $this->renderPartial('/portal/_modal_profile', $profileModal);
 }
+
+// Popup xem lịch trình tham quan chi tiết (file PDF).
+$this->renderPartial('_modal_tour_schedule', array(
+    'pdfUrl' => Yii::app()->theme->baseUrl . '/assets/docs/lich_trinh_tour.pdf',
+));
 ?>
