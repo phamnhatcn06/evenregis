@@ -905,5 +905,9 @@ $flashMessages = Yii::app()->user->getFlashes();
             'periodId'      => $periodId,
             'filterOptions' => $filterOptions,
         )); ?>
+        <?php $this->renderPartial('_modal_send_accounts', array(
+            'eventId'  => $eventId,
+            'periodId' => $periodId,
+        )); ?>
     <?php endif; ?>
 <?php endif; ?>
