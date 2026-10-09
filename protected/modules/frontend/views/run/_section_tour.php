@@ -23,6 +23,13 @@ $tourScheduleUrl = Yii::app()->theme->baseUrl . '/assets/docs/lich_trinh_tour.pd
         </span>
     </div>
 
+    <?php if ($registrationWindowText !== ''): ?>
+        <div class="reg-window-highlight d-flex align-items-start gap-2 px-3 px-md-4 py-3 border-bottom">
+            <i class="bi bi-calendar-event-fill fs-5 flex-shrink-0"></i>
+            <span class="fw-bold"><?php echo CHtml::encode($registrationWindowText); ?></span>
+        </div>
+    <?php endif; ?>
+
     <!-- Ảnh giới thiệu tour Di sản Tràng An -->
     <div class="tour-hero-banner">
         <img src="<?php echo $tourImg; ?>" alt="Tour tham quan Di sản Tràng An" loading="lazy">
