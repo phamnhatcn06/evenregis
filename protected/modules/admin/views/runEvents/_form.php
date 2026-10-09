@@ -42,33 +42,37 @@
         </div>
     </div>
 
+<?php
+    $fmtPicker = function ($value) {
+        if (!$value) return '';
+        $ts = is_numeric($value) ? (int) $value : strtotime($value);
+        return $ts ? date('d-m-Y H:i', $ts) : '';
+    };
+    ?>
     <div class="row">
         <div class="col-md-6">
             <label class="control-label">Mở lúc</label>
-            <?php echo CHtml::activeTextField($model, 'open_at', array(
-                'type' => 'datetime-local',
-                'class' => 'form-control',
-                'value' => $model->open_at ? date('Y-m-d\TH:i', (int) $model->open_at) : '',
-            )); ?>
+            <input type="text" id="open_at_picker" class="form-control"
+                value="<?php echo $fmtPicker($model->open_at); ?>" placeholder="dd-mm-yyyy hh:mm" autocomplete="off">
+            <input type="hidden" name="RunEvents[open_at]" id="open_at_hidden"
+                value="<?php echo CHtml::encode($model->open_at); ?>">
         </div>
         <div class="col-md-6">
             <label class="control-label">Đóng lúc</label>
-            <?php echo CHtml::activeTextField($model, 'close_at', array(
-                'type' => 'datetime-local',
-                'class' => 'form-control',
-                'value' => $model->close_at ? date('Y-m-d\TH:i', (int) $model->close_at) : '',
-            )); ?>
+            <input type="text" id="close_at_picker" class="form-control"
+                value="<?php echo $fmtPicker($model->close_at); ?>" placeholder="dd-mm-yyyy hh:mm" autocomplete="off">
+            <input type="hidden" name="RunEvents[close_at]" id="close_at_hidden"
+                value="<?php echo CHtml::encode($model->close_at); ?>">
         </div>
     </div>
 
     <div class="row mt-2">
         <div class="col-md-6">
             <label class="control-label">Hạn chót xin hủy</label>
-            <?php echo CHtml::activeTextField($model, 'cancel_until', array(
-                'type' => 'datetime-local',
-                'class' => 'form-control',
-                'value' => $model->cancel_until ? date('Y-m-d\TH:i', (int) $model->cancel_until) : '',
-            )); ?>
+            <input type="text" id="cancel_until_picker" class="form-control"
+                value="<?php echo $fmtPicker($model->cancel_until); ?>" placeholder="dd-mm-yyyy hh:mm" autocomplete="off">
+            <input type="hidden" name="RunEvents[cancel_until]" id="cancel_until_hidden"
+                value="<?php echo CHtml::encode($model->cancel_until); ?>">
             <small class="text-muted">Sau mốc này người đăng ký không thể xin hủy. Để trống nếu cho hủy đến khi đóng đăng ký.</small>
         </div>
     </div>
