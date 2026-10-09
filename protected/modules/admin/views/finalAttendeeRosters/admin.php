@@ -37,7 +37,7 @@ Yii::app()->clientScript->registerScriptFile(
     CClientScript::POS_END
 );
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/finalattendeerosters-admin.js?v=2.7',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/finalattendeerosters-admin.js?v=2.8',
     CClientScript::POS_END
 );
 
