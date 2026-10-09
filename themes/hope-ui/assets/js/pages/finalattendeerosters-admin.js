@@ -31,6 +31,7 @@
         bindMergeSplitModal(config);
         bindPerPageSelect();
         bindSetLuckyModal(config);
+        bindSendAccountsModal(config);
     });
 
     /** Huỷ tư cách — luôn hỏi lại, và nói rõ mã lucky sẽ bị khoá chứ không mất. */
