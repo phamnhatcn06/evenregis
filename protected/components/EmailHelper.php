@@ -3,15 +3,7 @@
 class EmailHelper
 {
     // DEBUG: khi bật, mọi email chỉ gửi đến địa chỉ này (không CC/BCC ai khác)
-    const DEBUG_MODE = false;
-    const DEBUG_EMAIL = 'cswm@muongthanh.vn';
-
-    public static function send($to, $subject, $view, $data = array(), $attachments = array(), $cc = array(), $bcc = array())
-    {
-        return MyHelper::sendMail($to, $subject, $view, $data, $attachments, $cc, $bcc);
-    }
-
-    /**
+    const DEBUG_MODE = false.hero-slider-wrap
      * Render một view email (application.views.mail.{view}) ra chuỗi HTML, dùng để dựng PDF.
      *
      * @param string $view
