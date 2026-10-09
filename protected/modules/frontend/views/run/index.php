@@ -54,10 +54,13 @@ $now = time();
 
 // Thời hạn đăng ký Fun Run: từ mốc mở sớm nhất tới mốc đóng muộn nhất của các cự ly.
 // Khi người dùng đã đăng ký (không còn danh sách cự ly) thì dùng câu mặc định do BTC quy định.
+$runEventsAll = isset($runEventsAll) ? $runEventsAll : $runEvents;
+$tourSessionsAll = isset($tourSessionsAll) ? $tourSessionsAll : $tourSessions;
+
 $regOpenAts = array();
 $regCloseAts = array();
-if (!empty($runEvents)) {
-    foreach ($runEvents as $e) {
+if (!empty($runEventsAll)) {
+    foreach ($runEventsAll as $e) {
         $o = !empty($e['open_at']) ? (is_numeric($e['open_at']) ? (int)$e['open_at'] : strtotime($e['open_at'])) : 0;
         $c = !empty($e['close_at']) ? (is_numeric($e['close_at']) ? (int)$e['close_at'] : strtotime($e['close_at'])) : 0;
         if ($o > 0) { $regOpenAts[] = $o; }
