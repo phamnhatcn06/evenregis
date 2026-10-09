@@ -209,6 +209,7 @@ $tourWindow = $computeWindow($tourSessions);
             'runEvents' => $runEvents,
             'fullName'  => $fullName,
             'registrationWindowText' => $registrationWindowText,
+            'window'    => $runWindow,
         )); ?>
     </div>
     <div class="col-lg-6">
