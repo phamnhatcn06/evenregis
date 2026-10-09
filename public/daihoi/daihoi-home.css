@@ -17,7 +17,13 @@ html {
 }
 
 body {
-  font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    "Lato",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   background-color: var(--surface-ground);
   color: #0f172a;
   overflow-x: hidden;
@@ -26,7 +32,11 @@ body {
 }
 
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
   vertical-align: middle;
 }
 
@@ -35,7 +45,10 @@ body {
    ========================================================================== */
 
 header.sticky-top {
-  transition: padding 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  transition:
+    padding 0.3s ease,
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   background-color: rgba(255, 255, 255, 0.94) !important;
@@ -44,13 +57,23 @@ header.sticky-top {
 header.sticky-top.is-scrolled {
   padding-top: 4px !important;
   padding-bottom: 4px !important;
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
+  box-shadow:
+    0 10px 25px -5px rgba(15, 23, 42, 0.08),
+    0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
 }
 
 /* Dải gradient cầu vồng dưới header với hiệu ứng dịch chuyển */
 .rainbow-divider {
   height: 3px;
-  background: linear-gradient(90deg, #9333ea, #2563eb, #0d9488, #f59e0b, #ec4899, #9333ea);
+  background: linear-gradient(
+    90deg,
+    #9333ea,
+    #2563eb,
+    #0d9488,
+    #f59e0b,
+    #ec4899,
+    #9333ea
+  );
   background-size: 300% 100%;
   animation: rainbowShift 12s linear infinite;
 }
@@ -72,7 +95,7 @@ nav a.nav-link {
 }
 
 nav a.nav-link::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 2px;
   left: 50%;
@@ -80,7 +103,9 @@ nav a.nav-link::after {
   height: 2px;
   background: linear-gradient(90deg, #1d4ed8, #0d9488);
   border-radius: 2px;
-  transition: width 0.3s var(--transition-smooth), left 0.3s var(--transition-smooth);
+  transition:
+    width 0.3s var(--transition-smooth),
+    left 0.3s var(--transition-smooth);
 }
 
 nav a.nav-link:hover::after {
@@ -117,7 +142,9 @@ nav a.nav-link:hover::after {
 .hero-slide {
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.75s ease-in-out, visibility 0.75s ease-in-out;
+  transition:
+    opacity 0.75s ease-in-out,
+    visibility 0.75s ease-in-out;
   pointer-events: none;
 }
 
@@ -143,7 +170,7 @@ nav a.nav-link:hover::after {
 .hero-slide .slide-bg-img {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto !important;
   max-height: 100%;
   object-fit: cover;
   object-position: center;
@@ -169,7 +196,7 @@ nav a.nav-link:hover::after {
       min-height: 0 !important;
     }
 
-    .hero-slider-wrap>.w-100.h-100 {
+    .hero-slider-wrap > .w-100.h-100 {
       height: auto !important;
       min-height: 56.25vw;
       /* giữ chiều cao tối thiểu ~16:9 khi slide không có ảnh */
@@ -193,7 +220,7 @@ nav a.nav-link:hover::after {
     }
 
     /* Giữ khối chữ overlay nằm đè lên đáy ảnh (ảnh đã quyết định chiều cao) */
-    .hero-slide>.container {
+    .hero-slide > .container {
       position: absolute !important;
       bottom: 0;
       left: 0;
@@ -215,7 +242,10 @@ nav a.nav-link:hover::after {
 
 /* Animated decorative background grid (chỉ thấy khi slide không có ảnh) */
 .hero-slide-grid-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.12) 1px,
+    transparent 1px
+  );
   background-size: 24px 24px;
 }
 
@@ -277,7 +307,10 @@ nav a.nav-link:hover::after {
 
 .slider-dot {
   cursor: pointer;
-  transition: width 0.35s var(--transition-smooth), background-color 0.35s ease, transform 0.2s ease;
+  transition:
+    width 0.35s var(--transition-smooth),
+    background-color 0.35s ease,
+    transform 0.2s ease;
 }
 
 .slider-dot:hover {
@@ -310,7 +343,8 @@ nav a.nav-link:hover::after {
 
 /* Hiệu ứng hover card cao cấp */
 .card-hover {
-  transition: transform 0.32s var(--transition-smooth),
+  transition:
+    transform 0.32s var(--transition-smooth),
     box-shadow 0.32s var(--transition-smooth),
     border-color 0.3s ease;
   will-change: transform, box-shadow;
@@ -318,7 +352,9 @@ nav a.nav-link:hover::after {
 
 .card-hover:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.06) !important;
+  box-shadow:
+    0 20px 35px -10px rgba(15, 23, 42, 0.12),
+    0 10px 15px -8px rgba(15, 23, 42, 0.06) !important;
 }
 
 /* Hover icon zoom & subtle rotate */
@@ -379,13 +415,18 @@ nav a.nav-link:hover::after {
 }
 
 .btn-shimmer::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -120%;
   width: 70%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
   transform: skewX(-25deg);
   transition: left 0.65s ease;
 }
@@ -405,7 +446,7 @@ nav a.nav-link:hover::after {
 }
 
 .pulse-live-dot::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -3px;
   left: -3px;
@@ -461,7 +502,9 @@ nav a.nav-link:hover::after {
 .reveal-on-scroll {
   opacity: 0;
   transform: translateY(32px);
-  transition: opacity 0.75s var(--transition-smooth), transform 0.75s var(--transition-smooth);
+  transition:
+    opacity 0.75s var(--transition-smooth),
+    transform 0.75s var(--transition-smooth);
   will-change: opacity, transform;
 }
 
@@ -473,7 +516,9 @@ nav a.nav-link:hover::after {
 .reveal-fade-left {
   opacity: 0;
   transform: translateX(-35px);
-  transition: opacity 0.75s var(--transition-smooth), transform 0.75s var(--transition-smooth);
+  transition:
+    opacity 0.75s var(--transition-smooth),
+    transform 0.75s var(--transition-smooth);
   will-change: opacity, transform;
 }
 
@@ -485,7 +530,9 @@ nav a.nav-link:hover::after {
 .reveal-fade-right {
   opacity: 0;
   transform: translateX(35px);
-  transition: opacity 0.75s var(--transition-smooth), transform 0.75s var(--transition-smooth);
+  transition:
+    opacity 0.75s var(--transition-smooth),
+    transform 0.75s var(--transition-smooth);
   will-change: opacity, transform;
 }
 
@@ -497,7 +544,9 @@ nav a.nav-link:hover::after {
 .reveal-scale {
   opacity: 0;
   transform: scale(0.94);
-  transition: opacity 0.75s var(--transition-smooth), transform 0.75s var(--transition-smooth);
+  transition:
+    opacity 0.75s var(--transition-smooth),
+    transform 0.75s var(--transition-smooth);
   will-change: opacity, transform;
 }
 
