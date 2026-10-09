@@ -122,6 +122,23 @@ $tourImg = Yii::app()->theme->baseUrl . '/assets/images/tour-trang-an.jpg';
                 <p class="text-muted small mb-0">Hiện chưa có đợt tham quan nào mở đăng ký hoặc cổng đang tạm đóng.</p>
             </div>
 
+        <?php elseif (!$regOpen): ?>
+            <div class="text-center py-5">
+                <div class="category-icon-tag tag-tour mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
+                    <i class="bi <?php echo $window['state'] === 'before' ? 'bi-hourglass-split' : 'bi-lock-fill'; ?>"></i>
+                </div>
+                <h6 class="text-dark fw-bold mb-1">
+                    <?php echo $window['state'] === 'before' ? 'Chưa tới giờ mở đăng ký' : 'Đã hết thời gian đăng ký'; ?>
+                </h6>
+                <p class="text-muted small mb-0">
+                    <?php if ($window['state'] === 'before'): ?>
+                        Cổng đăng ký tham quan sẽ mở theo đồng hồ đếm ngược phía trên. Vui lòng quay lại khi cổng mở.
+                    <?php else: ?>
+                        Cổng đăng ký tham quan đã đóng. Cảm ơn bạn đã quan tâm.
+                    <?php endif; ?>
+                </p>
+            </div>
+
         <?php else: ?>
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="text-muted small">
