@@ -102,8 +102,14 @@ class EmailHelper
             // DEBUG: chỉ gửi tới địa chỉ debug để test, không chạm tới email thật của đơn vị
             $actualRecipients = self::DEBUG_MODE ? array(self::DEBUG_EMAIL) : $recipients;
 
+            // CC cố định về cswm@muongthanh.vn để lưu vết (bỏ nếu đã nằm trong To).
+            // Khi test mode thì To đã là chính địa chỉ này nên không CC trùng.
+            $ccList = self::DEBUG_MODE
+                ? array()
+                : array_values(array_diff(array('cswm@muongthanh.vn'), $actualRecipients));
+
             try {
-                $ok = self::send($actualRecipients, $subject, 'final_roster_accounts', $viewData, $attachments);
+                $ok = self::send($actualRecipients, $subject, 'final_roster_accounts', $viewData, $attachments, $ccList);
                 if ($ok) {
                     $sent++;
                     $report[] = array(
