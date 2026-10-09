@@ -106,8 +106,8 @@ $computeWindow = function ($rows) use ($now) {
     return array('state' => 'closed', 'target' => 0, 'label' => 'Đã đóng đăng ký');
 };
 
-$runWindow = $computeWindow($runEvents);
-$tourWindow = $computeWindow($tourSessions);
+$runWindow = $computeWindow($runEventsAll);
+$tourWindow = $computeWindow($tourSessionsAll);
 
 // Thời hạn đăng ký tham quan: từ mốc mở sớm nhất tới mốc đóng muộn nhất của các đợt.
 $tourOpenAts = array();
