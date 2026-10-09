@@ -234,57 +234,25 @@ if (!empty($regOpenAts) && !empty($regCloseAts)) {
      data-has-emergency="<?php echo $hasEmergencyInfo ? '1' : '0'; ?>"
      data-needs-shirt-size="<?php echo $needsShirtSize ? '1' : '0'; ?>"></div>
 
-<!-- Hero Banner: Countdown thời gian đăng ký & Hướng dẫn -->
+<!-- Hero Banner: Hướng dẫn cơ chế đăng ký (đồng hồ đếm ngược chuyển vào từng card) -->
 <div class="run-countdown-banner">
-    <div class="row align-items-center g-4">
-        <div class="col-lg-7">
-            <div>
-                <span class="countdown-live-pill">
-                    <span class="pulse-circle"></span> <?php echo $countdownBadgeText; ?>
-                </span>
-                <h3 class="fw-bold text-white mb-2"><?php echo $countdownTitle; ?></h3>
-                <p class="text-white-50 small mb-3" style="line-height: 1.6;">
-                    Hệ thống áp dụng cơ chế <strong>FCFS (First-Come, First-Served)</strong> — ưu tiên người đăng ký trước.
-                    Mỗi đại biểu được chọn <strong>1 cự ly chạy</strong> và <strong>1 đợt tham quan</strong>.
-                </p>
+    <div>
+        <span class="countdown-live-pill">
+            <span class="pulse-circle"></span> Cổng đăng ký hoạt động
+        </span>
+        <h3 class="fw-bold text-white mb-2">Giữ suất Giải chạy &amp; Tham quan</h3>
+        <p class="text-white-50 small mb-3" style="line-height: 1.6;">
+            Hệ thống áp dụng cơ chế <strong>FCFS (First-Come, First-Served)</strong> — ưu tiên người đăng ký trước.
+            Mỗi đại biểu được chọn <strong>1 cự ly chạy</strong> và <strong>1 đợt tham quan</strong>.
+            Mỗi nội dung có <strong>khung thời gian đăng ký riêng</strong> — xem đồng hồ đếm ngược ngay trên từng thẻ bên dưới.
+        </p>
 
-                <div class="d-flex flex-wrap gap-2">
-                    <div class="portal-rule-item">
-                        <i class="bi bi-lightning-charge-fill text-warning"></i> Giành suất trực tuyến
-                    </div>
-                    <div class="portal-rule-item">
-                        <i class="bi bi-ticket-perforated-fill text-info"></i> Tự động cấp số BIB
-                    </div>
-                </div>
+        <div class="d-flex flex-wrap gap-2">
+            <div class="portal-rule-item">
+                <i class="bi bi-lightning-charge-fill text-warning"></i> Giành suất trực tuyến
             </div>
-        </div>
-
-        <div class="col-lg-5 text-center text-lg-end">
-            <!-- Khung đồng hồ đếm ngược -->
-            <div class="countdown-clock-container" id="run-portal-countdown" data-target="<?php echo $countdownTarget; ?>" data-type="<?php echo $countdownType; ?>">
-                <div class="countdown-unit-box">
-                    <div class="countdown-digit" id="cd-days">00</div>
-                    <div class="countdown-unit-label">Ngày</div>
-                </div>
-                <div class="countdown-colon">:</div>
-                <div class="countdown-unit-box">
-                    <div class="countdown-digit" id="cd-hours">00</div>
-                    <div class="countdown-unit-label">Giờ</div>
-                </div>
-                <div class="countdown-colon">:</div>
-                <div class="countdown-unit-box">
-                    <div class="countdown-digit" id="cd-mins">00</div>
-                    <div class="countdown-unit-label">Phút</div>
-                </div>
-                <div class="countdown-colon">:</div>
-                <div class="countdown-unit-box">
-                    <div class="countdown-digit text-warning" id="cd-secs">00</div>
-                    <div class="countdown-unit-label">Giây</div>
-                </div>
-            </div>
-
-            <div class="text-white-50 small mt-2">
-                <i class="bi bi-clock-history me-1 text-warning"></i> Cổng tự động khóa khi hết thời gian
+            <div class="portal-rule-item">
+                <i class="bi bi-ticket-perforated-fill text-info"></i> Tự động cấp số BIB
             </div>
         </div>
     </div>
