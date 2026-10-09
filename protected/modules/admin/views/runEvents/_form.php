@@ -108,3 +108,9 @@
 
     <?php $this->endWidget(); ?>
 </div>
+
+<?php
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/vendor/flatpickr/dist/flatpickr.min.js', CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/js/pages/runEvents-form.js', CClientScript::POS_END);
+?>
