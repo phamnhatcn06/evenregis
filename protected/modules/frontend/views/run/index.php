@@ -236,6 +236,7 @@ if (!empty($tourOpenAts) && !empty($tourCloseAts)) {
             'tourMine'     => $tourMine,
             'tourSessions' => $tourSessions,
             'fullName'     => $fullName,
+            'registrationWindowText' => $tourRegistrationWindowText,
             'window'       => $tourWindow,
         )); ?>
     </div>
