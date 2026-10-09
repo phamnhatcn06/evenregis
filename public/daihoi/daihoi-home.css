@@ -179,6 +179,13 @@ nav a.nav-link:hover::after {
     object-fit: contain !important;
     transform: none !important;
   }
+  /* Giữ khối chữ overlay nằm đè lên đáy ảnh (ảnh đã quyết định chiều cao) */
+  .hero-slide > .container {
+    position: absolute !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
   .hero-slide .slide-title {
     font-size: clamp(1.05rem, 3.2vw, 1.35rem) !important;
     line-height: 1.25 !important;
