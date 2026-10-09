@@ -99,15 +99,10 @@ nav a.nav-link:hover::after {
 .hero-slider-wrap {
   width: 100%;
   aspect-ratio: 16 / 9;
-  max-height: 600px;
+  max-height: 920px;
   height: auto;
   position: relative;
   background-color: #0b1329;
-}
-@media (min-width: 1366px) {
-  .hero-slider-wrap {
-    max-height: 920px;
-  }
 }
 
 /* Slide item */
@@ -137,23 +132,23 @@ nav a.nav-link:hover::after {
   transform: scale(1.02);
 }
 
-/* Lớp phủ gradient nhẹ ở chân slide: giảm chiều cao, không che tối phần trên ảnh */
+/* Lớp phủ gradient nhẹ ở chân slide: cực kỳ gọn gàng (~100px), không che tối tranh/người */
 .slide-gradient-overlay {
-  height: 40%;
-  max-height: 260px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.32) 55%, transparent 100%);
+  height: 100px;
+  max-height: 110px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
   pointer-events: none;
 }
 
 /* Tiêu đề slide: font-size vừa phải để vừa 1 dòng */
 .hero-slide .slide-title {
-  font-size: clamp(1.2rem, 1.8vw, 1.95rem);
+  font-size: clamp(1.15rem, 1.65vw, 1.85rem);
   line-height: 1.25;
   letter-spacing: -0.01em;
 }
 @media (min-width: 992px) {
   .hero-slide .slide-title {
-    font-size: clamp(1.3rem, 1.75vw, 1.95rem);
+    font-size: clamp(1.2rem, 1.6vw, 1.85rem);
   }
 }
 
@@ -174,13 +169,17 @@ nav a.nav-link:hover::after {
   }
 }
 @media (max-width: 575.98px) {
+  .slide-gradient-overlay {
+    height: 75px !important;
+    max-height: 80px !important;
+  }
   .hero-slide .slide-title {
     font-size: clamp(0.95rem, 3.5vw, 1.25rem) !important;
     line-height: 1.2 !important;
     margin-bottom: 4px !important;
   }
   .hero-slide .container {
-    padding-bottom: 0.75rem !important;
+    padding-bottom: 0.5rem !important;
   }
   .slider-control-btn {
     width: 32px !important;
