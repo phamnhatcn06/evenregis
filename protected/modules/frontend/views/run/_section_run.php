@@ -22,9 +22,9 @@ $regOpen = ($window['state'] === 'open');
     </div>
 
     <?php if ($registrationWindowText !== ''): ?>
-        <div class="d-flex align-items-start gap-2 px-3 px-md-4 py-2 border-bottom bg-light text-secondary small">
-            <i class="bi bi-calendar-event text-success mt-1"></i>
-            <span><?php echo CHtml::encode($registrationWindowText); ?></span>
+        <div class="reg-window-highlight d-flex align-items-start gap-2 px-3 px-md-4 py-3 border-bottom">
+            <i class="bi bi-calendar-event-fill fs-5 flex-shrink-0"></i>
+            <span class="fw-bold"><?php echo CHtml::encode($registrationWindowText); ?></span>
         </div>
     <?php endif; ?>
 
