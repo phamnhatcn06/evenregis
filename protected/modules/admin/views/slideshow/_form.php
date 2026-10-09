@@ -49,8 +49,8 @@
 <?php
 $uploadUrl = $this->createUrl('uploadImage');
 $dropzones = array(
-    array('attr' => 'image', 'label' => 'Ảnh nền (desktop)', 'hint' => 'Kéo & thả hoặc bấm để chọn ảnh nền desktop (khuyến nghị: 1920x600px)'),
-    array('attr' => 'mobile_image', 'label' => 'Ảnh nền (mobile)', 'hint' => 'Tuỳ chọn — ảnh nền hiển thị trên điện thoại (khuyến nghị: 800x600px)'),
+    array('attr' => 'image', 'label' => 'Ảnh nền (desktop)', 'hint' => 'Kéo & thả hoặc bấm để chọn ảnh nền desktop (khuyến nghị chuẩn 16:9, ví dụ: 1920x1080px)'),
+    array('attr' => 'mobile_image', 'label' => 'Ảnh nền (mobile)', 'hint' => 'Tuỳ chọn — ảnh nền hiển thị trên điện thoại (khuyến nghị chuẩn 16:9 hoặc 9:16)'),
 );
 ?>
 <div class="row">
