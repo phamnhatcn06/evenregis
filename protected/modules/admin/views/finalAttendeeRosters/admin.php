@@ -66,7 +66,7 @@ $flashMessages = Yii::app()->user->getFlashes();
      data-set-lucky-url="<?php echo $this->createUrl('setLucky'); ?>"
      data-reset-pin-url="<?php echo $this->createUrl('resetPin'); ?>"
      data-check-lucky-url="<?php echo $this->createUrl('checkLucky'); ?>"
-     data-account-units-url="<?php echo $this->createUrl('accountUnits', array('event_id' => (int) $eventId, 'period_id' => (int) $periodId)); ?>"
+     data-account-units-url="<?php echo $this->createUrl('accountUnits'); ?>"
      data-send-accounts-url="<?php echo $this->createUrl('sendAccounts'); ?>"
      data-list-url="<?php echo $this->createUrl('admin'); ?>"
      data-search-url="<?php echo $this->createUrl('filterOptions'); ?>"
