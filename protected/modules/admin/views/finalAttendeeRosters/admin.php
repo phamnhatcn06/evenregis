@@ -151,6 +151,13 @@ $flashMessages = Yii::app()->user->getFlashes();
                                     </span>
                                 <?php endif; ?>
                             </button>
+
+                            <button type="button" class="far-btn far-btn-info text-white"
+                                    data-bs-toggle="modal" data-bs-target="#modal_send_accounts"
+                                    title="Gửi email thông tin tài khoản kèm PDF danh sách cho từng đơn vị đang lọc">
+                                <i class="fa fa-paper-plane"></i>
+                                <span>Gửi thông tin tài khoản</span>
+                            </button>
                         <?php endif; ?>
 
                         <a href="<?php echo $this->createUrl('export', array_merge(
