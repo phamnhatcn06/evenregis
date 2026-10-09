@@ -1,18 +1,21 @@
 <?php
 /**
  * Khối đăng ký Chạy bộ (Fun Run) — Giao diện chuyên nghiệp, tích hợp icon & Race BIB Card.
- * Tham số: $runMine, $runEvents, $fullName (optional), $registrationWindowText (optional)
+ * Tham số: $runMine, $runEvents, $fullName (optional), $registrationWindowText (optional), $window (optional)
  */
 $registrationWindowText = isset($registrationWindowText) ? $registrationWindowText : '';
+$window = isset($window) ? $window : array('state' => 'open', 'target' => 0, 'label' => '');
+$regOpen = ($window['state'] === 'open');
 ?>
 <div class="activity-card h-100">
-    <div class="activity-card-header-run d-flex justify-content-between align-items-center">
+    <div class="activity-card-header-run d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
             <h5 class="mb-0 text-white fw-bold d-flex align-items-center">
                 <i class="bi bi-trophy-fill text-warning me-2"></i> Chạy bộ (Fun Run)
             </h5>
             <small class="text-white-50">Chinh phục đường đua Vòng Chung Kết</small>
         </div>
+        <?php $this->renderPartial('_card_countdown', array('window' => $window)); ?>
         <span class="activity-badge">
             <i class="bi bi-check-circle me-1"></i> Tối đa 1 cự ly
         </span>
