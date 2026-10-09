@@ -226,6 +226,125 @@
 }
 
 /* ==========================================================================
+   Per-card Countdown (hiển thị trên header từng card nội dung)
+   ========================================================================== */
+.card-countdown {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 12px;
+    padding: 0.4rem 0.7rem;
+    backdrop-filter: blur(6px);
+}
+
+.card-countdown .cc-label {
+    font-size: 0.64rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+}
+
+.card-countdown .cc-clock {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.card-countdown .cc-unit {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 30px;
+    line-height: 1;
+}
+
+.card-countdown .cc-unit b {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+}
+
+.card-countdown .cc-unit i {
+    font-style: normal;
+    font-size: 0.56rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.15rem;
+}
+
+.card-countdown .cc-sep {
+    font-size: 1rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.1;
+}
+
+.card-countdown-closed {
+    flex-direction: row;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #ffffff;
+    padding: 0.3rem 0.7rem;
+}
+
+/* Ảnh giới thiệu tour trên card Đi tham quan */
+.tour-hero-banner {
+    position: relative;
+    width: 100%;
+    height: 170px;
+    overflow: hidden;
+}
+
+.tour-hero-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.activity-card:hover .tour-hero-banner img {
+    transform: scale(1.05);
+}
+
+.tour-hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    padding: 0.85rem 1rem;
+    background: linear-gradient(to top, rgba(6, 95, 70, 0.85) 0%, rgba(6, 95, 70, 0.15) 55%, transparent 100%);
+}
+
+.tour-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.92);
+    color: #065f46;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+}
+
+.tour-hero-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1rem;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
    Option Cards (For Unregistered State)
    ========================================================================== */
 .portal-option-card {
