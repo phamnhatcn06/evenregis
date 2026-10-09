@@ -710,3 +710,15 @@ a:hover > .portal-feature-card {
     transform: translateY(-4px);
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12) !important;
 }
+
+/* Dải "Thời hạn đăng ký" — làm đậm & nổi bật */
+.reg-window-highlight {
+    background: linear-gradient(90deg, #fff8e1 0%, #fffdf5 100%);
+    border-left: 4px solid #f59e0b;
+    color: #92400e;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+.reg-window-highlight i {
+    color: #f59e0b;
+}

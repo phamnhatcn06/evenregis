@@ -74,7 +74,7 @@ $features = array(
     <div class="container">
         <div class="d-flex align-items-center justify-content-between">
             <!-- Brand Logo & Name -->
-            <a href="<?php echo $this->createUrl('/frontend/portal/index'); ?>" class="portal-brand-link">
+            <a href="<?php echo Yii::app()->request->baseUrl; ?>/" class="portal-brand-link">
                 <img src="<?php echo Yii::app()->theme->baseUrl; ?>/logo_daihoi.png" 
                      alt="Đại hội Mường Thanh 2026" 
                      class="portal-brand-logo">
