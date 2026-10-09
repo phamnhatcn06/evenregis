@@ -15,13 +15,16 @@ class RunController extends AttendeePortalController
         $eventId = $this->currentEventId();
 
         // Fun Run: phiếu đã đăng ký (nếu có) hoặc danh sách cự ly đang mở.
+        // Luôn lấy danh sách để tính khung thời hạn đăng ký; chỉ ẩn phần chọn cự ly khi đã đăng ký.
         $runMine = RunRegistrations::findMine($attendeeId);
-        $runEvents = $runMine ? array() : RunEvents::listOpen($eventId);
+        $runEventsAll = RunEvents::listOpen($eventId);
+        $runEvents = $runMine ? array() : $runEventsAll;
         $runCancelledNotice = RunRegistrations::findLatestCancelled($attendeeId);
 
         // Tham quan: độc lập với Fun Run.
         $tourMine = TourRegistrations::findMine($attendeeId);
-        $tourSessions = $tourMine ? array() : TourSessions::listOpen($eventId);
+        $tourSessionsAll = TourSessions::listOpen($eventId);
+        $tourSessions = $tourMine ? array() : $tourSessionsAll;
         $tourCancelledNotice = TourRegistrations::findLatestCancelled($attendeeId);
 
         $eventInfo = null;
