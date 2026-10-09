@@ -1535,6 +1535,7 @@
                 if (item.status === 'sent') {
                     li.className = 'text-success';
                     li.textContent = '✓ ' + label + 'đã gửi tới ' + (item.recipient || '')
+                        + (item.cc ? ' (CC: ' + item.cc + ')' : '')
                         + (item.has_pdf ? '' : ' (không có PDF)')
                         + (item.note ? ' — ' + item.note : '');
                 } else if (item.status === 'skipped') {
