@@ -154,6 +154,31 @@ nav a.nav-link:hover::after {
 
 /* Responsive adjustment for slide typography under 16:9 aspect ratio */
 @media (max-width: 767.98px) {
+  /* Mobile: ảnh slide co trọn 100% chiều rộng màn hình, không cắt tràn 2 bên.
+     Khung tự co theo tỉ lệ ảnh (bỏ ép 16:9), nền tối lấp phần dư cho gọn. */
+  .hero-slider-wrap {
+    aspect-ratio: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .hero-slider-wrap > .w-100.h-100 {
+    height: auto !important;
+    min-height: 56.25vw; /* giữ chiều cao tối thiểu ~16:9 khi slide không có ảnh */
+  }
+  .hero-slide {
+    position: relative !important;
+  }
+  .hero-slide:not(.active) {
+    display: none !important;
+  }
+  .hero-slide .slide-bg-img {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    transform: none !important;
+  }
   .hero-slide .slide-title {
     font-size: clamp(1.05rem, 3.2vw, 1.35rem) !important;
     line-height: 1.25 !important;
