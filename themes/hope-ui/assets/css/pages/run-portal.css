@@ -214,6 +214,13 @@
     position: relative;
 }
 
+/* Đồng bộ chiều cao 2 header (Fun Run có badge 1 dòng, Tham quan có đồng hồ
+   đếm ngược cao hơn) để dải "Thời hạn đăng ký" bên dưới nằm ngang nhau. */
+.activity-card-header-run,
+.activity-card-header-tour {
+    min-height: 96px;
+}
+
 .activity-badge {
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
