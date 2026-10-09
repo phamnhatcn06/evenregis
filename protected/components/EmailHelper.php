@@ -11,6 +11,144 @@ class EmailHelper
         return MyHelper::sendMail($to, $subject, $view, $data, $attachments, $cc, $bcc);
     }
 
+    /**
+     * Render một view email (application.views.mail.{view}) ra chuỗi HTML, dùng để dựng PDF.
+     *
+     * @param string $view
+     * @param array  $data
+     * @return string
+     */
+    private static function renderMailView($view, $data = array())
+    {
+        $viewPath = Yii::getPathOfAlias('application.views.mail.' . $view) . '.php';
+        if (!file_exists($viewPath)) {
+            throw new Exception('Không tìm thấy view email: ' . $viewPath);
+        }
+        extract($data);
+        ob_start();
+        include($viewPath);
+        return ob_get_clean();
+    }
+
+    /**
+     * Gửi "thông tin tài khoản" cho từng ĐƠN VỊ: mỗi đơn vị một email kèm PDF danh sách người
+     * vào vòng chung kết + định danh đăng nhập, để đơn vị tự chuyển cho thành viên của mình.
+     *
+     * Mỗi phần tử $unitGroups cần có: property_name, property_code, people (mảng dòng roster),
+     * recipient (email nhận, thường là mail_confirm của đơn vị — rỗng thì bỏ qua & báo lại).
+     * Khi bật DEBUG_MODE, toàn bộ email chỉ gửi tới DEBUG_EMAIL để test an toàn.
+     *
+     * @param string $eventName  Tên sự kiện (hiển thị trong email/PDF)
+     * @param string $loginUrl   URL trang đăng nhập cổng cá nhân
+     * @param array  $unitGroups Danh sách nhóm theo đơn vị
+     * @return array ['success'=>bool, 'report'=>array, 'sent'=>int, 'skipped'=>int]
+     */
+    public static function sendFinalRosterAccounts($eventName, $loginUrl, $unitGroups)
+    {
+        $report  = array();
+        $sent    = 0;
+        $skipped = 0;
+
+        foreach ($unitGroups as $group) {
+            $unitName = isset($group['property_name']) ? $group['property_name'] : 'Đơn vị';
+            $people   = isset($group['people']) && is_array($group['people']) ? $group['people'] : array();
+            $count    = count($people);
+
+            if ($count === 0) {
+                continue;
+            }
+
+            $recipients = self::parseEmailList(isset($group['recipient']) ? $group['recipient'] : '');
+            if (empty($recipients)) {
+                $skipped++;
+                $report[] = array(
+                    'unit'   => $unitName,
+                    'status' => 'skipped',
+                    'count'  => $count,
+                    'reason' => 'Đơn vị chưa cấu hình email nhận (mail_confirm).',
+                );
+                continue;
+            }
+
+            $viewData = array(
+                'eventName' => $eventName,
+                'unitName'  => $unitName,
+                'people'    => $people,
+                'loginUrl'  => $loginUrl,
+            );
+
+            // Dựng PDF danh sách tài khoản của đơn vị
+            $attachments = array();
+            $pdfError    = null;
+            try {
+                $html     = self::renderMailView('final_roster_accounts_pdf', $viewData);
+                $slug     = !empty($group['property_code'])
+                    ? MyHelper::toSlug($group['property_code'])
+                    : MyHelper::toSlug($unitName);
+                $fileName = 'Tai_Khoan_VCK_' . strtoupper($slug !== '' ? $slug : 'DONVI') . '.pdf';
+                $pdfPath  = PdfHelper::generateHtmlPdf($html, $fileName);
+                if ($pdfPath && file_exists($pdfPath)) {
+                    $attachments[] = $pdfPath;
+                } else {
+                    $pdfError = 'File PDF không tồn tại sau khi tạo.';
+                }
+            } catch (Exception $e) {
+                $pdfError = $e->getMessage();
+                Yii::log('Generate account PDF error (' . $unitName . '): ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.components.EmailHelper');
+            }
+
+            $subject = '[ĐHMT2026] Thông tin tài khoản tham dự Vòng chung kết - ' . $unitName;
+
+            // DEBUG: chỉ gửi tới địa chỉ debug để test, không chạm tới email thật của đơn vị
+            $actualRecipients = self::DEBUG_MODE ? array(self::DEBUG_EMAIL) : $recipients;
+
+            try {
+                $ok = self::send($actualRecipients, $subject, 'final_roster_accounts', $viewData, $attachments);
+                if ($ok) {
+                    $sent++;
+                    $report[] = array(
+                        'unit'            => $unitName,
+                        'status'          => 'sent',
+                        'count'           => $count,
+                        'recipient'       => implode(', ', $actualRecipients),
+                        'intended'        => implode(', ', $recipients),
+                        'has_pdf'         => !empty($attachments),
+                        'note'            => $pdfError ? ('PDF lỗi: ' . $pdfError) : '',
+                    );
+                } else {
+                    $skipped++;
+                    $report[] = array(
+                        'unit'   => $unitName,
+                        'status' => 'failed',
+                        'count'  => $count,
+                        'reason' => 'Gửi email thất bại (SMTP trả về 0).',
+                    );
+                }
+            } catch (Exception $e) {
+                $skipped++;
+                $report[] = array(
+                    'unit'   => $unitName,
+                    'status' => 'failed',
+                    'count'  => $count,
+                    'reason' => $e->getMessage(),
+                );
+                Yii::log('sendFinalRosterAccounts error (' . $unitName . '): ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.components.EmailHelper');
+            }
+
+            // Dọn file PDF tạm sau khi đã gửi
+            foreach ($attachments as $file) {
+                @unlink($file);
+            }
+        }
+
+        return array(
+            'success' => true,
+            'report'  => $report,
+            'sent'    => $sent,
+            'skipped' => $skipped,
+        );
+    }
+
     public static function sendMissInvitation($contestant)
     {
         $email = $contestant->personal_email;
