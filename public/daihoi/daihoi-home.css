@@ -144,54 +144,16 @@ nav a.nav-link:hover::after {
   transform: scale(1.02);
 }
 
-/* Lớp phủ gradient nhẹ ở chân slide: cực kỳ gọn gàng (~100px), không che tối tranh/người */
-.slide-gradient-overlay {
-  height: 100px;
-  max-height: 110px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
-  pointer-events: none;
-}
-
-/* Tiêu đề slide: font-size vừa phải để vừa 1 dòng */
-.hero-slide .slide-title {
-  font-size: clamp(1.15rem, 1.65vw, 1.85rem);
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-}
-@media (min-width: 992px) {
-  .hero-slide .slide-title {
-    font-size: clamp(1.2rem, 1.6vw, 1.85rem);
-  }
-}
-
-/* Responsive adjustment for slide typography under 16:9 aspect ratio */
-@media (max-width: 767.98px) {
-  .hero-slide .slide-title {
-    font-size: clamp(1.05rem, 3.2vw, 1.35rem) !important;
-    line-height: 1.25 !important;
-  }
-  .hero-slide .slide-subtitle {
-    font-size: 10.5px !important;
-    padding: 2px 10px !important;
-    margin-bottom: 4px !important;
-  }
-  .hero-slide .slide-btn-wrap .btn {
-    padding: 6px 16px !important;
-    font-size: 12.5px !important;
+/* Responsive: giảm chiều cao khung banner trên tablet/mobile để ảnh không bị crop quá nhiều.
+   Ảnh desktop giữ tỉ lệ 16:9; màn nhỏ dùng tỉ lệ cao hơn (ưu tiên mobile_image nếu có). */
+@media (max-width: 991.98px) {
+  .hero-slider-wrap {
+    aspect-ratio: 16 / 10;
   }
 }
 @media (max-width: 575.98px) {
-  .slide-gradient-overlay {
-    height: 75px !important;
-    max-height: 80px !important;
-  }
-  .hero-slide .slide-title {
-    font-size: clamp(0.95rem, 3.5vw, 1.25rem) !important;
-    line-height: 1.2 !important;
-    margin-bottom: 4px !important;
-  }
-  .hero-slide .container {
-    padding-bottom: 0.5rem !important;
+  .hero-slider-wrap {
+    aspect-ratio: 4 / 3;
   }
   .slider-control-btn {
     width: 32px !important;
@@ -199,24 +161,10 @@ nav a.nav-link:hover::after {
   }
 }
 
-/* Animated decorative background grid */
+/* Animated decorative background grid (chỉ thấy khi slide không có ảnh) */
 .hero-slide-grid-pattern {
   background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
   background-size: 24px 24px;
-}
-
-/* Staggered Content Animation */
-.hero-slide.active .slide-subtitle {
-  animation: slideInDown 0.65s var(--transition-smooth) 0.1s both;
-}
-.hero-slide.active .slide-title {
-  animation: slideInUp 0.75s var(--transition-smooth) 0.25s both;
-}
-.hero-slide.active .slide-desc {
-  animation: slideInUp 0.75s var(--transition-smooth) 0.4s both;
-}
-.hero-slide.active .slide-btn-wrap {
-  animation: slideInUp 0.75s var(--transition-smooth) 0.55s both;
 }
 
 @keyframes slideInUp {
