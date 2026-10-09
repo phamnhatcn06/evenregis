@@ -1,25 +1,50 @@
 /**
  * Daihoi public homepage - JS.
- * - Hero slider carousel (tự chạy + prev/next + dots)
+ * - Hero slider carousel (tự chạy + progress bar + pause on hover + touch swipe + staggered text entrance)
+ * - Scroll Reveal Animations (IntersectionObserver for sections & cards)
+ * - Sticky Header scroll elevation & Back to top button
  * - Tự động làm mới khối "Kết quả nổi bật" (realtime) mỗi 30 giây
- * Vanilla JS, không phụ thuộc thư viện ngoài. Tách khỏi view theo rule dự án.
+ * Vanilla JS, không phụ thuộc thư viện ngoài.
  */
 (function () {
   'use strict';
 
-  /* ===================== Hero Slider ===================== */
+  /* ===================== 1. Hero Slider Carousel ===================== */
   (function initSlider() {
+    var sliderSection = document.querySelector('.hero-slider-section');
     var slides = document.querySelectorAll('.hero-slide');
     var dots = document.querySelectorAll('.slider-dot');
     var counter = document.getElementById('slider-counter');
     var prevBtn = document.getElementById('slider-prev');
     var nextBtn = document.getElementById('slider-next');
+    var progressBar = document.getElementById('slider-progress-bar');
 
     if (!slides.length) return;
 
     var currentSlide = 0;
     var totalSlides = slides.length;
-    var autoSlideTimer;
+    var SLIDE_DURATION = 5500; // ms
+    var autoSlideTimer = null;
+    var progressInterval = null;
+    var progressStartTime = null;
+    var isPaused = false;
+    var elapsedBeforePause = 0;
+
+    function resetProgressBar() {
+      if (progressBar) {
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '0%';
+      }
+    }
+
+    function runProgressBar(remainingTime) {
+      if (!progressBar) return;
+      var duration = remainingTime || SLIDE_DURATION;
+      // Force repaint
+      progressBar.offsetHeight;
+      progressBar.style.transition = 'width ' + duration + 'ms linear';
+      progressBar.style.width = '100%';
+    }
 
     function showSlide(index) {
       if (index < 0) index = totalSlides - 1;
@@ -28,10 +53,11 @@
       slides.forEach(function (slide, idx) {
         if (idx === index) {
           slide.classList.remove('d-none');
-          setTimeout(function () {
+          // Add active class to trigger staggered animations
+          requestAnimationFrame(function () {
             slide.classList.remove('opacity-0');
             slide.classList.add('opacity-100', 'active');
-          }, 20);
+          });
         } else {
           slide.classList.remove('opacity-100', 'active');
           slide.classList.add('opacity-0');
@@ -39,62 +65,198 @@
             if (!slide.classList.contains('active')) {
               slide.classList.add('d-none');
             }
-          }, 300);
+          }, 600);
         }
       });
 
       dots.forEach(function (dot, idx) {
+        var activeDotColor = dot.getAttribute('data-active-color') || '#2dd4bf';
         if (idx === index) {
-          dot.style.width = '24px';
-          dot.style.backgroundColor = '#2dd4bf';
+          dot.style.width = '28px';
+          dot.style.backgroundColor = activeDotColor;
         } else {
           dot.style.width = '8px';
-          dot.style.backgroundColor = 'rgba(255,255,255,0.4)';
+          dot.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
         }
       });
 
       if (counter) {
-        counter.textContent = '0' + (index + 1) + ' / 0' + totalSlides;
+        var curStr = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
+        var totStr = totalSlides < 10 ? '0' + totalSlides : totalSlides;
+        counter.textContent = curStr + ' / ' + totStr;
       }
 
       currentSlide = index;
+      resetProgressBar();
+      if (!isPaused) {
+        startAutoSlide();
+      }
     }
 
     function startAutoSlide() {
       stopAutoSlide();
-      autoSlideTimer = setInterval(function () {
+      progressStartTime = Date.now();
+      runProgressBar(SLIDE_DURATION);
+
+      autoSlideTimer = setTimeout(function () {
         showSlide(currentSlide + 1);
-      }, 5500);
+      }, SLIDE_DURATION);
     }
 
     function stopAutoSlide() {
-      if (autoSlideTimer) clearInterval(autoSlideTimer);
+      if (autoSlideTimer) {
+        clearTimeout(autoSlideTimer);
+        autoSlideTimer = null;
+      }
+      resetProgressBar();
     }
 
+    function pauseSlider() {
+      if (isPaused) return;
+      isPaused = true;
+      if (autoSlideTimer) {
+        clearTimeout(autoSlideTimer);
+        autoSlideTimer = null;
+      }
+      if (progressBar) {
+        var computedStyle = window.getComputedStyle(progressBar);
+        var currentWidth = computedStyle.getPropertyValue('width');
+        progressBar.style.transition = 'none';
+        progressBar.style.width = currentWidth;
+      }
+    }
+
+    function resumeSlider() {
+      if (!isPaused) return;
+      isPaused = false;
+      startAutoSlide();
+    }
+
+    // Prev / Next click
     if (nextBtn) {
-      nextBtn.addEventListener('click', function () {
+      nextBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         showSlide(currentSlide + 1);
-        startAutoSlide();
       });
     }
     if (prevBtn) {
-      prevBtn.addEventListener('click', function () {
+      prevBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         showSlide(currentSlide - 1);
-        startAutoSlide();
       });
     }
+
+    // Dots click
     dots.forEach(function (dot) {
       dot.addEventListener('click', function () {
         var target = parseInt(this.getAttribute('data-slide'), 10);
         showSlide(target);
-        startAutoSlide();
       });
     });
 
-    startAutoSlide();
+    // Pause on hover
+    if (sliderSection) {
+      sliderSection.addEventListener('mouseenter', pauseSlider);
+      sliderSection.addEventListener('mouseleave', resumeSlider);
+    }
+
+    // Touch swipe support on mobile
+    var touchStartX = 0;
+    var touchEndX = 0;
+
+    if (sliderSection) {
+      sliderSection.addEventListener('touchstart', function (e) {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      sliderSection.addEventListener('touchend', function (e) {
+        touchEndX = e.changedTouches[0].screenX;
+        var diff = touchEndX - touchStartX;
+        if (Math.abs(diff) > 45) {
+          if (diff < 0) {
+            // Swiped left -> next slide
+            showSlide(currentSlide + 1);
+          } else {
+            // Swiped right -> prev slide
+            showSlide(currentSlide - 1);
+          }
+        }
+      }, { passive: true });
+    }
+
+    // Initial slide show
+    showSlide(0);
   })();
 
-  /* ===================== Realtime: Kết quả nổi bật ===================== */
+  /* ===================== 2. Scroll Reveal Animations ===================== */
+  (function initScrollReveal() {
+    var revealElements = document.querySelectorAll('.reveal-on-scroll, .reveal-fade-left, .reveal-fade-right, .reveal-scale');
+    if (!revealElements.length) return;
+
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      revealElements.forEach(function (el) {
+        observer.observe(el);
+      });
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      revealElements.forEach(function (el) {
+        el.classList.add('is-revealed');
+      });
+    }
+  })();
+
+  /* ===================== 3. Sticky Header & Back To Top ===================== */
+  (function initHeaderAndScrollTop() {
+    var header = document.querySelector('header.sticky-top');
+    var backToTopBtn = document.getElementById('back-to-top');
+
+    function onScroll() {
+      var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (header) {
+        if (scrollY > 30) {
+          header.classList.add('is-scrolled');
+        } else {
+          header.classList.remove('is-scrolled');
+        }
+      }
+
+      if (backToTopBtn) {
+        if (scrollY > 320) {
+          backToTopBtn.classList.add('show');
+        } else {
+          backToTopBtn.classList.remove('show');
+        }
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    if (backToTopBtn) {
+      backToTopBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  })();
+
+  /* ===================== 4. Realtime: Kết quả nổi bật ===================== */
   (function initLiveResults() {
     var root = document.getElementById('daihoi-root');
     var grid = document.getElementById('live-match-grid');
@@ -152,7 +314,7 @@
         '  <div class="card h-100 border-0 rounded-4 shadow-sm bg-white overflow-hidden card-hover" style="border-top: 4px solid #10b981 !important;">' +
         '    <div class="p-3 pb-2 border-bottom bg-slate-50 d-flex align-items-center justify-content-between">' +
         '      <div class="d-flex align-items-center gap-2">' +
-        '        <div class="rounded-circle bg-teal-50 text-teal-600 border border-teal-200 d-flex align-items-center justify-content-center" style="width:28px;height:28px;">' +
+        '        <div class="rounded-circle bg-teal-50 text-teal-600 border border-teal-200 d-flex align-items-center justify-content-center icon-bounce" style="width:28px;height:28px;">' +
         '          <span class="material-symbols-outlined fs-6">emoji_events</span>' +
         '        </div>' +
         '        <div><span class="fw-bold text-dark small d-block lh-1">' + esc(title) + '</span>' +

@@ -129,11 +129,12 @@ if (!empty($agenda) && isset($agenda[0]) && is_array($agenda[0])) {
 // ----- Hero slider (dữ liệu từ bảng slideshows) -----
 // Map màu nhấn -> class gradient (span tiêu đề) + màu chấm indicator.
 $slideThemes = array(
-  'blue' => array('grad' => 'from-blue-300 via-teal-200 to-amber-300', 'dot' => '#2dd4bf', 'bg' => 'linear-gradient(135deg,#0b1329,#1e3a8a 55%,#0f766e)'),
-  'amber' => array('grad' => 'from-amber-300 via-orange-300 to-rose-300', 'dot' => '#fbbf24', 'bg' => 'linear-gradient(135deg,#7c2d12,#b45309 55%,#f59e0b)'),
-  'purple' => array('grad' => 'from-purple-300 via-pink-300 to-amber-200', 'dot' => '#c084fc', 'bg' => 'linear-gradient(135deg,#581c87,#9333ea 55%,#ec4899)'),
-  'teal' => array('grad' => 'from-teal-200 via-emerald-200 to-lime-200', 'dot' => '#2dd4bf', 'bg' => 'linear-gradient(135deg,#065f46,#0d9488 55%,#22c55e)'),
+  'blue' => array('grad' => 'from-blue-300 via-teal-200 to-amber-300', 'dot' => '#2dd4bf', 'bg' => 'linear-gradient(135deg,#09132b 0%,#173479 45%,#0d5f57 100%)'),
+  'amber' => array('grad' => 'from-amber-300 via-orange-300 to-rose-300', 'dot' => '#fbbf24', 'bg' => 'linear-gradient(135deg,#451a03 0%,#854d0e 45%,#d97706 100%)'),
+  'purple' => array('grad' => 'from-purple-300 via-pink-300 to-amber-200', 'dot' => '#c084fc', 'bg' => 'linear-gradient(135deg,#3b0764 0%,#6b21a8 45%,#db2777 100%)'),
+  'teal' => array('grad' => 'from-teal-200 via-emerald-200 to-lime-200', 'dot' => '#2dd4bf', 'bg' => 'linear-gradient(135deg,#042f2e 0%,#0d9488 45%,#16a34a 100%)'),
 );
+
 $slideList = array();
 if (!empty($slides) && isset($slides[0]) && is_array($slides[0])) {
   foreach ($slides as $sl) {
@@ -149,13 +150,25 @@ if (!empty($slides) && isset($slides[0]) && is_array($slides[0])) {
     );
   }
 }
+
+// Bổ sung các slide tiêu biểu để hero carousel luôn đầy đủ, sinh động (ít nhất 3-4 slide)
+$curatedSlides = array(
+  array('image' => '', 'subtitle' => 'Giải Chạy Tiếp Sức', 'title' => 'MƯỜNG THANH FUN RUN - BỨT PHÁ TRÊN CUNG ĐƯỜNG DI SẢN', 'desc' => 'Cùng sải bước đón bình minh giữa non nước Ninh Bình kỳ vĩ với các cự ly 5KM, 10KM và 15km.', 'btn_text' => 'Tìm hiểu giải chạy', 'btn_url' => '#dang-ky', 'theme' => 'amber'),
+  array('image' => '', 'subtitle' => 'Đêm Gala Tôn Vinh Bản Sắc', 'title' => 'VIỆT NAM GẤM HOA & MISS MƯỜNG THANH ' . $eventYear, 'desc' => 'Đại tiệc nghệ thuật truyền thống tôn vinh vẻ đẹp tự tin, duyên dáng và trí tuệ của cán bộ nhân viên Mường Thanh.', 'btn_text' => 'Xem chi tiết', 'btn_url' => '#noi-dung', 'theme' => 'purple'),
+  array('image' => '', 'subtitle' => 'Hội Tụ Tinh Hoa Nghề Nghiệp', 'title' => 'ĐỈNH CAO TAY NGHỀ & TRANH TÀI THỂ THAO RỰC LỬA', 'desc' => 'Chuẩn mực nghiệp vụ khách sạn thắp sáng tinh thần hiếu khách cùng ngọn lửa thể thao rực cháy của các đoàn vận động viên.', 'btn_text' => 'Khám phá ngay', 'btn_url' => '#noi-dung', 'theme' => 'teal'),
+);
+
 if (empty($slideList)) {
-  // Fallback: slide 1 lấy từ sự kiện, 2 slide còn lại là nội dung mặc định.
-  $slideList = array(
-    array('image' => $coverImage, 'subtitle' => $eventLocation, 'title' => $eventName, 'desc' => $heroDesc, 'btn_text' => 'Khám phá chương trình', 'btn_url' => '#noi-dung', 'theme' => 'blue'),
-    array('image' => '', 'subtitle' => 'Giải Chạy Tiếp Sức', 'title' => 'MƯỜNG THANH FUN RUN - BỨT PHÁ TRÊN CUNG ĐƯỜNG DI SẢN', 'desc' => 'Cùng sải bước đón bình minh giữa non nước Ninh Bình kỳ vĩ với các cự ly 5KM, 10KM và 15km.', 'btn_text' => 'Tìm hiểu giải chạy', 'btn_url' => '#noi-dung', 'theme' => 'amber'),
-    array('image' => '', 'subtitle' => 'Đêm Gala Tôn Vinh Bản Sắc', 'title' => 'VIỆT NAM GẤM HOA & MISS MƯỜNG THANH ' . $eventYear, 'desc' => 'Đại tiệc nghệ thuật truyền thống tôn vinh vẻ đẹp tự tin, duyên dáng và trí tuệ của cán bộ nhân viên Mường Thanh.', 'btn_text' => 'Xem chi tiết', 'btn_url' => '#tin-tuc', 'theme' => 'purple'),
+  $slideList = array_merge(
+    array(array('image' => $coverImage, 'subtitle' => $eventLocation, 'title' => $eventName, 'desc' => $heroDesc, 'btn_text' => 'Khám phá chương trình', 'btn_url' => '#noi-dung', 'theme' => 'blue')),
+    $curatedSlides
   );
+} else {
+  // Nếu DB có ít slide (vd chỉ có 1 slide), tự động bổ sung slide tiêu biểu
+  foreach ($curatedSlides as $cs) {
+    if (count($slideList) >= 4) break;
+    $slideList[] = $cs;
+  }
 }
 $slideCount = count($slideList);
 
@@ -204,9 +217,9 @@ if (empty($albumList)) {
         <!-- Logo & Brand -->
         <div class="col-8 col-sm-6 col-lg-3 d-flex align-items-center">
           <a class="d-flex align-items-center gap-2 text-decoration-none text-dark" href="<?php echo $e($base); ?>/">
-            <img alt="<?php echo $e($eventName); ?>" class="img-fluid" src="<?php echo $e($logo); ?>" style="height:42px;object-fit:contain;">
+            <img alt="<?php echo $e($eventName); ?>" class="img-fluid" src="<?php echo $e($logo); ?>" style="height:44px;object-fit:contain;">
             <div class="d-flex flex-column">
-              <span class="fw-bold text-dark lh-1" style="font-size:15px;letter-spacing:-0.02em;">ĐẠI HỘI MƯỜNG THANH</span>
+              <span class="fw-bold text-dark lh-1" style="font-size:15.5px;letter-spacing:-0.02em;">ĐẠI HỘI MƯỜNG THANH</span>
               <span class="text-primary fw-bold text-uppercase" style="font-size:10.5px;letter-spacing:0.08em;"><?php echo $e($eventLocation); ?></span>
             </div>
           </a>
@@ -215,20 +228,16 @@ if (empty($albumList)) {
         <div class="col-lg-6 d-none d-lg-flex justify-content-center">
           <nav class="d-flex align-items-center gap-1">
             <?php foreach ($navItems as $it): ?>
-              <a class="nav-link px-3 py-2 fw-semibold text-secondary rounded hover:text-dark hover:bg-light transition" href="<?php echo $e($it[0]); ?>"><?php echo $e($it[1]); ?></a>
+              <a class="nav-link px-3 py-2 fw-semibold text-secondary rounded hover:text-dark transition" href="<?php echo $e($it[0]); ?>"><?php echo $e($it[1]); ?></a>
             <?php endforeach; ?>
           </nav>
         </div>
         <!-- Header Actions -->
         <div class="col-4 col-sm-6 col-lg-3 d-flex align-items-center justify-content-end gap-2">
-          <button aria-label="Thông báo" class="btn btn-light rounded-circle p-1 position-relative d-none d-sm-flex align-items-center justify-content-center" style="width:36px;height:36px;" type="button">
-            <span class="material-symbols-outlined fs-5 text-secondary">notifications</span>
-            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-primary border border-light rounded-circle"></span>
-          </button>
-          <a class="btn btn-sm fw-bold px-3 py-1 rounded-pill d-none d-md-inline-flex align-items-center gap-1 shadow-sm text-white" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
-            <span class="material-symbols-outlined" style="font-size:16px;">how_to_reg</span> Đăng ký hoạt động
+          <a class="btn btn-sm fw-bold px-3 py-2 rounded-pill d-none d-md-inline-flex align-items-center gap-1 shadow-sm text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
+            <span class="material-symbols-outlined" style="font-size:17px;">how_to_reg</span> Đăng ký hoạt động
           </a>
-          <a class="btn btn-primary btn-sm fw-bold px-3 py-1 rounded-pill d-none d-sm-inline-flex align-items-center shadow-sm" href="<?php echo $e($loginUrl); ?>" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;font-size:13px;">
+          <a class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-pill d-none d-sm-inline-flex align-items-center shadow-sm btn-shimmer" href="<?php echo $e($loginUrl); ?>" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;font-size:13px;">
             <?php echo $e($loginLabel); ?>
           </a>
           <button aria-expanded="false" aria-label="Menu" class="btn btn-light d-lg-none p-1 border rounded" data-bs-target="#mobileNav" data-bs-toggle="collapse" type="button">
@@ -242,8 +251,8 @@ if (empty($albumList)) {
           <?php foreach ($navItems as $it): ?>
             <a class="badge bg-light text-dark fw-bold text-decoration-none px-3 py-2 border rounded-pill" href="<?php echo $e($it[0]); ?>"><?php echo $e($it[1]); ?></a>
           <?php endforeach; ?>
-          <a class="badge text-white fw-bold text-decoration-none px-3 py-2 rounded-pill" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);">Đăng ký hoạt động</a>
-          <a class="badge bg-primary text-white fw-bold text-decoration-none px-3 py-2 rounded-pill" href="<?php echo $e($loginUrl); ?>"><?php echo $e($loginLabel); ?></a>
+          <a class="badge text-white fw-bold text-decoration-none px-3 py-2 rounded-pill btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);">Đăng ký hoạt động</a>
+          <a class="badge bg-primary text-white fw-bold text-decoration-none px-3 py-2 rounded-pill btn-shimmer" href="<?php echo $e($loginUrl); ?>"><?php echo $e($loginLabel); ?></a>
         </div>
       </div>
     </div>
@@ -256,33 +265,44 @@ if (empty($albumList)) {
     <!-- SECTION 1: HERO SLIDER (FULL WIDTH) -->
     <section class="hero-slider-section position-relative w-100 overflow-hidden">
       <div class="hero-slider-wrap position-relative w-100 overflow-hidden bg-dark">
+        <!-- Slide Countdown Progress Bar -->
+        <div class="slider-progress-track">
+          <div class="slider-progress-bar" id="slider-progress-bar"></div>
+        </div>
+
         <div class="w-100 h-100 position-relative overflow-hidden">
           <?php foreach ($slideList as $si => $sld):
             $th = $slideThemes[$sld['theme']];
             $first = ($si === 0);
           ?>
-            <div class="hero-slide position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end transition-opacity duration-700 <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>" <?php echo $sld['image'] ? '' : ' style="background:' . $e($th['bg']) . ';"'; ?>>
-              <?php if ($sld['image']): ?>
-                <img alt="<?php echo $e($sld['title']); ?>" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" src="<?php echo $e($sld['image']); ?>">
+            <div class="hero-slide position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>" style="background:<?php echo $e($th['bg']); ?>;">
+              <!-- Subtle decorative geometry & ambient glow -->
+              <div class="position-absolute top-0 start-0 w-100 h-100 hero-slide-grid-pattern opacity-25 pointer-events-none"></div>
+              <div class="glow-orb" style="top:15%;right:15%;width:340px;height:340px;background:radial-gradient(circle,<?php echo $e($th['dot']); ?>35 0%,transparent 70%);"></div>
+
+              <?php if (!empty($sld['image'])): ?>
+                <img alt="<?php echo $e($sld['title']); ?>" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover slide-bg-img" src="<?php echo $e($sld['image']); ?>" onerror="this.style.display='none';">
               <?php endif; ?>
-              <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+              <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-t from-black/90 via-black/45 to-transparent"></div>
               <div class="container h-100 position-relative z-1 d-flex align-items-end pb-4 pb-md-5">
-                <div class="text-white py-2" style="max-width:850px;">
+                <div class="text-white py-2" style="max-width:880px;">
                   <?php if ($sld['subtitle'] !== ''): ?>
-                    <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill bg-white/20 backdrop-blur-md border border-white/25 text-white fw-bold text-uppercase mb-2" style="font-size:11px;">
-                      <span class="rounded-circle d-inline-block" style="width:8px;height:8px;background-color:<?php echo $e($th['dot']); ?>;"></span> <?php echo $e($sld['subtitle']); ?>
+                    <div class="slide-subtitle d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill glass-badge text-white fw-bold text-uppercase mb-2" style="font-size:11.5px;letter-spacing:0.04em;">
+                      <span class="rounded-circle d-inline-block" style="width:8px;height:8px;background-color:<?php echo $e($th['dot']); ?>;box-shadow:0 0 10px <?php echo $e($th['dot']); ?>;"></span> <?php echo $e($sld['subtitle']); ?>
                     </div>
                   <?php endif; ?>
-                  <h2 class="fw-black text-uppercase text-white lh-sm mb-2" style="font-size:calc(1.35rem + 1.6vw);">
+                  <h2 class="slide-title fw-black text-uppercase text-white lh-sm mb-2" style="font-size:calc(1.4rem + 1.8vw);text-shadow:0 2px 20px rgba(0,0,0,0.5);">
                     <span class="text-transparent bg-clip-text bg-gradient-to-r <?php echo $th['grad']; ?>"><?php echo $e($sld['title']); ?></span>
                   </h2>
                   <?php if ($sld['desc'] !== ''): ?>
-                    <p class="text-light mb-3 d-none d-sm-block" style="font-size:calc(0.85rem + 0.25vw);max-width:650px;"><?php echo $e($sld['desc']); ?></p>
+                    <p class="slide-desc text-light opacity-90 mb-3 d-none d-sm-block lh-base" style="font-size:calc(0.9rem + 0.22vw);max-width:680px;text-shadow:0 1px 8px rgba(0,0,0,0.6);"><?php echo $e($sld['desc']); ?></p>
                   <?php endif; ?>
                   <?php if ($sld['btn_text'] !== ''): ?>
-                    <a class="btn btn-light fw-bold rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 shadow text-dark" href="<?php echo $e($sld['btn_url'] !== '' ? $sld['btn_url'] : '#noi-dung'); ?>" style="font-size:13.5px;">
-                      <span><?php echo $e($sld['btn_text']); ?></span><span class="material-symbols-outlined fs-6">arrow_forward</span>
-                    </a>
+                    <div class="slide-btn-wrap">
+                      <a class="btn btn-light fw-bold rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 shadow-lg text-dark btn-shimmer" href="<?php echo $e($sld['btn_url'] !== '' ? $sld['btn_url'] : '#noi-dung'); ?>" style="font-size:14px;">
+                        <span><?php echo $e($sld['btn_text']); ?></span><span class="material-symbols-outlined fs-6">arrow_forward</span>
+                      </a>
+                    </div>
                   <?php endif; ?>
                 </div>
               </div>
@@ -290,14 +310,16 @@ if (empty($albumList)) {
           <?php endforeach; ?>
         </div>
         <!-- Controls -->
-        <button aria-label="Trước" class="position-absolute top-50 start-0 translate-middle-y ms-2 ms-md-4 btn btn-dark btn-sm rounded-circle p-2 text-white bg-black/40 border border-white/20 backdrop-blur-sm z-2" id="slider-prev" type="button"><span class="material-symbols-outlined fs-5">arrow_back</span></button>
-        <button aria-label="Sau" class="position-absolute top-50 end-0 translate-middle-y me-2 me-md-4 btn btn-dark btn-sm rounded-circle p-2 text-white bg-black/40 border border-white/20 backdrop-blur-sm z-2" id="slider-next" type="button"><span class="material-symbols-outlined fs-5">arrow_forward</span></button>
+        <button aria-label="Trước" class="position-absolute top-50 start-0 translate-middle-y ms-2 ms-md-4 slider-control-btn z-2" id="slider-prev" type="button"><span class="material-symbols-outlined fs-5">arrow_back</span></button>
+        <button aria-label="Sau" class="position-absolute top-50 end-0 translate-middle-y me-2 me-md-4 slider-control-btn z-2" id="slider-next" type="button"><span class="material-symbols-outlined fs-5">arrow_forward</span></button>
         <!-- Indicators -->
-        <div class="position-absolute bottom-0 end-0 m-3 m-md-4 me-xl-5 mb-xl-4 d-flex align-items-center gap-2 bg-black/50 px-3 py-1 rounded-pill border border-white/20 backdrop-blur-md z-2">
+        <div class="position-absolute bottom-0 end-0 m-3 m-md-4 me-xl-5 mb-xl-4 d-flex align-items-center gap-2 slider-indicators-pill px-3 py-1 rounded-pill z-2">
           <div class="d-flex align-items-center gap-1" id="slider-dots">
-            <?php for ($si = 0; $si < $slideCount; $si++): ?>
-              <button class="slider-dot rounded-pill border-0 transition" data-slide="<?php echo $si; ?>" style="height:6px;width:<?php echo $si === 0 ? '24px' : '8px'; ?>;background-color:<?php echo $si === 0 ? '#2dd4bf' : 'rgba(255,255,255,0.4)'; ?>;"></button>
-            <?php endfor; ?>
+            <?php foreach ($slideList as $si => $sld): 
+              $th = $slideThemes[$sld['theme']];
+            ?>
+              <button class="slider-dot rounded-pill border-0" data-slide="<?php echo $si; ?>" data-active-color="<?php echo $e($th['dot']); ?>" style="height:6px;width:<?php echo $si === 0 ? '28px' : '8px'; ?>;background-color:<?php echo $si === 0 ? $e($th['dot']) : 'rgba(255,255,255,0.4)'; ?>;"></button>
+            <?php endforeach; ?>
           </div>
           <span class="text-white-50 font-monospace small ps-1" id="slider-counter" style="font-size:11px;">01 / <?php echo str_pad($slideCount, 2, '0', STR_PAD_LEFT); ?></span>
         </div>
@@ -305,12 +327,12 @@ if (empty($albumList)) {
     </section>
 
     <!-- TICKER -->
-    <section class="container pt-3 pt-md-4 pb-1">
-      <div class="card border rounded-3 shadow-sm bg-white p-2 p-md-3">
+    <section class="container pt-3 pt-md-4 pb-1 reveal-on-scroll">
+      <div class="card border rounded-3 shadow-sm bg-white p-2 p-md-3 card-hover" style="border-left: 4px solid #1d4ed8 !important;">
         <div class="row align-items-center g-2">
           <div class="col-12 d-flex align-items-center gap-2">
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle text-uppercase px-2 py-1 fw-bold" style="font-size:11px;">
-              <span class="spinner-grow spinner-grow-sm text-primary me-1" style="width:8px;height:8px;"></span> Cập nhật
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle text-uppercase px-2 py-1 fw-bold d-inline-flex align-items-center gap-1" style="font-size:11px;">
+              <span class="pulse-live-dot bg-primary me-1" style="width:7px;height:7px;"></span> Cập nhật
             </span>
             <p class="mb-0 text-secondary text-truncate" style="font-size:13.5px;">
               <?php if (!empty($matches)):
@@ -320,7 +342,7 @@ if (empty($albumList)) {
                 <?php $v = $val($m0, array('venue', 'location'), '');
                 echo $v ? ' • ' . $e($v) : ''; ?>
               <?php else: ?>
-                <strong class="text-dark">Đại hội Mường Thanh <?php echo $e($eventYear); ?></strong> • Theo dõi lịch thi đấu và kết quả cập nhật liên tục.
+                <strong class="text-dark">Đại hội Mường Thanh <?php echo $e($eventYear); ?></strong> • Theo dõi lịch thi đấu và kết quả cập nhật liên tục trực tiếp từ các cụm sân.
               <?php endif; ?>
             </p>
           </div>
@@ -329,27 +351,31 @@ if (empty($albumList)) {
     </section>
 
     <!-- SECTION 1B: CTA ĐĂNG KÝ HOẠT ĐỘNG (Giải chạy + Tham quan) -->
-    <section class="container py-2 py-md-3" id="dang-ky">
-      <div class="card border-0 rounded-4 shadow overflow-hidden" style="background:linear-gradient(135deg,#065f46 0%,#0f766e 55%,#0e7490 100%);">
-        <div class="card-body p-4 p-md-5 text-white">
+    <section class="container py-2 py-md-3 reveal-scale" id="dang-ky">
+      <div class="card border-0 rounded-4 shadow-lg overflow-hidden position-relative" style="background:linear-gradient(135deg,#064e3b 0%,#0f766e 45%,#0369a1 100%);">
+        <!-- Ambient glowing orbs -->
+        <div class="glow-orb" style="top:-20%;right:-10%;width:320px;height:320px;background:radial-gradient(circle,rgba(45,212,191,0.25) 0%,transparent 70%);"></div>
+        <div class="glow-orb" style="bottom:-30%;left:10%;width:280px;height:280px;background:radial-gradient(circle,rgba(56,189,248,0.2) 0%,transparent 70%);"></div>
+
+        <div class="card-body p-4 p-md-5 text-white position-relative z-1">
           <div class="row align-items-center g-3">
             <div class="col-lg-8">
-              <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill bg-white/20 border border-white/25 fw-bold text-uppercase mb-2" style="font-size:11px;">
+              <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge fw-bold text-uppercase mb-2" style="font-size:11px;">
                 <span class="material-symbols-outlined" style="font-size:15px;">how_to_reg</span> Dành cho danh sách Vòng Chung Kết
               </div>
-              <h2 class="fw-black text-uppercase lh-sm mb-2" style="font-size:calc(1.2rem + 1vw);">Đăng ký Giải chạy &amp; Đi tham quan</h2>
-              <p class="text-light mb-3" style="font-size:14px;max-width:640px;">
+              <h2 class="fw-black text-uppercase lh-sm mb-2" style="font-size:calc(1.3rem + 1vw);">Đăng ký Giải chạy &amp; Đi tham quan</h2>
+              <p class="text-light opacity-90 mb-3" style="font-size:14.5px;max-width:640px;">
                 Chọn cự ly chạy Fun Run (5km / 10km / 15km) và đợt đi tham quan. Số suất giới hạn,
                 đăng ký theo thứ tự &mdash; ai nhanh người đó được. Đăng nhập bằng mã định danh &amp; mã PIN cá nhân.
               </p>
-              <div class="d-flex flex-wrap gap-3">
-                <span class="d-inline-flex align-items-center gap-1" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">sprint</span> Fun Run 3 cự ly</span>
-                <span class="d-inline-flex align-items-center gap-1" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">directions_bus</span> Tham quan 3 đợt</span>
+              <div class="d-flex flex-wrap gap-2 gap-sm-3">
+                <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">sprint</span> Fun Run 3 cự ly</span>
+                <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">directions_bus</span> Tham quan 3 đợt</span>
               </div>
             </div>
             <div class="col-lg-4 text-lg-end">
-              <a class="btn btn-light fw-bold rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 shadow text-dark" href="<?php echo $e($portalUrl); ?>" style="font-size:14px;">
-                <span>Đăng ký ngay</span><span class="material-symbols-outlined fs-6">arrow_forward</span>
+              <a class="btn btn-light fw-bold rounded-pill px-4 py-3 d-inline-flex align-items-center gap-2 shadow-lg text-dark btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="font-size:14.5px;">
+                <span>Đăng ký tham gia ngay</span><span class="material-symbols-outlined fs-6">arrow_forward</span>
               </a>
             </div>
           </div>
@@ -359,7 +385,7 @@ if (empty($albumList)) {
 
     <!-- SECTION 2: NỘI DUNG TRỌNG ĐIỂM -->
     <section class="container py-4 py-lg-5" id="noi-dung">
-      <div class="row align-items-end justify-content-between mb-4 g-3">
+      <div class="row align-items-end justify-content-between mb-4 g-3 reveal-on-scroll">
         <div class="col-12 col-lg-8">
           <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-blue-50 border border-blue-200 text-primary fw-bold text-uppercase mb-2" style="font-size:11px;">
             <span class="rounded-circle bg-primary d-inline-block" style="width:7px;height:7px;"></span> Nội dung trọng điểm Đại hội <?php echo $e($eventYear); ?>
@@ -400,14 +426,16 @@ if (empty($albumList)) {
             $cards[] = array('theme' => $t, 'title' => $d[0], 'desc' => $d[1], 'tag' => $t['tag']);
           }
         }
-        foreach ($cards as $card):
+        $delays = array('delay-100', 'delay-150', 'delay-200', 'delay-250', 'delay-300', 'delay-350');
+        foreach ($cards as $ci => $card):
           $t = $card['theme'];
+          $delayClass = isset($delays[$ci]) ? $delays[$ci] : 'delay-100';
         ?>
-          <div class="col-12 col-md-6 col-lg-4">
+          <div class="col-12 col-md-6 col-lg-4 reveal-on-scroll <?php echo $delayClass; ?>">
             <div class="card h-100 card-hover border shadow-sm rounded-4 p-4 bg-white" style="border-top:4px solid <?php echo $e($t['border']); ?> !important;">
               <div class="d-flex align-items-center justify-content-between mb-4">
                 <span class="badge <?php echo $t['badge']; ?> px-3 py-1 rounded-pill fw-bold text-uppercase" style="font-size:10.5px;"><?php echo $e($card['tag']); ?></span>
-                <div class="rounded-3 <?php echo $t['icon_bg']; ?> text-white p-2 d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;">
+                <div class="rounded-3 <?php echo $t['icon_bg']; ?> text-white p-2 d-flex align-items-center justify-content-center shadow-sm icon-bounce" style="width:40px;height:40px;">
                   <span class="material-symbols-outlined fs-5"><?php echo $e($t['icon']); ?></span>
                 </div>
               </div>
@@ -415,7 +443,7 @@ if (empty($albumList)) {
                 <h3 class="fw-bold text-dark fs-5 mb-2"><?php echo $e($card['title']); ?></h3>
                 <p class="text-secondary small mb-3 lh-base line-clamp-2"><?php echo $e($card['desc']); ?></p>
                 <div class="d-inline-flex align-items-center gap-1 <?php echo $t['link']; ?> fw-bold small">
-                  <span>Tìm hiểu thêm</span><span class="material-symbols-outlined fs-6">arrow_forward</span>
+                  <span>Tìm hiểu thêm</span><span class="material-symbols-outlined fs-6 arrow-slide">arrow_forward</span>
                 </div>
               </div>
             </div>
@@ -425,11 +453,13 @@ if (empty($albumList)) {
     </section>
 
     <!-- SECTION 3: HÔM NAY TẠI ĐẠI HỘI -->
-    <section class="container py-3" id="hom-nay">
+    <section class="container py-3 reveal-on-scroll" id="hom-nay">
       <div class="card border rounded-4 shadow-sm bg-white p-4">
         <div class="row align-items-center justify-content-between mb-3 g-2">
           <div class="col-12 col-md-8">
-            <span class="text-primary fw-bold text-uppercase small d-block mb-1">Lịch trình sự kiện</span>
+            <span class="text-primary fw-bold text-uppercase small d-block mb-1">
+              <span class="pulse-live-dot bg-primary me-1" style="width:7px;height:7px;"></span> Lịch trình sự kiện
+            </span>
             <h2 class="fw-bold text-dark fs-4 mb-1">Hôm nay tại Đại hội</h2>
             <p class="text-secondary small mb-0">Lịch hiển thị theo dữ liệu thực tế và có thể được Ban Tổ chức cập nhật theo ngày.</p>
           </div>
@@ -437,8 +467,8 @@ if (empty($albumList)) {
         <div class="card border bg-light rounded-3 p-3">
           <div class="row align-items-center g-3">
             <div class="col-12 col-md-4 d-flex align-items-center gap-3">
-              <div class="rounded-3 bg-dark text-white d-flex flex-column align-items-center justify-content-center p-2 text-center" style="width:58px;height:58px;">
-                <span class="fw-black fs-4 lh-1"><?php echo $e(date('d')); ?></span>
+              <div class="rounded-3 bg-dark text-white d-flex flex-column align-items-center justify-content-center p-2 text-center shadow-sm" style="width:62px;height:62px;background:linear-gradient(135deg,#0f172a,#1e293b);">
+                <span class="fw-black fs-4 lh-1 text-teal-300"><?php echo $e(date('d')); ?></span>
                 <span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Th<?php echo $e(date('n')); ?></span>
               </div>
               <div>
@@ -449,7 +479,7 @@ if (empty($albumList)) {
               </div>
             </div>
             <div class="col-12 col-md-8">
-              <div class="card bg-white border rounded-3 p-3">
+              <div class="card bg-white border rounded-3 p-3 card-hover">
                 <div class="row align-items-center justify-content-between g-2">
                   <div class="col-12 col-sm-8">
                     <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
@@ -459,7 +489,7 @@ if (empty($albumList)) {
                     <p class="text-muted mb-0 small"><?php echo $e($todayItemPlace); ?></p>
                   </div>
                   <div class="col-12 col-sm-4 text-sm-end">
-                    <a class="btn btn-dark btn-sm rounded-pill px-3 py-1 fw-bold" href="<?php echo $e($base); ?>/daihoi/schedule" style="font-size:12.5px;">Theo dõi chi tiết</a>
+                    <a class="btn btn-dark btn-sm rounded-pill px-3 py-1 fw-bold btn-shimmer" href="<?php echo $e($base); ?>/daihoi/schedule" style="font-size:12.5px;">Theo dõi chi tiết</a>
                   </div>
                 </div>
               </div>
@@ -470,15 +500,15 @@ if (empty($albumList)) {
     </section>
 
     <!-- SECTION 4: KẾT QUẢ NỔI BẬT -->
-    <section class="container py-4" id="ket-qua">
+    <section class="container py-4 reveal-on-scroll" id="ket-qua">
       <div class="p-3 p-md-4 rounded-4 shadow-sm position-relative overflow-hidden" style="background:linear-gradient(#ffffff 0%,#f1f5f9 100%);border:1px solid #e2e8f0;">
-        <div class="position-absolute top-0 end-0 rounded-circle bg-primary-subtle opacity-75" style="width:320px;height:320px;filter:blur(80px);transform:translate(30%,-30%);pointer-events:none;"></div>
+        <div class="position-absolute top-0 end-0 rounded-circle bg-primary-subtle opacity-75" style="width:340px;height:340px;filter:blur(80px);transform:translate(30%,-30%);pointer-events:none;"></div>
 
         <div class="row align-items-center justify-content-between mb-4 g-3 position-relative z-1">
           <div class="col-12 col-md-7">
             <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
               <span class="badge bg-danger text-white rounded-pill px-2 py-1 fw-bold text-uppercase d-inline-flex align-items-center gap-1 shadow-sm" style="font-size:11px;">
-                <span class="spinner-grow spinner-grow-sm text-white" style="width:7px;height:7px;"></span> Cập nhật trực tiếp
+                <span class="pulse-live-dot bg-white me-1" style="width:6px;height:6px;"></span> Cập nhật trực tiếp
               </span>
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -488,6 +518,11 @@ if (empty($albumList)) {
               <h2 class="fw-black text-dark fs-3 mb-0">Kết quả thi đấu nổi bật</h2>
             </div>
             <p class="text-secondary small mb-0 mt-1">Bảng tỷ số cập nhật theo thời gian thực từ các bộ môn tại Đại hội Mường Thanh <?php echo $e($eventYear); ?>.</p>
+          </div>
+          <div class="col-12 col-md-5 text-md-end">
+            <a class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3 py-1 d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/daihoi/schedule">
+              <span>Xem bảng xếp hạng &amp; lịch đấu</span><span class="material-symbols-outlined fs-6 arrow-slide">arrow_forward</span>
+            </a>
           </div>
         </div>
 
@@ -503,7 +538,7 @@ if (empty($albumList)) {
                 <div class="card h-100 border-0 rounded-4 shadow-sm bg-white overflow-hidden card-hover" style="border-top:4px solid #10b981 !important;">
                   <div class="p-3 pb-2 border-bottom bg-slate-50 d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-2">
-                      <div class="rounded-circle bg-teal-50 text-teal-600 border border-teal-200 d-flex align-items-center justify-content-center" style="width:28px;height:28px;">
+                      <div class="rounded-circle bg-teal-50 text-teal-600 border border-teal-200 d-flex align-items-center justify-content-center icon-bounce" style="width:28px;height:28px;">
                         <span class="material-symbols-outlined fs-6">sports_soccer</span>
                       </div>
                       <div>
@@ -536,8 +571,113 @@ if (empty($albumList)) {
               </div>
             <?php endforeach;
           else: ?>
-            <div class="col-12">
-              <p class="text-secondary small mb-0 py-4 text-center">Chưa có trận đấu nào được cập nhật.</p>
+            <!-- Trạng thái chuẩn bị khởi tranh thể thao hấp dẫn -->
+            <div class="col-12 col-md-4">
+              <div class="card h-100 border-0 rounded-4 shadow-sm bg-white overflow-hidden card-hover" style="border-top:4px solid #2563eb !important;">
+                <div class="p-3 pb-2 border-bottom bg-slate-50 d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-blue-50 text-primary border border-blue-200 d-flex align-items-center justify-content-center icon-bounce" style="width:28px;height:28px;">
+                      <span class="material-symbols-outlined fs-6">sports_soccer</span>
+                    </div>
+                    <div>
+                      <span class="fw-bold text-dark small d-block lh-1">Bóng Đá Nam</span>
+                      <span class="text-muted" style="font-size:10.5px;">Vòng Bảng Toàn Đoàn</span>
+                    </div>
+                  </div>
+                  <span class="badge bg-primary text-white rounded-pill px-2 py-1 fw-semibold" style="font-size:10px;">Sắp diễn ra</span>
+                </div>
+                <div class="p-3">
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-3 mb-2" style="background-color:#f8fafc;border-left:3px solid #2563eb;">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:11px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);">MB</div>
+                      <span class="fw-bold text-dark small">Khối Miền Bắc</span>
+                    </div>
+                    <span class="badge rounded-3 px-2 py-1 text-primary fw-black fs-5 font-monospace" style="background-color:#dbeafe;">--</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle bg-light text-secondary border d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:11px;">MT</div>
+                      <span class="fw-semibold text-secondary small">Khối Miền Trung</span>
+                    </div>
+                    <span class="badge rounded-3 px-2 py-1 text-secondary fw-bold fs-5 font-monospace bg-light border">--</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between px-3 py-2 border-top bg-light text-muted" style="font-size:11.5px;">
+                  <span class="d-flex align-items-center gap-1"><span class="material-symbols-outlined text-secondary fs-6">schedule</span> 08:30 • Sân vận động trung tâm</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <div class="card h-100 border-0 rounded-4 shadow-sm bg-white overflow-hidden card-hover" style="border-top:4px solid #0d9488 !important;">
+                <div class="p-3 pb-2 border-bottom bg-slate-50 d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-teal-50 text-teal-600 border border-teal-200 d-flex align-items-center justify-content-center icon-bounce" style="width:28px;height:28px;">
+                      <span class="material-symbols-outlined fs-6">sports_tennis</span>
+                    </div>
+                    <div>
+                      <span class="fw-bold text-dark small d-block lh-1">Pickleball &amp; Tennis</span>
+                      <span class="text-muted" style="font-size:10.5px;">Đôi Nam Nữ Phối Hợp</span>
+                    </div>
+                  </div>
+                  <span class="badge bg-teal-600 text-white rounded-pill px-2 py-1 fw-semibold" style="font-size:10px;">Sắp diễn ra</span>
+                </div>
+                <div class="p-3">
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-3 mb-2" style="background-color:#f8fafc;border-left:3px solid #0d9488;">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:11px;background:linear-gradient(135deg,#0d9488,#10b981);">MN</div>
+                      <span class="fw-bold text-dark small">Khối Miền Nam</span>
+                    </div>
+                    <span class="badge rounded-3 px-2 py-1 text-teal-700 fw-black fs-5 font-monospace" style="background-color:#ccfbf1;">--</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle bg-light text-secondary border d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:11px;">VP</div>
+                      <span class="fw-semibold text-secondary small">Văn Phòng Tập Đoàn</span>
+                    </div>
+                    <span class="badge rounded-3 px-2 py-1 text-secondary fw-bold fs-5 font-monospace bg-light border">--</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between px-3 py-2 border-top bg-light text-muted" style="font-size:11.5px;">
+                  <span class="d-flex align-items-center gap-1"><span class="material-symbols-outlined text-secondary fs-6">schedule</span> 09:15 • Cụm sân thể thao đa năng</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <div class="card h-100 border-0 rounded-4 shadow-sm bg-white overflow-hidden card-hover" style="border-top:4px solid #f59e0b !important;">
+                <div class="p-3 pb-2 border-bottom bg-slate-50 d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-amber-50 text-amber-700 border border-amber-200 d-flex align-items-center justify-content-center icon-bounce" style="width:28px;height:28px;">
+                      <span class="material-symbols-outlined fs-6">sprint</span>
+                    </div>
+                    <div>
+                      <span class="fw-bold text-dark small d-block lh-1">Mường Thanh Fun Run</span>
+                      <span class="text-muted" style="font-size:10.5px;">Tiếp sức di sản Tràng An</span>
+                    </div>
+                  </div>
+                  <span class="badge bg-amber-500 text-white rounded-pill px-2 py-1 fw-semibold" style="font-size:10px;">Chuẩn bị</span>
+                </div>
+                <div class="p-3">
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-3 mb-2" style="background-color:#f8fafc;border-left:3px solid #f59e0b;">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#ea580c);">5K</div>
+                      <span class="fw-bold text-dark small">Cự ly 5KM, 10KM, 15KM</span>
+                    </div>
+                    <span class="badge rounded-3 px-2 py-1 text-amber-800 fw-black fs-5 font-monospace" style="background-color:#fef3c7;">OPEN</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle bg-light text-secondary border d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:11px;">ALL</div>
+                      <span class="fw-semibold text-secondary small">Vận động viên toàn đoàn</span>
+                    </div>
+                    <span class="badge rounded-3 px-2 py-1 text-secondary fw-bold fs-5 font-monospace bg-light border">READY</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between px-3 py-2 border-top bg-light text-muted" style="font-size:11.5px;">
+                  <span class="d-flex align-items-center gap-1"><span class="material-symbols-outlined text-secondary fs-6">schedule</span> 06:00 • Cung đường di sản Tràng An</span>
+                </div>
+              </div>
             </div>
           <?php endif; ?>
         </div>
@@ -545,34 +685,37 @@ if (empty($albumList)) {
     </section>
 
     <!-- SECTION 5: BANNER FUN RUN -->
-    <section class="container py-3 py-md-4">
+    <section class="container py-3 py-md-4 reveal-scale">
       <div class="rounded-4 p-4 p-md-5 text-white shadow-lg overflow-hidden position-relative" style="background:linear-gradient(135deg,#0b1329 0%,#1e3a8a 50%,#0f766e 100%);">
+        <!-- Floating ambient glowing light -->
+        <div class="glow-orb" style="top:10%;right:15%;width:320px;height:320px;background:radial-gradient(circle,rgba(56,189,248,0.25) 0%,transparent 70%);"></div>
+
         <div class="row align-items-center g-4 position-relative z-1">
           <div class="col-12 col-md-8">
-            <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill bg-white/10 text-white-50 text-uppercase fw-bold mb-2" style="font-size:11px;">
-              <span class="material-symbols-outlined fs-6">stars</span> Đại Hội Mường Thanh <?php echo $e($eventYear); ?>
+            <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge text-white-50 text-uppercase fw-bold mb-2" style="font-size:11px;">
+              <span class="material-symbols-outlined fs-6 text-warning">stars</span> Đại Hội Mường Thanh <?php echo $e($eventYear); ?>
             </div>
             <h2 class="fw-black text-uppercase text-white lh-1 mb-2" style="font-size:calc(1.6rem + 1.2vw);">MƯỜNG THANH FUN RUN</h2>
             <p class="fs-6 fw-bold text-info-emphasis mb-2">Chạy Giữa Miền Di Sản • <?php echo $e($eventDestination); ?></p>
-            <p class="text-light opacity-75 small mb-4" style="max-width:580px;">Hành trình chạy bộ kết nối cộng đồng người Mường Thanh giữa không gian danh thắng, nơi tinh thần rèn luyện thể thao hòa quyện cùng cảnh sắc non nước Ninh Bình hùng vĩ.</p>
+            <p class="text-light opacity-90 small mb-4" style="max-width:580px;">Hành trình chạy bộ kết nối cộng đồng người Mường Thanh giữa không gian danh thắng, nơi tinh thần rèn luyện thể thao hòa quyện cùng cảnh sắc non nước Ninh Bình hùng vĩ.</p>
             <div class="row g-2">
               <div class="col-12 col-sm-4">
-                <div class="card bg-white/10 border-white/20 p-2 text-white"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Thời gian</span><strong class="small">06:00 - 10:30</strong></div>
+                <div class="card glass-badge border-0 p-3 text-white card-hover"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Thời gian</span><strong class="small">06:00 - 10:30</strong></div>
               </div>
               <div class="col-12 col-sm-4">
-                <div class="card bg-white/10 border-white/20 p-2 text-white"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Điểm xuất phát</span><strong class="small">Quảng trường trung tâm</strong></div>
+                <div class="card glass-badge border-0 p-3 text-white card-hover"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Điểm xuất phát</span><strong class="small">Quảng trường trung tâm</strong></div>
               </div>
               <div class="col-12 col-sm-4">
-                <div class="card bg-white/10 border-white/20 p-2 text-white"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Cự ly</span><strong class="small">5KM &amp; 10KM</strong></div>
+                <div class="card glass-badge border-0 p-3 text-white card-hover"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Cự ly</span><strong class="small">5KM, 10KM &amp; 15KM</strong></div>
               </div>
             </div>
           </div>
           <div class="col-12 col-md-4 text-center d-flex flex-column align-items-center justify-content-center gap-3">
-            <div class="rounded-4 p-4 shadow-lg d-flex align-items-center justify-content-center text-white" style="width:110px;height:110px;background:linear-gradient(135deg,#ea580c,#f59e0b);">
+            <div class="rounded-4 p-4 shadow-lg d-flex align-items-center justify-content-center text-white icon-bounce" style="width:110px;height:110px;background:linear-gradient(135deg,#ea580c,#f59e0b);box-shadow:0 12px 30px rgba(234,88,12,0.4) !important;">
               <span class="material-symbols-outlined" style="font-size:54px;">sprint</span>
             </div>
-            <a class="btn btn-light rounded-pill fw-bold px-4 py-2 text-dark shadow d-inline-flex align-items-center gap-1" href="#noi-dung" style="font-size:13.5px;">
-              <span>Xem chi tiết giải chạy</span><span class="material-symbols-outlined fs-6">arrow_forward</span>
+            <a class="btn btn-light rounded-pill fw-bold px-4 py-2 text-dark shadow-lg d-inline-flex align-items-center gap-1 btn-shimmer" href="#noi-dung" style="font-size:13.5px;">
+              <span>Xem chi tiết giải chạy</span><span class="material-symbols-outlined fs-6 arrow-slide">arrow_forward</span>
             </a>
           </div>
         </div>
@@ -581,7 +724,7 @@ if (empty($albumList)) {
 
     <!-- SECTION 6: TIN TỨC -->
     <section class="container py-4" id="tin-tuc">
-      <div class="row align-items-end justify-content-between mb-4 g-2">
+      <div class="row align-items-end justify-content-between mb-4 g-2 reveal-on-scroll">
         <div class="col-12 col-md-8">
           <span class="text-primary fw-bold text-uppercase small d-block mb-1">Tin tức &amp; Thông báo</span>
           <h2 class="fw-black text-dark fs-3 mb-1">Thông tin mới nhất</h2>
@@ -606,24 +749,26 @@ if (empty($albumList)) {
         if (empty($newsItems)) {
           $newsItems = array(
             array('thumb' => '', 'cat' => 'Ban Tổ Chức', 'date' => '', 'title' => 'Sẵn sàng cho hành trình hội tụ tại miền di sản Ninh Bình', 'desc' => 'Ban Tổ chức hoàn tất công tác chuẩn bị cho các nội dung trọng điểm của Đại hội.', 'id' => ''),
-            array('thumb' => '', 'cat' => 'Thể thao', 'date' => '', 'title' => 'Các đơn vị tích cực chuẩn bị cho các nội dung thể thao', 'desc' => 'Không khí luyện tập sôi nổi tại khắp các khách sạn trong hệ thống.', 'id' => ''),
-            array('thumb' => '', 'cat' => 'Thông báo', 'date' => '', 'title' => 'Hướng dẫn thủ tục check-in và thẻ Đại biểu điện tử', 'desc' => 'Mỗi đại biểu vui lòng kích hoạt mã QR định danh trước khi có mặt.', 'id' => ''),
+            array('thumb' => '', 'cat' => 'Thể thao', 'date' => '', 'title' => 'Các đơn vị tích cực chuẩn bị cho các nội dung thể thao', 'desc' => 'Không khí luyện tập sôi nổi tại khắp các khách sạn trong toàn hệ thống.', 'id' => ''),
+            array('thumb' => '', 'cat' => 'Thông báo', 'date' => '', 'title' => 'Hướng dẫn thủ tục check-in và thẻ Đại biểu điện tử', 'desc' => 'Mỗi đại biểu vui lòng kích hoạt mã QR định danh trước khi có mặt tại sự kiện.', 'id' => ''),
           );
         }
-        foreach ($newsItems as $n):
+        $newsDelays = array('delay-100', 'delay-200', 'delay-300');
+        foreach ($newsItems as $ni => $n):
           $href = $n['id'] !== '' ? $base . '/daihoi/index#tin-' . $e($n['id']) : '#tin-tuc';
+          $nDelay = isset($newsDelays[$ni]) ? $newsDelays[$ni] : 'delay-100';
         ?>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-4 reveal-on-scroll <?php echo $nDelay; ?>">
             <article class="card h-100 border rounded-3 overflow-hidden shadow-sm card-hover bg-white">
-              <div class="position-relative" style="height:190px;background:#e2e8f0;">
+              <div class="position-relative img-zoom-wrap" style="height:190px;background:#e2e8f0;">
                 <?php if ($n['thumb']): ?>
-                  <img alt="<?php echo $e($n['title']); ?>" class="w-100 h-100 object-fit-cover" src="<?php echo $e($n['thumb']); ?>">
+                  <img alt="<?php echo $e($n['title']); ?>" class="w-100 h-100 object-fit-cover" src="<?php echo $e($n['thumb']); ?>" onerror="this.style.display='none';">
                 <?php else: ?>
                   <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background:linear-gradient(135deg,#1e3a8a,#0f766e);">
-                    <span class="material-symbols-outlined text-white" style="font-size:40px;">newspaper</span>
+                    <span class="material-symbols-outlined text-white icon-bounce" style="font-size:42px;">newspaper</span>
                   </div>
                 <?php endif; ?>
-                <span class="position-absolute top-0 start-0 m-2 badge bg-dark/80 text-white text-uppercase" style="font-size:10px;"><?php echo $e($n['cat']); ?></span>
+                <span class="position-absolute top-0 start-0 m-2 badge glass-card-dark text-white text-uppercase" style="font-size:10px;"><?php echo $e($n['cat']); ?></span>
               </div>
               <div class="card-body d-flex flex-column justify-content-between p-3">
                 <div>
@@ -632,7 +777,9 @@ if (empty($albumList)) {
                   <p class="text-secondary small mb-3 line-clamp-2"><?php echo $e($n['desc']); ?></p>
                 </div>
                 <div class="pt-2 border-top">
-                  <a class="text-primary fw-bold text-decoration-none small" href="<?php echo $href; ?>">Đọc tiếp →</a>
+                  <a class="text-primary fw-bold text-decoration-none small d-inline-flex align-items-center gap-1" href="<?php echo $href; ?>">
+                    <span>Đọc tiếp</span><span class="arrow-slide">→</span>
+                  </a>
                 </div>
               </div>
             </article>
@@ -643,7 +790,7 @@ if (empty($albumList)) {
 
     <!-- SECTION 7: THƯ VIỆN -->
     <section class="container py-4" id="thu-vien">
-      <div class="row align-items-end justify-content-between mb-4 g-2">
+      <div class="row align-items-end justify-content-between mb-4 g-2 reveal-on-scroll">
         <div class="col-12 col-md-8">
           <span class="text-primary fw-bold text-uppercase small d-block mb-1">Thư viện đại hội</span>
           <h2 class="fw-black text-dark fs-3 mb-1">Khoảnh khắc đáng nhớ</h2>
@@ -651,17 +798,24 @@ if (empty($albumList)) {
         </div>
       </div>
       <div class="row g-3">
-        <?php foreach ($albumList as $al):
+        <?php
+        $albumDelays = array('delay-100', 'delay-200', 'delay-300', 'delay-400');
+        foreach ($albumList as $ai => $al):
           $albumHref = $al['id'] !== '' ? $base . '/daihoi/index#album-' . $e($al['id']) : '#thu-vien';
+          $aDelay = isset($albumDelays[$ai % count($albumDelays)]) ? $albumDelays[$ai % count($albumDelays)] : 'delay-100';
         ?>
-          <div class="col-6 col-md-3">
-            <a class="card border-0 rounded-3 overflow-hidden position-relative shadow-sm card-hover text-decoration-none text-white d-block" href="<?php echo $albumHref; ?>" style="height:240px;<?php echo $al['cover'] ? '' : 'background:linear-gradient(135deg,' . $e($al['g'][0]) . ',' . $e($al['g'][1]) . ');'; ?>">
+          <div class="col-6 col-md-3 reveal-on-scroll <?php echo $aDelay; ?>">
+            <a class="card border-0 rounded-3 overflow-hidden position-relative shadow-sm card-hover text-decoration-none text-white d-block img-zoom-wrap" href="<?php echo $albumHref; ?>" style="height:240px;<?php echo $al['cover'] ? '' : 'background:linear-gradient(135deg,' . $e($al['g'][0]) . ',' . $e($al['g'][1]) . ');'; ?>">
               <?php if ($al['cover']): ?>
-                <img alt="<?php echo $e($al['title']); ?>" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" src="<?php echo $e($al['cover']); ?>">
+                <img alt="<?php echo $e($al['title']); ?>" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" src="<?php echo $e($al['cover']); ?>" onerror="this.style.display='none';">
               <?php endif; ?>
-              <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-t from-black/85 via-black/20 to-transparent"></div>
+              <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+              <!-- Floating camera icon watermark on top right -->
+              <div class="position-absolute top-0 end-0 m-2 text-white-50">
+                <span class="material-symbols-outlined fs-5">photo_camera</span>
+              </div>
               <div class="position-absolute bottom-0 start-0 p-3 w-100">
-                <span class="badge bg-white/20 backdrop-blur-sm text-white mb-1" style="font-size:9.5px;"><?php echo $e($al['badge']); ?></span>
+                <span class="badge glass-badge text-white mb-1" style="font-size:9.5px;"><?php echo $e($al['badge']); ?></span>
                 <h3 class="fw-bold fs-6 text-white mb-0 text-truncate"><?php echo $e($al['title']); ?></h3>
                 <span class="text-white-50" style="font-size:11px;"><?php echo $e($al['meta']); ?></span>
               </div>
@@ -672,7 +826,7 @@ if (empty($albumList)) {
     </section>
 
     <!-- SECTION 8: SỔ TAY ĐẠI BIỂU -->
-    <section class="container pt-3 pb-5" id="so-tay">
+    <section class="container pt-3 pb-5 reveal-on-scroll" id="so-tay">
       <div class="card border rounded-4 shadow-sm bg-white p-4">
         <div class="row align-items-center justify-content-between mb-4 g-2">
           <div class="col-12 col-md-8">
@@ -689,12 +843,13 @@ if (empty($albumList)) {
             array('medical_services', 'bg-teal-50 text-teal-700 border border-teal-200', 'Y tế &amp; Hỗ trợ 24/7', 'Trực cấp cứu, tủ thuốc di động và hướng dẫn an toàn sự kiện.'),
             array('contact_phone', 'bg-purple-50 text-purple-700 border border-purple-200', 'Liên hệ &amp; Bản đồ BTC', 'Danh bạ thường trực tiểu ban và sơ đồ di chuyển các điểm thi.'),
           );
-          foreach ($handbook as $h):
+          foreach ($handbook as $hi => $h):
+            $hDelay = isset($albumDelays[$hi % count($albumDelays)]) ? $albumDelays[$hi % count($albumDelays)] : 'delay-100';
           ?>
-            <div class="col-12 col-sm-6 col-lg-3">
+            <div class="col-12 col-sm-6 col-lg-3 reveal-on-scroll <?php echo $hDelay; ?>">
               <a class="card h-100 border rounded-3 p-3 bg-white text-decoration-none card-hover" href="#so-tay">
                 <div class="d-flex align-items-start gap-3">
-                  <div class="rounded-3 <?php echo $h[1]; ?> p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width:42px;height:42px;">
+                  <div class="rounded-3 <?php echo $h[1]; ?> p-2 d-flex align-items-center justify-content-center flex-shrink-0 icon-bounce" style="width:42px;height:42px;">
                     <span class="material-symbols-outlined fs-5"><?php echo $e($h[0]); ?></span>
                   </div>
                   <div>
@@ -716,12 +871,12 @@ if (empty($albumList)) {
       <div class="row g-4">
         <div class="col-12 col-md-6 col-lg-3">
           <div class="d-flex align-items-center gap-2 mb-3">
-            <img alt="Mường Thanh" class="img-fluid" src="<?php echo $e($logo); ?>" style="height:38px;object-fit:contain;">
+            <img alt="Mường Thanh" class="img-fluid" src="<?php echo $e($logo); ?>" style="height:40px;object-fit:contain;">
             <span class="fw-black text-dark fs-5">MƯỜNG THANH</span>
           </div>
           <p class="text-secondary small mb-3"><?php echo $e($eventName); ?> tại <?php echo $e($eventDestination); ?>. Nơi kết nối nhiệt huyết và vinh danh tinh thần đồng đội.</p>
           <div class="d-flex align-items-center gap-2 text-muted small">
-            <span class="material-symbols-outlined fs-6">location_on</span>
+            <span class="material-symbols-outlined fs-6 text-primary">location_on</span>
             <span><?php echo $e($eventLocation); ?>, Việt Nam</span>
           </div>
         </div>
@@ -772,4 +927,10 @@ if (empty($albumList)) {
       </div>
     </div>
   </footer>
+
+  <!-- FLOATING BACK TO TOP BUTTON -->
+  <button id="back-to-top" aria-label="Lên đầu trang" type="button">
+    <span class="material-symbols-outlined fs-5">keyboard_arrow_up</span>
+  </button>
+
 </div>

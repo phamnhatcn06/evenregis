@@ -38,6 +38,6 @@ $dh = $base . '/public/daihoi';
   <!-- Bootstrap 5 Bundle JS (local) -->
   <script src="<?php echo $vendor; ?>/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- JS trang chủ: slider + realtime -->
-  <script src="<?php echo $dh; ?>/daihoi-home.js"></script>
+  <script src="<?php echo $dh; ?>/daihoi-home.js?v=<?php echo @filemtime(Yii::getPathOfAlias('webroot') . '/public/daihoi/daihoi-home.js') ?: time(); ?>"></script>
 </body>
 </html>
