@@ -1,8 +1,9 @@
 <?php
 /**
  * Khối đăng ký Chạy bộ (Fun Run) — Giao diện chuyên nghiệp, tích hợp icon & Race BIB Card.
- * Tham số: $runMine, $runEvents, $fullName (optional)
+ * Tham số: $runMine, $runEvents, $fullName (optional), $registrationWindowText (optional)
  */
+$registrationWindowText = isset($registrationWindowText) ? $registrationWindowText : '';
 ?>
 <div class="activity-card h-100">
     <div class="activity-card-header-run d-flex justify-content-between align-items-center">
