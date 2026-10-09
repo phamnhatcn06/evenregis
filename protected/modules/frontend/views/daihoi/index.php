@@ -291,30 +291,31 @@ if (empty($albumList)) {
           <div class="slider-progress-bar" id="slider-progress-bar"></div>
         </div>
 
-        <div class="w-100 h-100 position-relative overflow-hidden">
+        <div class="hero-slider-track w-100 position-relative overflow-hidden">
           <?php foreach ($slideList as $si => $sld):
             $th = $slideThemes[$sld['theme']];
             $first = ($si === 0);
+            $hasImg = !empty($sld['image']);
           ?>
             <?php
               $slideLink = isset($sld['btn_url']) ? trim((string) $sld['btn_url']) : '';
               $hasLink = ($slideLink !== '' && $slideLink !== '#');
               $mobileImg = (!empty($sld['mobile_image'])) ? $sld['mobile_image'] : '';
             ?>
-            <div class="hero-slide position-absolute top-0 start-0 w-100 h-100 <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>" style="background:<?php echo $e($th['bg']); ?>;">
-              <!-- Decorative fallback (chỉ hiện khi slide không có ảnh) -->
-              <div class="position-absolute top-0 start-0 w-100 h-100 hero-slide-grid-pattern opacity-25 pointer-events-none"></div>
-              <div class="glow-orb" style="top:15%;right:15%;width:340px;height:340px;background:radial-gradient(circle,<?php echo $e($th['dot']); ?>35 0%,transparent 70%);"></div>
-
-              <?php if (!empty($sld['image'])): ?>
+            <div class="hero-slide w-100 <?php echo $hasImg ? '' : 'has-no-image'; ?> <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>" style="<?php echo $hasImg ? '' : 'background:' . $e($th['bg']) . ';'; ?>">
+              <?php if (!$hasImg): ?>
+                <!-- Decorative fallback (chỉ hiện khi slide không có ảnh) -->
+                <div class="position-absolute top-0 start-0 w-100 h-100 hero-slide-grid-pattern opacity-25 pointer-events-none"></div>
+                <div class="glow-orb" style="top:15%;right:15%;width:340px;height:340px;background:radial-gradient(circle,<?php echo $e($th['dot']); ?>35 0%,transparent 70%);"></div>
+              <?php else: ?>
                 <?php $imgTag = '<picture class="slide-picture">'
                     . ($mobileImg !== '' ? '<source media="(max-width: 575.98px)" srcset="' . $e($mobileImg) . '">' : '')
-                    . '<img alt="' . $e($sld['title']) . '" class="w-100 h-100 object-fit-cover slide-bg-img" src="' . $e($sld['image']) . '" onerror="this.closest(\'.slide-picture\').style.display=\'none\';">'
+                    . '<img alt="' . $e($sld['title']) . '" class="w-100 d-block slide-bg-img" src="' . $e($sld['image']) . '" onerror="this.closest(\'.slide-picture\').style.display=\'none\';">'
                     . '</picture>'; ?>
                 <?php if ($hasLink): ?>
-                  <a class="slide-link position-absolute top-0 start-0 w-100 h-100" href="<?php echo $e($slideLink); ?>" aria-label="<?php echo $e($sld['title'] !== '' ? $sld['title'] : 'Xem chi tiết'); ?>"><?php echo $imgTag; ?></a>
+                  <a class="slide-link d-block w-100" href="<?php echo $e($slideLink); ?>" aria-label="<?php echo $e($sld['title'] !== '' ? $sld['title'] : 'Xem chi tiết'); ?>"><?php echo $imgTag; ?></a>
                 <?php else: ?>
-                  <div class="slide-link position-absolute top-0 start-0 w-100 h-100"><?php echo $imgTag; ?></div>
+                  <div class="slide-link d-block w-100"><?php echo $imgTag; ?></div>
                 <?php endif; ?>
               <?php endif; ?>
             </div>

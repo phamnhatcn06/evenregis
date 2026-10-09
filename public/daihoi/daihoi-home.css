@@ -131,109 +131,73 @@ nav a.nav-link:hover::after {
 
 .hero-slider-wrap {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: 1020px;
   height: auto;
+  min-height: 0;
   position: relative;
-  background-color: #0b1329;
+  background-color: transparent;
+}
+
+/* Lưới xếp chồng các slide cùng chiếm 1 ô để tự co giãn theo chiều cao ảnh */
+.hero-slider-track {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: auto;
+  width: 100%;
+  position: relative;
 }
 
 /* Slide item */
 .hero-slide {
+  grid-area: 1 / 1 / 2 / 2;
+  width: 100%;
+  height: auto;
+  position: relative;
   opacity: 0;
   visibility: hidden;
   transition:
     opacity 0.75s ease-in-out,
     visibility 0.75s ease-in-out;
   pointer-events: none;
+  z-index: 1;
 }
 
 .hero-slide.active {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+  z-index: 2;
 }
 
-/* Link/picture wrapper phủ kín khung slide (slide chỉ còn ảnh) */
+/* Slide không có ảnh: giữ độ cao tối thiểu để không bị xẹp */
+.hero-slide.has-no-image {
+  min-height: clamp(260px, 35vw, 480px);
+}
+
+/* Link/picture wrapper co giãn tự nhiên theo ảnh */
 .hero-slide .slide-link,
 .hero-slide .slide-picture {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 .hero-slide a.slide-link {
   cursor: pointer;
+  text-decoration: none;
 }
 
-/* Background image preserving 16:9 ratio and auto-fitting frame */
+/* Ảnh banner hiển thị trọn vẹn 100% kích thước tự nhiên, không crop */
 .hero-slide .slide-bg-img {
   display: block;
-  width: 100%;
+  width: 100% !important;
   height: auto !important;
-  max-height: 100%;
-  object-fit: cover;
+  max-height: none !important;
+  object-fit: contain;
   object-position: center;
-  transform: scale(1);
-  transition: transform 7s ease-out;
-}
-
-.hero-slide.active .slide-bg-img {
-  transform: scale(1.02);
-}
-
-/* Responsive: giảm chiều cao khung banner trên tablet/mobile để ảnh không bị crop quá nhiều.
-   Ảnh desktop giữ tỉ lệ 16:9; màn nhỏ dùng tỉ lệ cao hơn (ưu tiên mobile_image nếu có). */
-@media (max-width: 991.98px) {
-  .hero-slider-wrap {
-    aspect-ratio: 16 / 10;
-
-    /* Mobile: ảnh slide co trọn 100% chiều rộng màn hình, không cắt tràn 2 bên.
-     Khung tự co theo tỉ lệ ảnh (bỏ ép 16:9), nền tối lấp phần dư cho gọn. */
-    .hero-slider-wrap {
-      aspect-ratio: auto !important;
-      height: auto !important;
-      min-height: 0 !important;
-    }
-
-    .hero-slider-wrap > .w-100.h-100 {
-      height: auto !important;
-      min-height: 56.25vw;
-      /* giữ chiều cao tối thiểu ~16:9 khi slide không có ảnh */
-    }
-
-    .hero-slide {
-      position: relative !important;
-    }
-
-    .hero-slide:not(.active) {
-      display: none !important;
-    }
-
-    .hero-slide .slide-bg-img {
-      position: relative !important;
-      width: 100% !important;
-      height: auto !important;
-      max-height: none !important;
-      object-fit: contain !important;
-      transform: none !important;
-    }
-
-    /* Giữ khối chữ overlay nằm đè lên đáy ảnh (ảnh đã quyết định chiều cao) */
-    .hero-slide > .container {
-      position: absolute !important;
-      bottom: 0;
-      left: 0;
-      right: 0;
-    }
-  }
+  transform: none;
 }
 
 @media (max-width: 575.98px) {
-  .hero-slider-wrap {
-    aspect-ratio: 4 / 3;
-  }
-
   .slider-control-btn {
     width: 32px !important;
     height: 32px !important;
