@@ -105,6 +105,25 @@ $computeWindow = function ($rows) use ($now) {
 
 $runWindow = $computeWindow($runEvents);
 $tourWindow = $computeWindow($tourSessions);
+
+// Thời hạn đăng ký tham quan: từ mốc mở sớm nhất tới mốc đóng muộn nhất của các đợt.
+$tourOpenAts = array();
+$tourCloseAts = array();
+if (!empty($tourSessions)) {
+    foreach ($tourSessions as $s) {
+        $o = !empty($s['open_at']) ? (is_numeric($s['open_at']) ? (int)$s['open_at'] : strtotime($s['open_at'])) : 0;
+        $c = !empty($s['close_at']) ? (is_numeric($s['close_at']) ? (int)$s['close_at'] : strtotime($s['close_at'])) : 0;
+        if ($o > 0) { $tourOpenAts[] = $o; }
+        if ($c > 0) { $tourCloseAts[] = $c; }
+    }
+}
+if (!empty($tourOpenAts) && !empty($tourCloseAts)) {
+    $tourRegistrationWindowText = 'Thời hạn đăng ký: từ ' . date('H\hi', min($tourOpenAts)) . ' ngày ' . date('d/m/Y', min($tourOpenAts))
+        . ' tới ' . date('H\hi', max($tourCloseAts)) . ' ngày ' . date('d/m/Y', max($tourCloseAts))
+        . ' (hoặc có thể kết thúc sớm hơn khi đủ chỉ tiêu).';
+} else {
+    $tourRegistrationWindowText = 'Thời hạn đăng ký: từ 10h00 ngày 10/10/2026 tới 23h59 ngày 13/10/2026 (hoặc có thể kết thúc sớm hơn khi đủ chỉ tiêu).';
+}
 ?>
 
 <!-- Header & Thông tin đại biểu -->
