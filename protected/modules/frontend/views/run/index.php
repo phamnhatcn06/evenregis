@@ -297,6 +297,7 @@ if (!empty($regOpenAts) && !empty($regCloseAts)) {
             'runMine'   => $runMine,
             'runEvents' => $runEvents,
             'fullName'  => $fullName,
+            'registrationWindowText' => $registrationWindowText,
         )); ?>
     </div>
     <div class="col-lg-6">
