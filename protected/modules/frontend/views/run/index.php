@@ -112,8 +112,8 @@ $tourWindow = $computeWindow($tourSessions);
 // Thời hạn đăng ký tham quan: từ mốc mở sớm nhất tới mốc đóng muộn nhất của các đợt.
 $tourOpenAts = array();
 $tourCloseAts = array();
-if (!empty($tourSessions)) {
-    foreach ($tourSessions as $s) {
+if (!empty($tourSessionsAll)) {
+    foreach ($tourSessionsAll as $s) {
         $o = !empty($s['open_at']) ? (is_numeric($s['open_at']) ? (int)$s['open_at'] : strtotime($s['open_at'])) : 0;
         $c = !empty($s['close_at']) ? (is_numeric($s['close_at']) ? (int)$s['close_at'] : strtotime($s['close_at'])) : 0;
         if ($o > 0) { $tourOpenAts[] = $o; }
