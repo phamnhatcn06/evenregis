@@ -23,7 +23,24 @@
         maybePromptShirtSize(config);
         maybePromptEmergency(config);
         initCountdown();
+        bindTourScheduleModal();
     });
+
+    // Lịch trình tham quan (PDF): chỉ nạp iframe khi modal được mở để tránh
+    // tải file nặng ngay khi vào trang.
+    function bindTourScheduleModal() {
+        var modal = document.getElementById('modalTourSchedule');
+        if (!modal) { return; }
+        var frame = document.getElementById('tourScheduleFrame');
+        if (!frame) { return; }
+
+        modal.addEventListener('show.bs.modal', function () {
+            if (!frame.getAttribute('src')) {
+                var src = frame.getAttribute('data-src');
+                if (src) { frame.setAttribute('src', src); }
+            }
+        });
+    }
 
     var EMERGENCY_PROMPT_KEY = 'run_emergency_prompt_pending';
 
