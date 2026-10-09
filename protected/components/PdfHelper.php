@@ -89,7 +89,99 @@ class PdfHelper
         // Cấu trúc tên file: Phieu_Xac_Nhan_Dang_Ky_{nội dung đợt}_{mã đơn vị (cột prefix)}_{ID phiếu}
         $unitCode = !empty($data['model']->property_code) ? MyHelper::toSlug($data['model']->property_code) : 'DONVI';
         $pdfFileName = 'Phieu_Xac_Nhan_Dang_Ky_' . $contentPart . '_' . strtoupper($unitCode) . '_' . $registrationId . '.pdf';
-        $filePath = $tempDir . DIRECTORY_SEPARATOR . $pdfFileName;
+
+        return self::renderHtmlToFile($html, $pdfFileName);
+    }
+
+    /**
+     * Dựng PDF A4 dọc từ chuỗi HTML dựng sẵn và lưu vào runtime, trả đường dẫn file.
+     * Dùng cho các PDF không gắn với phiếu đăng ký (vd: danh sách tài khoản VCK theo đơn vị).
+     *
+     * @param string $html     Nội dung HTML đầy đủ
+     * @param string $fileName Tên file mong muốn (sẽ được làm sạch ký tự)
+     * @return string Đường dẫn file PDF đã tạo
+     */
+    public static function generateHtmlPdf($html, $fileName)
+    {
+        self::registerAutoloader();
+
+        if (!class_exists('Dompdf\Dompdf')) {
+            throw new Exception('Thư viện Dompdf chưa được tải thành công.');
+        }
+
+        return self::renderHtmlToFile($html, $fileName);
+    }
+
+    /**
+     * Cấu hình Dompdf (font Times New Roman tiếng Việt, chroot, remote ảnh), render HTML và
+     * ghi ra file trong runtime. Thân chung cho mọi PDF hệ thống để không lặp cấu hình.
+     *
+     * @param string $html
+     * @param string $fileName
+     * @return string Đường dẫn file PDF
+     */
+    protected static function renderHtmlToFile($html, $fileName)
+    {
+        // Thư mục cache font phải ghi được để dompdf tự cài Times New Roman (TTF có glyph tiếng Việt)
+        $fontDir = Yii::getPathOfAlias('application.runtime') . DIRECTORY_SEPARATOR . 'dompdf_fonts';
+        if (!file_exists($fontDir)) {
+            @mkdir($fontDir, 0777, true);
+        }
+
+        $dompdf = new Dompdf\Dompdf(array(
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'isFontSubsettingEnabled' => true,
+            'fontDir' => $fontDir,
+            'fontCache' => $fontDir,
+            // Cho phép nạp font TTF nằm trong thư mục protected (mặc định chroot chỉ ở vendor dompdf)
+            'chroot' => array(
+                Yii::getPathOfAlias('application'),
+                Yii::getPathOfAlias('application.vendors.dompdf.dompdf'),
+                // Cho phép đọc ảnh chân dung người tham dự lưu trong webroot/uploads
+                Yii::getPathOfAlias('webroot'),
+            ),
+            'defaultFont' => 'Times New Roman',
+        ));
+
+        // Đăng ký font Times New Roman (TTF có glyph tiếng Việt) đóng gói trong application.data.fonts
+        $fontBase = str_replace('\\', '/', Yii::getPathOfAlias('application.data.fonts'));
+        $timesFonts = array(
+            array('weight' => 'normal', 'style' => 'normal', 'file' => 'times.ttf'),
+            array('weight' => 'bold', 'style' => 'normal', 'file' => 'timesbd.ttf'),
+            array('weight' => 'normal', 'style' => 'italic', 'file' => 'timesi.ttf'),
+            array('weight' => 'bold', 'style' => 'italic', 'file' => 'timesbi.ttf'),
+        );
+        $fontMetrics = $dompdf->getFontMetrics();
+        foreach ($timesFonts as $f) {
+            $ttf = $fontBase . '/' . $f['file'];
+            if (file_exists($ttf)) {
+                $fontMetrics->registerFont(
+                    array('family' => 'Times New Roman', 'weight' => $f['weight'], 'style' => $f['style']),
+                    'file://' . $ttf
+                );
+            }
+        }
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $pdfOutput = $dompdf->output();
+
+        $tempDir = Yii::getPathOfAlias('application.runtime');
+        if (!file_exists($tempDir)) {
+            @mkdir($tempDir, 0777, true);
+        }
+        if (!is_writable($tempDir)) {
+            throw new Exception('Thư mục runtime không ghi được, không thể tạo file PDF: ' . $tempDir);
+        }
+
+        $safeName = preg_replace('/[^A-Za-z0-9_\-.]/', '_', $fileName);
+        if ($safeName === '' || $safeName === null) {
+            $safeName = 'document_' . date('Ymd_His') . '.pdf';
+        }
+        $filePath = $tempDir . DIRECTORY_SEPARATOR . $safeName;
 
         if (file_put_contents($filePath, $pdfOutput) === false) {
             throw new Exception('Ghi file PDF thất bại: ' . $filePath);
