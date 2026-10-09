@@ -141,6 +141,7 @@ if (!empty($slides) && isset($slides[0]) && is_array($slides[0])) {
     $theme = (string) $val($sl, array('theme'), 'blue');
     $slideList[] = array(
       'image' => $val($sl, array('image', 'mobile_image'), ''),
+      'mobile_image' => $val($sl, array('mobile_image'), ''),
       'subtitle' => $val($sl, array('subtitle'), ''),
       'title' => $val($sl, array('title'), ''),
       'desc' => $val($sl, array('description'), ''),
