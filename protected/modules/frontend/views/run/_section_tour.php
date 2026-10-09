@@ -3,6 +3,7 @@
  * Khối đăng ký Đi tham quan (Tour) — Giao diện chuyên nghiệp, tích hợp icon & Tour Boarding Pass.
  * Tham số: $tourMine, $tourSessions, $fullName (optional), $window (optional)
  */
+$registrationWindowText = isset($registrationWindowText) ? $registrationWindowText : '';
 $window = isset($window) ? $window : array('state' => 'open', 'target' => 0, 'label' => '');
 $regOpen = ($window['state'] === 'open');
 $tourImg = Yii::app()->theme->baseUrl . '/assets/images/tour-trang-an.jpg';
