@@ -31,6 +31,15 @@ $tourScheduleUrl = Yii::app()->theme->baseUrl . '/assets/docs/lich_trinh_tour.pd
         </div>
     </div>
 
+    <!-- Nút xem lịch trình tham quan chi tiết (file PDF) -->
+    <div class="px-3 px-md-4 pt-3">
+        <button type="button" class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center gap-2 fw-semibold"
+                data-bs-toggle="modal" data-bs-target="#modalTourSchedule"
+                data-pdf-url="<?php echo $tourScheduleUrl; ?>">
+            <i class="bi bi-file-earmark-pdf-fill"></i> Xem thêm thông tin lịch trình tham quan
+        </button>
+    </div>
+
     <div class="p-3 p-md-4">
         <?php if (!empty($tourMine)): ?>
             <?php
