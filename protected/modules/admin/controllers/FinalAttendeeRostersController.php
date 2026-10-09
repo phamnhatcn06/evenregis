@@ -942,6 +942,152 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Danh sách ĐƠN VỊ sẽ nhận email (dưới bộ lọc hiện tại), để HO xác nhận trước khi gửi.
+     * Kèm số người và email nhận (mail_confirm) để cảnh báo đơn vị chưa có email.
+     */
+    public function actionAccountUnits()
+    {
+        if (!PermissionHelper::can('finalattendeerosters', 'read')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền xem danh sách này.'), 403);
+            return;
+        }
+
+        $eventId  = $this->getIntParam('event_id');
+        $periodId = $this->getIntParam('period_id');
+        if (!$eventId || !$periodId) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn sự kiện và đợt Vòng Chung Kết.'), 422);
+            return;
+        }
+
+        $rows   = FinalAttendeeRosters::fetchAllActive($this->buildFilterParams($eventId, $periodId));
+        $groups = FinalAttendeeRosters::groupByUnit($rows);
+
+        $units = array();
+        foreach ($groups as $group) {
+            $email = $this->resolveUnitEmail($group['property_id']);
+            $units[] = array(
+                'property_id' => $group['property_id'],
+                'name'        => $group['property_name'],
+                'code'        => $group['property_code'],
+                'count'       => count($group['people']),
+                'email'       => $email,
+                'has_email'   => $email !== '',
+            );
+        }
+
+        usort($units, function ($a, $b) {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        $this->renderJson(array(
+            'success'    => true,
+            'units'      => $units,
+            'debug_mode' => EmailHelper::DEBUG_MODE,
+            'debug_email' => EmailHelper::DEBUG_MODE ? EmailHelper::DEBUG_EMAIL : null,
+        ));
+    }
+
+    /**
+     * Gửi lần lượt từng đơn vị một email kèm PDF danh sách tài khoản (định danh đăng nhập) của
+     * những người vào vòng chung kết thuộc đơn vị đó. Khi bật test mode, email chỉ tới địa chỉ debug.
+     */
+    public function actionSendAccounts()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            $this->renderJson(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'), 400);
+            return;
+        }
+
+        if (!PermissionHelper::can('finalattendeerosters', 'create')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền gửi thông tin tài khoản.'), 403);
+            return;
+        }
+
+        $request  = Yii::app()->request;
+        $eventId  = (int) $request->getPost('event_id');
+        $periodId = (int) $request->getPost('period_id');
+        if (!$eventId || !$periodId) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn sự kiện và đợt Vòng Chung Kết.'), 422);
+            return;
+        }
+
+        $selected = $request->getPost('property_ids');
+        $selected = is_array($selected) ? array_map('intval', $selected) : array();
+        if (empty($selected)) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn ít nhất một đơn vị để gửi.'), 422);
+            return;
+        }
+        $selectedMap = array_flip($selected);
+
+        $rows   = FinalAttendeeRosters::fetchAllActive($this->buildFilterParams($eventId, $periodId));
+        $groups = FinalAttendeeRosters::groupByUnit($rows);
+
+        // Chỉ giữ đơn vị được chọn và đang có người, kèm email nhận đã resolve.
+        $toSend = array();
+        foreach ($groups as $pid => $group) {
+            if (!isset($selectedMap[$pid]) || empty($group['people'])) {
+                continue;
+            }
+            $group['recipient'] = $this->resolveUnitEmail($pid);
+            $toSend[] = $group;
+        }
+
+        if (empty($toSend)) {
+            $this->renderJson(array('success' => false, 'message' => 'Không có đơn vị hợp lệ để gửi.'), 422);
+            return;
+        }
+
+        $eventName = $this->resolveEventName($eventId);
+        $loginUrl  = $this->resolvePortalBaseUrl() . '/portal/login';
+
+        $result = EmailHelper::sendFinalRosterAccounts($eventName, $loginUrl, $toSend);
+
+        $message = 'Đã gửi ' . $result['sent'] . ' đơn vị'
+            . ($result['skipped'] ? (', bỏ qua ' . $result['skipped'] . ' đơn vị') : '') . '.';
+        if (EmailHelper::DEBUG_MODE) {
+            $message .= ' (Test mode: email chỉ gửi tới ' . EmailHelper::DEBUG_EMAIL . ')';
+        }
+
+        $this->renderJson(array(
+            'success'    => true,
+            'message'    => $message,
+            'report'     => $result['report'],
+            'sent'       => $result['sent'],
+            'skipped'    => $result['skipped'],
+            'debug_mode' => EmailHelper::DEBUG_MODE,
+        ));
+    }
+
+    /**
+     * Email nhận của một đơn vị (cột mail_confirm của Property). Rỗng nếu đơn vị chưa cấu hình.
+     */
+    protected function resolveUnitEmail($propertyId)
+    {
+        $propertyId = (int) $propertyId;
+        if (!$propertyId) {
+            return '';
+        }
+        try {
+            $property = Properties::fetchFromApi($propertyId);
+            if ($property && !empty($property->mail_confirm)) {
+                return trim((string) $property->mail_confirm);
+            }
+        } catch (Exception $e) {
+            Yii::log('resolveUnitEmail lỗi (#' . $propertyId . '): ' . $e->getMessage(), CLogger::LEVEL_WARNING);
+        }
+        return '';
+    }
+
+    /**
+     * Tên sự kiện theo id, lấy từ danh mục sự kiện đã nạp.
+     */
+    protected function resolveEventName($eventId)
+    {
+        $list = $this->getEventList();
+        return isset($list[$eventId]) ? $list[$eventId] : ('Sự kiện #' . (int) $eventId);
+    }
+
+    /**
      * Kiểm tra POST + quyền cho các action ghi. Trả false nếu đã xuất lỗi.
      */
     protected function guardWrite($operation)
