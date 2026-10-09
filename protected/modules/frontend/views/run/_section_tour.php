@@ -6,6 +6,7 @@
 $window = isset($window) ? $window : array('state' => 'open', 'target' => 0, 'label' => '');
 $regOpen = ($window['state'] === 'open');
 $tourImg = Yii::app()->theme->baseUrl . '/assets/images/tour-trang-an.jpg';
+$tourScheduleUrl = Yii::app()->theme->baseUrl . '/assets/docs/lich_trinh_tour.pdf';
 ?>
 <div class="activity-card h-100">
     <div class="activity-card-header-tour d-flex flex-wrap justify-content-between align-items-center gap-2">
