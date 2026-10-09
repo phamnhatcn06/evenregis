@@ -71,6 +71,40 @@ if (!empty($regOpenAts) && !empty($regCloseAts)) {
 } else {
     $registrationWindowText = 'Thời hạn đăng ký: từ 10h00 ngày 10/10/2026 tới 23h59 ngày 13/10/2026 (hoặc có thể kết thúc sớm hơn khi đủ chỉ tiêu).';
 }
+
+/**
+ * Tính trạng thái khung thời gian đăng ký cho 1 nhóm nội dung (cự ly / đợt tham quan).
+ * Trả về: state ('before' | 'open' | 'closed'), target (timestamp đếm ngược), label.
+ *  - before: chưa tới giờ mở  -> đếm ngược tới giờ MỞ sớm nhất.
+ *  - open:   đang trong hạn    -> đếm ngược tới giờ ĐÓNG gần nhất.
+ *  - closed: đã hết hạn tất cả -> không đếm ngược, ẩn form đăng ký.
+ */
+$computeWindow = function ($rows) use ($now) {
+    $futureOpen = array();
+    $openClose = array();
+    foreach ((array) $rows as $r) {
+        $o = !empty($r['open_at']) ? (is_numeric($r['open_at']) ? (int) $r['open_at'] : strtotime($r['open_at'])) : 0;
+        $c = !empty($r['close_at']) ? (is_numeric($r['close_at']) ? (int) $r['close_at'] : strtotime($r['close_at'])) : 0;
+        if ($o > $now) {
+            $futureOpen[] = $o;
+        } elseif ($c > $now) {
+            $openClose[] = $c;
+        } elseif ($c <= 0 && $o > 0 && $o <= $now) {
+            // Đã mở, không có mốc đóng -> coi như mở vô thời hạn.
+            $openClose[] = PHP_INT_MAX;
+        }
+    }
+    if (!empty($openClose)) {
+        return array('state' => 'open', 'target' => min($openClose), 'label' => 'Thời gian đăng ký còn lại');
+    }
+    if (!empty($futureOpen)) {
+        return array('state' => 'before', 'target' => min($futureOpen), 'label' => 'Mở đăng ký sau');
+    }
+    return array('state' => 'closed', 'target' => 0, 'label' => 'Đã đóng đăng ký');
+};
+
+$runWindow = $computeWindow($runEvents);
+$tourWindow = $computeWindow($tourSessions);
 ?>
 
 <!-- Header & Thông tin đại biểu -->
