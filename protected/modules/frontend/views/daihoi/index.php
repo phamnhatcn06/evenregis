@@ -283,15 +283,15 @@ if (empty($albumList)) {
               <?php if (!empty($sld['image'])): ?>
                 <img alt="<?php echo $e($sld['title']); ?>" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover slide-bg-img" src="<?php echo $e($sld['image']); ?>" onerror="this.style.display='none';">
               <?php endif; ?>
-              <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-t from-black/90 via-black/45 to-transparent"></div>
+              <div class="position-absolute bottom-0 start-0 w-100 slide-gradient-overlay pointer-events-none"></div>
               <div class="container h-100 position-relative z-1 d-flex align-items-end pb-4 pb-md-5">
-                <div class="text-white py-2" style="max-width:880px;">
+                <div class="text-white py-2 slide-content-box" style="max-width:1200px;">
                   <?php if ($sld['subtitle'] !== ''): ?>
                     <div class="slide-subtitle d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill glass-badge text-white fw-bold text-uppercase mb-2" style="font-size:11.5px;letter-spacing:0.04em;">
                       <span class="rounded-circle d-inline-block" style="width:8px;height:8px;background-color:<?php echo $e($th['dot']); ?>;box-shadow:0 0 10px <?php echo $e($th['dot']); ?>;"></span> <?php echo $e($sld['subtitle']); ?>
                     </div>
                   <?php endif; ?>
-                  <h2 class="slide-title fw-black text-uppercase text-white lh-sm mb-2" style="font-size:calc(1.4rem + 1.8vw);text-shadow:0 2px 20px rgba(0,0,0,0.5);">
+                  <h2 class="slide-title fw-black text-uppercase text-white lh-sm mb-2" style="text-shadow:0 2px 20px rgba(0,0,0,0.5);">
                     <span class="text-transparent bg-clip-text bg-gradient-to-r <?php echo $th['grad']; ?>"><?php echo $e($sld['title']); ?></span>
                   </h2>
                   <?php if ($sld['desc'] !== ''): ?>

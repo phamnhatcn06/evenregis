@@ -137,10 +137,30 @@ nav a.nav-link:hover::after {
   transform: scale(1.02);
 }
 
+/* Lớp phủ gradient nhẹ ở chân slide: giảm chiều cao, không che tối phần trên ảnh */
+.slide-gradient-overlay {
+  height: 40%;
+  max-height: 260px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.32) 55%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Tiêu đề slide: font-size vừa phải để vừa 1 dòng */
+.hero-slide .slide-title {
+  font-size: clamp(1.2rem, 1.8vw, 1.95rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+@media (min-width: 992px) {
+  .hero-slide .slide-title {
+    font-size: clamp(1.3rem, 1.75vw, 1.95rem);
+  }
+}
+
 /* Responsive adjustment for slide typography under 16:9 aspect ratio */
 @media (max-width: 767.98px) {
   .hero-slide .slide-title {
-    font-size: clamp(1.1rem, 3.8vw, 1.6rem) !important;
+    font-size: clamp(1.05rem, 3.2vw, 1.35rem) !important;
     line-height: 1.25 !important;
   }
   .hero-slide .slide-subtitle {
