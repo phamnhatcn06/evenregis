@@ -501,6 +501,72 @@ class FinalAttendeeRosters extends CFormModel
         return array();
     }
 
+    /** Trần số dòng khi gom danh sách để gửi email, chặn một bộ lọc quá rộng kéo vô hạn. */
+    const SEND_MAX_ROWS = 10000;
+
+    /**
+     * Lấy toàn bộ người ĐANG tham dự theo bộ lọc (bỏ người đã huỷ tư cách), chia trang để
+     * không nạp hết vào bộ nhớ một lúc. Dùng cho gửi email thông tin tài khoản theo đơn vị.
+     */
+    public static function fetchAllActive($params, $maxRows = self::SEND_MAX_ROWS)
+    {
+        $all     = array();
+        $page    = 1;
+        $perPage = 500;
+
+        do {
+            $chunk = self::fetchPage($params, $page, $perPage);
+            foreach ($chunk as $item) {
+                if (!empty($item['is_withdrawn'])) {
+                    continue;
+                }
+                $all[] = $item;
+            }
+            $page++;
+            if (count($all) >= $maxRows) {
+                break;
+            }
+        } while (count($chunk) === $perPage);
+
+        return $all;
+    }
+
+    /**
+     * Gom danh sách theo ĐƠN VỊ (property_id). Mỗi nhóm giữ tên/mã đơn vị và danh sách người,
+     * dùng để gửi lần lượt từng đơn vị một email kèm PDF danh sách thành viên.
+     */
+    public static function groupByUnit($rows)
+    {
+        $groups = array();
+        foreach ($rows as $row) {
+            $pid = isset($row['property_id']) && $row['property_id'] !== null ? (int) $row['property_id'] : 0;
+            if (!isset($groups[$pid])) {
+                $groups[$pid] = array(
+                    'property_id'   => $pid,
+                    'property_name' => self::resolveRowUnitName($row),
+                    'property_code' => isset($row['property_code']) ? (string) $row['property_code'] : '',
+                    'people'        => array(),
+                );
+            }
+            $groups[$pid]['people'][] = $row;
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Tên đơn vị của một dòng: ưu tiên tên đơn vị gốc, rồi nhãn in thẻ, rồi tên tổ chức in thẻ.
+     */
+    protected static function resolveRowUnitName($row)
+    {
+        foreach (array('property_name', 'unit_label', 'badge_org_name') as $key) {
+            if (!empty($row[$key])) {
+                return trim((string) $row[$key]);
+            }
+        }
+        return 'Chưa rõ đơn vị';
+    }
+
     /**
      * Lấy một dòng roster theo id (mảng thuộc tính), dùng cho xuất ảnh thẻ.
      */
