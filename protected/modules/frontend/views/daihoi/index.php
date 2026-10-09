@@ -141,6 +141,7 @@ if (!empty($slides) && isset($slides[0]) && is_array($slides[0])) {
     $theme = (string) $val($sl, array('theme'), 'blue');
     $slideList[] = array(
       'image' => $val($sl, array('image', 'mobile_image'), ''),
+      'mobile_image' => $val($sl, array('mobile_image'), ''),
       'subtitle' => $val($sl, array('subtitle'), ''),
       'title' => $val($sl, array('title'), ''),
       'desc' => $val($sl, array('description'), ''),
@@ -284,7 +285,7 @@ if (empty($albumList)) {
 
     <!-- SECTION 1: HERO SLIDER (FULL WIDTH) -->
     <section class="hero-slider-section position-relative w-100 overflow-hidden">
-      <div class="hero-slider-wrap position-relative w-100 overflow-hidden bg-dark" style="aspect-ratio:16/9;max-height:920px;">
+      <div class="hero-slider-wrap position-relative w-100 overflow-hidden bg-dark">
         <!-- Slide Countdown Progress Bar -->
         <div class="slider-progress-track">
           <div class="slider-progress-bar" id="slider-progress-bar"></div>
@@ -295,37 +296,27 @@ if (empty($albumList)) {
             $th = $slideThemes[$sld['theme']];
             $first = ($si === 0);
           ?>
-            <div class="hero-slide position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>" style="background:<?php echo $e($th['bg']); ?>;">
-              <!-- Subtle decorative geometry & ambient glow -->
+            <?php
+              $slideLink = isset($sld['btn_url']) ? trim((string) $sld['btn_url']) : '';
+              $hasLink = ($slideLink !== '' && $slideLink !== '#');
+              $mobileImg = (!empty($sld['mobile_image'])) ? $sld['mobile_image'] : '';
+            ?>
+            <div class="hero-slide position-absolute top-0 start-0 w-100 h-100 <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>" style="background:<?php echo $e($th['bg']); ?>;">
+              <!-- Decorative fallback (chỉ hiện khi slide không có ảnh) -->
               <div class="position-absolute top-0 start-0 w-100 h-100 hero-slide-grid-pattern opacity-25 pointer-events-none"></div>
               <div class="glow-orb" style="top:15%;right:15%;width:340px;height:340px;background:radial-gradient(circle,<?php echo $e($th['dot']); ?>35 0%,transparent 70%);"></div>
 
               <?php if (!empty($sld['image'])): ?>
-                <img alt="<?php echo $e($sld['title']); ?>" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover slide-bg-img" src="<?php echo $e($sld['image']); ?>" onerror="this.style.display='none';">
+                <?php $imgTag = '<picture class="slide-picture">'
+                    . ($mobileImg !== '' ? '<source media="(max-width: 575.98px)" srcset="' . $e($mobileImg) . '">' : '')
+                    . '<img alt="' . $e($sld['title']) . '" class="w-100 h-100 object-fit-cover slide-bg-img" src="' . $e($sld['image']) . '" onerror="this.closest(\'.slide-picture\').style.display=\'none\';">'
+                    . '</picture>'; ?>
+                <?php if ($hasLink): ?>
+                  <a class="slide-link position-absolute top-0 start-0 w-100 h-100" href="<?php echo $e($slideLink); ?>" aria-label="<?php echo $e($sld['title'] !== '' ? $sld['title'] : 'Xem chi tiết'); ?>"><?php echo $imgTag; ?></a>
+                <?php else: ?>
+                  <div class="slide-link position-absolute top-0 start-0 w-100 h-100"><?php echo $imgTag; ?></div>
+                <?php endif; ?>
               <?php endif; ?>
-              <div class="position-absolute bottom-0 start-0 w-100 slide-gradient-overlay pointer-events-none" style="height:100px;max-height:110px;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);"></div>
-              <div class="container h-100 position-relative z-1 d-flex align-items-end pb-3 pb-md-3">
-                <div class="text-white py-1 slide-content-box" style="max-width:1200px;">
-                  <?php if ($sld['subtitle'] !== ''): ?>
-                    <div class="slide-subtitle d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill glass-badge text-white fw-bold text-uppercase mb-2" style="font-size:11.5px;letter-spacing:0.04em;">
-                      <span class="rounded-circle d-inline-block" style="width:8px;height:8px;background-color:<?php echo $e($th['dot']); ?>;box-shadow:0 0 10px <?php echo $e($th['dot']); ?>;"></span> <?php echo $e($sld['subtitle']); ?>
-                    </div>
-                  <?php endif; ?>
-                  <h2 class="slide-title fw-black text-uppercase text-white lh-sm mb-1" style="text-shadow:0 2px 20px rgba(0,0,0,0.5);">
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r <?php echo $th['grad']; ?>"><?php echo $e($sld['title']); ?></span>
-                  </h2>
-                  <?php if ($sld['desc'] !== ''): ?>
-                    <p class="slide-desc text-light opacity-90 mb-3 d-none d-sm-block lh-base" style="font-size:calc(0.9rem + 0.22vw);max-width:680px;text-shadow:0 1px 8px rgba(0,0,0,0.6);"><?php echo $e($sld['desc']); ?></p>
-                  <?php endif; ?>
-                  <?php if ($sld['btn_text'] !== ''): ?>
-                    <div class="slide-btn-wrap">
-                      <a class="btn btn-light fw-bold rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 shadow-lg text-dark btn-shimmer" href="<?php echo $e($sld['btn_url'] !== '' ? $sld['btn_url'] : '#noi-dung'); ?>" style="font-size:14px;">
-                        <span><?php echo $e($sld['btn_text']); ?></span><span class="material-symbols-outlined fs-6">arrow_forward</span>
-                      </a>
-                    </div>
-                  <?php endif; ?>
-                </div>
-              </div>
             </div>
           <?php endforeach; ?>
         </div>
