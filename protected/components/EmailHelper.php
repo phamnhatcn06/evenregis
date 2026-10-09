@@ -117,6 +117,7 @@ class EmailHelper
                         'status'          => 'sent',
                         'count'           => $count,
                         'recipient'       => implode(', ', $actualRecipients),
+                        'cc'              => implode(', ', $ccList),
                         'intended'        => implode(', ', $recipients),
                         'has_pdf'         => !empty($attachments),
                         'note'            => $pdfError ? ('PDF lỗi: ' . $pdfError) : '',
