@@ -104,6 +104,11 @@ nav a.nav-link:hover::after {
   position: relative;
   background-color: #0b1329;
 }
+@media (min-width: 1366px) {
+  .hero-slider-wrap {
+    max-height: 850px;
+  }
+}
 
 /* Slide item */
 .hero-slide {
@@ -127,6 +132,11 @@ nav a.nav-link:hover::after {
   object-position: center;
   transform: scale(1);
   transition: transform 7s ease-out;
+}
+@media (min-width: 1366px) {
+  .hero-slide .slide-bg-img {
+    max-height: 850px;
+  }
 }
 .hero-slide.active .slide-bg-img {
   transform: scale(1.02);
