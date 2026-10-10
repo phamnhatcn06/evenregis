@@ -708,16 +708,13 @@
             photoInput.value = '';
         }
         var preview = document.getElementById('edit_portrait_preview');
-        var placeholder = document.getElementById('edit_portrait_placeholder');
-        if (preview && placeholder) {
+        if (preview) {
             if (row.avatar_url) {
                 preview.src = row.avatar_url;
                 preview.style.display = '';
-                placeholder.style.display = 'none';
             } else {
                 preview.src = '';
                 preview.style.display = 'none';
-                placeholder.style.display = '';
             }
         }
 
