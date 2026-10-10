@@ -40,6 +40,10 @@ Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/pages/finalattendeerosters-admin.js?v=2.8',
     CClientScript::POS_END
 );
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/finalattendeerosters-assign.js?v=1.0',
+    CClientScript::POS_END
+);
 
 $canCreate = PermissionHelper::can('finalattendeerosters', 'create');
 $canUpdate = PermissionHelper::can('finalattendeerosters', 'update');
