@@ -51,6 +51,9 @@ $canCreate = PermissionHelper::can('finalattendeerosters', 'create');
 $canUpdate = PermissionHelper::can('finalattendeerosters', 'update');
 $canDelete = PermissionHelper::can('finalattendeerosters', 'delete');
 
+/** Có nội dung Fun Run / Tham quan để gán hay không (ẩn nút nếu sự kiện chưa cấu hình) */
+$hasActivities = !empty($runEventList) || !empty($tourSessionList);
+
 /** Dữ liệu cũ sau 24h thì nhắc HO đồng bộ lại */
 $isStale = $lastSyncedAt && (time() - $lastSyncedAt) > 86400;
 
