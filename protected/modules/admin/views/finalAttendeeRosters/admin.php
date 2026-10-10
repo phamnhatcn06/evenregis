@@ -787,6 +787,29 @@ $flashMessages = Yii::app()->user->getFlashes();
                                         </button>
                                     <?php endif; ?>
 
+                                    <?php if (!$isWithdrawn && $hasActivities && $row->attendee_id): ?>
+                                        <?php
+                                        $rowBirthYear = $row->birth_year ? (int) $row->birth_year : '';
+                                        if ($rowBirthYear === '' && !empty($row->birthday)) {
+                                            $bdTs = strtotime((string) $row->birthday);
+                                            if ($bdTs !== false) {
+                                                $rowBirthYear = (int) date('Y', $bdTs);
+                                            }
+                                        }
+                                        $rowGender = ($row->gender === null || $row->gender === '') ? '' : (int) $row->gender;
+                                        ?>
+                                        <button type="button"
+                                                class="far-action-btn far-action-assign js-assign-activity"
+                                                data-roster-id="<?php echo (int) $row->id; ?>"
+                                                data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                                data-unit="<?php echo CHtml::encode(!empty($row->badge_org_name) ? $row->badge_org_name : $row->property_name); ?>"
+                                                data-birth-year="<?php echo $rowBirthYear; ?>"
+                                                data-gender="<?php echo $rowGender === '' ? '' : $rowGender; ?>"
+                                                title="Gán vào Fun Run / Tham quan">
+                                            <i class="fa fa-flag-checkered"></i>
+                                        </button>
+                                    <?php endif; ?>
+
                                     <?php if (!$isWithdrawn): ?>
                                         <button type="button"
                                                 class="far-action-btn far-action-merge js-merge-split"
