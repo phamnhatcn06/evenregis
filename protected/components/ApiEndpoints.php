@@ -645,6 +645,7 @@ class ApiEndpoints
 
     const TOUR_REGISTRATION_LIST = '/api/tour-registrations';
     const TOUR_REGISTRATION_CLAIM = '/api/tour-registrations/claim';
+    const TOUR_REGISTRATION_ADMIN_ASSIGN = '/api/tour-registrations/admin-assign';
     const TOUR_REGISTRATION_MINE = '/api/tour-registrations/mine';
     const TOUR_REGISTRATION_CANCEL_REQUEST = '/api/tour-registrations/cancel-request';
     const TOUR_REGISTRATION_CANCEL_REQUESTS = '/api/tour-registrations/cancel-requests';
