@@ -1381,6 +1381,73 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Lưu ảnh chân dung vừa tải lên vào webroot của FE (giống luồng upload attendee).
+     *
+     * Trả về đường dẫn tương đối để lưu vào hồ sơ, `null` khi không có file tải lên.
+     * Gặp lỗi file (sai định dạng, quá nặng, không ghi được) thì xuất JSON và dừng request.
+     */
+    protected function saveUploadedPortrait()
+    {
+        $key = 'portrait_file';
+        if (!isset($_FILES[$key]) || $_FILES[$key]['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if ($_FILES[$key]['error'] !== UPLOAD_ERR_OK) {
+            $this->renderJson(array('success' => false, 'message' => 'Tải ảnh thất bại. Vui lòng thử lại.'), 422);
+        }
+
+        $allowed = array('jpg', 'jpeg', 'png');
+        $ext     = strtolower(pathinfo($_FILES[$key]['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowed, true)) {
+            $this->renderJson(array('success' => false, 'message' => 'Ảnh chân dung phải là JPG hoặc PNG.'), 422);
+        }
+        if ($_FILES[$key]['size'] > 10 * 1024 * 1024) {
+            $this->renderJson(array('success' => false, 'message' => 'Ảnh chân dung vượt quá 10MB.'), 422);
+        }
+
+        $relDir    = '/uploads/attendees/' . date('Y/m');
+        $uploadDir = Yii::getPathOfAlias('webroot') . $relDir;
+        if (!is_dir($uploadDir) && !@mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+            $this->renderJson(array('success' => false, 'message' => 'Không tạo được thư mục lưu ảnh trên máy chủ.'), 500);
+        }
+
+        $filename = 'portrait_' . uniqid() . '.' . $ext;
+        if (!move_uploaded_file($_FILES[$key]['tmp_name'], $uploadDir . '/' . $filename)) {
+            $this->renderJson(array('success' => false, 'message' => 'Không lưu được ảnh chân dung.'), 500);
+        }
+
+        return $relDir . '/' . $filename;
+    }
+
+    /**
+     * Gắn ảnh chân dung mới vào hồ sơ người tham dự của dòng roster.
+     *
+     * Dòng roster hiển thị/ dựng thẻ từ ảnh của attendee, nên cập nhật thẳng attendee là đủ.
+     */
+    protected function applyPortraitToAttendee($rosterId, $photoPath)
+    {
+        $row        = FinalAttendeeRosters::fetchOne($rosterId);
+        $attendeeId = ($row && !empty($row['attendee_id'])) ? (int) $row['attendee_id'] : 0;
+        if (!$attendeeId) {
+            return array('success' => false, 'error' => 'Dòng này chưa gắn hồ sơ người tham dự nên chưa cập nhật được ảnh.');
+        }
+
+        $attendee = Attendees::fetchFromApi($attendeeId);
+        if ($attendee === null) {
+            return array('success' => false, 'error' => 'Không tìm thấy hồ sơ người tham dự để cập nhật ảnh.');
+        }
+
+        $attendee->portrait_path = $photoPath;
+        $result = $attendee->updateViaApi();
+
+        if (empty($result['success'])) {
+            return array('success' => false, 'error' => isset($result['error']) ? $result['error'] : 'Không cập nhật được ảnh chân dung.');
+        }
+
+        return array('success' => true, 'error' => '');
+    }
+
+    /**
      * Xuất JSON và kết thúc request, kèm HTTP status thật để JS phân biệt được lỗi.
      */
     protected function renderJson($payload, $status = 200)
