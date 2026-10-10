@@ -626,6 +626,7 @@ class ApiEndpoints
 
     const RUN_REGISTRATION_LIST = '/api/run-registrations';
     const RUN_REGISTRATION_CLAIM = '/api/run-registrations/claim';
+    const RUN_REGISTRATION_ADMIN_ASSIGN = '/api/run-registrations/admin-assign';
     const RUN_REGISTRATION_MINE = '/api/run-registrations/mine';
     const RUN_REGISTRATION_SAVE_EMERGENCY = '/api/run-registrations/save-emergency';
     const RUN_REGISTRATION_SAVE_SHIRT_SIZE = '/api/run-registrations/save-shirt-size';
