@@ -16,6 +16,8 @@
  * @var int $pageSize
  * @var array $pageSizes
  * @var array $filters
+ * @var array $runEventList
+ * @var array $tourSessionList
  */
 
 $this->breadcrumbs = array('Tổng hợp danh sách Vòng Chung Kết');
