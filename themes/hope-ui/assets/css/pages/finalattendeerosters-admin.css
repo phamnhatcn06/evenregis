@@ -1038,6 +1038,16 @@
     color: #ffffff;
 }
 
+.far-action-assign {
+    background: rgba(26, 170, 77, 0.12);
+    color: #118138;
+}
+
+.far-action-assign:hover {
+    background: #118138;
+    color: #ffffff;
+}
+
 .far-action-withdraw {
     background: rgba(192, 50, 33, 0.1);
     color: #c03221;
