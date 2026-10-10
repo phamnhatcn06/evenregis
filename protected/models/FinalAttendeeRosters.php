@@ -30,6 +30,7 @@ class FinalAttendeeRosters extends CFormModel
     public $staff_code;
     public $id_card;
     public $birthday;
+    public $birth_year;
     public $gender;
     public $phone_number;
     public $email;
