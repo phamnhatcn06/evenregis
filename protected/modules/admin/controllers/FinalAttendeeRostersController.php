@@ -692,6 +692,107 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Admin gán một người vào nội dung Fun Run và/hoặc Tham quan (JSON).
+     *
+     * Xác nhận năm sinh + giới tính (lưu vào hồ sơ để suy nhãn nội dung), sau đó gán vào
+     * cự ly chạy (nếu chọn) và/hoặc đợt tham quan (nếu chọn). Gán Fun Run bằng tài khoản
+     * admin cấp BIB từ dải giữ chỗ (bắt đầu từ 1), không tính suất công khai.
+     */
+    public function actionAssignActivity()
+    {
+        if (!$this->guardWrite('update')) {
+            return;
+        }
+
+        $request    = Yii::app()->request;
+        $id         = (int) $request->getPost('id');
+        $birthYear  = $request->getPost('birth_year');
+        $gender     = $request->getPost('gender');
+        $runEventId = $request->getPost('run_event_id');
+        $sessionId  = $request->getPost('tour_session_id');
+
+        $runEventId = ($runEventId !== null && $runEventId !== '') ? (int) $runEventId : null;
+        $sessionId  = ($sessionId !== null && $sessionId !== '') ? (int) $sessionId : null;
+
+        if (!$id) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu mã dòng cần gán.'), 422);
+            return;
+        }
+
+        if (!$runEventId && !$sessionId) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn ít nhất một nội dung (Fun Run hoặc Tham quan).'), 422);
+            return;
+        }
+
+        // Năm sinh + giới tính bắt buộc xác nhận (0 = Nữ, 1 = Nam).
+        $birthYear = ($birthYear !== null && $birthYear !== '') ? (int) $birthYear : null;
+        $gender    = ($gender !== null && $gender !== '') ? (int) $gender : null;
+        if ($birthYear === null || $gender === null || !in_array($gender, array(0, 1), true)) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng xác nhận năm sinh và giới tính.'), 422);
+            return;
+        }
+
+        $row = FinalAttendeeRosters::fetchOne($id);
+        if ($row === null) {
+            $this->renderJson(array('success' => false, 'message' => 'Không tìm thấy người tham dự.'), 404);
+            return;
+        }
+
+        $attendeeId = isset($row['attendee_id']) ? (int) $row['attendee_id'] : 0;
+        if (!$attendeeId) {
+            $this->renderJson(array('success' => false, 'message' => 'Người này chưa gắn với bản ghi đăng ký gốc nên không thể gán nội dung.'), 422);
+            return;
+        }
+
+        $ssoUser   = AuthHandler::getUser();
+        $authEmail = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+        // Lưu năm sinh + giới tính trước (dù chỉ gán Tham quan cũng cần xác nhận hồ sơ).
+        $profile = RunAuth::saveProfile($attendeeId, $birthYear, $gender, $authEmail);
+        if (!$profile['success']) {
+            $status = isset($profile['code']) && (int) $profile['code'] >= 400 ? (int) $profile['code'] : 500;
+            $this->renderJson(array(
+                'success' => false,
+                'message' => $profile['error'] ?: 'Không lưu được năm sinh/giới tính.',
+            ), $status);
+            return;
+        }
+
+        $messages = array();
+        $errors   = array();
+
+        if ($runEventId) {
+            $res = RunRegistrations::adminAssignViaApi($runEventId, $attendeeId, $birthYear, $gender, $authEmail);
+            if ($res['success']) {
+                $data = isset($res['data']['data']) ? $res['data']['data'] : array();
+                $bib  = isset($data['bib_number']) ? $data['bib_number'] : '';
+                $messages[] = 'Fun Run: đã gán' . ($bib !== '' ? (' (BIB ' . $bib . ')') : '') . '.';
+            } else {
+                $errors[] = 'Fun Run: ' . ($res['error'] ?: 'không gán được.');
+            }
+        }
+
+        if ($sessionId) {
+            $res = TourRegistrations::adminAssignViaApi($sessionId, $attendeeId, $authEmail);
+            if ($res['success']) {
+                $messages[] = 'Tham quan: đã gán.';
+            } else {
+                $errors[] = 'Tham quan: ' . ($res['error'] ?: 'không gán được.');
+            }
+        }
+
+        if (empty($messages)) {
+            $this->renderJson(array('success' => false, 'message' => implode(' ', $errors)), 409);
+            return;
+        }
+
+        $this->renderJson(array(
+            'success' => true,
+            'message' => implode(' ', array_merge($messages, $errors)),
+        ));
+    }
+
+    /**
      * Danh sách gọn phục vụ tìm nhanh trong modal gộp dòng.
      */
     protected function searchRows($eventId, $periodId)
