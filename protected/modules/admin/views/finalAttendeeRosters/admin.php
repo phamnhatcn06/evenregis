@@ -919,6 +919,12 @@ $flashMessages = Yii::app()->user->getFlashes();
         <?php $this->renderPartial('_modal_edit_row'); ?>
         <?php $this->renderPartial('_modal_merge_split'); ?>
         <?php $this->renderPartial('_modal_set_lucky'); ?>
+        <?php if ($hasActivities): ?>
+            <?php $this->renderPartial('_modal_assign_activity', array(
+                'runEventList'    => $runEventList,
+                'tourSessionList' => $tourSessionList,
+            )); ?>
+        <?php endif; ?>
     <?php endif; ?>
 
     <?php if ($canCreate): ?>
