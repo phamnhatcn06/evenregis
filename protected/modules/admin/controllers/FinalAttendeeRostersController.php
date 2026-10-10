@@ -1312,14 +1312,29 @@ class FinalAttendeeRostersController extends AdminController
 
             $result = FinalAttendeeRosters::resetFieldsViaApi($id, $fields);
         } else {
-            $fields = $this->collectEditableFields($request->getPost('fields'));
+            $fields    = $this->collectEditableFields($request->getPost('fields'));
+            $photoPath = $this->saveUploadedPortrait();
 
-            if (empty($fields)) {
+            if (empty($fields) && $photoPath === null) {
                 $this->renderJson(array('success' => false, 'message' => 'Không có trường nào được phép sửa.'), 422);
                 return;
             }
 
-            $result = FinalAttendeeRosters::updateFieldsViaApi($id, $fields);
+            // Ảnh chân dung không nằm trong danh sách trường sửa tay (không ghi đè snapshot);
+            // thay vào đó cập nhật thẳng vào hồ sơ người tham dự để thẻ dùng ảnh mới.
+            if ($photoPath !== null) {
+                $photoResult = $this->applyPortraitToAttendee($id, $photoPath);
+                if (!$photoResult['success']) {
+                    $this->renderJson(array('success' => false, 'message' => $photoResult['error']), 422);
+                    return;
+                }
+            }
+
+            if (!empty($fields)) {
+                $result = FinalAttendeeRosters::updateFieldsViaApi($id, $fields);
+            } else {
+                $result = array('success' => true, 'data' => array('message' => 'Đã cập nhật ảnh chân dung.'));
+            }
         }
 
         if (!$result['success']) {
