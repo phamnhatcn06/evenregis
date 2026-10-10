@@ -706,6 +706,25 @@
             idInput.value = row.id;
         }
 
+        // Đặt lại ô chọn ảnh + hiển thị ảnh hiện tại của người này.
+        var photoInput = document.getElementById('edit_portrait_file');
+        if (photoInput) {
+            photoInput.value = '';
+        }
+        var preview = document.getElementById('edit_portrait_preview');
+        var placeholder = document.getElementById('edit_portrait_placeholder');
+        if (preview && placeholder) {
+            if (row.avatar_url) {
+                preview.src = row.avatar_url;
+                preview.style.display = '';
+                placeholder.style.display = 'none';
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+                placeholder.style.display = '';
+            }
+        }
+
         var overridden = row.overridden_fields || [];
         var snapshot = row.source_snapshot || {};
 
