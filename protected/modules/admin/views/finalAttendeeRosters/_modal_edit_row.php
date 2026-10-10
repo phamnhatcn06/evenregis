@@ -48,6 +48,27 @@ $textFields = array(
                     <input type="hidden" name="id" id="edit_row_id" value="">
 
                     <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold text-muted mb-1">Ảnh chân dung (ảnh thẻ)</label>
+                            <div class="d-flex align-items-center gap-3 p-2 border rounded-3 bg-light">
+                                <img id="edit_portrait_preview" src="" alt="Ảnh chân dung"
+                                     class="rounded-3 border bg-white"
+                                     style="width: 72px; height: 96px; object-fit: cover; display: none;">
+                                <span id="edit_portrait_placeholder"
+                                      class="d-inline-flex align-items-center justify-content-center rounded-3 border bg-white text-muted"
+                                      style="width: 72px; height: 96px;">
+                                    <i class="fa fa-user fa-2x"></i>
+                                </span>
+                                <div class="flex-grow-1">
+                                    <input type="file" class="form-control form-control-sm" id="edit_portrait_file"
+                                           name="portrait_file" accept="image/jpeg,image/png">
+                                    <div class="form-text small mb-0">
+                                        Chọn ảnh JPG/PNG để thay ảnh thẻ. Để trống nếu không đổi ảnh.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <?php foreach ($textFields as $field => $label): ?>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-muted mb-1" for="edit_<?php echo $field; ?>">
