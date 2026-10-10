@@ -35,6 +35,19 @@ class TourRegistrations extends CFormModel
         ));
     }
 
+    /**
+     * Admin gán người vào một đợt tham quan (bỏ qua khung giờ, vẫn chặn quota).
+     * Trả mảng ApiClient chuẩn. code=200 thành công; 409 đã đăng ký/hết chỗ.
+     */
+    public static function adminAssignViaApi($tourSessionId, $attendeeId, $authEmail = null)
+    {
+        return ApiClient::post(ApiEndpoints::TOUR_REGISTRATION_ADMIN_ASSIGN, array(
+            'tour_session_id' => $tourSessionId,
+            'attendee_id'     => $attendeeId,
+            'auth_email'      => $authEmail,
+        ));
+    }
+
     /** Phiếu đăng ký của 1 người (hoặc null). */
     public static function findMine($attendeeId)
     {
