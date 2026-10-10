@@ -1486,6 +1486,46 @@ class FinalAttendeeRostersController extends AdminController
         return $list;
     }
 
+    /**
+     * Danh sách cự ly Fun Run của sự kiện (mọi cự ly, kể cả đã đóng) cho popup gán nội dung.
+     */
+    protected function getRunEventList($eventId)
+    {
+        $list = array();
+        try {
+            foreach (RunEvents::getApiDataProvider(array('event_id' => $eventId), 1000)->getData() as $ev) {
+                $list[] = array(
+                    'id'   => (int) $ev->id,
+                    'name' => $ev->name,
+                    'code' => $ev->code,
+                );
+            }
+        } catch (Exception $e) {
+            Yii::log('Không tải được danh sách cự ly Fun Run: ' . $e->getMessage(), CLogger::LEVEL_WARNING);
+        }
+        return $list;
+    }
+
+    /**
+     * Danh sách đợt Tham quan của sự kiện (mọi đợt, kể cả đã đóng) cho popup gán nội dung.
+     */
+    protected function getTourSessionList($eventId)
+    {
+        $list = array();
+        try {
+            foreach (TourSessions::getApiDataProvider(array('event_id' => $eventId), 1000)->getData() as $s) {
+                $list[] = array(
+                    'id'         => (int) $s->id,
+                    'name'       => $s->name,
+                    'start_time' => $s->start_time,
+                );
+            }
+        } catch (Exception $e) {
+            Yii::log('Không tải được danh sách đợt Tham quan: ' . $e->getMessage(), CLogger::LEVEL_WARNING);
+        }
+        return $list;
+    }
+
     protected function getEventList()
     {
         $list = array();
