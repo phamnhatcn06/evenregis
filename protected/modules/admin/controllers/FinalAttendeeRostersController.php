@@ -94,6 +94,8 @@ class FinalAttendeeRostersController extends AdminController
             'pageSize'      => $this->resolvePageSize(),
             'pageSizes'     => self::PAGE_SIZES,
             'filters'       => $this->getFilterValues(),
+            'runEventList'    => $eventId ? $this->getRunEventList($eventId) : array(),
+            'tourSessionList' => $eventId ? $this->getTourSessionList($eventId) : array(),
         ));
     }
 
