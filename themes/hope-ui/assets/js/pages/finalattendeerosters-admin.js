@@ -629,7 +629,10 @@
             event.preventDefault();
 
             var changed = collectChangedFields(current);
-            if (Object.keys(changed).length === 0) {
+            var photoInput = document.getElementById('edit_portrait_file');
+            var hasPhoto = photoInput && photoInput.files && photoInput.files.length > 0;
+
+            if (Object.keys(changed).length === 0 && !hasPhoto) {
                 if (typeof Toast !== 'undefined') {
                     Toast.info('Bạn chưa thay đổi trường nào.');
                 }
@@ -641,6 +644,9 @@
             Object.keys(changed).forEach(function (field) {
                 body.append('fields[' + field + ']', changed[field]);
             });
+            if (hasPhoto) {
+                body.append('portrait_file', photoInput.files[0]);
+            }
 
             postWithButton(form.action, body, saveButton, function (data) {
                 var modal = bootstrap.Modal.getInstance(modalElement);
