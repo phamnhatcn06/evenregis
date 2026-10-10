@@ -140,7 +140,7 @@ class FinalAttendeeRosters extends CFormModel
         return array(
             array(
                 'id, event_id, period_id, attendee_id, source_attendee_ids, registration_id, dedup_key,
-                 dedup_source, full_name, staff_code, id_card, birthday, gender, phone_number, email,
+                 dedup_source, full_name, staff_code, id_card, birthday, birth_year, gender, phone_number, email,
                  property_id, property_code, property_name, badge_org_name, unit_label, division_code, division_name,
                  department_code, department_name, position, position_code, position_name, position_display,
                  attendee_type, shirt_size, note, sort_order, is_btc, lucky_number, login_identifier,
