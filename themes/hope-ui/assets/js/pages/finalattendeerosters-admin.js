@@ -630,16 +630,12 @@
         if (photoInput) {
             photoInput.addEventListener('change', function () {
                 var preview = document.getElementById('edit_portrait_preview');
-                var placeholder = document.getElementById('edit_portrait_placeholder');
                 if (!preview) {
                     return;
                 }
                 if (this.files && this.files[0]) {
                     preview.src = URL.createObjectURL(this.files[0]);
                     preview.style.display = '';
-                    if (placeholder) {
-                        placeholder.style.display = 'none';
-                    }
                 }
             });
         }
