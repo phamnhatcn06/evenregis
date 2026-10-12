@@ -491,6 +491,7 @@ class ApiEndpoints
     // Sport Match Result
     const SPORT_MATCH_RESULT_LIST = '/api/sport-match-results';
     const SPORT_MATCH_RESULT_STORE = '/api/sport-match-results/store';
+    const SPORT_MATCH_RESULT_RECORD = '/api/sport-match-results/record';
     const SPORT_MATCH_RESULT_DETAIL = '/api/sport-match-results/detail/{id}';
     const SPORT_MATCH_RESULT_UPDATE = '/api/sport-match-results/update/{id}';
     const SPORT_MATCH_RESULT_DESTROY = '/api/sport-match-results/destroy/{id}';
