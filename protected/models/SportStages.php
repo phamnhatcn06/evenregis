@@ -190,6 +190,24 @@ class SportStages extends BaseSportStages
         return null;
     }
 
+    /**
+     * Lưu kết quả gán thủ công (kéo-thả) đội vào bảng / vị trí seed.
+     *
+     * @param string $stageId
+     * @param array $assignments Mảng phần tử:
+     *   - với vòng bảng:  ['team_id' => , 'group_label' => 'A', 'group_order' => 1]
+     *   - với nhánh:      ['team_id' => , 'seed' => 1]
+     * @return array kết quả ApiClient
+     */
+    public static function saveManualDraw($stageId, $assignments)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_ASSIGN, array('stageId' => $stageId));
+        return ApiClient::post($url, array(
+            'assignments' => $assignments,
+            'auth_email' => self::authEmail(),
+        ));
+    }
+
     protected static function authEmail()
     {
         $ssoUser = AuthHandler::getUser();
