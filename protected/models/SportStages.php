@@ -29,6 +29,7 @@ class SportStages extends BaseSportStages
 
     // Thuộc tính hiển thị
     public $sport_name;
+    public $sport_code;
     public $event_name;
 
     public static function model($className = __CLASS__)
