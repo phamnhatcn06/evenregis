@@ -85,6 +85,20 @@ $renderMatch = function ($m) use ($slotName, $teamMap) {
                 <div class="flex-grow-1" style="min-width:140px;">
                     <?php echo $slotName($m['team_b_id'], isset($m['team_b_source']) ? $m['team_b_source'] : null); ?>
                 </div>
+                <?php if ($hasBoth && empty($m['is_bye']) && $isKnockout): ?>
+                    <select class="form-select form-select-sm winner-select" style="width:auto;"
+                            title="Đội thắng (bắt buộc khi hòa điểm)">
+                        <option value="">Thắng: tự động</option>
+                        <option value="<?php echo CHtml::encode($m['team_a_id']); ?>"
+                            <?php echo ($winnerId == $m['team_a_id']) ? 'selected' : ''; ?>>
+                            <?php echo CHtml::encode(isset($teamMap[$m['team_a_id']]) ? $teamMap[$m['team_a_id']] : ('#' . $m['team_a_id'])); ?>
+                        </option>
+                        <option value="<?php echo CHtml::encode($m['team_b_id']); ?>"
+                            <?php echo ($winnerId == $m['team_b_id']) ? 'selected' : ''; ?>>
+                            <?php echo CHtml::encode(isset($teamMap[$m['team_b_id']]) ? $teamMap[$m['team_b_id']] : ('#' . $m['team_b_id'])); ?>
+                        </option>
+                    </select>
+                <?php endif; ?>
                 <?php if ($hasBoth && empty($m['is_bye'])): ?>
                     <button type="button" class="btn btn-sm btn-primary btn-save-result">
                         <i class="fa fa-save"></i>
