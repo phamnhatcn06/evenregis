@@ -21,4 +21,6 @@ return array(
             'rules' => array(),
         ),
     ),
+    // Dùng chung params với web app (API key, Portal URL) để ApiClient hoạt động trong console
+    'params' => require(dirname(__FILE__) . '/params.php'),
 );
