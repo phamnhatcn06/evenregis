@@ -85,6 +85,54 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Màn hình ghi kết quả từng trận của giai đoạn.
+     */
+    public function actionResults($id)
+    {
+        $model = SportStages::fetchFromApi($id);
+        if ($model === null) {
+            throw new CHttpException(404, 'Không tìm thấy giai đoạn.');
+        }
+
+        $preview = SportStages::fetchDrawPreview($id);
+
+        $this->render('results', array(
+            'model' => $model,
+            'preview' => $preview,
+        ));
+    }
+
+    /**
+     * Ghi kết quả 1 trận (AJAX). Backend tự đẩy đội thắng vòng kế.
+     */
+    public function actionSaveResult()
+    {
+        $this->requirePost();
+
+        $req = Yii::app()->getRequest();
+        $matchId = $req->getPost('match_id');
+        $scoreA = $req->getPost('score_a');
+        $scoreB = $req->getPost('score_b');
+
+        if (!$matchId || $scoreA === null || $scoreA === '' || $scoreB === null || $scoreB === '') {
+            $this->jsonResponse(false, 'Vui lòng nhập đủ tỉ số hai đội.');
+        }
+
+        $result = SportMatchResults::recordViaApi(array(
+            'match_id' => $matchId,
+            'score_a' => (int) $scoreA,
+            'score_b' => (int) $scoreB,
+            'winner_team_id' => $req->getPost('winner_team_id') ?: null,
+            'is_draw' => $req->getPost('is_draw') ? 1 : 0,
+        ));
+
+        if (!empty($result['success'])) {
+            $this->jsonResponse(true, 'Đã ghi kết quả trận đấu.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể ghi kết quả.'));
+    }
+
+    /**
      * Lưu kết quả gán thủ công (AJAX, nhận JSON assignments).
      */
     public function actionSaveAssignment($id)
