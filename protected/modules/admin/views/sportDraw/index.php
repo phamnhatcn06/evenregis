@@ -97,7 +97,13 @@ $stages = ($dataProvider !== null) ? $dataProvider->getData() : array();
                     ?>
                     <tr>
                         <td>
-                            <strong><?php echo CHtml::encode($stage->name); ?></strong>
+                            <strong><?php echo CHtml::encode($stage->sport_name ? $stage->sport_name : ('#' . $stage->sport_id)); ?></strong>
+                            <?php if ($stage->sport_code): ?>
+                                <br><small class="text-muted"><?php echo CHtml::encode($stage->sport_code); ?></small>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php echo CHtml::encode($stage->name); ?>
                         </td>
                         <td><?php echo CHtml::encode(SportStages::getFormatLabel($stage->format)); ?></td>
                         <td class="text-center">
