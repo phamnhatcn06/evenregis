@@ -137,6 +137,12 @@ $stages = ($dataProvider !== null) ? $dataProvider->getData() : array();
                                     <i class="fa fa-sitemap"></i> Sinh nhánh từ bảng
                                 </button>
                             <?php endif; ?>
+                            <?php if (($isGroup || $isBracket) && !$isLocked): ?>
+                                <a href="<?php echo $this->createUrl('assign', array('id' => $stage->id)); ?>"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fa fa-hand-rock-o"></i> Gán thủ công
+                                </a>
+                            <?php endif; ?>
                             <a href="<?php echo $this->createUrl('view', array('id' => $stage->id)); ?>"
                                class="btn btn-sm btn-outline-info">
                                 <i class="fa fa-eye"></i> Xem
