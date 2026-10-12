@@ -132,31 +132,43 @@ if ($isBracket && $bracketSize < 2) {
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
+                    <?php
+                    // Render từng ô slot: tìm đội theo bracket_slot
+                    $slotChip = function ($pos) use ($teams) {
+                        $team = null;
+                        foreach ($teams as $t) {
+                            if ((int) ($t['bracket_slot'] ?? 0) === $pos) { $team = $t; break; }
+                        }
+                        ?>
+                        <div class="team-zone flex-grow-1 border rounded p-1 seed-slot"
+                             data-zone="seed" data-seed="<?php echo $pos; ?>" style="min-height:46px;">
+                            <?php if ($team): ?>
+                                <div class="team-chip card shadow-sm mb-0" draggable="true"
+                                     data-team-id="<?php echo CHtml::encode($team['team_id']); ?>">
+                                    <div class="card-body p-2 small d-flex align-items-center">
+                                        <i class="fa fa-arrows me-2 text-muted"></i>
+                                        <?php echo CHtml::encode($team['team_name'] !== null ? $team['team_name'] : ('#' . $team['team_id'])); ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php
+                    };
+                    $numMatches = (int) ($bracketSize / 2);
+                    ?>
                     <div class="card">
-                        <div class="card-header fw-bold">Vị trí hạt giống (nhánh <?php echo $bracketSize; ?>)</div>
+                        <div class="card-header fw-bold">Cặp đấu vòng 1 (nhánh <?php echo $bracketSize; ?> — <?php echo $numMatches; ?> trận)</div>
                         <div class="card-body">
                             <div class="row">
-                                <?php for ($seed = 1; $seed <= $bracketSize; $seed++): ?>
-                                    <?php
-                                    $seedTeam = null;
-                                    foreach ($teams as $t) {
-                                        if ((int) ($t['seed'] ?? 0) === $seed) { $seedTeam = $t; break; }
-                                    }
-                                    ?>
-                                    <div class="col-md-6 mb-2 d-flex align-items-center">
-                                        <span class="badge bg-primary me-2" style="width:34px;">#<?php echo $seed; ?></span>
-                                        <div class="team-zone flex-grow-1 border rounded p-1 seed-slot"
-                                             data-zone="seed" data-seed="<?php echo $seed; ?>"
-                                             style="min-height:46px;">
-                                            <?php if ($seedTeam): ?>
-                                                <div class="team-chip card shadow-sm mb-0" draggable="true"
-                                                     data-team-id="<?php echo CHtml::encode($seedTeam['team_id']); ?>">
-                                                    <div class="card-body p-2 small d-flex align-items-center">
-                                                        <i class="fa fa-arrows me-2 text-muted"></i>
-                                                        <?php echo CHtml::encode($seedTeam['team_name'] !== null ? $seedTeam['team_name'] : ('#' . $seedTeam['team_id'])); ?>
-                                                    </div>
-                                                </div>
-                                            <?php endif; ?>
+                                <?php for ($m = 1; $m <= $numMatches; $m++): ?>
+                                    <div class="col-lg-6 mb-3">
+                                        <div class="border rounded p-2 bg-white">
+                                            <div class="small fw-bold text-muted mb-1">Trận <?php echo $m; ?></div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <?php $slotChip(2 * $m - 1); ?>
+                                                <span class="fw-bold text-muted">VS</span>
+                                                <?php $slotChip(2 * $m); ?>
+                                            </div>
                                         </div>
                                     </div>
                                 <?php endfor; ?>
