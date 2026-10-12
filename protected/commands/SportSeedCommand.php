@@ -4,7 +4,7 @@
  * Sport Seed Command — Seed môn/nội dung thi đấu (sports) + giai đoạn (sport_stages)
  * cho Đại hội Mường Thanh 2026 theo file bốc thăm docs/Boc_tham.xlsx.
  *
- * Nguồn mapping: docs/mapping_boc_tham.md (sheet "Bang ma" + "Thể lệ").
+ * Nguồn mapping: docs/Boc_tham.xlsx (sheet "Bang ma" = bảng mã nội dung, "Thể lệ" = thể thức).
  *
  * Luôn gọi qua Model -> ApiClient (không ghi DB trực tiếp), tôn trọng kiến trúc 2 repo.
  * Idempotent: kiểm tra theo `code` (sports) và (event_id + sport_id + name) (stages)
