@@ -71,6 +71,7 @@ $stages = ($dataProvider !== null) ? $dataProvider->getData() : array();
             <table class="table table-bordered table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th>Nội dung thi đấu</th>
                         <th>Giai đoạn</th>
                         <th>Thể thức</th>
                         <th class="text-center">Cấu hình</th>
