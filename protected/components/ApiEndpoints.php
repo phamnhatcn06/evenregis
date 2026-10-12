@@ -516,6 +516,8 @@ class ApiEndpoints
     const SPORT_DRAW_STANDINGS = '/api/sport-draw/standings/{stageId}';
     const SPORT_DRAW_GENERATE_KNOCKOUT = '/api/sport-draw/generate-knockout/{stageId}';
     const SPORT_DRAW_LOCK = '/api/sport-draw/lock/{stageId}';
+    // Gán thủ công (kéo-thả) đội vào bảng / vị trí seed nhánh
+    const SPORT_DRAW_ASSIGN = '/api/sport-draw/assign/{stageId}';
 
     // Alliance Team Orgs
     const ALLIANCE_TEAM_ORG_LIST = '/api/alliance-team-orgs';
