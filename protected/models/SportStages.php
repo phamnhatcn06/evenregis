@@ -105,6 +105,33 @@ class SportStages extends BaseSportStages
     }
 
     /**
+     * Tạo mới giai đoạn qua API (dùng cho seed).
+     * Gửi cả cột DB và cấu hình thể thức/bốc thăm.
+     */
+    public function storeViaApi()
+    {
+        $data = array(
+            'event_id' => $this->event_id,
+            'sport_id' => $this->sport_id,
+            'name' => $this->name,
+            'stage_type' => $this->stage_type,
+            'stage_order' => $this->stage_order,
+            'location' => $this->location,
+            'rules' => $this->rules,
+            'status' => $this->status,
+            'format' => $this->format,
+            'num_groups' => $this->num_groups !== '' ? $this->num_groups : null,
+            'teams_per_group' => $this->teams_per_group !== '' ? $this->teams_per_group : null,
+            'advance_per_group' => $this->advance_per_group !== '' ? $this->advance_per_group : null,
+            'bracket_size' => $this->bracket_size !== '' ? $this->bracket_size : null,
+        );
+        $data = array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+        return ApiClient::post(ApiEndpoints::SPORT_STAGE_STORE, $data);
+    }
+
+    /**
      * Cập nhật cấu hình thể thức/bốc thăm của giai đoạn.
      */
     public function updateConfigViaApi()
