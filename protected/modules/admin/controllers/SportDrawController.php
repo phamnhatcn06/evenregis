@@ -67,6 +67,44 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Màn hình gán thủ công (kéo-thả) đội vào bảng / vị trí seed nhánh.
+     */
+    public function actionAssign($id)
+    {
+        $model = SportStages::fetchFromApi($id);
+        if ($model === null) {
+            throw new CHttpException(404, 'Không tìm thấy giai đoạn.');
+        }
+
+        $preview = SportStages::fetchDrawPreview($id);
+
+        $this->render('assign', array(
+            'model' => $model,
+            'preview' => $preview,
+        ));
+    }
+
+    /**
+     * Lưu kết quả gán thủ công (AJAX, nhận JSON assignments).
+     */
+    public function actionSaveAssignment($id)
+    {
+        $this->requirePost();
+
+        $raw = Yii::app()->getRequest()->getPost('assignments');
+        $assignments = is_string($raw) ? CJSON::decode($raw) : $raw;
+        if (!is_array($assignments) || empty($assignments)) {
+            $this->jsonResponse(false, 'Chưa có dữ liệu phân bổ đội.');
+        }
+
+        $result = SportStages::saveManualDraw($id, $assignments);
+        if (!empty($result['success'])) {
+            $this->jsonResponse(true, 'Đã lưu phân bổ đội.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể lưu phân bổ đội.'));
+    }
+
+    /**
      * Lưu cấu hình thể thức/bốc thăm cho giai đoạn (AJAX).
      */
     public function actionConfig($id)
