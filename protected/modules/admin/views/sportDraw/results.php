@@ -58,8 +58,13 @@ $renderMatch = function ($m) use ($slotName, $teamMap) {
     $scoreA = $res ? $res['score_a'] : '';
     $scoreB = $res ? $res['score_b'] : '';
     $done = $res !== null && $res['score_a'] !== null && $res['score_b'] !== null;
+    // Trận loại trực tiếp/chung kết/tranh hạng không được hòa -> cần chọn đội thắng khi hòa điểm
+    $isKnockout = in_array(($m['match_type'] ?? ''), array('knockout', 'final', 'playoff'), true);
+    $winnerId = $res && isset($res['winner_team_id']) ? $res['winner_team_id'] : null;
     ?>
-    <div class="card mb-2 match-row" data-match-id="<?php echo CHtml::encode($m['id']); ?>">
+    <div class="card mb-2 match-row"
+         data-match-id="<?php echo CHtml::encode($m['id']); ?>"
+         data-knockout="<?php echo $isKnockout ? '1' : '0'; ?>">
         <div class="card-body p-2">
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <span class="badge bg-light text-dark"><?php echo CHtml::encode($m['round']); ?></span>
