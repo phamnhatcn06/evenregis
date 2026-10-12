@@ -143,6 +143,10 @@ $stages = ($dataProvider !== null) ? $dataProvider->getData() : array();
                                     <i class="fa fa-hand-rock-o"></i> Gán thủ công
                                 </a>
                             <?php endif; ?>
+                            <a href="<?php echo $this->createUrl('results', array('id' => $stage->id)); ?>"
+                               class="btn btn-sm btn-outline-success">
+                                <i class="fa fa-pencil-square-o"></i> Ghi kết quả
+                            </a>
                             <a href="<?php echo $this->createUrl('view', array('id' => $stage->id)); ?>"
                                class="btn btn-sm btn-outline-info">
                                 <i class="fa fa-eye"></i> Xem
