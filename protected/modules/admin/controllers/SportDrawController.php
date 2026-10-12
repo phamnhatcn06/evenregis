@@ -23,6 +23,14 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Alias cho action 'admin' (quy ước menu admin) → dùng chung màn hình chính.
+     */
+    public function actionAdmin()
+    {
+        $this->actionIndex();
+    }
+
+    /**
      * Màn hình chính: chọn sự kiện + nội dung → danh sách giai đoạn + bốc thăm.
      */
     public function actionIndex()
