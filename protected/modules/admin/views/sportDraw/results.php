@@ -1,0 +1,146 @@
+<?php
+/**
+ * Màn hình ghi kết quả từng trận. Sau khi lưu, backend tự đẩy đội thắng vòng sau.
+ *
+ * @var SportDrawController $this
+ * @var SportStages $model
+ * @var array|null $preview
+ */
+
+$this->breadcrumbs = array(
+    'Bốc thăm thi đấu' => $this->createUrl('index'),
+    $model->name => $this->createUrl('view', array('id' => $model->id)),
+    'Ghi kết quả',
+);
+$this->Tabletitle = 'Ghi kết quả: ' . $model->name;
+
+$this->menu = array(
+    array(
+        'label' => 'Quay lại',
+        'url' => $this->createUrl('index', array('event_id' => $model->event_id, 'sport_id' => $model->sport_id)),
+        'color' => 'secondary',
+        'icon' => 'fa-arrow-left',
+        'id' => 'btn_back',
+    ),
+);
+
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/plugins/toast.js',
+    CClientScript::POS_END
+);
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/sportdraw-results.js?v=1.0',
+    CClientScript::POS_END
+);
+
+$teamMap = array();
+if ($preview && isset($preview['teams'])) {
+    foreach ($preview['teams'] as $t) {
+        $teamMap[$t['team_id']] = $t['team_name'] !== null ? $t['team_name'] : ('#' . $t['team_id']);
+    }
+}
+$matches = ($preview && isset($preview['matches'])) ? $preview['matches'] : array();
+
+$slotName = function ($teamId, $source) use ($teamMap) {
+    if ($teamId && isset($teamMap[$teamId])) {
+        return CHtml::encode($teamMap[$teamId]);
+    }
+    if ($source) {
+        return '<span class="text-muted fst-italic">Chờ: ' . CHtml::encode($source) . '</span>';
+    }
+    return '<span class="text-muted fst-italic">Chưa xác định</span>';
+};
+
+/** Render 1 dòng trận với ô nhập tỉ số */
+$renderMatch = function ($m) use ($slotName, $teamMap) {
+    $hasBoth = !empty($m['team_a_id']) && !empty($m['team_b_id']);
+    $res = isset($m['result']) ? $m['result'] : null;
+    $scoreA = $res ? $res['score_a'] : '';
+    $scoreB = $res ? $res['score_b'] : '';
+    $done = $res !== null && $res['score_a'] !== null && $res['score_b'] !== null;
+    ?>
+    <div class="card mb-2 match-row" data-match-id="<?php echo CHtml::encode($m['id']); ?>">
+        <div class="card-body p-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="badge bg-light text-dark"><?php echo CHtml::encode($m['round']); ?></span>
+                <div class="flex-grow-1 text-end" style="min-width:140px;">
+                    <?php echo $slotName($m['team_a_id'], isset($m['team_a_source']) ? $m['team_a_source'] : null); ?>
+                </div>
+                <?php if (!empty($m['is_bye'])): ?>
+                    <span class="badge bg-secondary">BYE</span>
+                <?php elseif ($hasBoth): ?>
+                    <input type="number" class="form-control form-control-sm text-center score-a"
+                           style="width:60px;" value="<?php echo CHtml::encode($scoreA); ?>" min="0">
+                    <span class="fw-bold">-</span>
+                    <input type="number" class="form-control form-control-sm text-center score-b"
+                           style="width:60px;" value="<?php echo CHtml::encode($scoreB); ?>" min="0">
+                <?php else: ?>
+                    <span class="text-muted">vs</span>
+                <?php endif; ?>
+                <div class="flex-grow-1" style="min-width:140px;">
+                    <?php echo $slotName($m['team_b_id'], isset($m['team_b_source']) ? $m['team_b_source'] : null); ?>
+                </div>
+                <?php if ($hasBoth && empty($m['is_bye'])): ?>
+                    <button type="button" class="btn btn-sm btn-primary btn-save-result">
+                        <i class="fa fa-save"></i>
+                    </button>
+                    <span class="badge bg-success result-badge <?php echo $done ? '' : 'd-none'; ?>">
+                        <i class="fa fa-check"></i>
+                    </span>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+    <?php
+};
+?>
+
+<?php if (!$preview || empty($matches)): ?>
+    <div class="alert alert-warning">Chưa có trận đấu nào. Hãy bốc thăm/gán đội và sinh lịch trước.</div>
+<?php else: ?>
+
+    <div id="results-board" data-save-url="<?php echo $this->createUrl('saveResult'); ?>">
+        <div class="alert alert-light border small">
+            <i class="fa fa-info-circle me-1"></i>
+            Nhập tỉ số rồi nhấn <i class="fa fa-save"></i>. Với sơ đồ loại trực tiếp, đội thắng sẽ
+            tự được điền vào trận vòng sau. Với vòng bảng, sau khi nhập đủ hãy
+            <strong>Tính BXH</strong> rồi <strong>Sinh nhánh từ bảng</strong> ở màn danh sách.
+        </div>
+
+        <?php
+        // Nhóm trận: vòng bảng theo group_label, còn lại theo round_no
+        $groupMatches = array();
+        $koMatches = array();
+        foreach ($matches as $m) {
+            if (($m['match_type'] ?? '') === 'group') {
+                $groupMatches[$m['group_label'] ?? '?'][] = $m;
+            } else {
+                $koMatches[] = $m;
+            }
+        }
+        ksort($groupMatches);
+        ?>
+
+        <?php if (!empty($groupMatches)): ?>
+            <h5 class="mb-2">Vòng bảng</h5>
+            <div class="row">
+                <?php foreach ($groupMatches as $label => $list): ?>
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header fw-bold py-2">Bảng <?php echo CHtml::encode($label); ?></div>
+                            <div class="card-body p-2">
+                                <?php foreach ($list as $m) { $renderMatch($m); } ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($koMatches)): ?>
+            <h5 class="mb-2 mt-2">Vòng loại trực tiếp</h5>
+            <?php foreach ($koMatches as $m) { $renderMatch($m); } ?>
+        <?php endif; ?>
+    </div>
+
+<?php endif; ?>
