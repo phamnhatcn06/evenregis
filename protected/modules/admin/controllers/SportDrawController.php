@@ -3,8 +3,9 @@
 class SportDrawController extends AdminController
 {
     /**
-     * Bốc thăm là một phần của quản lý thể thao → dùng chung quyền 'sport'
-     * thay vì yêu cầu một permission 'sportdraw' riêng từ Portal.
+     * Bốc thăm là một phần của quản lý thể thao. Quyền được cấp từ Portal theo
+     * tên controller thật ('sports', 'sportteams', 'sportdraw'), KHÔNG phải 'sport'.
+     * Chấp nhận nếu user có quyền ở bất kỳ controller thể thao nào tương ứng.
      */
     public function beforeAction($action)
     {
@@ -15,8 +16,14 @@ class SportDrawController extends AdminController
         $actionId = strtolower($action->id);
         $operation = $this->mapActionToOperation($actionId);
 
-        if ($operation && !PermissionHelper::can('sport', $operation)) {
-            throw new CHttpException(403, 'Bạn không có quyền thực hiện thao tác này.');
+        if ($operation) {
+            $allowed = PermissionHelper::can('sports', $operation)
+                || PermissionHelper::can('sportdraw', $operation)
+                || PermissionHelper::can('sportteams', $operation)
+                || PermissionHelper::can('sport', $operation);
+            if (!$allowed) {
+                throw new CHttpException(403, 'Bạn không có quyền thực hiện thao tác này.');
+            }
         }
 
         return true;
