@@ -47,6 +47,14 @@ for ($i = 0; $i < $numGroups; $i++) {
     $groupLabels[] = chr(65 + $i); // A, B, C...
 }
 $bracketSize = (int) $model->bracket_size;
+// Fallback: nếu chưa cấu hình kích thước nhánh, tự tính theo số đội (lũy thừa 2 gần nhất)
+if ($isBracket && $bracketSize < 2) {
+    $teamCount = count($teams);
+    $bracketSize = 2;
+    while ($bracketSize < $teamCount) {
+        $bracketSize *= 2;
+    }
+}
 ?>
 
 <?php if (!$mode): ?>
