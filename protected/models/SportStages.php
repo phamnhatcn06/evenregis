@@ -46,7 +46,7 @@ class SportStages extends BaseSportStages
         if (is_array($values)) {
             $extra = array('format', 'num_groups', 'teams_per_group', 'advance_per_group',
                 'bracket_size', 'draw_status', 'draw_seed', 'drawn_by', 'drawn_at',
-                'sport_name', 'event_name');
+                'sport_name', 'sport_code', 'event_name');
             foreach ($extra as $name) {
                 if (array_key_exists($name, $values)) {
                     $this->$name = $values[$name];
