@@ -17,13 +17,14 @@
 
         var searchUrl = config.getAttribute('data-search-url');
         var assignUrl = config.getAttribute('data-assign-url');
+        var checkUrl = config.getAttribute('data-check-url');
 
         openButton.addEventListener('click', function () {
             resetForm();
             new bootstrap.Modal(modalElement).show();
         });
 
-        bindSearch(searchUrl);
+        bindSearch(searchUrl, checkUrl);
         bindSubmit(modalElement, assignUrl);
 
         // Admin tự chọn năm sinh -> ẩn note cảnh báo thiếu dữ liệu.
