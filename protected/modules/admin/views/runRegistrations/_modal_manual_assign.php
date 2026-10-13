@@ -17,8 +17,8 @@ $minYear     = 1950;
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
                 <h5 class="modal-title text-white d-flex align-items-center gap-2" style="font-size: 16px; font-weight: 700;">
-                    <i class="fa fa-user-plus"></i>
-                    <span>Gán thủ công vào nội dung chạy</span>
+                    <i class="fa fa-user-plus" id="manual_modal_icon"></i>
+                    <span id="manual_modal_title">Gán thủ công vào nội dung chạy</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
