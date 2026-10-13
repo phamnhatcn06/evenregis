@@ -397,10 +397,13 @@
         setValue('manual_search', '');
         setValue('manual_bib', '');
         setValue('manual_guest_name', '');
+        setValue('manual_guest_company', '');
         var guestCheckbox = document.getElementById('manual_is_guest');
         if (guestCheckbox) { guestCheckbox.checked = false; }
         var guestNameGroup = document.getElementById('manual_guest_name_group');
         if (guestNameGroup) { guestNameGroup.style.display = 'none'; }
+        var guestCompanyGroup = document.getElementById('manual_guest_company_group');
+        if (guestCompanyGroup) { guestCompanyGroup.style.display = 'none'; }
         var searchGroupReset = document.getElementById('manual_search_group');
         if (searchGroupReset) { searchGroupReset.style.display = ''; }
         setText('manual_target_name', '-');
