@@ -179,6 +179,9 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                                 <td>
                                     <?php if (!empty($r['is_guest'])): ?>
                                         <span class="badge bg-warning text-dark"><i class="fa fa-user-o me-1"></i>Khách ngoài</span>
+                                        <?php if (!empty($r['company'])): ?>
+                                            <div class="small text-muted mt-1"><?php echo CHtml::encode($r['company']); ?></div>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <?php echo CHtml::encode(!empty($r['unit_label']) ? $r['unit_label'] : '—'); ?>
                                     <?php endif; ?>
