@@ -75,7 +75,8 @@ $positionText = function ($row) use ($col) {
                     <td class="c"><?php echo $stt; ?></td>
                     <td><?php echo CHtml::encode($col($row, 'full_name')); ?></td>
                     <td class="c"><?php echo CHtml::encode($col($row, 'staff_code')); ?></td>
-                    <td><?php echo CHtml::encode($division($row)); ?></td>
+                    <td><?php echo CHtml::encode($unit($row)); ?></td>
+                    <td><?php echo CHtml::encode($positionText($row)); ?></td>
                     <td class="c <?php echo $ident === '' ? 'empty' : 'ident'; ?>">
                         <?php echo $ident === '' ? 'Chưa cấp' : CHtml::encode($ident); ?>
                     </td>
