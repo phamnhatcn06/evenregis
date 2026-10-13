@@ -73,6 +73,22 @@ class RunRegistrations extends CFormModel
         ));
     }
 
+    /**
+     * Admin đổi nội dung (cự ly) cho một đăng ký đã có (thu hồi BIB cũ). Trả mảng ApiClient chuẩn.
+     * code=200 thành công; 409 BIB đã cấp / đã đăng ký khác; 422 lỗi dữ liệu.
+     */
+    public static function adminChangeContentViaApi($registrationId, $runEventId, $bibNumber, $birthYear = null, $gender = null, $authEmail = null)
+    {
+        return ApiClient::post(ApiEndpoints::RUN_REGISTRATION_ADMIN_CHANGE_CONTENT, array(
+            'registration_id' => $registrationId,
+            'run_event_id'    => $runEventId,
+            'bib_number'      => $bibNumber,
+            'birth_year'      => $birthYear,
+            'gender'          => $gender,
+            'auth_email'      => $authEmail,
+        ));
+    }
+
     /** Phiếu đăng ký của 1 người (hoặc null). */
     public static function findMine($attendeeId)
     {
