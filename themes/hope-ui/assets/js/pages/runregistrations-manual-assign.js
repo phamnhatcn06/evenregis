@@ -283,6 +283,7 @@
         document.querySelectorAll('input[name="manual_run_event_id"]').forEach(function (el) {
             el.checked = false;
         });
+        lockForExisting(false);
     }
 
     function getCheckedValue(name) {
