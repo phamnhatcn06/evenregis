@@ -137,6 +137,32 @@ class RunRegistrationsController extends AdminController
     }
 
     /**
+     * Kiểm tra đăng ký chạy hiện có của một người (GET, JSON) — để cảnh báo tránh cấp lần 2.
+     * Trả về bib_number + tên cự ly nếu người này đã có đăng ký đang hiệu lực.
+     */
+    public function actionCheckRegistration()
+    {
+        $attendeeId = (int) Yii::app()->request->getParam('attendee_id');
+        if (!$attendeeId) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu attendee_id.'), 422);
+            return;
+        }
+
+        $reg = RunRegistrations::findMine($attendeeId);
+        if (!empty($reg) && !empty($reg['bib_number'])) {
+            $this->renderJson(array(
+                'success'     => true,
+                'registered'  => true,
+                'bib_number'  => $reg['bib_number'],
+                'run_event_name' => isset($reg['run_event_name']) ? $reg['run_event_name'] : '',
+            ));
+            return;
+        }
+
+        $this->renderJson(array('success' => true, 'registered' => false));
+    }
+
+    /**
      * Admin gán thủ công một người vào một cự ly với mã BIB tự điền (POST, JSON).
      * Lưu năm sinh/giới tính trước rồi gọi API gán (kiểm tra trùng BIB ở backend).
      */
