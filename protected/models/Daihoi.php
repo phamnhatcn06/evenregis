@@ -368,6 +368,33 @@ class Daihoi
     }
 
     /**
+     * Danh sách tin tức cho trang Tin tức chung, có thể lọc theo danh mục.
+     * @param int|null $categoryId Lọc theo danh mục (null = tất cả)
+     * @param int $limit Số lượng tối đa
+     * @return array
+     */
+    public static function getNewsList($categoryId = null, $limit = 60)
+    {
+        $params = array('per_page' => $limit, 'page' => 1, 'is_published' => 1);
+        if ($categoryId !== null && $categoryId !== '') {
+            $params['category_id'] = (int) $categoryId;
+        }
+        return self::unwrap(ApiClient::get(ApiEndpoints::NEWS_LIST, $params), array());
+    }
+
+    /**
+     * Danh sách danh mục tin tức đang kích hoạt (dùng cho sidebar).
+     * @return array
+     */
+    public static function getNewsCategories()
+    {
+        return self::unwrap(
+            ApiClient::get(ApiEndpoints::NEWS_CATEGORY_LIST, array('is_active' => 1, 'per_page' => 100, 'page' => 1)),
+            array()
+        );
+    }
+
+    /**
      * Chi tiết một bài tin theo id.
      * @param int $id
      * @return array
