@@ -85,12 +85,24 @@ class DaihoiController extends FrontEndController
      */
     public function actionSchedule()
     {
-        $this->frontTitle = 'Lịch thi đấu';
+        $this->frontTitle = 'Lịch thi đấu & Kết quả thể thao';
+        $event = Daihoi::getEvent();
+        $sportId = Yii::app()->request->getParam('sport_id');
+        $status = Yii::app()->request->getParam('status');
+        $date = Yii::app()->request->getParam('date');
+
+        $tournament = Daihoi::getTournamentSchedule(isset($event['id']) ? $event['id'] : null, $sportId);
+
         $this->render('schedule', array(
-            'event' => Daihoi::getEvent(),
-            'liveMatches' => Daihoi::getLiveMatches(),
-            'recentMatches' => Daihoi::getRecentMatches(),
+            'event' => $event,
+            'tournament' => $tournament,
+            'liveMatches' => $tournament['liveMatches'],
+            'recentMatches' => $tournament['recentMatches'],
+            'upcomingMatches' => $tournament['upcomingMatches'],
             'rankings' => Daihoi::getRankings(10),
+            'selectedSportId' => $sportId,
+            'selectedStatus' => $status,
+            'selectedDate' => $date,
         ));
     }
 

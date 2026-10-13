@@ -22,6 +22,17 @@ $this->menu = array(
         'icon' => 'fa-arrow-left',
         'id' => 'btn_back',
     ),
+    array(
+        'label' => 'Xem sơ đồ cây',
+        'url' => $this->createUrl('view', array('id' => $model->id)),
+        'color' => 'info',
+        'icon' => 'fa-sitemap',
+        'id' => 'btn_view_bracket',
+    ),
+);
+
+Yii::app()->clientScript->registerCssFile(
+    Yii::app()->theme->baseUrl . '/assets/css/pages/sportdraw-bracket.css?v=1.2'
 );
 
 Yii::app()->clientScript->registerScriptFile(

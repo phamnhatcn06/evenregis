@@ -1,6 +1,13 @@
 <?php
 /**
- * Hiển thị kết quả bốc thăm: bảng đấu (round-robin) và sơ đồ cây (knockout).
+ * Hiển thị kết quả bốc thăm: bảng đấu (round-robin) và sơ đồ cây loại trực tiếp (knockout).
+ * Giao diện hiện đại tích hợp:
+ * 1. Sơ đồ loại trực tiếp với đường nối SVG động, hiệu ứng rà chuột, bục cúp vô địch và trận tranh hạng 3.
+ * 2. Bảng xếp hạng chi tiết cho từng bảng (luôn tự động tính toán từ các trận đấu).
+ * 3. Chức năng ghi tỉ số / kết quả trực tiếp trên từng trận (modal popup AJAX).
+ * 4. Kéo thả sắp xếp thứ tự các trận đấu và lưu lại backend.
+ * 5. Ghi thời gian bắt đầu và địa điểm sân thi đấu cho từng trận.
+ * 6. Sắp xếp các trận đấu tự động theo thứ tự thời gian tăng dần.
  *
  * @var SportDrawController $this
  * @var SportStages $model
@@ -11,7 +18,7 @@ $this->breadcrumbs = array(
     'Bốc thăm thi đấu' => $this->createUrl('index'),
     $model->name,
 );
-$this->Tabletitle = 'Kết quả bốc thăm: ' . $model->name;
+$this->Tabletitle = 'Chi tiết thi đấu: ' . $model->name;
 
 $this->menu = array(
     array(
@@ -21,9 +28,36 @@ $this->menu = array(
         'icon' => 'fa-arrow-left',
         'id' => 'btn_back',
     ),
+    array(
+        'label' => 'Ghi kết quả',
+        'url' => $this->createUrl('results', array('id' => $model->id)),
+        'color' => 'success',
+        'icon' => 'fa-pencil-square-o',
+        'id' => 'btn_results',
+    ),
+    array(
+        'label' => 'Gán thủ công',
+        'url' => $this->createUrl('assign', array('id' => $model->id)),
+        'color' => 'outline-primary',
+        'icon' => 'fa-hand-rock-o',
+        'id' => 'btn_assign',
+    ),
 );
 
-// Map team_id -> tên để hiển thị trong trận
+// Register CSS & JS
+Yii::app()->clientScript->registerCssFile(
+    Yii::app()->theme->baseUrl . '/assets/css/pages/sportdraw-bracket.css?v=1.3'
+);
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/plugins/toast.js',
+    CClientScript::POS_END
+);
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/sportdraw-view.js?v=1.3',
+    CClientScript::POS_END
+);
+
+// Map team_id -> tên để hiển thị
 $teamMap = array();
 $teams = array();
 if ($preview && isset($preview['teams'])) {
@@ -35,180 +69,954 @@ if ($preview && isset($preview['teams'])) {
 
 $matches = ($preview && isset($preview['matches'])) ? $preview['matches'] : array();
 
-/** Tên đội trong 1 slot của trận */
-$slotName = function ($teamId, $source) use ($teamMap) {
+// Match lookup & Feeder hierarchy mapping
+$matchMap = array();
+$feedersOf = array();
+$loserFeedersOf = array();
+
+foreach ($matches as $m) {
+    $matchMap[$m['id']] = $m;
+    if (!empty($m['winner_to_match_id'])) {
+        $feedersOf[$m['winner_to_match_id']][] = $m;
+    }
+    if (!empty($m['loser_to_match_id'])) {
+        $loserFeedersOf[$m['loser_to_match_id']][] = $m;
+    }
+}
+
+/** Tên đội hoặc nguồn chờ thông minh */
+$getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($teamMap, $feedersOf, $loserFeedersOf) {
     if ($teamId && isset($teamMap[$teamId])) {
-        return CHtml::encode($teamMap[$teamId]);
+        return array('name' => $teamMap[$teamId], 'isTeam' => true);
     }
-    if ($source) {
-        return '<span class="text-muted fst-italic">Chờ: ' . CHtml::encode($source) . '</span>';
+    if (!empty($explicitSource)) {
+        return array('name' => 'Chờ ' . $explicitSource, 'isTeam' => false);
     }
-    return '<span class="text-muted fst-italic">Chưa xác định</span>';
+    // Dò tìm từ nhánh vòng trước
+    $isPlayoff = (($match['match_type'] ?? '') === 'playoff');
+    if ($isPlayoff && !empty($loserFeedersOf[$match['id']][$slotIndex])) {
+        $f = $loserFeedersOf[$match['id']][$slotIndex];
+        return array('name' => 'Thua ' . ($f['round'] ?? 'Trận') . ' ' . ($f['bracket_pos'] ?? ''), 'isTeam' => false);
+    }
+    if (!empty($feedersOf[$match['id']][$slotIndex])) {
+        $f = $feedersOf[$match['id']][$slotIndex];
+        return array('name' => 'Thắng ' . ($f['round'] ?? 'Trận') . ' ' . ($f['bracket_pos'] ?? ''), 'isTeam' => false);
+    }
+    return array('name' => 'Chờ xác định', 'isTeam' => false);
 };
 ?>
 
 <?php if (!$preview): ?>
-    <div class="alert alert-warning">Chưa có dữ liệu bốc thăm cho giai đoạn này.</div>
+    <div class="alert alert-warning d-flex align-items-center">
+        <i class="fa fa-exclamation-triangle fs-4 me-3"></i>
+        <div>Chưa có dữ liệu bốc thăm cho giai đoạn này. Vui lòng tiến hành bốc thăm hoặc gán đội trước.</div>
+    </div>
 <?php else: ?>
 
-    <div class="mb-3">
-        Thể thức: <strong><?php echo CHtml::encode(SportStages::getFormatLabel($model->format)); ?></strong>
-        &nbsp;|&nbsp; <?php echo SportStages::getDrawStatusLabel($preview['draw_status']); ?>
-    </div>
+    <div id="sport-draw-view-root"
+         data-stage-id="<?php echo CHtml::encode($model->id); ?>"
+         data-event-id="<?php echo CHtml::encode($model->event_id); ?>"
+         data-sport-id="<?php echo CHtml::encode($model->sport_id); ?>"
+         data-save-result-url="<?php echo $this->createUrl('saveResult'); ?>"
+         data-update-match-url="<?php echo $this->createUrl('updateMatch'); ?>"
+         data-reorder-matches-url="<?php echo $this->createUrl('reorderMatches'); ?>"
+         data-standings-url="<?php echo $this->createUrl('standings', array('id' => $model->id)); ?>"
+         data-generate-knockout-url="<?php echo $this->createUrl('generateKnockout', array('id' => $model->id)); ?>">
 
-    <?php
-    // ===== Bảng xếp hạng =====
-    $standings = isset($preview['standings']) ? $preview['standings'] : array();
-    $standingsByGroup = array();
-    foreach ($standings as $s) {
-        $standingsByGroup[$s['group_label']][] = $s;
-    }
-    ksort($standingsByGroup);
-    ?>
-    <?php if (!empty($standingsByGroup)): ?>
-        <h5 class="mb-3">Bảng xếp hạng</h5>
-        <div class="row">
-            <?php foreach ($standingsByGroup as $label => $rows): ?>
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header fw-bold">Bảng <?php echo CHtml::encode($label); ?></div>
-                        <table class="table table-sm table-bordered mb-0 text-center">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th><th class="text-start">Đội</th><th>Trận</th>
-                                    <th>T</th><th>H</th><th>B</th><th>HS</th><th>Điểm</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <?php foreach ($rows as $r): ?>
-                                <tr>
-                                    <td><?php echo (int) $r['rank']; ?></td>
-                                    <td class="text-start"><?php echo CHtml::encode($teamMap[$r['team_id']] ?? ('#' . $r['team_id'])); ?></td>
-                                    <td><?php echo (int) $r['played']; ?></td>
-                                    <td><?php echo (int) $r['won']; ?></td>
-                                    <td><?php echo (int) $r['drawn']; ?></td>
-                                    <td><?php echo (int) $r['lost']; ?></td>
-                                    <td><?php echo ((int) $r['points_scored']) . ':' . ((int) $r['points_conceded']); ?></td>
-                                    <td class="fw-bold"><?php echo (int) $r['points']; ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
+        <!-- 1. Header Banner Giai đoạn -->
+        <div class="sportdraw-header-card">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-primary px-2 py-1"><i class="fa fa-trophy me-1"></i><?php echo CHtml::encode($model->name); ?></span>
+                        <span class="text-muted small">Giai đoạn ID: #<?php echo CHtml::encode($model->id); ?></span>
+                    </div>
+                    <h4 class="mb-0 fw-bold text-dark"><?php echo CHtml::encode(SportStages::getFormatLabel($model->format)); ?></h4>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <div class="sportdraw-stat-pill">
+                        <i class="fa fa-info-circle"></i>
+                        <span>Trạng thái: <strong><?php echo SportStages::getDrawStatusLabel($preview['draw_status']); ?></strong></span>
+                    </div>
+                    <div class="sportdraw-stat-pill">
+                        <i class="fa fa-users"></i>
+                        <span>Đội tham gia: <strong><?php echo count($teams); ?></strong></span>
+                    </div>
+                    <div class="sportdraw-stat-pill">
+                        <i class="fa fa-calendar-check-o"></i>
+                        <span>Trận đấu: <strong><?php echo count($matches); ?></strong></span>
+                    </div>
+                    <?php if ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT): ?>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="btn-genko-top"
+                                onclick="if(confirm('Sinh sơ đồ loại trực tiếp từ bảng xếp hạng hiện tại?')){ fetch('<?php echo $this->createUrl('generateKnockout', array('id' => $model->id)); ?>', {method:'POST'}).then(r=>r.json()).then(res=>{ if(res.success){ alert('Đã sinh sơ đồ nhánh!'); location.reload(); }else{ alert(res.message||'Lỗi sinh nhánh'); } }); }">
+                            <i class="fa fa-sitemap me-1"></i>Sinh nhánh từ BXH
+                        </button>
+                    <?php endif; ?>
+                    <a href="<?php echo $this->createUrl('results', array('id' => $model->id)); ?>" class="btn btn-sm btn-success">
+                        <i class="fa fa-pencil-square-o me-1"></i>Ghi kết quả (Màn riêng)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <?php
+        // =========================================================================
+        // PHÂN LOẠI TRẬN ĐẤU: VÒNG BẢNG VÀ VÒNG LOẠI TRỰC TIẾP
+        // =========================================================================
+        $groupMatches = array();
+        $koMatches = array();
+        $rounds = array();
+        $thirdPlace = null;
+        $finalMatch = null;
+        $championTeamId = null;
+        $championTeamName = null;
+
+        foreach ($matches as $m) {
+            $type = $m['match_type'] ?? '';
+            if ($type === 'group') {
+                $groupMatches[$m['group_label'] ?? '?'][] = $m;
+            } elseif ($type === 'playoff') {
+                $thirdPlace = $m;
+            } else {
+                if ($type === 'final') {
+                    $finalMatch = $m;
+                }
+                $rounds[$m['round_no']][] = $m;
+                $koMatches[] = $m;
+            }
+        }
+        ksort($groupMatches);
+        ksort($rounds);
+
+        if ($finalMatch) {
+            $fRes = $finalMatch['result'] ?? null;
+            if ($fRes && !empty($fRes['winner_team_id'])) {
+                $championTeamId = $fRes['winner_team_id'];
+                $championTeamName = $teamMap[$championTeamId] ?? ('#' . $championTeamId);
+            }
+        }
+
+        // Nhóm đội theo bảng
+        $groups = array();
+        foreach ($teams as $t) {
+            if (!empty($t['group_label'])) {
+                $groups[$t['group_label']][] = $t;
+            }
+        }
+        ksort($groups);
+
+        // =========================================================================
+        // BẢNG XẾP HẠNG CỦA TỪNG BẢNG (TỰ ĐỘNG TÍNH TOÁN NẾU API CHƯA CÓ)
+        // =========================================================================
+        $standingsByGroup = array();
+        $rawStandings = isset($preview['standings']) ? $preview['standings'] : array();
+        foreach ($rawStandings as $s) {
+            if (!empty($s['group_label'])) {
+                $standingsByGroup[$s['group_label']][] = $s;
+            }
+        }
+
+        // Luôn đảm bảo tất cả các bảng đều có Bảng Xếp Hạng
+        foreach ($groups as $label => $members) {
+            if (empty($standingsByGroup[$label])) {
+                $computed = array();
+                foreach ($members as $mem) {
+                    $tid = $mem['team_id'];
+                    $computed[$tid] = array(
+                        'group_label' => $label,
+                        'team_id' => $tid,
+                        'team_name' => $teamMap[$tid] ?? ('#' . $tid),
+                        'rank' => 1,
+                        'played' => 0,
+                        'won' => 0,
+                        'drawn' => 0,
+                        'lost' => 0,
+                        'points_scored' => 0,
+                        'points_conceded' => 0,
+                        'goal_diff' => 0,
+                        'points' => 0,
+                    );
+                }
+
+                if (!empty($groupMatches[$label])) {
+                    foreach ($groupMatches[$label] as $gm) {
+                        $res = $gm['result'] ?? null;
+                        if ($res && $res['score_a'] !== null && $res['score_b'] !== null && $res['score_a'] !== '' && $res['score_b'] !== '') {
+                            $sa = (int) $res['score_a'];
+                            $sb = (int) $res['score_b'];
+                            $ta = $gm['team_a_id'];
+                            $tb = $gm['team_b_id'];
+                            if (isset($computed[$ta]) && isset($computed[$tb])) {
+                                $computed[$ta]['played']++;
+                                $computed[$tb]['played']++;
+                                $computed[$ta]['points_scored'] += $sa;
+                                $computed[$ta]['points_conceded'] += $sb;
+                                $computed[$tb]['points_scored'] += $sb;
+                                $computed[$tb]['points_conceded'] += $sa;
+
+                                if ($sa > $sb) {
+                                    $computed[$ta]['won']++;
+                                    $computed[$ta]['points'] += 3;
+                                    $computed[$tb]['lost']++;
+                                } elseif ($sb > $sa) {
+                                    $computed[$tb]['won']++;
+                                    $computed[$tb]['points'] += 3;
+                                    $computed[$ta]['lost']++;
+                                } else {
+                                    $computed[$ta]['drawn']++;
+                                    $computed[$ta]['points'] += 1;
+                                    $computed[$tb]['drawn']++;
+                                    $computed[$tb]['points'] += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach ($computed as $tid => $row) {
+                    $computed[$tid]['goal_diff'] = $row['points_scored'] - $row['points_conceded'];
+                }
+
+                usort($computed, function ($a, $b) {
+                    if ($b['points'] !== $a['points']) return $b['points'] - $a['points'];
+                    if ($b['goal_diff'] !== $a['goal_diff']) return $b['goal_diff'] - $a['goal_diff'];
+                    if ($b['points_scored'] !== $a['points_scored']) return $b['points_scored'] - $a['points_scored'];
+                    return 0;
+                });
+
+                $rNum = 1;
+                foreach ($computed as $idx => $row) {
+                    $computed[$idx]['rank'] = $rNum++;
+                }
+                $standingsByGroup[$label] = $computed;
+            }
+        }
+        ksort($standingsByGroup);
+        $advancePerGroup = (int) ($model->advance_per_group ?: 2);
+        ?>
+
+        <!-- 2. BẢNG XẾP HẠNG TỪNG BẢNG -->
+        <!-- 2. BẢNG XẾP HẠNG TỪNG BẢNG (GROUP STANDINGS) -->
+        <?php if (!empty($standingsByGroup)): ?>
+            <?php
+            $isFinalStage = (isset($model->stage_type) && $model->stage_type === 'final');
+            $groupCount = count($standingsByGroup);
+            $groupColClass = ($groupCount === 1) ? 'col-lg-8 mx-auto mb-3' : 'col-lg-6 mb-3';
+            ?>
+            <div class="card mb-4 border-0 shadow-sm <?php echo $isFinalStage ? 'border-top border-4 border-warning' : ''; ?>">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div>
+                            <h5 class="mb-0 fw-bold text-dark">
+                                <?php if ($isFinalStage): ?>
+                                    <i class="fa fa-trophy text-warning me-2"></i>Bảng xếp hạng Vòng chung kết (Tranh Huy chương Vàng • Bạc • Đồng)
+                                <?php else: ?>
+                                    <i class="fa fa-list-ol text-success me-2"></i>Bảng xếp hạng từng bảng
+                                <?php endif; ?>
+                            </h5>
+                            <small class="text-muted">
+                                <?php if ($isFinalStage): ?>
+                                    Kết quả thi đấu vòng tròn xếp hạng: 🥇 Nhất (HCV) • 🥈 Nhì (HCB) • 🥉 Ba (HCĐ)
+                                <?php else: ?>
+                                    Cập nhật điểm số, hiệu số và thứ hạng trực tiếp theo kết quả các trận đấu
+                                <?php endif; ?>
+                            </small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <?php if ($isFinalStage): ?>
+                                <span class="badge bg-warning text-dark border">
+                                    <i class="fa fa-trophy me-1"></i>Tranh Huy chương 1 - 2 - 3
+                                </span>
+                            <?php else: ?>
+                                <span class="badge bg-light text-muted border">
+                                    Top <?php echo $advancePerGroup; ?> đội đầu bảng vào vòng trong
+                                </span>
+                            <?php endif; ?>
+                            <button type="button" class="btn btn-sm btn-outline-success" id="btn-recompute-standings" title="Tính lại BXH qua API">
+                                <i class="fa fa-refresh me-1"></i>Tính lại BXH
+                            </button>
+                        </div>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
 
-    <?php
-    // ===== Vòng bảng (round-robin) =====
-    $groups = array();
-    foreach ($teams as $t) {
-        if (!empty($t['group_label'])) {
-            $groups[$t['group_label']][] = $t;
-        }
-    }
-    ksort($groups);
-    $groupMatches = array();
-    foreach ($matches as $m) {
-        if (($m['match_type'] ?? '') === 'group' && !empty($m['group_label'])) {
-            $groupMatches[$m['group_label']][] = $m;
-        }
-    }
-    ?>
-
-    <?php if (!empty($groups)): ?>
-        <h5 class="mb-3">Bảng đấu</h5>
-        <div class="row">
-            <?php foreach ($groups as $label => $members): ?>
-                <?php usort($members, function ($a, $b) { return $a['group_order'] - $b['group_order']; }); ?>
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header fw-bold">Bảng <?php echo CHtml::encode($label); ?></div>
-                        <table class="table table-sm table-bordered mb-0">
-                            <thead class="table-light">
-                                <tr><th style="width:40px;">#</th><th>Đội / VĐV</th></tr>
-                            </thead>
-                            <tbody>
-                            <?php foreach ($members as $i => $t): ?>
-                                <tr>
-                                    <td><?php echo $i + 1; ?></td>
-                                    <td><?php echo CHtml::encode($t['team_name']); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                        <?php if (!empty($groupMatches[$label])): ?>
-                            <div class="card-footer small">
-                                <div class="fw-bold mb-1">Lịch đấu</div>
-                                <?php foreach ($groupMatches[$label] as $m): ?>
-                                    <div>
-                                        <?php echo $slotName($m['team_a_id'], $m['team_a_source'] ?? null); ?>
-                                        <span class="text-muted"> vs </span>
-                                        <?php echo $slotName($m['team_b_id'], $m['team_b_source'] ?? null); ?>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <?php foreach ($standingsByGroup as $label => $rows): ?>
+                            <div class="<?php echo $groupColClass; ?>">
+                                <div class="sportdraw-table-card h-100 <?php echo $isFinalStage ? 'shadow-sm' : ''; ?>">
+                                    <div class="sportdraw-table-header <?php echo $isFinalStage ? 'bg-light' : ''; ?>">
+                                        <span class="fw-bold fs-6 text-dark">
+                                            <?php if ($isFinalStage && $groupCount === 1): ?>
+                                                <i class="fa fa-trophy text-warning me-2"></i>Bảng Chung kết
+                                            <?php else: ?>
+                                                <i class="fa fa-flag text-primary me-2"></i>Bảng <?php echo CHtml::encode($label); ?>
+                                            <?php endif; ?>
+                                        </span>
+                                        <span class="badge bg-light text-muted border"><?php echo count($rows); ?> đội</span>
                                     </div>
-                                <?php endforeach; ?>
+                                    <div class="table-responsive mb-0">
+                                        <table class="table table-hover align-middle mb-0 text-center group-standings-table"
+                                               data-group-label="<?php echo CHtml::encode($label); ?>">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 44px;">#</th>
+                                                    <th class="text-start">Đội / VĐV</th>
+                                                    <th title="Trận đã đấu">Trận</th>
+                                                    <th title="Thắng" class="text-success">T</th>
+                                                    <th title="Hòa">H</th>
+                                                    <th title="Bại" class="text-danger">B</th>
+                                                    <th title="Bàn thắng : Bàn thua">Hiệu số</th>
+                                                    <th title="Điểm" class="text-primary">Điểm</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php foreach ($rows as $r): ?>
+                                                <?php
+                                                $rank = (int)$r['rank'];
+                                                $rankClass = ($rank === 1) ? 'rank-gold' : (($rank === 2) ? 'rank-silver' : (($rank === 3) ? 'rank-bronze' : 'bg-light text-muted'));
+                                                $tName = $teamMap[$r['team_id']] ?? ($r['team_name'] ?? ('#' . $r['team_id']));
+                                                $isQualified = ($rank <= $advancePerGroup);
+                                                ?>
+                                                <tr data-team-id="<?php echo CHtml::encode($r['team_id']); ?>"
+                                                    class="<?php echo (!$isFinalStage && $isQualified) ? 'standings-qualify-row' : ''; ?>">
+                                                    <td>
+                                                        <span class="rank-badge <?php echo $rankClass; ?>">
+                                                            <?php echo $rank; ?>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-start fw-semibold text-dark">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span><?php echo CHtml::encode($tName); ?></span>
+                                                            <?php if ($isFinalStage): ?>
+                                                                <?php if ($rank === 1): ?>
+                                                                    <span class="badge bg-warning text-dark fw-bold"><i class="fa fa-trophy me-1"></i>HCV (Nhất)</span>
+                                                                <?php elseif ($rank === 2): ?>
+                                                                    <span class="badge bg-secondary text-white fw-bold"><i class="fa fa-star me-1"></i>HCB (Nhì)</span>
+                                                                <?php elseif ($rank === 3): ?>
+                                                                    <span class="badge text-white fw-bold" style="background:#cd7f32;"><i class="fa fa-star-half-o me-1"></i>HCĐ (Ba)</span>
+                                                                <?php endif; ?>
+                                                            <?php elseif ($isQualified): ?>
+                                                                <span class="standings-qualify-badge" title="Đủ điều kiện vào vòng loại trực tiếp">Vào vòng trong</span>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </td>
+                                                    <td class="col-played"><?php echo (int) $r['played']; ?></td>
+                                                    <td class="col-won text-success fw-bold"><?php echo (int) $r['won']; ?></td>
+                                                    <td class="col-drawn"><?php echo (int) $r['drawn']; ?></td>
+                                                    <td class="col-lost text-danger"><?php echo (int) $r['lost']; ?></td>
+                                                    <td class="col-diff">
+                                                        <span class="badge bg-light text-dark border">
+                                                            <?php echo ((int)$r['points_scored']) . ':' . ((int)$r['points_conceded']); ?>
+                                                        </span>
+                                                    </td>
+                                                    <td class="col-pts fw-bold fs-6 text-primary"><?php echo (int) $r['points']; ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
-    <?php
-    // ===== Sơ đồ loại trực tiếp (knockout) =====
-    $rounds = array();
-    $thirdPlace = null;
-    foreach ($matches as $m) {
-        $type = $m['match_type'] ?? '';
-        if ($type === 'playoff') {
-            $thirdPlace = $m;
-            continue;
-        }
-        if ($type === 'knockout' || $type === 'final') {
-            $rounds[$m['round_no']][] = $m;
-        }
-    }
-    ksort($rounds);
-    ?>
+        <!-- 3. DANH SÁCH & LỊCH THI ĐẤU (CÓ THỂ KÉO THẢ, GHI KẾT QUẢ, ĐẶT GIỜ, SẮP XẾP THỜI GIAN) -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom py-3">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div>
+                        <h5 class="mb-0 fw-bold text-dark">
+                            <i class="fa fa-calendar text-primary me-2"></i>Lịch thi đấu & Kéo sắp xếp trận đấu
+                        </h5>
+                        <small class="text-muted">Kéo thả biểu tượng <i class="fa fa-ellipsis-v text-muted"></i> để sắp xếp thứ tự thi đấu, hoặc sắp xếp tự động theo thời gian bắt đầu</small>
+                    </div>
 
-    <?php if (!empty($rounds)): ?>
-        <h5 class="mb-3">Sơ đồ loại trực tiếp</h5>
-        <div class="d-flex gap-4 overflow-auto pb-3">
-            <?php foreach ($rounds as $roundNo => $roundMatches): ?>
-                <?php usort($roundMatches, function ($a, $b) { return $a['bracket_pos'] - $b['bracket_pos']; }); ?>
-                <div style="min-width:220px;">
-                    <div class="text-center fw-bold mb-2"><?php echo CHtml::encode($roundMatches[0]['round']); ?></div>
-                    <?php foreach ($roundMatches as $m): ?>
-                        <div class="card mb-3">
-                            <div class="card-body p-2 small">
-                                <div><?php echo $slotName($m['team_a_id'], $m['team_a_source'] ?? null); ?></div>
-                                <hr class="my-1">
-                                <div>
-                                    <?php if (!empty($m['is_bye'])): ?>
-                                        <span class="badge bg-light text-muted">BYE</span>
-                                    <?php else: ?>
-                                        <?php echo $slotName($m['team_b_id'], $m['team_b_source'] ?? null); ?>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="btn-sort-by-time" title="Tự động sắp xếp các trận đấu theo thời gian bắt đầu tăng dần">
+                            <i class="fa fa-sort-amount-asc me-1"></i>Sắp xếp theo thứ tự thời gian
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success shadow-sm" id="btn-save-match-order" style="display: none;" title="Lưu lại thứ tự thi đấu vừa sắp xếp">
+                            <i class="fa fa-floppy-o me-1"></i>Lưu thứ tự thi đấu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-3">
+                <?php
+                // Sắp xếp các trận: ưu tiên match_order nếu có
+                $allDisplayMatches = $matches;
+                usort($allDisplayMatches, function ($a, $b) {
+                    $ordA = $a['match_order'] !== null ? (int)$a['match_order'] : 9999;
+                    $ordB = $b['match_order'] !== null ? (int)$b['match_order'] : 9999;
+                    if ($ordA !== $ordB) return $ordA - $ordB;
+                    return ($a['id'] ?? 0) - ($b['id'] ?? 0);
+                });
+                ?>
+
+                <div class="sortable-matches-container">
+                    <?php foreach ($allDisplayMatches as $idx => $m): ?>
+                        <?php
+                        $mRes = $m['result'] ?? null;
+                        $hasScore = ($mRes !== null && $mRes['score_a'] !== null && $mRes['score_b'] !== null && $mRes['score_a'] !== '' && $mRes['score_b'] !== '');
+                        $sA = $hasScore ? $mRes['score_a'] : '';
+                        $sB = $hasScore ? $mRes['score_b'] : '';
+                        $wId = $mRes['winner_team_id'] ?? null;
+                        $teamAName = $teamMap[$m['team_a_id']] ?? ($m['team_a_source'] ? ('Chờ ' . $m['team_a_source']) : 'Chờ xác định');
+                        $teamBName = $teamMap[$m['team_b_id']] ?? ($m['team_b_source'] ? ('Chờ ' . $m['team_b_source']) : 'Chờ xác định');
+                        $orderVal = $m['match_order'] ?: ($idx + 1);
+                        ?>
+
+                        <div class="sortable-match-item"
+                             draggable="true"
+                             data-match-id="<?php echo CHtml::encode($m['id']); ?>"
+                             data-match-code="<?php echo CHtml::encode($m['code'] ?: ('M' . $m['id'])); ?>"
+                             data-round-name="<?php echo CHtml::encode($m['round']); ?>"
+                             data-match-type="<?php echo CHtml::encode($m['match_type']); ?>"
+                             data-group-label="<?php echo CHtml::encode($m['group_label'] ?: ''); ?>"
+                             data-team-a-id="<?php echo CHtml::encode($m['team_a_id'] ?: ''); ?>"
+                             data-team-b-id="<?php echo CHtml::encode($m['team_b_id'] ?: ''); ?>"
+                             data-team-a-name="<?php echo CHtml::encode($teamAName); ?>"
+                             data-team-b-name="<?php echo CHtml::encode($teamBName); ?>"
+                             data-score-a="<?php echo CHtml::encode($sA); ?>"
+                             data-score-b="<?php echo CHtml::encode($sB); ?>"
+                             data-winner-id="<?php echo CHtml::encode($wId ?: ''); ?>"
+                             data-is-draw="<?php echo (!empty($mRes['is_draw'])) ? '1' : '0'; ?>"
+                             data-match-time="<?php echo CHtml::encode($m['match_time'] ?: ''); ?>"
+                             data-location="<?php echo CHtml::encode($m['location'] ?: ''); ?>"
+                             data-match-order="<?php echo CHtml::encode($orderVal); ?>">
+
+                            <!-- Khối 1: Kéo thả & Thứ tự & Vòng đấu -->
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="drag-handle" title="Kéo để đổi thứ tự thi đấu">
+                                    <i class="fa fa-ellipsis-v"></i><i class="fa fa-ellipsis-v"></i>
+                                </div>
+                                <span class="match-order-pill" title="Thứ tự trận">
+                                    #<span class="order-num"><?php echo $orderVal; ?></span>
+                                </span>
+                                <span class="badge bg-light text-dark border">
+                                    <?php echo CHtml::encode($m['round']); ?>
+                                </span>
+                                <span class="text-muted small fw-semibold">
+                                    #<?php echo CHtml::encode($m['code'] ?: ('M' . $m['id'])); ?>
+                                </span>
+                            </div>
+
+                            <!-- Khối 2: Cặp đấu & Tỉ số -->
+                            <div class="d-flex align-items-center justify-content-center gap-3 flex-grow-1 px-3">
+                                <div class="text-end fw-semibold text-truncate" style="max-width: 220px;" title="<?php echo CHtml::encode($teamAName); ?>">
+                                    <?php echo CHtml::encode($teamAName); ?>
+                                    <?php if ($wId && $wId == $m['team_a_id']): ?>
+                                        <i class="fa fa-trophy text-warning ms-1" title="Thắng"></i>
                                     <?php endif; ?>
                                 </div>
+
+                                <div class="badge <?php echo $hasScore ? 'bg-primary text-white' : 'bg-light text-muted border'; ?> px-3 py-2 fs-6 shadow-sm match-score-pill">
+                                    <?php if ($hasScore): ?>
+                                        <strong><?php echo $sA; ?> - <?php echo $sB; ?></strong>
+                                    <?php else: ?>
+                                        <span>vs</span>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="text-start fw-semibold text-truncate" style="max-width: 220px;" title="<?php echo CHtml::encode($teamBName); ?>">
+                                    <?php if ($wId && $wId == $m['team_b_id']): ?>
+                                        <i class="fa fa-trophy text-warning me-1" title="Thắng"></i>
+                                    <?php endif; ?>
+                                    <?php echo CHtml::encode($teamBName); ?>
+                                </div>
+                            </div>
+
+                            <!-- Khối 3: Thời gian, Địa điểm sân & Thao tác ghi kết quả -->
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Nút đặt/sửa giờ bắt đầu -->
+                                <button type="button"
+                                        class="match-time-btn <?php echo !empty($m['match_time']) ? 'has-time' : ''; ?>"
+                                        title="Nhấn để thiết lập thời gian bắt đầu và địa điểm">
+                                    <?php if (!empty($m['match_time'])): ?>
+                                        <i class="fa fa-clock-o me-1"></i><?php echo date('H:i d/m/Y', strtotime($m['match_time'])); ?>
+                                    <?php else: ?>
+                                        <i class="fa fa-calendar-plus-o me-1"></i>Đặt giờ & sân
+                                    <?php endif; ?>
+                                </button>
+
+                                <!-- Huy hiệu địa điểm nếu có -->
+                                <span class="badge bg-light text-muted border location-badge"
+                                      style="<?php echo empty($m['location']) ? 'display:none;' : ''; ?>">
+                                    <i class="fa fa-map-marker text-danger me-1"></i><?php echo CHtml::encode($m['location'] ?: ''); ?>
+                                </span>
+
+                                <!-- Nút Ghi tỉ số -->
+                                <button type="button" class="btn btn-sm btn-primary btn-quick-result" title="Ghi tỉ số và kết quả">
+                                    <i class="fa fa-pencil me-1"></i>Ghi kết quả
+                                </button>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+            </div>
         </div>
 
-        <?php if ($thirdPlace): ?>
-            <div class="card mt-2" style="max-width:260px;">
-                <div class="card-header fw-bold py-1 small">Tranh hạng 3</div>
-                <div class="card-body p-2 small">
-                    <div><?php echo $slotName($thirdPlace['team_a_id'], $thirdPlace['team_a_source'] ?? null); ?></div>
-                    <hr class="my-1">
-                    <div><?php echo $slotName($thirdPlace['team_b_id'], $thirdPlace['team_b_source'] ?? null); ?></div>
+        <!-- 4. SƠ ĐỒ LOẠI TRỰC TIẾP (KNOCKOUT BRACKET TREE WITH CONNECTORS) - NẾU CÓ CÁC VÒNG KNOCKOUT -->
+        <?php if (!empty($rounds)): ?>
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div>
+                            <h5 class="mb-0 fw-bold text-dark">
+                                <i class="fa fa-sitemap text-primary me-2"></i>Sơ đồ thi đấu loại trực tiếp (Nhánh thi đấu có đường nối)
+                            </h5>
+                            <small class="text-muted">Nhấn vào từng trận trên sơ đồ để ghi kết quả hoặc đặt giờ thi đấu</small>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-light text-muted border">Kéo rê để di chuyển vùng nhìn</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toolbar điều khiển sơ đồ -->
+                <div class="bracket-toolbar">
+                    <div class="bracket-controls-group">
+                        <button type="button" class="bracket-btn-tool" id="btn-bracket-zoomin" title="Thu phóng to (Zoom In)">
+                            <i class="fa fa-search-plus"></i>
+                        </button>
+                        <button type="button" class="bracket-btn-tool" id="btn-bracket-zoomreset" title="Tỷ lệ 100%">
+                            <span id="bracket-zoom-level">100%</span>
+                        </button>
+                        <button type="button" class="bracket-btn-tool" id="btn-bracket-zoomout" title="Thu nhỏ (Zoom Out)">
+                            <i class="fa fa-search-minus"></i>
+                        </button>
+                        <button type="button" class="bracket-btn-tool" id="btn-bracket-toggle-lines" title="Đổi kiểu đường nối">
+                            <i class="fa fa-code-fork"></i>
+                            <span class="mode-label">Góc vuông</span>
+                        </button>
+                    </div>
+
+                    <div class="bracket-controls-group">
+                        <div class="input-group input-group-sm" style="width: 230px;">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa fa-filter text-muted"></i></span>
+                            <select class="form-select form-select-sm border-start-0" id="bracket-team-filter">
+                                <option value="">-- Theo dõi đường đi của đội --</option>
+                                <?php foreach ($teams as $t): ?>
+                                    <option value="<?php echo CHtml::encode($t['team_id']); ?>">
+                                        <?php echo CHtml::encode($t['team_name'] ?: ('#' . $t['team_id'])); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bracket-controls-group">
+                        <button type="button" class="bracket-btn-tool" id="btn-bracket-fullscreen" title="Xem toàn màn hình">
+                            <i class="fa fa-arrows-alt me-1"></i>Toàn màn hình
+                        </button>
+                        <button type="button" class="bracket-btn-tool" id="btn-bracket-print" title="In sơ đồ thi đấu">
+                            <i class="fa fa-print me-1"></i>In
+                        </button>
+                    </div>
+
+                    <div class="d-none d-lg-flex align-items-center gap-3">
+                        <div class="bracket-legend-item">
+                            <span class="bracket-legend-dot" style="background: #10b981;"></span>
+                            <span>Đã có tỉ số</span>
+                        </div>
+                        <div class="bracket-legend-item">
+                            <span class="bracket-legend-dot" style="background: #3b82f6;"></span>
+                            <span>Sẵn sàng đấu</span>
+                        </div>
+                        <div class="bracket-legend-item">
+                            <span class="bracket-legend-dot" style="background: #f59e0b;"></span>
+                            <span>Chung kết / Cup</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Khung vẽ Sơ đồ (Viewport) -->
+                <div class="bracket-viewport" id="bracket-viewport">
+                    <button type="button" class="btn btn-dark btn-sm bracket-fullscreen-close shadow" id="btn-bracket-fullscreen-close">
+                        <i class="fa fa-times me-1"></i>Thoát toàn màn hình (Esc)
+                    </button>
+
+                    <div class="bracket-tree-wrapper" id="bracket-tree-wrapper">
+                        <svg class="bracket-svg-canvas" id="bracket-svg-canvas"></svg>
+
+                        <?php
+                        $roundCount = count($rounds);
+                        $currentRoundIndex = 0;
+                        ?>
+
+                        <?php foreach ($rounds as $roundNo => $roundMatches): ?>
+                            <?php
+                            $currentRoundIndex++;
+                            usort($roundMatches, function ($a, $b) {
+                                return ($a['bracket_pos'] ?? 0) - ($b['bracket_pos'] ?? 0);
+                            });
+                            $firstMatch = $roundMatches[0];
+                            $isLastRound = ($currentRoundIndex === $roundCount);
+                            $isFinalRound = ($firstMatch['match_type'] ?? '') === 'final' || $isLastRound;
+                            ?>
+
+                            <div class="bracket-round-column" data-round="<?php echo $roundNo; ?>">
+                                <div class="bracket-round-header">
+                                    <span class="bracket-round-pill <?php echo $isFinalRound ? 'pill-final' : ''; ?>">
+                                        Vòng <?php echo $roundNo; ?>
+                                    </span>
+                                    <h6 class="bracket-round-title">
+                                        <?php echo CHtml::encode($firstMatch['round']); ?>
+                                    </h6>
+                                    <small class="text-muted"><?php echo count($roundMatches); ?> trận</small>
+                                </div>
+
+                                <div class="bracket-round-matches">
+                                    <?php foreach ($roundMatches as $m): ?>
+                                        <?php
+                                        $res = $m['result'] ?? null;
+                                        $hasResult = ($res !== null && $res['score_a'] !== null && $res['score_b'] !== null && $res['score_a'] !== '' && $res['score_b'] !== '');
+                                        $scoreA = $hasResult ? $res['score_a'] : '';
+                                        $scoreB = $hasResult ? $res['score_b'] : '';
+                                        $winnerId = $res['winner_team_id'] ?? null;
+
+                                        if ($hasResult && !$winnerId) {
+                                            if ((int)$scoreA > (int)$scoreB) $winnerId = $m['team_a_id'];
+                                            elseif ((int)$scoreB > (int)$scoreA) $winnerId = $m['team_b_id'];
+                                        }
+
+                                        $isWinnerA = ($winnerId && $m['team_a_id'] && $winnerId == $m['team_a_id']);
+                                        $isWinnerB = ($winnerId && $m['team_b_id'] && $winnerId == $m['team_b_id']);
+                                        $isMatchFinal = ($m['match_type'] ?? '') === 'final' || $isLastRound;
+
+                                        $targetMatchId = $m['winner_to_match_id'] ?? null;
+                                        // Fallback thông minh: nếu targetMatchId rỗng, tính theo ceil(bracket_pos / 2) ở vòng sau
+                                        if (!$targetMatchId && isset($rounds[$roundNo + 1])) {
+                                            $nextPos = (int) ceil(($m['bracket_pos'] ?? 1) / 2);
+                                            foreach ($rounds[$roundNo + 1] as $nm) {
+                                                if (($nm['bracket_pos'] ?? 0) === $nextPos) {
+                                                    $targetMatchId = $nm['id'];
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        $slotA = $getSlotLabel($m['team_a_id'], $m['team_a_source'] ?? null, $m, 0);
+                                        $slotB = $getSlotLabel($m['team_b_id'], $m['team_b_source'] ?? null, $m, 1);
+
+                                        $cardClass = 'bracket-match-card';
+                                        if ($hasResult) $cardClass .= ' status-completed';
+                                        elseif (!empty($m['team_a_id']) && !empty($m['team_b_id'])) $cardClass .= ' status-scheduled';
+                                        if ($isMatchFinal) $cardClass .= ' status-final';
+                                        ?>
+
+                                        <div class="<?php echo $cardClass; ?>"
+                                             data-match-id="<?php echo CHtml::encode($m['id']); ?>"
+                                             data-match-code="<?php echo CHtml::encode($m['code'] ?: ('M' . $m['id'])); ?>"
+                                             data-round-name="<?php echo CHtml::encode($m['round']); ?>"
+                                             data-match-type="<?php echo CHtml::encode($m['match_type']); ?>"
+                                             data-target-id="<?php echo CHtml::encode($targetMatchId ?: ''); ?>"
+                                             data-has-winner="<?php echo $winnerId ? '1' : '0'; ?>"
+                                             data-winner-id="<?php echo CHtml::encode($winnerId ?: ''); ?>"
+                                             data-team-a-id="<?php echo CHtml::encode($m['team_a_id'] ?: ''); ?>"
+                                             data-team-b-id="<?php echo CHtml::encode($m['team_b_id'] ?: ''); ?>"
+                                             data-team-a-name="<?php echo CHtml::encode($slotA['name']); ?>"
+                                             data-team-b-name="<?php echo CHtml::encode($slotB['name']); ?>"
+                                             data-score-a="<?php echo CHtml::encode($scoreA); ?>"
+                                             data-score-b="<?php echo CHtml::encode($scoreB); ?>"
+                                             data-match-time="<?php echo CHtml::encode($m['match_time'] ?: ''); ?>"
+                                             data-location="<?php echo CHtml::encode($m['location'] ?: ''); ?>"
+                                             data-match-order="<?php echo CHtml::encode($m['match_order'] ?: ''); ?>"
+                                             data-is-final="<?php echo $isMatchFinal ? '1' : '0'; ?>">
+
+                                            <span class="bracket-anchor-in"></span>
+                                            <span class="bracket-anchor-out"></span>
+
+                                            <!-- Header trận đấu trên nhánh -->
+                                            <div class="match-card-header">
+                                                <span class="match-code-badge">
+                                                    <i class="fa fa-hashtag"></i><?php echo CHtml::encode($m['code'] ?: ('M' . $m['id'])); ?>
+                                                </span>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <?php if (!empty($m['match_time'])): ?>
+                                                        <span class="badge bg-light text-primary border" title="<?php echo CHtml::encode($m['match_time']); ?>">
+                                                            <i class="fa fa-clock-o"></i> <?php echo date('H:i', strtotime($m['match_time'])); ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                    <button type="button" class="btn btn-xs btn-outline-primary btn-quick-result py-0 px-1" title="Ghi tỉ số / Đặt giờ">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Đội A -->
+                                            <div class="match-team-row <?php echo $isWinnerA ? 'is-winner' : ($isWinnerB ? 'is-loser' : ''); ?>"
+                                                 data-team-id="<?php echo CHtml::encode($m['team_a_id'] ?: ''); ?>">
+                                                <div class="team-info-col">
+                                                    <span class="team-seed-chip">A</span>
+                                                    <?php if ($slotA['isTeam']): ?>
+                                                        <span class="team-name-text" title="<?php echo CHtml::encode($slotA['name']); ?>">
+                                                            <?php echo CHtml::encode($slotA['name']); ?>
+                                                        </span>
+                                                        <?php if ($isWinnerA): ?>
+                                                            <i class="fa fa-trophy winner-crown-icon" title="Thắng"></i>
+                                                        <?php endif; ?>
+                                                    <?php else: ?>
+                                                        <span class="team-source-hint"><?php echo CHtml::encode($slotA['name']); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <span class="team-score-box">
+                                                    <?php echo ($scoreA !== '') ? CHtml::encode($scoreA) : '-'; ?>
+                                                </span>
+                                            </div>
+
+                                            <!-- Đội B -->
+                                            <div class="match-team-row <?php echo $isWinnerB ? 'is-winner' : ($isWinnerA ? 'is-loser' : ''); ?>"
+                                                 data-team-id="<?php echo CHtml::encode($m['team_b_id'] ?: ''); ?>">
+                                                <div class="team-info-col">
+                                                    <span class="team-seed-chip">B</span>
+                                                    <?php if (!empty($m['is_bye'])): ?>
+                                                        <span class="badge bg-light text-muted">BYE</span>
+                                                    <?php elseif ($slotB['isTeam']): ?>
+                                                        <span class="team-name-text" title="<?php echo CHtml::encode($slotB['name']); ?>">
+                                                            <?php echo CHtml::encode($slotB['name']); ?>
+                                                        </span>
+                                                        <?php if ($isWinnerB): ?>
+                                                            <i class="fa fa-trophy winner-crown-icon" title="Thắng"></i>
+                                                        <?php endif; ?>
+                                                    <?php else: ?>
+                                                        <span class="team-source-hint"><?php echo CHtml::encode($slotB['name']); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <span class="team-score-box">
+                                                    <?php if (!empty($m['is_bye'])): ?>
+                                                        -
+                                                    <?php else: ?>
+                                                        <?php echo ($scoreB !== '') ? CHtml::encode($scoreB) : '-'; ?>
+                                                    <?php endif; ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <!-- CỘT CÚP VÔ ĐỊCH (CHAMPION SHOWCASE) -->
+                        <div class="bracket-champion-column">
+                            <div class="bracket-champion-card" id="bracket-champion-card">
+                                <span class="bracket-anchor-in"></span>
+                                <div class="champion-trophy-halo">
+                                    <i class="fa fa-trophy"></i>
+                                </div>
+                                <div class="champion-tag">Nhà Vô Địch Đại Hội</div>
+                                <?php if ($championTeamName): ?>
+                                    <div class="champion-team-name text-success">
+                                        <?php echo CHtml::encode($championTeamName); ?>
+                                    </div>
+                                    <span class="badge bg-warning text-dark px-3 py-1 fw-bold">
+                                        <i class="fa fa-star me-1"></i>QUÁN QUÂN
+                                    </span>
+                                <?php else: ?>
+                                    <div class="champion-placeholder">
+                                        Đang chờ kết quả trận Chung kết...
+                                    </div>
+                                    <span class="badge bg-light text-muted border mt-2">
+                                        Cúp Vô Địch
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
+
+            <!-- TRẬN TRANH HẠNG 3 (BRONZE MEDAL MATCH) -->
+            <?php if ($thirdPlace): ?>
+                <?php
+                $tpRes = $thirdPlace['result'] ?? null;
+                $tpDone = ($tpRes !== null && $tpRes['score_a'] !== null && $tpRes['score_b'] !== null);
+                $tpScoreA = $tpDone ? $tpRes['score_a'] : '';
+                $tpScoreB = $tpDone ? $tpRes['score_b'] : '';
+                $tpWinner = $tpRes['winner_team_id'] ?? null;
+                if ($tpDone && !$tpWinner) {
+                    if ((int)$tpScoreA > (int)$tpScoreB) $tpWinner = $thirdPlace['team_a_id'];
+                    elseif ((int)$tpScoreB > (int)$tpScoreA) $tpWinner = $thirdPlace['team_b_id'];
+                }
+                $tpSlotA = $getSlotLabel($thirdPlace['team_a_id'], $thirdPlace['team_a_source'] ?? null, $thirdPlace, 0);
+                $tpSlotB = $getSlotLabel($thirdPlace['team_b_id'], $thirdPlace['team_b_source'] ?? null, $thirdPlace, 1);
+                ?>
+                <div class="bracket-playoff-section mb-4">
+                    <div class="playoff-header">
+                        <span class="playoff-medal-icon">
+                            <i class="fa fa-shield"></i>
+                        </span>
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">Trận Tranh Hạng 3 (Huy chương Đồng)</h6>
+                            <small class="text-muted">Dành cho hai đội thua ở vòng Bán kết</small>
+                        </div>
+                    </div>
+
+                    <div class="bracket-match-card card-playoff" style="max-width: 340px;"
+                         data-match-id="<?php echo CHtml::encode($thirdPlace['id']); ?>"
+                         data-match-code="<?php echo CHtml::encode($thirdPlace['code'] ?: 'TRANH-HANG-3'); ?>"
+                         data-round-name="<?php echo CHtml::encode($thirdPlace['round']); ?>"
+                         data-match-type="playoff"
+                         data-team-a-id="<?php echo CHtml::encode($thirdPlace['team_a_id'] ?: ''); ?>"
+                         data-team-b-id="<?php echo CHtml::encode($thirdPlace['team_b_id'] ?: ''); ?>"
+                         data-team-a-name="<?php echo CHtml::encode($tpSlotA['name']); ?>"
+                         data-team-b-name="<?php echo CHtml::encode($tpSlotB['name']); ?>"
+                         data-score-a="<?php echo CHtml::encode($tpScoreA); ?>"
+                         data-score-b="<?php echo CHtml::encode($tpScoreB); ?>"
+                         data-winner-id="<?php echo CHtml::encode($tpWinner ?: ''); ?>"
+                         data-match-time="<?php echo CHtml::encode($thirdPlace['match_time'] ?: ''); ?>"
+                         data-location="<?php echo CHtml::encode($thirdPlace['location'] ?: ''); ?>"
+                         data-match-order="<?php echo CHtml::encode($thirdPlace['match_order'] ?: ''); ?>">
+
+                        <div class="match-card-header">
+                            <span class="match-code-badge">
+                                <i class="fa fa-hashtag"></i><?php echo CHtml::encode($thirdPlace['code'] ?: 'TRANH-HANG-3'); ?>
+                            </span>
+                            <div class="d-flex align-items-center gap-1">
+                                <?php if ($tpDone): ?>
+                                    <span class="match-status-badge bg-success text-white">
+                                        <i class="fa fa-check me-1"></i>Đã xong
+                                    </span>
+                                <?php else: ?>
+                                    <span class="match-status-badge bg-warning text-dark">Sắp diễn ra</span>
+                                <?php endif; ?>
+                                <button type="button" class="btn btn-xs btn-outline-primary btn-quick-result py-0 px-1" title="Ghi tỉ số / Đặt giờ">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="match-team-row <?php echo ($tpWinner && $thirdPlace['team_a_id'] == $tpWinner) ? 'is-winner' : ''; ?>">
+                            <div class="team-info-col">
+                                <span class="team-seed-chip">1</span>
+                                <?php if ($tpSlotA['isTeam']): ?>
+                                    <span class="team-name-text"><?php echo CHtml::encode($tpSlotA['name']); ?></span>
+                                    <?php if ($tpWinner && $thirdPlace['team_a_id'] == $tpWinner): ?>
+                                        <span class="badge bg-warning text-dark ms-1">Huy chương Đồng</span>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span class="team-source-hint"><?php echo CHtml::encode($tpSlotA['name']); ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <span class="team-score-box">
+                                <?php echo ($tpScoreA !== '') ? CHtml::encode($tpScoreA) : '-'; ?>
+                            </span>
+                        </div>
+
+                        <div class="match-team-row <?php echo ($tpWinner && $thirdPlace['team_b_id'] == $tpWinner) ? 'is-winner' : ''; ?>">
+                            <div class="team-info-col">
+                                <span class="team-seed-chip">2</span>
+                                <?php if ($tpSlotB['isTeam']): ?>
+                                    <span class="team-name-text"><?php echo CHtml::encode($tpSlotB['name']); ?></span>
+                                    <?php if ($tpWinner && $thirdPlace['team_b_id'] == $tpWinner): ?>
+                                        <span class="badge bg-warning text-dark ms-1">Huy chương Đồng</span>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span class="team-source-hint"><?php echo CHtml::encode($tpSlotB['name']); ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <span class="team-score-box">
+                                <?php echo ($tpScoreB !== '') ? CHtml::encode($tpScoreB) : '-'; ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
-    <?php endif; ?>
+
+    </div><!-- /#sport-draw-view-root -->
+
+    <!-- =========================================================================
+         5. MODAL POPUP GHI KẾT QUẢ VÀ ĐẶT LỊCH THI ĐẤU (QUICK MATCH EDITOR)
+         ========================================================================= -->
+    <div class="modal fade" id="modal-match-editor" tabindex="-1" aria-labelledby="modalMatchEditorLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header bg-light border-bottom py-3">
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="modal-match-title">
+                            <i class="fa fa-pencil-square text-primary me-2"></i>Cập nhật Trận đấu
+                        </h5>
+                        <small class="text-muted">Nhập tỉ số thi đấu và thông tin ngày giờ, sân đấu</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form id="form-modal-match-editor">
+                    <input type="hidden" id="modal-field-match-id" name="match_id" value="">
+
+                    <div class="modal-body p-4">
+                        <!-- PHẦN 1: TỈ SỐ TRẬN ĐẤU -->
+                        <h6 class="fw-bold text-dark mb-3"><i class="fa fa-futbol-o text-success me-2"></i>Kết quả trận đấu</h6>
+                        <div class="modal-match-editor-scores">
+                            <!-- Đội A -->
+                            <div class="text-center flex-grow-1" style="max-width: 140px;">
+                                <label class="form-label fw-bold small text-truncate d-block mb-1" id="modal-team-a-name">Đội A</label>
+                                <input type="number" class="form-control modal-score-input mx-auto"
+                                       id="modal-field-score-a" min="0" placeholder="0">
+                            </div>
+
+                            <span class="fs-4 fw-bold text-muted">-</span>
+
+                            <!-- Đội B -->
+                            <div class="text-center flex-grow-1" style="max-width: 140px;">
+                                <label class="form-label fw-bold small text-truncate d-block mb-1" id="modal-team-b-name">Đội B</label>
+                                <input type="number" class="form-control modal-score-input mx-auto"
+                                       id="modal-field-score-b" min="0" placeholder="0">
+                            </div>
+                        </div>
+
+                        <!-- Chọn đội thắng khi trận Knockout hòa điểm -->
+                        <div class="mb-3" id="modal-winner-section">
+                            <label class="form-label small fw-bold text-muted">Đội thắng (Loại trực tiếp / Pen):</label>
+                            <select class="form-select form-select-sm" id="modal-field-winner">
+                                <option value="">-- Tự động theo tỉ số --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="modal-field-is-draw" value="1">
+                            <label class="form-check-label small" for="modal-field-is-draw">
+                                Xác nhận kết quả hòa (vòng bảng)
+                            </label>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <!-- PHẦN 2: THỜI GIAN & ĐỊA ĐIỂM SÂN THI ĐẤU -->
+                        <h6 class="fw-bold text-dark mb-3"><i class="fa fa-clock-o text-primary me-2"></i>Thời gian & Địa điểm thi đấu</h6>
+                        <div class="row g-3">
+                            <div class="col-md-7">
+                                <label class="form-label small fw-semibold">Thời gian bắt đầu:</label>
+                                <input type="datetime-local" class="form-control form-control-sm" id="modal-field-match-time">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label small fw-semibold">Thứ tự thi đấu:</label>
+                                <input type="number" class="form-control form-control-sm" id="modal-field-match-order" min="1" placeholder="1, 2, 3...">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold">Sân đấu / Địa điểm:</label>
+                                <input type="text" class="form-control form-control-sm" id="modal-field-location" placeholder="Ví dụ: Sân bóng số 1, Sân A, Nhà thi đấu...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light py-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-sm btn-primary px-3" id="btn-modal-save-all">
+                            <i class="fa fa-save me-1"></i>Lưu thông tin
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 <?php endif; ?>

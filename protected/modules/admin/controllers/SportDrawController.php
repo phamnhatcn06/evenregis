@@ -148,6 +148,89 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Cập nhật thông tin trận đấu (thời gian bắt đầu, địa điểm, thứ tự) (AJAX).
+     */
+    public function actionUpdateMatch()
+    {
+        $this->requirePost();
+
+        $req = Yii::app()->getRequest();
+        $matchId = $req->getPost('match_id');
+        $eventId = (int) $req->getPost('event_id');
+        $sportId = (int) $req->getPost('sport_id');
+        $matchTime = $req->getPost('match_time');
+        $location = $req->getPost('location');
+        $matchOrder = $req->getPost('match_order');
+
+        if (!$matchId) {
+            $this->jsonResponse(false, 'Thiếu ID trận đấu.');
+        }
+
+        $payload = array(
+            'event_id' => $eventId,
+            'sport_id' => $sportId,
+        );
+        if ($matchTime !== null) {
+            $payload['match_time'] = !empty($matchTime) ? date('Y-m-d H:i:s', strtotime($matchTime)) : null;
+        }
+        if ($location !== null) {
+            $payload['location'] = trim($location);
+        }
+        if ($matchOrder !== null && $matchOrder !== '') {
+            $payload['match_order'] = (int) $matchOrder;
+        }
+
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_MATCH_UPDATE, array('id' => $matchId));
+        $result = ApiClient::post($url, $payload);
+
+        if (!empty($result['success'])) {
+            $this->jsonResponse(true, 'Đã cập nhật thông tin trận đấu.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể cập nhật thông tin trận đấu.'));
+    }
+
+    /**
+     * Lưu thứ tự sắp xếp lại các trận đấu (AJAX).
+     */
+    public function actionReorderMatches()
+    {
+        $this->requirePost();
+
+        $req = Yii::app()->getRequest();
+        $eventId = (int) $req->getPost('event_id');
+        $sportId = (int) $req->getPost('sport_id');
+        $rawOrders = $req->getPost('orders');
+        $orders = is_string($rawOrders) ? CJSON::decode($rawOrders) : $rawOrders;
+
+        if (!is_array($orders) || empty($orders)) {
+            $this->jsonResponse(false, 'Dữ liệu thứ tự không hợp lệ.');
+        }
+
+        $hasError = false;
+        foreach ($orders as $item) {
+            $mId = isset($item['match_id']) ? $item['match_id'] : null;
+            $order = isset($item['match_order']) ? (int) $item['match_order'] : null;
+            if (!$mId || $order === null) continue;
+
+            $payload = array(
+                'event_id' => $eventId,
+                'sport_id' => $sportId,
+                'match_order' => $order,
+            );
+            $url = ApiEndpoints::url(ApiEndpoints::SPORT_MATCH_UPDATE, array('id' => $mId));
+            $res = ApiClient::post($url, $payload);
+            if (empty($res['success'])) {
+                $hasError = true;
+            }
+        }
+
+        if (!$hasError) {
+            $this->jsonResponse(true, 'Đã lưu thứ tự các trận đấu.');
+        }
+        $this->jsonResponse(false, 'Có một số trận chưa được lưu thứ tự thành công.');
+    }
+
+    /**
      * Lưu kết quả gán thủ công (AJAX, nhận JSON assignments).
      */
     public function actionSaveAssignment($id)

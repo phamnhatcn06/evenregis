@@ -22,8 +22,18 @@ $this->menu = array(
         'icon' => 'fa-arrow-left',
         'id' => 'btn_back',
     ),
+    array(
+        'label' => 'Xem sơ đồ cây',
+        'url' => $this->createUrl('view', array('id' => $model->id)),
+        'color' => 'info',
+        'icon' => 'fa-sitemap',
+        'id' => 'btn_view_tree',
+    ),
 );
 
+Yii::app()->clientScript->registerCssFile(
+    Yii::app()->theme->baseUrl . '/assets/css/pages/sportdraw-bracket.css?v=1.2'
+);
 Yii::app()->clientScript->registerScriptFile(
     Yii::app()->theme->baseUrl . '/assets/js/plugins/toast.js',
     CClientScript::POS_END
@@ -119,11 +129,16 @@ $renderMatch = function ($m) use ($slotName, $teamMap) {
 <?php else: ?>
 
     <div id="results-board" data-save-url="<?php echo $this->createUrl('saveResult'); ?>">
-        <div class="alert alert-light border small">
-            <i class="fa fa-info-circle me-1"></i>
-            Nhập tỉ số rồi nhấn <i class="fa fa-save"></i>. Với sơ đồ loại trực tiếp, đội thắng sẽ
-            tự được điền vào trận vòng sau. Với vòng bảng, sau khi nhập đủ hãy
-            <strong>Tính BXH</strong> rồi <strong>Sinh nhánh từ bảng</strong> ở màn danh sách.
+        <div class="alert alert-light border small d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <i class="fa fa-info-circle me-1"></i>
+                Nhập tỉ số rồi nhấn <i class="fa fa-save"></i>. Với sơ đồ loại trực tiếp, đội thắng sẽ
+                tự được điền vào trận vòng sau. Với vòng bảng, sau khi nhập đủ hãy
+                <strong>Tính BXH</strong> rồi <strong>Sinh nhánh từ bảng</strong> ở màn danh sách.
+            </div>
+            <a href="<?php echo $this->createUrl('view', array('id' => $model->id)); ?>" class="btn btn-sm btn-outline-info text-nowrap">
+                <i class="fa fa-sitemap me-1"></i>Xem sơ đồ cây (có đường nối)
+            </a>
         </div>
 
         <?php

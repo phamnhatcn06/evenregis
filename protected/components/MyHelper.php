@@ -928,7 +928,7 @@ class MyHelper
     {
         // Thuộc tính dùng chung (font, cỡ chữ, canh giữa) cho cả hai loại phôi.
         // Cỡ chữ theo chiều cao glyph thật: tên 100px (83pt), chức danh 55px (34pt, in đậm), đơn vị 40px (32pt).
-        $name     = array('pos_x' => 0, 'font' => 'fontten',      'size' => 83, 'align' => 'C');
+        $name     = array('pos_x' => 0, 'font' => 'fontten',      'size' => 76, 'align' => 'C');
         $position = array('pos_x' => 0, 'font' => 'fontchucdanh', 'size' => 34, 'align' => 'C', 'bold' => true);
         $unit     = array('pos_x' => 0, 'font' => 'fontdonvi',    'size' => 32, 'align' => 'C');
 
@@ -1026,10 +1026,14 @@ class MyHelper
         );
         if ($photo) {
             imagecopy(
-                $front, $photo,
-                $photoCfg['pos_x'], $photoCfg['pos_y'],
-                0, 0,
-                $photoCfg['width'], $photoCfg['height']
+                $front,
+                $photo,
+                $photoCfg['pos_x'],
+                $photoCfg['pos_y'],
+                0,
+                0,
+                $photoCfg['width'],
+                $photoCfg['height']
             );
             imagedestroy($photo);
         }
@@ -1068,10 +1072,14 @@ class MyHelper
             $qr    = self::makeQrResource($qrUrl, $backCfg['qr']['size'], isset($backCfg['qr']['bg']) ? $backCfg['qr']['bg'] : '#FFFFFF');
             if ($qr) {
                 imagecopy(
-                    $back, $qr,
-                    $backCfg['qr']['pos_x'], $backCfg['qr']['pos_y'],
-                    0, 0,
-                    imagesx($qr), imagesy($qr)
+                    $back,
+                    $qr,
+                    $backCfg['qr']['pos_x'],
+                    $backCfg['qr']['pos_y'],
+                    0,
+                    0,
+                    imagesx($qr),
+                    imagesy($qr)
                 );
                 imagedestroy($qr);
             }

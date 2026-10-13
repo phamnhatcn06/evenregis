@@ -236,12 +236,20 @@ class SportSeedCommand extends CConsoleCommand
             ),
 
             // Bóng bàn đơn Nữ — 11 đội, 3 bảng vòng tròn, VCK nhất bảng tranh 1-2-3
-            'BB.F' => array(array(
-                'name' => 'Vòng bảng + Chung kết', 'stage_type' => 'final', 'stage_order' => 1,
-                'format' => 'round_robin_knockout',
-                'num_groups' => 3, 'teams_per_group' => 4, 'advance_per_group' => 1, 'bracket_size' => 3,
-                'location' => $NTD,
-            )),
+            'BB.F' => array(
+                array(
+                    'name' => 'Vòng loại (3 bảng)', 'stage_type' => 'qualification', 'stage_order' => 1,
+                    'format' => 'round_robin',
+                    'num_groups' => 3, 'teams_per_group' => 4, 'advance_per_group' => 1,
+                    'location' => $NTD,
+                ),
+                array(
+                    'name' => 'Vòng chung kết (Tranh 1-2-3)', 'stage_type' => 'final', 'stage_order' => 2,
+                    'format' => 'round_robin',
+                    'num_groups' => 1, 'teams_per_group' => 3, 'advance_per_group' => 3,
+                    'location' => $NTD,
+                ),
+            ),
 
             // Cầu lông đơn/đôi (trừ MF) — loại trực tiếp
             'CL.M' => $ko($NTD, 8),
@@ -250,12 +258,20 @@ class SportSeedCommand extends CConsoleCommand
             'CL.2F' => $ko($NTD, 8),
 
             // Cầu lông đôi Nam-Nữ — 9 đội, 3 bảng vòng tròn, CK vòng tròn chọn 1-2-3
-            'CL.MF' => array(array(
-                'name' => 'Vòng bảng + Chung kết', 'stage_type' => 'final', 'stage_order' => 1,
-                'format' => 'round_robin_knockout',
-                'num_groups' => 3, 'teams_per_group' => 3, 'advance_per_group' => 1, 'bracket_size' => 3,
-                'location' => $NTD,
-            )),
+            'CL.MF' => array(
+                array(
+                    'name' => 'Vòng loại (3 bảng)', 'stage_type' => 'qualification', 'stage_order' => 1,
+                    'format' => 'round_robin',
+                    'num_groups' => 3, 'teams_per_group' => 3, 'advance_per_group' => 1,
+                    'location' => $NTD,
+                ),
+                array(
+                    'name' => 'Vòng chung kết (Tranh 1-2-3)', 'stage_type' => 'final', 'stage_order' => 2,
+                    'format' => 'round_robin',
+                    'num_groups' => 1, 'teams_per_group' => 3, 'advance_per_group' => 3,
+                    'location' => $NTD,
+                ),
+            ),
 
             // Pickleball — loại trực tiếp
             'PK.2M' => $ko($KS, 8),
