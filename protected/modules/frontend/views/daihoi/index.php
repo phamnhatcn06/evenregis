@@ -58,8 +58,8 @@ $portalUrl = $base . '/run';
 $navItems = array(
   array('#dang-ky', 'Đăng ký'),
   array('#noi-dung', 'Chương trình'),
-  array($base . '/daihoi/agenda', 'Lịch trình'),
-  array($base . '/daihoi/schedule', 'Lịch thi đấu'),
+  array($base . '/agenda-tong-the', 'Lịch trình'),
+  array($base . '/lich-thi-the-thao', 'Lịch thi đấu'),
   array('#tin-tuc', 'Tin tức'),
   array('#thu-vien', 'Thư viện'),
   array('#so-tay', 'Sổ tay'),
