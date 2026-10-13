@@ -110,11 +110,12 @@ $minYear     = 1950;
                         </div>
                         <div class="col-md-6">
                             <label for="manual_bib" class="form-label fw-bold text-dark mb-2">
-                                <i class="fa fa-hashtag text-secondary me-1"></i>Mã BIB <span class="text-danger">*</span>
+                                <i class="fa fa-hashtag text-secondary me-1"></i>Mã BIB
+                                <span class="text-muted small fw-normal">(tùy chọn)</span>
                             </label>
                             <input type="text" id="manual_bib" class="form-control" autocomplete="off"
-                                   placeholder="Nhập mã BIB (vd 5010)">
-                            <div class="form-text">Mã BIB sẽ được kiểm tra trùng trong cự ly trước khi lưu.</div>
+                                   placeholder="Để trống để tự cấp (vd 5010)">
+                            <div class="form-text">Nhập mã thì kiểm tra trùng trước khi lưu; để trống thì hệ thống tự cấp theo quy luật.</div>
                         </div>
                     </div>
                 </form>
