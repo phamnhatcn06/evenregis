@@ -341,6 +341,32 @@ class RunRegistrationsController extends AdminController
         return $list;
     }
 
+    /** Danh sách cự ly Fun Run của sự kiện cho popup gán thủ công. */
+    protected function getRunEventList($eventId)
+    {
+        $list = array();
+        try {
+            foreach (RunEvents::getApiDataProvider(array('event_id' => $eventId), 1000)->getData() as $ev) {
+                $list[] = array(
+                    'id'   => (int) $ev->id,
+                    'name' => $ev->name,
+                    'code' => $ev->code,
+                );
+            }
+        } catch (Exception $e) {
+            Yii::log('Không tải được danh sách cự ly Fun Run: ' . $e->getMessage(), CLogger::LEVEL_WARNING);
+        }
+        return $list;
+    }
+
+    /** Trả JSON cho JS, giữ HTTP status thật. */
+    protected function renderJson($payload, $status = 200)
+    {
+        header('Content-Type: application/json; charset=utf-8', true, $status);
+        echo CJSON::encode($payload);
+        Yii::app()->end();
+    }
+
     protected function createPhpExcel()
     {
         $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
