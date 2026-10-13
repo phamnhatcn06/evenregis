@@ -340,10 +340,13 @@
 
     function resetForm() {
         setValue('manual_attendee_id', '');
+        setValue('manual_registration_id', '');
         setValue('manual_search', '');
         setValue('manual_bib', '');
         setText('manual_target_name', '-');
         setText('manual_target_unit', '-');
+        var changeNote = document.getElementById('manual_change_note');
+        if (changeNote) { changeNote.style.display = 'none'; }
         var box = document.getElementById('manual_selected_box');
         if (box) { box.style.display = 'none'; }
         var results = document.getElementById('manual_search_results');
