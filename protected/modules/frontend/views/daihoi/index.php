@@ -934,7 +934,7 @@ if (empty($albumList)) {
           <div class="d-inline-flex gap-3">
             <a class="text-muted text-decoration-none hover:text-dark" href="#so-tay">Điều khoản</a><span>•</span>
             <a class="text-muted text-decoration-none hover:text-dark" href="#so-tay">Bảo mật thông tin</a><span>•</span>
-            <a class="text-muted text-decoration-none hover:text-dark" href="<?php echo $e($base); ?>/">Hỗ trợ kỹ thuật</a>
+            <a class="text-muted text-decoration-none hover:text-dark" href="<?php echo $e($base); ?>/ho-tro">Hỗ trợ kỹ thuật</a>
           </div>
         </div>
       </div>
