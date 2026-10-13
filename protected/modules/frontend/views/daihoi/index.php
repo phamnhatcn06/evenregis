@@ -742,6 +742,11 @@ if (empty($albumList)) {
           <h2 class="fw-black text-dark fs-3 mb-1">Thông tin mới nhất</h2>
           <p class="text-secondary small mb-0">Cập nhật liên tục các tin tức, hoạt động và thông báo mới nhất từ Ban Tổ Chức.</p>
         </div>
+        <div class="col-12 col-md-4 text-md-end">
+          <a class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3 py-2 d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/tin-tuc">
+            <span>Xem tất cả tin tức</span><span class="material-symbols-outlined fs-6">arrow_forward</span>
+          </a>
+        </div>
       </div>
       <div class="row g-4">
         <?php
