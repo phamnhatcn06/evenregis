@@ -81,7 +81,8 @@ $positionText = function ($row) use ($col) {
                         <td style="border:1px solid #e2e8f0; text-align:center;"><?php echo $stt; ?></td>
                         <td style="border:1px solid #e2e8f0;"><?php echo CHtml::encode($col($row, 'full_name')); ?></td>
                         <td style="border:1px solid #e2e8f0; text-align:center;"><?php echo CHtml::encode($col($row, 'staff_code')); ?></td>
-                        <td style="border:1px solid #e2e8f0;"><?php echo CHtml::encode($division($row)); ?></td>
+                        <td style="border:1px solid #e2e8f0;"><?php echo CHtml::encode($unit($row)); ?></td>
+                        <td style="border:1px solid #e2e8f0;"><?php echo CHtml::encode($positionText($row)); ?></td>
                         <td style="border:1px solid #e2e8f0; text-align:center; font-weight:bold; <?php echo $ident === '' ? 'color:#c53030; font-style:italic; font-weight:normal;' : ''; ?>">
                             <?php echo $ident === '' ? 'Chưa cấp' : CHtml::encode($ident); ?>
                         </td>
