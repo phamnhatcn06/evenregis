@@ -29,6 +29,14 @@ $minYear     = 1950;
                     <input type="hidden" id="manual_registration_id" value="">
                     <input type="hidden" id="manual_mode" value="assign">
 
+                    <!-- Bước 0: Khách ngoài (không thuộc đơn vị, chỉ cấp BIB) -->
+                    <div class="form-check form-switch mb-3" id="manual_guest_toggle_group">
+                        <input class="form-check-input" type="checkbox" role="switch" id="manual_is_guest" value="1">
+                        <label class="form-check-label fw-bold text-dark" for="manual_is_guest">
+                            Khách ngoài <span class="text-muted small fw-normal">(không thuộc đơn vị — chỉ cấp BIB)</span>
+                        </label>
+                    </div>
+
                     <!-- Bước 1: Tìm & chọn người (chỉ khi gán mới) -->
                     <div class="mb-3 position-relative" id="manual_search_group">
                         <label for="manual_search" class="form-label fw-bold text-dark mb-1">
