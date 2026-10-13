@@ -186,6 +186,40 @@ class DaihoiController extends FrontEndController
         ));
     }
 
+    /**
+     * Các đầu mối hỗ trợ (y tế, an ninh - PCCC, xe cấp cứu...).
+     * Nội dung in trong Sổ tay Đại hội - slug /ho-tro.
+     */
+    public function actionHoTro()
+    {
+        $this->frontTitle = 'Các đầu mối hỗ trợ';
+        $this->render('ho-tro', array(
+            'event' => Daihoi::getEvent(),
+        ));
+    }
+
+    /**
+     * Danh sách Ban Thư Ký Đoàn - slug /doan-thu-ky.
+     */
+    public function actionDoanThuKy()
+    {
+        $this->frontTitle = 'Danh sách Ban Thư Ký Đoàn';
+        $this->render('doan-thu-ky', array(
+            'event' => Daihoi::getEvent(),
+        ));
+    }
+
+    /**
+     * Sơ đồ địa điểm Đại hội - slug /so-do-dia-diem.
+     */
+    public function actionSoDoDiaDiem()
+    {
+        $this->frontTitle = 'Sơ đồ địa điểm Đại hội';
+        $this->render('so-do-dia-diem', array(
+            'event' => Daihoi::getEvent(),
+        ));
+    }
+
     public function actionJsonLive()
     {
         $this->renderJson(Daihoi::getLiveMatches());
