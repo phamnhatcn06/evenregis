@@ -31,10 +31,10 @@ function renderFillBar($name, $extra, $registered, $quota)
 // Tổng hợp nhanh.
 $sumReg = 0;
 $sumQuota = 0;
-foreach ($runEvents as $e) { 
+foreach ($runEvents as $e) {
     $reserved = isset($e->reserved_slots) ? (int) $e->reserved_slots : 0;
-    $sumReg += ($reserved + (int) $e->registered_count); 
-    $sumQuota += (int) $e->quota; 
+    $sumReg += isset($e->total_registered) ? (int) $e->total_registered : ($reserved + (int) $e->registered_count);
+    $sumQuota += (int) $e->quota;
 }
 foreach ($tourSessions as $s) { 
     $sumReg += (int) $s->registered_count; 
