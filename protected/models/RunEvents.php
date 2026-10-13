@@ -16,6 +16,7 @@ class RunEvents extends CFormModel
     public $quota;
     public $reserved_slots;
     public $registered_count;
+    public $total_registered;
     public $remaining;
     public $open_at;
     public $close_at;
