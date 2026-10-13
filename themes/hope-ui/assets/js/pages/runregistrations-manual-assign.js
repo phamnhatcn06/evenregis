@@ -82,6 +82,7 @@
             lockForExisting(false);
         } else {
             setValue('manual_guest_name', '');
+            setValue('manual_guest_company', '');
         }
     }
 
