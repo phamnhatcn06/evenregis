@@ -232,6 +232,8 @@
         if (results) { results.style.display = 'none'; results.innerHTML = ''; }
         var birthSelect = document.getElementById('manual_birth_year');
         if (birthSelect) { birthSelect.value = ''; }
+        var birthNote = document.getElementById('manual_birth_year_note');
+        if (birthNote) { birthNote.style.display = 'none'; }
         ['manual_gender_male', 'manual_gender_female'].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) { el.checked = false; }
