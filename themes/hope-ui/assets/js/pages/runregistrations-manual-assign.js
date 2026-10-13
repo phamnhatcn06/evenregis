@@ -38,7 +38,7 @@
     });
 
     /** Tìm người theo từ khoá (debounce) rồi đổ kết quả xuống danh sách chọn. */
-    function bindSearch(searchUrl) {
+    function bindSearch(searchUrl, checkUrl) {
         var input = document.getElementById('manual_search');
         var box = document.getElementById('manual_search_results');
         if (!input || !box) {
@@ -54,7 +54,7 @@
                 return;
             }
             timer = window.setTimeout(function () {
-                fetchPeople(searchUrl, keyword, box);
+                fetchPeople(searchUrl, keyword, box, checkUrl);
             }, 300);
         });
 
