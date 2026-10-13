@@ -36,8 +36,11 @@ $this->Tabletitle = 'Danh sách nội dung chạy';
                     'value' => function ($data) {
                         $quota = (int) $data->quota;
                         $reserved = isset($data->reserved_slots) ? (int) $data->reserved_slots : 0;
-                        $publicReg = (int) $data->registered_count;
-                        $totalReg = $reserved + $publicReg;
+                        // Số người THỰC TẾ đang chiếm chỗ (do API trả về, đếm từ bản ghi thật).
+                        // Fallback cho API cũ: suất giữ + suất công khai.
+                        $totalReg = isset($data->total_registered)
+                            ? (int) $data->total_registered
+                            : $reserved + (int) $data->registered_count;
                         $remaining = isset($data->remaining) ? (int) $data->remaining : max(0, $quota - $totalReg);
                         $cls = $remaining <= 0 ? 'bg-danger' : ($remaining <= 5 ? 'bg-warning text-dark' : 'bg-success');
                         $reservedTag = $reserved > 0 ? ' <small class="text-muted" title="Suất giữ lại VIP/BTC">(giữ ' . $reserved . ')</small>' : '';
