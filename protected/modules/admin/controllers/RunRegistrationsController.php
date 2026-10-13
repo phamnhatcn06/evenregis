@@ -66,6 +66,16 @@ class RunRegistrationsController extends AdminController
         });
         $registrations = array_values($registrations);
 
+        // Sắp xếp theo số BIB tăng dần (so sánh phần số; BIB cùng cự ly có chung tiền tố km).
+        usort($registrations, function ($a, $b) {
+            $na = isset($a['bib_number']) ? (int) preg_replace('/\D/', '', (string) $a['bib_number']) : 0;
+            $nb = isset($b['bib_number']) ? (int) preg_replace('/\D/', '', (string) $b['bib_number']) : 0;
+            if ($na === $nb) {
+                return 0;
+            }
+            return ($na < $nb) ? -1 : 1;
+        });
+
         $this->render('admin', array(
             'eventId'            => $eventId,
             'eventList'          => $this->getEventList(),
