@@ -231,6 +231,62 @@ class RunRegistrationsController extends AdminController
     }
 
     /**
+     * Admin đổi nội dung (cự ly) cho một đăng ký đã có (POST, JSON). Thu hồi BIB cũ, cấp lại
+     * ở cự ly mới (để trống BIB thì tự cấp). Lưu năm sinh/giới tính trước.
+     */
+    public function actionChangeContent()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            $this->renderJson(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'), 400);
+            return;
+        }
+        if (!PermissionHelper::can('runregistrations', 'update')) {
+            $this->renderJson(array('success' => false, 'message' => 'Bạn không có quyền thực hiện thao tác này.'), 403);
+            return;
+        }
+
+        $request        = Yii::app()->request;
+        $registrationId = (int) $request->getPost('registration_id');
+        $runEventId     = (int) $request->getPost('run_event_id');
+        $bibNumber      = trim((string) $request->getPost('bib_number'));
+        $birthYear      = $request->getPost('birth_year');
+        $gender         = $request->getPost('gender');
+
+        $birthYear = ($birthYear !== null && $birthYear !== '') ? (int) $birthYear : null;
+        $gender    = ($gender !== null && $gender !== '') ? (int) $gender : null;
+
+        if (!$registrationId) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu đăng ký cần đổi.'), 422);
+            return;
+        }
+        if (!$runEventId) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn cự ly.'), 422);
+            return;
+        }
+        if ($birthYear === null || $gender === null || !in_array($gender, array(0, 1), true)) {
+            $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn năm sinh và giới tính.'), 422);
+            return;
+        }
+
+        $ssoUser   = AuthHandler::getUser();
+        $authEmail = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+        $res = RunRegistrations::adminChangeContentViaApi($registrationId, $runEventId, $bibNumber, $birthYear, $gender, $authEmail);
+        if (!$res['success']) {
+            $status = isset($res['code']) && (int) $res['code'] >= 400 ? (int) $res['code'] : 500;
+            $this->renderJson(array('success' => false, 'message' => $res['error'] ?: 'Không đổi được nội dung chạy.'), $status);
+            return;
+        }
+
+        $data = isset($res['data']['data']) ? $res['data']['data'] : array();
+        $bib  = isset($data['bib_number']) ? $data['bib_number'] : $bibNumber;
+        $this->renderJson(array(
+            'success' => true,
+            'message' => 'Đã đổi nội dung chạy (BIB mới ' . $bib . ').',
+        ));
+    }
+
+    /**
      * Cấp số lucky cho người VCK của sự kiện — ĐÃ NGỪNG SỬ DỤNG.
      *
      * Lệnh này cấp mã theo TỪNG BẢN GHI attendee, nên một người có nhiều bản ghi sẽ nhận nhiều
