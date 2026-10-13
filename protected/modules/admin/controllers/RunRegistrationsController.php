@@ -173,10 +173,7 @@ class RunRegistrationsController extends AdminController
             $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn năm sinh và giới tính.'), 422);
             return;
         }
-        if ($bibNumber === '') {
-            $this->renderJson(array('success' => false, 'message' => 'Vui lòng nhập mã BIB.'), 422);
-            return;
-        }
+        // Mã BIB tùy chọn: để trống thì backend tự cấp theo quy luật.
 
         $ssoUser   = AuthHandler::getUser();
         $authEmail = isset($ssoUser['email']) ? $ssoUser['email'] : null;
