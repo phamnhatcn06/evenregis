@@ -203,6 +203,7 @@ class RunRegistrationsController extends AdminController
         $isGuest    = (int) $request->getPost('is_guest') === 1;
         $attendeeId = (int) $request->getPost('attendee_id');
         $fullName   = trim((string) $request->getPost('full_name'));
+        $company    = trim((string) $request->getPost('company'));
         $runEventId = (int) $request->getPost('run_event_id');
         $bibNumber  = trim((string) $request->getPost('bib_number'));
         $birthYear  = $request->getPost('birth_year');
