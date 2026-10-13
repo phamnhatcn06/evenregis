@@ -11,8 +11,17 @@
 $col = function ($row, $key) {
     return isset($row[$key]) && $row[$key] !== null ? (string) $row[$key] : '';
 };
-$division = function ($row) use ($col) {
-    foreach (array('division_name', 'department_name') as $k) {
+$unit = function ($row) use ($col) {
+    foreach (array('badge_org_name', 'unit_label', 'property_name') as $k) {
+        $v = $col($row, $k);
+        if ($v !== '') {
+            return $v;
+        }
+    }
+    return '';
+};
+$positionText = function ($row) use ($col) {
+    foreach (array('position', 'position_display', 'position_name') as $k) {
         $v = $col($row, $k);
         if ($v !== '') {
             return $v;
