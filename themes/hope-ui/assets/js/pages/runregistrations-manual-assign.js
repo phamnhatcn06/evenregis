@@ -104,12 +104,17 @@
         document.getElementById('manual_selected_box').style.display = '';
         document.getElementById('manual_search').value = p.full_name || '';
 
+        // Năm sinh: tự lấy theo attendee; nếu không có dữ liệu thì hiện note đỏ + để admin tự chọn.
         var birthSelect = document.getElementById('manual_birth_year');
+        var birthNote = document.getElementById('manual_birth_year_note');
         if (birthSelect) {
             var by = p.birth_year ? String(p.birth_year) : '';
             birthSelect.value = by;
             if (birthSelect.value !== by) {
                 birthSelect.value = '';
+            }
+            if (birthNote) {
+                birthNote.style.display = birthSelect.value ? 'none' : '';
             }
         }
 
