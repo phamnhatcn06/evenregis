@@ -51,6 +51,38 @@
         }
     });
 
+    /** Bật/tắt chế độ "Khách ngoài": ẩn ô tìm người, hiện ô nhập họ tên khách. */
+    function bindGuestToggle() {
+        var checkbox = document.getElementById('manual_is_guest');
+        if (!checkbox) {
+            return;
+        }
+        checkbox.addEventListener('change', function () {
+            applyGuestMode(checkbox.checked);
+        });
+    }
+
+    /** Áp dụng trạng thái khách ngoài cho form (ẩn/hiện các khối liên quan). */
+    function applyGuestMode(isGuest) {
+        var searchGroup = document.getElementById('manual_search_group');
+        var guestNameGroup = document.getElementById('manual_guest_name_group');
+        var selectedBox = document.getElementById('manual_selected_box');
+        var results = document.getElementById('manual_search_results');
+
+        if (searchGroup) { searchGroup.style.display = isGuest ? 'none' : ''; }
+        if (guestNameGroup) { guestNameGroup.style.display = isGuest ? '' : 'none'; }
+        if (selectedBox) { selectedBox.style.display = 'none'; }
+        if (results) { results.style.display = 'none'; results.innerHTML = ''; }
+
+        // Chuyển sang khách ngoài: không gán vào finalist nào, mở khóa ô BIB/nút gán.
+        setValue('manual_attendee_id', '');
+        if (isGuest) {
+            lockForExisting(false);
+        } else {
+            setValue('manual_guest_name', '');
+        }
+    }
+
     /** Tìm người theo từ khoá (debounce) rồi đổ kết quả xuống danh sách chọn. */
     function bindSearch(searchUrl, checkUrl) {
         var input = document.getElementById('manual_search');
