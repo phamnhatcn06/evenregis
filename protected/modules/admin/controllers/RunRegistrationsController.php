@@ -200,7 +200,9 @@ class RunRegistrationsController extends AdminController
         }
 
         $request    = Yii::app()->request;
+        $isGuest    = (int) $request->getPost('is_guest') === 1;
         $attendeeId = (int) $request->getPost('attendee_id');
+        $fullName   = trim((string) $request->getPost('full_name'));
         $runEventId = (int) $request->getPost('run_event_id');
         $bibNumber  = trim((string) $request->getPost('bib_number'));
         $birthYear  = $request->getPost('birth_year');
@@ -209,7 +211,13 @@ class RunRegistrationsController extends AdminController
         $birthYear = ($birthYear !== null && $birthYear !== '') ? (int) $birthYear : null;
         $gender    = ($gender !== null && $gender !== '') ? (int) $gender : null;
 
-        if (!$attendeeId) {
+        // Khách ngoài: không gắn attendee, chỉ cần họ tên. Finalist: bắt buộc attendee_id.
+        if ($isGuest) {
+            if ($fullName === '') {
+                $this->renderJson(array('success' => false, 'message' => 'Vui lòng nhập họ tên khách.'), 422);
+                return;
+            }
+        } elseif (!$attendeeId) {
             $this->renderJson(array('success' => false, 'message' => 'Vui lòng chọn người cần gán.'), 422);
             return;
         }
@@ -226,18 +234,30 @@ class RunRegistrationsController extends AdminController
         $ssoUser   = AuthHandler::getUser();
         $authEmail = isset($ssoUser['email']) ? $ssoUser['email'] : null;
 
-        // Lưu năm sinh + giới tính trước (để suy nhãn nội dung chi tiết).
-        $profile = RunAuth::saveProfile($attendeeId, $birthYear, $gender, $authEmail);
-        if (!$profile['success']) {
-            $status = isset($profile['code']) && (int) $profile['code'] >= 400 ? (int) $profile['code'] : 500;
-            $this->renderJson(array(
-                'success' => false,
-                'message' => $profile['error'] ?: 'Không lưu được năm sinh/giới tính.',
-            ), $status);
-            return;
+        // Finalist: lưu năm sinh + giới tính vào attendee trước (để suy nhãn nội dung chi tiết).
+        // Khách ngoài không có attendee nên bỏ qua; năm sinh/giới tính gửi thẳng khi gán.
+        if (!$isGuest) {
+            $profile = RunAuth::saveProfile($attendeeId, $birthYear, $gender, $authEmail);
+            if (!$profile['success']) {
+                $status = isset($profile['code']) && (int) $profile['code'] >= 400 ? (int) $profile['code'] : 500;
+                $this->renderJson(array(
+                    'success' => false,
+                    'message' => $profile['error'] ?: 'Không lưu được năm sinh/giới tính.',
+                ), $status);
+                return;
+            }
         }
 
-        $res = RunRegistrations::adminManualAssignViaApi($runEventId, $attendeeId, $bibNumber, $birthYear, $gender, $authEmail);
+        $res = RunRegistrations::adminManualAssignViaApi(
+            $runEventId,
+            $isGuest ? null : $attendeeId,
+            $bibNumber,
+            $birthYear,
+            $gender,
+            $authEmail,
+            $isGuest,
+            $isGuest ? $fullName : null
+        );
         if (!$res['success']) {
             $status = isset($res['code']) && (int) $res['code'] >= 400 ? (int) $res['code'] : 500;
             $this->renderJson(array('success' => false, 'message' => $res['error'] ?: 'Không gán được vào nội dung chạy.'), $status);
