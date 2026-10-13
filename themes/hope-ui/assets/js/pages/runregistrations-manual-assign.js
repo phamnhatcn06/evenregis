@@ -277,6 +277,7 @@
                     }
                     body.append('is_guest', '1');
                     body.append('full_name', guestName);
+                    body.append('company', getValue('manual_guest_company').trim());
                 } else {
                     var attendeeId = getValue('manual_attendee_id');
                     if (!attendeeId) {
