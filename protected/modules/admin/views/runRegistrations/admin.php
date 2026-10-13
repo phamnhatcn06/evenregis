@@ -92,6 +92,7 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
 <?php if ($eventId && $canUpdate && !empty($runEventList)): ?>
     <div id="run-manual-assign-config"
          data-search-url="<?php echo $this->createUrl('searchPeople', array('event_id' => $eventId)); ?>"
+         data-check-url="<?php echo $this->createUrl('checkRegistration'); ?>"
          data-assign-url="<?php echo $this->createUrl('manualAssign'); ?>"></div>
     <?php $this->renderPartial('_modal_manual_assign', array('runEventList' => $runEventList)); ?>
     <?php
