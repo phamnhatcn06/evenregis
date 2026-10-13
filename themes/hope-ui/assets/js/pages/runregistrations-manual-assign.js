@@ -264,12 +264,24 @@
                 body.append('registration_id', registrationId);
                 url = changeUrl;
             } else {
-                var attendeeId = getValue('manual_attendee_id');
-                if (!attendeeId) {
-                    toastError('Vui lòng chọn người cần gán.');
-                    return;
+                var guestCheckbox = document.getElementById('manual_is_guest');
+                var isGuest = guestCheckbox && guestCheckbox.checked;
+                if (isGuest) {
+                    var guestName = getValue('manual_guest_name').trim();
+                    if (!guestName) {
+                        toastError('Vui lòng nhập họ tên khách.');
+                        return;
+                    }
+                    body.append('is_guest', '1');
+                    body.append('full_name', guestName);
+                } else {
+                    var attendeeId = getValue('manual_attendee_id');
+                    if (!attendeeId) {
+                        toastError('Vui lòng chọn người cần gán.');
+                        return;
+                    }
+                    body.append('attendee_id', attendeeId);
                 }
-                body.append('attendee_id', attendeeId);
                 url = assignUrl;
             }
 
