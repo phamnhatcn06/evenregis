@@ -306,6 +306,10 @@
         if (searchGroup) { searchGroup.style.display = isChange ? 'none' : ''; }
         if (title) { title.textContent = isChange ? 'Đổi nội dung chạy' : 'Gán thủ công vào nội dung chạy'; }
         if (icon) { icon.className = isChange ? 'fa fa-exchange' : 'fa fa-user-plus'; }
+
+        // Khách ngoài chỉ áp dụng khi gán mới, không áp dụng cho đổi nội dung.
+        var guestToggle = document.getElementById('manual_guest_toggle_group');
+        if (guestToggle) { guestToggle.style.display = isChange ? 'none' : ''; }
     }
 
     /** Đổ dữ liệu dòng vào popup ở chế độ đổi nội dung. */
