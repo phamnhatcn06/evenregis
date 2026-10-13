@@ -61,7 +61,7 @@ class RunRegistrations extends CFormModel
      * Admin gán người vào một cự ly với mã BIB nhập tay. Trả mảng ApiClient chuẩn.
      * code=200 thành công; 409 đã đăng ký / BIB đã cấp; 422 lỗi dữ liệu.
      */
-    public static function adminManualAssignViaApi($runEventId, $attendeeId, $bibNumber, $birthYear = null, $gender = null, $authEmail = null)
+    public static function adminManualAssignViaApi($runEventId, $attendeeId, $bibNumber, $birthYear = null, $gender = null, $authEmail = null, $isGuest = false, $fullName = null)
     {
         return ApiClient::post(ApiEndpoints::RUN_REGISTRATION_ADMIN_MANUAL_ASSIGN, array(
             'run_event_id' => $runEventId,
@@ -70,6 +70,8 @@ class RunRegistrations extends CFormModel
             'birth_year'   => $birthYear,
             'gender'       => $gender,
             'auth_email'   => $authEmail,
+            'is_guest'     => $isGuest ? 1 : 0,
+            'full_name'    => $fullName,
         ));
     }
 
