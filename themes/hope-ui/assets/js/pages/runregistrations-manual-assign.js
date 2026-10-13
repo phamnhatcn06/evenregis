@@ -192,23 +192,19 @@
         if (submit) { submit.disabled = locked; }
     }
 
-    function bindSubmit(modalElement, assignUrl) {
+    function bindSubmit(modalElement, assignUrl, changeUrl) {
         var button = document.getElementById('btn_submit_manual_assign');
         if (!button) {
             return;
         }
 
         button.addEventListener('click', function () {
-            var attendeeId = getValue('manual_attendee_id');
+            var mode = getValue('manual_mode') || 'assign';
             var birthYear = getValue('manual_birth_year');
             var gender = getCheckedValue('manual_gender');
             var runEventId = getCheckedValue('manual_run_event_id');
             var bib = getValue('manual_bib').trim();
 
-            if (!attendeeId) {
-                toastError('Vui lòng chọn người cần gán.');
-                return;
-            }
             if (!birthYear || gender === null) {
                 toastError('Vui lòng chọn năm sinh và giới tính.');
                 return;
@@ -220,21 +216,88 @@
             // Mã BIB tùy chọn: để trống thì server tự cấp theo quy luật.
 
             var body = new FormData();
-            body.append('attendee_id', attendeeId);
             body.append('birth_year', birthYear);
             body.append('gender', gender);
             body.append('run_event_id', runEventId);
             body.append('bib_number', bib);
 
-            postWithButton(assignUrl, body, button, function (data) {
+            var url;
+            if (mode === 'change') {
+                var registrationId = getValue('manual_registration_id');
+                if (!registrationId) {
+                    toastError('Thiếu đăng ký cần đổi.');
+                    return;
+                }
+                body.append('registration_id', registrationId);
+                url = changeUrl;
+            } else {
+                var attendeeId = getValue('manual_attendee_id');
+                if (!attendeeId) {
+                    toastError('Vui lòng chọn người cần gán.');
+                    return;
+                }
+                body.append('attendee_id', attendeeId);
+                url = assignUrl;
+            }
+
+            postWithButton(url, body, button, function (data) {
                 var modal = bootstrap.Modal.getInstance(modalElement);
                 if (modal) { modal.hide(); }
                 if (typeof Toast !== 'undefined') {
-                    Toast.success(data.message || 'Đã gán vào nội dung chạy.');
+                    Toast.success(data.message || 'Đã lưu.');
                 }
                 window.setTimeout(function () { window.location.reload(); }, 900);
             });
         });
+    }
+
+    /** Đặt chế độ popup: 'assign' (gán mới, có tìm người) hoặc 'change' (đổi nội dung). */
+    function setMode(mode) {
+        setValue('manual_mode', mode);
+        var searchGroup = document.getElementById('manual_search_group');
+        var title = document.getElementById('manual_modal_title');
+        var icon = document.getElementById('manual_modal_icon');
+        var isChange = (mode === 'change');
+        if (searchGroup) { searchGroup.style.display = isChange ? 'none' : ''; }
+        if (title) { title.textContent = isChange ? 'Đổi nội dung chạy' : 'Gán thủ công vào nội dung chạy'; }
+        if (icon) { icon.className = isChange ? 'fa fa-exchange' : 'fa fa-user-plus'; }
+    }
+
+    /** Đổ dữ liệu dòng vào popup ở chế độ đổi nội dung. */
+    function fillChangeMode(btn) {
+        setMode('change');
+        setValue('manual_registration_id', btn.getAttribute('data-registration-id') || '');
+        setValue('manual_attendee_id', ''); // đổi không dùng attendee_id, server lấy theo registration.
+
+        setText('manual_target_name', btn.getAttribute('data-full-name') || '-');
+        setText('manual_target_unit', btn.getAttribute('data-unit') || '-');
+        document.getElementById('manual_selected_box').style.display = '';
+
+        // Note thu hồi BIB cũ.
+        var oldBib = btn.getAttribute('data-bib') || '';
+        setText('manual_change_old_bib', oldBib || '(chưa có)');
+        var changeNote = document.getElementById('manual_change_note');
+        if (changeNote) { changeNote.style.display = ''; }
+
+        // Prefill năm sinh / giới tính.
+        var birthYear = btn.getAttribute('data-birth-year') || '';
+        var birthSelect = document.getElementById('manual_birth_year');
+        var birthNote = document.getElementById('manual_birth_year_note');
+        if (birthSelect) {
+            birthSelect.value = birthYear;
+            if (birthSelect.value !== birthYear) { birthSelect.value = ''; }
+            if (birthNote) { birthNote.style.display = birthSelect.value ? 'none' : ''; }
+        }
+        var gender = btn.getAttribute('data-gender');
+        var male = document.getElementById('manual_gender_male');
+        var female = document.getElementById('manual_gender_female');
+        if (male) { male.checked = (gender === '1'); }
+        if (female) { female.checked = (gender === '0'); }
+
+        // Prefill cự ly hiện tại.
+        var runEventId = btn.getAttribute('data-run-event-id') || '';
+        var runRadio = document.getElementById('manual_run_' + runEventId);
+        if (runRadio) { runRadio.checked = true; }
     }
 
     function postWithButton(url, body, button, onSuccess) {
