@@ -10,22 +10,35 @@
     document.addEventListener('DOMContentLoaded', function () {
         var config = document.getElementById('run-manual-assign-config');
         var modalElement = document.getElementById('modal_manual_assign');
-        var openButton = document.getElementById('btn_open_manual_assign');
-        if (!config || !modalElement || !openButton) {
+        if (!config || !modalElement) {
             return;
         }
 
         var searchUrl = config.getAttribute('data-search-url');
         var assignUrl = config.getAttribute('data-assign-url');
         var checkUrl = config.getAttribute('data-check-url');
+        var changeUrl = config.getAttribute('data-change-url');
 
-        openButton.addEventListener('click', function () {
-            resetForm();
-            new bootstrap.Modal(modalElement).show();
+        var openButton = document.getElementById('btn_open_manual_assign');
+        if (openButton) {
+            openButton.addEventListener('click', function () {
+                resetForm();
+                setMode('assign');
+                new bootstrap.Modal(modalElement).show();
+            });
+        }
+
+        // Nút "Đổi nội dung" trên từng dòng -> mở popup ở chế độ đổi.
+        document.querySelectorAll('.js-change-content').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                resetForm();
+                fillChangeMode(btn);
+                new bootstrap.Modal(modalElement).show();
+            });
         });
 
         bindSearch(searchUrl, checkUrl);
-        bindSubmit(modalElement, assignUrl);
+        bindSubmit(modalElement, assignUrl, changeUrl);
 
         // Admin tự chọn năm sinh -> ẩn note cảnh báo thiếu dữ liệu.
         var birthSelect = document.getElementById('manual_birth_year');
