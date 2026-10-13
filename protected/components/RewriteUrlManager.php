@@ -16,6 +16,17 @@ class RewriteUrlManager extends CUrlManager
             'run' => 'frontend/run/index',
             'run/<action:\w+>' => 'frontend/run/<action>',
 
+            // Slug thân thiện cho các link in trong Sổ tay Đại hội — phải đứng TRƯỚC
+            // catch-all generic '<controller>/<action>' (vốn không khớp slug có dấu "-").
+            'agenda-tong-the' => 'frontend/daihoi/agenda',
+            'tiec-welcome' => 'frontend/daihoi/tiecWelcome',
+            'lich-thi-the-thao' => 'frontend/daihoi/schedule',
+            'lich-tham-quan' => 'frontend/daihoi/lichThamQuan',
+            'tiec-gala' => 'frontend/daihoi/tiecGala',
+            'ho-tro' => 'frontend/daihoi/hoTro',
+            'doan-thu-ky' => 'frontend/daihoi/doanThuKy',
+            'so-do-dia-diem' => 'frontend/daihoi/soDoDiaDiem',
+
             // Admin module routes
             'admin/<controller:\w+>/<action:\w+>/<id:\d+>/<contentId:\d+>' => 'admin/<controller>/<action>',
             'admin/<controller:\w+>/<action:\w+>/<id:\d+>' => 'admin/<controller>/<action>',
