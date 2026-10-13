@@ -257,7 +257,8 @@ class RunRegistrationsController extends AdminController
             $gender,
             $authEmail,
             $isGuest,
-            $isGuest ? $fullName : null
+            $isGuest ? $fullName : null,
+            $isGuest ? $company : null
         );
         if (!$res['success']) {
             $status = isset($res['code']) && (int) $res['code'] >= 400 ? (int) $res['code'] : 500;
