@@ -71,14 +71,36 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                 <a href="<?php echo $this->createUrl('admin', array('event_id' => $eventId)); ?>" class="btn btn-outline-secondary">
                     <i class="fa fa-times me-1"></i>Xóa lọc
                 </a>
+                <?php if ($canUpdate && !empty($runEventList)): ?>
+                <button type="button" class="btn btn-primary ms-auto" id="btn_open_manual_assign">
+                    <i class="fa fa-user-plus me-1"></i>Gán thủ công
+                </button>
+                <a href="<?php echo $this->createUrl('export', array('event_id' => $eventId)); ?>" class="btn btn-success">
+                    <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
+                </a>
+                <?php else: ?>
                 <a href="<?php echo $this->createUrl('export', array('event_id' => $eventId)); ?>" class="btn btn-success ms-auto">
                     <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
                 </a>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
         </form>
     </div>
 </div>
+
+<?php if ($eventId && $canUpdate && !empty($runEventList)): ?>
+    <div id="run-manual-assign-config"
+         data-search-url="<?php echo $this->createUrl('searchPeople', array('event_id' => $eventId)); ?>"
+         data-assign-url="<?php echo $this->createUrl('manualAssign'); ?>"></div>
+    <?php $this->renderPartial('_modal_manual_assign', array('runEventList' => $runEventList)); ?>
+    <?php
+    Yii::app()->clientScript->registerScriptFile(
+        Yii::app()->theme->baseUrl . '/assets/js/pages/runregistrations-manual-assign.js',
+        CClientScript::POS_END
+    );
+    ?>
+<?php endif; ?>
 
 <?php if ($eventId && $cancelRequestCount > 0): ?>
     <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
