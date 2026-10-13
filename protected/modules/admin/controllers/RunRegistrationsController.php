@@ -440,7 +440,7 @@ class RunRegistrationsController extends AdminController
             $sheet->setCellValue('A' . $row, $stt++);
             $sheet->setCellValue('B' . $row, isset($r['bib_number']) ? $r['bib_number'] : '');
             $sheet->setCellValue('C' . $row, isset($r['full_name']) ? $r['full_name'] : '');
-            $sheet->setCellValue('D' . $row, isset($r['unit_label']) ? $r['unit_label'] : '');
+            $sheet->setCellValue('D' . $row, !empty($r['is_guest']) ? 'Khách ngoài' : (isset($r['unit_label']) ? $r['unit_label'] : ''));
             $sheet->setCellValue('E' . $row, isset($r['phone_number']) ? $r['phone_number'] : '');
             $sheet->setCellValue('F' . $row, !empty($r['birth_year']) ? $r['birth_year'] : '');
             $sheet->setCellValue('G' . $row, $genderLabel);
