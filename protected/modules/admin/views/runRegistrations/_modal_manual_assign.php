@@ -49,6 +49,12 @@ $minYear     = 1950;
                         </div>
                     </div>
 
+                    <div class="alert alert-warning py-2 px-3 small mb-3" id="manual_existing_warning" style="display: none;">
+                        <i class="fa fa-exclamation-triangle me-1"></i>
+                        Người này đã có đăng ký chạy: <strong id="manual_existing_detail"></strong>.
+                        Không thể cấp lần 2.
+                    </div>
+
                     <!-- Bước 2: Năm sinh + giới tính -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
