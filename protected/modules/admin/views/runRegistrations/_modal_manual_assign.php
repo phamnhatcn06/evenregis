@@ -51,6 +51,12 @@ $minYear     = 1950;
                         </div>
                     </div>
 
+                    <div class="alert alert-primary py-2 px-3 small mb-3" id="manual_change_note" style="display: none;">
+                        <i class="fa fa-exchange me-1"></i>
+                        Đổi nội dung: mã BIB hiện tại <strong id="manual_change_old_bib"></strong> sẽ được <strong>thu hồi</strong>
+                        và có thể cấp lại cho người khác. Để trống ô BIB để hệ thống tự cấp số mới.
+                    </div>
+
                     <div class="alert alert-warning py-2 px-3 small mb-3" id="manual_existing_warning" style="display: none;">
                         <i class="fa fa-exclamation-triangle me-1"></i>
                         Người này đã có đăng ký chạy: <strong id="manual_existing_detail"></strong>.
