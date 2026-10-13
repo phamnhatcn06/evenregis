@@ -139,6 +139,9 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                             <th>Giới tính</th>
                             <th>Cự ly</th>
                             <th>Nội dung</th>
+                            <?php if ($canUpdate && !empty($runEventList)): ?>
+                            <th style="width:130px;">Thao tác</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
