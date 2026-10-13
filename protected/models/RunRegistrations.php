@@ -57,6 +57,22 @@ class RunRegistrations extends CFormModel
         ));
     }
 
+    /**
+     * Admin gán người vào một cự ly với mã BIB nhập tay. Trả mảng ApiClient chuẩn.
+     * code=200 thành công; 409 đã đăng ký / BIB đã cấp; 422 lỗi dữ liệu.
+     */
+    public static function adminManualAssignViaApi($runEventId, $attendeeId, $bibNumber, $birthYear = null, $gender = null, $authEmail = null)
+    {
+        return ApiClient::post(ApiEndpoints::RUN_REGISTRATION_ADMIN_MANUAL_ASSIGN, array(
+            'run_event_id' => $runEventId,
+            'attendee_id'  => $attendeeId,
+            'bib_number'   => $bibNumber,
+            'birth_year'   => $birthYear,
+            'gender'       => $gender,
+            'auth_email'   => $authEmail,
+        ));
+    }
+
     /** Phiếu đăng ký của 1 người (hoặc null). */
     public static function findMine($attendeeId)
     {
