@@ -772,7 +772,7 @@ if (empty($albumList)) {
         }
         $newsDelays = array('delay-100', 'delay-200', 'delay-300');
         foreach ($newsItems as $ni => $n):
-          $href = $n['id'] !== '' ? $base . '/daihoi/index#tin-' . $e($n['id']) : '#tin-tuc';
+          $href = $n['id'] !== '' ? $base . '/tin-tuc/' . $e($n['id']) : $base . '/tin-tuc';
           $nDelay = isset($newsDelays[$ni]) ? $newsDelays[$ni] : 'delay-100';
         ?>
           <div class="col-12 col-md-4 reveal-on-scroll <?php echo $nDelay; ?>">
