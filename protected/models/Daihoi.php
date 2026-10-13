@@ -119,7 +119,7 @@ class Daihoi
         if (is_array($res) && !empty($res)) {
             return $res;
         }
-        return array();
+        return self::getFallbackRankings($limit);
     }
 
     /**
@@ -336,6 +336,10 @@ class Daihoi
             }
         }
 
+        if (empty($matches)) {
+            return self::getFallbackTournamentSchedule($filterSportId);
+        }
+
         return array(
             'stats' => array(
                 'total_sports' => count($sportsMap),
@@ -436,5 +440,368 @@ class Daihoi
     {
         $url = ApiEndpoints::url(ApiEndpoints::DAIHOI_ALBUM_ITEMS, array('id' => $albumId));
         return self::unwrap(ApiClient::get($url), array());
+    }
+
+    /**
+     * Dữ liệu mẫu bảng tổng sắp huy chương toàn đoàn (khi API chưa mở cổng kết quả).
+     * @param int $limit
+     * @return array
+     */
+    public static function getFallbackRankings($limit = 10)
+    {
+        $list = array(
+            array('rank' => 1, 'name' => 'Mường Thanh Luxury Hạ Long', 'gold' => 4, 'silver' => 2, 'bronze' => 1, 'points' => 28),
+            array('rank' => 2, 'name' => 'Mường Thanh Grand Hà Nội', 'gold' => 3, 'silver' => 3, 'bronze' => 2, 'points' => 25),
+            array('rank' => 3, 'name' => 'Mường Thanh Grand Đà Nẵng', 'gold' => 2, 'silver' => 2, 'bronze' => 3, 'points' => 19),
+            array('rank' => 4, 'name' => 'Mường Thanh Luxury Sài Gòn', 'gold' => 2, 'silver' => 1, 'bronze' => 2, 'points' => 16),
+            array('rank' => 5, 'name' => 'Mường Thanh Sông Lam', 'gold' => 1, 'silver' => 3, 'bronze' => 1, 'points' => 14),
+            array('rank' => 6, 'name' => 'Khối Văn phòng Điều hành', 'gold' => 1, 'silver' => 1, 'bronze' => 2, 'points' => 11),
+            array('rank' => 7, 'name' => 'Mường Thanh Holiday Huế', 'gold' => 1, 'silver' => 1, 'bronze' => 0, 'points' => 8),
+            array('rank' => 8, 'name' => 'Mường Thanh Luxury Cần Thơ', 'gold' => 0, 'silver' => 2, 'bronze' => 2, 'points' => 8),
+            array('rank' => 9, 'name' => 'Mường Thanh Luxury Nha Trang', 'gold' => 0, 'silver' => 2, 'bronze' => 1, 'points' => 7),
+            array('rank' => 10, 'name' => 'Mường Thanh Grand Lào Cai', 'gold' => 0, 'silver' => 1, 'bronze' => 2, 'points' => 6),
+        );
+        return array_slice($list, 0, $limit);
+    }
+
+    /**
+     * Dữ liệu lịch thi đấu mẫu hoàn chỉnh cho Đại hội Mường Thanh (khi chưa bốc thăm).
+     * @param int|null $filterSportId
+     * @return array
+     */
+    public static function getFallbackTournamentSchedule($filterSportId = null)
+    {
+        $sports = array(
+            array('id' => 1, 'name' => 'Bóng đá nam', 'code' => 'FOOTBALL', 'icon' => 'sports_soccer', 'total_matches' => 6, 'completed_matches' => 2),
+            array('id' => 2, 'name' => 'Cầu lông đôi', 'code' => 'BADMINTON', 'icon' => 'sports_tennis', 'total_matches' => 5, 'completed_matches' => 2),
+            array('id' => 3, 'name' => 'Kéo co đồng đội', 'code' => 'TUG_OF_WAR', 'icon' => 'fitness_center', 'total_matches' => 4, 'completed_matches' => 1),
+            array('id' => 4, 'name' => 'Bóng bàn', 'code' => 'TABLE_TENNIS', 'icon' => 'sports_tennis', 'total_matches' => 4, 'completed_matches' => 2),
+            array('id' => 5, 'name' => 'Pickleball', 'code' => 'PICKLEBALL', 'icon' => 'sports_tennis', 'total_matches' => 4, 'completed_matches' => 1),
+            array('id' => 6, 'name' => 'Bơi lội tiếp sức', 'code' => 'SWIMMING', 'icon' => 'pool', 'total_matches' => 3, 'completed_matches' => 0),
+        );
+
+        $matches = array(
+            // --- BÓNG ĐÁ NAM ---
+            array(
+                'id' => 101, 'sport_id' => 1, 'sport_name' => 'Bóng đá nam', 'sport_code' => 'FOOTBALL', 'sport_icon' => 'sports_soccer',
+                'stage_id' => 1, 'stage_name' => 'Vòng bảng', 'round' => 'Bảng A • Lượt 2',
+                'team_a' => array('id' => 1, 'name' => 'MT Luxury Hạ Long', 'score' => 2, 'is_winner' => false),
+                'team_b' => array('id' => 2, 'name' => 'MT Grand Hà Nội', 'score' => 1, 'is_winner' => false),
+                'status' => 'live', 'status_text' => 'Đang diễn ra', 'status_class' => 'bg-danger text-white',
+                'match_time' => '10:30 27/10/2026', 'match_hour' => '10:30', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 10:30:00',
+                'location' => 'Sân bóng đá số 1', 'match_order' => 1,
+            ),
+            array(
+                'id' => 102, 'sport_id' => 1, 'sport_name' => 'Bóng đá nam', 'sport_code' => 'FOOTBALL', 'sport_icon' => 'sports_soccer',
+                'stage_id' => 1, 'stage_name' => 'Vòng bảng', 'round' => 'Bảng A • Lượt 1',
+                'team_a' => array('id' => 3, 'name' => 'MT Sông Lam', 'score' => 3, 'is_winner' => true),
+                'team_b' => array('id' => 4, 'name' => 'MT Holiday Huế', 'score' => 0, 'is_winner' => false),
+                'status' => 'completed', 'status_text' => 'Đã kết thúc', 'status_class' => 'bg-secondary text-white',
+                'match_time' => '08:00 27/10/2026', 'match_hour' => '08:00', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 08:00:00',
+                'location' => 'Sân bóng đá số 1', 'match_order' => 2,
+            ),
+            array(
+                'id' => 103, 'sport_id' => 1, 'sport_name' => 'Bóng đá nam', 'sport_code' => 'FOOTBALL', 'sport_icon' => 'sports_soccer',
+                'stage_id' => 1, 'stage_name' => 'Vòng bảng', 'round' => 'Bảng B • Lượt 1',
+                'team_a' => array('id' => 5, 'name' => 'MT Grand Đà Nẵng', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 6, 'name' => 'MT Luxury Sài Gòn', 'score' => null, 'is_winner' => false),
+                'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
+                'match_time' => '15:30 27/10/2026', 'match_hour' => '15:30', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 15:30:00',
+                'location' => 'Sân bóng đá số 2', 'match_order' => 3,
+            ),
+            array(
+                'id' => 104, 'sport_id' => 1, 'sport_name' => 'Bóng đá nam', 'sport_code' => 'FOOTBALL', 'sport_icon' => 'sports_soccer',
+                'stage_id' => 1, 'stage_name' => 'Vòng bảng', 'round' => 'Bảng B • Lượt 1',
+                'team_a' => array('id' => 7, 'name' => 'MT Luxury Cần Thơ', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 8, 'name' => 'MT Viễn Triều', 'score' => null, 'is_winner' => false),
+                'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
+                'match_time' => '16:45 27/10/2026', 'match_hour' => '16:45', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 16:45:00',
+                'location' => 'Sân bóng đá số 1', 'match_order' => 4,
+            ),
+            array(
+                'id' => 105, 'sport_id' => 1, 'sport_name' => 'Bóng đá nam', 'sport_code' => 'FOOTBALL', 'sport_icon' => 'sports_soccer',
+                'stage_id' => 2, 'stage_name' => 'Bán kết', 'round' => 'Bán kết 1',
+                'team_a' => array('id' => null, 'name' => 'Nhất Bảng A', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Nhì Bảng B', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Sắp diễn ra', 'status_class' => 'bg-primary text-white',
+                'match_time' => '08:30 28/10/2026', 'match_hour' => '08:30', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 08:30:00',
+                'location' => 'Sân vận động Trung tâm', 'match_order' => 5,
+            ),
+            array(
+                'id' => 106, 'sport_id' => 1, 'sport_name' => 'Bóng đá nam', 'sport_code' => 'FOOTBALL', 'sport_icon' => 'sports_soccer',
+                'stage_id' => 3, 'stage_name' => 'Chung kết', 'round' => 'Chung kết Tranh Cúp Vàng 🏆',
+                'team_a' => array('id' => null, 'name' => 'Thắng Bán kết 1', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Thắng Bán kết 2', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Chung kết', 'status_class' => 'bg-warning text-dark',
+                'match_time' => '15:00 29/10/2026', 'match_hour' => '15:00', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 15:00:00',
+                'location' => 'Sân vận động Trung tâm', 'match_order' => 6,
+            ),
+
+            // --- CẦU LÔNG ĐÔI ---
+            array(
+                'id' => 201, 'sport_id' => 2, 'sport_name' => 'Cầu lông đôi', 'sport_code' => 'BADMINTON', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 4, 'stage_name' => 'Vòng bảng', 'round' => 'Bảng A • Đôi nam nữ',
+                'team_a' => array('id' => 11, 'name' => 'MT Grand Quảng Ninh', 'score' => 1, 'is_winner' => false),
+                'team_b' => array('id' => 12, 'name' => 'MT Holiday Đà Lạt', 'score' => 1, 'is_winner' => false),
+                'status' => 'live', 'status_text' => 'Đang diễn ra', 'status_class' => 'bg-danger text-white',
+                'match_time' => '11:00 27/10/2026', 'match_hour' => '11:00', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 11:00:00',
+                'location' => 'Nhà thi đấu - Sân 1', 'match_order' => 7,
+            ),
+            array(
+                'id' => 202, 'sport_id' => 2, 'sport_name' => 'Cầu lông đôi', 'sport_code' => 'BADMINTON', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 4, 'stage_name' => 'Vòng bảng', 'round' => 'Bảng A • Đôi nam',
+                'team_a' => array('id' => 13, 'name' => 'MT Luxury Nha Trang', 'score' => 2, 'is_winner' => true),
+                'team_b' => array('id' => 14, 'name' => 'MT Grand Thanh Hóa', 'score' => 0, 'is_winner' => false),
+                'status' => 'completed', 'status_text' => 'Đã kết thúc', 'status_class' => 'bg-secondary text-white',
+                'match_time' => '09:00 27/10/2026', 'match_hour' => '09:00', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 09:00:00',
+                'location' => 'Nhà thi đấu - Sân 2', 'match_order' => 8,
+            ),
+            array(
+                'id' => 203, 'sport_id' => 2, 'sport_name' => 'Cầu lông đôi', 'sport_code' => 'BADMINTON', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 4, 'stage_name' => 'Vòng bảng', 'round' => 'Bảng B • Đôi nam',
+                'team_a' => array('id' => 15, 'name' => 'MT Sài Gòn Centre', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 16, 'name' => 'MT Grand Lào Cai', 'score' => null, 'is_winner' => false),
+                'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
+                'match_time' => '09:00 28/10/2026', 'match_hour' => '09:00', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 09:00:00',
+                'location' => 'Nhà thi đấu - Sân 1', 'match_order' => 9,
+            ),
+            array(
+                'id' => 204, 'sport_id' => 2, 'sport_name' => 'Cầu lông đôi', 'sport_code' => 'BADMINTON', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 5, 'stage_name' => 'Bán kết', 'round' => 'Bán kết Đôi nam nữ',
+                'team_a' => array('id' => null, 'name' => 'Nhất Bảng A', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Nhì Bảng B', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Sắp diễn ra', 'status_class' => 'bg-primary text-white',
+                'match_time' => '14:30 28/10/2026', 'match_hour' => '14:30', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 14:30:00',
+                'location' => 'Nhà thi đấu - Sân 1', 'match_order' => 10,
+            ),
+            array(
+                'id' => 205, 'sport_id' => 2, 'sport_name' => 'Cầu lông đôi', 'sport_code' => 'BADMINTON', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 6, 'stage_name' => 'Chung kết', 'round' => 'Chung kết Đôi nam nữ 🏆',
+                'team_a' => array('id' => null, 'name' => 'Thắng Bán kết 1', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Thắng Bán kết 2', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Chung kết', 'status_class' => 'bg-warning text-dark',
+                'match_time' => '10:00 29/10/2026', 'match_hour' => '10:00', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 10:00:00',
+                'location' => 'Nhà thi đấu - Sân 1', 'match_order' => 11,
+            ),
+
+            // --- KÉO CO ĐỒNG ĐỘI ---
+            array(
+                'id' => 301, 'sport_id' => 3, 'sport_name' => 'Kéo co đồng đội', 'sport_code' => 'TUG_OF_WAR', 'sport_icon' => 'fitness_center',
+                'stage_id' => 7, 'stage_name' => 'Tứ kết', 'round' => 'Tứ kết 1',
+                'team_a' => array('id' => 21, 'name' => 'Khối KS Miền Bắc', 'score' => 2, 'is_winner' => true),
+                'team_b' => array('id' => 22, 'name' => 'Khối KS Miền Trung', 'score' => 1, 'is_winner' => false),
+                'status' => 'completed', 'status_text' => 'Đã kết thúc', 'status_class' => 'bg-secondary text-white',
+                'match_time' => '08:30 27/10/2026', 'match_hour' => '08:30', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 08:30:00',
+                'location' => 'Sân cỏ trung tâm', 'match_order' => 12,
+            ),
+            array(
+                'id' => 302, 'sport_id' => 3, 'sport_name' => 'Kéo co đồng đội', 'sport_code' => 'TUG_OF_WAR', 'sport_icon' => 'fitness_center',
+                'stage_id' => 7, 'stage_name' => 'Tứ kết', 'round' => 'Tứ kết 2',
+                'team_a' => array('id' => 23, 'name' => 'Khối KS Miền Nam', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 24, 'name' => 'Khối VP Tập đoàn', 'score' => null, 'is_winner' => false),
+                'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
+                'match_time' => '10:00 28/10/2026', 'match_hour' => '10:00', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 10:00:00',
+                'location' => 'Sân cỏ trung tâm', 'match_order' => 13,
+            ),
+            array(
+                'id' => 303, 'sport_id' => 3, 'sport_name' => 'Kéo co đồng đội', 'sport_code' => 'TUG_OF_WAR', 'sport_icon' => 'fitness_center',
+                'stage_id' => 8, 'stage_name' => 'Bán kết', 'round' => 'Bán kết Kéo co',
+                'team_a' => array('id' => 21, 'name' => 'Khối KS Miền Bắc', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Thắng Tứ kết 2', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Sắp diễn ra', 'status_class' => 'bg-primary text-white',
+                'match_time' => '15:30 28/10/2026', 'match_hour' => '15:30', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 15:30:00',
+                'location' => 'Sân cỏ trung tâm', 'match_order' => 14,
+            ),
+            array(
+                'id' => 304, 'sport_id' => 3, 'sport_name' => 'Kéo co đồng đội', 'sport_code' => 'TUG_OF_WAR', 'sport_icon' => 'fitness_center',
+                'stage_id' => 9, 'stage_name' => 'Chung kết', 'round' => 'Chung kết Kéo co 🏆',
+                'team_a' => array('id' => null, 'name' => 'Thắng Bán kết 1', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Thắng Bán kết 2', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Chung kết', 'status_class' => 'bg-warning text-dark',
+                'match_time' => '11:00 29/10/2026', 'match_hour' => '11:00', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 11:00:00',
+                'location' => 'Sân cỏ trung tâm', 'match_order' => 15,
+            ),
+
+            // --- BÓNG BÀN ---
+            array(
+                'id' => 401, 'sport_id' => 4, 'sport_name' => 'Bóng bàn', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 10, 'stage_name' => 'Vòng loại', 'round' => 'Đơn nam • Vòng 1',
+                'team_a' => array('id' => 31, 'name' => 'MT Hà Nam', 'score' => 3, 'is_winner' => true),
+                'team_b' => array('id' => 32, 'name' => 'MT Phú Quốc', 'score' => 1, 'is_winner' => false),
+                'status' => 'completed', 'status_text' => 'Đã kết thúc', 'status_class' => 'bg-secondary text-white',
+                'match_time' => '09:30 27/10/2026', 'match_hour' => '09:30', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 09:30:00',
+                'location' => 'Nhà thi đấu - Bàn 1', 'match_order' => 16,
+            ),
+            array(
+                'id' => 402, 'sport_id' => 4, 'sport_name' => 'Bóng bàn', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 10, 'stage_name' => 'Vòng loại', 'round' => 'Đơn nam • Vòng 1',
+                'team_a' => array('id' => 33, 'name' => 'MT Luxury Đà Nẵng', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 34, 'name' => 'MT Grand Bắc Giang', 'score' => null, 'is_winner' => false),
+                'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
+                'match_time' => '14:00 28/10/2026', 'match_hour' => '14:00', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 14:00:00',
+                'location' => 'Nhà thi đấu - Bàn 2', 'match_order' => 17,
+            ),
+            array(
+                'id' => 403, 'sport_id' => 4, 'sport_name' => 'Bóng bàn', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 11, 'stage_name' => 'Bán kết', 'round' => 'Bán kết Đơn nam',
+                'team_a' => array('id' => 31, 'name' => 'MT Hà Nam', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Chờ xác định', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Sắp diễn ra', 'status_class' => 'bg-primary text-white',
+                'match_time' => '16:00 28/10/2026', 'match_hour' => '16:00', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 16:00:00',
+                'location' => 'Nhà thi đấu - Bàn 1', 'match_order' => 18,
+            ),
+            array(
+                'id' => 404, 'sport_id' => 4, 'sport_name' => 'Bóng bàn', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 12, 'stage_name' => 'Chung kết', 'round' => 'Chung kết Đơn nam 🏆',
+                'team_a' => array('id' => null, 'name' => 'Thắng Bán kết 1', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Thắng Bán kết 2', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Chung kết', 'status_class' => 'bg-warning text-dark',
+                'match_time' => '09:00 29/10/2026', 'match_hour' => '09:00', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 09:00:00',
+                'location' => 'Nhà thi đấu - Bàn 1', 'match_order' => 19,
+            ),
+
+            // --- PICKLEBALL ---
+            array(
+                'id' => 501, 'sport_id' => 5, 'sport_name' => 'Pickleball', 'sport_code' => 'PICKLEBALL', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 13, 'stage_name' => 'Vòng bảng', 'round' => 'Đôi nam • Vòng 1',
+                'team_a' => array('id' => 41, 'name' => 'MT Grand Cửa Lò', 'score' => 2, 'is_winner' => true),
+                'team_b' => array('id' => 42, 'name' => 'MT Luxury Quảng Bình', 'score' => 0, 'is_winner' => false),
+                'status' => 'completed', 'status_text' => 'Đã kết thúc', 'status_class' => 'bg-secondary text-white',
+                'match_time' => '08:00 27/10/2026', 'match_hour' => '08:00', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 08:00:00',
+                'location' => 'Cụm sân Pickleball số 1', 'match_order' => 20,
+            ),
+            array(
+                'id' => 502, 'sport_id' => 5, 'sport_name' => 'Pickleball', 'sport_code' => 'PICKLEBALL', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 13, 'stage_name' => 'Vòng bảng', 'round' => 'Đôi nam • Vòng 1',
+                'team_a' => array('id' => 43, 'name' => 'MT Luxury Hạ Long', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 44, 'name' => 'MT Grand Hà Nội', 'score' => null, 'is_winner' => false),
+                'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
+                'match_time' => '15:00 28/10/2026', 'match_hour' => '15:00', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 15:00:00',
+                'location' => 'Cụm sân Pickleball số 2', 'match_order' => 21,
+            ),
+            array(
+                'id' => 503, 'sport_id' => 5, 'sport_name' => 'Pickleball', 'sport_code' => 'PICKLEBALL', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 14, 'stage_name' => 'Bán kết', 'round' => 'Bán kết Đôi nam',
+                'team_a' => array('id' => 41, 'name' => 'MT Grand Cửa Lò', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Chờ xác định', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Sắp diễn ra', 'status_class' => 'bg-primary text-white',
+                'match_time' => '17:00 28/10/2026', 'match_hour' => '17:00', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 17:00:00',
+                'location' => 'Cụm sân Pickleball số 1', 'match_order' => 22,
+            ),
+            array(
+                'id' => 504, 'sport_id' => 5, 'sport_name' => 'Pickleball', 'sport_code' => 'PICKLEBALL', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 15, 'stage_name' => 'Chung kết', 'round' => 'Chung kết Đôi nam 🏆',
+                'team_a' => array('id' => null, 'name' => 'Thắng Bán kết 1', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Thắng Bán kết 2', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Chung kết', 'status_class' => 'bg-warning text-dark',
+                'match_time' => '09:30 29/10/2026', 'match_hour' => '09:30', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 09:30:00',
+                'location' => 'Cụm sân Pickleball số 1', 'match_order' => 23,
+            ),
+
+            // --- BƠI LỘI TIẾP SỨC ---
+            array(
+                'id' => 601, 'sport_id' => 6, 'sport_name' => 'Bơi lội tiếp sức', 'sport_code' => 'SWIMMING', 'sport_icon' => 'pool',
+                'stage_id' => 16, 'stage_name' => 'Vòng loại', 'round' => '4x50m Tự do • Đợt 1',
+                'team_a' => array('id' => 51, 'name' => 'Đoàn Miền Bắc', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 52, 'name' => 'Đoàn Miền Trung', 'score' => null, 'is_winner' => false),
+                'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
+                'match_time' => '08:00 29/10/2026', 'match_hour' => '08:00', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 08:00:00',
+                'location' => 'Bể bơi Olympic', 'match_order' => 24,
+            ),
+            array(
+                'id' => 602, 'sport_id' => 6, 'sport_name' => 'Bơi lội tiếp sức', 'sport_code' => 'SWIMMING', 'sport_icon' => 'pool',
+                'stage_id' => 16, 'stage_name' => 'Vòng loại', 'round' => '4x50m Tự do • Đợt 2',
+                'team_a' => array('id' => 53, 'name' => 'Đoàn Miền Nam', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 54, 'name' => 'Đoàn VP Tập đoàn', 'score' => null, 'is_winner' => false),
+                'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
+                'match_time' => '08:45 29/10/2026', 'match_hour' => '08:45', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 08:45:00',
+                'location' => 'Bể bơi Olympic', 'match_order' => 25,
+            ),
+            array(
+                'id' => 603, 'sport_id' => 6, 'sport_name' => 'Bơi lội tiếp sức', 'sport_code' => 'SWIMMING', 'sport_icon' => 'pool',
+                'stage_id' => 17, 'stage_name' => 'Chung kết', 'round' => 'Chung kết Tiếp sức 4x50m 🏆',
+                'team_a' => array('id' => null, 'name' => 'Nhất Đợt 1', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => null, 'name' => 'Nhất Đợt 2', 'score' => null, 'is_winner' => false),
+                'status' => 'upcoming', 'status_text' => 'Chung kết', 'status_class' => 'bg-warning text-dark',
+                'match_time' => '10:30 29/10/2026', 'match_hour' => '10:30', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 10:30:00',
+                'location' => 'Bể bơi Olympic', 'match_order' => 26,
+            ),
+        );
+
+        // Lọc theo môn nếu có tham số
+        if ($filterSportId) {
+            $filteredMatches = array();
+            foreach ($matches as $m) {
+                if ($m['sport_id'] == $filterSportId) {
+                    $filteredMatches[] = $m;
+                }
+            }
+            $matches = $filteredMatches;
+        }
+
+        // Bảng xếp hạng bảng đấu vòng tròn (Standings)
+        $standingsBySport = array(
+            1 => array( // Bóng đá nam
+                'A' => array(
+                    array('team_id' => 1, 'team_name' => 'MT Luxury Hạ Long', 'rank' => 1, 'played' => 2, 'won' => 2, 'drawn' => 0, 'lost' => 0, 'points_scored' => 5, 'points_conceded' => 1, 'points' => 6),
+                    array('team_id' => 3, 'team_name' => 'MT Sông Lam', 'rank' => 2, 'played' => 1, 'won' => 1, 'drawn' => 0, 'lost' => 0, 'points_scored' => 3, 'points_conceded' => 0, 'points' => 3),
+                    array('team_id' => 2, 'team_name' => 'MT Grand Hà Nội', 'rank' => 3, 'played' => 2, 'won' => 0, 'drawn' => 0, 'lost' => 2, 'points_scored' => 1, 'points_conceded' => 4, 'points' => 0),
+                    array('team_id' => 4, 'team_name' => 'MT Holiday Huế', 'rank' => 4, 'played' => 1, 'won' => 0, 'drawn' => 0, 'lost' => 1, 'points_scored' => 0, 'points_conceded' => 3, 'points' => 0),
+                ),
+                'B' => array(
+                    array('team_id' => 5, 'team_name' => 'MT Grand Đà Nẵng', 'rank' => 1, 'played' => 0, 'won' => 0, 'drawn' => 0, 'lost' => 0, 'points_scored' => 0, 'points_conceded' => 0, 'points' => 0),
+                    array('team_id' => 6, 'team_name' => 'MT Luxury Sài Gòn', 'rank' => 2, 'played' => 0, 'won' => 0, 'drawn' => 0, 'lost' => 0, 'points_scored' => 0, 'points_conceded' => 0, 'points' => 0),
+                    array('team_id' => 7, 'team_name' => 'MT Luxury Cần Thơ', 'rank' => 3, 'played' => 0, 'won' => 0, 'drawn' => 0, 'lost' => 0, 'points_scored' => 0, 'points_conceded' => 0, 'points' => 0),
+                    array('team_id' => 8, 'team_name' => 'MT Viễn Triều', 'rank' => 4, 'played' => 0, 'won' => 0, 'drawn' => 0, 'lost' => 0, 'points_scored' => 0, 'points_conceded' => 0, 'points' => 0),
+                ),
+            ),
+            2 => array( // Cầu lông đôi
+                'A' => array(
+                    array('team_id' => 13, 'team_name' => 'MT Luxury Nha Trang', 'rank' => 1, 'played' => 1, 'won' => 1, 'drawn' => 0, 'lost' => 0, 'points_scored' => 2, 'points_conceded' => 0, 'points' => 3),
+                    array('team_id' => 11, 'team_name' => 'MT Grand Quảng Ninh', 'rank' => 2, 'played' => 1, 'won' => 0, 'drawn' => 1, 'lost' => 0, 'points_scored' => 1, 'points_conceded' => 1, 'points' => 1),
+                    array('team_id' => 12, 'team_name' => 'MT Holiday Đà Lạt', 'rank' => 3, 'played' => 1, 'won' => 0, 'drawn' => 1, 'lost' => 0, 'points_scored' => 1, 'points_conceded' => 1, 'points' => 1),
+                    array('team_id' => 14, 'team_name' => 'MT Grand Thanh Hóa', 'rank' => 4, 'played' => 1, 'won' => 0, 'drawn' => 0, 'lost' => 1, 'points_scored' => 0, 'points_conceded' => 2, 'points' => 0),
+                ),
+            ),
+        );
+
+        $liveMatches = array();
+        $recentMatches = array();
+        $upcomingMatches = array();
+        $completedCount = 0;
+        $liveCount = 0;
+        $scheduledCount = 0;
+
+        foreach ($matches as $m) {
+            if ($m['status'] === 'live') {
+                $liveMatches[] = $m;
+                $liveCount++;
+            } elseif ($m['status'] === 'completed') {
+                $recentMatches[] = $m;
+                $completedCount++;
+            } else {
+                $upcomingMatches[] = $m;
+                if ($m['status'] === 'scheduled') {
+                    $scheduledCount++;
+                }
+            }
+        }
+
+        return array(
+            'stats' => array(
+                'total_sports' => count($sports),
+                'total_stages' => 17,
+                'total_matches' => count($matches),
+                'completed_matches' => $completedCount,
+                'live_matches' => $liveCount,
+                'scheduled_matches' => $scheduledCount,
+            ),
+            'sports' => $sports,
+            'matches' => $matches,
+            'liveMatches' => $liveMatches,
+            'recentMatches' => $recentMatches,
+            'upcomingMatches' => $upcomingMatches,
+            'standingsBySport' => $standingsBySport,
+        );
     }
 }

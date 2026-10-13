@@ -140,6 +140,7 @@ class ApiClient extends CComponent
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_TIMEOUT => self::$timeout,
+            CURLOPT_CONNECTTIMEOUT => 3,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_FOLLOWLOCATION => true,
         );
