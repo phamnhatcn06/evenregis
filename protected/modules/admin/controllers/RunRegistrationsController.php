@@ -108,12 +108,26 @@ class RunRegistrationsController extends AdminController
                         break;
                     }
                 }
+                // Năm sinh: ưu tiên cột birth_year; nếu trống thì suy từ ngày sinh gốc (nếu có).
+                $birthYear = '';
+                if (!empty($row['birth_year'])) {
+                    $birthYear = (int) $row['birth_year'];
+                } elseif (!empty($row['birthday'])) {
+                    $ts = strtotime((string) $row['birthday']);
+                    if ($ts !== false) {
+                        $y = (int) date('Y', $ts);
+                        if ($y >= 1950 && $y <= (int) date('Y')) {
+                            $birthYear = $y;
+                        }
+                    }
+                }
+
                 $results[] = array(
                     'attendee_id'  => $attendeeId,
                     'full_name'    => isset($row['full_name']) ? $row['full_name'] : '',
                     'unit'         => $unit,
                     'lucky_number' => isset($row['lucky_number']) ? $row['lucky_number'] : '',
-                    'birth_year'   => !empty($row['birth_year']) ? (int) $row['birth_year'] : '',
+                    'birth_year'   => $birthYear,
                     'gender'       => (isset($row['gender']) && $row['gender'] !== null && $row['gender'] !== '') ? (string) ((int) $row['gender']) : '',
                 );
             }
