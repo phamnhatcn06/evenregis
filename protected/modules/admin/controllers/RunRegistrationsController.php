@@ -35,6 +35,17 @@ class RunRegistrationsController extends AdminController
         ksort($cuLyOptions);
         ksort($unitOptions);
 
+        // Đếm tổng số người đăng ký theo từng nội dung (cự ly) từ TOÀN BỘ dữ liệu.
+        $countByContent = array();
+        foreach ($allRegistrations as $r) {
+            $name = !empty($r['run_event_name']) ? $r['run_event_name'] : 'Khác';
+            if (!isset($countByContent[$name])) {
+                $countByContent[$name] = 0;
+            }
+            $countByContent[$name]++;
+        }
+        ksort($countByContent);
+
         // Áp dụng lọc.
         $registrations = array_filter($allRegistrations, function ($r) use ($filters) {
             if ($filters['cu_ly'] !== '' && (!isset($r['run_event_name']) || $r['run_event_name'] !== $filters['cu_ly'])) {
