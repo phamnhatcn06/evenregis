@@ -57,6 +57,10 @@ $urlRewrite = array(
     'doan-thu-ky' => 'frontend/daihoi/doanThuKy',
     'so-do-dia-diem' => 'frontend/daihoi/soDoDiaDiem',
 
+    // Tin tức Đại hội: danh sách + chi tiết (đặt rule chi tiết TRƯỚC rule danh sách)
+    'tin-tuc/<id:\d+>' => 'frontend/daihoi/newsDetail',
+    'tin-tuc' => 'frontend/daihoi/news',
+
     'daihoi/<action:\w+>' => 'frontend/daihoi/<action>',
 
     // Cổng cá nhân người tham dự (đăng nhập dùng chung mọi tính năng)
