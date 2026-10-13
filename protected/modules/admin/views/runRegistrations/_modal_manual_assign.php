@@ -48,6 +48,15 @@ $minYear     = 1950;
                              style="z-index: 1080; max-height: 260px; overflow-y: auto; display: none;"></div>
                     </div>
 
+                    <!-- Bước 1b: Họ tên khách ngoài (chỉ hiện khi bật khách ngoài) -->
+                    <div class="mb-3" id="manual_guest_name_group" style="display: none;">
+                        <label for="manual_guest_name" class="form-label fw-bold text-dark mb-1">
+                            Họ tên khách <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="manual_guest_name" class="form-control" autocomplete="off"
+                               placeholder="Nhập họ và tên khách ngoài...">
+                    </div>
+
                     <div class="p-3 mb-3 rounded-3" id="manual_selected_box" style="background: #f8fafc; border: 1px solid #e2e8f0; display: none;">
                         <div class="d-flex align-items-center justify-content-between mb-1">
                             <span class="text-muted small fw-semibold">Người được gán:</span>
