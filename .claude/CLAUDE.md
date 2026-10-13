@@ -28,6 +28,27 @@ Hệ thống quản lý sự kiện đại hội (~600 người tham dự) sử 
 | Excel Export | PHPExcel |
 | Email | yii-mail (SwiftMailer) |
 
+### URL Rules — Khai báo trong RewriteUrlManager
+
+**QUAN TRỌNG**: Toàn bộ thay đổi/khai báo URL (url rules, slug, REST pattern...) **PHẢI ghi trong** `protected/config/RewriteUrlManager.php`, **KHÔNG được** thêm trực tiếp vào `rules` của `urlManager` trong `main.php` / `console.php` hay bất kỳ file config nào khác.
+
+```php
+// ✅ ĐÚNG — thêm rule mới vào protected/config/RewriteUrlManager.php
+$urlRewrite = array(
+    'daihoi' => 'frontend/daihoi/index',
+    'run/<action:\w+>' => 'frontend/run/<action>',
+    // ... thêm rule mới ở đây
+);
+
+// ❌ SAI — thêm rule vào main.php
+'urlManager' => array(
+    'class' => 'RewriteUrlManager',
+    'rules' => array(
+        'daihoi' => 'frontend/daihoi/index', // ❌ KHÔNG đặt ở đây
+    ),
+),
+```
+
 ### Asset Rules
 
 - **KHÔNG sử dụng CDN** cho CSS/JS libraries. Tải file về local và đặt trong `themes/hope-ui/assets/`

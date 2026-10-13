@@ -43,5 +43,24 @@ $urlRewrite = array(
     array('api/create', 'pattern' => 'api/<model:\w+>', 'verb' => 'POST'),
     // Other controllers
     '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
-);
+    // Trang Website công khai Đại hội
+    '' => 'frontend/daihoi/index',
+    'daihoi' => 'frontend/daihoi/index',
 
+    // Slug thân thiện cho các link in trong Sổ tay Đại hội
+    'agenda-tong-the' => 'frontend/daihoi/agenda',
+    'tiec-welcome' => 'frontend/daihoi/tiecWelcome',
+    'lich-thi-the-thao' => 'frontend/daihoi/schedule',
+    'lich-tham-quan' => 'frontend/daihoi/lichThamQuan',
+    'tiec-gala' => 'frontend/daihoi/tiecGala',
+
+    'daihoi/<action:\w+>' => 'frontend/daihoi/<action>',
+
+    // Cổng cá nhân người tham dự (đăng nhập dùng chung mọi tính năng)
+    'portal' => 'frontend/portal/login',
+    'portal/<action:\w+>' => 'frontend/portal/<action>',
+
+    // Cổng đăng ký hoạt động (Fun Run & Tham quan)
+    'run' => 'frontend/run/index',
+    'run/<action:\w+>' => 'frontend/run/<action>',
+);
