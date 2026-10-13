@@ -25,6 +25,15 @@
 
         bindSearch(searchUrl);
         bindSubmit(modalElement, assignUrl);
+
+        // Admin tự chọn năm sinh -> ẩn note cảnh báo thiếu dữ liệu.
+        var birthSelect = document.getElementById('manual_birth_year');
+        var birthNote = document.getElementById('manual_birth_year_note');
+        if (birthSelect && birthNote) {
+            birthSelect.addEventListener('change', function () {
+                birthNote.style.display = birthSelect.value ? 'none' : '';
+            });
+        }
     });
 
     /** Tìm người theo từ khoá (debounce) rồi đổ kết quả xuống danh sách chọn. */
