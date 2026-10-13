@@ -159,10 +159,7 @@
                 toastError('Vui lòng chọn cự ly.');
                 return;
             }
-            if (!bib) {
-                toastError('Vui lòng nhập mã BIB.');
-                return;
-            }
+            // Mã BIB tùy chọn: để trống thì server tự cấp theo quy luật.
 
             var body = new FormData();
             body.append('attendee_id', attendeeId);
