@@ -66,11 +66,13 @@
     function applyGuestMode(isGuest) {
         var searchGroup = document.getElementById('manual_search_group');
         var guestNameGroup = document.getElementById('manual_guest_name_group');
+        var guestCompanyGroup = document.getElementById('manual_guest_company_group');
         var selectedBox = document.getElementById('manual_selected_box');
         var results = document.getElementById('manual_search_results');
 
         if (searchGroup) { searchGroup.style.display = isGuest ? 'none' : ''; }
         if (guestNameGroup) { guestNameGroup.style.display = isGuest ? '' : 'none'; }
+        if (guestCompanyGroup) { guestCompanyGroup.style.display = isGuest ? '' : 'none'; }
         if (selectedBox) { selectedBox.style.display = 'none'; }
         if (results) { results.style.display = 'none'; results.innerHTML = ''; }
 
