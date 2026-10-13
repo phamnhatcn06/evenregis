@@ -100,6 +100,7 @@
             item.addEventListener('click', function () {
                 selectPerson(p);
                 hide(box);
+                checkExistingRegistration(checkUrl, p.attendee_id);
             });
             box.appendChild(item);
         });
