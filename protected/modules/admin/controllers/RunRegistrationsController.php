@@ -96,6 +96,7 @@ class RunRegistrationsController extends AdminController
             'filters'            => $filters,
             'cuLyOptions'        => $cuLyOptions,
             'unitOptions'        => $unitOptions,
+            'countByContent'     => $countByContent,
             'runEventList'       => $eventId ? $this->getRunEventList($eventId) : array(),
             'canUpdate'          => PermissionHelper::can('runregistrations', 'update'),
         ));
