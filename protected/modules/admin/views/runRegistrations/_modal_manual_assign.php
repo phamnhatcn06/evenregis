@@ -61,6 +61,9 @@ $minYear     = 1950;
                                     <option value="<?php echo $y; ?>"><?php echo $y; ?></option>
                                 <?php endfor; ?>
                             </select>
+                            <div class="form-text text-danger fw-semibold mt-1" id="manual_birth_year_note" style="display: none;">
+                                <i class="fa fa-exclamation-triangle me-1"></i>Không thấy dữ liệu năm sinh — vui lòng chọn.
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-dark mb-1">
