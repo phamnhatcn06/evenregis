@@ -501,7 +501,7 @@ if (empty($albumList)) {
                     <p class="text-muted mb-0 small"><?php echo $e($todayItemPlace); ?></p>
                   </div>
                   <div class="col-12 col-sm-4 text-sm-end">
-                    <a class="btn btn-dark btn-sm rounded-pill px-3 py-1 fw-bold btn-shimmer" href="<?php echo $e($base); ?>/daihoi/schedule" style="font-size:12.5px;">Theo dõi chi tiết</a>
+                    <a class="btn btn-dark btn-sm rounded-pill px-3 py-1 fw-bold btn-shimmer" href="<?php echo $e($base); ?>/lich-thi-the-thao" style="font-size:12.5px;">Theo dõi chi tiết</a>
                   </div>
                 </div>
               </div>
@@ -532,7 +532,7 @@ if (empty($albumList)) {
             <p class="text-secondary small mb-0 mt-1">Bảng tỷ số cập nhật theo thời gian thực từ các bộ môn tại Đại hội Mường Thanh <?php echo $e($eventYear); ?>.</p>
           </div>
           <div class="col-12 col-md-5 text-md-end">
-            <a class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3 py-1 d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/daihoi/schedule">
+            <a class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3 py-1 d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/lich-thi-the-thao">
               <span>Xem bảng xếp hạng &amp; lịch đấu</span><span class="material-symbols-outlined fs-6 arrow-slide">arrow_forward</span>
             </a>
           </div>
@@ -896,8 +896,8 @@ if (empty($albumList)) {
           <h4 class="fw-bold text-dark text-uppercase small mb-3">Danh mục sự kiện</h4>
           <ul class="list-unstyled d-flex flex-column gap-2 small">
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#noi-dung">Nội dung trọng điểm</a></li>
-            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/daihoi/agenda">Lịch trình Đại hội</a></li>
-            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/daihoi/schedule">Lịch thi đấu &amp; kết quả</a></li>
+            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/agenda-tong-the">Lịch trình Đại hội</a></li>
+            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/lich-thi-the-thao">Lịch thi đấu &amp; kết quả</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#tin-tuc">Tin nhanh hoạt động</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#thu-vien">Thư viện ảnh &amp; video</a></li>
           </ul>
@@ -908,7 +908,8 @@ if (empty($albumList)) {
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#so-tay">Sổ tay Đại biểu điện tử</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($loginUrl); ?>">Cổng đăng nhập Đại biểu</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#so-tay">Quy chế &amp; điều lệ thi đấu</a></li>
-            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#so-tay">Sơ đồ xe &amp; lưu trú</a></li>
+            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/so-do-dia-diem">Sơ đồ địa điểm Đại hội</a></li>
+            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/doan-thu-ky">Ban Thư Ký Đoàn</a></li>
           </ul>
         </div>
         <div class="col-12 col-md-6 col-lg-3">
