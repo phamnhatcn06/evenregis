@@ -13,7 +13,8 @@ $this->Tabletitle = 'Chi tiết nội dung chạy';
 $quota = (int) $model->quota;
 $reserved = isset($model->reserved_slots) ? (int) $model->reserved_slots : 0;
 $publicReg = (int) $model->registered_count;
-$totalReg = $reserved + $publicReg;
+// Tổng người thực tế đang chiếm chỗ (API đếm từ bản ghi thật); fallback API cũ.
+$totalReg = isset($model->total_registered) ? (int) $model->total_registered : $reserved + $publicReg;
 $remaining = $model->remaining !== null ? (int) $model->remaining : max(0, $quota - $totalReg);
 
 $attributes = array(
