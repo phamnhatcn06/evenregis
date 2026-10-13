@@ -162,6 +162,20 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                                 <td><?php echo CHtml::encode($genderLabel); ?></td>
                                 <td><?php echo CHtml::encode(isset($r['run_event_name']) ? $r['run_event_name'] : ''); ?></td>
                                 <td><?php echo CHtml::encode(!empty($r['age_group_label']) ? $r['age_group_label'] : '—'); ?></td>
+                                <?php if ($canUpdate && !empty($runEventList)): ?>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary js-change-content"
+                                            data-registration-id="<?php echo (int) $r['id']; ?>"
+                                            data-run-event-id="<?php echo isset($r['run_event_id']) ? (int) $r['run_event_id'] : ''; ?>"
+                                            data-full-name="<?php echo CHtml::encode(isset($r['full_name']) ? $r['full_name'] : ''); ?>"
+                                            data-unit="<?php echo CHtml::encode(!empty($r['unit_label']) ? $r['unit_label'] : ''); ?>"
+                                            data-bib="<?php echo CHtml::encode(isset($r['bib_number']) ? $r['bib_number'] : ''); ?>"
+                                            data-birth-year="<?php echo !empty($r['birth_year']) ? (int) $r['birth_year'] : ''; ?>"
+                                            data-gender="<?php echo (isset($r['gender']) && $r['gender'] !== null && $r['gender'] !== '') ? (int) $r['gender'] : ''; ?>">
+                                        <i class="fa fa-exchange me-1"></i>Đổi nội dung
+                                    </button>
+                                </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
