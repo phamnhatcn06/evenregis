@@ -93,7 +93,8 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
     <div id="run-manual-assign-config"
          data-search-url="<?php echo $this->createUrl('searchPeople', array('event_id' => $eventId)); ?>"
          data-check-url="<?php echo $this->createUrl('checkRegistration'); ?>"
-         data-assign-url="<?php echo $this->createUrl('manualAssign'); ?>"></div>
+         data-assign-url="<?php echo $this->createUrl('manualAssign'); ?>"
+         data-change-url="<?php echo $this->createUrl('changeContent'); ?>"></div>
     <?php $this->renderPartial('_modal_manual_assign', array('runEventList' => $runEventList)); ?>
     <?php
     Yii::app()->clientScript->registerScriptFile(
