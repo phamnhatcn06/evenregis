@@ -73,7 +73,7 @@ foreach ($tourSessions as $s) {
                     <div class="alert alert-warning mb-0">Chưa có cự ly nào.</div>
                 <?php else: foreach ($runEvents as $e): 
                     $reserved = isset($e->reserved_slots) ? (int) $e->reserved_slots : 0;
-                    $totalReg = $reserved + (int) $e->registered_count;
+                    $totalReg = isset($e->total_registered) ? (int) $e->total_registered : $reserved + (int) $e->registered_count;
                 ?>
                     <?php renderFillBar($e->name, $e->code, $totalReg, $e->quota); ?>
                 <?php endforeach; endif; ?>
