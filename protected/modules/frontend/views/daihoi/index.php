@@ -903,7 +903,7 @@ if (empty($albumList)) {
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#noi-dung">Nội dung trọng điểm</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/agenda-tong-the">Lịch trình Đại hội</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/lich-thi-the-thao">Lịch thi đấu &amp; kết quả</a></li>
-            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#tin-tuc">Tin nhanh hoạt động</a></li>
+            <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="<?php echo $e($base); ?>/tin-tuc">Tin nhanh hoạt động</a></li>
             <li><a class="text-secondary text-decoration-none hover:text-dark transition" href="#thu-vien">Thư viện ảnh &amp; video</a></li>
           </ul>
         </div>
