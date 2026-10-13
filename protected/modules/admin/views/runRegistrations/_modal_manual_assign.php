@@ -26,9 +26,11 @@ $minYear     = 1950;
             <div class="modal-body p-4">
                 <form id="form_manual_assign" onsubmit="return false;">
                     <input type="hidden" id="manual_attendee_id" value="">
+                    <input type="hidden" id="manual_registration_id" value="">
+                    <input type="hidden" id="manual_mode" value="assign">
 
-                    <!-- Bước 1: Tìm & chọn người -->
-                    <div class="mb-3 position-relative">
+                    <!-- Bước 1: Tìm & chọn người (chỉ khi gán mới) -->
+                    <div class="mb-3 position-relative" id="manual_search_group">
                         <label for="manual_search" class="form-label fw-bold text-dark mb-1">
                             Tìm người <span class="text-danger">*</span>
                         </label>
