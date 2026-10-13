@@ -220,6 +220,41 @@ class DaihoiController extends FrontEndController
         ));
     }
 
+    /**
+     * Trang Tin tức chung - hiển thị toàn bộ tin tức, sidebar lọc theo danh mục.
+     * slug: /tin-tuc  (?category_id=... để lọc)
+     */
+    public function actionNews()
+    {
+        $categoryId = Yii::app()->request->getParam('category_id');
+        $this->frontTitle = 'Tin tức Đại hội';
+        $this->render('news', array(
+            'event' => Daihoi::getEvent(),
+            'news' => Daihoi::getNewsList($categoryId, 60),
+            'categories' => Daihoi::getNewsCategories(),
+            'selectedCategoryId' => $categoryId,
+        ));
+    }
+
+    /**
+     * Trang chi tiết một bài tin - slug /tin-tuc/<id>.
+     */
+    public function actionNewsDetail($id)
+    {
+        $article = Daihoi::getNewsDetail($id);
+        if (empty($article)) {
+            throw new CHttpException(404, 'Không tìm thấy bài viết.');
+        }
+        $title = isset($article['title']) ? $article['title'] : 'Chi tiết tin tức';
+        $this->frontTitle = $title;
+        $this->render('news-detail', array(
+            'event' => Daihoi::getEvent(),
+            'article' => $article,
+            'categories' => Daihoi::getNewsCategories(),
+            'related' => Daihoi::getNewsList(isset($article['category_id']) ? $article['category_id'] : null, 6),
+        ));
+    }
+
     public function actionJsonLive()
     {
         $this->renderJson(Daihoi::getLiveMatches());
