@@ -39,6 +39,7 @@
 
         bindSearch(searchUrl, checkUrl);
         bindSubmit(modalElement, assignUrl, changeUrl);
+        bindGuestToggle();
 
         // Admin tự chọn năm sinh -> ẩn note cảnh báo thiếu dữ liệu.
         var birthSelect = document.getElementById('manual_birth_year');
