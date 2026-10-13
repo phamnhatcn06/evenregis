@@ -136,6 +136,49 @@
         if (female) { female.checked = (gender === '0'); }
     }
 
+    /**
+     * Kiểm tra người này đã có đăng ký chạy chưa (đã có BIB). Nếu rồi -> hiện cảnh báo,
+     * khóa ô nhập BIB + nút gán để tránh cấp lần 2.
+     */
+    function checkExistingRegistration(checkUrl, attendeeId) {
+        lockForExisting(false); // mặc định mở khóa trong lúc chờ.
+        if (!checkUrl || !attendeeId) {
+            return;
+        }
+        var url = checkUrl + (checkUrl.indexOf('?') >= 0 ? '&' : '?') + 'attendee_id=' + encodeURIComponent(attendeeId);
+        fetch(url, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data && data.registered) {
+                    var detail = data.bib_number || '';
+                    if (data.run_event_name) {
+                        detail = data.run_event_name + ' — BIB ' + data.bib_number;
+                    }
+                    setText('manual_existing_detail', detail);
+                    lockForExisting(true);
+                } else {
+                    lockForExisting(false);
+                }
+            })
+            .catch(function () { lockForExisting(false); });
+    }
+
+    /** Bật/tắt trạng thái khóa khi người được chọn đã có đăng ký. */
+    function lockForExisting(locked) {
+        var warning = document.getElementById('manual_existing_warning');
+        var bib = document.getElementById('manual_bib');
+        var submit = document.getElementById('btn_submit_manual_assign');
+        if (warning) { warning.style.display = locked ? '' : 'none'; }
+        if (bib) {
+            bib.disabled = locked;
+            if (locked) { bib.value = ''; }
+        }
+        if (submit) { submit.disabled = locked; }
+    }
+
     function bindSubmit(modalElement, assignUrl) {
         var button = document.getElementById('btn_submit_manual_assign');
         if (!button) {
