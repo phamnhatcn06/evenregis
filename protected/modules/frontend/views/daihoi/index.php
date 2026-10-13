@@ -60,7 +60,7 @@ $navItems = array(
   array('#noi-dung', 'Chương trình'),
   array($base . '/agenda-tong-the', 'Lịch trình'),
   array($base . '/lich-thi-the-thao', 'Lịch thi đấu'),
-  array('#tin-tuc', 'Tin tức'),
+  array($base . '/tin-tuc', 'Tin tức'),
   array('#thu-vien', 'Thư viện'),
   array('#so-tay', 'Sổ tay'),
 );
