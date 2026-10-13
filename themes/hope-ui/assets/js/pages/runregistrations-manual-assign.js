@@ -66,7 +66,7 @@
         });
     }
 
-    function fetchPeople(searchUrl, keyword, box) {
+    function fetchPeople(searchUrl, keyword, box, checkUrl) {
         var url = searchUrl + (searchUrl.indexOf('?') >= 0 ? '&' : '?') + 'keyword=' + encodeURIComponent(keyword);
         fetch(url, {
             headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
@@ -75,12 +75,12 @@
             .then(function (res) { return res.json(); })
             .then(function (data) {
                 var items = (data && data.data) || [];
-                renderResults(box, items);
+                renderResults(box, items, checkUrl);
             })
             .catch(function () { hide(box); });
     }
 
-    function renderResults(box, items) {
+    function renderResults(box, items, checkUrl) {
         box.innerHTML = '';
         if (!items.length) {
             var empty = document.createElement('div');
