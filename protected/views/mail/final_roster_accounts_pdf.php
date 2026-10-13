@@ -61,11 +61,12 @@ $positionText = function ($row) use ($col) {
     <table>
         <thead>
             <tr>
-                <th style="width:6%;">STT</th>
-                <th style="width:34%;">Họ và tên</th>
-                <th style="width:16%;">Mã nhân viên</th>
-                <th style="width:22%;">Bộ phận</th>
-                <th style="width:22%;">Định danh đăng nhập</th>
+                <th style="width:5%;">STT</th>
+                <th style="width:27%;">Họ và tên</th>
+                <th style="width:13%;">Mã nhân viên</th>
+                <th style="width:20%;">Đơn vị</th>
+                <th style="width:17%;">Chức vụ</th>
+                <th style="width:18%;">Định danh đăng nhập</th>
             </tr>
         </thead>
         <tbody>
