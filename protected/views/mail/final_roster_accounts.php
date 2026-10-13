@@ -70,7 +70,8 @@ $positionText = function ($row) use ($col) {
                     <th style="border:1px solid #e2e8f0; text-align:center; width:40px;">STT</th>
                     <th style="border:1px solid #e2e8f0; text-align:left;">Họ và tên</th>
                     <th style="border:1px solid #e2e8f0; text-align:center;">Mã NV</th>
-                    <th style="border:1px solid #e2e8f0; text-align:left;">Bộ phận</th>
+                    <th style="border:1px solid #e2e8f0; text-align:left;">Đơn vị</th>
+                    <th style="border:1px solid #e2e8f0; text-align:left;">Chức vụ</th>
                     <th style="border:1px solid #e2e8f0; text-align:center;">Định danh đăng nhập</th>
                 </tr>
             </thead>
