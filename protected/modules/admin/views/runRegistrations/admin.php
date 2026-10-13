@@ -176,7 +176,13 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                                 <td><?php echo $i + 1; ?></td>
                                 <td><span class="badge bg-primary"><?php echo CHtml::encode(isset($r['bib_number']) ? $r['bib_number'] : ''); ?></span></td>
                                 <td><?php echo CHtml::encode(isset($r['full_name']) ? $r['full_name'] : ''); ?></td>
-                                <td><?php echo CHtml::encode(!empty($r['unit_label']) ? $r['unit_label'] : '—'); ?></td>
+                                <td>
+                                    <?php if (!empty($r['is_guest'])): ?>
+                                        <span class="badge bg-warning text-dark"><i class="fa fa-user-o me-1"></i>Khách ngoài</span>
+                                    <?php else: ?>
+                                        <?php echo CHtml::encode(!empty($r['unit_label']) ? $r['unit_label'] : '—'); ?>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo CHtml::encode(isset($r['phone_number']) ? $r['phone_number'] : ''); ?></td>
                                 <td><?php echo CHtml::encode(!empty($r['birth_year']) ? $r['birth_year'] : '—'); ?></td>
                                 <td><?php echo CHtml::encode($genderLabel); ?></td>
