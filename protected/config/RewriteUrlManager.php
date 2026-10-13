@@ -53,6 +53,9 @@ $urlRewrite = array(
     'lich-thi-the-thao' => 'frontend/daihoi/schedule',
     'lich-tham-quan' => 'frontend/daihoi/lichThamQuan',
     'tiec-gala' => 'frontend/daihoi/tiecGala',
+    'ho-tro' => 'frontend/daihoi/hoTro',
+    'doan-thu-ky' => 'frontend/daihoi/doanThuKy',
+    'so-do-dia-diem' => 'frontend/daihoi/soDoDiaDiem',
 
     'daihoi/<action:\w+>' => 'frontend/daihoi/<action>',
 
