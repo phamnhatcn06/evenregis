@@ -116,6 +116,25 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
     </div>
 <?php endif; ?>
 
+<?php if ($eventId && !empty($countByContent)): ?>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="mb-3"><i class="fa fa-bar-chart me-1"></i>Số người đăng ký theo nội dung</h6>
+            <div class="d-flex flex-wrap gap-2">
+                <?php foreach ($countByContent as $contentName => $contentCount): ?>
+                    <span class="badge bg-light text-dark border fs-6 p-2">
+                        <?php echo CHtml::encode($contentName); ?>:
+                        <strong class="text-primary"><?php echo (int) $contentCount; ?></strong>
+                    </span>
+                <?php endforeach; ?>
+                <span class="badge bg-primary fs-6 p-2">
+                    Tổng: <strong><?php echo (int) $totalCount; ?></strong>
+                </span>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <div class="card">
     <div class="card-body">
         <?php if (!$eventId): ?>
