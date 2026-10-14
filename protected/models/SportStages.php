@@ -176,6 +176,27 @@ class SportStages extends BaseSportStages
         return ApiClient::post($url, array('auth_email' => self::authEmail()));
     }
 
+    public static function drawPlayoff($stageId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PLAYOFF, array('stageId' => $stageId));
+        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+    }
+
+    /**
+     * Chuyển người/đội thắng play-off vào giai đoạn vòng bảng đích.
+     *
+     * @param string $playoffStageId giai đoạn play-off (nguồn)
+     * @param string $targetStageId giai đoạn vòng bảng đích
+     */
+    public static function promotePlayoffWinners($playoffStageId, $targetStageId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PROMOTE_PLAYOFF, array('stageId' => $playoffStageId));
+        return ApiClient::post($url, array(
+            'target_stage_id' => $targetStageId,
+            'auth_email' => self::authEmail(),
+        ));
+    }
+
     public static function computeStandings($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_STANDINGS, array('stageId' => $stageId));
