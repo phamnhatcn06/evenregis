@@ -164,6 +164,26 @@ foreach ($stages as $s) {
                                     </button>
                                 <?php endif; ?>
                             <?php endif; ?>
+                            <?php if (SportStages::isSwimFormat($stage->format)): ?>
+                                <?php if (!$isLocked): ?>
+                                    <button type="button" class="btn btn-sm btn-primary btn-swim-draw"
+                                            data-id="<?php echo $stage->id; ?>">
+                                        <i class="fa fa-random"></i> Bốc lượt/làn
+                                    </button>
+                                <?php endif; ?>
+                                <a href="<?php echo $this->createUrl('swimTimes', array('id' => $stage->id)); ?>"
+                                   class="btn btn-sm btn-outline-success">
+                                    <i class="fa fa-stopwatch"></i> Nhập thành tích
+                                </a>
+                                <?php if ($stage->stage_type !== 'final' && isset($swimFinalBySport[$stage->sport_id])): ?>
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-promote-swim"
+                                            data-id="<?php echo $stage->id; ?>"
+                                            data-final-id="<?php echo $swimFinalBySport[$stage->sport_id]['id']; ?>"
+                                            data-final-name="<?php echo CHtml::encode($swimFinalBySport[$stage->sport_id]['name']); ?>">
+                                        <i class="fa fa-arrow-right"></i> Chuyển Top 6 → CK
+                                    </button>
+                                <?php endif; ?>
+                            <?php endif; ?>
                             <?php if ($isGroup && !$isLocked): ?>
                                 <button type="button" class="btn btn-sm btn-outline-success btn-standings"
                                         data-id="<?php echo $stage->id; ?>">
