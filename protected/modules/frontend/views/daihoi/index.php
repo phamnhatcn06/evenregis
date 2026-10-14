@@ -49,7 +49,9 @@ if ($eventYear === '') {
   $eventYear = '2026';
 }
 $logo = $base . '/themes/hope-ui/logo_daihoi.png';
-$loginUrl = !empty($hasAdminAccess) ? $base . '/admin/default/index' : $base . '/login';
+$hasPortalToken = !empty($hasPortalToken) || !empty($hasAdminAccess) || !empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenticated();
+$adminUrl = $base . '/admin/default/index';
+$loginUrl = $hasPortalToken ? $adminUrl : $base . '/login';
 // Cổng đăng ký hoạt động (Giải chạy Fun Run + Đi tham quan) cho danh sách Vòng Chung Kết.
 $portalUrl = $base . '/run';
 
@@ -272,9 +274,14 @@ if (empty($albumList)) {
         </div>
         <!-- Header Actions -->
         <div class="col-4 col-sm-6 col-lg-3 d-flex align-items-center justify-content-end gap-2">
-          <a class="btn btn-sm fw-bold px-3 py-2 rounded-pill d-none d-sm-inline-flex align-items-center gap-1 shadow-sm text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
+          <a class="btn btn-sm fw-bold px-3 py-2 rounded-pill <?php echo $hasPortalToken ? 'd-none d-md-inline-flex' : 'd-none d-sm-inline-flex'; ?> align-items-center gap-1 shadow-sm text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
             <span class="material-symbols-outlined" style="font-size:17px;">how_to_reg</span> Đăng ký hoạt động
           </a>
+          <?php if ($hasPortalToken): ?>
+            <a class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-pill d-none d-sm-inline-flex align-items-center gap-1 shadow-sm btn-shimmer" href="<?php echo $e($adminUrl); ?>" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;font-size:13px;">
+              <span class="material-symbols-outlined" style="font-size:17px;">admin_panel_settings</span> Vào quản trị
+            </a>
+          <?php endif; ?>
           <button aria-label="Menu" class="btn btn-light d-lg-none p-1 border rounded" data-bs-target="#mobileNav" data-bs-toggle="offcanvas" aria-controls="mobileNav" type="button">
             <span class="material-symbols-outlined fs-4">menu</span>
           </button>
@@ -309,6 +316,11 @@ if (empty($albumList)) {
         <a class="btn fw-bold rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1 text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:14px;">
           <span class="material-symbols-outlined" style="font-size:18px;">how_to_reg</span> Đăng ký hoạt động
         </a>
+        <?php if ($hasPortalToken): ?>
+          <a class="btn btn-primary fw-bold rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1 btn-shimmer" href="<?php echo $e($adminUrl); ?>" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;font-size:14px;">
+            <span class="material-symbols-outlined" style="font-size:18px;">admin_panel_settings</span> Vào quản trị
+          </a>
+        <?php endif; ?>
       </div>
     </div>
   </div>

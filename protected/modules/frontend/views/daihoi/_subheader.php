@@ -44,6 +44,12 @@ $eventName = isset($eventName) && $eventName !== '' ? $eventName : 'Đại hội
         <span class="material-symbols-outlined fs-6">home</span>
         <span>Trang chủ</span>
       </a>
+      <?php if (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenticated()): ?>
+        <a class="btn btn-sm btn-primary fw-semibold rounded-pill px-3 d-none d-md-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/admin/default/index" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;">
+          <span class="material-symbols-outlined fs-6">admin_panel_settings</span>
+          <span>Vào quản trị</span>
+        </a>
+      <?php endif; ?>
     </nav>
   </div>
 </header>

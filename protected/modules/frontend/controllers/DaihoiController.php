@@ -51,7 +51,8 @@ class DaihoiController extends FrontEndController
 
         // Trạng thái đăng nhập để hiển thị nút phù hợp (chỉ kiểm tra session,
         // KHÔNG gọi Portal ở trang công khai để tránh làm chậm trang).
-        $hasAdminAccess = AuthHandler::isAuthenticated() && PermissionHelper::hasAnyPermission();
+        $hasPortalToken = !empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenticated();
+        $hasAdminAccess = $hasPortalToken;
 
         $this->render('index', array(
             'event' => Daihoi::getEvent(),
@@ -66,6 +67,7 @@ class DaihoiController extends FrontEndController
             'slides' => Daihoi::getSlides(),
             'albums' => Daihoi::getAlbums(8),
             'hasAdminAccess' => $hasAdminAccess,
+            'hasPortalToken' => $hasPortalToken,
         ));
     }
 
