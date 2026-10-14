@@ -26,7 +26,9 @@ class BinhchonController extends CController
     public function actionIndex()
     {
         $cfg = $this->voteConfig();
-        $finalists = $this->loadFinalists($cfg['contest_id']);
+        $pageData = $this->loadVotePageData($cfg['contest_id']);
+        $finalists = $pageData['finalists'];
+        $gate = $pageData['gate'];
 
         // Thư viện Google Identity Services (bắt buộc tải từ máy chủ Google)
         Yii::app()->clientScript->registerScriptFile(
