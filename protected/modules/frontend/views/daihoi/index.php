@@ -28,7 +28,35 @@ $val = function ($arr, $keys, $default = '') {
   return $default;
 };
 $e = function ($s) {
+  if (is_array($s)) {
+    if (isset($s['name'])) {
+      return CHtml::encode($s['name']);
+    }
+    if (isset($s['title'])) {
+      return CHtml::encode($s['title']);
+    }
+    return '';
+  }
   return CHtml::encode($s);
+};
+
+/** Lấy tên đội thi đấu / VĐV từ match (hỗ trợ cả dạng string và mảng team_a / team_b) */
+$teamName = function ($m, $side, $default = '') use ($val) {
+  if (!is_array($m)) {
+    return $default;
+  }
+  $keys = ($side === 'home' || $side === 'a')
+    ? array('home_name', 'team_a_name', 'home', 'team_a')
+    : array('away_name', 'team_b_name', 'away', 'team_b');
+  foreach ($keys as $k) {
+    if (isset($m[$k]) && $m[$k] !== '' && $m[$k] !== null) {
+      if (is_array($m[$k])) {
+        return isset($m[$k]['name']) ? (string) $m[$k]['name'] : (isset($m[$k]['team_name']) ? (string) $m[$k]['team_name'] : $default);
+      }
+      return (string) $m[$k];
+    }
+  }
+  return $default;
 };
 
 // ----- Thông tin sự kiện -----
@@ -81,16 +109,142 @@ $newsCategories = isset($newsCategories) && is_array($newsCategories) ? $newsCat
 $normalize = function ($s) {
   $s = mb_strtolower((string) $s, 'UTF-8');
   $map = array(
-    'à','á','ả','ã','ạ','ă','ằ','ắ','ẳ','ẵ','ặ','â','ầ','ấ','ẩ','ẫ','ậ',
-    'è','é','ẻ','ẽ','ẹ','ê','ề','ế','ể','ễ','ệ','ì','í','ỉ','ĩ','ị',
-    'ò','ó','ỏ','õ','ọ','ô','ồ','ố','ổ','ỗ','ộ','ơ','ờ','ớ','ở','ỡ','ợ',
-    'ù','ú','ủ','ũ','ụ','ư','ừ','ứ','ử','ữ','ự','ỳ','ý','ỷ','ỹ','ỵ','đ',
+    'à',
+    'á',
+    'ả',
+    'ã',
+    'ạ',
+    'ă',
+    'ằ',
+    'ắ',
+    'ẳ',
+    'ẵ',
+    'ặ',
+    'â',
+    'ầ',
+    'ấ',
+    'ẩ',
+    'ẫ',
+    'ậ',
+    'è',
+    'é',
+    'ẻ',
+    'ẽ',
+    'ẹ',
+    'ê',
+    'ề',
+    'ế',
+    'ể',
+    'ễ',
+    'ệ',
+    'ì',
+    'í',
+    'ỉ',
+    'ĩ',
+    'ị',
+    'ò',
+    'ó',
+    'ỏ',
+    'õ',
+    'ọ',
+    'ô',
+    'ồ',
+    'ố',
+    'ổ',
+    'ỗ',
+    'ộ',
+    'ơ',
+    'ờ',
+    'ớ',
+    'ở',
+    'ỡ',
+    'ợ',
+    'ù',
+    'ú',
+    'ủ',
+    'ũ',
+    'ụ',
+    'ư',
+    'ừ',
+    'ứ',
+    'ử',
+    'ữ',
+    'ự',
+    'ỳ',
+    'ý',
+    'ỷ',
+    'ỹ',
+    'ỵ',
+    'đ',
   );
   $rep = array(
-    'a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a',
-    'e','e','e','e','e','e','e','e','e','e','e','i','i','i','i','i',
-    'o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o',
-    'u','u','u','u','u','u','u','u','u','u','u','y','y','y','y','y','d',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'e',
+    'e',
+    'e',
+    'e',
+    'e',
+    'e',
+    'e',
+    'e',
+    'e',
+    'e',
+    'e',
+    'i',
+    'i',
+    'i',
+    'i',
+    'i',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'u',
+    'u',
+    'u',
+    'u',
+    'u',
+    'u',
+    'u',
+    'u',
+    'u',
+    'u',
+    'u',
+    'y',
+    'y',
+    'y',
+    'y',
+    'y',
+    'd',
   );
   $s = str_replace($map, $rep, $s);
   return preg_replace('/[^a-z0-9]+/', ' ', $s);
@@ -98,14 +252,20 @@ $normalize = function ($s) {
 // Tìm category_id khớp với một thẻ nội dung theo tên/slug danh mục tin tức.
 $findCategoryId = function ($needle) use ($newsCategories, $normalize, $val) {
   $needleNorm = trim($normalize($needle));
-  if ($needleNorm === '') { return null; }
+  if ($needleNorm === '') {
+    return null;
+  }
   foreach ($newsCategories as $cat) {
     $cid = (int) $val($cat, array('id'), 0);
-    if (!$cid) { continue; }
+    if (!$cid) {
+      continue;
+    }
     $candidates = array($val($cat, array('name'), ''), $val($cat, array('slug'), ''));
     foreach ($candidates as $cand) {
       $candNorm = trim($normalize($cand));
-      if ($candNorm === '') { continue; }
+      if ($candNorm === '') {
+        continue;
+      }
       if (strpos($needleNorm, $candNorm) !== false || strpos($candNorm, $needleNorm) !== false) {
         return $cid;
       }
@@ -129,6 +289,9 @@ $statusMap = array(
   'postponed' => array('cls' => 'bg-warning text-dark', 'text' => 'Hoãn'),
 );
 $initials = function ($name) {
+  if (is_array($name)) {
+    $name = isset($name['name']) ? $name['name'] : (isset($name['title']) ? $name['title'] : '');
+  }
   $parts = preg_split('/\s+/', trim((string) $name));
   $s = '';
   foreach ($parts as $p) {
@@ -141,8 +304,12 @@ $initials = function ($name) {
 $matchScores = function ($m) use ($val) {
   $hs = $val($m, array('home_score'), null);
   $as = $val($m, array('away_score'), null);
-  if ($hs !== null && $as !== null) {
+  if ($hs !== null && $as !== null && !is_array($hs) && !is_array($as)) {
     return array($hs, $as);
+  }
+  if (isset($m['team_a']) && is_array($m['team_a']) && isset($m['team_a']['score']) &&
+      isset($m['team_b']) && is_array($m['team_b']) && isset($m['team_b']['score'])) {
+    return array($m['team_a']['score'], $m['team_b']['score']);
   }
   $raw = (string) $val($m, array('score'), '');
   if (preg_match('/^\s*(\d+)\s*[-:]\s*(\d+)\s*$/', $raw, $mm)) {
@@ -275,7 +442,7 @@ if (empty($albumList)) {
         <!-- Header Actions -->
         <div class="col-4 col-sm-6 col-lg-3 d-flex align-items-center justify-content-end gap-2">
           <a class="btn btn-sm fw-bold px-3 py-2 rounded-pill <?php echo $hasPortalToken ? 'd-none d-md-inline-flex' : 'd-none d-sm-inline-flex'; ?> align-items-center gap-1 shadow-sm text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
-            <span class="material-symbols-outlined" style="font-size:17px;">how_to_reg</span> Đăng ký hoạt động
+            <span class="material-symbols-outlined" style="font-size:17px;">how_to_reg</span> Đăng nhập thành viên
           </a>
           <?php if ($hasPortalToken): ?>
             <a class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-pill d-none d-sm-inline-flex align-items-center gap-1 shadow-sm btn-shimmer" href="<?php echo $e($adminUrl); ?>" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;font-size:13px;">
@@ -343,9 +510,9 @@ if (empty($albumList)) {
             $hasImg = !empty($sld['image']);
           ?>
             <?php
-              $slideLink = isset($sld['btn_url']) ? trim((string) $sld['btn_url']) : '';
-              $hasLink = ($slideLink !== '' && $slideLink !== '#');
-              $mobileImg = (!empty($sld['mobile_image'])) ? $sld['mobile_image'] : '';
+            $slideLink = isset($sld['btn_url']) ? trim((string) $sld['btn_url']) : '';
+            $hasLink = ($slideLink !== '' && $slideLink !== '#');
+            $mobileImg = (!empty($sld['mobile_image'])) ? $sld['mobile_image'] : '';
             ?>
             <div class="hero-slide w-100 <?php echo $hasImg ? '' : 'has-no-image'; ?> <?php echo $first ? 'opacity-100 active' : 'opacity-0 d-none'; ?>" style="<?php echo $hasImg ? '' : 'background:' . $e($th['bg']) . ';'; ?>">
               <?php if (!$hasImg): ?>
@@ -354,9 +521,9 @@ if (empty($albumList)) {
                 <div class="glow-orb" style="top:15%;right:15%;width:340px;height:340px;background:radial-gradient(circle,<?php echo $e($th['dot']); ?>35 0%,transparent 70%);"></div>
               <?php else: ?>
                 <?php $imgTag = '<picture class="slide-picture">'
-                    . ($mobileImg !== '' ? '<source media="(max-width: 575.98px)" srcset="' . $e($mobileImg) . '">' : '')
-                    . '<img alt="' . $e($sld['title']) . '" class="w-100 d-block slide-bg-img" src="' . $e($sld['image']) . '" onerror="this.closest(\'.slide-picture\').style.display=\'none\';">'
-                    . '</picture>'; ?>
+                  . ($mobileImg !== '' ? '<source media="(max-width: 575.98px)" srcset="' . $e($mobileImg) . '">' : '')
+                  . '<img alt="' . $e($sld['title']) . '" class="w-100 d-block slide-bg-img" src="' . $e($sld['image']) . '" onerror="this.closest(\'.slide-picture\').style.display=\'none\';">'
+                  . '</picture>'; ?>
                 <?php if ($hasLink): ?>
                   <a class="slide-link d-block w-100" href="<?php echo $e($slideLink); ?>" aria-label="<?php echo $e($sld['title'] !== '' ? $sld['title'] : 'Xem chi tiết'); ?>"><?php echo $imgTag; ?></a>
                 <?php else: ?>
@@ -393,9 +560,12 @@ if (empty($albumList)) {
             </span>
             <p class="mb-0 text-secondary text-truncate" style="font-size:13.5px;">
               <?php if (!empty($matches)):
-                $m0 = $matches[0]; ?>
+                $m0 = $matches[0];
+                $m0Home = $teamName($m0, 'home');
+                $m0Away = $teamName($m0, 'away');
+              ?>
                 <strong class="text-dark"><?php echo $e($val($m0, array('sport_name', 'category'), 'Thi đấu')); ?>:</strong>
-                <?php echo $e($val($m0, array('home_name', 'home', 'team_a'), '')); ?> vs <?php echo $e($val($m0, array('away_name', 'away', 'team_b'), '')); ?>
+                <?php echo $e($m0Home); ?> vs <?php echo $e($m0Away); ?>
                 <?php $v = $val($m0, array('venue', 'location'), '');
                 echo $v ? ' • ' . $e($v) : ''; ?>
               <?php else: ?>
@@ -592,9 +762,10 @@ if (empty($albumList)) {
           <?php if (!empty($matches)): foreach (array_slice($matches, 0, 3) as $m):
               $st = isset($statusMap[$val($m, array('status'), '')]) ? $statusMap[$m['status']] : $statusMap['done'];
               $sc = $matchScores($m);
-              $home = $val($m, array('home_name', 'home', 'team_a'), '');
-              $away = $val($m, array('away_name', 'away', 'team_b'), '');
-              $meta = trim($val($m, array('time', 'kickoff_time'), '') . ($val($m, array('venue', 'location'), '') ? ' • ' . $val($m, array('venue', 'location'), '') : ''));
+              $home = $teamName($m, 'home');
+              $away = $teamName($m, 'away');
+              $mLoc = $val($m, array('venue', 'location'), '');
+              $meta = trim($val($m, array('time', 'kickoff_time', 'match_time'), '') . ($mLoc ? ' • ' . (is_array($mLoc) ? (isset($mLoc['name']) ? $mLoc['name'] : '') : $mLoc) : ''));
           ?>
               <div class="col-12 col-md-4">
                 <div class="card h-100 border-0 rounded-4 shadow-sm bg-white overflow-hidden card-hover" style="border-top:4px solid #10b981 !important;">
@@ -605,7 +776,7 @@ if (empty($albumList)) {
                       </div>
                       <div>
                         <span class="fw-bold text-dark small d-block lh-1"><?php echo $e($val($m, array('sport_name', 'category'), 'Thi đấu')); ?></span>
-                        <span class="text-muted" style="font-size:10.5px;"><?php echo $e($val($m, array('round_name', 'stage'), '')); ?></span>
+                        <span class="text-muted" style="font-size:10.5px;"><?php echo $e($val($m, array('round_name', 'stage', 'round'), '')); ?></span>
                       </div>
                     </div>
                     <span class="badge <?php echo $st['cls']; ?> text-white rounded-pill px-2 py-1 fw-semibold" style="font-size:10px;"><?php echo $e($st['text']); ?></span>
