@@ -144,7 +144,7 @@ class SportStages extends BaseSportStages
         $data = array_filter($data, function ($value) {
             return $value !== null && $value !== '';
         });
-        return ApiClient::post(ApiEndpoints::SPORT_STAGE_STORE, $data);
+        return self::apiPost(ApiEndpoints::SPORT_STAGE_STORE, $data);
     }
 
     /**
@@ -172,7 +172,7 @@ class SportStages extends BaseSportStages
             $data['location'] = $this->location;
         }
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_STAGE_UPDATE, array('id' => $this->id));
-        return ApiClient::post($url, $data);
+        return self::apiPost($url, $data);
     }
 
     // ===== Bốc thăm =====
@@ -180,25 +180,25 @@ class SportStages extends BaseSportStages
     public static function drawGroups($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_GROUPS, array('stageId' => $stageId));
-        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+        return self::apiPost($url, array('auth_email' => self::authEmail()));
     }
 
     public static function drawBracket($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_BRACKET, array('stageId' => $stageId));
-        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+        return self::apiPost($url, array('auth_email' => self::authEmail()));
     }
 
     public static function lockDraw($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_LOCK, array('stageId' => $stageId));
-        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+        return self::apiPost($url, array('auth_email' => self::authEmail()));
     }
 
     public static function drawPlayoff($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PLAYOFF, array('stageId' => $stageId));
-        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+        return self::apiPost($url, array('auth_email' => self::authEmail()));
     }
 
     /**
@@ -210,7 +210,7 @@ class SportStages extends BaseSportStages
     public static function promotePlayoffWinners($playoffStageId, $targetStageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PROMOTE_PLAYOFF, array('stageId' => $playoffStageId));
-        return ApiClient::post($url, array(
+        return self::apiPost($url, array(
             'target_stage_id' => $targetStageId,
             'auth_email' => self::authEmail(),
         ));
@@ -222,7 +222,7 @@ class SportStages extends BaseSportStages
     public static function promoteGroupWinners($qualStageId, $targetStageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PROMOTE_GROUPS, array('stageId' => $qualStageId));
-        return ApiClient::post($url, array(
+        return self::apiPost($url, array(
             'target_stage_id' => $targetStageId,
             'auth_email' => self::authEmail(),
         ));
@@ -233,7 +233,7 @@ class SportStages extends BaseSportStages
     public static function drawSwimHeats($stageId, $laneCount = 6)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_SWIM_HEATS, array('stageId' => $stageId));
-        return ApiClient::post($url, array('lane_count' => $laneCount, 'auth_email' => self::authEmail()));
+        return self::apiPost($url, array('lane_count' => $laneCount, 'auth_email' => self::authEmail()));
     }
 
     /**
@@ -246,7 +246,7 @@ class SportStages extends BaseSportStages
     public static function recordSwimTimes($stageId, $times, $lanes = array())
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_SWIM_TIMES, array('stageId' => $stageId));
-        return ApiClient::post($url, array(
+        return self::apiPost($url, array(
             'times' => (object) $times,
             'lanes' => (object) $lanes,
             'auth_email' => self::authEmail(),
@@ -256,7 +256,7 @@ class SportStages extends BaseSportStages
     public static function promoteSwimTop($qualStageId, $finalStageId, $topN = 6)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PROMOTE_SWIM, array('stageId' => $qualStageId));
-        return ApiClient::post($url, array(
+        return self::apiPost($url, array(
             'final_stage_id' => $finalStageId,
             'top_n' => $topN,
             'auth_email' => self::authEmail(),
@@ -273,7 +273,7 @@ class SportStages extends BaseSportStages
     public static function importSwimSeeds($stageId, $entries, $dryRun = false)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_SWIM_SEEDS, array('stageId' => $stageId));
-        return ApiClient::post($url, array(
+        return self::apiPost($url, array(
             'entries' => $entries,
             'dry_run' => $dryRun ? 1 : 0,
             'auth_email' => self::authEmail(),
@@ -288,13 +288,13 @@ class SportStages extends BaseSportStages
     public static function computeStandings($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_STANDINGS, array('stageId' => $stageId));
-        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+        return self::apiPost($url, array('auth_email' => self::authEmail()));
     }
 
     public static function generateKnockout($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_GENERATE_KNOCKOUT, array('stageId' => $stageId));
-        return ApiClient::post($url, array('auth_email' => self::authEmail()));
+        return self::apiPost($url, array('auth_email' => self::authEmail()));
     }
 
     public static function fetchDrawPreview($stageId)
@@ -319,10 +319,25 @@ class SportStages extends BaseSportStages
     public static function saveManualDraw($stageId, $assignments)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_ASSIGN, array('stageId' => $stageId));
-        return ApiClient::post($url, array(
+        return self::apiPost($url, array(
             'assignments' => $assignments,
             'auth_email' => self::authEmail(),
         ));
+    }
+
+    /**
+     * POST tới API và nhận diện lỗi nghiệp vụ: backend trả HTTP 200 nhưng body có code >= 400
+     * (vd "Cần ít nhất 2 đội") -> đánh dấu success=false + error = message của backend.
+     * Giữ nguyên 'code' HTTP để phân biệt với lỗi kết nối (code 0) / lỗi máy chủ (>= 500).
+     */
+    protected static function apiPost($url, $data)
+    {
+        $result = ApiClient::post($url, $data);
+        if (!empty($result['success']) && isset($result['data']['code']) && (int) $result['data']['code'] >= 400) {
+            $result['success'] = false;
+            $result['error'] = isset($result['data']['message']) ? $result['data']['message'] : 'Lỗi từ máy chủ API';
+        }
+        return $result;
     }
 
     protected static function authEmail()
