@@ -82,7 +82,8 @@ $isOpen = !isset($gate['is_open']) || $gate['is_open'];
                         </div>
                         <button type="button"
                                 class="btn btn-sm w-100 btn-vote btn-outline-primary"
-                                data-contestant="<?php echo (int) $f['contestant_id']; ?>">
+                                data-contestant="<?php echo (int) $f['contestant_id']; ?>"
+                                <?php echo $isOpen ? '' : 'disabled'; ?>>
                             <i class="fa fa-heart me-1"></i>Bình chọn
                         </button>
                     </div>
