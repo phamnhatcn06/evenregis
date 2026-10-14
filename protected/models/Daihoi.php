@@ -419,7 +419,8 @@ class Daihoi
     public static function getNewsDetail($id)
     {
         $url = ApiEndpoints::url(ApiEndpoints::NEWS_DETAIL, array('id' => $id));
-        return self::unwrap(ApiClient::get($url), array());
+        // track_view=1: báo backend tăng lượt xem (chỉ khi xem công khai).
+        return self::unwrap(ApiClient::get($url, array('track_view' => 1)), array());
     }
 
     /**
