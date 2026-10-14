@@ -1,6 +1,10 @@
 <?php
 
 $urlRewrite = array(
+    // Cổng bình chọn Miss (public) — đặt TRƯỚC các rule generic
+    'binh-chon' => 'frontend/binhchon/index',
+    'binh-chon/<action:\w+>' => 'frontend/binhchon/<action>',
+
     // Cổng đăng ký hoạt động (Fun Run & Tham quan) — đặt TRƯỚC các rule generic
     'run' => 'frontend/run/index',
     'run/<action:\w+>' => 'frontend/run/<action>',
