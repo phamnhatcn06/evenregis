@@ -84,6 +84,9 @@ document.addEventListener('DOMContentLoaded', function () {
         Object.keys(times).forEach(function (laneId) {
             fd.append('times[' + laneId + ']', times[laneId]);
         });
+        Object.keys(lanes).forEach(function (laneId) {
+            fd.append('lanes[' + laneId + ']', lanes[laneId]);
+        });
 
         fetch(saveUrl, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function (res) { return res.json(); })
