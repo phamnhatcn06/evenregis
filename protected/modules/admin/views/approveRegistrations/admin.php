@@ -441,5 +441,10 @@ document.getElementById('filter-event').addEventListener('change', function() {
 });
 ", CClientScript::POS_END);
 
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/approveRegistrations-admin.js',
+    CClientScript::POS_END
+);
+
 $this->renderPartial('_modal_send_mail');
 ?>
