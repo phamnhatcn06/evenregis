@@ -22,9 +22,10 @@ class SportSeedCommand extends CConsoleCommand
     /** @var array map code => id của sports đã tồn tại/được tạo */
     protected $sportIdByCode = array();
 
-    public function actionIndex($eventId = null, $commit = 0, $stagesOnly = 0)
+    public function actionIndex($eventId = null, $commit = 0, $stagesOnly = 0, $force = 0)
     {
         $commit = (int) $commit;
+        $this->force = (int) $force;
         if (!$eventId) {
             echo "ERROR: Thiếu --eventId=<id> (ID sự kiện Đại hội).\n";
             return 1;
