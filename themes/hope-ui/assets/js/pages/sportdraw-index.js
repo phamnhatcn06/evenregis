@@ -103,9 +103,17 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', function () {
             var id = this.getAttribute('data-id');
             var type = this.getAttribute('data-type');
-            var isGroups = (type === 'groups');
-            var url = buildUrl(isGroups ? groupsUrlTpl : bracketUrlTpl, id);
-            var title = isGroups ? 'Bốc thăm chia bảng?' : 'Bốc thăm sơ đồ loại trực tiếp?';
+            var url, title;
+            if (type === 'groups') {
+                url = buildUrl(groupsUrlTpl, id);
+                title = 'Bốc thăm chia bảng?';
+            } else if (type === 'playoff') {
+                url = buildUrl(playoffUrlTpl, id);
+                title = 'Bốc thăm play-off?';
+            } else {
+                url = buildUrl(bracketUrlTpl, id);
+                title = 'Bốc thăm sơ đồ loại trực tiếp?';
+            }
 
             Swal.fire({
                 title: title,
