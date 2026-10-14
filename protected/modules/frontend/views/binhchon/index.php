@@ -25,6 +25,19 @@ $isOpen = !isset($gate['is_open']) || $gate['is_open'];
     </div>
 <?php endif; ?>
 
+<?php if (!$isOpen): ?>
+    <div class="alert alert-secondary text-center">
+        <i class="fa fa-lock me-1"></i>
+        <strong><?php echo CHtml::encode(isset($gate['message']) ? $gate['message'] : 'Cổng bình chọn hiện đóng.'); ?></strong>
+        <?php if (!empty($gate['start_at'])): ?>
+            <div class="small text-muted mt-1">Thời gian mở: <?php echo CHtml::encode($gate['start_at']); ?></div>
+        <?php endif; ?>
+        <?php if (!empty($gate['end_at'])): ?>
+            <div class="small text-muted">Thời gian đóng: <?php echo CHtml::encode($gate['end_at']); ?></div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
 <!-- Khu vực đăng nhập / thông tin người bình chọn -->
 <div id="voter-box"
      class="card shadow-sm mb-4"
