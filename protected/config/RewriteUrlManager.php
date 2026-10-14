@@ -1,6 +1,10 @@
 <?php
 
 $urlRewrite = array(
+    // Cổng đăng ký hoạt động (Fun Run & Tham quan) — đặt TRƯỚC các rule generic
+    'run' => 'frontend/run/index',
+    'run/<action:\w+>' => 'frontend/run/<action>',
+
     'danh-muc-tin/<title>_<id:\d+>-<page:\d+>' => 'frontend/news/category',
     'danh-muc-tin/<title>_<id:\d+>' => 'frontend/news/category',
     'thu-vien-video/<title>_<id:\d+>-<page:\d+>' => 'frontend/video/index',
