@@ -139,6 +139,37 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    /* ===== Chuyển người thắng play-off sang vòng bảng ===== */
+    document.querySelectorAll('.btn-promote-playoff').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            var targetId = this.getAttribute('data-target-id');
+            var targetName = this.getAttribute('data-target-name') || 'vòng bảng';
+            Swal.fire({
+                title: 'Chuyển người thắng play-off?',
+                text: 'Người/đội thắng các trận play-off (đã có kết quả) sẽ được thêm vào "' + targetName + '".',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'Chuyển',
+                cancelButtonText: 'Hủy'
+            }).then(function (result) {
+                if (!result.isConfirmed) {
+                    return;
+                }
+                postJson(buildUrl(promotePlayoffUrlTpl, id), function (d) {
+                    if (d.success) {
+                        var added = (d.data && d.data.added) ? d.data.added.length : 0;
+                        Toast.success((d.message || 'Đã chuyển') + ' (' + added + ' suất mới)');
+                        setTimeout(function () { location.reload(); }, 1000);
+                    } else {
+                        Toast.error(d.message || 'Không thể chuyển người thắng');
+                    }
+                }, { target_stage_id: targetId });
+            });
+        });
+    });
+
     /* ===== Tính bảng xếp hạng ===== */
     document.querySelectorAll('.btn-standings').forEach(function (btn) {
         btn.addEventListener('click', function () {
