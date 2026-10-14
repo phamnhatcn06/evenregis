@@ -191,14 +191,17 @@ class SportSeedCommand extends CConsoleCommand
         $TEDDY = 'Tổ hợp Teddy Bear (Xuân Thành)';
 
         // Loại trực tiếp thuần (1 stage final, single_elimination)
-        $ko = function ($loc, $bracket = 8) {
+        $ko = function ($loc, $bracket = 8, $rules = '') {
             return array(array(
                 'name' => 'Vòng chung kết (loại trực tiếp)',
                 'stage_type' => 'final', 'stage_order' => 1,
                 'format' => 'single_elimination', 'bracket_size' => $bracket,
-                'location' => $loc,
+                'location' => $loc, 'rules' => $rules,
             ));
         };
+
+        // Thể lệ tính điểm/set dùng chung
+        $RACKET_15 = '3 hiệp thắng 2 (chạm 15đ, ăn điểm trực tiếp). Loại trực tiếp tranh 1-2-3-4, có tranh hạng 3.';
 
         return array(
             // Bóng đá Nam — 8 đội loại trực tiếp
