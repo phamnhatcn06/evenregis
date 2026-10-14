@@ -69,6 +69,25 @@ $stats = isset($tournament['stats']) ? $tournament['stats'] : array(
 $allMatches = isset($tournament['matches']) ? $tournament['matches'] : array();
 $sportsList = isset($tournament['sports']) ? $tournament['sports'] : array();
 $standingsBySport = isset($tournament['standingsBySport']) ? $tournament['standingsBySport'] : array();
+$swimBySport = isset($tournament['swimBySport']) ? $tournament['swimBySport'] : array();
+
+// Đổi mili-giây sang chuỗi thành tích bơi (m:ss.cc hoặc ss.cc)
+$fmtSwimTime = function ($ms) {
+    if ($ms === null || $ms === '') {
+        return '—';
+    }
+    $ms = (int) $ms;
+    $totalSec = intval($ms / 1000);
+    $cs = intval(round(($ms % 1000) / 10));
+    $min = intval($totalSec / 60);
+    $sec = $totalSec % 60;
+    return $min > 0 ? sprintf('%d:%02d.%02d', $min, $sec, $cs) : sprintf('%d.%02d', $sec, $cs);
+};
+// Map nhanh id môn -> tên/icon (từ sportsList) để hiển thị tiêu đề khối bơi
+$sportInfoById = array();
+foreach ($sportsList as $sp) {
+    $sportInfoById[$sp['id']] = $sp;
+}
 
 // Hàm lấy chữ cái viết tắt của tên đội (Avatar chữ)
 $initials = function ($name) {
