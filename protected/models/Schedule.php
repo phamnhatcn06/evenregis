@@ -67,9 +67,8 @@ class Schedule
         $items = array_merge($items, self::getSportItems($attendeeId, $eventId));
         $items = array_merge($items, self::getCompetitionItems($attendeeId, $eventId));
         $items = array_merge($items, self::getAgendaItems($eventId));
-        // Phase 1 sẽ bổ sung tiếp:
-        // $items = array_merge($items, self::getMealItems($attendeeId, $eventId));
-        // $items = array_merge($items, self::getBanquetItems($attendeeId, $eventId));
+        $items = array_merge($items, self::getMealItems($attendeeId, $eventId));
+        $items = array_merge($items, self::getBanquetItems($attendeeId, $eventId));
         return self::buildTimeline($items);
     }
 
