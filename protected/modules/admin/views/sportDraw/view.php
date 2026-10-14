@@ -69,12 +69,98 @@ if ($preview && isset($preview['teams'])) {
 
 $matches = ($preview && isset($preview['matches'])) ? $preview['matches'] : array();
 
+// =========================================================================
+// PHÂN LOẠI TRẬN ĐẤU: VÒNG BẢNG VÀ VÒNG LOẠI TRỰC TIẾP
+// =========================================================================
+$groupMatches = array();
+$koMatches = array();
+$rounds = array();
+$thirdPlace = null;
+$finalMatch = null;
+$championTeamId = null;
+$championTeamName = null;
+
+foreach ($matches as $m) {
+    $type = $m['match_type'] ?? '';
+    if ($type === 'group') {
+        $groupMatches[$m['group_label'] ?? '?'][] = $m;
+    } elseif ($type === 'playoff') {
+        $thirdPlace = $m;
+    } else {
+        if ($type === 'final') {
+            $finalMatch = $m;
+        }
+        $rounds[$m['round_no']][] = $m;
+        $koMatches[] = $m;
+    }
+}
+ksort($groupMatches);
+ksort($rounds);
+
+// Đếm số trận vòng bảng đã có kết quả
+$totalGroupMatches = 0;
+$completedGroupMatches = 0;
+foreach ($groupMatches as $gLabel => $gList) {
+    foreach ($gList as $gm) {
+        $totalGroupMatches++;
+        $gres = $gm['result'] ?? null;
+        if ($gres && $gres['score_a'] !== null && $gres['score_b'] !== null && $gres['score_a'] !== '' && $gres['score_b'] !== '') {
+            $completedGroupMatches++;
+        }
+    }
+}
+$hasGroupResults = ($completedGroupMatches > 0);
+
+// Nếu thể thức là Vòng bảng + Knockout (round_robin_knockout) mà chưa có trận knockout nào trong dữ liệu:
+// Tự động dựng khung cấu trúc sơ đồ nhánh (placeholder) để hiển thị nhánh thi đấu
+if ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT && empty($rounds)) {
+    $mBK1 = array(
+        'id' => 'ko_bk1', 'code' => 'BK1', 'round' => 'Bán kết', 'match_type' => 'knockout',
+        'round_no' => 1, 'bracket_pos' => 1, 'team_a_id' => null, 'team_b_id' => null,
+        'team_a_source' => 'Nhất Bảng A', 'team_b_source' => 'Nhì Bảng B',
+        'winner_to_match_id' => 'ko_final', 'loser_to_match_id' => 'ko_third',
+        'result' => null, 'match_time' => null, 'location' => null, 'match_order' => 101, 'is_bye' => 0,
+    );
+    $mBK2 = array(
+        'id' => 'ko_bk2', 'code' => 'BK2', 'round' => 'Bán kết', 'match_type' => 'knockout',
+        'round_no' => 1, 'bracket_pos' => 2, 'team_a_id' => null, 'team_b_id' => null,
+        'team_a_source' => 'Nhất Bảng B', 'team_b_source' => 'Nhì Bảng A',
+        'winner_to_match_id' => 'ko_final', 'loser_to_match_id' => 'ko_third',
+        'result' => null, 'match_time' => null, 'location' => null, 'match_order' => 102, 'is_bye' => 0,
+    );
+    $mFinal = array(
+        'id' => 'ko_final', 'code' => 'CK', 'round' => 'Chung kết', 'match_type' => 'final',
+        'round_no' => 2, 'bracket_pos' => 1, 'team_a_id' => null, 'team_b_id' => null,
+        'team_a_source' => 'Thắng Bán kết 1', 'team_b_source' => 'Thắng Bán kết 2',
+        'winner_to_match_id' => null, 'loser_to_match_id' => null,
+        'result' => null, 'match_time' => null, 'location' => null, 'match_order' => 103, 'is_bye' => 0,
+    );
+    $mThird = array(
+        'id' => 'ko_third', 'code' => 'TRANH-HANG-3', 'round' => 'Tranh hạng 3', 'match_type' => 'playoff',
+        'round_no' => 2, 'bracket_pos' => 2, 'team_a_id' => null, 'team_b_id' => null,
+        'team_a_source' => 'Thua Bán kết 1', 'team_b_source' => 'Thua Bán kết 2',
+        'winner_to_match_id' => null, 'loser_to_match_id' => null,
+        'result' => null, 'match_time' => null, 'location' => null, 'match_order' => 104, 'is_bye' => 0,
+    );
+
+    $rounds[1] = array($mBK1, $mBK2);
+    $rounds[2] = array($mFinal);
+    $koMatches = array($mBK1, $mBK2, $mFinal);
+    $finalMatch = $mFinal;
+    $thirdPlace = $mThird;
+}
+
 // Match lookup & Feeder hierarchy mapping
 $matchMap = array();
 $feedersOf = array();
 $loserFeedersOf = array();
 
-foreach ($matches as $m) {
+$allActiveMatches = array_merge($matches, $koMatches);
+if ($thirdPlace && !isset($matchMap[$thirdPlace['id']])) {
+    $allActiveMatches[] = $thirdPlace;
+}
+
+foreach ($allActiveMatches as $m) {
     $matchMap[$m['id']] = $m;
     if (!empty($m['winner_to_match_id'])) {
         $feedersOf[$m['winner_to_match_id']][] = $m;
@@ -84,14 +170,46 @@ foreach ($matches as $m) {
     }
 }
 
-/** Tên đội hoặc nguồn chờ thông minh */
-$getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($teamMap, $feedersOf, $loserFeedersOf) {
+/**
+ * Tên đội hoặc nguồn chờ thông minh
+ * Lưu ý: Khi chưa có kết quả vòng bảng (completedGroupMatches == 0) ở thể thức round_robin_knockout,
+ * các slot vòng 1 của knockout chưa được điền đội thật mà hiển thị nguồn chờ: Nhất Bảng A, Nhì Bảng B...
+ */
+$getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($teamMap, $feedersOf, $loserFeedersOf, $completedGroupMatches, $model) {
+    $isKnockoutRound1 = (($match['match_type'] ?? '') === 'knockout' && (int)($match['round_no'] ?? 1) === 1);
+    $isRoundRobinKnockout = ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT);
+
+    // Xác định nguồn mặc định theo nhánh chéo
+    $defaultSource = '';
+    if ($isKnockoutRound1 && $isRoundRobinKnockout) {
+        $pos = (int)($match['bracket_pos'] ?? 1);
+        if ($pos === 1) {
+            $defaultSource = ($slotIndex === 0) ? 'Nhất Bảng A' : 'Nhì Bảng B';
+        } elseif ($pos === 2) {
+            $defaultSource = ($slotIndex === 0) ? 'Nhất Bảng B' : 'Nhì Bảng A';
+        } else {
+            $gLabel = chr(ord('A') + ($pos - 1));
+            $defaultSource = ($slotIndex === 0) ? "Nhất Bảng $gLabel" : "Nhì Bảng $gLabel";
+        }
+    }
+
+    $sourceLabel = !empty($explicitSource) ? $explicitSource : $defaultSource;
+
+    // Chưa có dữ liệu gì ở vòng bảng thì Sơ đồ loại trực tiếp chưa điền đội!
+    if ($isRoundRobinKnockout && $isKnockoutRound1 && $completedGroupMatches === 0) {
+        return array('name' => !empty($sourceLabel) ? $sourceLabel : 'Chờ xác định', 'isTeam' => false, 'source' => $sourceLabel);
+    }
+
+    // Đã có đội hợp lệ
     if ($teamId && isset($teamMap[$teamId])) {
-        return array('name' => $teamMap[$teamId], 'isTeam' => true);
+        return array('name' => $teamMap[$teamId], 'isTeam' => true, 'source' => $sourceLabel);
     }
-    if (!empty($explicitSource)) {
-        return array('name' => 'Chờ ' . $explicitSource, 'isTeam' => false);
+
+    // Nguồn chờ từ source cấu hình
+    if (!empty($sourceLabel)) {
+        return array('name' => $sourceLabel, 'isTeam' => false, 'source' => $sourceLabel);
     }
+
     // Dò tìm từ nhánh vòng trước
     $isPlayoff = (($match['match_type'] ?? '') === 'playoff');
     if ($isPlayoff && !empty($loserFeedersOf[$match['id']][$slotIndex])) {
@@ -121,7 +239,9 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
          data-update-match-url="<?php echo $this->createUrl('updateMatch'); ?>"
          data-reorder-matches-url="<?php echo $this->createUrl('reorderMatches'); ?>"
          data-standings-url="<?php echo $this->createUrl('standings', array('id' => $model->id)); ?>"
-         data-generate-knockout-url="<?php echo $this->createUrl('generateKnockout', array('id' => $model->id)); ?>">
+         data-generate-knockout-url="<?php echo $this->createUrl('generateKnockout', array('id' => $model->id)); ?>"
+         data-total-group-matches="<?php echo (int) $totalGroupMatches; ?>"
+         data-completed-group-matches="<?php echo (int) $completedGroupMatches; ?>">
 
         <!-- 1. Header Banner Giai đoạn -->
         <div class="sportdraw-header-card">
