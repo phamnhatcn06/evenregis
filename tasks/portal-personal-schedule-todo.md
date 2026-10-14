@@ -3,7 +3,7 @@
 Spec: `docs/specs/portal-personal-schedule.md` · Plan: `tasks/portal-personal-schedule-plan.md`
 
 ## Phase 0: Nền tảng
-- [ ] 0.1 Model `Schedule` + hằng số item/status + `buildTimeline`/next-up (giờ VN) + unit test
+- [x] 0.1 Model `Schedule` + hằng số item/status + `buildTimeline`/next-up (giờ VN) + unit test (14/14 pass qua harness CLI)
 - [ ] 0.2 Route + `PortalController::actionSchedule` + view khung + partial + `schedule-my.js` đếm ngược + link dashboard
 
 ## ⛳ Checkpoint A: Nền tảng xong (chốt Phương án backend A/B)
