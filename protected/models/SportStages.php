@@ -74,7 +74,7 @@ class SportStages extends BaseSportStages
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('format, num_groups, teams_per_group, advance_per_group, bracket_size, draw_status, draw_seed, drawn_by, drawn_at, sport_name, event_name', 'safe');
+        $rules[] = array('format, num_groups, teams_per_group, advance_per_group, bracket_size, draw_status, draw_seed, drawn_by, drawn_at, win_points, draw_points, loss_points, tiebreak, ko_pairing, sport_name, event_name', 'safe');
         return $rules;
     }
 
