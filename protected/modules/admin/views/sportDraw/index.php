@@ -55,6 +55,7 @@ foreach ($stages as $s) {
      data-promote-playoff-url="<?php echo $this->createUrl('promotePlayoff', array('id' => '__ID__')); ?>"
      data-draw-swim-url="<?php echo $this->createUrl('drawSwimHeats', array('id' => '__ID__')); ?>"
      data-promote-swim-url="<?php echo $this->createUrl('promoteSwim', array('id' => '__ID__')); ?>"
+     data-promote-groups-url="<?php echo $this->createUrl('promoteGroups', array('id' => '__ID__')); ?>"
      data-lock-url="<?php echo $this->createUrl('lock', array('id' => '__ID__')); ?>">
 </div>
 
