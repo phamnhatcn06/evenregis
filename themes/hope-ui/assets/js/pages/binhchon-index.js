@@ -6,9 +6,40 @@
 (function () {
     'use strict';
 
+    // Đếm ngược tới giờ mở cổng (hiển thị khi cổng chưa mở). Dùng lệch giờ
+    // server-client để không phụ thuộc đồng hồ máy khách.
+    initCountdown();
+
     var voterBox = document.getElementById('voter-box');
     if (!voterBox) {
         return;
+    }
+
+    function initCountdown() {
+        var el = document.getElementById('vote-countdown');
+        if (!el) { return; }
+        var start = new Date(el.getAttribute('data-start')).getTime();
+        var serverNow = new Date(el.getAttribute('data-now')).getTime();
+        if (isNaN(start) || isNaN(serverNow)) { return; }
+        var offset = serverNow - Date.now(); // chênh lệch server - client
+
+        var tick = function () {
+            var remaining = start - (Date.now() + offset);
+            if (remaining <= 0) {
+                el.textContent = 'Đang mở cổng...';
+                window.location.reload();
+                return;
+            }
+            var s = Math.floor(remaining / 1000);
+            var d = Math.floor(s / 86400); s -= d * 86400;
+            var h = Math.floor(s / 3600); s -= h * 3600;
+            var m = Math.floor(s / 60); s -= m * 60;
+            var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+            var text = (d > 0 ? d + ' ngày ' : '') + pad(h) + ':' + pad(m) + ':' + pad(s);
+            el.textContent = 'Cổng mở sau: ' + text;
+        };
+        tick();
+        setInterval(tick, 1000);
     }
 
     var voteUrl = voterBox.getAttribute('data-vote-url');
