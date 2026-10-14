@@ -483,9 +483,11 @@ if (empty($albumList)) {
         foreach ($cards as $ci => $card):
           $t = $card['theme'];
           $delayClass = isset($delays[$ci]) ? $delays[$ci] : 'delay-100';
+          $catId = $findCategoryId(isset($card['needle']) ? $card['needle'] : $card['title']);
+          $cardHref = $catId ? $base . '/tin-tuc?category_id=' . $catId : $base . '/tin-tuc';
         ?>
           <div class="col-12 col-md-6 col-lg-4 reveal-on-scroll <?php echo $delayClass; ?>">
-            <div class="card h-100 card-hover border shadow-sm rounded-4 p-4 bg-white" style="border-top:4px solid <?php echo $e($t['border']); ?> !important;">
+            <a href="<?php echo $e($cardHref); ?>" class="card h-100 card-hover border shadow-sm rounded-4 p-4 bg-white text-decoration-none" style="border-top:4px solid <?php echo $e($t['border']); ?> !important;">
               <div class="d-flex align-items-center justify-content-between mb-4">
                 <span class="badge <?php echo $t['badge']; ?> px-3 py-1 rounded-pill fw-bold text-uppercase" style="font-size:10.5px;"><?php echo $e($card['tag']); ?></span>
                 <div class="rounded-3 <?php echo $t['icon_bg']; ?> text-white p-2 d-flex align-items-center justify-content-center shadow-sm icon-bounce" style="width:40px;height:40px;">
@@ -499,7 +501,7 @@ if (empty($albumList)) {
                   <span>Tìm hiểu thêm</span><span class="material-symbols-outlined fs-6 arrow-slide">arrow_forward</span>
                 </div>
               </div>
-            </div>
+            </a>
           </div>
         <?php endforeach; ?>
       </div>
