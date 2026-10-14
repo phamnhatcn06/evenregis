@@ -143,9 +143,23 @@ if ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT && empty($rounds
         'result' => null, 'match_time' => null, 'location' => null, 'match_order' => 104, 'is_bye' => 0,
     );
 
-    $rounds[1] = array($mBK1, $mBK2);
-    $rounds[2] = array($mFinal);
-    $koMatches = array($mBK1, $mBK2, $mFinal);
+    if ($model->ko_pairing === SportStages::PAIRING_PLACEMENT) {
+        // Xếp hạng theo thứ hạng bảng: không có bán kết
+        $mFinal = array_merge($mFinal, array(
+            'round' => 'Chung kết (Tranh 1-2)', 'round_no' => 1,
+            'team_a_source' => 'Nhất Bảng A', 'team_b_source' => 'Nhất Bảng B',
+        ));
+        $mThird = array_merge($mThird, array(
+            'round' => 'Tranh hạng 3-4', 'round_no' => 1,
+            'team_a_source' => 'Nhì Bảng A', 'team_b_source' => 'Nhì Bảng B',
+        ));
+        $rounds[1] = array($mFinal);
+        $koMatches = array($mFinal);
+    } else {
+        $rounds[1] = array($mBK1, $mBK2);
+        $rounds[2] = array($mFinal);
+        $koMatches = array($mBK1, $mBK2, $mFinal);
+    }
     $finalMatch = $mFinal;
     $thirdPlace = $mThird;
 }
