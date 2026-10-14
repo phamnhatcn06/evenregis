@@ -115,6 +115,8 @@ class CHtml
 	 */
 	public static function encode($text)
 	{
+		if(is_array($text))
+			return '';
 		return htmlspecialchars((string)$text,ENT_QUOTES,Yii::app()->charset);
 	}
 

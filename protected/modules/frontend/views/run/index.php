@@ -129,6 +129,8 @@ if (!empty($tourOpenAts) && !empty($tourCloseAts)) {
 }
 ?>
 
+<div class="container py-3 py-md-4">
+
 <!-- Header & Thông tin đại biểu -->
 <div class="run-portal-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
     <div class="d-flex align-items-center gap-3">

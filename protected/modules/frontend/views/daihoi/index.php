@@ -27,17 +27,37 @@ $val = function ($arr, $keys, $default = '') {
   }
   return $default;
 };
-$e = function ($s) {
+$e = function ($s) use (&$e) {
   if (is_array($s)) {
     if (isset($s['name'])) {
-      return CHtml::encode($s['name']);
+      return $e($s['name']);
     }
     if (isset($s['title'])) {
-      return CHtml::encode($s['title']);
+      return $e($s['title']);
+    }
+    if (isset($s['label'])) {
+      return $e($s['label']);
+    }
+    foreach ($s as $v) {
+      if (is_scalar($v) && (string) $v !== '') {
+        return CHtml::encode((string) $v);
+      }
     }
     return '';
   }
-  return CHtml::encode($s);
+  if (is_object($s)) {
+    if (method_exists($s, '__toString')) {
+      return CHtml::encode((string) $s);
+    }
+    if (isset($s->name)) {
+      return $e($s->name);
+    }
+    if (isset($s->title)) {
+      return $e($s->title);
+    }
+    return '';
+  }
+  return CHtml::encode($s !== null ? (string) $s : '');
 };
 
 /** Lấy tên đội thi đấu / VĐV từ match (hỗ trợ cả dạng string và mảng team_a / team_b) */
@@ -63,7 +83,13 @@ $teamName = function ($m, $side, $default = '') use ($val) {
 $eventName = $val($event, array('name', 'title'), 'ĐẠI HỘI MƯỜNG THANH 2026');
 $eventSlogan = $val($event, array('slogan', 'subtitle'), 'HÀNH TRÌNH DI SẢN - RỰC CHÁY ĐAM MÊ');
 $eventDestination = $val($event, array('destination', 'location', 'venue', 'place', 'city'), 'Ninh Bình');
-$eventLocation = $val($event, array('location', 'venue', 'place'), $eventDestination . ' 2026');
+if (is_array($eventDestination)) {
+  $eventDestination = isset($eventDestination['name']) ? $eventDestination['name'] : (isset($eventDestination['title']) ? $eventDestination['title'] : 'Ninh Bình');
+}
+$eventLocation = $val($event, array('location', 'venue', 'place'), (string) $eventDestination . ' 2026');
+if (is_array($eventLocation)) {
+  $eventLocation = isset($eventLocation['name']) ? $eventLocation['name'] : (isset($eventLocation['title']) ? $eventLocation['title'] : ((string) $eventDestination . ' 2026'));
+}
 $heroDesc = $val($event, array('hero_description', 'description'), 'Hội tụ tinh hoa tay nghề nghiệp vụ khách sạn và khát vọng bứt phá trong ngày hội thể thao quy mô nhất toàn tập đoàn.');
 $coverImage = $val($event, array('cover_image', 'cover', 'banner'), '');
 $eventYear = $val($event, array('year'), '');
@@ -330,6 +356,9 @@ if (!empty($agenda) && isset($agenda[0]) && is_array($agenda[0])) {
   $todayItemName = $val($a0, array('title', 'name'), $todayItemName);
   $todayItemTime = $val($a0, array('time', 'time_range', 'start_time'), $todayItemTime);
   $todayItemPlace = $val($a0, array('location', 'venue', 'place'), $todayItemPlace);
+  if (is_array($todayItemPlace)) {
+    $todayItemPlace = isset($todayItemPlace['name']) ? $todayItemPlace['name'] : (isset($todayItemPlace['title']) ? $todayItemPlace['title'] : 'Cụm sân thi đấu Đại hội');
+  }
 }
 
 // ----- Hero slider (dữ liệu từ bảng slideshows) -----
@@ -566,8 +595,12 @@ if (empty($albumList)) {
               ?>
                 <strong class="text-dark"><?php echo $e($val($m0, array('sport_name', 'category'), 'Thi đấu')); ?>:</strong>
                 <?php echo $e($m0Home); ?> vs <?php echo $e($m0Away); ?>
-                <?php $v = $val($m0, array('venue', 'location'), '');
-                echo $v ? ' • ' . $e($v) : ''; ?>
+                <?php
+                $v = $val($m0, array('venue', 'location'), '');
+                if (is_array($v)) {
+                  $v = isset($v['name']) ? $v['name'] : (isset($v['title']) ? $v['title'] : '');
+                }
+                echo $v !== '' ? ' • ' . $e($v) : ''; ?>
               <?php else: ?>
                 <strong class="text-dark">Đại hội Mường Thanh <?php echo $e($eventYear); ?></strong> • Theo dõi lịch thi đấu và kết quả cập nhật liên tục trực tiếp từ các cụm sân.
               <?php endif; ?>
