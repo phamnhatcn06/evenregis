@@ -64,13 +64,47 @@ class Schedule
     public static function getForAttendee($attendeeId, $eventId)
     {
         $items = array();
-        // Phase 1 sẽ bổ sung lần lượt:
-        // $items = array_merge($items, self::getSportItems($attendeeId, $eventId));
+        $items = array_merge($items, self::getSportItems($attendeeId, $eventId));
+        // Phase 1 sẽ bổ sung tiếp:
         // $items = array_merge($items, self::getCompetitionItems($attendeeId, $eventId));
         // $items = array_merge($items, self::getAgendaItems($eventId));
         // $items = array_merge($items, self::getMealItems($attendeeId, $eventId));
         // $items = array_merge($items, self::getBanquetItems($attendeeId, $eventId));
         return self::buildTimeline($items);
+    }
+
+    /**
+     * Nguồn Thể thao: các trận đấu người tham dự có tham gia (qua đội của họ).
+     *
+     * @param string|int $attendeeId
+     * @param string|int $eventId
+     * @return array danh sách item chuẩn hoá (chưa gán status)
+     */
+    public static function getSportItems($attendeeId, $eventId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SCHEDULE_SPORT, array(
+            'attendee_id' => $attendeeId,
+            'event_id' => $eventId,
+        ));
+        return self::unwrapList($result);
+    }
+
+    /**
+     * Bóc danh sách item từ response ApiClient ({success, data:{code,message,data:[...]}}).
+     *
+     * @param array $result kết quả ApiClient
+     * @return array
+     */
+    private static function unwrapList($result)
+    {
+        if (empty($result['success']) || !isset($result['data'])) {
+            return array();
+        }
+        $data = $result['data'];
+        if (isset($data['data']) && is_array($data['data'])) {
+            return $data['data'];
+        }
+        return is_array($data) ? $data : array();
     }
 
     /**
