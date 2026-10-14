@@ -488,6 +488,13 @@ class ApiEndpoints
     const SPORT_MATCH_UPDATE = '/api/sport-matches/update/{id}';
     const SPORT_MATCH_DESTROY = '/api/sport-matches/destroy/{id}';
 
+    // Lịch trình cá nhân (tách theo nguồn)
+    const SCHEDULE_SPORT = '/api/schedule/sport';
+    const SCHEDULE_COMPETITION = '/api/schedule/competition';
+    const SCHEDULE_AGENDA = '/api/schedule/agenda';
+    const SCHEDULE_MEAL = '/api/schedule/meal';
+    const SCHEDULE_BANQUET = '/api/schedule/banquet';
+
     // Sport Match Result
     const SPORT_MATCH_RESULT_LIST = '/api/sport-match-results';
     const SPORT_MATCH_RESULT_STORE = '/api/sport-match-results/store';
