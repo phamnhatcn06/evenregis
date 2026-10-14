@@ -247,6 +247,8 @@ if (!empty($tourOpenAts) && !empty($tourCloseAts)) {
     </div>
 </div>
 
+</div><!-- /.container -->
+
 <?php
 // Modal xin hủy cho từng nội dung (chỉ render khi có đăng ký còn cho hủy).
 if (!empty($runMine) && !empty($runMine['can_request_cancel']) && $runMine['status'] !== 'cancel_requested') {
