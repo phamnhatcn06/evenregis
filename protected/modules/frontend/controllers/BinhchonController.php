@@ -42,6 +42,11 @@ class BinhchonController extends CController
         $voter = $this->getVoter();
         $votedIds = $this->getVotedContestantIds($contestId);
 
+        // Thư viện Google Identity Services (bắt buộc tải từ máy chủ Google)
+        Yii::app()->clientScript->registerScriptFile(
+            'https://accounts.google.com/gsi/client',
+            CClientScript::POS_HEAD
+        );
         Yii::app()->clientScript->registerScriptFile(
             Yii::app()->theme->baseUrl . '/assets/js/pages/binhchon-index.js',
             CClientScript::POS_END
