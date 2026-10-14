@@ -1,7 +1,7 @@
 /**
  * Cổng bình chọn Miss - Vòng chung kết.
  * Đăng nhập Google (Google Identity Services) rồi gửi credential kèm mỗi lượt
- * bình chọn lên server để xác thực.
+ * bình chọn lên server để xác thực. Backend áp dụng hạn mức theo tài khoản Google.
  */
 (function () {
     'use strict';
@@ -12,35 +12,64 @@
     }
 
     var voteUrl = voterBox.getAttribute('data-vote-url');
+    var statusUrl = voterBox.getAttribute('data-status-url');
     var clientId = voterBox.getAttribute('data-client-id');
     var credential = null; // Google ID token sau khi đăng nhập
 
     // Google gọi hàm này sau khi khách đăng nhập thành công
     window.onGoogleCredential = function (response) {
         credential = response.credential;
-        showSignedIn(response);
+        loadVoterStatus();
     };
 
-    function showSignedIn(response) {
-        var signin = document.getElementById('g_id_signin');
-        if (signin) {
-            signin.classList.add('d-none');
-        }
+    function loadVoterStatus() {
+        var body = new FormData();
+        body.append('credential', credential);
+
+        fetch(statusUrl, { method: 'POST', body: body })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!data.success) {
+                    if (typeof Toast !== 'undefined') { Toast.error(data.message || 'Xác thực thất bại.'); }
+                    return;
+                }
+                showSignedIn(data.name, data.remaining);
+                markVotedButtons(data.voted_ids || []);
+                if (data.remaining <= 0) {
+                    disableAllVoteButtons();
+                }
+                if (typeof Toast !== 'undefined') {
+                    Toast.success('Đăng nhập thành công! Hãy bình chọn cho thí sinh bạn yêu thích.');
+                }
+            })
+            .catch(function () {
+                if (typeof Toast !== 'undefined') { Toast.error('Lỗi kết nối máy chủ.'); }
+            });
+    }
+
+    function showSignedIn(name, remaining) {
+        var signinArea = document.getElementById('signin-area');
+        if (signinArea) { signinArea.classList.add('d-none'); }
         var info = document.getElementById('signed-in-info');
-        if (info) {
-            info.classList.remove('d-none');
-        }
-        // Giải mã tên từ JWT payload để hiển thị (không dùng để xác thực)
-        try {
-            var payload = JSON.parse(atob(response.credential.split('.')[1]));
-            var nameEl = document.getElementById('voter-name');
-            if (nameEl) {
-                nameEl.textContent = payload.name || payload.email || '';
-            }
-        } catch (e) {}
-        if (typeof Toast !== 'undefined') {
-            Toast.success('Đăng nhập thành công! Hãy bình chọn cho thí sinh bạn yêu thích.');
-        }
+        if (info) { info.classList.remove('d-none'); }
+        var nameEl = document.getElementById('voter-name');
+        if (nameEl) { nameEl.textContent = name || ''; }
+        var remEl = document.getElementById('remaining-votes');
+        if (remEl && typeof remaining !== 'undefined') { remEl.textContent = remaining; }
+    }
+
+    function markVotedButtons(votedIds) {
+        votedIds.forEach(function (cid) {
+            var btn = document.querySelector('.btn-vote[data-contestant="' + cid + '"]');
+            if (btn) { setVoted(btn); }
+        });
+    }
+
+    function setVoted(button) {
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-success');
+        button.innerHTML = '<i class="fa fa-check me-1"></i>Đã bình chọn';
+        button.disabled = true;
     }
 
     function initGoogle() {
@@ -95,46 +124,44 @@
         fetch(voteUrl, { method: 'POST', body: body })
             .then(function (res) { return res.json(); })
             .then(function (data) {
-                if (data.success) {
-                    button.classList.remove('btn-outline-primary');
-                    button.classList.add('btn-success');
-                    button.innerHTML = '<i class="fa fa-check me-1"></i>Đã bình chọn';
-                    button.disabled = true;
+                updateCount(contestantId, data.vote_count);
+                updateRemaining(data.remaining);
 
-                    var countEl = document.querySelector('.vote-count[data-contestant="' + contestantId + '"]');
-                    if (countEl && typeof data.vote_count !== 'undefined') {
-                        countEl.textContent = data.vote_count;
-                    }
-                    var remEl = document.getElementById('remaining-votes');
-                    if (remEl && typeof data.remaining !== 'undefined') {
-                        remEl.textContent = data.remaining;
-                        if (data.remaining <= 0) {
-                            disableAllVoteButtons();
-                        }
-                    }
-                    if (typeof Toast !== 'undefined') {
-                        Toast.success(data.message || 'Bình chọn thành công!');
-                    }
+                if (data.success) {
+                    setVoted(button);
+                    if (data.remaining <= 0) { disableAllVoteButtons(); }
+                    if (typeof Toast !== 'undefined') { Toast.success(data.message || 'Bình chọn thành công!'); }
                 } else {
-                    button.disabled = false;
-                    button.innerHTML = original;
-                    if (typeof Toast !== 'undefined') {
-                        Toast.error(data.message || 'Có lỗi xảy ra.');
+                    // Đồng bộ lại trạng thái nếu đã chọn rồi / hết lượt
+                    markVotedButtons(data.voted_ids || []);
+                    if (!button.disabled) {
+                        button.disabled = false;
+                        button.innerHTML = original;
                     }
+                    if (typeof Toast !== 'undefined') { Toast.error(data.message || 'Có lỗi xảy ra.'); }
                 }
             })
             .catch(function () {
                 button.disabled = false;
                 button.innerHTML = original;
-                if (typeof Toast !== 'undefined') {
-                    Toast.error('Lỗi kết nối máy chủ.');
-                }
+                if (typeof Toast !== 'undefined') { Toast.error('Lỗi kết nối máy chủ.'); }
             });
     }
 
+    function updateCount(contestantId, count) {
+        if (typeof count === 'undefined' || count === null) { return; }
+        var el = document.querySelector('.vote-count[data-contestant="' + contestantId + '"]');
+        if (el) { el.textContent = count; }
+    }
+
+    function updateRemaining(remaining) {
+        if (typeof remaining === 'undefined' || remaining === null) { return; }
+        var el = document.getElementById('remaining-votes');
+        if (el) { el.textContent = remaining; }
+    }
+
     function disableAllVoteButtons() {
-        var btns = document.querySelectorAll('.btn-vote');
-        btns.forEach(function (b) {
+        document.querySelectorAll('.btn-vote').forEach(function (b) {
             if (!b.disabled) {
                 b.disabled = true;
             }
