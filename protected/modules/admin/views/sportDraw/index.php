@@ -40,6 +40,8 @@ foreach ($stages as $s) {
      data-draw-bracket-url="<?php echo $this->createUrl('drawBracket', array('id' => '__ID__')); ?>"
      data-standings-url="<?php echo $this->createUrl('standings', array('id' => '__ID__')); ?>"
      data-generate-knockout-url="<?php echo $this->createUrl('generateKnockout', array('id' => '__ID__')); ?>"
+     data-draw-playoff-url="<?php echo $this->createUrl('drawPlayoff', array('id' => '__ID__')); ?>"
+     data-promote-playoff-url="<?php echo $this->createUrl('promotePlayoff', array('id' => '__ID__')); ?>"
      data-lock-url="<?php echo $this->createUrl('lock', array('id' => '__ID__')); ?>">
 </div>
 
