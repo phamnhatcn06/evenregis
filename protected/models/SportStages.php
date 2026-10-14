@@ -10,6 +10,7 @@ class SportStages extends BaseSportStages
     const FORMAT_ROUND_ROBIN_KNOCKOUT = 'round_robin_knockout';
     const FORMAT_HEAT_LANE = 'heat_lane';
     const FORMAT_TIME_TRIAL = 'time_trial';
+    const FORMAT_PLAYOFF = 'playoff';
 
     // Trạng thái bốc thăm
     const DRAW_NOT_DRAWN = 'not_drawn';
