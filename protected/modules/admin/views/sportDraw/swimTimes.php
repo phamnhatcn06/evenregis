@@ -106,7 +106,7 @@ function swimMsToText($ms)
                                                placeholder="ss.cc">
                                     </td>
                                     <td class="text-center">
-                                        <?php echo isset($lane['rank']) && $lane['rank'] ? '<span class="badge bg-primary">' . (int) $lane['rank'] . '</span>' : '—'; ?>
+                                        <?php echo swimRankBadge(isset($lane['rank']) ? $lane['rank'] : null); ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
