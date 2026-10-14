@@ -22,7 +22,10 @@ Backend API là **repo riêng** (theo ghi nhớ dự án). "API tách theo ngu�
 - **Phương án A — Endpoint chuyên dụng mới** (`/api/schedule/sport`, `/api/schedule/competition`, ...): BE tự join nhiều bảng, trả item đã chuẩn hóa. Response gọn, ít round-trip. **Cần sửa repo backend.**
 - **Phương án B — Tái dùng list endpoint sẵn có**: Model `Schedule` (Yii) gọi các list endpoint hiện có kèm filter param rồi tự join/chuẩn hóa trong PHP. **Không đụng repo backend**, nhưng nhiều round-trip và join phía client (vd: thể thao = lấy team của attendee → lấy match theo team).
 
-→ **Khuyến nghị:** Phương án A cho `sport` + `competition` (join phức tạp), còn `agenda`/`meal`/`banquet` có thể A hoặc B. Plan dưới viết theo **Phương án A**; nếu chọn B thì task "BE endpoint" đổi thành "mở rộng filter cho list endpoint + join trong Model".
+→ **ĐÃ CHỐT: Phương án A** (endpoint chuyên dụng mới) cho cả 5 nguồn.
+- Backend: Laravel 8 (modules nwidart) tại `E:\even_API\MTRegistrationPortal`, DB `lrv_even`, chạy `http://127.0.0.1:8000`.
+- Chạy artisan: `/c/MAMP/bin/php/php8.1.0/php.exe -d extension_dir=/c/MAMP/bin/php/php8.1.0/ext -d extension=pdo_mysql -d extension=mysqli artisan ...`
+- Phase 0 (Task 0.1, 0.2) chỉ đụng repo Yii; backend chỉ cần từ Task 1.1.
 
 ---
 
