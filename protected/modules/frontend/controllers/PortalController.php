@@ -118,6 +118,7 @@ class PortalController extends AttendeePortalController
 
         $this->render('index', array(
             'fullName'     => $this->currentFullName(),
+            'profile'      => $this->loadProfile(),
             'profileModal' => $this->profileModalData(),
         ));
     }

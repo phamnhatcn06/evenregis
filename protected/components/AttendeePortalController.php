@@ -59,6 +59,11 @@ class AttendeePortalController extends CController
         return $this->session()[self::SESSION_EVENT_ID];
     }
 
+    public function currentProfile()
+    {
+        return $this->loadProfile();
+    }
+
     /**
      * Bắt buộc đăng nhập trước khi vào tính năng. Nếu chưa, chuyển về cổng đăng
      * nhập chung kèm URL quay lại.
