@@ -177,6 +177,29 @@ class SportStages extends BaseSportStages
         return self::apiPost($url, $data);
     }
 
+    /**
+     * Cập nhật CẤU TRÚC giai đoạn (tên, loại, thứ tự) — chỉ gửi đúng các trường được truyền vào.
+     *
+     * @param string $id
+     * @param array $fields Một phần của ['name' => , 'stage_type' => , 'stage_order' => ]
+     */
+    public static function updateStructureViaApi($id, $fields)
+    {
+        $model = self::fetchFromApi($id);
+        if ($model === null) {
+            return array('success' => false, 'code' => 404, 'data' => null, 'error' => 'Không tìm thấy giai đoạn.');
+        }
+        // name là trường bắt buộc khi update -> luôn gửi (giữ tên cũ nếu không đổi)
+        $data = array('name' => isset($fields['name']) ? $fields['name'] : $model->name);
+        foreach (array('stage_type', 'stage_order') as $name) {
+            if (isset($fields[$name])) {
+                $data[$name] = $fields[$name];
+            }
+        }
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_STAGE_UPDATE, array('id' => $id));
+        return self::apiPost($url, $data);
+    }
+
     // ===== Bốc thăm =====
 
     public static function drawGroups($stageId)
