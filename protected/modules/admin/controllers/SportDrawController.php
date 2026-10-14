@@ -634,6 +634,66 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Bơi: bốc thăm phân lượt/làn (AJAX).
+     */
+    public function actionDrawSwimHeats($id)
+    {
+        $this->requirePost();
+        $laneCount = (int) Yii::app()->getRequest()->getPost('lane_count', 6);
+        $result = SportStages::drawSwimHeats($id, $laneCount > 0 ? $laneCount : 6);
+        $this->handleDrawResult($result);
+    }
+
+    /**
+     * Bơi: chuyển Top N vòng loại vào chung kết (AJAX).
+     */
+    public function actionPromoteSwim($id)
+    {
+        $this->requirePost();
+        $finalStageId = (int) Yii::app()->getRequest()->getPost('final_stage_id', 0);
+        $topN = (int) Yii::app()->getRequest()->getPost('top_n', 6);
+        if ($finalStageId < 1) {
+            $this->jsonResponse(false, 'Thiếu giai đoạn chung kết đích.');
+        }
+        $result = SportStages::promoteSwimTop($id, $finalStageId, $topN > 0 ? $topN : 6);
+        if ($result['success']) {
+            $this->jsonResponse(true, 'Đã chuyển Top vào chung kết.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể chuyển Top.'));
+    }
+
+    /**
+     * Bơi: màn nhập thành tích theo làn.
+     */
+    public function actionSwimTimes($id)
+    {
+        $model = $this->loadModel($id);
+        $preview = SportStages::fetchDrawPreview($id);
+        $heats = ($preview && isset($preview['swim_heats'])) ? $preview['swim_heats'] : array();
+        $this->render('swimTimes', array(
+            'model' => $model,
+            'heats' => $heats,
+        ));
+    }
+
+    /**
+     * Bơi: lưu thành tích (AJAX). POST times[lane_id] = "mm:ss.xx" đã đổi sang ms ở JS.
+     */
+    public function actionSaveSwimTimes($id)
+    {
+        $this->requirePost();
+        $times = Yii::app()->getRequest()->getPost('times', array());
+        if (!is_array($times)) {
+            $times = array();
+        }
+        $result = SportStages::recordSwimTimes($id, $times);
+        if ($result['success']) {
+            $this->jsonResponse(true, 'Đã lưu thành tích.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể lưu thành tích.'));
+    }
+
+    /**
      * Khoá kết quả bốc thăm (AJAX).
      */
     public function actionLock($id)
