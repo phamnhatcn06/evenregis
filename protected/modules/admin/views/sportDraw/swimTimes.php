@@ -100,9 +100,37 @@ usort($ranking, function ($a, $b) {
     </div>
 <?php else: ?>
     <div class="alert alert-info py-2 small">
-        Nhập thời gian dạng <code>ss.cc</code> (vd <code>30.65</code>) hoặc <code>m:ss.cc</code> (vd <code>1:19.03</code>).
-        Thứ hạng chung cuộc được tính tự động khi lưu.
+        Có thể sửa số làn trực tiếp. Nhập thời gian dạng <code>ss.cc</code> (vd <code>30.65</code>) hoặc
+        <code>m:ss.cc</code> (vd <code>1:19.03</code>). Thứ hạng chung cuộc (gộp các lượt) được tính tự động khi lưu.
     </div>
+
+    <?php if (!empty($ranking)): ?>
+        <div class="card mb-3">
+            <div class="card-header bg-light fw-bold">Bảng xếp hạng chung cuộc</div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-bordered mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:80px;" class="text-center">Hạng</th>
+                            <th>VĐV</th>
+                            <th style="width:110px;" class="text-center">Lượt / Làn</th>
+                            <th style="width:120px;">Thành tích</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($ranking as $row): ?>
+                        <tr>
+                            <td class="text-center"><?php echo swimRankBadge($row['rank']); ?></td>
+                            <td><?php echo CHtml::encode($row['team_name']); ?></td>
+                            <td class="text-center"><?php echo (int) $row['heat_no'] . ' / ' . (int) $row['lane_no']; ?></td>
+                            <td class="font-monospace"><?php echo swimMsToText($row['result_ms']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php endif; ?>
     <div class="row g-3">
         <?php foreach ($heats as $heat): ?>
             <div class="col-12 col-lg-6">
