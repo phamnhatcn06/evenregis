@@ -20,8 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return tpl.replace('__ID__', id);
     }
 
-    function postJson(url, onDone) {
+    function postJson(url, onDone, params) {
         var fd = new FormData();
+        if (params) {
+            Object.keys(params).forEach(function (k) { fd.append(k, params[k]); });
+        }
         fetch(url, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function (res) { return res.json(); })
             .then(onDone)
