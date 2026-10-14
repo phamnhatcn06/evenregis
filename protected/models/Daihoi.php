@@ -106,19 +106,13 @@ class Daihoi
     }
 
     /**
-     * Bảng xếp hạng tạm thời.
+     * Bảng tổng sắp huy chương toàn đoàn (lấy dữ liệu thật từ cơ sở dữ liệu).
+     *
      * @param int $limit
      * @return array
      */
     public static function getRankings($limit = 10)
     {
-        $res = self::unwrap(
-            ApiClient::get(ApiEndpoints::DAIHOI_RANKINGS, array('limit' => $limit)),
-            null
-        );
-        if (is_array($res) && !empty($res)) {
-            return $res;
-        }
         return self::getRankingsFromDb(null, $limit);
     }
 
@@ -512,6 +506,30 @@ class Daihoi
         $matches = Yii::app()->db->createCommand($sqlMatches)
             ->bindValue(':eventId', $eventId)
             ->queryAll();
+        $awardMedal = function($propId, $allianceIds, $medalType) use (&$unitsMap) {
+            $pids = array();
+            if ($propId) {
+                $pids[] = (int)$propId;
+            }
+            if (!empty($allianceIds)) {
+                if (is_string($allianceIds)) {
+                    $decoded = json_decode($allianceIds, true);
+                    if (is_array($decoded)) {
+                        foreach ($decoded as $id) $pids[] = (int)$id;
+                    } else {
+                        foreach (explode(',', $allianceIds) as $id) {
+                            if (is_numeric(trim($id))) $pids[] = (int)trim($id);
+                        }
+                    }
+                }
+            }
+            $pids = array_unique($pids);
+            foreach ($pids as $pid) {
+                if (isset($unitsMap[$pid])) {
+                    $unitsMap[$pid][$medalType]++;
+                }
+            }
+        };
 
         foreach ($matches as $m) {
             $round = mb_strtolower((string)$m['round'], 'UTF-8');
@@ -527,28 +545,24 @@ class Daihoi
             $loserId = ($winnerId == (int)$m['team_a_id']) ? (int)$m['team_b_id'] : (int)$m['team_a_id'];
             $winnerPropId = ($winnerId == (int)$m['team_a_id']) ? (int)$m['team_a_prop_id'] : (int)$m['team_b_prop_id'];
             $loserPropId = ($loserId == (int)$m['team_a_id']) ? (int)$m['team_a_prop_id'] : (int)$m['team_b_prop_id'];
+            $winnerAlliance = ($winnerId == (int)$m['team_a_id']) ? $m['team_a_alliance_ids'] : $m['team_b_alliance_ids'];
+            $loserAlliance = ($loserId == (int)$m['team_a_id']) ? $m['team_a_alliance_ids'] : $m['team_b_alliance_ids'];
 
             $isFinal = ($type === 'final' || strpos($round, 'chung kết') !== false || strpos($round, 'final') !== false)
                 && strpos($round, 'bán kết') === false && strpos($round, 'tứ kết') === false;
             $isPlayoff = ($type === 'playoff' || strpos($round, 'tranh hạng 3') !== false || strpos($round, 'hạng 3') !== false || strpos($round, 'hạng ba') !== false);
 
             if ($isFinal) {
-                if ($winnerPropId && isset($unitsMap[$winnerPropId])) {
-                    $unitsMap[$winnerPropId]['gold']++;
-                }
-                if ($loserPropId && isset($unitsMap[$loserPropId])) {
-                    $unitsMap[$loserPropId]['silver']++;
-                }
+                $awardMedal($winnerPropId, $winnerAlliance, 'gold');
+                $awardMedal($loserPropId, $loserAlliance, 'silver');
             } elseif ($isPlayoff) {
-                if ($winnerPropId && isset($unitsMap[$winnerPropId])) {
-                    $unitsMap[$winnerPropId]['bronze']++;
-                }
+                $awardMedal($winnerPropId, $winnerAlliance, 'bronze');
             }
         }
 
         // 3. Tính huy chương từ bảng xếp hạng vòng tròn Vòng Chung kết (sport_standings)
         $sqlStandings = "
-            SELECT s.rank, s.points, t.property_id
+            SELECT s.rank, s.points, t.property_id, t.alliance_org_ids
             FROM sport_standings s
             JOIN sport_stages st ON st.id = s.stage_id AND st.event_id = :eventId AND st.deleted_at IS NULL
             JOIN sport_teams t ON t.id = s.team_id AND t.deleted_at IS NULL
@@ -562,10 +576,10 @@ class Daihoi
 
         foreach ($standings as $s) {
             $pid = (int)$s['property_id'];
-            if (!$pid || !isset($unitsMap[$pid])) continue;
-            if ((int)$s['rank'] === 1) $unitsMap[$pid]['gold']++;
-            elseif ((int)$s['rank'] === 2) $unitsMap[$pid]['silver']++;
-            elseif ((int)$s['rank'] === 3) $unitsMap[$pid]['bronze']++;
+            $alliance = isset($s['alliance_org_ids']) ? $s['alliance_org_ids'] : null;
+            if ((int)$s['rank'] === 1) $awardMedal($pid, $alliance, 'gold');
+            elseif ((int)$s['rank'] === 2) $awardMedal($pid, $alliance, 'silver');
+            elseif ((int)$s['rank'] === 3) $awardMedal($pid, $alliance, 'bronze');
         }
 
         // 4. Tính huy chương từ sport_stage_teams (nếu có gán final_rank 1, 2, 3)
