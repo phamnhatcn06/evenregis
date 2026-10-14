@@ -79,6 +79,10 @@ class SportStageBackfillCommand extends CConsoleCommand
      */
     protected function pickSpec($spec, $st)
     {
+        // Giai đoạn play-off có cấu hình riêng, không áp spec của vòng chính
+        if (isset($st['stage_type']) && $st['stage_type'] === 'playoff') {
+            return null;
+        }
         // Nội dung 1 giai đoạn
         if (isset($spec['format'])) {
             return array_merge($spec, array('match' => 'single'));
