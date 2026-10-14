@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var lockUrlTpl = cfg.getAttribute('data-lock-url');
     var standingsUrlTpl = cfg.getAttribute('data-standings-url');
     var genkoUrlTpl = cfg.getAttribute('data-generate-knockout-url');
+    var playoffUrlTpl = cfg.getAttribute('data-draw-playoff-url');
+    var promotePlayoffUrlTpl = cfg.getAttribute('data-promote-playoff-url');
 
     var GROUP_FORMATS = ['round_robin', 'round_robin_knockout'];
     var BRACKET_FORMATS = ['single_elimination', 'round_robin_knockout'];
