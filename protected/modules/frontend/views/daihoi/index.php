@@ -777,7 +777,7 @@ if (empty($albumList)) {
         ?>
           <div class="col-12 col-md-4 reveal-on-scroll <?php echo $nDelay; ?>">
             <article class="card h-100 border rounded-3 overflow-hidden shadow-sm card-hover bg-white">
-              <div class="position-relative img-zoom-wrap" style="height:190px;background:#e2e8f0;">
+              <div class="position-relative img-zoom-wrap" style="aspect-ratio:16/9;background:#e2e8f0;">
                 <?php if ($n['thumb']): ?>
                   <img alt="<?php echo $e($n['title']); ?>" class="w-100 h-100 object-fit-cover" src="<?php echo $e($n['thumb']); ?>" onerror="this.style.display='none';">
                 <?php else: ?>
