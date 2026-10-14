@@ -305,10 +305,12 @@ class SportSeedCommand extends CConsoleCommand
             array(
                 'name' => 'Vòng loại (phân lượt)', 'stage_type' => 'qualification', 'stage_order' => 1,
                 'format' => 'heat_lane', 'location' => $loc,
+                'rules' => 'Tính thời gian. Chia 6 làn; mỗi nội dung chia 2 lượt bơi vòng loại.',
             ),
             array(
                 'name' => 'Chung kết (Top 6)', 'stage_type' => 'final', 'stage_order' => 2,
                 'format' => 'heat_lane', 'location' => $loc,
+                'rules' => 'Tính thời gian. Top 6 mỗi nội dung thi cùng 1 lượt tranh 1-2-3-4.',
             ),
         );
     }
