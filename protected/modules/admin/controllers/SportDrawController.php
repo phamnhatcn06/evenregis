@@ -634,6 +634,23 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Chuyển đội đi tiếp của vòng loại chia bảng sang vòng chung kết (AJAX).
+     */
+    public function actionPromoteGroups($id)
+    {
+        $this->requirePost();
+        $targetStageId = (int) Yii::app()->getRequest()->getPost('target_stage_id', 0);
+        if ($targetStageId < 1) {
+            $this->jsonResponse(false, 'Thiếu giai đoạn chung kết đích.');
+        }
+        $result = SportStages::promoteGroupWinners($id, $targetStageId);
+        if ($result['success']) {
+            $this->jsonResponse(true, 'Đã chuyển đội đi tiếp vào vòng chung kết.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể chuyển đội đi tiếp.'));
+    }
+
+    /**
      * Bơi: bốc thăm phân lượt/làn (AJAX).
      */
     public function actionDrawSwimHeats($id)
