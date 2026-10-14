@@ -372,13 +372,30 @@
         var matchItem = btn.closest('[data-match-id]');
         if (!matchItem) return;
 
+        var mId = matchItem.getAttribute('data-match-id') || '';
+        var matchType = matchItem.getAttribute('data-match-type') || 'group';
+        var tAId = matchItem.getAttribute('data-team-a-id') || '';
+        var tBId = matchItem.getAttribute('data-team-b-id') || '';
+
+        // Chặn nhập tỉ số nếu chưa có đội thật trong sơ đồ loại trực tiếp
+        if (btn.classList.contains('btn-quick-result') && matchType !== 'group' && (!tAId || !tBId)) {
+            showToast('Trận đấu này chưa xác định đủ 2 đội tham gia. Vui lòng ghi kết quả vòng bảng và cập nhật danh sách đội trước khi nhập tỉ số!', 'warning');
+            return;
+        }
+
+        // Chặn chỉnh sửa trận ảo / placeholder
+        if (mId.indexOf('ko_') === 0) {
+            showToast('Sơ đồ nhánh đang ở chế độ xem trước khung thi đấu. Nhấn nút "Cập nhật danh sách đội từ BXH" để khởi tạo các trận đấu chính thức!', 'info');
+            return;
+        }
+
         var data = {
-            id: matchItem.getAttribute('data-match-id'),
-            code: matchItem.getAttribute('data-match-code') || matchItem.getAttribute('data-match-id'),
+            id: mId,
+            code: matchItem.getAttribute('data-match-code') || mId,
             round: matchItem.getAttribute('data-round-name') || '',
-            matchType: matchItem.getAttribute('data-match-type') || 'group',
-            teamAId: matchItem.getAttribute('data-team-a-id') || '',
-            teamBId: matchItem.getAttribute('data-team-b-id') || '',
+            matchType: matchType,
+            teamAId: tAId,
+            teamBId: tBId,
             teamAName: matchItem.getAttribute('data-team-a-name') || 'Đội A',
             teamBName: matchItem.getAttribute('data-team-b-name') || 'Đội B',
             scoreA: matchItem.getAttribute('data-score-a'),
@@ -637,13 +654,31 @@
 
             // Re-order tbody and update text
             var tbody = table.querySelector('tbody');
+            var isMedalTable = table.getAttribute('data-is-medal-table') === '1';
+            var advanceCount = parseInt(table.getAttribute('data-advance-count') || '2', 10);
+
             sortedTeams.forEach(function (s, index) {
                 var rank = index + 1;
                 var tr = s.tr;
                 var rankBadge = tr.querySelector('.rank-badge');
                 if (rankBadge) {
                     rankBadge.textContent = rank;
-                    rankBadge.className = 'rank-badge ' + (rank === 1 ? 'rank-gold' : (rank === 2 ? 'rank-silver' : (rank === 3 ? 'rank-bronze' : 'bg-light text-muted')));
+                    if (s.played > 0 && isMedalTable) {
+                        rankBadge.className = 'rank-badge ' + (rank === 1 ? 'rank-gold' : (rank === 2 ? 'rank-silver' : (rank === 3 ? 'rank-bronze' : 'bg-light text-muted')));
+                    } else {
+                        rankBadge.className = 'rank-badge bg-light text-muted';
+                    }
+                }
+
+                // Manage qualification highlight & badge
+                var qualifyBadge = tr.querySelector('.standings-qualify-badge');
+                if (qualifyBadge) {
+                    qualifyBadge.style.display = (s.played > 0 && rank <= advanceCount && !isMedalTable) ? 'inline-block' : 'none';
+                }
+                if (s.played > 0 && rank <= advanceCount && !isMedalTable) {
+                    tr.classList.add('standings-qualify-row');
+                } else {
+                    tr.classList.remove('standings-qualify-row');
                 }
 
                 var tdP = tr.querySelector('.col-played'); if (tdP) tdP.textContent = s.played;
@@ -682,6 +717,78 @@
                     btnRecompute.innerHTML = '<i class="fa fa-refresh me-1"></i>Tính lại BXH';
                     showToast('Lỗi: ' + err.message, 'error');
                 });
+        });
+    }
+
+    // Cập nhật danh sách đội từ BXH các bảng vào Sơ đồ nhánh loại trực tiếp
+    var generateKnockoutUrl = rootEl ? rootEl.getAttribute('data-generate-knockout-url') : '';
+    function handleSyncBracket(btn) {
+        if (!generateKnockoutUrl) return;
+
+        var completedGroupMatches = parseInt(rootEl ? rootEl.getAttribute('data-completed-group-matches') || '0' : '0', 10);
+        var totalGroupMatches = parseInt(rootEl ? rootEl.getAttribute('data-total-group-matches') || '0' : '0', 10);
+
+        var confirmMsg = '';
+        var force = 0;
+
+        if (totalGroupMatches > 0 && completedGroupMatches === 0) {
+            confirmMsg = 'Vòng bảng hiện chưa có trận đấu nào có kết quả (0/' + totalGroupMatches + ' trận).\nBạn có muốn cập nhật sơ đồ loại trực tiếp theo bảng xếp hạng hiện tại không?';
+            force = 1;
+        } else if (totalGroupMatches > 0 && completedGroupMatches < totalGroupMatches) {
+            confirmMsg = 'Vòng bảng mới hoàn thành ' + completedGroupMatches + '/' + totalGroupMatches + ' trận.\nBạn có chắc muốn cập nhật sơ đồ nhánh theo bảng xếp hạng tạm thời hiện tại?';
+            force = 1;
+        } else {
+            confirmMsg = 'Vòng bảng đã hoàn thành ' + completedGroupMatches + '/' + totalGroupMatches + ' trận.\nXác nhận cập nhật danh sách các đội nhất, nhì bảng vào sơ đồ loại trực tiếp?';
+            force = 0;
+        }
+
+        if (!confirm(confirmMsg)) {
+            return;
+        }
+
+        var origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang cập nhật...';
+        }
+
+        var fd = new FormData();
+        fd.append('force', force);
+
+        fetch(generateKnockoutUrl, { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = origHtml;
+                }
+                if (res && res.success) {
+                    showToast(res.message || 'Đã cập nhật danh sách đội vào sơ đồ nhánh thành công!', 'success');
+                    setTimeout(function () { window.location.reload(); }, 600);
+                } else {
+                    showToast(res ? (res.message || 'Lỗi cập nhật nhánh.') : 'Lỗi cập nhật.', 'error');
+                }
+            })
+            .catch(function (err) {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = origHtml;
+                }
+                showToast('Lỗi kết nối: ' + err.message, 'error');
+            });
+    }
+
+    var btnSyncBracket = document.getElementById('btn-sync-bracket-teams');
+    if (btnSyncBracket) {
+        btnSyncBracket.addEventListener('click', function () {
+            handleSyncBracket(btnSyncBracket);
+        });
+    }
+
+    var btnPushToBracket = document.getElementById('btn-push-to-bracket');
+    if (btnPushToBracket) {
+        btnPushToBracket.addEventListener('click', function () {
+            handleSyncBracket(btnPushToBracket);
         });
     }
 

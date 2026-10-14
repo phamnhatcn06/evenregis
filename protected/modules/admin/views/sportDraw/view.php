@@ -150,6 +150,14 @@ if ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT && empty($rounds
     $thirdPlace = $mThird;
 }
 
+if ($finalMatch) {
+    $fRes = $finalMatch['result'] ?? null;
+    if ($fRes && !empty($fRes['winner_team_id'])) {
+        $championTeamId = $fRes['winner_team_id'];
+        $championTeamName = $teamMap[$championTeamId] ?? ('#' . $championTeamId);
+    }
+}
+
 // Match lookup & Feeder hierarchy mapping
 $matchMap = array();
 $feedersOf = array();
@@ -172,11 +180,13 @@ foreach ($allActiveMatches as $m) {
 
 /**
  * Tên đội hoặc nguồn chờ thông minh
- * Lưu ý: Khi chưa có kết quả vòng bảng (completedGroupMatches == 0) ở thể thức round_robin_knockout,
- * các slot vòng 1 của knockout chưa được điền đội thật mà hiển thị nguồn chờ: Nhất Bảng A, Nhì Bảng B...
+ * Khi chưa có kết quả vòng bảng (completedGroupMatches == 0) ở thể thức round_robin_knockout,
+ * các slot knockout KHÔNG điền đội thật mà hiển thị nguồn chờ: Nhất Bảng A, Nhì Bảng B...
  */
 $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($teamMap, $feedersOf, $loserFeedersOf, $completedGroupMatches, $model) {
-    $isKnockoutRound1 = (($match['match_type'] ?? '') === 'knockout' && (int)($match['round_no'] ?? 1) === 1);
+    $matchType = $match['match_type'] ?? '';
+    $roundNo = (int)($match['round_no'] ?? 1);
+    $isKnockoutRound1 = ($matchType === 'knockout' && $roundNo === 1);
     $isRoundRobinKnockout = ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT);
 
     // Xác định nguồn mặc định theo nhánh chéo
@@ -195,9 +205,19 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
 
     $sourceLabel = !empty($explicitSource) ? $explicitSource : $defaultSource;
 
-    // Chưa có dữ liệu gì ở vòng bảng thì Sơ đồ loại trực tiếp chưa điền đội!
-    if ($isRoundRobinKnockout && $isKnockoutRound1 && $completedGroupMatches === 0) {
-        return array('name' => !empty($sourceLabel) ? $sourceLabel : 'Chờ xác định', 'isTeam' => false, 'source' => $sourceLabel);
+    // Chưa có dữ liệu gì ở vòng bảng thì toàn bộ Sơ đồ loại trực tiếp chưa điền đội!
+    if ($isRoundRobinKnockout && $completedGroupMatches === 0) {
+        if ($isKnockoutRound1) {
+            return array('name' => !empty($sourceLabel) ? $sourceLabel : 'Chờ xác định', 'isTeam' => false, 'source' => $sourceLabel);
+        }
+        if ($matchType === 'playoff') {
+            $pSource = ($slotIndex === 0) ? 'Thua Bán kết 1' : 'Thua Bán kết 2';
+            return array('name' => !empty($explicitSource) ? $explicitSource : $pSource, 'isTeam' => false, 'source' => $pSource);
+        }
+        if ($matchType === 'final' || $roundNo > 1) {
+            $fSource = ($slotIndex === 0) ? 'Thắng Bán kết 1' : 'Thắng Bán kết 2';
+            return array('name' => !empty($explicitSource) ? $explicitSource : $fSource, 'isTeam' => false, 'source' => $fSource);
+        }
     }
 
     // Đã có đội hợp lệ
@@ -211,8 +231,7 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
     }
 
     // Dò tìm từ nhánh vòng trước
-    $isPlayoff = (($match['match_type'] ?? '') === 'playoff');
-    if ($isPlayoff && !empty($loserFeedersOf[$match['id']][$slotIndex])) {
+    if ($matchType === 'playoff' && !empty($loserFeedersOf[$match['id']][$slotIndex])) {
         $f = $loserFeedersOf[$match['id']][$slotIndex];
         return array('name' => 'Thua ' . ($f['round'] ?? 'Trận') . ' ' . ($f['bracket_pos'] ?? ''), 'isTeam' => false);
     }
@@ -281,42 +300,6 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
         </div>
 
         <?php
-        // =========================================================================
-        // PHÂN LOẠI TRẬN ĐẤU: VÒNG BẢNG VÀ VÒNG LOẠI TRỰC TIẾP
-        // =========================================================================
-        $groupMatches = array();
-        $koMatches = array();
-        $rounds = array();
-        $thirdPlace = null;
-        $finalMatch = null;
-        $championTeamId = null;
-        $championTeamName = null;
-
-        foreach ($matches as $m) {
-            $type = $m['match_type'] ?? '';
-            if ($type === 'group') {
-                $groupMatches[$m['group_label'] ?? '?'][] = $m;
-            } elseif ($type === 'playoff') {
-                $thirdPlace = $m;
-            } else {
-                if ($type === 'final') {
-                    $finalMatch = $m;
-                }
-                $rounds[$m['round_no']][] = $m;
-                $koMatches[] = $m;
-            }
-        }
-        ksort($groupMatches);
-        ksort($rounds);
-
-        if ($finalMatch) {
-            $fRes = $finalMatch['result'] ?? null;
-            if ($fRes && !empty($fRes['winner_team_id'])) {
-                $championTeamId = $fRes['winner_team_id'];
-                $championTeamName = $teamMap[$championTeamId] ?? ('#' . $championTeamId);
-            }
-        }
-
         // Nhóm đội theo bảng
         $groups = array();
         foreach ($teams as $t) {
@@ -416,42 +399,47 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
         $advancePerGroup = (int) ($model->advance_per_group ?: 2);
         ?>
 
-        <!-- 2. BẢNG XẾP HẠNG TỪNG BẢNG -->
         <!-- 2. BẢNG XẾP HẠNG TỪNG BẢNG (GROUP STANDINGS) -->
         <?php if (!empty($standingsByGroup)): ?>
             <?php
             $isFinalStage = (isset($model->stage_type) && $model->stage_type === 'final');
             $groupCount = count($standingsByGroup);
             $groupColClass = ($groupCount === 1) ? 'col-lg-8 mx-auto mb-3' : 'col-lg-6 mb-3';
+            $isPureRoundRobinFinal = ($isFinalStage && $groupCount === 1 && empty($rounds) && $model->format === SportStages::FORMAT_ROUND_ROBIN);
             ?>
-            <div class="card mb-4 border-0 shadow-sm <?php echo $isFinalStage ? 'border-top border-4 border-warning' : ''; ?>">
+            <div class="card mb-4 border-0 shadow-sm <?php echo $isPureRoundRobinFinal ? 'border-top border-4 border-warning' : ''; ?>">
                 <div class="card-header bg-white border-bottom py-3">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                         <div>
                             <h5 class="mb-0 fw-bold text-dark">
-                                <?php if ($isFinalStage): ?>
+                                <?php if ($isPureRoundRobinFinal): ?>
                                     <i class="fa fa-trophy text-warning me-2"></i>Bảng xếp hạng Vòng chung kết (Tranh Huy chương Vàng • Bạc • Đồng)
                                 <?php else: ?>
-                                    <i class="fa fa-list-ol text-success me-2"></i>Bảng xếp hạng từng bảng
+                                    <i class="fa fa-list-ol text-primary me-2"></i>Bảng xếp hạng từng bảng
                                 <?php endif; ?>
                             </h5>
                             <small class="text-muted">
-                                <?php if ($isFinalStage): ?>
-                                    Kết quả thi đấu vòng tròn xếp hạng: 🥇 Nhất (HCV) • 🥈 Nhì (HCB) • 🥉 Ba (HCĐ)
+                                <?php if ($isPureRoundRobinFinal): ?>
+                                    <?php echo $hasGroupResults ? 'Kết quả thi đấu vòng tròn xếp hạng: 🥇 Nhất (HCV) • 🥈 Nhì (HCB) • 🥉 Ba (HCĐ)' : 'Chưa có kết quả thi đấu vòng chung kết'; ?>
                                 <?php else: ?>
-                                    Cập nhật điểm số, hiệu số và thứ hạng trực tiếp theo kết quả các trận đấu
+                                    Cập nhật điểm số, hiệu số và thứ hạng của các đội sau mỗi trận đấu vòng bảng
                                 <?php endif; ?>
                             </small>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <?php if ($isFinalStage): ?>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <?php if ($isPureRoundRobinFinal): ?>
                                 <span class="badge bg-warning text-dark border">
                                     <i class="fa fa-trophy me-1"></i>Tranh Huy chương 1 - 2 - 3
                                 </span>
                             <?php else: ?>
                                 <span class="badge bg-light text-muted border">
-                                    Top <?php echo $advancePerGroup; ?> đội đầu bảng vào vòng trong
+                                    Top <?php echo $advancePerGroup; ?> đội mỗi bảng vào vòng trong
                                 </span>
+                            <?php endif; ?>
+                            <?php if ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT): ?>
+                                <button type="button" class="btn btn-sm btn-primary shadow-sm" id="btn-push-to-bracket" title="Cập nhật các đội xếp đầu bảng vào Sơ đồ loại trực tiếp">
+                                    <i class="fa fa-refresh me-1"></i>Cập nhật vào Sơ đồ nhánh
+                                </button>
                             <?php endif; ?>
                             <button type="button" class="btn btn-sm btn-outline-success" id="btn-recompute-standings" title="Tính lại BXH qua API">
                                 <i class="fa fa-refresh me-1"></i>Tính lại BXH
@@ -464,10 +452,10 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                     <div class="row">
                         <?php foreach ($standingsByGroup as $label => $rows): ?>
                             <div class="<?php echo $groupColClass; ?>">
-                                <div class="sportdraw-table-card h-100 <?php echo $isFinalStage ? 'shadow-sm' : ''; ?>">
-                                    <div class="sportdraw-table-header <?php echo $isFinalStage ? 'bg-light' : ''; ?>">
+                                <div class="sportdraw-table-card h-100 <?php echo $isPureRoundRobinFinal ? 'shadow-sm' : ''; ?>">
+                                    <div class="sportdraw-table-header <?php echo $isPureRoundRobinFinal ? 'bg-light' : ''; ?>">
                                         <span class="fw-bold fs-6 text-dark">
-                                            <?php if ($isFinalStage && $groupCount === 1): ?>
+                                            <?php if ($isPureRoundRobinFinal): ?>
                                                 <i class="fa fa-trophy text-warning me-2"></i>Bảng Chung kết
                                             <?php else: ?>
                                                 <i class="fa fa-flag text-primary me-2"></i>Bảng <?php echo CHtml::encode($label); ?>
@@ -477,7 +465,9 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                     </div>
                                     <div class="table-responsive mb-0">
                                         <table class="table table-hover align-middle mb-0 text-center group-standings-table"
-                                               data-group-label="<?php echo CHtml::encode($label); ?>">
+                                               data-group-label="<?php echo CHtml::encode($label); ?>"
+                                               data-is-medal-table="<?php echo $isPureRoundRobinFinal ? '1' : '0'; ?>"
+                                               data-advance-count="<?php echo (int) $advancePerGroup; ?>">
                                             <thead class="table-light">
                                                 <tr>
                                                     <th style="width: 44px;">#</th>
@@ -494,12 +484,16 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                             <?php foreach ($rows as $r): ?>
                                                 <?php
                                                 $rank = (int)$r['rank'];
-                                                $rankClass = ($rank === 1) ? 'rank-gold' : (($rank === 2) ? 'rank-silver' : (($rank === 3) ? 'rank-bronze' : 'bg-light text-muted'));
+                                                $played = (int)$r['played'];
+                                                $hasPlayed = ($played > 0);
+                                                $rankClass = ($hasPlayed && $isPureRoundRobinFinal)
+                                                    ? (($rank === 1) ? 'rank-gold' : (($rank === 2) ? 'rank-silver' : (($rank === 3) ? 'rank-bronze' : 'bg-light text-muted')))
+                                                    : 'bg-light text-muted';
                                                 $tName = $teamMap[$r['team_id']] ?? ($r['team_name'] ?? ('#' . $r['team_id']));
-                                                $isQualified = ($rank <= $advancePerGroup);
+                                                $isQualified = ($hasPlayed && $rank <= $advancePerGroup);
                                                 ?>
                                                 <tr data-team-id="<?php echo CHtml::encode($r['team_id']); ?>"
-                                                    class="<?php echo (!$isFinalStage && $isQualified) ? 'standings-qualify-row' : ''; ?>">
+                                                    class="<?php echo (!$isPureRoundRobinFinal && $isQualified) ? 'standings-qualify-row' : ''; ?>">
                                                     <td>
                                                         <span class="rank-badge <?php echo $rankClass; ?>">
                                                             <?php echo $rank; ?>
@@ -508,7 +502,7 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                                     <td class="text-start fw-semibold text-dark">
                                                         <div class="d-flex align-items-center gap-2">
                                                             <span><?php echo CHtml::encode($tName); ?></span>
-                                                            <?php if ($isFinalStage): ?>
+                                                            <?php if ($isPureRoundRobinFinal && $hasPlayed): ?>
                                                                 <?php if ($rank === 1): ?>
                                                                     <span class="badge bg-warning text-dark fw-bold"><i class="fa fa-trophy me-1"></i>HCV (Nhất)</span>
                                                                 <?php elseif ($rank === 2): ?>
@@ -516,12 +510,12 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                                                 <?php elseif ($rank === 3): ?>
                                                                     <span class="badge text-white fw-bold" style="background:#cd7f32;"><i class="fa fa-star-half-o me-1"></i>HCĐ (Ba)</span>
                                                                 <?php endif; ?>
-                                                            <?php elseif ($isQualified): ?>
+                                                            <?php elseif (!$isPureRoundRobinFinal && $isQualified): ?>
                                                                 <span class="standings-qualify-badge" title="Đủ điều kiện vào vòng loại trực tiếp">Vào vòng trong</span>
                                                             <?php endif; ?>
                                                         </div>
                                                     </td>
-                                                    <td class="col-played"><?php echo (int) $r['played']; ?></td>
+                                                    <td class="col-played"><?php echo $played; ?></td>
                                                     <td class="col-won text-success fw-bold"><?php echo (int) $r['won']; ?></td>
                                                     <td class="col-drawn"><?php echo (int) $r['drawn']; ?></td>
                                                     <td class="col-lost text-danger"><?php echo (int) $r['lost']; ?></td>
@@ -693,11 +687,26 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                             <small class="text-muted">Nhấn vào từng trận trên sơ đồ để ghi kết quả hoặc đặt giờ thi đấu</small>
                         </div>
 
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <?php if ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT): ?>
+                                <button type="button" class="btn btn-sm btn-primary shadow-sm" id="btn-sync-bracket-teams"
+                                        title="Cập nhật danh sách đội từ BXH các bảng vào sơ đồ loại trực tiếp">
+                                    <i class="fa fa-refresh me-1"></i>Cập nhật danh sách đội từ BXH
+                                </button>
+                            <?php endif; ?>
                             <span class="badge bg-light text-muted border">Kéo rê để di chuyển vùng nhìn</span>
                         </div>
                     </div>
                 </div>
+
+                <?php if ($model->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT && $completedGroupMatches === 0): ?>
+                    <div class="alert alert-info py-2 px-3 mb-0 border-0 rounded-0 d-flex align-items-center justify-content-between gap-2" style="background: #eff6ff; font-size: 0.825rem;">
+                        <div>
+                            <i class="fa fa-info-circle text-primary me-1"></i>
+                            <strong>Chế độ xem trước nhánh thi đấu:</strong> Các nhánh Bán kết đang hiển thị nguồn chờ (<em>Nhất Bảng A vs Nhì Bảng B</em>, <em>Nhất Bảng B vs Nhì Bảng A</em>). Sau khi có kết quả thi đấu vòng bảng, nhấn nút <strong>"Cập nhật danh sách đội từ BXH"</strong> để tự động điền các đội vào sơ đồ.
+                        </div>
+                    </div>
+                <?php endif; ?>
 
                 <!-- Toolbar điều khiển sơ đồ -->
                 <div class="bracket-toolbar">
@@ -883,7 +892,9 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                                             <i class="fa fa-trophy winner-crown-icon" title="Thắng"></i>
                                                         <?php endif; ?>
                                                     <?php else: ?>
-                                                        <span class="team-source-hint"><?php echo CHtml::encode($slotA['name']); ?></span>
+                                                        <span class="team-source-hint text-primary fw-semibold" title="<?php echo CHtml::encode($slotA['name']); ?>">
+                                                            <i class="fa fa-clock-o text-muted me-1"></i><?php echo CHtml::encode($slotA['name']); ?>
+                                                        </span>
                                                     <?php endif; ?>
                                                 </div>
                                                 <span class="team-score-box">
@@ -906,7 +917,9 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                                             <i class="fa fa-trophy winner-crown-icon" title="Thắng"></i>
                                                         <?php endif; ?>
                                                     <?php else: ?>
-                                                        <span class="team-source-hint"><?php echo CHtml::encode($slotB['name']); ?></span>
+                                                        <span class="team-source-hint text-primary fw-semibold" title="<?php echo CHtml::encode($slotB['name']); ?>">
+                                                            <i class="fa fa-clock-o text-muted me-1"></i><?php echo CHtml::encode($slotB['name']); ?>
+                                                        </span>
                                                     <?php endif; ?>
                                                 </div>
                                                 <span class="team-score-box">
@@ -1022,7 +1035,9 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                         <span class="badge bg-warning text-dark ms-1">Huy chương Đồng</span>
                                     <?php endif; ?>
                                 <?php else: ?>
-                                    <span class="team-source-hint"><?php echo CHtml::encode($tpSlotA['name']); ?></span>
+                                    <span class="team-source-hint text-primary fw-semibold" title="<?php echo CHtml::encode($tpSlotA['name']); ?>">
+                                        <i class="fa fa-clock-o text-muted me-1"></i><?php echo CHtml::encode($tpSlotA['name']); ?>
+                                    </span>
                                 <?php endif; ?>
                             </div>
                             <span class="team-score-box">
@@ -1039,7 +1054,9 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                         <span class="badge bg-warning text-dark ms-1">Huy chương Đồng</span>
                                     <?php endif; ?>
                                 <?php else: ?>
-                                    <span class="team-source-hint"><?php echo CHtml::encode($tpSlotB['name']); ?></span>
+                                    <span class="team-source-hint text-primary fw-semibold" title="<?php echo CHtml::encode($tpSlotB['name']); ?>">
+                                        <i class="fa fa-clock-o text-muted me-1"></i><?php echo CHtml::encode($tpSlotB['name']); ?>
+                                    </span>
                                 <?php endif; ?>
                             </div>
                             <span class="team-score-box">
