@@ -137,11 +137,14 @@ class BinhchonController extends CController
      * Lấy danh sách thí sinh chung kết (chuẩn hoá field cho view).
      * Nếu backend chưa có dữ liệu → dùng danh sách demo để xem thử giao diện.
      */
-    protected function loadFinalists($contestId)
+    protected function loadVotePageData($contestId)
     {
+        $gate = array('is_open' => true, 'message' => '');
         $raw = array();
         try {
-            $raw = BeautyVotes::getFinalistsForVote($contestId);
+            $pageData = BeautyVotes::getVotePageData($contestId);
+            $raw = $pageData['finalists'];
+            $gate = $pageData['gate'];
         } catch (Exception $e) {
             $raw = array();
         }
