@@ -197,12 +197,12 @@ class SportStageBackfillCommand extends CConsoleCommand
             'Cầu lông đôi nam - nữ' => array(
                 'qualification' => array(
                     'format' => 'round_robin', 'num_groups' => 3, 'teams_per_group' => 3, 'advance_per_group' => 1,
-                    'rules' => '1 hiệp chạm 21đ. Bốc thăm 3 bảng đấu vòng tròn, chọn Nhất mỗi bảng.',
-                ),
+                    'rules' => '1 hiệp chạm 21đ. Bốc thăm 3 bảng đấu vòng tròn, xếp theo số trận thắng (bằng nhau xét hiệu số ván → hiệu số điểm), chọn Nhất mỗi bảng.',
+                ) + $winsOnly,
                 'final' => array(
                     'format' => 'round_robin', 'num_groups' => 1, 'teams_per_group' => 3, 'advance_per_group' => 3,
-                    'rules' => '1 hiệp chạm 21đ. Nhất 3 bảng vào đấu vòng tròn tranh 1-2-3.',
-                ),
+                    'rules' => '1 hiệp chạm 21đ. Nhất 3 bảng vào đấu vòng tròn tranh 1-2-3, xếp theo số trận thắng.',
+                ) + $winsOnly,
             ),
 
             // Pickleball — loại trực tiếp
