@@ -10,7 +10,7 @@ Spec: `docs/specs/portal-personal-schedule.md` · Plan: `tasks/portal-personal-s
 
 ## Phase 1: Nguồn dữ liệu (vertical slices)
 - [x] 1.1 Nguồn Thể thao — BE `/api/schedule/sport` (Sport module) + `Schedule::getSportItems` + ApiEndpoints; verified HTTP + giờ VN round-trip
-- [ ] 1.2 Nguồn Thi nghiệp vụ (+ số báo danh)
+- [x] 1.2 Nguồn Thi nghiệp vụ — BE `/api/schedule/competition` (Competition module) + `Schedule::getCompetitionItems`; verified HTTP. competitions KHÔNG có event_id (scope theo attendee); không lọc status (chỉ non-deleted); SBD rỗng → subtitle rỗng
 - [ ] 1.3 Nguồn Agenda chung (is_public=1)
 - [ ] 1.4 Nguồn Bữa ăn (+ cờ "Đã báo cắt")
 - [ ] 1.5 Nguồn Tiệc
