@@ -146,6 +146,7 @@ class NewsController extends AdminController
 	public function actionAdmin()
 	{
 		$model = new News('search');
+		$model->unsetAttributes();
 
 		if (isset($_GET['News'])) {
 			$model->setAttributes($_GET['News']);
