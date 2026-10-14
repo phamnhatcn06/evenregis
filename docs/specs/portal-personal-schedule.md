@@ -119,10 +119,10 @@ Hiển thị toàn bộ item lịch của attendee, nhóm theo ngày, sắp xế
 - Giờ VN cố định Asia/Ho_Chi_Minh.
 - Truy cập dữ liệu qua Model → ApiClient → ApiEndpoints.
 
-### Ask First
-- Bữa ăn đã báo cắt: ẩn hẳn hay chỉ đánh dấu?
-- Có gộp cả tiệc + bữa ăn vào cùng timeline hay tách tab?
-- Endpoint gộp 1 request hay tách theo nguồn?
+### Quyết định đã chốt
+- Bữa ăn đã báo cắt (`meal_cutoffs`) → **đánh dấu "Đã báo cắt"** (vẫn hiển thị, không ẩn).
+- **Gộp tất cả nguồn vào MỘT timeline** chung (không tách tab).
+- API **tách theo nguồn** (mỗi nguồn 1 endpoint); Model `Schedule` gọi song song các nguồn rồi merge + sort ở tầng Model (BE), view nhận 1 cấu trúc đã gộp.
 
 ### Never Do
 - Không dùng ID nội bộ trong URL public.
