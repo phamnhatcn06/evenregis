@@ -93,6 +93,11 @@ class SportStageSetupCommand extends CConsoleCommand
 
             if ($newStage) {
                 echo "  [CO SAN] {$newStage->name} (id={$newStage->id})\n";
+                $this->ensureMain($newStage, array(
+                    'name' => $cfg['new']['name'],
+                    'stage_type' => $cfg['new']['stage_type'],
+                    'stage_order' => $cfg['new']['stage_order'],
+                ), $commit);
             } else {
                 $this->createNew($eventId, $main->sport_id, $cfg['new'], $commit);
             }
