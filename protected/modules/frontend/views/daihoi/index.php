@@ -453,11 +453,14 @@ if (empty($albumList)) {
           foreach ($contents as $c) {
             if ($i >= 6) break;
             $t = $cardThemes[$i % count($cardThemes)];
+            $cardTitle = $val($c, array('name', 'title'), '');
+            $cardTag = $val($c, array('type_label', 'category'), $t['tag']);
             $cards[] = array(
               'theme' => $t,
-              'title' => $val($c, array('name', 'title'), ''),
+              'title' => $cardTitle,
               'desc' => $val($c, array('description', 'summary', 'short_description'), ''),
-              'tag' => $val($c, array('type_label', 'category'), $t['tag']),
+              'tag' => $cardTag,
+              'needle' => $cardTitle . ' ' . $cardTag . ' ' . $val($c, array('type', 'slug', 'category'), ''),
             );
             $i++;
           }
