@@ -160,7 +160,7 @@ class SportStages extends BaseSportStages
             'advance_per_group' => $this->advance_per_group !== '' ? $this->advance_per_group : null,
             'bracket_size' => $this->bracket_size !== '' ? $this->bracket_size : null,
         );
-        foreach (array('win_points', 'draw_points', 'loss_points', 'tiebreak', 'ko_pairing', 'stage_order') as $name) {
+        foreach (array('win_points', 'draw_points', 'loss_points', 'tiebreak', 'ko_pairing', 'stage_order', 'stage_type') as $name) {
             if ($this->$name !== null && $this->$name !== '') {
                 $data[$name] = $this->$name;
             }
