@@ -368,6 +368,75 @@ $sportThemes = array(
 
 
     <!-- =====================================================================
+         2.5 THỂ LỆ THI ĐẤU CÁC NỘI DUNG (thu gọn)
+         ===================================================================== -->
+    <?php
+    // Chỉ lấy các bộ môn có ít nhất một giai đoạn khai báo thể lệ
+    $sportsWithRules = array();
+    foreach ($sportsList as $sp) {
+        if (empty($sp['stages'])) {
+            continue;
+        }
+        foreach ($sp['stages'] as $st) {
+            if (!empty($st['rules'])) {
+                $sportsWithRules[] = $sp;
+                break;
+            }
+        }
+    }
+    ?>
+    <?php if (!empty($sportsWithRules)): ?>
+      <section class="mb-4" id="rules-section">
+        <details class="rules-accordion bg-white rounded-4 shadow-sm border border-slate-200 overflow-hidden">
+          <summary class="d-flex align-items-center justify-content-between gap-2 p-3 p-md-4 fw-bold text-dark"
+                   style="cursor:pointer; list-style:none;">
+            <span class="d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined text-primary">gavel</span>
+              Thể lệ &amp; cách thức thi đấu từng nội dung
+            </span>
+            <span class="material-symbols-outlined text-muted rules-chevron">expand_more</span>
+          </summary>
+          <div class="px-3 px-md-4 pb-4 pt-0">
+            <div class="row g-3">
+              <?php foreach ($sportsWithRules as $sp): ?>
+                <div class="col-12 col-lg-6">
+                  <div class="h-100 border rounded-4 p-3 bg-slate-50">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <span class="material-symbols-outlined text-primary"><?php echo $e(isset($sp['icon']) ? $sp['icon'] : 'emoji_events'); ?></span>
+                      <span class="fw-bold text-dark"><?php echo $e($sp['name']); ?></span>
+                    </div>
+                    <?php foreach ($sp['stages'] as $st): ?>
+                      <?php if (empty($st['rules']) && empty($st['format'])) continue; ?>
+                      <div class="mb-2 ps-1 border-start border-3 border-primary-subtle">
+                        <div class="d-flex flex-wrap align-items-center gap-2 ms-2">
+                          <span class="small fw-semibold text-dark"><?php echo $e($st['name']); ?></span>
+                          <?php if (!empty($st['format'])): ?>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0" style="font-size:10.5px;">
+                              <?php echo $e(SportStages::getFormatLabel($st['format'])); ?>
+                            </span>
+                          <?php endif; ?>
+                          <?php if (!empty($st['location'])): ?>
+                            <span class="text-muted" style="font-size:10.5px;">📍 <?php echo $e($st['location']); ?></span>
+                          <?php endif; ?>
+                        </div>
+                        <?php if (!empty($st['rules'])): ?>
+                          <div class="small text-muted ms-2 mt-1" style="font-size:12px; line-height:1.45;">
+                            <?php echo $e($st['rules']); ?>
+                          </div>
+                        <?php endif; ?>
+                      </div>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        </details>
+      </section>
+    <?php endif; ?>
+
+
+    <!-- =====================================================================
          3. KHỐI TRẬN ĐẤU ĐANG DIỄN RA (LIVE MATCHES SHOWCASE)
          ===================================================================== -->
     <?php if (!empty($tournament['liveMatches'])): ?>
