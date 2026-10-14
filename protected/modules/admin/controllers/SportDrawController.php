@@ -667,7 +667,10 @@ class SportDrawController extends AdminController
      */
     public function actionSwimTimes($id)
     {
-        $model = $this->loadModel($id);
+        $model = SportStages::fetchFromApi($id);
+        if ($model === null) {
+            throw new CHttpException(404, 'Không tìm thấy giai đoạn.');
+        }
         $preview = SportStages::fetchDrawPreview($id);
         $heats = ($preview && isset($preview['swim_heats'])) ? $preview['swim_heats'] : array();
         $this->render('swimTimes', array(
