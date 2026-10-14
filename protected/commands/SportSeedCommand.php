@@ -14,6 +14,7 @@
  *   php protected/yiic sportseed --eventId=5              # DRY-RUN: chỉ in kế hoạch, không ghi
  *   php protected/yiic sportseed --eventId=5 --commit=1   # Thực thi tạo qua API
  *   php protected/yiic sportseed --eventId=5 --commit=1 --stagesOnly=1  # Chỉ seed stages
+ *   php protected/yiic sportseed --eventId=5 --commit=1 --force=1       # Backfill thể lệ/cấu hình vào stage đã có
  */
 class SportSeedCommand extends CConsoleCommand
 {
