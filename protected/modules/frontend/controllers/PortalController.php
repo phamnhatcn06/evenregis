@@ -123,6 +123,24 @@ class PortalController extends AttendeePortalController
     }
 
     /**
+     * Lịch trình cá nhân: timeline gộp các hoạt động liên quan tới người đang đăng
+     * nhập (thể thao, thi nghiệp vụ, agenda, bữa ăn, tiệc) + thẻ "Sự kiện tiếp theo".
+     * Dữ liệu lấy qua Model Schedule (giờ Việt Nam cố định).
+     */
+    public function actionSchedule()
+    {
+        $this->requireLogin();
+        $this->layout = '//layouts/portal';
+
+        $timeline = Schedule::getForAttendee($this->currentAttendeeId(), $this->currentEventId());
+
+        $this->render('schedule', array(
+            'fullName' => $this->currentFullName(),
+            'timeline' => $timeline,
+        ));
+    }
+
+    /**
      * Lưu năm sinh + giới tính từ popup hồ sơ (AJAX). Lưu thành công mới đánh dấu đã xác
      * nhận trong phiên, mở khóa các chức năng đăng ký. Trả JSON {success, message}.
      */
