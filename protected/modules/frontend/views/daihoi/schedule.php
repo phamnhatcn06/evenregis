@@ -1067,6 +1067,13 @@ $sportThemes = array(
      STYLE TÙY BIẾN CHO GIAO DIỆN THỂ THAO THÂN THIỆN
      ===================================================================== -->
 <style>
+/* Thể lệ accordion */
+.rules-accordion > summary { list-style: none; }
+.rules-accordion > summary::-webkit-details-marker { display: none; }
+.rules-accordion > summary:hover { background-color: #f8fafc; }
+.rules-accordion[open] .rules-chevron { transform: rotate(180deg); }
+.rules-chevron { transition: transform .2s ease; }
+
 /* Design tokens */
 .bg-slate-50 { background-color: #f8fafc !important; }
 .bg-emerald { color: #10b981 !important; }
