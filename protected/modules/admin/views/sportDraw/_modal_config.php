@@ -41,6 +41,39 @@
                         </div>
                     </div>
 
+                    <div class="cfg-group-fields d-none mt-3">
+                        <label class="form-label fw-semibold">Cách tính điểm vòng bảng</label>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <label class="form-label small text-muted mb-1">Thắng</label>
+                                <input type="number" min="0" max="10" class="form-control" name="SportStages[win_points]" id="cfg-win-points">
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label small text-muted mb-1">Hoà</label>
+                                <input type="number" min="0" max="10" class="form-control" name="SportStages[draw_points]" id="cfg-draw-points">
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label small text-muted mb-1">Thua</label>
+                                <input type="number" min="0" max="10" class="form-control" name="SportStages[loss_points]" id="cfg-loss-points">
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <label class="form-label small text-muted mb-1">Tiêu chí phụ khi bằng điểm</label>
+                            <?php echo CHtml::dropDownList('SportStages[tiebreak]', '', SportStages::getTiebreakOptions(), array(
+                                'class' => 'form-select',
+                                'id' => 'cfg-tiebreak',
+                            )); ?>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 cfg-pairing-fields d-none">
+                        <label class="form-label">Cách ghép đội từ bảng vào loại trực tiếp</label>
+                        <?php echo CHtml::dropDownList('SportStages[ko_pairing]', '', SportStages::getPairingOptions(), array(
+                            'class' => 'form-select',
+                            'id' => 'cfg-ko-pairing',
+                        )); ?>
+                    </div>
+
                     <div class="mb-3 cfg-bracket-fields d-none mt-3">
                         <label class="form-label">Kích thước nhánh loại trực tiếp</label>
                         <?php echo CHtml::dropDownList('SportStages[bracket_size]', '', array(
