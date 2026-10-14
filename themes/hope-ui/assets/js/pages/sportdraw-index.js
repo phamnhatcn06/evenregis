@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var promotePlayoffUrlTpl = cfg.getAttribute('data-promote-playoff-url');
     var swimDrawUrlTpl = cfg.getAttribute('data-draw-swim-url');
     var promoteSwimUrlTpl = cfg.getAttribute('data-promote-swim-url');
+    var promoteGroupsUrlTpl = cfg.getAttribute('data-promote-groups-url');
 
     var GROUP_FORMATS = ['round_robin', 'round_robin_knockout'];
     var BRACKET_FORMATS = ['single_elimination', 'round_robin_knockout'];
