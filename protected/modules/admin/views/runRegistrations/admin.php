@@ -97,8 +97,10 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
          data-change-url="<?php echo $this->createUrl('changeContent'); ?>"></div>
     <?php $this->renderPartial('_modal_manual_assign', array('runEventList' => $runEventList)); ?>
     <?php
+    $manualAssignJs = '/assets/js/pages/runregistrations-manual-assign.js';
+    $manualAssignVer = @filemtime(Yii::app()->theme->basePath . $manualAssignJs);
     Yii::app()->clientScript->registerScriptFile(
-        Yii::app()->theme->baseUrl . '/assets/js/pages/runregistrations-manual-assign.js',
+        Yii::app()->theme->baseUrl . $manualAssignJs . ($manualAssignVer ? '?v=' . $manualAssignVer : ''),
         CClientScript::POS_END
     );
     ?>
