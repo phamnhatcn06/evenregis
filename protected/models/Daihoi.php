@@ -17,6 +17,25 @@ class Daihoi
      * @param mixed $default Giá trị mặc định khi lỗi/không có dữ liệu
      * @return mixed
      */
+    /**
+     * Kiểm tra một cột có tồn tại trong bảng không (cache theo request).
+     * Dùng để tương thích khi DB prod chưa chạy migration thêm cột.
+     */
+    private static function columnExists($table, $column)
+    {
+        static $cache = array();
+        $key = $table . '.' . $column;
+        if (!isset($cache[$key])) {
+            try {
+                $schema = Yii::app()->db->getSchema()->getTable($table);
+                $cache[$key] = ($schema !== null && isset($schema->columns[$column]));
+            } catch (Exception $e) {
+                $cache[$key] = false;
+            }
+        }
+        return $cache[$key];
+    }
+
     private static function unwrap($result, $default = array())
     {
         if (!is_array($result) || empty($result['success']) || !isset($result['data'])) {
