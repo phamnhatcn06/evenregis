@@ -231,12 +231,14 @@ class SportSeedCommand extends CConsoleCommand
                     'name' => 'Play-off', 'stage_type' => 'playoff', 'stage_order' => 1,
                     'format' => 'single_elimination', 'bracket_size' => 4,
                     'location' => $NTD,
+                    'rules' => '5 hiệp thắng 3 (11đ/séc, cách biệt 2đ). 2 trận play-off chọn đủ 8 đội vào vòng bảng.',
                 ),
                 array(
                     'name' => 'Vòng bảng + Chung kết', 'stage_type' => 'final', 'stage_order' => 2,
                     'format' => 'round_robin_knockout',
                     'num_groups' => 2, 'teams_per_group' => 4, 'advance_per_group' => 2, 'bracket_size' => 4,
                     'location' => $NTD,
+                    'rules' => 'Vòng bảng: 3 hiệp thắng 2 (11đ/séc, cách biệt 2đ). VCK: 5 hiệp thắng 3. 2 bảng vòng tròn, Nhất-Nhì mỗi bảng vào bán kết, chung kết tranh 1-2-3-4.',
                 ),
             ),
 
