@@ -179,6 +179,18 @@ $catName = function ($item) use ($val, $catMap) {
               }
               $title = $val($n, array('title', 'name'), 'Bài viết');
               $desc = $val($n, array('excerpt', 'summary', 'short_description', 'description'), '');
+              // Không có mô tả ngắn -> trích một đoạn từ nội dung bài viết.
+              if ($desc === '') {
+                  $content = $val($n, array('content', 'body'), '');
+                  if ($content !== '') {
+                      $text = trim(preg_replace('/\s+/', ' ', strip_tags($content)));
+                      if (function_exists('mb_substr')) {
+                          $desc = mb_strlen($text, 'UTF-8') > 200 ? mb_substr($text, 0, 200, 'UTF-8') . '…' : $text;
+                      } else {
+                          $desc = strlen($text) > 200 ? substr($text, 0, 200) . '…' : $text;
+                      }
+                  }
+              }
               $date = $fmtDate($val($n, array('published_at', 'created_at', 'date'), ''));
               $views = $val($n, array('view_count'), '');
               $cName = $catName($n);
