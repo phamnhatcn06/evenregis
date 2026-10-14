@@ -167,6 +167,42 @@ class MenuHelper
     }
 
     /**
+     * Chèn mục "Kết quả bình chọn" vào nhóm "Thi Miss".
+     * Nếu nhóm miss chưa có (user chưa có quyền nào thuộc miss) thì tạo nhóm mới.
+     * @param array $menu tham chiếu menu đang dựng
+     */
+    private static function injectMissVoteMenu(&$menu)
+    {
+        $active = strcasecmp((string) Yii::app()->controller->id, 'missVotes') === 0;
+        $child = array(
+            'label' => 'Kết quả bình chọn',
+            'icon' => self::getIcon('miss'),
+            'url' => Yii::app()->createUrl('/admin/missVotes/index'),
+            'active' => $active,
+            'controller' => 'missVotes',
+            'module' => 'admin',
+            'action' => '*',
+            'sort' => 90,
+        );
+
+        if (isset($menu['miss']) && isset($menu['miss']['children'])) {
+            $menu['miss']['children']['missVotes'] = $child;
+            if ($active) {
+                $menu['miss']['active'] = true;
+            }
+        } else {
+            $rootConfig = self::getRootConfig('miss');
+            $menu['miss'] = array(
+                'label' => $rootConfig['label'],
+                'icon' => self::getIcon(isset($rootConfig['icon']) ? $rootConfig['icon'] : 'activities'),
+                'children' => array('missVotes' => $child),
+                'active' => $active,
+                'sort' => isset($rootConfig['sort']) ? (int) $rootConfig['sort'] : 60,
+            );
+        }
+    }
+
+    /**
      * Build single menu item from permission
      */
     private static function buildMenuItem($perm)
