@@ -334,6 +334,11 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
             }
         }
 
+        // Điểm thắng/hoà/thua theo cấu hình giai đoạn (mặc định 3-1-0)
+        $winPts = ($model->win_points !== null && $model->win_points !== '') ? (int) $model->win_points : 3;
+        $drawPts = ($model->draw_points !== null && $model->draw_points !== '') ? (int) $model->draw_points : 1;
+        $lossPts = ($model->loss_points !== null && $model->loss_points !== '') ? (int) $model->loss_points : 0;
+
         // Luôn đảm bảo tất cả các bảng đều có Bảng Xếp Hạng
         foreach ($groups as $label => $members) {
             if (empty($standingsByGroup[$label])) {
