@@ -686,10 +686,12 @@ class SportDrawController extends AdminController
     {
         $this->requirePost();
         $times = Yii::app()->getRequest()->getPost('times', array());
-        if (!is_array($times)) {
-            $times = array();
-        }
-        $result = SportStages::recordSwimTimes($id, $times);
+        $lanes = Yii::app()->getRequest()->getPost('lanes', array());
+        $result = SportStages::recordSwimTimes(
+            $id,
+            is_array($times) ? $times : array(),
+            is_array($lanes) ? $lanes : array()
+        );
         if ($result['success']) {
             $this->jsonResponse(true, 'Đã lưu thành tích.', isset($result['data']) ? $result['data'] : null);
         }
