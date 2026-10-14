@@ -167,7 +167,7 @@ class BinhchonController extends CController
         if (empty($list)) {
             $list = $this->demoFinalists();
         }
-        return $list;
+        return array('gate' => $gate, 'finalists' => $list);
     }
 
     protected function demoFinalists()
