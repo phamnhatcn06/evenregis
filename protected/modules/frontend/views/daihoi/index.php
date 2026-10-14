@@ -1025,13 +1025,31 @@ if (empty($albumList)) {
       </div>
       <div class="row g-4">
         <?php
+        // Map danh mục id -> tên để hiển thị đúng tên danh mục tin tức (không hiện slug như "GENERAL").
+        $newsCatMap = array();
+        foreach ($newsCategories as $c) {
+          if (isset($c['id'])) {
+            $newsCatMap[(int) $c['id']] = $c;
+          }
+        }
+        // Định dạng ngày về d-m-Y.
+        $fmtNewsDate = function ($raw) {
+          if ($raw === '' || $raw === null) { return ''; }
+          $ts = ctype_digit((string) $raw) ? (int) $raw : strtotime((string) $raw);
+          if (!$ts) { return ''; }
+          return date('d-m-Y', $ts);
+        };
         $newsItems = array();
         if (!empty($news)) {
           foreach (array_slice($news, 0, 3) as $n) {
+            $cid = (int) $val($n, array('category_id'), 0);
+            $catName = ($cid && !empty($newsCatMap[$cid]['name']))
+              ? $newsCatMap[$cid]['name']
+              : $val($n, array('category_name', 'category'), 'Tin tức');
             $newsItems[] = array(
               'thumb' => $val($n, array('thumbnail', 'image', 'cover', 'thumbnail_url'), ''),
-              'cat' => $val($n, array('category_name', 'category'), 'Tin tức'),
-              'date' => $val($n, array('published_at', 'created_at', 'date'), ''),
+              'cat' => $catName,
+              'date' => $fmtNewsDate($val($n, array('published_at', 'created_at', 'date'), '')),
               'title' => $val($n, array('title', 'name'), ''),
               'desc' => $val($n, array('excerpt', 'summary', 'short_description', 'description'), ''),
               'id' => $val($n, array('id'), ''),
