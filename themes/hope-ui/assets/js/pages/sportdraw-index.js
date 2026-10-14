@@ -172,6 +172,65 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    /* ===== Bơi: bốc thăm phân lượt/làn ===== */
+    document.querySelectorAll('.btn-swim-draw').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            Swal.fire({
+                title: 'Bốc thăm phân lượt/làn?',
+                text: 'Chia VĐV vào các lượt (6 làn/lượt). Kết quả cũ (nếu có) sẽ bị thay thế.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'Bốc thăm',
+                cancelButtonText: 'Hủy'
+            }).then(function (result) {
+                if (!result.isConfirmed) {
+                    return;
+                }
+                postJson(buildUrl(swimDrawUrlTpl, id), function (d) {
+                    if (d.success) {
+                        Toast.success(d.message || 'Đã bốc lượt/làn');
+                        setTimeout(function () { location.reload(); }, 800);
+                    } else {
+                        Toast.error(d.message || 'Bốc thăm thất bại');
+                    }
+                }, { lane_count: 6 });
+            });
+        });
+    });
+
+    /* ===== Bơi: chuyển Top 6 vào chung kết ===== */
+    document.querySelectorAll('.btn-promote-swim').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            var finalId = this.getAttribute('data-final-id');
+            var finalName = this.getAttribute('data-final-name') || 'chung kết';
+            Swal.fire({
+                title: 'Chuyển Top 6 vào chung kết?',
+                text: 'Lấy 6 VĐV có thành tích tốt nhất ở vòng loại vào "' + finalName + '".',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'Chuyển',
+                cancelButtonText: 'Hủy'
+            }).then(function (result) {
+                if (!result.isConfirmed) {
+                    return;
+                }
+                postJson(buildUrl(promoteSwimUrlTpl, id), function (d) {
+                    if (d.success) {
+                        var added = (d.data && d.data.added) ? d.data.added.length : 0;
+                        Toast.success((d.message || 'Đã chuyển') + ' (' + added + ' suất mới)');
+                        setTimeout(function () { location.reload(); }, 1000);
+                    } else {
+                        Toast.error(d.message || 'Không thể chuyển Top');
+                    }
+                }, { final_stage_id: finalId, top_n: 6 });
+            });
+        });
+    });
+
     /* ===== Tính bảng xếp hạng ===== */
     document.querySelectorAll('.btn-standings').forEach(function (btn) {
         btn.addEventListener('click', function () {
