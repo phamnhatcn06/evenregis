@@ -39,6 +39,7 @@ $isOpen = !isset($gate['is_open']) || $gate['is_open'];
 <?php endif; ?>
 
 <!-- Khu vực đăng nhập / thông tin người bình chọn -->
+<?php if ($isOpen): ?>
 <div id="voter-box"
      class="card shadow-sm mb-4"
      data-vote-url="<?php echo $voteUrl; ?>"
@@ -56,6 +57,7 @@ $isOpen = !isset($gate['is_open']) || $gate['is_open'];
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- Danh sách thí sinh -->
 <div class="row g-3" id="finalist-grid">
