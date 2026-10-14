@@ -80,19 +80,22 @@ Hiển thị toàn bộ item lịch của attendee, nhóm theo ngày, sắp xế
 - **View** `portal/schedule.php` — chỉ hiển thị; tách partial `_next_up.php` và `_timeline.php` nếu dài.
 - **Route**: thêm vào `protected/config/RewriteUrlManager.php` (đã có `portal/<action:\w+>` → có thể đủ; xác nhận khi plan).
 
-### API contract (dự kiến — khai báo trong ApiEndpoints.php)
-- `SCHEDULE_MY = '/api/schedule/my'` (param: `attendee_id`, `event_id`).
-- Response:
+### API contract (tách theo nguồn — khai báo trong ApiEndpoints.php)
+Mỗi nguồn 1 endpoint, cùng trả về danh sách item đã chuẩn hóa. Model `Schedule` gọi các endpoint này rồi merge + sort + chia ngày + tính next-up ở tầng Model (BE).
+- `SCHEDULE_SPORT = '/api/schedule/sport'` (param: `attendee_id`, `event_id`)
+- `SCHEDULE_COMPETITION = '/api/schedule/competition'` (param: `attendee_id`, `event_id`)
+- `SCHEDULE_AGENDA = '/api/schedule/agenda'` (param: `event_id`)
+- `SCHEDULE_MEAL = '/api/schedule/meal'` (param: `attendee_id`, `event_id`)
+- `SCHEDULE_BANQUET = '/api/schedule/banquet'` (param: `attendee_id`, `event_id`)
+
+Mỗi endpoint response:
   ```json
-  {
-    "success": true,
-    "data": {
-      "serverTime": 1760000000,
-      "nextUp": [ { "type":"sport", "title":"...", "startTime":..., "location":"..." } ],
-      "days": [ { "date":"2026-11-01", "items":[ {...} ] } ],
-      "noTime": [ {...} ]
-    }
-  }
+  { "success": true, "data": [ { "type":"sport", "title":"...", "subtitle":"...", "startTime":1760000000, "endTime":null, "location":"...", "status":0, "refId":"123" } ] }
+  ```
+
+Cấu trúc gộp mà Model trả xuống view:
+  ```
+  { serverTime, nextUp:[...], days:[ {date, items:[...]} ], noTime:[...] }
   ```
   Field body camelCase; thời gian trả cả Unix lẫn chuỗi đã format giờ VN.
 
