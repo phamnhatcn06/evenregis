@@ -62,6 +62,7 @@ class DaihoiController extends FrontEndController
             'recentMatches' => Daihoi::getRecentMatches(),
             'rankings' => Daihoi::getRankings(5),
             'news' => Daihoi::getNews(6),
+            'newsCategories' => Daihoi::getNewsCategories(),
             'slides' => Daihoi::getSlides(),
             'albums' => Daihoi::getAlbums(8),
             'hasAdminAccess' => $hasAdminAccess,
