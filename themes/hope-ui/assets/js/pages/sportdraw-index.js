@@ -69,6 +69,11 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('cfg-num-groups').value = data.num_groups || '';
             document.getElementById('cfg-advance').value = data.advance_per_group || '';
             document.getElementById('cfg-bracket-size').value = data.bracket_size || '';
+            document.getElementById('cfg-win-points').value = valueOr(data.win_points, 3);
+            document.getElementById('cfg-draw-points').value = valueOr(data.draw_points, 1);
+            document.getElementById('cfg-loss-points').value = valueOr(data.loss_points, 0);
+            document.getElementById('cfg-tiebreak').value = valueOr(data.tiebreak, 'head_to_head');
+            document.getElementById('cfg-ko-pairing').value = valueOr(data.ko_pairing, 'cross');
             toggleFormatFields();
             bootstrap.Modal.getOrCreateInstance(modalEl).show();
         });
