@@ -151,6 +151,10 @@ class MenuHelper
             }
         }
 
+        // Luôn thêm "Kết quả bình chọn Miss" vào nhóm "Thi Miss" (cổng bình chọn
+        // public — không gắn với permission Portal nên khai báo cố định ở đây).
+        self::injectMissVoteMenu($menu);
+
         // Sort top-level menu by 'sort' field
         uasort($menu, function ($a, $b) {
             $sortA = isset($a['sort']) ? (int)$a['sort'] : 100;
