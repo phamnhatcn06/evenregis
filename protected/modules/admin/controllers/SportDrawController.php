@@ -606,6 +606,34 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Bốc thăm play-off (AJAX) — các trận độc lập, người thắng chuyển sang vòng bảng.
+     */
+    public function actionDrawPlayoff($id)
+    {
+        $this->requirePost();
+        $result = SportStages::drawPlayoff($id);
+        $this->handleDrawResult($result);
+    }
+
+    /**
+     * Chuyển người/đội thắng play-off vào giai đoạn vòng bảng đích (AJAX).
+     */
+    public function actionPromotePlayoff($id)
+    {
+        $this->requirePost();
+        $targetStageId = (int) Yii::app()->getRequest()->getPost('target_stage_id', 0);
+        if ($targetStageId < 1) {
+            $this->jsonResponse(false, 'Thiếu giai đoạn vòng bảng đích.');
+        }
+        $result = SportStages::promotePlayoffWinners($id, $targetStageId);
+        if ($result['success']) {
+            $data = isset($result['data']) ? $result['data'] : null;
+            $this->jsonResponse(true, 'Đã chuyển người thắng play-off vào vòng bảng.', $data);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể chuyển người thắng.'));
+    }
+
+    /**
      * Khoá kết quả bốc thăm (AJAX).
      */
     public function actionLock($id)
