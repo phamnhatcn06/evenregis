@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Layout Cổng Cá Nhân Đại Biểu (Attendee Portal) - Đại Hội Mường Thanh 2026.
  * Chuẩn giao diện cao cấp, chuyên nghiệp với Header, Navigation, Footer chuẩn mực và đồng bộ.
@@ -85,7 +86,7 @@ $isRunActive = ($controllerId === 'run');
                         <?php if ($fullName): ?>
                             <div class="portal-user-chip d-none d-md-flex">
                                 <div class="portal-user-avatar">
-                                    <?php 
+                                    <?php
                                     $initial = mb_substr(trim($fullName), 0, 1, 'UTF-8');
                                     echo CHtml::encode($initial ?: 'Đ');
                                     ?>
@@ -193,7 +194,7 @@ $isRunActive = ($controllerId === 'run');
                             </li>
                             <li class="d-flex align-items-start gap-2 mb-2">
                                 <i class="bi bi-headset text-success mt-1"></i>
-                                <span>Kỹ thuật CNTT: <strong>support.cntt@muongthanh.vn</strong></span>
+                                <span>Kỹ thuật CNTT: <strong>itsupport@muongthanh.vn</strong></span>
                             </li>
                             <li class="d-flex align-items-start gap-2">
                                 <i class="bi bi-shield-lock text-info mt-1"></i>
