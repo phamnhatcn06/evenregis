@@ -70,8 +70,4 @@ $urlRewrite = array(
     'tin-tuc' => 'frontend/daihoi/news',
 
     'daihoi/<action:\w+>' => 'frontend/daihoi/<action>',
-
-    // Cổng cá nhân người tham dự (đăng nhập dùng chung mọi tính năng)
-    'portal' => 'frontend/portal/login',
-    'portal/<action:\w+>' => 'frontend/portal/<action>',
 );
