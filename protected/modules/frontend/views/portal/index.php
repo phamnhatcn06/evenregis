@@ -15,6 +15,19 @@ Yii::app()->clientScript->registerScriptFile(
 // Danh mục tính năng
 $features = array(
     array(
+        'category' => 'Lịch trình cá nhân',
+        'icon'     => 'bi-calendar-week-fill',
+        'gradient' => 'icon-gradient-blue',
+        'title'    => 'Lịch trình của tôi',
+        'desc'     => 'Xem toàn bộ lịch trình liên quan đến anh/chị: trận thi đấu, vòng thi nghiệp vụ, nghi thức, bữa ăn và tiệc — kèm sự kiện sắp diễn ra.',
+        'url'      => $this->createUrl('/frontend/portal/schedule'),
+        'chips'    => array(
+            array('icon' => 'bi-hourglass-split text-primary', 'label' => 'Sự kiện tiếp theo'),
+            array('icon' => 'bi-clock-history text-info', 'label' => 'Đếm ngược'),
+            array('icon' => 'bi-list-check text-success', 'label' => 'Gộp mọi hoạt động'),
+        ),
+    ),
+    array(
         'category' => 'Thể thao & Tham quan',
         'icon'     => 'bi-calendar2-check-fill',
         'gradient' => 'icon-gradient-blue',
