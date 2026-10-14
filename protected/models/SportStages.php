@@ -197,6 +197,41 @@ class SportStages extends BaseSportStages
         ));
     }
 
+    // ===== Bơi (heat/lane) =====
+
+    public static function drawSwimHeats($stageId, $laneCount = 6)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_SWIM_HEATS, array('stageId' => $stageId));
+        return ApiClient::post($url, array('lane_count' => $laneCount, 'auth_email' => self::authEmail()));
+    }
+
+    /**
+     * Ghi thành tích bơi theo làn.
+     *
+     * @param string $stageId
+     * @param array $times Mảng [lane_id => result_ms]
+     */
+    public static function recordSwimTimes($stageId, $times)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_SWIM_TIMES, array('stageId' => $stageId));
+        return ApiClient::post($url, array('times' => $times, 'auth_email' => self::authEmail()));
+    }
+
+    public static function promoteSwimTop($qualStageId, $finalStageId, $topN = 6)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PROMOTE_SWIM, array('stageId' => $qualStageId));
+        return ApiClient::post($url, array(
+            'final_stage_id' => $finalStageId,
+            'top_n' => $topN,
+            'auth_email' => self::authEmail(),
+        ));
+    }
+
+    public static function isSwimFormat($format)
+    {
+        return $format === self::FORMAT_HEAT_LANE;
+    }
+
     public static function computeStandings($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_STANDINGS, array('stageId' => $stageId));
