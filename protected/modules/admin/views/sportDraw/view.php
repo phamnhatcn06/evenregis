@@ -374,17 +374,19 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
 
                                 if ($sa > $sb) {
                                     $computed[$ta]['won']++;
-                                    $computed[$ta]['points'] += 3;
+                                    $computed[$ta]['points'] += $winPts;
                                     $computed[$tb]['lost']++;
+                                    $computed[$tb]['points'] += $lossPts;
                                 } elseif ($sb > $sa) {
                                     $computed[$tb]['won']++;
-                                    $computed[$tb]['points'] += 3;
+                                    $computed[$tb]['points'] += $winPts;
                                     $computed[$ta]['lost']++;
+                                    $computed[$ta]['points'] += $lossPts;
                                 } else {
                                     $computed[$ta]['drawn']++;
-                                    $computed[$ta]['points'] += 1;
+                                    $computed[$ta]['points'] += $drawPts;
                                     $computed[$tb]['drawn']++;
-                                    $computed[$tb]['points'] += 1;
+                                    $computed[$tb]['points'] += $drawPts;
                                 }
                             }
                         }
