@@ -311,14 +311,9 @@ class SportSeedCommand extends CConsoleCommand
     {
         return array(
             array(
-                'name' => 'Vòng loại (phân lượt)', 'stage_type' => 'qualification', 'stage_order' => 1,
+                'name' => 'Vòng chung kết', 'stage_type' => 'final', 'stage_order' => 1,
                 'format' => 'heat_lane', 'location' => $loc,
-                'rules' => 'Tính thời gian. Chia 6 làn; mỗi nội dung chia 2 lượt bơi vòng loại.',
-            ),
-            array(
-                'name' => 'Chung kết (Top 6)', 'stage_type' => 'final', 'stage_order' => 2,
-                'format' => 'heat_lane', 'location' => $loc,
-                'rules' => 'Tính thời gian. Top 6 mỗi nội dung thi cùng 1 lượt tranh 1-2-3-4.',
+                'rules' => 'Tính thời gian. Thi chung kết, phân lượt/làn (6 làn/lượt); xếp hạng 1-2-3 theo thành tích.',
             ),
         );
     }
