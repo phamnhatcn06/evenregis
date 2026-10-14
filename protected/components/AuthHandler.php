@@ -153,6 +153,10 @@ class AuthHandler extends CApplicationComponent
      */
     public static function isAuthenticated()
     {
+        // Ngữ cảnh console (CConsoleApplication) không có component session.
+        if (!(Yii::app() instanceof CWebApplication)) {
+            return false;
+        }
         $session = Yii::app()->session;
         $userData = isset($session[self::SESSION_USER_KEY]) ? $session[self::SESSION_USER_KEY] : null;
 
