@@ -7,6 +7,7 @@ $urlRewrite = array(
 
     // Cổng cá nhân người tham dự — đặt TRƯỚC các rule generic để action 2 đoạn (vd: portal/saveProfile) không bị bắt nhầm
     'portal' => 'frontend/portal/login',
+    'lich-trinh-cua-toi' => 'frontend/portal/schedule',
     'portal/<action:\w+>' => 'frontend/portal/<action>',
 
     'danh-muc-tin/<title>_<id:\d+>-<page:\d+>' => 'frontend/news/category',
