@@ -201,6 +201,14 @@ foreach ($stages as $s) {
                                     <i class="fa fa-list-ol"></i> Tính BXH
                                 </button>
                             <?php endif; ?>
+                            <?php if ($isGroup && $stage->stage_type === 'qualification' && isset($groupFinalBySport[$stage->sport_id])): ?>
+                                <button type="button" class="btn btn-sm btn-outline-primary btn-promote-groups"
+                                        data-id="<?php echo $stage->id; ?>"
+                                        data-target-id="<?php echo $groupFinalBySport[$stage->sport_id]['id']; ?>"
+                                        data-target-name="<?php echo CHtml::encode($groupFinalBySport[$stage->sport_id]['name']); ?>">
+                                    <i class="fa fa-arrow-right"></i> Chuyển đội đi tiếp → CK
+                                </button>
+                            <?php endif; ?>
                             <?php if ($stage->format === SportStages::FORMAT_ROUND_ROBIN_KNOCKOUT && !$isLocked): ?>
                                 <button type="button" class="btn btn-sm btn-primary btn-genko"
                                         data-id="<?php echo $stage->id; ?>">
