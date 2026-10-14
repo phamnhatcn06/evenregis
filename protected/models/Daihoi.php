@@ -375,7 +375,7 @@ class Daihoi
             }
         }
 
-        if (empty($matches)) {
+        if (empty($matches) && empty($swimBySport)) {
             return self::getFallbackTournamentSchedule($filterSportId);
         }
 
@@ -394,6 +394,7 @@ class Daihoi
             'recentMatches' => $recentMatches,
             'upcomingMatches' => $upcomingMatches,
             'standingsBySport' => $standingsBySport,
+            'swimBySport' => $swimBySport,
         );
     }
 
