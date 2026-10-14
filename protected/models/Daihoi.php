@@ -119,7 +119,7 @@ class Daihoi
         if (is_array($res) && !empty($res)) {
             return $res;
         }
-        return self::getFallbackRankings($limit);
+        return self::getRankingsFromDb(null, $limit);
     }
 
     /**
@@ -443,25 +443,181 @@ class Daihoi
     }
 
     /**
-     * Dữ liệu mẫu bảng tổng sắp huy chương toàn đoàn (khi API chưa mở cổng kết quả).
+     * Bảng tổng sắp huy chương toàn đoàn lấy trực tiếp từ cơ sở dữ liệu.
+     * Tính toán từ kết quả các trận Chung kết / Tranh hạng 3 (sport_matches & sport_match_results),
+     * bảng xếp hạng vòng tròn Vòng Chung kết (sport_standings),
+     * và xếp hạng vòng chung kết (sport_stage_teams).
+     *
+     * @param int|null $eventId
      * @param int $limit
      * @return array
      */
-    public static function getFallbackRankings($limit = 10)
+    public static function getRankingsFromDb($eventId = null, $limit = 10)
     {
-        $list = array(
-            array('rank' => 1, 'name' => 'Mường Thanh Luxury Hạ Long', 'gold' => 4, 'silver' => 2, 'bronze' => 1, 'points' => 28),
-            array('rank' => 2, 'name' => 'Mường Thanh Grand Hà Nội', 'gold' => 3, 'silver' => 3, 'bronze' => 2, 'points' => 25),
-            array('rank' => 3, 'name' => 'Mường Thanh Grand Đà Nẵng', 'gold' => 2, 'silver' => 2, 'bronze' => 3, 'points' => 19),
-            array('rank' => 4, 'name' => 'Mường Thanh Luxury Sài Gòn', 'gold' => 2, 'silver' => 1, 'bronze' => 2, 'points' => 16),
-            array('rank' => 5, 'name' => 'Mường Thanh Sông Lam', 'gold' => 1, 'silver' => 3, 'bronze' => 1, 'points' => 14),
-            array('rank' => 6, 'name' => 'Khối Văn phòng Điều hành', 'gold' => 1, 'silver' => 1, 'bronze' => 2, 'points' => 11),
-            array('rank' => 7, 'name' => 'Mường Thanh Holiday Huế', 'gold' => 1, 'silver' => 1, 'bronze' => 0, 'points' => 8),
-            array('rank' => 8, 'name' => 'Mường Thanh Luxury Cần Thơ', 'gold' => 0, 'silver' => 2, 'bronze' => 2, 'points' => 8),
-            array('rank' => 9, 'name' => 'Mường Thanh Luxury Nha Trang', 'gold' => 0, 'silver' => 2, 'bronze' => 1, 'points' => 7),
-            array('rank' => 10, 'name' => 'Mường Thanh Grand Lào Cai', 'gold' => 0, 'silver' => 1, 'bronze' => 2, 'points' => 6),
-        );
-        return array_slice($list, 0, $limit);
+        if (!$eventId) {
+            $ev = self::getEvent();
+            $eventId = isset($ev['id']) ? (int)$ev['id'] : 3;
+        }
+
+        // 1. Lấy danh sách các đơn vị (properties) tham gia sự kiện
+        $sqlProps = "
+            SELECT p.id, p.prefix, p.name, p.code
+            FROM properties p
+            JOIN event_units eu ON eu.property_id = p.id AND eu.event_id = :eventId AND eu.deleted_at IS NULL
+            WHERE p.deleted_at IS NULL
+            ORDER BY p.name ASC
+        ";
+        $props = Yii::app()->db->createCommand($sqlProps)
+            ->bindValue(':eventId', $eventId)
+            ->queryAll();
+
+        if (empty($props)) {
+            $props = Yii::app()->db->createCommand("
+                SELECT id, prefix, name, code
+                FROM properties
+                WHERE deleted_at IS NULL
+                ORDER BY name ASC
+            ")->queryAll();
+        }
+
+        $unitsMap = array();
+        foreach ($props as $p) {
+            $pid = (int)$p['id'];
+            $unitsMap[$pid] = array(
+                'property_id' => $pid,
+                'prefix' => !empty($p['prefix']) ? trim($p['prefix']) : '',
+                'name' => trim($p['name']),
+                'code' => !empty($p['code']) ? trim($p['code']) : '',
+                'gold' => 0,
+                'silver' => 0,
+                'bronze' => 0,
+                'points' => 0,
+            );
+        }
+
+        // 2. Tính huy chương từ các trận Chung kết & Tranh hạng 3
+        $sqlMatches = "
+            SELECT m.id, m.match_type, m.round, m.team_a_id, m.team_b_id,
+                   ta.property_id as team_a_prop_id, ta.alliance_org_ids as team_a_alliance_ids,
+                   tb.property_id as team_b_prop_id, tb.alliance_org_ids as team_b_alliance_ids,
+                   r.score_a, r.score_b, r.winner_team_id
+            FROM sport_matches m
+            JOIN sport_stages st ON st.id = m.stage_id AND st.event_id = :eventId AND st.deleted_at IS NULL
+            LEFT JOIN sport_teams ta ON ta.id = m.team_a_id AND ta.deleted_at IS NULL
+            LEFT JOIN sport_teams tb ON tb.id = m.team_b_id AND tb.deleted_at IS NULL
+            JOIN sport_match_results r ON r.match_id = m.id AND r.deleted_at IS NULL
+            WHERE m.deleted_at IS NULL
+              AND (r.winner_team_id IS NOT NULL OR (r.score_a IS NOT NULL AND r.score_b IS NOT NULL AND r.score_a != r.score_b))
+        ";
+        $matches = Yii::app()->db->createCommand($sqlMatches)
+            ->bindValue(':eventId', $eventId)
+            ->queryAll();
+
+        foreach ($matches as $m) {
+            $round = mb_strtolower((string)$m['round'], 'UTF-8');
+            $type = (string)$m['match_type'];
+
+            $winnerId = !empty($m['winner_team_id']) ? (int)$m['winner_team_id'] : null;
+            if (!$winnerId && $m['score_a'] !== null && $m['score_b'] !== null) {
+                if ((int)$m['score_a'] > (int)$m['score_b']) $winnerId = (int)$m['team_a_id'];
+                elseif ((int)$m['score_b'] > (int)$m['score_a']) $winnerId = (int)$m['team_b_id'];
+            }
+            if (!$winnerId) continue;
+
+            $loserId = ($winnerId == (int)$m['team_a_id']) ? (int)$m['team_b_id'] : (int)$m['team_a_id'];
+            $winnerPropId = ($winnerId == (int)$m['team_a_id']) ? (int)$m['team_a_prop_id'] : (int)$m['team_b_prop_id'];
+            $loserPropId = ($loserId == (int)$m['team_a_id']) ? (int)$m['team_a_prop_id'] : (int)$m['team_b_prop_id'];
+
+            $isFinal = ($type === 'final' || strpos($round, 'chung kết') !== false || strpos($round, 'final') !== false)
+                && strpos($round, 'bán kết') === false && strpos($round, 'tứ kết') === false;
+            $isPlayoff = ($type === 'playoff' || strpos($round, 'tranh hạng 3') !== false || strpos($round, 'hạng 3') !== false || strpos($round, 'hạng ba') !== false);
+
+            if ($isFinal) {
+                if ($winnerPropId && isset($unitsMap[$winnerPropId])) {
+                    $unitsMap[$winnerPropId]['gold']++;
+                }
+                if ($loserPropId && isset($unitsMap[$loserPropId])) {
+                    $unitsMap[$loserPropId]['silver']++;
+                }
+            } elseif ($isPlayoff) {
+                if ($winnerPropId && isset($unitsMap[$winnerPropId])) {
+                    $unitsMap[$winnerPropId]['bronze']++;
+                }
+            }
+        }
+
+        // 3. Tính huy chương từ bảng xếp hạng vòng tròn Vòng Chung kết (sport_standings)
+        $sqlStandings = "
+            SELECT s.rank, s.points, t.property_id
+            FROM sport_standings s
+            JOIN sport_stages st ON st.id = s.stage_id AND st.event_id = :eventId AND st.deleted_at IS NULL
+            JOIN sport_teams t ON t.id = s.team_id AND t.deleted_at IS NULL
+            WHERE s.deleted_at IS NULL
+              AND (st.stage_type = 'final' OR st.name LIKE '%Chung kết%')
+              AND s.rank IN (1, 2, 3)
+        ";
+        $standings = Yii::app()->db->createCommand($sqlStandings)
+            ->bindValue(':eventId', $eventId)
+            ->queryAll();
+
+        foreach ($standings as $s) {
+            $pid = (int)$s['property_id'];
+            if (!$pid || !isset($unitsMap[$pid])) continue;
+            if ((int)$s['rank'] === 1) $unitsMap[$pid]['gold']++;
+            elseif ((int)$s['rank'] === 2) $unitsMap[$pid]['silver']++;
+            elseif ((int)$s['rank'] === 3) $unitsMap[$pid]['bronze']++;
+        }
+
+        // 4. Tính huy chương từ sport_stage_teams (nếu có gán final_rank 1, 2, 3)
+        $sqlStageTeams = "
+            SELECT stt.final_rank, t.property_id
+            FROM sport_stage_teams stt
+            JOIN sport_stages st ON st.id = stt.stage_id AND st.event_id = :eventId AND st.deleted_at IS NULL
+            JOIN sport_teams t ON t.id = stt.team_id AND t.deleted_at IS NULL
+            WHERE stt.deleted_at IS NULL
+              AND stt.final_rank IN (1, 2, 3)
+              AND (st.stage_type = 'final' OR st.name LIKE '%Chung kết%')
+        ";
+        $stageTeams = Yii::app()->db->createCommand($sqlStageTeams)
+            ->bindValue(':eventId', $eventId)
+            ->queryAll();
+
+        foreach ($stageTeams as $st) {
+            $pid = (int)$st['property_id'];
+            if (!$pid || !isset($unitsMap[$pid])) continue;
+            if ((int)$st['final_rank'] === 1) $unitsMap[$pid]['gold']++;
+            elseif ((int)$st['final_rank'] === 2) $unitsMap[$pid]['silver']++;
+            elseif ((int)$st['final_rank'] === 3) $unitsMap[$pid]['bronze']++;
+        }
+
+        // 5. Tính điểm tổng theo chuẩn: Vàng (5 điểm), Bạc (3 điểm), Đồng (1 điểm)
+        foreach ($unitsMap as $pid => $data) {
+            $points = ($data['gold'] * 5) + ($data['silver'] * 3) + ($data['bronze'] * 1);
+            $unitsMap[$pid]['points'] = $points;
+            $unitsMap[$pid]['total_medals'] = $data['gold'] + $data['silver'] + $data['bronze'];
+        }
+
+        // 6. Sắp xếp thứ hạng toàn đoàn:
+        // Ưu tiên 1: HCV desc
+        // Ưu tiên 2: HCB desc
+        // Ưu tiên 3: HCĐ desc
+        // Ưu tiên 4: Tổng điểm desc
+        // Ưu tiên 5: Tên đơn vị asc
+        $rankings = array_values($unitsMap);
+        usort($rankings, function ($a, $b) {
+            if ($a['gold'] !== $b['gold']) return $b['gold'] - $a['gold'];
+            if ($a['silver'] !== $b['silver']) return $b['silver'] - $a['silver'];
+            if ($a['bronze'] !== $b['bronze']) return $b['bronze'] - $a['bronze'];
+            if ($a['points'] !== $b['points']) return $b['points'] - $a['points'];
+            return strcmp($a['name'], $b['name']);
+        });
+
+        foreach ($rankings as $idx => &$r) {
+            $r['rank'] = $idx + 1;
+        }
+        unset($r);
+
+        return array_slice($rankings, 0, $limit);
     }
 
     /**

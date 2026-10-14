@@ -11,11 +11,13 @@ class TourRegistrationsController extends AdminController
         $eventId = isset($_GET['event_id']) && $_GET['event_id'] !== '' ? (int) $_GET['event_id'] : null;
 
         $registrations = $eventId ? TourRegistrations::listByEvent($eventId) : array();
+        $cancelRequestCount = $eventId ? count(TourRegistrations::listCancelRequests($eventId)) : 0;
 
         $this->render('admin', array(
-            'eventId'       => $eventId,
-            'eventList'     => $this->getEventList(),
-            'registrations' => $registrations,
+            'eventId'            => $eventId,
+            'eventList'          => $this->getEventList(),
+            'registrations'      => $registrations,
+            'cancelRequestCount' => $cancelRequestCount,
         ));
     }
 
