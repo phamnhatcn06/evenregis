@@ -75,6 +75,44 @@ $cardThemes = array(
   array('border' => '#ea580c', 'badge' => 'bg-orange-50 text-orange-700 border border-orange-200', 'icon_bg' => 'bg-orange-600', 'link' => 'text-orange-600', 'icon' => 'sports_golf', 'tag' => 'Giải Chào Mừng'),
 );
 
+// ----- Khớp thẻ nội dung -> danh mục tin tức để tạo link /tin-tuc?category_id=X -----
+$newsCategories = isset($newsCategories) && is_array($newsCategories) ? $newsCategories : array();
+$normalize = function ($s) {
+  $s = mb_strtolower((string) $s, 'UTF-8');
+  $map = array(
+    'à','á','ả','ã','ạ','ă','ằ','ắ','ẳ','ẵ','ặ','â','ầ','ấ','ẩ','ẫ','ậ',
+    'è','é','ẻ','ẽ','ẹ','ê','ề','ế','ể','ễ','ệ','ì','í','ỉ','ĩ','ị',
+    'ò','ó','ỏ','õ','ọ','ô','ồ','ố','ổ','ỗ','ộ','ơ','ờ','ớ','ở','ỡ','ợ',
+    'ù','ú','ủ','ũ','ụ','ư','ừ','ứ','ử','ữ','ự','ỳ','ý','ỷ','ỹ','ỵ','đ',
+  );
+  $rep = array(
+    'a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a',
+    'e','e','e','e','e','e','e','e','e','e','e','i','i','i','i','i',
+    'o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o',
+    'u','u','u','u','u','u','u','u','u','u','u','y','y','y','y','y','d',
+  );
+  $s = str_replace($map, $rep, $s);
+  return preg_replace('/[^a-z0-9]+/', ' ', $s);
+};
+// Tìm category_id khớp với một thẻ nội dung theo tên/slug danh mục tin tức.
+$findCategoryId = function ($needle) use ($newsCategories, $normalize, $val) {
+  $needleNorm = trim($normalize($needle));
+  if ($needleNorm === '') { return null; }
+  foreach ($newsCategories as $cat) {
+    $cid = (int) $val($cat, array('id'), 0);
+    if (!$cid) { continue; }
+    $candidates = array($val($cat, array('name'), ''), $val($cat, array('slug'), ''));
+    foreach ($candidates as $cand) {
+      $candNorm = trim($normalize($cand));
+      if ($candNorm === '') { continue; }
+      if (strpos($needleNorm, $candNorm) !== false || strpos($candNorm, $needleNorm) !== false) {
+        return $cid;
+      }
+    }
+  }
+  return null;
+};
+
 // Chuẩn hoá danh sách trận đấu cho khối Kết quả
 $matches = !empty($liveMatches) ? $liveMatches : $recentMatches;
 $statusMap = array(
