@@ -211,9 +211,16 @@ class SportStageBackfillCommand extends CConsoleCommand
 
     protected function swimSpec()
     {
+        // Bơi tách 2 giai đoạn: Vòng loại (phân lượt) + Chung kết (Top 6).
         return array(
-            'format' => 'heat_lane',
-            'rules' => 'Tính thời gian. Chia 6 làn. Vòng loại mỗi nội dung chia 2 lượt; Top 6 vào chung kết thi cùng 1 lượt tranh 1-2-3-4.',
+            'qualification' => array(
+                'format' => 'heat_lane',
+                'rules' => 'Tính thời gian. Chia 6 làn; mỗi nội dung chia 2 lượt bơi vòng loại.',
+            ),
+            'final' => array(
+                'format' => 'heat_lane',
+                'rules' => 'Tính thời gian. Top 6 vào chung kết thi cùng 1 lượt tranh 1-2-3-4.',
+            ),
         );
     }
 
