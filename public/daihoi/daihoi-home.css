@@ -346,11 +346,12 @@ nav a.nav-link:hover::after {
 }
 
 .img-zoom-wrap img {
-  transition: transform 0.5s var(--transition-smooth);
+  transition: transform 0.7s var(--transition-smooth);
 }
 
-.card-hover:hover .img-zoom-wrap img {
-  transform: scale(1.08);
+.card-hover:hover .img-zoom-wrap img,
+.img-zoom-wrap:hover img {
+  transform: scale(1.1);
 }
 
 /* Giới hạn số dòng cho tiêu đề/mô tả */
