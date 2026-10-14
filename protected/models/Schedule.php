@@ -119,6 +119,38 @@ class Schedule
     }
 
     /**
+     * Nguồn Bữa ăn: các bữa người tham dự được phân (kèm cờ đã báo cắt).
+     *
+     * @param string|int $attendeeId
+     * @param string|int $eventId
+     * @return array danh sách item chuẩn hoá (chưa gán status)
+     */
+    public static function getMealItems($attendeeId, $eventId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SCHEDULE_MEAL, array(
+            'attendee_id' => $attendeeId,
+            'event_id' => $eventId,
+        ));
+        return self::unwrapList($result);
+    }
+
+    /**
+     * Nguồn Tiệc: chỗ ngồi tiệc của người tham dự (bàn + ghế).
+     *
+     * @param string|int $attendeeId
+     * @param string|int $eventId
+     * @return array danh sách item chuẩn hoá (chưa gán status)
+     */
+    public static function getBanquetItems($attendeeId, $eventId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SCHEDULE_BANQUET, array(
+            'attendee_id' => $attendeeId,
+            'event_id' => $eventId,
+        ));
+        return self::unwrapList($result);
+    }
+
+    /**
      * Bóc danh sách item từ response ApiClient ({success, data:{code,message,data:[...]}}).
      *
      * @param array $result kết quả ApiClient
