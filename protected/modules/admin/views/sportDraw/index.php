@@ -143,6 +143,20 @@ foreach ($stages as $s) {
                                     <i class="fa fa-sitemap"></i> Bốc nhánh
                                 </button>
                             <?php endif; ?>
+                            <?php if ($stage->format === SportStages::FORMAT_PLAYOFF && !$isLocked): ?>
+                                <button type="button" class="btn btn-sm btn-primary btn-draw"
+                                        data-id="<?php echo $stage->id; ?>" data-type="playoff">
+                                    <i class="fa fa-random"></i> Bốc play-off
+                                </button>
+                                <?php if (isset($targetStageBySport[$stage->sport_id])): ?>
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-promote-playoff"
+                                            data-id="<?php echo $stage->id; ?>"
+                                            data-target-id="<?php echo $targetStageBySport[$stage->sport_id]['id']; ?>"
+                                            data-target-name="<?php echo CHtml::encode($targetStageBySport[$stage->sport_id]['name']); ?>">
+                                        <i class="fa fa-arrow-right"></i> Chuyển người thắng → vòng bảng
+                                    </button>
+                                <?php endif; ?>
+                            <?php endif; ?>
                             <?php if ($isGroup && !$isLocked): ?>
                                 <button type="button" class="btn btn-sm btn-outline-success btn-standings"
                                         data-id="<?php echo $stage->id; ?>">
