@@ -52,6 +52,30 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // Số làn: mỗi bảng (lượt) không được trùng làn
+        var lanes = {};
+        var laneError = '';
+        document.querySelectorAll('table').forEach(function (table) {
+            var seen = {};
+            table.querySelectorAll('.swim-lane-input').forEach(function (inp) {
+                var no = parseInt(inp.value, 10);
+                inp.classList.remove('is-invalid');
+                if (!no || no < 1) {
+                    laneError = 'Số làn phải lớn hơn 0.';
+                    inp.classList.add('is-invalid');
+                } else if (seen[no]) {
+                    laneError = 'Trùng làn ' + no + ' trong cùng một lượt.';
+                    inp.classList.add('is-invalid');
+                }
+                seen[no] = true;
+                lanes[inp.getAttribute('data-lane-id')] = no;
+            });
+        });
+        if (laneError) {
+            Toast.error(laneError);
+            return;
+        }
+
         var original = saveBtn.innerHTML;
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...';
