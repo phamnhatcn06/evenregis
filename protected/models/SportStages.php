@@ -216,6 +216,18 @@ class SportStages extends BaseSportStages
         ));
     }
 
+    /**
+     * Chuyển đội đi tiếp của vòng loại chia bảng sang giai đoạn kế tiếp.
+     */
+    public static function promoteGroupWinners($qualStageId, $targetStageId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PROMOTE_GROUPS, array('stageId' => $qualStageId));
+        return ApiClient::post($url, array(
+            'target_stage_id' => $targetStageId,
+            'auth_email' => self::authEmail(),
+        ));
+    }
+
     // ===== Bơi (heat/lane) =====
 
     public static function drawSwimHeats($stageId, $laneCount = 6)
