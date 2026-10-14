@@ -353,7 +353,14 @@ class SportDrawController extends AdminController
             $this->jsonResponse(true, 'Đã cập nhật danh sách đội từ Bảng xếp hạng vào sơ đồ nhánh!', isset($result['data']) ? $result['data'] : null);
         }
 
-        // Fallback: Đồng bộ trực tiếp qua cơ sở dữ liệu nếu API chưa bật hoặc gặp lỗi
+        // Backend đã xử lý nhưng từ chối vì lý do nghiệp vụ (vd chưa có BXH, sai số bảng):
+        // báo đúng lỗi, KHÔNG fallback (fallback chỉ biết ghép chéo 3-1-0, sai với thể thức xếp hạng)
+        $httpCode = isset($result['code']) ? (int) $result['code'] : 0;
+        if ($httpCode >= 200 && $httpCode < 500) {
+            $this->jsonResponse(false, $this->apiError($result, 'Không thể sinh sơ đồ nhánh.'));
+        }
+
+        // Fallback: Đồng bộ trực tiếp qua cơ sở dữ liệu nếu API không kết nối được / lỗi máy chủ
         $fallback = $this->syncKnockoutFromDb($stageId);
         if ($fallback['success']) {
             $this->jsonResponse(true, $fallback['message'], $fallback['data'] ?? null);
