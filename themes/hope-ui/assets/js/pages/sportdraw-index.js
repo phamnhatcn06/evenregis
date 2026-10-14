@@ -39,13 +39,21 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ===== Modal cấu hình ===== */
     var modalEl = document.getElementById('modal-config');
     var formatSelect = document.getElementById('cfg-format');
-    var groupFields = document.querySelector('.cfg-group-fields');
+    var groupFields = document.querySelectorAll('.cfg-group-fields');
     var bracketFields = document.querySelector('.cfg-bracket-fields');
+    var pairingFields = document.querySelector('.cfg-pairing-fields');
 
     function toggleFormatFields() {
         var val = formatSelect.value;
-        groupFields.classList.toggle('d-none', GROUP_FORMATS.indexOf(val) === -1);
+        groupFields.forEach(function (el) {
+            el.classList.toggle('d-none', GROUP_FORMATS.indexOf(val) === -1);
+        });
         bracketFields.classList.toggle('d-none', BRACKET_FORMATS.indexOf(val) === -1);
+        pairingFields.classList.toggle('d-none', val !== 'round_robin_knockout');
+    }
+
+    function valueOr(value, fallback) {
+        return (value === null || value === undefined || value === '') ? fallback : value;
     }
 
     if (formatSelect) {
