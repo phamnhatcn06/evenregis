@@ -151,16 +151,11 @@ class SportStageSetupCommand extends CConsoleCommand
             return;
         }
 
-        // Dựng lại từ API để giữ nguyên cấu hình hiện có, chỉ đổi các trường cấu trúc
-        $model = SportStages::fetchFromApi($stage->id);
-        if ($model === null) {
-            echo "  [LOI] Khong tai duoc stage id={$stage->id}\n";
-            return;
-        }
+        $fields = array();
         foreach ($changes as $field => $v) {
-            $model->$field = $v[1];
+            $fields[$field] = $v[1];
         }
-        $result = $model->updateConfigViaApi();
+        $result = SportStages::updateStructureViaApi($stage->id, $fields);
         echo !empty($result['success'])
             ? "  [CAP NHAT OK] id={$stage->id}: {$desc}\n"
             : "  [LOI] id={$stage->id}: " . $this->errMsg($result) . "\n";
