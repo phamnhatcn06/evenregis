@@ -159,6 +159,7 @@ class Daihoi
         $sportsMap = array();
         $matches = array();
         $standingsBySport = array();
+        $swimBySport = array();
         $completedCount = 0;
         $liveCount = 0;
         $scheduledCount = 0;
