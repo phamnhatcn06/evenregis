@@ -561,18 +561,22 @@ class Daihoi
         }
 
         // 3. Tính huy chương từ bảng xếp hạng vòng tròn Vòng Chung kết (sport_standings)
-        $sqlStandings = "
-            SELECT s.rank, s.points, t.property_id, t.alliance_org_ids
-            FROM sport_standings s
-            JOIN sport_stages st ON st.id = s.stage_id AND st.event_id = :eventId AND st.deleted_at IS NULL
-            JOIN sport_teams t ON t.id = s.team_id AND t.deleted_at IS NULL
-            WHERE s.deleted_at IS NULL
-              AND (st.stage_type = 'final' OR st.name LIKE '%Chung kết%')
-              AND s.rank IN (1, 2, 3)
-        ";
-        $standings = Yii::app()->db->createCommand($sqlStandings)
-            ->bindValue(':eventId', $eventId)
-            ->queryAll();
+        // Cột stage_id được thêm ở bản cập nhật sau; bỏ qua khối này nếu DB chưa có cột.
+        $standings = array();
+        if (self::columnExists('sport_standings', 'stage_id')) {
+            $sqlStandings = "
+                SELECT s.rank, s.points, t.property_id, t.alliance_org_ids
+                FROM sport_standings s
+                JOIN sport_stages st ON st.id = s.stage_id AND st.event_id = :eventId AND st.deleted_at IS NULL
+                JOIN sport_teams t ON t.id = s.team_id AND t.deleted_at IS NULL
+                WHERE s.deleted_at IS NULL
+                  AND (st.stage_type = 'final' OR st.name LIKE '%Chung kết%')
+                  AND s.rank IN (1, 2, 3)
+            ";
+            $standings = Yii::app()->db->createCommand($sqlStandings)
+                ->bindValue(':eventId', $eventId)
+                ->queryAll();
+        }
 
         foreach ($standings as $s) {
             $pid = (int)$s['property_id'];
