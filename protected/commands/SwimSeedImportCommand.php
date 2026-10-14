@@ -126,17 +126,22 @@ class SwimSeedImportCommand extends CConsoleCommand
     }
 
     /**
-     * Map tên nội dung (chuẩn hoá) => giai đoạn vòng loại bơi của event.
+     * Map tên nội dung (chuẩn hoá) => giai đoạn bơi đầu tiên thi đấu của nội dung
+     * (hiện bơi chỉ thi Vòng chung kết; nếu sau này có vòng loại thì ưu tiên vòng loại).
      */
     protected function loadQualStages($eventId)
     {
         $map = array();
         $rows = SportStages::getApiDataProvider(array('event_id' => $eventId), 10000)->getData();
         foreach ($rows as $row) {
-            if (!SportStages::isSwimFormat($row->format) || $row->stage_type === 'final') {
+            if (!SportStages::isSwimFormat($row->format)) {
                 continue;
             }
-            $map[$this->normalize($row->sport_name)] = array('id' => $row->id, 'name' => $row->name);
+            $key = $this->normalize($row->sport_name);
+            $isQual = ($row->stage_type === 'qualification');
+            if (!isset($map[$key]) || ($isQual && !$map[$key]['is_qual'])) {
+                $map[$key] = array('id' => $row->id, 'name' => $row->name, 'is_qual' => $isQual);
+            }
         }
         return $map;
     }
