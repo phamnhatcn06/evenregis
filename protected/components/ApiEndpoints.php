@@ -529,6 +529,10 @@ class ApiEndpoints
     // Play-off: bốc thăm các trận độc lập + chuyển người thắng vào vòng bảng
     const SPORT_DRAW_PLAYOFF = '/api/sport-draw/playoff/{stageId}';
     const SPORT_DRAW_PROMOTE_PLAYOFF = '/api/sport-draw/promote-playoff/{stageId}';
+    // Bơi: bốc thăm phân lượt/làn, ghi thành tích, chuyển Top N vào chung kết
+    const SPORT_DRAW_SWIM_HEATS = '/api/sport-draw/swim-heats/{stageId}';
+    const SPORT_DRAW_SWIM_TIMES = '/api/sport-draw/swim-times/{stageId}';
+    const SPORT_DRAW_PROMOTE_SWIM = '/api/sport-draw/promote-swim/{stageId}';
 
     // Alliance Team Orgs
     const ALLIANCE_TEAM_ORG_LIST = '/api/alliance-team-orgs';
