@@ -8,19 +8,78 @@
 class BeautyVotes
 {
     /**
-     * Danh sách thí sinh chung kết kèm số phiếu.
+     * Dữ liệu trang bình chọn: trạng thái cổng + danh sách thí sinh kèm số phiếu.
+     * @param int $contestId
+     * @return array ['gate' => array, 'finalists' => array]
+     */
+    public static function getVotePageData($contestId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_VOTE_FINALISTS, array('id' => $contestId));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            if (is_array($data)) {
+                return array(
+                    'gate' => isset($data['gate']) ? $data['gate'] : array('is_open' => true, 'message' => ''),
+                    'finalists' => isset($data['finalists']) ? $data['finalists'] : array(),
+                );
+            }
+        }
+        return array('gate' => array('is_open' => true, 'message' => ''), 'finalists' => array());
+    }
+
+    /**
+     * Bảng xếp hạng số phiếu (trang quản trị).
+     * @param int $contestId
+     * @return array ['total_votes' => int, 'voter_count' => int, 'ranking' => array]
+     */
+    public static function getRanking($contestId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_VOTE_RANKING, array('id' => $contestId));
+        $result = ApiClient::get($url);
+        if ($result['success'] && isset($result['data'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
+            if (is_array($data)) {
+                return array(
+                    'total_votes' => isset($data['total_votes']) ? (int) $data['total_votes'] : 0,
+                    'voter_count' => isset($data['voter_count']) ? (int) $data['voter_count'] : 0,
+                    'ranking' => isset($data['ranking']) ? $data['ranking'] : array(),
+                );
+            }
+        }
+        return array('total_votes' => 0, 'voter_count' => 0, 'ranking' => array());
+    }
+
+    /**
+     * Lấy cấu hình khung giờ bình chọn.
      * @param int $contestId
      * @return array
      */
-    public static function getFinalistsForVote($contestId)
+    public static function getSettings($contestId)
     {
-        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_VOTE_FINALISTS, array('id' => $contestId));
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_VOTE_SETTINGS, array('id' => $contestId));
         $result = ApiClient::get($url);
         if ($result['success'] && isset($result['data'])) {
             $data = isset($result['data']['data']) ? $result['data']['data'] : $result['data'];
             return is_array($data) ? $data : array();
         }
         return array();
+    }
+
+    /**
+     * Cập nhật khung giờ bình chọn.
+     * @param int $contestId
+     * @param string|null $startAt
+     * @param string|null $endAt
+     * @return array raw response
+     */
+    public static function updateSettings($contestId, $startAt, $endAt)
+    {
+        return ApiClient::post(ApiEndpoints::BEAUTY_VOTE_SETTINGS_UPDATE, array(
+            'contest_id' => $contestId,
+            'vote_start_at' => $startAt,
+            'vote_end_at' => $endAt,
+        ));
     }
 
     /**
