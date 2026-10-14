@@ -273,19 +273,21 @@ class SportSeedCommand extends CConsoleCommand
                     'format' => 'round_robin',
                     'num_groups' => 3, 'teams_per_group' => 3, 'advance_per_group' => 1,
                     'location' => $NTD,
+                    'rules' => '1 hiệp chạm 21đ. Bốc thăm 3 bảng đấu vòng tròn, chọn Nhất mỗi bảng.',
                 ),
                 array(
                     'name' => 'Vòng chung kết (Tranh 1-2-3)', 'stage_type' => 'final', 'stage_order' => 2,
                     'format' => 'round_robin',
                     'num_groups' => 1, 'teams_per_group' => 3, 'advance_per_group' => 3,
                     'location' => $NTD,
+                    'rules' => '1 hiệp chạm 21đ. Nhất 3 bảng vào đấu vòng tròn tranh 1-2-3.',
                 ),
             ),
 
             // Pickleball — loại trực tiếp
-            'PK.2M' => $ko($KS, 8),
-            'PK.2F' => $ko($KS, 8),
-            'PK.MF' => $ko($KS, 8),
+            'PK.2M' => $ko($KS, 8, $RACKET_15),
+            'PK.2F' => $ko($KS, 8, $RACKET_15),
+            'PK.MF' => $ko($KS, 8, $RACKET_15),
 
             // Bơi (6 nội dung) — vòng loại theo lượt + chung kết top 6
             'BTD.M40' => $this->swimStages($BB_POOL),
