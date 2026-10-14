@@ -210,11 +210,16 @@ class SportStages extends BaseSportStages
      *
      * @param string $stageId
      * @param array $times Mảng [lane_id => result_ms]
+     * @param array $lanes Mảng [lane_id => lane_no] (sửa làn thủ công, tuỳ chọn)
      */
-    public static function recordSwimTimes($stageId, $times)
+    public static function recordSwimTimes($stageId, $times, $lanes = array())
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_SWIM_TIMES, array('stageId' => $stageId));
-        return ApiClient::post($url, array('times' => $times, 'auth_email' => self::authEmail()));
+        return ApiClient::post($url, array(
+            'times' => (object) $times,
+            'lanes' => (object) $lanes,
+            'auth_email' => self::authEmail(),
+        ));
     }
 
     public static function promoteSwimTop($qualStageId, $finalStageId, $topN = 6)
