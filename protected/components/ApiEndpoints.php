@@ -622,6 +622,11 @@ class ApiEndpoints
     const BEAUTY_FINAL_LIST = '/api/beauty-finals/list/{id}';
     const BEAUTY_FINAL_REMOVE = '/api/beauty-finals/remove/{id}';
 
+    // Cổng bình chọn Miss (public)
+    const BEAUTY_VOTE_FINALISTS = '/api/beauty-votes/finalists/{id}';
+    const BEAUTY_VOTE_CAST = '/api/beauty-votes/cast';
+    const BEAUTY_VOTE_STATUS = '/api/beauty-votes/voter-status';
+
     const TALENT_FINAL_ADD = '/api/talent-finals/add';
     const TALENT_FINAL_LIST = '/api/talent-finals/list/{id}';
     const TALENT_FINAL_REMOVE = '/api/talent-finals/remove/{id}';
