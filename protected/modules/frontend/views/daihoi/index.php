@@ -476,7 +476,7 @@ if (empty($albumList)) {
           );
           foreach ($defaults as $i => $d) {
             $t = $cardThemes[$i % count($cardThemes)];
-            $cards[] = array('theme' => $t, 'title' => $d[0], 'desc' => $d[1], 'tag' => $t['tag']);
+            $cards[] = array('theme' => $t, 'title' => $d[0], 'desc' => $d[1], 'tag' => $t['tag'], 'needle' => $d[0] . ' ' . $t['tag']);
           }
         }
         $delays = array('delay-100', 'delay-150', 'delay-200', 'delay-250', 'delay-300', 'delay-350');
