@@ -36,6 +36,11 @@ foreach ($stages as $s) {
     if (SportStages::isSwimFormat($s->format) && $s->stage_type === 'final' && !isset($swimFinalBySport[$s->sport_id])) {
         $swimFinalBySport[$s->sport_id] = array('id' => $s->id, 'name' => $s->name);
     }
+    // Vòng chung kết chia bảng (vd vòng tròn tranh 1-2-3) nhận đội đi tiếp từ vòng loại
+    $isGroupFinal = SportStages::isGroupFormat($s->format) && $s->stage_type === 'final';
+    if ($isGroupFinal && (!isset($groupFinalBySport[$s->sport_id]) || $s->id < $groupFinalBySport[$s->sport_id]['id'])) {
+        $groupFinalBySport[$s->sport_id] = array('id' => $s->id, 'name' => $s->name);
+    }
 }
 ?>
 
