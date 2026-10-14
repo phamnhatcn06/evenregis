@@ -106,6 +106,20 @@ class Schedule
     }
 
     /**
+     * Nguồn Agenda chung: chương trình đại hội công khai (áp dụng cho mọi người).
+     *
+     * @param string|int $eventId
+     * @return array danh sách item chuẩn hoá (chưa gán status)
+     */
+    public static function getAgendaItems($eventId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SCHEDULE_AGENDA, array(
+            'event_id' => $eventId,
+        ));
+        return self::unwrapList($result);
+    }
+
+    /**
      * Bóc danh sách item từ response ApiClient ({success, data:{code,message,data:[...]}}).
      *
      * @param array $result kết quả ApiClient
