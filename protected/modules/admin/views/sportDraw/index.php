@@ -23,6 +23,15 @@ Yii::app()->clientScript->registerScriptFile(
 );
 
 $stages = ($dataProvider !== null) ? $dataProvider->getData() : array();
+
+// Map sport_id => stage vòng bảng đích (để chuyển người thắng play-off sang).
+// Ưu tiên giai đoạn chia bảng (round_robin_knockout / round_robin) cùng môn.
+$targetStageBySport = array();
+foreach ($stages as $s) {
+    if (SportStages::isGroupFormat($s->format) && !isset($targetStageBySport[$s->sport_id])) {
+        $targetStageBySport[$s->sport_id] = array('id' => $s->id, 'name' => $s->name);
+    }
+}
 ?>
 
 <div id="sport-draw-config"
