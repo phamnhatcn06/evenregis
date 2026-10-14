@@ -739,43 +739,6 @@ if (empty($albumList)) {
       </div>
     </section>
 
-    <!-- SECTION 5: BANNER FUN RUN -->
-    <section class="container py-3 py-md-4 reveal-scale">
-      <div class="rounded-4 p-4 p-md-5 text-white shadow-lg overflow-hidden position-relative" style="background:linear-gradient(135deg,#0b1329 0%,#1e3a8a 50%,#0f766e 100%);">
-        <!-- Floating ambient glowing light -->
-        <div class="glow-orb" style="top:10%;right:15%;width:320px;height:320px;background:radial-gradient(circle,rgba(56,189,248,0.25) 0%,transparent 70%);"></div>
-
-        <div class="row align-items-center g-4 position-relative z-1">
-          <div class="col-12 col-md-8">
-            <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge text-white-50 text-uppercase fw-bold mb-2" style="font-size:11px;">
-              <span class="material-symbols-outlined fs-6 text-warning">stars</span> Đại Hội Mường Thanh <?php echo $e($eventYear); ?>
-            </div>
-            <h2 class="fw-black text-uppercase text-white lh-1 mb-2" style="font-size:calc(1.6rem + 1.2vw);">MƯỜNG THANH FUN RUN</h2>
-            <p class="fs-6 fw-bold text-info-emphasis mb-2">Chạy Giữa Miền Di Sản • <?php echo $e($eventDestination); ?></p>
-            <p class="text-light opacity-90 small mb-4" style="max-width:580px;">Hành trình chạy bộ kết nối cộng đồng người Mường Thanh giữa không gian danh thắng, nơi tinh thần rèn luyện thể thao hòa quyện cùng cảnh sắc non nước Ninh Bình hùng vĩ.</p>
-            <div class="row g-2">
-              <div class="col-12 col-sm-4">
-                <div class="card glass-badge border-0 p-3 text-white card-hover"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Thời gian</span><strong class="small">06:00 - 10:30</strong></div>
-              </div>
-              <div class="col-12 col-sm-4">
-                <div class="card glass-badge border-0 p-3 text-white card-hover"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Điểm xuất phát</span><strong class="small">Quảng trường trung tâm</strong></div>
-              </div>
-              <div class="col-12 col-sm-4">
-                <div class="card glass-badge border-0 p-3 text-white card-hover"><span class="text-white-50 text-uppercase fw-bold" style="font-size:10px;">Cự ly</span><strong class="small">5KM, 10KM &amp; 15KM</strong></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-md-4 text-center d-flex flex-column align-items-center justify-content-center gap-3">
-            <div class="rounded-4 p-4 shadow-lg d-flex align-items-center justify-content-center text-white icon-bounce" style="width:110px;height:110px;background:linear-gradient(135deg,#ea580c,#f59e0b);box-shadow:0 12px 30px rgba(234,88,12,0.4) !important;">
-              <span class="material-symbols-outlined" style="font-size:54px;">sprint</span>
-            </div>
-            <a class="btn btn-light rounded-pill fw-bold px-4 py-2 text-dark shadow-lg d-inline-flex align-items-center gap-1 btn-shimmer" href="#noi-dung" style="font-size:13.5px;">
-              <span>Xem chi tiết giải chạy</span><span class="material-symbols-outlined fs-6 arrow-slide">arrow_forward</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- SECTION 6: TIN TỨC -->
     <section class="container py-4" id="tin-tuc">
