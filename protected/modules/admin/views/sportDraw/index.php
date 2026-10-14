@@ -29,6 +29,7 @@ $stages = ($dataProvider !== null) ? $dataProvider->getData() : array();
 $targetStageBySport = array();
 // Map sport_id => stage chung kết bơi (heat_lane, stage_type=final) để chuyển Top N.
 $swimFinalBySport = array();
+$groupFinalBySport = array();
 foreach ($stages as $s) {
     if (SportStages::isGroupFormat($s->format) && !isset($targetStageBySport[$s->sport_id])) {
         $targetStageBySport[$s->sport_id] = array('id' => $s->id, 'name' => $s->name);
