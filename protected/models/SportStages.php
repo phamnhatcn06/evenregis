@@ -145,6 +145,12 @@ class SportStages extends BaseSportStages
             'advance_per_group' => $this->advance_per_group !== '' ? $this->advance_per_group : null,
             'bracket_size' => $this->bracket_size !== '' ? $this->bracket_size : null,
         );
+        if ($this->rules !== null && $this->rules !== '') {
+            $data['rules'] = $this->rules;
+        }
+        if ($this->location !== null && $this->location !== '') {
+            $data['location'] = $this->location;
+        }
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_STAGE_UPDATE, array('id' => $this->id));
         return ApiClient::post($url, $data);
     }
