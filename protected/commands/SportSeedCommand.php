@@ -205,7 +205,7 @@ class SportSeedCommand extends CConsoleCommand
 
         return array(
             // Bóng đá Nam — 8 đội loại trực tiếp
-            'BĐ.M' => $ko($TEDDY, 8),
+            'BĐ.M' => $ko($TEDDY, 8, '25 phút/hiệp. Bốc thăm chia cặp, loại trực tiếp tranh 1-2-3-4.'),
 
             // Bóng đá Nữ — 2 bảng vòng tròn -> tranh 1-2 / 3-4
             'BĐ.F' => array(array(
@@ -213,6 +213,7 @@ class SportSeedCommand extends CConsoleCommand
                 'format' => 'round_robin_knockout',
                 'num_groups' => 2, 'teams_per_group' => 3, 'advance_per_group' => 2, 'bracket_size' => 4,
                 'location' => $TEDDY,
+                'rules' => '20 phút/hiệp. Bốc thăm chia 2 bảng, đấu vòng tròn. Nhất bảng vào tranh 1-2, Nhì bảng vào tranh 3-4.',
             )),
 
             // Kéo co — 8 đội, 2 bảng vòng tròn, BK chéo, CK tranh 1-2-3-4
@@ -221,6 +222,7 @@ class SportSeedCommand extends CConsoleCommand
                 'format' => 'round_robin_knockout',
                 'num_groups' => 2, 'teams_per_group' => 4, 'advance_per_group' => 2, 'bracket_size' => 4,
                 'location' => $NTD,
+                'rules' => '3 hiệp thắng 2. Bốc thăm 2 bảng đấu vòng tròn chọn Nhất-Nhì; bán kết đấu chéo; chung kết loại trực tiếp tranh 1-2-3-4.',
             )),
 
             // Bóng bàn đơn Nam — 2 play-off + 2 bảng vòng tròn -> BK, CK
