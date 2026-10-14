@@ -70,8 +70,4 @@ $urlRewrite = array(
     // Cổng cá nhân người tham dự (đăng nhập dùng chung mọi tính năng)
     'portal' => 'frontend/portal/login',
     'portal/<action:\w+>' => 'frontend/portal/<action>',
-
-    // Cổng đăng ký hoạt động (Fun Run & Tham quan)
-    'run' => 'frontend/run/index',
-    'run/<action:\w+>' => 'frontend/run/<action>',
 );
