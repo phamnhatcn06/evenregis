@@ -1039,6 +1039,22 @@ if (empty($albumList)) {
           if (!$ts) { return ''; }
           return date('d-m-Y', $ts);
         };
+        // Lấy mô tả ngắn; nếu rỗng thì trích một đoạn từ nội dung bài viết.
+        $newsExcerpt = function ($item) use ($val) {
+          $desc = $val($item, array('excerpt', 'summary', 'short_description', 'description'), '');
+          if ($desc === '') {
+            $content = $val($item, array('content', 'body'), '');
+            if ($content !== '') {
+              $text = trim(preg_replace('/\s+/', ' ', strip_tags($content)));
+              if (function_exists('mb_substr')) {
+                $desc = mb_strlen($text, 'UTF-8') > 160 ? mb_substr($text, 0, 160, 'UTF-8') . '…' : $text;
+              } else {
+                $desc = strlen($text) > 160 ? substr($text, 0, 160) . '…' : $text;
+              }
+            }
+          }
+          return $desc;
+        };
         $newsItems = array();
         if (!empty($news)) {
           foreach (array_slice($news, 0, 3) as $n) {
@@ -1051,7 +1067,7 @@ if (empty($albumList)) {
               'cat' => $catName,
               'date' => $fmtNewsDate($val($n, array('published_at', 'created_at', 'date'), '')),
               'title' => $val($n, array('title', 'name'), ''),
-              'desc' => $val($n, array('excerpt', 'summary', 'short_description', 'description'), ''),
+              'desc' => $newsExcerpt($n),
               'id' => $val($n, array('id'), ''),
             );
           }
