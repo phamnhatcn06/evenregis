@@ -120,6 +120,9 @@ class SportStageBackfillCommand extends CConsoleCommand
         $model->advance_per_group = isset($spec['advance_per_group']) ? $spec['advance_per_group'] : '';
         $model->bracket_size = isset($spec['bracket_size']) ? $spec['bracket_size'] : '';
         $model->rules = isset($spec['rules']) ? $spec['rules'] : '';
+        foreach (array('win_points', 'draw_points', 'loss_points', 'tiebreak', 'ko_pairing') as $name) {
+            $model->$name = isset($spec[$name]) ? $spec[$name] : '';
+        }
 
         $result = $model->updateConfigViaApi();
         if (!empty($result['success'])) {
