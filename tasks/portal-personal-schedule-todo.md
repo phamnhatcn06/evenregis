@@ -4,9 +4,9 @@ Spec: `docs/specs/portal-personal-schedule.md` · Plan: `tasks/portal-personal-s
 
 ## Phase 0: Nền tảng
 - [x] 0.1 Model `Schedule` + hằng số item/status + `buildTimeline`/next-up (giờ VN) + unit test (14/14 pass qua harness CLI)
-- [ ] 0.2 Route + `PortalController::actionSchedule` + view khung + partial + `schedule-my.js` đếm ngược + link dashboard
+- [x] 0.2 Route (`lich-trinh-cua-toi`) + `PortalController::actionSchedule` + view `schedule.php` + partial `_next_up`/`_timeline` + `schedule-my.js` đếm ngược + `schedule-my.css` + link dashboard
 
-## ⛳ Checkpoint A: Nền tảng xong (chốt Phương án backend A/B)
+## ⛳ Checkpoint A: Nền tảng xong ✅ (Phương án A đã chốt) — ĐANG DỪNG CHỜ XÁC NHẬN
 
 ## Phase 1: Nguồn dữ liệu (vertical slices)
 - [ ] 1.1 Nguồn Thể thao (ưu tiên nhất)
