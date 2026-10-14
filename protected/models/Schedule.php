@@ -90,6 +90,22 @@ class Schedule
     }
 
     /**
+     * Nguồn Thi nghiệp vụ: các vòng thi của cuộc thi người tham dự đã đăng ký (kèm SBD).
+     *
+     * @param string|int $attendeeId
+     * @param string|int $eventId
+     * @return array danh sách item chuẩn hoá (chưa gán status)
+     */
+    public static function getCompetitionItems($attendeeId, $eventId)
+    {
+        $result = ApiClient::get(ApiEndpoints::SCHEDULE_COMPETITION, array(
+            'attendee_id' => $attendeeId,
+            'event_id' => $eventId,
+        ));
+        return self::unwrapList($result);
+    }
+
+    /**
      * Bóc danh sách item từ response ApiClient ({success, data:{code,message,data:[...]}}).
      *
      * @param array $result kết quả ApiClient
