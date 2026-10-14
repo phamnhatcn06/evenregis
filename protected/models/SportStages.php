@@ -12,6 +12,14 @@ class SportStages extends BaseSportStages
     const FORMAT_TIME_TRIAL = 'time_trial';
     const FORMAT_PLAYOFF = 'playoff';
 
+    // Tiêu chí phụ khi bằng điểm
+    const TIEBREAK_HEAD_TO_HEAD = 'head_to_head';
+    const TIEBREAK_GOAL_DIFFERENCE = 'goal_difference';
+
+    // Cách ghép đội từ bảng vào loại trực tiếp
+    const PAIRING_CROSS = 'cross';
+    const PAIRING_PLACEMENT = 'placement';
+
     // Trạng thái bốc thăm
     const DRAW_NOT_DRAWN = 'not_drawn';
     const DRAW_DRAWN = 'drawn';
