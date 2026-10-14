@@ -16,7 +16,7 @@ class FrontEndController extends Controller
 
   public function init()
   {
-    Yii::app()->theme = 'highadmin';
+    Yii::app()->theme = 'hope-ui';
     $this->layout = 'main';
   }
 
