@@ -111,6 +111,11 @@ foreach ($stages as $s) {
                         'teams_per_group' => $stage->teams_per_group,
                         'advance_per_group' => $stage->advance_per_group,
                         'bracket_size' => $stage->bracket_size,
+                        'win_points' => $stage->win_points,
+                        'draw_points' => $stage->draw_points,
+                        'loss_points' => $stage->loss_points,
+                        'tiebreak' => $stage->tiebreak,
+                        'ko_pairing' => $stage->ko_pairing,
                     ));
                     ?>
                     <tr>
