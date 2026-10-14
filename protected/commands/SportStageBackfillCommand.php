@@ -147,39 +147,44 @@ class SportStageBackfillCommand extends CConsoleCommand
         };
         $racket = self::RACKET_15;
 
+        // Cách tính điểm vòng bảng theo điều lệ từng môn (docs/dieule)
+        $football = array('win_points' => 3, 'draw_points' => 1, 'loss_points' => 0, 'tiebreak' => 'goal_difference');
+        $winTwoLossOne = array('win_points' => 2, 'draw_points' => 1, 'loss_points' => 1, 'tiebreak' => 'head_to_head');
+        $winsOnly = array('win_points' => 1, 'draw_points' => 0, 'loss_points' => 0, 'tiebreak' => 'goal_difference');
+
         return array(
             // Bóng đá
             'Bóng đá nam' => $KO8('25 phút/hiệp. Bốc thăm chia cặp, loại trực tiếp tranh 1-2-3-4.'),
             'Bóng đá nữ' => array(
                 'format' => 'round_robin_knockout', 'num_groups' => 2, 'teams_per_group' => 3,
-                'advance_per_group' => 2, 'bracket_size' => 4,
-                'rules' => '20 phút/hiệp. Bốc thăm chia 2 bảng, đấu vòng tròn. Nhất bảng vào tranh 1-2, Nhì bảng vào tranh 3-4.',
-            ),
+                'advance_per_group' => 2, 'bracket_size' => 4, 'ko_pairing' => 'placement',
+                'rules' => '20 phút/hiệp. Bốc thăm chia 2 bảng, đấu vòng tròn (thắng 3đ, hoà 1đ, thua 0đ; bằng điểm xét hiệu số → bàn thắng → đối đầu). Nhất bảng vào tranh 1-2, Nhì bảng vào tranh 3-4.',
+            ) + $football,
 
             // Kéo co
             'Kéo co phối hợp Nam - Nữ' => array(
                 'format' => 'round_robin_knockout', 'num_groups' => 2, 'teams_per_group' => 4,
-                'advance_per_group' => 2, 'bracket_size' => 4,
-                'rules' => '3 hiệp thắng 2. Bốc thăm 2 bảng đấu vòng tròn chọn Nhất-Nhì; bán kết đấu chéo; chung kết loại trực tiếp tranh 1-2-3-4.',
-            ),
+                'advance_per_group' => 2, 'bracket_size' => 4, 'ko_pairing' => 'cross',
+                'rules' => '3 hiệp thắng 2. Bốc thăm 2 bảng đấu vòng tròn (thắng 2đ, thua 1đ; bằng điểm xét đối đầu → hiệu số hiệp) chọn Nhất-Nhì; bán kết đấu chéo; chung kết loại trực tiếp tranh 1-2-3-4.',
+            ) + $winTwoLossOne,
 
-            // Bóng bàn đơn nam — có play-off; stage hiện tại đặt là vòng bảng + KO
+            // Bóng bàn đơn nam — play-off (stage riêng) rồi vòng bảng + KO
             'Bóng bàn đơn nam' => array(
                 'format' => 'round_robin_knockout', 'num_groups' => 2, 'teams_per_group' => 4,
-                'advance_per_group' => 2, 'bracket_size' => 4,
-                'rules' => 'Vòng bảng: 3 hiệp thắng 2 (11đ/séc, cách biệt 2đ). VCK: 5 hiệp thắng 3. 2 trận play-off chọn đủ 8 đội; 2 bảng vòng tròn, Nhất-Nhì mỗi bảng vào bán kết, chung kết tranh 1-2-3-4. (Nếu cần tách play-off thành giai đoạn riêng, tạo thêm trong màn cấu hình.)',
-            ),
+                'advance_per_group' => 2, 'bracket_size' => 4, 'ko_pairing' => 'cross',
+                'rules' => 'Vòng bảng: 3 hiệp thắng 2 (11đ/séc, cách biệt 2đ); thắng 2đ, thua 1đ, bằng điểm xét đối đầu → hiệu số séc. VCK: 5 hiệp thắng 3. 2 bảng vòng tròn, Nhất-Nhì mỗi bảng vào bán kết, chung kết tranh 1-2-3-4.',
+            ) + $winTwoLossOne,
 
             // Bóng bàn đơn nữ — vòng loại 3 bảng + CK vòng tròn 3
             'Bóng bàn đơn nữ' => array(
                 'qualification' => array(
                     'format' => 'round_robin', 'num_groups' => 3, 'teams_per_group' => 4, 'advance_per_group' => 1,
-                    'rules' => 'Vòng loại: 3 hiệp thắng 2 (11đ/séc, cách biệt 2đ). Bốc thăm 3 bảng (4+4+3) đấu vòng tròn, chọn Nhất mỗi bảng.',
-                ),
+                    'rules' => 'Vòng loại: 3 hiệp thắng 2 (11đ/séc, cách biệt 2đ); thắng 2đ, thua 1đ, bằng điểm xét đối đầu → hiệu số séc. Bốc thăm 3 bảng (4+4+3) đấu vòng tròn, chọn Nhất mỗi bảng.',
+                ) + $winTwoLossOne,
                 'final' => array(
                     'format' => 'round_robin', 'num_groups' => 1, 'teams_per_group' => 3, 'advance_per_group' => 3,
-                    'rules' => 'VCK: 5 hiệp thắng 3 (11đ/séc, cách biệt 2đ). Nhất 3 bảng vào đấu vòng tròn tranh 1-2-3.',
-                ),
+                    'rules' => 'VCK: 5 hiệp thắng 3 (11đ/séc, cách biệt 2đ). Nhất 3 bảng vào đấu vòng tròn tranh 1-2-3 (thắng 2đ, thua 1đ).',
+                ) + $winTwoLossOne,
             ),
 
             // Cầu lông đơn/đôi — loại trực tiếp
