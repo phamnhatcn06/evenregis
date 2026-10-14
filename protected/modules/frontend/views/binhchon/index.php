@@ -26,6 +26,10 @@ $isOpen = !isset($gate['is_open']) || $gate['is_open'];
 <?php endif; ?>
 
 <?php if (!$isOpen): ?>
+    <?php
+    // Chưa tới giờ mở (có start_at và server_time < start_at) → đếm ngược.
+    $notYet = !empty($gate['start_at']) && !empty($gate['server_time']) && $gate['server_time'] < $gate['start_at'];
+    ?>
     <div class="alert alert-secondary text-center">
         <i class="fa fa-lock me-1"></i>
         <strong><?php echo CHtml::encode(isset($gate['message']) ? $gate['message'] : 'Cổng bình chọn hiện đóng.'); ?></strong>
@@ -34,6 +38,14 @@ $isOpen = !isset($gate['is_open']) || $gate['is_open'];
         <?php endif; ?>
         <?php if (!empty($gate['end_at'])): ?>
             <div class="small text-muted">Thời gian đóng: <?php echo CHtml::encode($gate['end_at']); ?></div>
+        <?php endif; ?>
+        <?php if ($notYet): ?>
+            <div id="vote-countdown"
+                 class="h4 fw-bold text-primary mt-2 mb-0"
+                 data-start="<?php echo CHtml::encode(str_replace(' ', 'T', $gate['start_at'])); ?>"
+                 data-now="<?php echo CHtml::encode(str_replace(' ', 'T', $gate['server_time'])); ?>">
+                Cổng mở sau: --:--:--
+            </div>
         <?php endif; ?>
     </div>
 <?php endif; ?>
