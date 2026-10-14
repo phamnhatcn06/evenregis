@@ -481,9 +481,40 @@ if (empty($albumList)) {
         </div>
         <!-- Header Actions -->
         <div class="col-4 col-sm-6 col-lg-3 d-flex align-items-center justify-content-end gap-2">
-          <a class="btn btn-sm fw-bold px-3 py-2 rounded-pill <?php echo $hasPortalToken ? 'd-none d-md-inline-flex' : 'd-none d-sm-inline-flex'; ?> align-items-center gap-1 shadow-sm text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
-            <span class="material-symbols-outlined" style="font-size:17px;">how_to_reg</span> Đăng nhập thành viên
-          </a>
+          <?php if ($memberLoggedIn): ?>
+            <div class="dropdown <?php echo $hasPortalToken ? 'd-none d-md-block' : 'd-none d-sm-block'; ?>">
+              <button class="btn btn-sm fw-bold px-3 py-2 rounded-pill d-inline-flex align-items-center gap-1 shadow-sm text-white btn-shimmer" type="button" id="memberMenuBtn" data-bs-toggle="dropdown" aria-expanded="false" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
+                <span class="material-symbols-outlined" style="font-size:17px;">account_circle</span>
+                <span class="text-truncate" style="max-width:150px;"><?php echo $e($memberName); ?></span>
+                <span class="material-symbols-outlined" style="font-size:16px;">expand_more</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="memberMenuBtn" style="min-width:220px;">
+                <li>
+                  <h6 class="dropdown-header text-truncate"><?php echo $e($memberName); ?></h6>
+                </li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?php echo $e($memberHomeUrl); ?>">
+                    <span class="material-symbols-outlined text-success" style="font-size:19px;">person</span> Trang cá nhân
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?php echo $e($memberScheduleUrl); ?>">
+                    <span class="material-symbols-outlined text-success" style="font-size:19px;">event</span> Lịch trình của tôi
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="<?php echo $e($memberLogoutUrl); ?>">
+                    <span class="material-symbols-outlined" style="font-size:19px;">logout</span> Đăng xuất
+                  </a>
+                </li>
+              </ul>
+            </div>
+          <?php else: ?>
+            <a class="btn btn-sm fw-bold px-3 py-2 rounded-pill <?php echo $hasPortalToken ? 'd-none d-md-inline-flex' : 'd-none d-sm-inline-flex'; ?> align-items-center gap-1 shadow-sm text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:13px;">
+              <span class="material-symbols-outlined" style="font-size:17px;">how_to_reg</span> Đăng nhập thành viên
+            </a>
+          <?php endif; ?>
           <?php if ($hasPortalToken): ?>
             <a class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-pill d-none d-sm-inline-flex align-items-center gap-1 shadow-sm btn-shimmer" href="<?php echo $e($adminUrl); ?>" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;font-size:13px;">
               <span class="material-symbols-outlined" style="font-size:17px;">admin_panel_settings</span> Vào quản trị
