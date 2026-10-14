@@ -38,6 +38,38 @@ function swimMsToText($ms)
     }
     return sprintf('%d.%02d', $sec, $cs);
 }
+
+/** Huy chương cho hạng 1-3, số thứ tự cho hạng còn lại */
+function swimRankBadge($rank)
+{
+    $medals = array(1 => array('Nhất', 'bg-warning text-dark'), 2 => array('Nhì', 'bg-secondary'), 3 => array('Ba', 'bg-danger'));
+    if (!$rank) {
+        return '—';
+    }
+    if (isset($medals[$rank])) {
+        return '<span class="badge ' . $medals[$rank][1] . '">' . $medals[$rank][0] . '</span>';
+    }
+    return '<span class="badge bg-light text-dark">' . (int) $rank . '</span>';
+}
+
+// Bảng xếp hạng chung cuộc: gộp mọi lượt, sắp theo hạng
+$ranking = array();
+foreach ($heats as $heat) {
+    foreach ($heat['lanes'] as $lane) {
+        if (!empty($lane['rank'])) {
+            $ranking[] = array(
+                'rank' => (int) $lane['rank'],
+                'team_name' => $lane['team_name'],
+                'heat_no' => $heat['heat_no'],
+                'lane_no' => $lane['lane_no'],
+                'result_ms' => $lane['result_ms'],
+            );
+        }
+    }
+}
+usort($ranking, function ($a, $b) {
+    return $a['rank'] - $b['rank'];
+});
 ?>
 
 <div id="swim-times-root"
