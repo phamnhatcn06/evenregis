@@ -799,7 +799,16 @@ $sportThemes = array(
         </div>
 
         <!-- 6.1 Bục Vinh Danh Top 3 (Podium Showcase) -->
-        <?php if (count($rankings) >= 3): ?>
+        <?php
+        $hasMedals = false;
+        foreach ($rankings as $item) {
+            if (!empty($item['gold']) || !empty($item['silver']) || !empty($item['bronze']) || !empty($item['points'])) {
+                $hasMedals = true;
+                break;
+            }
+        }
+        ?>
+        <?php if ($hasMedals && count($rankings) >= 3): ?>
           <?php
           $top1 = $rankings[0];
           $top2 = $rankings[1];
@@ -812,6 +821,7 @@ $sportThemes = array(
                 <div class="podium-badge-icon mb-2">🥈</div>
                 <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1 fw-bold small mb-2">Hạng 2 • Á Quân</span>
                 <h5 class="fw-bold text-dark fs-6 mb-2 text-truncate" title="<?php echo $e($val($top2, array('name', 'team_name'), '')); ?>">
+                  <?php if (!empty($top2['prefix'])): ?><span class="badge bg-dark text-white rounded-pill me-1" style="font-size:9.5px;letter-spacing:0.3px;"><?php echo $e($top2['prefix']); ?></span><?php endif; ?>
                   <?php echo $e($val($top2, array('name', 'team_name'), '')); ?>
                 </h5>
                 <div class="d-flex align-items-center justify-content-center gap-2 small text-muted mb-2">
@@ -830,6 +840,7 @@ $sportThemes = array(
                 <div class="podium-badge-icon mb-2 fs-1">👑</div>
                 <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-black small mb-2 shadow-2xs">🥇 HẠNG 1 • VÔ ĐỊCH</span>
                 <h4 class="fw-black text-dark fs-6 mb-2 text-truncate" title="<?php echo $e($val($top1, array('name', 'team_name'), '')); ?>">
+                  <?php if (!empty($top1['prefix'])): ?><span class="badge bg-dark text-white rounded-pill me-1" style="font-size:10px;letter-spacing:0.3px;"><?php echo $e($top1['prefix']); ?></span><?php endif; ?>
                   <?php echo $e($val($top1, array('name', 'team_name'), '')); ?>
                 </h4>
                 <div class="d-flex align-items-center justify-content-center gap-3 small text-muted mb-3">
@@ -847,6 +858,7 @@ $sportThemes = array(
                 <div class="podium-badge-icon mb-2">🥉</div>
                 <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 fw-bold small mb-2">Hạng 3 • Quý Quân</span>
                 <h5 class="fw-bold text-dark fs-6 mb-2 text-truncate" title="<?php echo $e($val($top3, array('name', 'team_name'), '')); ?>">
+                  <?php if (!empty($top3['prefix'])): ?><span class="badge bg-dark text-white rounded-pill me-1" style="font-size:9.5px;letter-spacing:0.3px;"><?php echo $e($top3['prefix']); ?></span><?php endif; ?>
                   <?php echo $e($val($top3, array('name', 'team_name'), '')); ?>
                 </h5>
                 <div class="d-flex align-items-center justify-content-center gap-2 small text-muted mb-2">
@@ -855,6 +867,18 @@ $sportThemes = array(
                   <span>🥉 <?php echo (int)$val($top3, 'bronze', 0); ?></span>
                 </div>
                 <div class="fw-black text-primary fs-5"><?php echo $e($val($top3, array('points', 'score'), 0)); ?> <span class="small fs-6 fw-normal text-muted">điểm</span></div>
+              </div>
+            </div>
+          </div>
+        <?php elseif (!$hasMedals): ?>
+          <div class="card border-0 rounded-4 shadow-sm bg-white p-3 mb-4">
+            <div class="d-flex align-items-center gap-3">
+              <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center flex-shrink-0" style="width:38px;height:38px;">
+                <span class="material-symbols-outlined fs-5">emoji_events</span>
+              </div>
+              <div>
+                <div class="fw-bold text-dark small">Bảng tổng sắp huy chương toàn đoàn (Dữ liệu thời gian thực)</div>
+                <div class="text-muted" style="font-size:12px;">Các nội dung tranh tài đang diễn ra. Bục vinh danh và số lượng huy chương sẽ được tự động cập nhật ngay khi các trận chung kết có kết quả chính thức.</div>
               </div>
             </div>
           </div>
@@ -878,6 +902,10 @@ $sportThemes = array(
                 <?php foreach ($rankings as $i => $r):
                   $rank = (int) $val($r, array('rank', 'position'), $i + 1);
                   $name = $val($r, array('name', 'team_name', 'unit_name', 'org_name', 'organization_name'), '');
+                  $prefix = $val($r, array('prefix', 'property_prefix'), '');
+                  if ($prefix === '') {
+                      $prefix = $initials($name);
+                  }
                   $points = $val($r, array('points', 'score', 'total_points'), '0');
                   $gold = $val($r, array('gold'), 0);
                   $silver = $val($r, array('silver'), 0);
@@ -885,7 +913,7 @@ $sportThemes = array(
 
                   $badgeCls = $rank === 1 ? 'bg-warning text-dark fw-black' : ($rank === 2 ? 'bg-secondary text-white fw-bold' : ($rank === 3 ? 'bg-danger text-white fw-bold' : 'bg-light text-dark border'));
                 ?>
-                <tr class="<?php echo $rank <= 3 ? 'table-light/50' : ''; ?>">
+                <tr class="<?php echo ($rank <= 3 && $hasMedals) ? 'table-light/50' : ''; ?>">
                   <td class="ps-4">
                     <span class="badge <?php echo $badgeCls; ?> rounded-circle fw-bold d-inline-flex align-items-center justify-content-center" style="width:28px;height:28px;font-size:12px;">
                       <?php echo $rank; ?>
@@ -893,9 +921,10 @@ $sportThemes = array(
                   </td>
                   <td class="fw-bold text-dark">
                     <div class="d-flex align-items-center gap-2">
-                      <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold avatar-initials flex-shrink-0"
-                           style="width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,#0f172a,#334155);">
-                        <?php echo $e($initials($name)); ?>
+                      <div class="rounded-pill text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0 px-1"
+                           style="min-width:28px;height:28px;font-size:<?php echo mb_strlen($prefix) > 4 ? '8px' : (mb_strlen($prefix) > 3 ? '9px' : '10px'); ?>;background:linear-gradient(135deg,#0f172a,#334155);"
+                           title="<?php echo $e($prefix); ?>">
+                        <?php echo $e($prefix); ?>
                       </div>
                       <span class="text-truncate"><?php echo $e($name); ?></span>
                     </div>
