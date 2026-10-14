@@ -1,5 +1,6 @@
 <?php
 /** @var array $finalists */
+/** @var array $gate */
 /** @var string $googleClientId */
 /** @var int $maxVotes */
 
@@ -7,6 +8,7 @@ $this->pageTitle = 'Bình chọn Miss - Vòng chung kết';
 $voteUrl = $this->createUrl('/frontend/binhchon/vote');
 $statusUrl = $this->createUrl('/frontend/binhchon/status');
 $configured = $googleClientId && strpos($googleClientId, 'YOUR_GOOGLE_CLIENT_ID') === false;
+$isOpen = !isset($gate['is_open']) || $gate['is_open'];
 ?>
 
 <div class="text-center mb-4">
