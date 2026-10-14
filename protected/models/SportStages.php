@@ -345,6 +345,22 @@ class SportStages extends BaseSportStages
         );
     }
 
+    public static function getTiebreakOptions()
+    {
+        return array(
+            self::TIEBREAK_HEAD_TO_HEAD => 'Đối đầu → Hiệu số → Số ghi được',
+            self::TIEBREAK_GOAL_DIFFERENCE => 'Hiệu số → Số ghi được → Đối đầu',
+        );
+    }
+
+    public static function getPairingOptions()
+    {
+        return array(
+            self::PAIRING_CROSS => 'Bán kết chéo (1A-2B, 1B-2A)',
+            self::PAIRING_PLACEMENT => 'Xếp hạng (Nhất tranh 1-2, Nhì tranh 3-4)',
+        );
+    }
+
     public static function getFormatLabel($format)
     {
         $options = self::getFormatOptions();
