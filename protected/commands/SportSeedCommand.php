@@ -22,6 +22,9 @@ class SportSeedCommand extends CConsoleCommand
     /** @var array map code => id của sports đã tồn tại/được tạo */
     protected $sportIdByCode = array();
 
+    /** @var int 1 = cập nhật (backfill) stage đã tồn tại thay vì bỏ qua */
+    protected $force = 0;
+
     public function actionIndex($eventId = null, $commit = 0, $stagesOnly = 0, $force = 0)
     {
         $commit = (int) $commit;
