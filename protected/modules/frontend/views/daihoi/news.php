@@ -116,7 +116,7 @@ $catName = function ($item) use ($val, $catMap) {
             <div class="col-12 col-md-6">
               <article class="card h-100 border rounded-4 overflow-hidden shadow-sm">
                 <a href="<?php echo $href; ?>" class="text-decoration-none d-flex flex-column h-100">
-                  <div class="position-relative" style="height:180px;background:#e2e8f0;">
+                  <div class="position-relative" style="aspect-ratio:16/9;background:#e2e8f0;">
                     <?php if ($thumb): ?>
                       <img alt="<?php echo $e($title); ?>" class="w-100 h-100 object-fit-cover" src="<?php echo $e($thumb); ?>" onerror="this.style.display='none';">
                     <?php else: ?>
