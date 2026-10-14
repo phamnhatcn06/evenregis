@@ -551,9 +551,25 @@ if (empty($albumList)) {
         <?php endforeach; ?>
       </nav>
       <div class="d-flex flex-column gap-2 p-4 mt-auto border-top">
-        <a class="btn fw-bold rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1 text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:14px;">
-          <span class="material-symbols-outlined" style="font-size:18px;">how_to_reg</span> Đăng ký hoạt động
-        </a>
+        <?php if ($memberLoggedIn): ?>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="material-symbols-outlined text-success" style="font-size:22px;">account_circle</span>
+            <span class="fw-bold text-dark text-truncate" style="font-size:14px;"><?php echo $e($memberName); ?></span>
+          </div>
+          <a class="btn btn-outline-success fw-bold rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1" href="<?php echo $e($memberHomeUrl); ?>" style="font-size:14px;">
+            <span class="material-symbols-outlined" style="font-size:18px;">person</span> Trang cá nhân
+          </a>
+          <a class="btn btn-outline-success fw-bold rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1" href="<?php echo $e($memberScheduleUrl); ?>" style="font-size:14px;">
+            <span class="material-symbols-outlined" style="font-size:18px;">event</span> Lịch trình của tôi
+          </a>
+          <a class="btn btn-outline-danger fw-bold rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1" href="<?php echo $e($memberLogoutUrl); ?>" style="font-size:14px;">
+            <span class="material-symbols-outlined" style="font-size:18px;">logout</span> Đăng xuất
+          </a>
+        <?php else: ?>
+          <a class="btn fw-bold rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1 text-white btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="background:linear-gradient(135deg,#059669 0%,#0d9488 100%);border:none;font-size:14px;">
+            <span class="material-symbols-outlined" style="font-size:18px;">how_to_reg</span> Đăng nhập thành viên
+          </a>
+        <?php endif; ?>
         <?php if ($hasPortalToken): ?>
           <a class="btn btn-primary fw-bold rounded-pill py-2 d-inline-flex align-items-center justify-content-center gap-1 btn-shimmer" href="<?php echo $e($adminUrl); ?>" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;font-size:14px;">
             <span class="material-symbols-outlined" style="font-size:18px;">admin_panel_settings</span> Vào quản trị
