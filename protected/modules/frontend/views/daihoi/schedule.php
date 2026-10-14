@@ -456,6 +456,72 @@ $sportThemes = array(
 
 
     <!-- =====================================================================
+         2.6 SƠ ĐỒ BƠI (LƯỢT / LÀN) & KẾT QUẢ
+         ===================================================================== -->
+    <?php if (!empty($swimBySport)): ?>
+      <section class="mb-4" id="swim-section">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="material-symbols-outlined text-info">pool</span>
+          <h2 class="fw-bold text-dark fs-5 mb-0">Sơ đồ bơi — Lượt &amp; Làn</h2>
+        </div>
+        <div class="row g-3">
+          <?php foreach ($swimBySport as $sportId => $heats): ?>
+            <?php
+            $sInfo = isset($sportInfoById[$sportId]) ? $sportInfoById[$sportId] : array('name' => 'Nội dung bơi', 'icon' => 'pool');
+            if ($selectedSportId && $sportId != $selectedSportId) {
+                continue;
+            }
+            ?>
+            <div class="col-12 col-xl-6" data-sport-id="<?php echo (int) $sportId; ?>">
+              <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-info-subtle d-flex align-items-center gap-2 border-0">
+                  <span class="material-symbols-outlined text-info"><?php echo $e(isset($sInfo['icon']) ? $sInfo['icon'] : 'pool'); ?></span>
+                  <span class="fw-bold text-dark"><?php echo $e($sInfo['name']); ?></span>
+                </div>
+                <div class="card-body p-3">
+                  <?php foreach ($heats as $heat): ?>
+                    <div class="mb-3">
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-info text-white rounded-pill px-2 py-1">Lượt <?php echo (int) $heat['heat_no']; ?></span>
+                        <span class="small text-muted"><?php echo $e($heat['stage_name']); ?></span>
+                      </div>
+                      <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-0">
+                          <thead class="table-light">
+                            <tr>
+                              <th class="text-center" style="width:52px;">Làn</th>
+                              <th>VĐV</th>
+                              <th style="width:110px;">Thành tích</th>
+                              <th class="text-center" style="width:56px;">Hạng</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          <?php foreach ($heat['lanes'] as $lane): ?>
+                            <?php $rank = isset($lane['rank']) ? $lane['rank'] : null; ?>
+                            <tr class="<?php echo ($rank && $rank <= 3) ? 'table-warning' : ''; ?>">
+                              <td class="text-center fw-bold"><?php echo (int) $lane['lane_no']; ?></td>
+                              <td><?php echo $e($lane['team_name']); ?></td>
+                              <td class="font-monospace"><?php echo $e($fmtSwimTime($lane['result_ms'])); ?></td>
+                              <td class="text-center">
+                                <?php echo $rank ? '<span class="badge bg-primary">' . (int) $rank . '</span>' : '—'; ?>
+                              </td>
+                            </tr>
+                          <?php endforeach; ?>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </section>
+    <?php endif; ?>
+
+
+    <!-- =====================================================================
          3. KHỐI TRẬN ĐẤU ĐANG DIỄN RA (LIVE MATCHES SHOWCASE)
          ===================================================================== -->
     <?php if (!empty($tournament['liveMatches'])): ?>
