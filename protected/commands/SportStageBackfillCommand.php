@@ -99,11 +99,14 @@ class SportStageBackfillCommand extends CConsoleCommand
     protected function applySpec($id, $stageName, $st, $spec, $commit)
     {
         $plan = sprintf(
-            "fmt=%s grp=%s adv=%s brk=%s",
+            "fmt=%s grp=%s adv=%s brk=%s diem=%s tb=%s ghep=%s",
             $spec['format'],
             isset($spec['num_groups']) ? $spec['num_groups'] : '-',
             isset($spec['advance_per_group']) ? $spec['advance_per_group'] : '-',
-            isset($spec['bracket_size']) ? $spec['bracket_size'] : '-'
+            isset($spec['bracket_size']) ? $spec['bracket_size'] : '-',
+            isset($spec['win_points']) ? ($spec['win_points'] . '-' . $spec['draw_points'] . '-' . $spec['loss_points']) : '-',
+            isset($spec['tiebreak']) ? $spec['tiebreak'] : '-',
+            isset($spec['ko_pairing']) ? $spec['ko_pairing'] : '-'
         );
 
         if (!$commit) {
