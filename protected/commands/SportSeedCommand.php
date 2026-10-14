@@ -37,6 +37,9 @@ class SportSeedCommand extends CConsoleCommand
 
         echo $commit ? ">>> CHE DO GHI (COMMIT) — se tao du lieu qua API\n"
                      : ">>> CHE DO DRY-RUN — chi in ke hoach, khong ghi (them --commit=1 de thuc thi)\n";
+        if ($this->force) {
+            echo ">>> FORCE=1 — se CAP NHAT the le/cau hinh vao cac stage da ton tai\n";
+        }
         echo "Event ID: {$eventId}\n\n";
 
         // 1. Nạp sports hiện có để idempotent
