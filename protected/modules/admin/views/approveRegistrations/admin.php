@@ -47,33 +47,46 @@ $baseColumns = array(
     ),
 );
 
+// Nút Duyệt / Trả lại cho phiếu đang chờ duyệt (dùng chung cho mọi tab)
+$approveReturnButtons = function ($data) {
+    if ((int)$data->status !== Registrations::STATUS_SUBMITTED) {
+        return '';
+    }
+    $propertyName = isset($data->property_name) ? $data->property_name : '';
+    $html = '<button type="button" class="btn btn-sm btn-success btn-approve-reg me-1" data-id="' . $data->id . '" data-property="' . CHtml::encode($propertyName) . '" title="Duyệt phiếu đăng ký"><i class="fa fa-check me-1"></i>Duyệt</button>';
+    $html .= '<button type="button" class="btn btn-sm btn-warning btn-return-reg me-1" data-id="' . $data->id . '" data-property="' . CHtml::encode($propertyName) . '" title="Trả lại để đơn vị chỉnh sửa"><i class="fa fa-undo me-1"></i>Trả lại</button>';
+    return $html;
+};
+
 // Cột thao tác cho tab Chờ duyệt
 $actionColumnSubmitted = array(
     'header' => 'Thao tác',
-    'width' => '180px',
+    'width' => '320px',
     'type' => 'raw',
     'filter' => false,
     'sortable' => false,
-    'value' => function ($data) {
+    'value' => function ($data) use ($approveReturnButtons) {
         $propertyName = isset($data->property_name) ? $data->property_name : '';
         $submittedBy = isset($data->submitted_by) ? $data->submitted_by : '';
         $html = '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm btn-primary me-1"><i class="fa fa-eye me-1"></i>Xem & Duyệt</a>';
+        $html .= $approveReturnButtons($data);
         $html .= '<button type="button" class="btn btn-sm btn-outline-info btn-send-mail" data-id="' . $data->id . '" data-property="' . CHtml::encode($propertyName) . '" data-email="' . CHtml::encode($submittedBy) . '" title="Gửi mail xác nhận"><i class="fa fa-envelope me-1"></i>Gửi mail</button>';
         return $html;
     }
 );
 
-// Cột thao tác cho tab Trả về và Đã duyệt
+// Cột thao tác cho tab Trả về, Đã duyệt và Tất cả
 $actionColumnOther = array(
     'header' => 'Thao tác',
-    'width' => '160px',
+    'width' => '300px',
     'type' => 'raw',
     'filter' => false,
     'sortable' => false,
-    'value' => function ($data) {
+    'value' => function ($data) use ($approveReturnButtons) {
         $propertyName = isset($data->property_name) ? $data->property_name : '';
         $submittedBy = isset($data->submitted_by) ? $data->submitted_by : '';
         $html = '<a href="' . Yii::app()->createUrl('/admin/approveRegistrations/view', array('id' => $data->id)) . '" class="btn btn-sm btn-outline-secondary me-1"><i class="fa fa-eye me-1"></i>Xem</a>';
+        $html .= $approveReturnButtons($data);
         $html .= '<button type="button" class="btn btn-sm btn-outline-info btn-send-mail" data-id="' . $data->id . '" data-property="' . CHtml::encode($propertyName) . '" data-email="' . CHtml::encode($submittedBy) . '" title="Gửi mail xác nhận"><i class="fa fa-envelope me-1"></i>Gửi mail</button>';
         return $html;
     }
