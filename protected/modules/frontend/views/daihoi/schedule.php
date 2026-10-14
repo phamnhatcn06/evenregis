@@ -503,7 +503,16 @@ $sportThemes = array(
                               <td><?php echo $e($lane['team_name']); ?></td>
                               <td class="font-monospace"><?php echo $e($fmtSwimTime($lane['result_ms'])); ?></td>
                               <td class="text-center">
-                                <?php echo $rank ? '<span class="badge bg-primary">' . (int) $rank . '</span>' : '—'; ?>
+                                <?php
+                                $medals = array(1 => 'Nhất', 2 => 'Nhì', 3 => 'Ba');
+                                if ($rank && isset($medals[$rank])) {
+                                    echo '<span class="badge bg-warning text-dark">' . $medals[$rank] . '</span>';
+                                } elseif ($rank) {
+                                    echo '<span class="badge bg-light text-dark">' . (int) $rank . '</span>';
+                                } else {
+                                    echo '—';
+                                }
+                                ?>
                               </td>
                             </tr>
                           <?php endforeach; ?>
