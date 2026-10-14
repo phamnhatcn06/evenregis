@@ -6,6 +6,12 @@
  */
 class MissVotesController extends AdminController
 {
+    public function actionAdmin()
+    {
+        // Menu sidebar trỏ tới action 'admin' theo quy ước; chuyển về index.
+        $this->redirect(array('index', 'contest_id' => Yii::app()->request->getParam('contest_id')));
+    }
+
     public function actionIndex()
     {
         $contests = BeautyContests::getListForDropdown();
