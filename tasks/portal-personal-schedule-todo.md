@@ -9,7 +9,7 @@ Spec: `docs/specs/portal-personal-schedule.md` · Plan: `tasks/portal-personal-s
 ## ⛳ Checkpoint A: Nền tảng xong ✅ (Phương án A đã chốt) — ĐANG DỪNG CHỜ XÁC NHẬN
 
 ## Phase 1: Nguồn dữ liệu (vertical slices)
-- [ ] 1.1 Nguồn Thể thao (ưu tiên nhất)
+- [x] 1.1 Nguồn Thể thao — BE `/api/schedule/sport` (Sport module) + `Schedule::getSportItems` + ApiEndpoints; verified HTTP + giờ VN round-trip
 - [ ] 1.2 Nguồn Thi nghiệp vụ (+ số báo danh)
 - [ ] 1.3 Nguồn Agenda chung (is_public=1)
 - [ ] 1.4 Nguồn Bữa ăn (+ cờ "Đã báo cắt")
