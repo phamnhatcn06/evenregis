@@ -323,6 +323,29 @@ class Daihoi
                         $sportsMap[$sportId]['total_matches']++;
                     }
                 }
+
+                // Bơi: thu thập sơ đồ lượt/làn (không có match)
+                if (!empty($preview['swim_heats'])) {
+                    foreach ($preview['swim_heats'] as $heat) {
+                        $lanes = array();
+                        foreach ((isset($heat['lanes']) ? $heat['lanes'] : array()) as $lane) {
+                            $lanes[] = array(
+                                'lane_no' => (int)(isset($lane['lane_no']) ? $lane['lane_no'] : 0),
+                                'team_name' => !empty($lane['team_name']) ? $lane['team_name'] : ('#' . (isset($lane['team_id']) ? $lane['team_id'] : '')),
+                                'result_ms' => isset($lane['result_ms']) ? $lane['result_ms'] : null,
+                                'rank' => isset($lane['rank']) ? $lane['rank'] : null,
+                            );
+                        }
+                        $swimBySport[$sportId][] = array(
+                            'stage_id' => $sId,
+                            'stage_name' => $stage['name'],
+                            'stage_type' => isset($stage['stage_type']) ? $stage['stage_type'] : '',
+                            'heat_no' => (int)(isset($heat['heat_no']) ? $heat['heat_no'] : 0),
+                            'heat_type' => isset($heat['heat_type']) ? $heat['heat_type'] : '',
+                            'lanes' => $lanes,
+                        );
+                    }
+                }
             }
         }
 
