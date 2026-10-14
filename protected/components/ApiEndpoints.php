@@ -526,6 +526,9 @@ class ApiEndpoints
     const SPORT_DRAW_LOCK = '/api/sport-draw/lock/{stageId}';
     // Gán thủ công (kéo-thả) đội vào bảng / vị trí seed nhánh
     const SPORT_DRAW_ASSIGN = '/api/sport-draw/assign/{stageId}';
+    // Play-off: bốc thăm các trận độc lập + chuyển người thắng vào vòng bảng
+    const SPORT_DRAW_PLAYOFF = '/api/sport-draw/playoff/{stageId}';
+    const SPORT_DRAW_PROMOTE_PLAYOFF = '/api/sport-draw/promote-playoff/{stageId}';
 
     // Alliance Team Orgs
     const ALLIANCE_TEAM_ORG_LIST = '/api/alliance-team-orgs';
