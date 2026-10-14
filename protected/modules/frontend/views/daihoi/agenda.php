@@ -15,7 +15,38 @@ $val = function ($arr, $keys, $default = '') {
     }
     return $default;
 };
-$e = function ($s) { return CHtml::encode($s); };
+$e = function ($s) use (&$e) {
+    if (is_array($s)) {
+        if (isset($s['name'])) {
+            return $e($s['name']);
+        }
+        if (isset($s['title'])) {
+            return $e($s['title']);
+        }
+        if (isset($s['label'])) {
+            return $e($s['label']);
+        }
+        foreach ($s as $v) {
+            if (is_scalar($v) && (string) $v !== '') {
+                return CHtml::encode((string) $v);
+            }
+        }
+        return '';
+    }
+    if (is_object($s)) {
+        if (method_exists($s, '__toString')) {
+            return CHtml::encode((string) $s);
+        }
+        if (isset($s->name)) {
+            return $e($s->name);
+        }
+        if (isset($s->title)) {
+            return $e($s->title);
+        }
+        return '';
+    }
+    return CHtml::encode($s !== null ? (string) $s : '');
+};
 
 $eventName = $val($event, array('name', 'title'), 'Đại hội Mường Thanh 2026');
 

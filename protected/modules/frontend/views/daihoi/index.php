@@ -109,6 +109,17 @@ $loginUrl = $hasPortalToken ? $adminUrl : $base . '/login';
 // Cổng đăng ký hoạt động (Giải chạy Fun Run + Đi tham quan) cho danh sách Vòng Chung Kết.
 $portalUrl = $base . '/run';
 
+// ----- Trạng thái đăng nhập thành viên (cổng cá nhân /portal) -----
+$session = Yii::app()->session;
+$memberLoggedIn = !empty($session['portal_attendee_id']);
+$memberName = $memberLoggedIn ? trim((string) $session['portal_full_name']) : '';
+if ($memberLoggedIn && $memberName === '') {
+  $memberName = 'Thành viên';
+}
+$memberHomeUrl     = $base . '/portal/index';
+$memberScheduleUrl = $base . '/lich-trinh-cua-toi';
+$memberLogoutUrl   = $base . '/portal/logout';
+
 // ----- Menu điều hướng (anchor trong trang) -----
 $navItems = array(
   array('#dang-ky', 'Đăng ký'),
