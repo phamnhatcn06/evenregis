@@ -186,6 +186,37 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    /* ===== Chuyển đội đi tiếp của vòng loại chia bảng sang vòng chung kết ===== */
+    document.querySelectorAll('.btn-promote-groups').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            var targetId = this.getAttribute('data-target-id');
+            var targetName = this.getAttribute('data-target-name') || 'vòng chung kết';
+            Swal.fire({
+                title: 'Chuyển đội đi tiếp vào vòng chung kết?',
+                text: 'Hệ thống tính lại BXH vòng loại rồi đưa các đội đi tiếp vào "' + targetName + '".',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'Chuyển',
+                cancelButtonText: 'Hủy'
+            }).then(function (result) {
+                if (!result.isConfirmed) {
+                    return;
+                }
+                postJson(buildUrl(promoteGroupsUrlTpl, id), function (d) {
+                    if (d.success) {
+                        var added = (d.data && d.data.added) ? d.data.added.length : 0;
+                        Toast.success((d.message || 'Đã chuyển') + ' (' + added + ' suất mới)');
+                        setTimeout(function () { location.reload(); }, 1000);
+                    } else {
+                        Toast.error(d.message || 'Không thể chuyển đội đi tiếp');
+                    }
+                }, { target_stage_id: targetId });
+            });
+        });
+    });
+
     /* ===== Bơi: bốc thăm phân lượt/làn ===== */
     document.querySelectorAll('.btn-swim-draw').forEach(function (btn) {
         btn.addEventListener('click', function () {
