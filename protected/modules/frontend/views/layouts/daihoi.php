@@ -18,8 +18,13 @@ $dh = $base . '/public/daihoi';
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?php echo isset($this->frontTitle) && $this->frontTitle ? CHtml::encode($this->frontTitle) : 'Đại hội Mường Thanh Ninh Bình 2026'; ?></title>
 
-  <!-- Fonts (local) -->
-  <link rel="stylesheet" href="<?php echo $vendor; ?>/fonts/lato/lato.css" />
+  <!-- Google Fonts: Inter (Full Vietnamese support) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Fonts (local fallback for offline environments) -->
+  <link rel="stylesheet" href="<?php echo $vendor; ?>/fonts/inter/inter.css" />
   <link rel="stylesheet" href="<?php echo $vendor; ?>/fonts/material-symbols/ms.css" />
 
   <!-- Bootstrap 5 CSS (local) -->

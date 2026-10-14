@@ -819,3 +819,10 @@ a.label.btn {
 .btn-warning svg {
   color: #212529;
 }
+
+/* ========================================
+   Global Font Inter (Full Vietnamese)
+   ======================================== */
+body, button, input, select, textarea, .table, .form-control, .form-select, .btn, .modal, .dropdown-menu, .card-title, .nav-link, .sidebar {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}

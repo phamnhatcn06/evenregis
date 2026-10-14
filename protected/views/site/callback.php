@@ -7,6 +7,11 @@ $tokenHash = md5(Yii::app()->session['sso_token']);
 <head>
     <meta charset="UTF-8">
     <title>Redirecting...</title>
+    <!-- Google Fonts: Inter (Full Vietnamese support) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo Yii::app()->request->baseUrl; ?>/public/vendor/fonts/inter/inter.css">
     <style>
         body {
             display: flex;
@@ -14,7 +19,7 @@ $tokenHash = md5(Yii::app()->session['sso_token']);
             align-items: center;
             height: 100vh;
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: #f5f5f5;
         }
         .loader {

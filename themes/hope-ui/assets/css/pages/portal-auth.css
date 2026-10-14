@@ -23,7 +23,7 @@
     --auth-border-input: #cbd5e1;
     --auth-radius-card: 24px;
     --auth-radius-input: 14px;
-    --auth-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --auth-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body.portal-auth-body {

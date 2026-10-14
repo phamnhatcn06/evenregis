@@ -5,6 +5,10 @@ $urlRewrite = array(
     'run' => 'frontend/run/index',
     'run/<action:\w+>' => 'frontend/run/<action>',
 
+    // Cổng cá nhân người tham dự — đặt TRƯỚC các rule generic để action 2 đoạn (vd: portal/saveProfile) không bị bắt nhầm
+    'portal' => 'frontend/portal/login',
+    'portal/<action:\w+>' => 'frontend/portal/<action>',
+
     'danh-muc-tin/<title>_<id:\d+>-<page:\d+>' => 'frontend/news/category',
     'danh-muc-tin/<title>_<id:\d+>' => 'frontend/news/category',
     'thu-vien-video/<title>_<id:\d+>-<page:\d+>' => 'frontend/video/index',

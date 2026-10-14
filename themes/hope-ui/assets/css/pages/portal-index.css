@@ -8,7 +8,7 @@
    Root Variables & Typography
    ========================================================================== */
 :root {
-    --portal-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --portal-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --portal-bg: #f8fafc;
     --portal-card-bg: #ffffff;
     --portal-primary: #2563eb;

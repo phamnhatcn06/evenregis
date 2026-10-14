@@ -7,10 +7,11 @@
     <title><?php echo CHtml::encode($this->pageTitle ? $this->pageTitle . ' - Đại Hội Mường Thanh 2026' : 'Cổng Cá Nhân Đại Biểu - Đại Hội Mường Thanh 2026'); ?></title>
     <link rel="shortcut icon" href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/images/favicon.ico">
 
-    <!-- Google Fonts: Plus Jakarta Sans -->
+    <!-- Google Fonts: Inter (Full Vietnamese support) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo Yii::app()->request->baseUrl; ?>/public/vendor/fonts/inter/inter.css">
 
     <!-- Bootstrap 5, FontAwesome & Bootstrap Icons -->
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -18,7 +19,7 @@
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/css/font-awesome/font-awesome.min.css" rel="stylesheet">
 
     <!-- Portal Base Stylesheet -->
-    <link href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/css/pages/portal-index.css" rel="stylesheet">
+    <link href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/css/pages/portal-index.css?v=20261014_inter" rel="stylesheet">
 </head>
 
 <body class="portal-body">
