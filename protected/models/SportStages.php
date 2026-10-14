@@ -227,6 +227,23 @@ class SportStages extends BaseSportStages
         ));
     }
 
+    /**
+     * Nạp thành tích hạt giống bơi (khớp theo tên VĐV / mã đơn vị ở backend).
+     *
+     * @param string $stageId giai đoạn vòng loại bơi
+     * @param array $entries Mảng ['name' => , 'unit' => , 'time_ms' => ]
+     * @param bool $dryRun true = chỉ xem kết quả khớp, không ghi
+     */
+    public static function importSwimSeeds($stageId, $entries, $dryRun = false)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_SWIM_SEEDS, array('stageId' => $stageId));
+        return ApiClient::post($url, array(
+            'entries' => $entries,
+            'dry_run' => $dryRun ? 1 : 0,
+            'auth_email' => self::authEmail(),
+        ));
+    }
+
     public static function isSwimFormat($format)
     {
         return $format === self::FORMAT_HEAT_LANE;
