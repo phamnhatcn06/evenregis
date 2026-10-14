@@ -92,7 +92,12 @@ function swimMsToText($ms)
                             <tbody>
                             <?php foreach ($heat['lanes'] as $lane): ?>
                                 <tr>
-                                    <td class="text-center fw-bold"><?php echo (int) $lane['lane_no']; ?></td>
+                                    <td>
+                                        <input type="number" min="1" max="10"
+                                               class="form-control form-control-sm text-center swim-lane-input"
+                                               data-lane-id="<?php echo (int) $lane['lane_id']; ?>"
+                                               value="<?php echo (int) $lane['lane_no']; ?>">
+                                    </td>
                                     <td><?php echo CHtml::encode($lane['team_name']); ?></td>
                                     <td>
                                         <input type="text" class="form-control form-control-sm swim-time-input"
