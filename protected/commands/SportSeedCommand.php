@@ -249,20 +249,22 @@ class SportSeedCommand extends CConsoleCommand
                     'format' => 'round_robin',
                     'num_groups' => 3, 'teams_per_group' => 4, 'advance_per_group' => 1,
                     'location' => $NTD,
+                    'rules' => 'Vòng loại: 3 hiệp thắng 2 (11đ/séc, cách biệt 2đ). Bốc thăm 3 bảng (4+4+3) đấu vòng tròn, chọn Nhất mỗi bảng.',
                 ),
                 array(
                     'name' => 'Vòng chung kết (Tranh 1-2-3)', 'stage_type' => 'final', 'stage_order' => 2,
                     'format' => 'round_robin',
                     'num_groups' => 1, 'teams_per_group' => 3, 'advance_per_group' => 3,
                     'location' => $NTD,
+                    'rules' => 'VCK: 5 hiệp thắng 3 (11đ/séc, cách biệt 2đ). Nhất 3 bảng vào đấu vòng tròn tranh 1-2-3.',
                 ),
             ),
 
             // Cầu lông đơn/đôi (trừ MF) — loại trực tiếp
-            'CL.M' => $ko($NTD, 8),
-            'CL.F' => $ko($NTD, 8),
-            'CL.2M' => $ko($NTD, 8),
-            'CL.2F' => $ko($NTD, 8),
+            'CL.M' => $ko($NTD, 8, $RACKET_15),
+            'CL.F' => $ko($NTD, 8, $RACKET_15),
+            'CL.2M' => $ko($NTD, 8, $RACKET_15),
+            'CL.2F' => $ko($NTD, 8, $RACKET_15),
 
             // Cầu lông đôi Nam-Nữ — 9 đội, 3 bảng vòng tròn, CK vòng tròn chọn 1-2-3
             'CL.MF' => array(
