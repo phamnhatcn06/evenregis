@@ -333,11 +333,30 @@ class SportSeedCommand extends CConsoleCommand
 
             foreach ($stages as $s) {
                 $key = $sportId . '|' . $s['name'];
-                if (!$this->isPlaceholder($sportId) && isset($existing[$key])) {
-                    echo "  [BO QUA] {$sportCode} / {$s['name']} — da ton tai (id={$existing[$key]})\n";
+                $existsId = (!$this->isPlaceholder($sportId) && isset($existing[$key])) ? $existing[$key] : null;
+
+                // Stage đã tồn tại
+                if ($existsId !== null) {
+                    if (!$this->force) {
+                        echo "  [BO QUA] {$sportCode} / {$s['name']} — da ton tai (id={$existsId})\n";
+                        continue;
+                    }
+                    if (!$commit) {
+                        echo "  [SE CAP NHAT] {$sportCode} / {$s['name']} (id={$existsId}) — backfill the le/cau hinh\n";
+                        continue;
+                    }
+                    $model = new SportStages;
+                    $model->setAttributes(array_merge($s, array('id' => $existsId)), false);
+                    $result = $model->updateConfigViaApi();
+                    if (!empty($result['success'])) {
+                        echo "  [CAP NHAT OK] {$sportCode} / {$s['name']} id={$existsId}\n";
+                    } else {
+                        echo "  [LOI]   {$sportCode} / {$s['name']}: " . $this->errMsg($result) . "\n";
+                    }
                     continue;
                 }
 
+                // Stage mới
                 if (!$commit) {
                     echo "  [SE TAO] {$sportCode} / {$s['name']} [type={$s['stage_type']}, format={$s['format']}]\n";
                     continue;
