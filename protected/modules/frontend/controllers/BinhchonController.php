@@ -42,6 +42,7 @@ class BinhchonController extends CController
 
         $this->render('index', array(
             'finalists' => $finalists,
+            'gate' => $gate,
             'googleClientId' => GoogleAuthHelper::getClientId(),
             'maxVotes' => $cfg['max_votes_per_voter'],
         ));
