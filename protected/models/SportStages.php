@@ -232,6 +232,7 @@ class SportStages extends BaseSportStages
             self::FORMAT_SINGLE_ELIMINATION => 'Loại trực tiếp',
             self::FORMAT_HEAT_LANE => 'Phân lượt/làn (bơi)',
             self::FORMAT_TIME_TRIAL => 'Tính thành tích',
+            self::FORMAT_PLAYOFF => 'Play-off (trận độc lập)',
         );
     }
 
