@@ -35,6 +35,11 @@ class SportStages extends BaseSportStages
     public $draw_seed;
     public $drawn_by;
     public $drawn_at;
+    public $win_points;
+    public $draw_points;
+    public $loss_points;
+    public $tiebreak;
+    public $ko_pairing;
 
     // Thuộc tính hiển thị
     public $sport_name;
