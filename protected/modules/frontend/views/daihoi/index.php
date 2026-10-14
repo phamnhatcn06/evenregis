@@ -820,7 +820,7 @@ if (empty($albumList)) {
         ?>
           <div class="col-12 col-md-4 reveal-on-scroll <?php echo $nDelay; ?>">
             <article class="card h-100 border rounded-3 overflow-hidden shadow-sm card-hover bg-white">
-              <div class="position-relative img-zoom-wrap" style="aspect-ratio:16/9;background:#e2e8f0;">
+              <a href="<?php echo $href; ?>" class="position-relative img-zoom-wrap d-block text-decoration-none" style="aspect-ratio:16/9;background:#e2e8f0;">
                 <?php if ($n['thumb']): ?>
                   <img alt="<?php echo $e($n['title']); ?>" class="w-100 h-100 object-fit-cover" src="<?php echo $e($n['thumb']); ?>" onerror="this.style.display='none';">
                 <?php else: ?>
@@ -829,11 +829,11 @@ if (empty($albumList)) {
                   </div>
                 <?php endif; ?>
                 <span class="position-absolute top-0 start-0 m-2 badge glass-card-dark text-white text-uppercase" style="font-size:10px;"><?php echo $e($n['cat']); ?></span>
-              </div>
+              </a>
               <div class="card-body d-flex flex-column justify-content-between p-3">
                 <div>
                   <?php if ($n['date']): ?><span class="text-muted d-block mb-1" style="font-size:11px;"><?php echo $e($n['date']); ?></span><?php endif; ?>
-                  <h3 class="fw-bold text-dark fs-6 mb-2 lh-sm line-clamp-2"><?php echo $e($n['title']); ?></h3>
+                  <h3 class="fw-bold fs-6 mb-2 lh-sm line-clamp-2"><a href="<?php echo $href; ?>" class="text-dark text-decoration-none stretched-link-title"><?php echo $e($n['title']); ?></a></h3>
                   <p class="text-secondary small mb-3 line-clamp-2"><?php echo $e($n['desc']); ?></p>
                 </div>
                 <div class="pt-2 border-top">
