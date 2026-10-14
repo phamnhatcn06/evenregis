@@ -2,12 +2,10 @@
 /** @var array $finalists */
 /** @var string $googleClientId */
 /** @var int $maxVotes */
-/** @var array|null $voter */
-/** @var array $votedIds */
-/** @var int $remaining */
 
 $this->pageTitle = 'Bình chọn Miss - Vòng chung kết';
 $voteUrl = $this->createUrl('/frontend/binhchon/vote');
+$statusUrl = $this->createUrl('/frontend/binhchon/status');
 $configured = $googleClientId && strpos($googleClientId, 'YOUR_GOOGLE_CLIENT_ID') === false;
 ?>
 
@@ -29,33 +27,24 @@ $configured = $googleClientId && strpos($googleClientId, 'YOUR_GOOGLE_CLIENT_ID'
 <div id="voter-box"
      class="card shadow-sm mb-4"
      data-vote-url="<?php echo $voteUrl; ?>"
+     data-status-url="<?php echo $statusUrl; ?>"
      data-client-id="<?php echo CHtml::encode($googleClientId); ?>"
      data-max-votes="<?php echo (int) $maxVotes; ?>">
     <div class="card-body text-center">
-        <?php if ($voter): ?>
-            <div id="signed-in-info">
-                <?php if (!empty($voter['picture'])): ?>
-                    <img src="<?php echo CHtml::encode($voter['picture']); ?>" alt="avatar"
-                         class="rounded-circle mb-2" width="48" height="48" referrerpolicy="no-referrer">
-                <?php endif; ?>
-                <div>Xin chào, <strong><?php echo CHtml::encode($voter['name'] ?: $voter['email']); ?></strong></div>
-                <div class="text-muted">Bạn còn <span id="remaining-votes" class="fw-bold text-primary"><?php echo (int) $remaining; ?></span>/<?php echo (int) $maxVotes; ?> lượt bình chọn</div>
-            </div>
-        <?php else: ?>
+        <div id="signin-area">
             <p class="mb-2">Vui lòng đăng nhập để bình chọn:</p>
             <div id="g_id_signin" class="d-inline-block"></div>
-            <div id="signed-in-info" class="d-none mt-2">
-                <div>Xin chào, <strong id="voter-name"></strong></div>
-                <div class="text-muted">Bạn còn <span id="remaining-votes" class="fw-bold text-primary"><?php echo (int) $maxVotes; ?></span>/<?php echo (int) $maxVotes; ?> lượt bình chọn</div>
-            </div>
-        <?php endif; ?>
+        </div>
+        <div id="signed-in-info" class="d-none">
+            <div>Xin chào, <strong id="voter-name"></strong></div>
+            <div class="text-muted">Bạn còn <span id="remaining-votes" class="fw-bold text-primary"><?php echo (int) $maxVotes; ?></span>/<?php echo (int) $maxVotes; ?> lượt bình chọn</div>
+        </div>
     </div>
 </div>
 
 <!-- Danh sách thí sinh -->
 <div class="row g-3" id="finalist-grid">
     <?php foreach ($finalists as $f): ?>
-        <?php $voted = in_array($f['contestant_id'], $votedIds); ?>
         <div class="col-6 col-md-4 col-lg-3">
             <div class="card h-100 shadow-sm contestant-card">
                 <img src="<?php echo CHtml::encode($f['photo']); ?>" class="card-img-top"
@@ -75,11 +64,9 @@ $configured = $googleClientId && strpos($googleClientId, 'YOUR_GOOGLE_CLIENT_ID'
                             <span class="vote-count" data-contestant="<?php echo (int) $f['contestant_id']; ?>"><?php echo (int) $f['vote_count']; ?></span> phiếu
                         </div>
                         <button type="button"
-                                class="btn btn-sm w-100 btn-vote <?php echo $voted ? 'btn-success' : 'btn-outline-primary'; ?>"
-                                data-contestant="<?php echo (int) $f['contestant_id']; ?>"
-                                <?php echo $voted ? 'disabled' : ''; ?>>
-                            <i class="fa <?php echo $voted ? 'fa-check' : 'fa-heart'; ?> me-1"></i>
-                            <?php echo $voted ? 'Đã bình chọn' : 'Bình chọn'; ?>
+                                class="btn btn-sm w-100 btn-vote btn-outline-primary"
+                                data-contestant="<?php echo (int) $f['contestant_id']; ?>">
+                            <i class="fa fa-heart me-1"></i>Bình chọn
                         </button>
                     </div>
                 </div>
