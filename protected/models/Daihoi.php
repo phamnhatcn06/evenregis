@@ -200,6 +200,8 @@ class Daihoi
                 'format' => isset($stage['format']) ? $stage['format'] : '',
                 'stage_type' => isset($stage['stage_type']) ? $stage['stage_type'] : '',
                 'draw_status' => isset($stage['draw_status']) ? $stage['draw_status'] : 'not_drawn',
+                'rules' => isset($stage['rules']) ? $stage['rules'] : '',
+                'location' => isset($stage['location']) ? $stage['location'] : '',
             );
 
             // Bỏ qua nếu lọc theo môn khác
