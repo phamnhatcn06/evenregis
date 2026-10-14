@@ -268,6 +268,10 @@ $columnsAll = array_merge($baseColumns, array($sendMailStatusColumn, $actionColu
     </div>
 </div>
 
+<div id="approve-actions-config"
+     data-approve-url="<?php echo Yii::app()->createUrl('/admin/approveRegistrations/approveAll'); ?>"
+     data-return-url="<?php echo Yii::app()->createUrl('/admin/approveRegistrations/return'); ?>"></div>
+
 <div class="card">
     <div class="card-body">
         <ul class="nav approval-tabs" id="approvalTabs" role="tablist">
