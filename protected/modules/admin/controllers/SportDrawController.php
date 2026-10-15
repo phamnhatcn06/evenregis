@@ -623,6 +623,69 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Danh sách VĐV/đội ở vòng chung kết của nội dung (để chọn đưa vào play-off) (AJAX).
+     */
+    public function actionPlayoffEntrants($id)
+    {
+        $stage = SportStages::fetchFromApi($id);
+        if ($stage === null) {
+            $this->jsonResponse(false, 'Không tìm thấy giai đoạn.');
+        }
+
+        $data = array();
+        foreach (SportTeams::getFinalists($stage->event_id, $stage->sport_id) as $f) {
+            $teamId = isset($f['team_id']) ? $f['team_id'] : null;
+            if ($teamId === null) {
+                continue;
+            }
+            $team = isset($f['team']) && is_array($f['team']) ? $f['team'] : array();
+            $name = isset($team['name']) && $team['name'] !== null ? $team['name'] : ('#' . $teamId);
+
+            $members = (isset($team['members']) && is_array($team['members'])) ? $team['members'] : array();
+            if (count($members) >= 1 && count($members) <= 2) {
+                $names = array();
+                foreach ($members as $mm) {
+                    $nm = isset($mm['name']) ? $mm['name'] : (isset($mm['attendee_name']) ? $mm['attendee_name'] : '');
+                    if ($nm !== '') {
+                        $names[] = $nm;
+                    }
+                }
+                if (!empty($names)) {
+                    $name .= ' — ' . implode(' + ', $names);
+                }
+            }
+
+            $data[] = array(
+                'team_id' => $teamId,
+                'name' => $name,
+            );
+        }
+
+        $this->jsonResponse(true, '', $data);
+    }
+
+    /**
+     * Chuyển các đội/VĐV đã chọn từ vòng chung kết sang giai đoạn play-off (AJAX).
+     */
+    public function actionMovePlayoffEntrants($id)
+    {
+        $this->requirePost();
+        $raw = Yii::app()->getRequest()->getPost('team_ids', array());
+        $teamIds = is_array($raw) ? $raw : array_filter(explode(',', (string) $raw));
+        $teamIds = array_values(array_filter(array_map('intval', $teamIds)));
+        if (empty($teamIds)) {
+            $this->jsonResponse(false, 'Vui lòng chọn ít nhất một đội/VĐV.');
+        }
+
+        $result = SportStages::movePlayoffEntrants($id, $teamIds);
+        if (!empty($result['success'])) {
+            $moved = isset($result['data']['moved']) ? count($result['data']['moved']) : 0;
+            $this->jsonResponse(true, 'Đã chuyển ' . $moved . ' VĐV vào play-off.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể chuyển VĐV vào play-off.'));
+    }
+
+    /**
      * Chuyển người/đội thắng play-off vào giai đoạn vòng bảng đích (AJAX).
      */
     public function actionPromotePlayoff($id)
