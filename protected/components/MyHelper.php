@@ -1126,13 +1126,15 @@ class MyHelper
         $templateDir = rtrim($templateDir, '/\\') . '/';
         $blank = $templateDir . 'blank_bib.png';
 
-        $source   = !empty($data['age_group_label'])
-            ? $data['age_group_label']
-            : (isset($data['run_event_name']) ? $data['run_event_name'] : '');
-        $distance = preg_replace('/\D/', '', (string) $source);
-        if ($distance === '') {
+        // Cự ly = SỐ ĐẦU TIÊN trong tên cự ly (ưu tiên run_event_name "5km"); KHÔNG gộp hết chữ số
+        // vì nhãn nội dung "5km ... dưới 35 tuổi" sẽ ra "535". Thiếu run_event_name thì lấy từ nhãn.
+        $distSource = !empty($data['run_event_name'])
+            ? (string) $data['run_event_name']
+            : (isset($data['age_group_label']) ? (string) $data['age_group_label'] : '');
+        if (!preg_match('/\d+/', $distSource, $m)) {
             return $blank;
         }
+        $distance = $m[0];
 
         $gender = (isset($data['gender']) && $data['gender'] !== null && $data['gender'] !== '')
             ? (int) $data['gender']
