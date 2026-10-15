@@ -1233,7 +1233,8 @@ class MyHelper
         ));
 
         // QR Code vào ô trắng ở thanh vàng. Nội dung theo quy ước:
-        // "<bib>_<Họ tên>-<đơn vị (position)>-<nội dung cự ly>".
+        // "<bib>_<Họ tên>-<đơn vị (badge_org_name)>-<nội dung + giới tính [+ nhóm tuổi 5km]>".
+        // Đoạn cuối dùng age_group_label (vd "5km Nữ trên 35 tuổi") đã gồm cự ly + Nam/Nữ + tuổi.
         $qrContent = $bib . '_' . $rawName . '-' . $position . '-' . $content;
         $qrSize    = min($boxX2 - $boxX1, 300) - 16;
         if ($qrSize < 60) {
