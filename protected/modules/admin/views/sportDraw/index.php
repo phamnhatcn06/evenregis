@@ -252,3 +252,4 @@ foreach ($stages as $s) {
 <?php endif; ?>
 
 <?php $this->renderPartial('_modal_config'); ?>
+<?php $this->renderPartial('_modal_playoff_entrants'); ?>
