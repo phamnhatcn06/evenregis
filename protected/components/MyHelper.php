@@ -1188,39 +1188,59 @@ class MyHelper
         }
         imagealphablending($canvas, true);
 
-        $name = isset($data['full_name']) ? mb_strtoupper(trim($data['full_name']), 'UTF-8') : '';
-        $unit = isset($data['unit']) ? trim((string) $data['unit']) : '';
-        $bib  = isset($data['bib_number']) ? trim((string) $data['bib_number']) : '';
+        $rawName  = isset($data['full_name']) ? trim((string) $data['full_name']) : '';
+        $name     = $rawName !== '' ? mb_strtoupper($rawName, 'UTF-8') : '';
+        $position = isset($data['position']) ? trim((string) $data['position']) : '';
+        $bib      = isset($data['bib_number']) ? trim((string) $data['bib_number']) : '';
+        $content  = !empty($data['age_group_label'])
+            ? trim((string) $data['age_group_label'])
+            : (isset($data['run_event_name']) ? trim((string) $data['run_event_name']) : '');
 
-        // Bố cục cố định theo giới tính (không quét pixel để tránh nặng trên ảnh 2481×1754):
-        // - Phôi Nam: nền màu → chữ trắng; ô Số BIB bên phải (x 1917–2210).
-        // - Phôi Nữ : nền trắng → chữ xanh than; ô Số BIB lệch trái hơn (x 1808–2101).
+        // Màu chữ theo giới tính: phôi Nam nền màu → chữ trắng; phôi Nữ nền trắng → chữ đen.
+        // Ô trắng ở thanh vàng (QR) lệch vị trí theo phôi Nam/Nữ.
         $gender = (isset($data['gender']) && $data['gender'] !== null && $data['gender'] !== '')
             ? (int) $data['gender']
             : 1;
         $isNu      = ($gender === 0);
-        $textColor = $isNu ? '#16205B' : '#FFFFFF';
+        $textColor = $isNu ? '#1A1A1A' : '#FFFFFF';
         $boxX1     = $isNu ? 1808 : 1917;
         $boxX2     = $isNu ? 2101 : 2210;
+        $boxCy     = 1570;
 
-        // Họ tên: in đậm, căn giữa ở khoảng trống phía trên nhãn "Mã ĐV".
+        // Họ tên: in đậm, căn giữa phía trên.
         self::drawRunBibText($canvas, $name, array(
             'font' => 'fontten', 'color' => $textColor, 'bold' => true,
-            'size' => 104, 'min_size' => 46,
-            'box_x1' => 350, 'box_x2' => 2130, 'center_y' => 545, 'align' => 'C',
+            'size' => 108, 'min_size' => 46,
+            'box_x1' => 300, 'box_x2' => 2180, 'center_y' => 455, 'align' => 'C',
         ));
-        // Đơn vị: sau nhãn "Mã ĐV:" (nhãn kết thúc ~x=1194, baseline giữa y≈700).
-        self::drawRunBibText($canvas, $unit, array(
+        // Dòng "Mã ĐV: <đơn vị lấy từ cột position>", căn giữa dưới họ tên.
+        $maDvLine = 'Mã ĐV: ' . $position;
+        self::drawRunBibText($canvas, $maDvLine, array(
             'font' => 'fontdonvi', 'color' => $textColor, 'bold' => false,
-            'size' => 54, 'min_size' => 26,
-            'box_x1' => 1215, 'box_x2' => 2420, 'center_y' => 700, 'align' => 'L',
+            'size' => 58, 'min_size' => 28,
+            'box_x1' => 300, 'box_x2' => 2180, 'center_y' => 690, 'align' => 'C',
         ));
-        // Số BIB: in đậm, màu xanh than (ô luôn trắng), căn giữa trong ô.
+        // Số BIB: cỡ lớn, căn giữa thẻ (Nam trắng, Nữ đen).
         self::drawRunBibText($canvas, $bib, array(
-            'font' => 'fontten', 'color' => '#16205B', 'bold' => true,
-            'size' => 150, 'min_size' => 48, 'pad' => 20,
-            'box_x1' => $boxX1, 'box_x2' => $boxX2, 'center_y' => 1570, 'align' => 'C',
+            'font' => 'fontten', 'color' => $textColor, 'bold' => true,
+            'size' => 440, 'min_size' => 160, 'pad' => 40,
+            'box_x1' => 250, 'box_x2' => 2230, 'center_y' => 1040, 'align' => 'C',
         ));
+
+        // QR Code vào ô trắng ở thanh vàng. Nội dung theo quy ước:
+        // "<bib>_<Họ tên>-<đơn vị (position)>-<nội dung cự ly>".
+        $qrContent = $bib . '_' . $rawName . '-' . $position . '-' . $content;
+        $qrSize    = min($boxX2 - $boxX1, 300) - 16;
+        if ($qrSize < 60) {
+            $qrSize = 60;
+        }
+        $qr = self::makeQrResource($qrContent, $qrSize, '#FFFFFF');
+        if ($qr) {
+            $qrX = (int) round($boxX1 + (($boxX2 - $boxX1) - imagesx($qr)) / 2);
+            $qrY = (int) round($boxCy - imagesy($qr) / 2);
+            imagecopy($canvas, $qr, $qrX, $qrY, 0, 0, imagesx($qr), imagesy($qr));
+            imagedestroy($qr);
+        }
 
         $outDir = rtrim($outDir, '/\\') . '/';
         if (!is_dir($outDir)) {
