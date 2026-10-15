@@ -572,6 +572,67 @@ class RunRegistrationsController extends AdminController
     }
 
     /**
+     * Xuất thẻ BIB của ĐÚNG MỘT người (tải thẳng PNG, không bao giờ đóng ZIP).
+     * Tách riêng khỏi actionExportBib để nút "xuất 1 thẻ" không thể rơi vào nhánh xuất hàng loạt.
+     */
+    public function actionExportBibOne($event_id, $id)
+    {
+        if (!PermissionHelper::can('runregistrations', 'read')) {
+            throw new CHttpException(403, 'Bạn không có quyền xuất thẻ BIB.');
+        }
+        $eventId = (int) $event_id;
+        $regId   = (int) $id;
+        if (!$eventId || !$regId) {
+            throw new CHttpException(422, 'Thiếu sự kiện hoặc người cần xuất.');
+        }
+
+        if (!function_exists('imagecreatefrompng') || !function_exists('imagettftext')) {
+            throw new CHttpException(500, 'Máy chủ chưa bật extension GD (php-gd) để tạo ảnh BIB.');
+        }
+        @set_time_limit(120);
+        @ini_set('memory_limit', '512M');
+
+        $templateDir = Yii::app()->basePath . '/..' . self::BIB_TEMPLATE_DIR;
+        if (!is_dir($templateDir) || !is_file($templateDir . 'blank_bib.png')) {
+            throw new CHttpException(500, 'Không tìm thấy thư mục phôi BIB trên máy chủ.');
+        }
+
+        $target = null;
+        foreach (RunRegistrations::listByEvent($eventId) as $r) {
+            if ((int) (isset($r['id']) ? $r['id'] : 0) === $regId) {
+                $target = $r;
+                break;
+            }
+        }
+        if ($target === null) {
+            throw new CHttpException(404, 'Không tìm thấy người cần xuất thẻ BIB.');
+        }
+
+        $outDir = Yii::app()->basePath . '/../uploads/run_bibs/'
+            . MyHelper::toSlug(!empty($target['run_event_name']) ? $target['run_event_name'] : 'Khac');
+        $path = MyHelper::RunBibCard($this->bibCardData($target), $templateDir, $outDir);
+        if (!$path || !is_file($path)) {
+            throw new CHttpException(500, 'Không tạo được thẻ BIB. Kiểm tra phôi và dữ liệu đăng ký.');
+        }
+
+        $this->sendFileThenDelete($path, basename($path), 'image/png');
+    }
+
+    /** Chuẩn hoá một dòng đăng ký thành dữ liệu dựng thẻ BIB. */
+    protected function bibCardData($r)
+    {
+        return array(
+            'bib_number'      => isset($r['bib_number']) ? $r['bib_number'] : '',
+            'full_name'       => isset($r['full_name']) ? $r['full_name'] : '',
+            'position'        => $this->resolveBibUnit($r),
+            'run_event_name'  => isset($r['run_event_name']) ? $r['run_event_name'] : '',
+            'age_group_label' => isset($r['age_group_label']) ? $r['age_group_label'] : '',
+            'gender'          => isset($r['gender']) ? $r['gender'] : null,
+            'birth_year'      => isset($r['birth_year']) ? $r['birth_year'] : null,
+        );
+    }
+
+    /**
      * Giá trị "đơn vị" in lên BIB và nhúng QR, lấy từ cột position (chức danh/đơn vị theo hồ sơ).
      * Khách ngoài không có position nên lùi về company.
      */
