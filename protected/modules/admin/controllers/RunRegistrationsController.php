@@ -644,11 +644,15 @@ class RunRegistrationsController extends AdminController
     }
 
     /**
-     * Giá trị "đơn vị" in lên BIB và nhúng QR: CHỈ lấy từ badge_org_name (tên tổ chức in trên thẻ).
-     * Không có badge_org_name thì để trống (không lùi về unit_label/company).
+     * Giá trị "đơn vị" in lên BIB và nhúng QR.
+     * - Khách ngoài: lấy cột company (run_registrations).
+     * - Còn lại: CHỈ lấy badge_org_name (không lùi về unit_label).
      */
     protected function resolveBibUnit($row)
     {
+        if (!empty($row['is_guest'])) {
+            return !empty($row['company']) ? (string) $row['company'] : '';
+        }
         return !empty($row['badge_org_name']) ? (string) $row['badge_org_name'] : '';
     }
 
