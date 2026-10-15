@@ -52,6 +52,8 @@ foreach ($stages as $s) {
      data-standings-url="<?php echo $this->createUrl('standings', array('id' => '__ID__')); ?>"
      data-generate-knockout-url="<?php echo $this->createUrl('generateKnockout', array('id' => '__ID__')); ?>"
      data-draw-playoff-url="<?php echo $this->createUrl('drawPlayoff', array('id' => '__ID__')); ?>"
+     data-playoff-entrants-list-url="<?php echo $this->createUrl('playoffEntrants', array('id' => '__ID__')); ?>"
+     data-playoff-entrants-move-url="<?php echo $this->createUrl('movePlayoffEntrants', array('id' => '__ID__')); ?>"
      data-promote-playoff-url="<?php echo $this->createUrl('promotePlayoff', array('id' => '__ID__')); ?>"
      data-draw-swim-url="<?php echo $this->createUrl('drawSwimHeats', array('id' => '__ID__')); ?>"
      data-promote-swim-url="<?php echo $this->createUrl('promoteSwim', array('id' => '__ID__')); ?>"
