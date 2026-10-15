@@ -593,13 +593,19 @@ class RunRegistrationsController extends AdminController
         $this->sendFileThenDelete($zipPath, $downloadName, 'application/zip');
     }
 
-    /** Tên đơn vị in lên BIB: khách ngoài dùng company, còn lại dùng unit_label. */
+    /**
+     * Giá trị "đơn vị" in lên BIB và nhúng QR, lấy từ cột position (chức danh/đơn vị theo hồ sơ).
+     * Khách ngoài không có position nên lùi về company.
+     */
     protected function resolveBibUnit($row)
     {
-        if (!empty($row['is_guest'])) {
-            return !empty($row['company']) ? (string) $row['company'] : 'Khách ngoài';
+        if (!empty($row['position'])) {
+            return (string) $row['position'];
         }
-        return !empty($row['unit_label']) ? (string) $row['unit_label'] : '';
+        if (!empty($row['is_guest']) && !empty($row['company'])) {
+            return (string) $row['company'];
+        }
+        return '';
     }
 
     /** Gửi file cho trình duyệt rồi xoá file tạm. */
