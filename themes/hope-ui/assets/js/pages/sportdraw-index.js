@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var groupFields = document.querySelectorAll('.cfg-group-fields');
     var bracketFields = document.querySelector('.cfg-bracket-fields');
     var pairingFields = document.querySelector('.cfg-pairing-fields');
+    var playoffFields = document.querySelector('.cfg-playoff-fields');
+    var playoffSelect = document.getElementById('cfg-playoff-source');
 
     function toggleFormatFields() {
         var val = formatSelect.value;
@@ -53,6 +55,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         bracketFields.classList.toggle('d-none', BRACKET_FORMATS.indexOf(val) === -1);
         pairingFields.classList.toggle('d-none', val !== 'round_robin_knockout');
+        if (playoffFields) {
+            playoffFields.classList.toggle('d-none', val !== 'round_robin_knockout');
+        }
+    }
+
+    // Nạp danh sách giai đoạn play-off nguồn vào dropdown, giữ lựa chọn hiện tại.
+    function fillPlayoffSources(sources, selectedId) {
+        if (!playoffSelect) {
+            return;
+        }
+        playoffSelect.innerHTML = '<option value="">-- Không đặt chỗ trước play-off --</option>';
+        (sources || []).forEach(function (s) {
+            var opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = s.name;
+            playoffSelect.appendChild(opt);
+        });
+        playoffSelect.value = selectedId ? String(selectedId) : '';
     }
 
     function valueOr(value, fallback) {
