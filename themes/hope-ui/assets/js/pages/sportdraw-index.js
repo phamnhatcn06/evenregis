@@ -157,6 +157,120 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    /* ===== Chọn VĐV từ vòng chung kết vào play-off ===== */
+    var peModalEl = document.getElementById('modal-playoff-entrants');
+    if (peModalEl) {
+        var peCurrentStageId = null;
+        var peListEl = document.getElementById('pe-list');
+        var peCheckAll = document.getElementById('pe-check-all');
+        var peCountEl = document.getElementById('pe-selected-count');
+        var peSubmitBtn = document.getElementById('pe-submit');
+        var peStageNameEl = document.getElementById('pe-stage-name');
+
+        function peCheckboxes() {
+            return peListEl.querySelectorAll('input.pe-item');
+        }
+
+        function peUpdateCount() {
+            var total = peCheckboxes().length;
+            var checked = peListEl.querySelectorAll('input.pe-item:checked').length;
+            peCountEl.textContent = checked + '/' + total + ' đã chọn';
+            if (peCheckAll) {
+                peCheckAll.checked = total > 0 && checked === total;
+            }
+        }
+
+        function peRenderList(items) {
+            if (!Array.isArray(items) || items.length === 0) {
+                peListEl.innerHTML = '<div class="text-center text-muted py-3">Vòng chung kết chưa có VĐV nào.</div>';
+                peUpdateCount();
+                return;
+            }
+            var html = '';
+            items.forEach(function (it) {
+                var id = 'pe-item-' + it.team_id;
+                html += '<div class="form-check py-1 border-bottom">'
+                    + '<input class="form-check-input pe-item" type="checkbox" value="' + it.team_id + '" id="' + id + '">'
+                    + '<label class="form-check-label" for="' + id + '">' + (it.name || ('#' + it.team_id)) + '</label>'
+                    + '</div>';
+            });
+            peListEl.innerHTML = html;
+            peCheckboxes().forEach(function (cb) {
+                cb.addEventListener('change', peUpdateCount);
+            });
+            peUpdateCount();
+        }
+
+        document.querySelectorAll('.btn-playoff-entrants').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                peCurrentStageId = this.getAttribute('data-id');
+                peStageNameEl.textContent = this.getAttribute('data-name') || 'play-off';
+                peListEl.innerHTML = '<div class="text-center text-muted py-3"><i class="fa fa-spinner fa-spin me-1"></i>Đang tải danh sách...</div>';
+                if (peCheckAll) { peCheckAll.checked = false; }
+                peCountEl.textContent = '0 đã chọn';
+                bootstrap.Modal.getOrCreateInstance(peModalEl).show();
+
+                fetch(buildUrl(peListUrlTpl, peCurrentStageId), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function (res) { return res.json(); })
+                    .then(function (d) {
+                        if (d.success) {
+                            peRenderList(d.data || []);
+                        } else {
+                            peListEl.innerHTML = '<div class="text-center text-danger py-3">' + (d.message || 'Không tải được danh sách') + '</div>';
+                        }
+                    })
+                    .catch(function () {
+                        peListEl.innerHTML = '<div class="text-center text-danger py-3">Lỗi kết nối máy chủ</div>';
+                    });
+            });
+        });
+
+        if (peCheckAll) {
+            peCheckAll.addEventListener('change', function () {
+                var checked = this.checked;
+                peCheckboxes().forEach(function (cb) { cb.checked = checked; });
+                peUpdateCount();
+            });
+        }
+
+        if (peSubmitBtn) {
+            peSubmitBtn.addEventListener('click', function () {
+                var ids = [];
+                peListEl.querySelectorAll('input.pe-item:checked').forEach(function (cb) { ids.push(cb.value); });
+                if (ids.length === 0) {
+                    Toast.warning('Vui lòng chọn ít nhất một VĐV.');
+                    return;
+                }
+                var original = peSubmitBtn.innerHTML;
+                peSubmitBtn.disabled = true;
+                peSubmitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang chuyển...';
+
+                var fd = new FormData();
+                ids.forEach(function (id) { fd.append('team_ids[]', id); });
+                fetch(buildUrl(peMoveUrlTpl, peCurrentStageId), {
+                    method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(function (res) { return res.json(); })
+                    .then(function (d) {
+                        if (d.success) {
+                            bootstrap.Modal.getInstance(peModalEl).hide();
+                            Toast.success(d.message || 'Đã chuyển VĐV vào play-off');
+                            setTimeout(function () { location.reload(); }, 900);
+                        } else {
+                            peSubmitBtn.disabled = false;
+                            peSubmitBtn.innerHTML = original;
+                            Toast.error(d.message || 'Không thể chuyển VĐV');
+                        }
+                    })
+                    .catch(function () {
+                        peSubmitBtn.disabled = false;
+                        peSubmitBtn.innerHTML = original;
+                        Toast.error('Lỗi kết nối máy chủ');
+                    });
+            });
+        }
+    }
+
     /* ===== Chuyển người thắng play-off sang vòng bảng ===== */
     document.querySelectorAll('.btn-promote-playoff').forEach(function (btn) {
         btn.addEventListener('click', function () {
