@@ -130,7 +130,9 @@ foreach ($stages as $s) {
                         'loss_points' => $stage->loss_points,
                         'tiebreak' => $stage->tiebreak,
                         'ko_pairing' => $stage->ko_pairing,
+                        'playoff_source_stage_id' => $stage->playoff_source_stage_id,
                     ));
+                    $playoffSources = isset($playoffStagesBySport[$stage->sport_id]) ? $playoffStagesBySport[$stage->sport_id] : array();
                     ?>
                     <tr>
                         <td>
