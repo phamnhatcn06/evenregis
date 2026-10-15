@@ -1321,6 +1321,9 @@
                 placeholder: cfg.ph,
                 allowClear: true
             });
+            // select2 phát sự kiện change qua jQuery.trigger — KHÔNG gọi handler đăng ký
+            // bằng addEventListener. Phải bind lại qua jQuery để auto-điền thông tin/ảnh.
+            $el.on('change', cfg.sel === '#add_other' ? addOnOtherChange : addOnStaffChange);
         });
     }
 
