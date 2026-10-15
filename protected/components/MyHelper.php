@@ -1190,7 +1190,7 @@ class MyHelper
         self::drawRunBibText($canvas, $name, array(
             'font' => 'fontten', 'color' => '#FFFFFF', 'bold' => true,
             'size' => 104, 'min_size' => 46,
-            'box_x1' => 150, 'box_x2' => 2331, 'center_y' => 480, 'align' => 'C',
+            'box_x1' => 150, 'box_x2' => 2331, 'center_y' => 545, 'align' => 'C',
         ));
         // Đơn vị: sau nhãn "Mã ĐV:" (nhãn kết thúc ~x=1194, baseline giữa y≈700).
         self::drawRunBibText($canvas, $unit, array(
