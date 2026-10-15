@@ -223,7 +223,7 @@ foreach ($stages as $s) {
                                     <i class="fa fa-sitemap"></i> Sinh nhánh từ bảng
                                 </button>
                             <?php endif; ?>
-                            <?php if (($isGroup || $isBracket) && !$isLocked): ?>
+                            <?php if (($isGroup || $isBracket || $stage->format === SportStages::FORMAT_PLAYOFF) && !$isLocked): ?>
                                 <a href="<?php echo $this->createUrl('assign', array('id' => $stage->id)); ?>"
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="fa fa-hand-rock-o"></i> Gán thủ công

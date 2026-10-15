@@ -1147,58 +1147,77 @@ $sportThemes = array(
                         </span>
                       </div>
 
-                      <!-- 2. Body thẻ: Đối đầu Đội A vs Đội B (Face-off VS Layout) -->
-                      <div class="p-3">
-                        <div class="match-faceoff-grid d-flex align-items-center justify-content-between gap-2">
-                          <!-- Đội A -->
-                          <div class="team-side text-center flex-grow-1 overflow-hidden">
-                            <div class="avatar-squircle mx-auto mb-1 text-white fw-bold d-flex align-items-center justify-content-center shadow-2xs <?php echo $isWinnerA ? 'ring-winner' : ''; ?>"
-                                 style="width:42px;height:42px;font-size:13px;background:linear-gradient(135deg,#1e40af,#3b82f6);">
-                              <?php echo $e($initials($ta)); ?>
+                      <!-- 2. Body thẻ: Đối đầu Đội A vs Đội B (Match Arena - Thẳng hàng 100%, không lồi lõm) -->
+                      <div class="px-2 pt-2 pb-1">
+                        <div class="match-arena-box">
+                          <!-- Hàng 1: Avatar Đội A - VS / Tỷ số - Avatar Đội B (Cố định cùng hàng, Icon luôn thẳng tắp) -->
+                          <div class="faceoff-row-avatars">
+                            <div class="avatar-cell">
+                              <div class="avatar-squircle text-white fw-bold d-flex align-items-center justify-content-center shadow-xs <?php echo $isWinnerA ? 'ring-winner' : ''; ?>"
+                                   style="width:46px;height:46px;font-size:14px;background:linear-gradient(135deg,#1d4ed8 0%,#3b82f6 100%);border:2px solid #ffffff;">
+                                <?php echo $e($initials($ta)); ?>
+                              </div>
                             </div>
-                            <div class="team-name fw-bold <?php echo $isWinnerA ? 'text-success' : 'text-dark'; ?> small text-truncate px-1" title="<?php echo $e($ta); ?>">
+
+                            <div class="center-emblem-cell">
+                              <?php if ($hasScore || $status === 'live'): ?>
+                                <div class="score-pill-emblem d-flex align-items-center justify-content-center gap-1 px-2.5 py-1 rounded-pill text-white font-monospace shadow-xs">
+                                  <span class="fs-5 fw-black <?php echo $isWinnerA ? 'text-success' : 'text-white'; ?>"><?php echo (int) $sa; ?></span>
+                                  <span class="text-white-50 fs-6">-</span>
+                                  <span class="fs-5 fw-black <?php echo $isWinnerB ? 'text-success' : 'text-white'; ?>"><?php echo (int) $sb; ?></span>
+                                </div>
+                              <?php else: ?>
+                                <div class="vs-circle-emblem">VS</div>
+                              <?php endif; ?>
+                            </div>
+
+                            <div class="avatar-cell">
+                              <div class="avatar-squircle text-white fw-bold d-flex align-items-center justify-content-center shadow-xs <?php echo $isWinnerB ? 'ring-winner' : ''; ?>"
+                                   style="width:46px;height:46px;font-size:14px;background:linear-gradient(135deg,#0f172a 0%,#334155 100%);border:2px solid #ffffff;">
+                                <?php echo $e($initials($tb)); ?>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Hàng 2: Tên Đội A - Giờ đấu / FT - Tên Đội B (Chiều cao 36px cố định, Tên đội luôn thẳng hàng) -->
+                          <div class="faceoff-row-names mt-2">
+                            <div class="team-name-cell <?php echo $isWinnerA ? 'text-success' : 'text-dark'; ?>" title="<?php echo $e($ta); ?>">
                               <?php echo $e($ta); ?>
                             </div>
-                            <?php if ($isWinnerA): ?>
-                              <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0 mt-1" style="font-size:9.5px;">
-                                🏆 Thắng
-                              </span>
-                            <?php endif; ?>
-                          </div>
 
-                          <!-- Điểm số / VS ở giữa -->
-                          <div class="score-center text-center flex-shrink-0 px-2">
-                            <?php if ($hasScore || $status === 'live'): ?>
-                              <div class="score-box d-flex align-items-center justify-content-center gap-1 px-3 py-1 rounded-3 bg-slate-100">
-                                <span class="fs-3 fw-black font-monospace <?php echo $isWinnerA ? 'text-success' : 'text-dark'; ?>"><?php echo (int) $sa; ?></span>
-                                <span class="text-muted fw-light fs-4">-</span>
-                                <span class="fs-3 fw-black font-monospace <?php echo $isWinnerB ? 'text-success' : 'text-dark'; ?>"><?php echo (int) $sb; ?></span>
-                              </div>
-                            <?php else: ?>
-                              <div class="vs-box d-flex flex-column align-items-center justify-content-center">
-                                <span class="badge bg-light text-muted border rounded-circle fw-black d-flex align-items-center justify-content-center" style="width:32px;height:32px;font-size:11px;">VS</span>
-                                <?php if (!empty($m['match_hour'])): ?>
-                                  <span class="text-primary fw-bold small mt-1" style="font-size:11px;"><?php echo $e($m['match_hour']); ?></span>
-                                <?php endif; ?>
-                              </div>
-                            <?php endif; ?>
-                          </div>
-
-                          <!-- Đội B -->
-                          <div class="team-side text-center flex-grow-1 overflow-hidden">
-                            <div class="avatar-squircle mx-auto mb-1 text-white fw-bold d-flex align-items-center justify-content-center shadow-2xs <?php echo $isWinnerB ? 'ring-winner' : ''; ?>"
-                                 style="width:42px;height:42px;font-size:13px;background:linear-gradient(135deg,#334155,#64748b);">
-                              <?php echo $e($initials($tb)); ?>
+                            <div class="center-time-cell">
+                              <?php if (!empty($m['match_hour']) && !$hasScore): ?>
+                                <span class="match-time-chip"><?php echo $e($m['match_hour']); ?></span>
+                              <?php elseif ($status === 'live'): ?>
+                                <span class="badge bg-danger text-white rounded-pill px-2 py-0.5" style="font-size:10px;">LIVE</span>
+                              <?php elseif ($isWinnerA || $isWinnerB): ?>
+                                <span class="text-muted fw-bold" style="font-size:10px;">FT</span>
+                              <?php else: ?>
+                                <span class="text-muted small">—</span>
+                              <?php endif; ?>
                             </div>
-                            <div class="team-name fw-bold <?php echo $isWinnerB ? 'text-success' : 'text-dark'; ?> small text-truncate px-1" title="<?php echo $e($tb); ?>">
+
+                            <div class="team-name-cell <?php echo $isWinnerB ? 'text-success' : 'text-dark'; ?>" title="<?php echo $e($tb); ?>">
                               <?php echo $e($tb); ?>
                             </div>
-                            <?php if ($isWinnerB): ?>
-                              <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0 mt-1" style="font-size:9.5px;">
-                                🏆 Thắng
-                              </span>
-                            <?php endif; ?>
                           </div>
+
+                          <!-- Hàng 3: Huy hiệu chiến thắng nếu có (Cố định, không làm lệch hàng trên) -->
+                          <?php if ($isWinnerA || $isWinnerB): ?>
+                            <div class="faceoff-row-winners mt-1">
+                              <div class="text-center">
+                                <?php if ($isWinnerA): ?>
+                                  <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0" style="font-size:9.5px;">🏆 Thắng</span>
+                                <?php endif; ?>
+                              </div>
+                              <div></div>
+                              <div class="text-center">
+                                <?php if ($isWinnerB): ?>
+                                  <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0" style="font-size:9.5px;">🏆 Thắng</span>
+                                <?php endif; ?>
+                              </div>
+                            </div>
+                          <?php endif; ?>
                         </div>
                       </div>
 
