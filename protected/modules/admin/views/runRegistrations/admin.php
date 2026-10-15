@@ -188,9 +188,9 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                                 <td>
                                     <span class="badge bg-primary"><?php echo CHtml::encode(isset($r['bib_number']) ? $r['bib_number'] : ''); ?></span>
                                     <?php if (!empty($r['bib_number'])): ?>
-                                    <a href="<?php echo $this->createUrl('exportBib', array('event_id' => $eventId, 'reg_id' => (int) $r['id'])); ?>"
-                                       class="text-decoration-none ms-1" title="Xuất thẻ BIB người này">
-                                        <i class="fa fa-id-card-o"></i>
+                                    <a href="<?php echo $this->createUrl('exportBibOne', array('event_id' => $eventId, 'id' => (int) $r['id'])); ?>"
+                                       class="btn btn-sm btn-outline-success ms-1 py-0 px-1" title="Xuất thẻ BIB người này">
+                                        <i class="fa fa-download"></i>
                                     </a>
                                     <?php endif; ?>
                                 </td>
