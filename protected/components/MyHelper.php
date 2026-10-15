@@ -1115,6 +1115,165 @@ class MyHelper
         return is_file($path) ? $path : false;
     }
 
+    /**
+     * Chọn phôi BIB chạy theo quy ước tên file: "<km>_bib_<nam|nu>[_<duoi35|tren35>].png".
+     * - Cự ly suy từ nhãn nội dung (age_group_label) hoặc tên cự ly (run_event_name).
+     * - Chỉ cự ly 5km có phôi tách nhóm tuổi; nhóm lấy từ nhãn ("dưới/trên 35") hoặc năm sinh.
+     * Thiếu dữ liệu để chọn → trả phôi trắng blank_bib.png.
+     */
+    public static function runBibTemplateFile($data, $templateDir)
+    {
+        $templateDir = rtrim($templateDir, '/\\') . '/';
+        $blank = $templateDir . 'blank_bib.png';
+
+        $source   = !empty($data['age_group_label'])
+            ? $data['age_group_label']
+            : (isset($data['run_event_name']) ? $data['run_event_name'] : '');
+        $distance = preg_replace('/\D/', '', (string) $source);
+        if ($distance === '') {
+            return $blank;
+        }
+
+        $gender = (isset($data['gender']) && $data['gender'] !== null && $data['gender'] !== '')
+            ? (int) $data['gender']
+            : null;
+        if ($gender === null) {
+            return $blank;
+        }
+        $base = $distance . '_bib_' . ($gender === 1 ? 'nam' : 'nu');
+
+        $candidates = array();
+        if ($distance === '5') {
+            $label = isset($data['age_group_label']) ? (string) $data['age_group_label'] : '';
+            $group = '';
+            if (mb_stripos($label, 'dưới', 0, 'UTF-8') !== false) {
+                $group = 'duoi35';
+            } elseif (mb_stripos($label, 'trên', 0, 'UTF-8') !== false) {
+                $group = 'tren35';
+            } elseif (!empty($data['birth_year'])) {
+                $age   = (int) date('Y') - (int) $data['birth_year'];
+                $group = $age < 35 ? 'duoi35' : 'tren35';
+            }
+            if ($group !== '') {
+                $candidates[] = $base . '_' . $group . '.png';
+            }
+        }
+        $candidates[] = $base . '.png';
+
+        foreach ($candidates as $file) {
+            if (is_file($templateDir . $file)) {
+                return $templateDir . $file;
+            }
+        }
+        return $blank;
+    }
+
+    /**
+     * Dựng ảnh thẻ BIB chạy cho một người: chọn phôi theo nội dung rồi in Số BIB (ô trắng
+     * phải), Họ tên (vùng giữa) và Đơn vị (sau nhãn "Mã ĐV:"). Trả về đường dẫn file PNG hoặc false.
+     *
+     * $data: bib_number, full_name, unit, run_event_name, age_group_label, gender, birth_year.
+     */
+    public static function RunBibCard($data, $templateDir, $outDir)
+    {
+        $tpl    = self::runBibTemplateFile($data, $templateDir);
+        $canvas = self::loadPngCanvas($tpl);
+        if (!$canvas) {
+            return false;
+        }
+
+        $name = isset($data['full_name']) ? mb_strtoupper(trim($data['full_name']), 'UTF-8') : '';
+        $unit = isset($data['unit']) ? trim((string) $data['unit']) : '';
+        $bib  = isset($data['bib_number']) ? trim((string) $data['bib_number']) : '';
+
+        // Họ tên: in đậm trắng, căn giữa ở khoảng trống phía trên nhãn "Mã ĐV".
+        self::drawRunBibText($canvas, $name, array(
+            'font' => 'fontten', 'color' => '#FFFFFF', 'bold' => true,
+            'size' => 104, 'min_size' => 46,
+            'box_x1' => 150, 'box_x2' => 2331, 'center_y' => 480, 'align' => 'C',
+        ));
+        // Đơn vị: sau nhãn "Mã ĐV:" (nhãn kết thúc ~x=1194, baseline giữa y≈700).
+        self::drawRunBibText($canvas, $unit, array(
+            'font' => 'fontdonvi', 'color' => '#FFFFFF', 'bold' => false,
+            'size' => 54, 'min_size' => 26,
+            'box_x1' => 1215, 'box_x2' => 2420, 'center_y' => 700, 'align' => 'L',
+        ));
+        // Số BIB: in đậm, màu xanh than, căn giữa trong ô trắng (x 1917–2210, y 1423–1717).
+        self::drawRunBibText($canvas, $bib, array(
+            'font' => 'fontten', 'color' => '#16205B', 'bold' => true,
+            'size' => 150, 'min_size' => 48,
+            'box_x1' => 1917, 'box_x2' => 2210, 'center_y' => 1570, 'align' => 'C',
+        ));
+
+        $outDir = rtrim($outDir, '/\\') . '/';
+        if (!is_dir($outDir)) {
+            mkdir($outDir, 0755, true);
+        }
+        $namePart = UrlTransliterate::cleanString($name !== '' ? $name : 'nguoi');
+        $bibPart  = UrlTransliterate::cleanString($bib !== '' ? $bib : (string) mt_rand(1000, 9999));
+        $path     = $outDir . $bibPart . '-' . $namePart . '.png';
+
+        imagepng($canvas, $path);
+        imagedestroy($canvas);
+
+        return is_file($path) ? $path : false;
+    }
+
+    /**
+     * Vẽ text BIB với tự co font cho vừa bề ngang hộp, căn giữa (C) hoặc trái (L) trong hộp,
+     * căn giữa dọc quanh center_y. $cfg: font, color, bold, size, min_size, box_x1, box_x2,
+     * center_y, align, pad.
+     */
+    protected static function drawRunBibText($canvas, $text, $cfg)
+    {
+        $text = trim((string) $text);
+        if ($text === '') {
+            return;
+        }
+        $fontPath = self::badgeFontPath($cfg['font']);
+        if (!$fontPath) {
+            return;
+        }
+
+        $rgb = self::hexToRgb(isset($cfg['color']) ? $cfg['color'] : '#000000');
+        $col = imagecolorallocate($canvas, $rgb[0], $rgb[1], $rgb[2]);
+
+        $boxX1   = (int) $cfg['box_x1'];
+        $boxX2   = (int) $cfg['box_x2'];
+        $pad     = isset($cfg['pad']) ? (int) $cfg['pad'] : 12;
+        $maxW    = max(1, ($boxX2 - $boxX1) - 2 * $pad);
+        $size    = (float) $cfg['size'];
+        $minSize = isset($cfg['min_size']) ? (float) $cfg['min_size'] : $size;
+
+        $box = imagettfbbox($size, 0, $fontPath, $text);
+        $tw  = abs($box[2] - $box[0]);
+        while ($tw > $maxW && $size > $minSize) {
+            $size -= 2;
+            $box = imagettfbbox($size, 0, $fontPath, $text);
+            $tw  = abs($box[2] - $box[0]);
+        }
+
+        $leftBearing = $box[0];
+        $ascent      = abs($box[7]);
+        $descent     = abs($box[1]);
+        $th          = $ascent + $descent;
+
+        $align = isset($cfg['align']) ? $cfg['align'] : 'C';
+        if ($align === 'L') {
+            $x = $boxX1 + $pad - $leftBearing;
+        } else {
+            $x = (int) round($boxX1 + (($boxX2 - $boxX1) - $tw) / 2) - $leftBearing;
+        }
+        $y = (int) round($cfg['center_y'] + $th / 2 - $descent);
+
+        imagettftext($canvas, $size, 0, $x, $y, $col, $fontPath, $text);
+        if (!empty($cfg['bold'])) {
+            imagettftext($canvas, $size, 0, $x + 1, $y, $col, $fontPath, $text);
+            imagettftext($canvas, $size, 0, $x + 2, $y, $col, $fontPath, $text);
+            imagettftext($canvas, $size, 0, $x + 1, $y + 1, $col, $fontPath, $text);
+        }
+    }
+
     /** Nạp một ảnh PNG thành canvas truecolor có alpha để chỉnh sửa. */
     protected static function loadPngCanvas($path)
     {
