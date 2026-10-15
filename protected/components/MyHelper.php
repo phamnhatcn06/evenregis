@@ -1305,11 +1305,38 @@ class MyHelper
         }
         $y = (int) round($cfg['center_y'] + $th / 2 - $descent);
 
-        imagettftext($canvas, $size, 0, $x, $y, $col, $fontPath, $text);
-        if (!empty($cfg['bold'])) {
-            imagettftext($canvas, $size, 0, $x + 1, $y, $col, $fontPath, $text);
-            imagettftext($canvas, $size, 0, $x + 2, $y, $col, $fontPath, $text);
-            imagettftext($canvas, $size, 0, $x + 1, $y + 1, $col, $fontPath, $text);
+        // Độ đậm giả: vẽ đè theo lưới bán kính $weight (font không có bản bold riêng).
+        // 'weight' ưu tiên; nếu chỉ có 'bold' thì dùng bán kính 1.
+        $weight = isset($cfg['weight']) ? max(0, (int) $cfg['weight']) : (!empty($cfg['bold']) ? 1 : 0);
+
+        // Đổ bóng: vẽ chữ (đã làm đậm) bằng màu bóng, lệch (dx,dy) TRƯỚC khi vẽ chữ chính.
+        if (!empty($cfg['shadow'])) {
+            $sh  = $cfg['shadow'];
+            $sdx = isset($sh['dx']) ? (int) $sh['dx'] : 8;
+            $sdy = isset($sh['dy']) ? (int) $sh['dy'] : 8;
+            $srgb = self::hexToRgb(isset($sh['color']) ? $sh['color'] : '#000000');
+            $salpha = isset($sh['alpha']) ? (int) $sh['alpha'] : 70; // 0 đặc … 127 trong suốt
+            $scol = imagecolorallocatealpha($canvas, $srgb[0], $srgb[1], $srgb[2], max(0, min(127, $salpha)));
+            self::stampText($canvas, $size, $x + $sdx, $y + $sdy, $scol, $fontPath, $text, $weight);
+        }
+
+        self::stampText($canvas, $size, $x, $y, $col, $fontPath, $text, $weight);
+    }
+
+    /** Vẽ một chuỗi tại (x,y), đè theo lưới bán kính $weight để nét dày lên (bold giả). */
+    protected static function stampText($canvas, $size, $x, $y, $color, $fontPath, $text, $weight = 0)
+    {
+        imagettftext($canvas, $size, 0, $x, $y, $color, $fontPath, $text);
+        if ($weight <= 0) {
+            return;
+        }
+        for ($dx = -$weight; $dx <= $weight; $dx++) {
+            for ($dy = -$weight; $dy <= $weight; $dy++) {
+                if ($dx === 0 && $dy === 0) {
+                    continue;
+                }
+                imagettftext($canvas, $size, 0, $x + $dx, $y + $dy, $color, $fontPath, $text);
+            }
         }
     }
 
