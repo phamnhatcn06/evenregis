@@ -74,6 +74,14 @@
                         )); ?>
                     </div>
 
+                    <div class="mt-3 cfg-playoff-fields d-none">
+                        <label class="form-label">Giai đoạn play-off nguồn <span class="text-muted">(không bắt buộc)</span></label>
+                        <select class="form-select" name="SportStages[playoff_source_stage_id]" id="cfg-playoff-source">
+                            <option value="">-- Không đặt chỗ trước play-off --</option>
+                        </select>
+                        <small class="text-muted">Khi bốc bảng sẽ đặt sẵn 1 slot cho mỗi trận play-off; đội thắng tự điền vào slot khi có kết quả.</small>
+                    </div>
+
                     <div class="mb-3 cfg-bracket-fields d-none mt-3">
                         <label class="form-label">Kích thước nhánh loại trực tiếp</label>
                         <?php echo CHtml::dropDownList('SportStages[bracket_size]', '', array(
