@@ -528,6 +528,7 @@ class ApiEndpoints
     const SPORT_DRAW_ASSIGN = '/api/sport-draw/assign/{stageId}';
     // Play-off: bốc thăm các trận độc lập + chuyển người thắng vào vòng bảng
     const SPORT_DRAW_PLAYOFF = '/api/sport-draw/playoff/{stageId}';
+    const SPORT_DRAW_PLAYOFF_ENTRANTS = '/api/sport-draw/playoff-entrants/{stageId}';
     const SPORT_DRAW_PROMOTE_PLAYOFF = '/api/sport-draw/promote-playoff/{stageId}';
     // Bơi: bốc thăm phân lượt/làn, ghi thành tích, chuyển Top N vào chung kết
     const SPORT_DRAW_SWIM_HEATS = '/api/sport-draw/swim-heats/{stageId}';
