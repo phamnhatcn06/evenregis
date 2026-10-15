@@ -1229,7 +1229,7 @@ class MyHelper
             'font' => 'sobib', 'color' => $textColor, 'weight' => 0,
             'size' => 440, 'min_size' => 160, 'pad' => 40,
             'box_x1' => 250, 'box_x2' => 2230, 'center_y' => 1040, 'align' => 'C',
-            'shadow' => array('color' => $shadowColor, 'alpha' => 70, 'dx' => 22, 'dy' => 12),
+            'shadow' => array('color' => $shadowColor, 'alpha' => 0, 'dx' => 32, 'dy' => 20),
         ));
 
         // QR Code vào ô trắng ở thanh vàng. Nội dung theo quy ước:
