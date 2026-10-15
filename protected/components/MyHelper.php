@@ -1209,11 +1209,11 @@ class MyHelper
         $boxX2     = $isNu ? 2101 : 2210;
         $boxCy     = 1570;
 
-        // Họ tên: in đậm, căn giữa phía trên.
+        // Họ tên: in đậm, căn giữa phía trên (hạ xuống ngang vạch thiết kế).
         self::drawRunBibText($canvas, $name, array(
             'font' => 'fontten', 'color' => $textColor, 'bold' => true,
             'size' => 108, 'min_size' => 46,
-            'box_x1' => 300, 'box_x2' => 2180, 'center_y' => 455, 'align' => 'C',
+            'box_x1' => 300, 'box_x2' => 2180, 'center_y' => 540, 'align' => 'C',
         ));
         // Dòng "Mã ĐV: <đơn vị lấy từ cột position>", căn giữa dưới họ tên.
         $maDvLine = 'Mã ĐV: ' . $position;
