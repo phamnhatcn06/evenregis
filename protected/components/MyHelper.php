@@ -1223,11 +1223,13 @@ class MyHelper
             'box_x1' => 300, 'box_x2' => 2180, 'center_y' => 690, 'align' => 'C',
         ));
         // Số BIB: cỡ lớn, extra bold + đổ bóng, căn giữa thẻ (Nam trắng, Nữ đen).
+        // Bóng ngược màu chữ: chữ đen → bóng trắng, chữ trắng → bóng đen; lệch phải nhiều.
+        $shadowColor = $isNu ? '#FFFFFF' : '#000000';
         self::drawRunBibText($canvas, $bib, array(
             'font' => 'fontdonvi', 'color' => $textColor, 'weight' => 4,
             'size' => 440, 'min_size' => 160, 'pad' => 40,
             'box_x1' => 250, 'box_x2' => 2230, 'center_y' => 1040, 'align' => 'C',
-            'shadow' => array('color' => '#000000', 'alpha' => 75, 'dx' => 10, 'dy' => 12),
+            'shadow' => array('color' => $shadowColor, 'alpha' => 70, 'dx' => 22, 'dy' => 12),
         ));
 
         // QR Code vào ô trắng ở thanh vàng. Nội dung theo quy ước:
