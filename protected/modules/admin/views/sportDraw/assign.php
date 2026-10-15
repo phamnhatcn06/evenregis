@@ -45,7 +45,9 @@ Yii::app()->clientScript->registerScriptFile(
 );
 
 $isGroup = SportStages::isGroupFormat($model->format);
-$isBracket = SportStages::isBracketFormat($model->format);
+$isPlayoff = ($model->format === SportStages::FORMAT_PLAYOFF);
+// Play-off dùng chung bố cục ghép cặp theo slot như nhánh loại trực tiếp.
+$isBracket = SportStages::isBracketFormat($model->format) || $isPlayoff;
 $mode = $isGroup ? 'groups' : ($isBracket ? 'bracket' : '');
 
 // Danh sách đội của giai đoạn + phân bổ hiện tại (nếu đã bốc)
