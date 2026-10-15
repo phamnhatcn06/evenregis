@@ -489,6 +489,13 @@ class RunRegistrationsController extends AdminController
             throw new CHttpException(422, 'Vui lòng chọn sự kiện.');
         }
 
+        // Dựng ảnh BIB hàng loạt (ảnh 2481×1754) tốn CPU/RAM; nới giới hạn để tránh 503/timeout.
+        @set_time_limit(0);
+        @ini_set('memory_limit', '1024M');
+        if (function_exists('ignore_user_abort')) {
+            ignore_user_abort(true);
+        }
+
         $regId = (int) Yii::app()->request->getParam('reg_id');
         $cuLy  = trim((string) Yii::app()->request->getParam('cu_ly'));
 
