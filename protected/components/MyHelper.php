@@ -1186,23 +1186,31 @@ class MyHelper
         $unit = isset($data['unit']) ? trim((string) $data['unit']) : '';
         $bib  = isset($data['bib_number']) ? trim((string) $data['bib_number']) : '';
 
-        // Họ tên: in đậm trắng, căn giữa ở khoảng trống phía trên nhãn "Mã ĐV".
+        // Mỗi phôi có bố cục/nền khác nhau (phôi Nam nền màu, phôi Nữ nền trắng), nên:
+        // - Dò ô trắng (vùng in Số BIB) ngay trên ảnh để đặt BIB đúng chỗ dù phôi đổi.
+        // - Chọn màu chữ Họ tên / Đơn vị theo độ sáng nền: nền sáng → chữ xanh than, nền tối → chữ trắng.
+        $box      = self::detectBibBox($canvas);
+        $bgLum    = self::sampleAreaLuminance($canvas, 300, 470, 2180, 620);
+        $textColor = $bgLum > 160 ? '#16205B' : '#FFFFFF';
+
+        // Họ tên: in đậm, căn giữa ở khoảng trống phía trên nhãn "Mã ĐV".
         self::drawRunBibText($canvas, $name, array(
-            'font' => 'fontten', 'color' => '#FFFFFF', 'bold' => true,
+            'font' => 'fontten', 'color' => $textColor, 'bold' => true,
             'size' => 104, 'min_size' => 46,
-            'box_x1' => 150, 'box_x2' => 2331, 'center_y' => 545, 'align' => 'C',
+            'box_x1' => 350, 'box_x2' => 2130, 'center_y' => 545, 'align' => 'C',
         ));
         // Đơn vị: sau nhãn "Mã ĐV:" (nhãn kết thúc ~x=1194, baseline giữa y≈700).
         self::drawRunBibText($canvas, $unit, array(
-            'font' => 'fontdonvi', 'color' => '#FFFFFF', 'bold' => false,
+            'font' => 'fontdonvi', 'color' => $textColor, 'bold' => false,
             'size' => 54, 'min_size' => 26,
             'box_x1' => 1215, 'box_x2' => 2420, 'center_y' => 700, 'align' => 'L',
         ));
-        // Số BIB: in đậm, màu xanh than, căn giữa trong ô trắng (x 1917–2210, y 1423–1717).
+        // Số BIB: in đậm, màu xanh than (ô luôn trắng), căn giữa trong ô đã dò.
         self::drawRunBibText($canvas, $bib, array(
             'font' => 'fontten', 'color' => '#16205B', 'bold' => true,
-            'size' => 150, 'min_size' => 48,
-            'box_x1' => 1917, 'box_x2' => 2210, 'center_y' => 1570, 'align' => 'C',
+            'size' => 150, 'min_size' => 48, 'pad' => 20,
+            'box_x1' => $box['x1'], 'box_x2' => $box['x2'],
+            'center_y' => $box['cy'], 'align' => 'C',
         ));
 
         $outDir = rtrim($outDir, '/\\') . '/';
