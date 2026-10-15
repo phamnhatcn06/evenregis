@@ -1874,6 +1874,30 @@ $sportThemes = array(
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
+/* Live blinking indicator trên thẻ trận đấu */
+.live-dot-blink {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: live-dot-pulse 1s ease-in-out infinite;
+}
+@keyframes live-dot-pulse {
+  0%   { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  70%  { opacity: 0.4; box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.live-blink-text {
+  letter-spacing: 0.5px;
+  animation: live-text-blink 1s steps(2, start) infinite;
+}
+@keyframes live-text-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
 /* Sticky Filter Card */
 .sticky-filter {
   transition: box-shadow 0.2s ease;
