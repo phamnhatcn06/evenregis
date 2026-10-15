@@ -445,7 +445,7 @@ class RunRegistrationsController extends AdminController
             if (!empty($r['is_guest'])) {
                 $unitCell = !empty($r['company']) ? ($r['company'] . ' (Khách ngoài)') : 'Khách ngoài';
             } else {
-                $unitCell = isset($r['unit_label']) ? $r['unit_label'] : '';
+                $unitCell = !empty($r['badge_org_name']) ? $r['badge_org_name'] : (isset($r['unit_label']) ? $r['unit_label'] : '');
             }
             $sheet->setCellValue('D' . $row, $unitCell);
             $sheet->setCellValue('E' . $row, isset($r['phone_number']) ? $r['phone_number'] : '');
