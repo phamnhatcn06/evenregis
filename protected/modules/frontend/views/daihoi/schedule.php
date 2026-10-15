@@ -1039,6 +1039,58 @@ $sportThemes = array(
         </div>
       <?php else: ?>
 
+        <!-- Thanh lọc nhanh tại chỗ: chọn môn + trạng thái (dùng chung JS lọc) -->
+        <div class="inline-match-filter card border-0 shadow-sm rounded-4 mb-3 p-2 p-md-3 bg-white">
+          <!-- Lọc theo môn thi đấu -->
+          <div class="d-flex align-items-center gap-2 overflow-x-auto pb-1 sports-nav-scroller">
+            <span class="text-muted fw-bold small text-nowrap d-flex align-items-center gap-1 me-1" style="font-size:11.5px;">
+              <span class="material-symbols-outlined fs-6 text-primary">sports</span> Nội dung:
+            </span>
+            <button type="button"
+                    class="sport-filter-btn btn btn-sm rounded-pill fw-bold text-nowrap d-flex align-items-center gap-1 px-3 py-1 <?php echo empty($selectedSportId) ? 'active btn-brand-primary' : 'btn-light'; ?>"
+                    data-sport-id="">
+              <span class="material-symbols-outlined fs-6">all_inclusive</span>
+              <span>Tất cả</span>
+              <span class="badge <?php echo empty($selectedSportId) ? 'bg-white text-dark' : 'bg-secondary text-white'; ?> rounded-pill px-2 py-0 ms-1" style="font-size:10px;"><?php echo count($allMatches); ?></span>
+            </button>
+            <?php foreach ($sportsList as $sp): ?>
+              <?php
+              $isActive = ($selectedSportId == $sp['id']);
+              $btnCls = $isActive ? 'active btn-brand-primary' : 'btn-light';
+              ?>
+              <button type="button"
+                      class="sport-filter-btn btn btn-sm rounded-pill fw-bold text-nowrap d-flex align-items-center gap-1 px-3 py-1 <?php echo $btnCls; ?>"
+                      data-sport-id="<?php echo $sp['id']; ?>"
+                      data-sport-name="<?php echo $e($sp['name']); ?>">
+                <span class="material-symbols-outlined fs-6"><?php echo $e($sp['icon']); ?></span>
+                <span><?php echo $e($sp['name']); ?></span>
+                <?php if ($sp['total_matches'] > 0): ?>
+                  <span class="badge <?php echo $isActive ? 'bg-white text-dark' : 'bg-primary text-white'; ?> rounded-pill px-2 py-0 ms-1" style="font-size:10px;"><?php echo $sp['total_matches']; ?></span>
+                <?php endif; ?>
+              </button>
+            <?php endforeach; ?>
+          </div>
+
+          <!-- Lọc theo trạng thái -->
+          <div class="d-flex flex-wrap align-items-center gap-1 mt-2 pt-2 border-top status-filter-group">
+            <span class="text-muted fw-bold small text-nowrap d-flex align-items-center gap-1 me-1" style="font-size:11.5px;">
+              <span class="material-symbols-outlined fs-6 text-primary">filter_alt</span> Trạng thái:
+            </span>
+            <button type="button" class="btn btn-sm rounded-pill status-filter-btn active" data-status="">
+              Tất cả (<?php echo count($allMatches); ?>)
+            </button>
+            <button type="button" class="btn btn-sm rounded-pill status-filter-btn status-btn-live d-inline-flex align-items-center gap-1" data-status="live">
+              <span class="pulse-indicator-sm"></span> Trực tiếp (<?php echo (int) $stats['live_matches']; ?>)
+            </button>
+            <button type="button" class="btn btn-sm rounded-pill status-filter-btn" data-status="completed">
+              Đã kết thúc (<?php echo (int) $stats['completed_matches']; ?>)
+            </button>
+            <button type="button" class="btn btn-sm rounded-pill status-filter-btn" data-status="scheduled">
+              Đã xếp lịch (<?php echo (int) $stats['scheduled_matches']; ?>)
+            </button>
+          </div>
+        </div>
+
         <!-- Container danh sách trận đấu (Hỗ trợ Gom nhóm theo ngày hoặc hiển thị phẳng) -->
         <div id="matches-grid-container" class="view-cards-mode">
           <?php
