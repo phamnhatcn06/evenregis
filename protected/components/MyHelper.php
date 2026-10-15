@@ -1200,9 +1200,11 @@ class MyHelper
 
         // Màu chữ theo giới tính: phôi Nam nền màu → chữ trắng; phôi Nữ nền trắng → chữ đen.
         // Ô trắng ở thanh vàng (QR) lệch vị trí theo phôi Nam/Nữ.
+        // Thiếu giới tính → mặc định coi như Nữ để chữ dùng màu TỐI (không trắng), tránh chữ trắng
+        // trên phôi trắng blank_bib thành ảnh trắng tinh.
         $gender = (isset($data['gender']) && $data['gender'] !== null && $data['gender'] !== '')
             ? (int) $data['gender']
-            : 1;
+            : 0;
         $isNu      = ($gender === 0);
         $textColor = $isNu ? '#1A1A1A' : '#FFFFFF';
         $boxX1     = $isNu ? 1808 : 1917;
