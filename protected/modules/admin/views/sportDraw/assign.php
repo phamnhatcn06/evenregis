@@ -53,6 +53,14 @@ $mode = $isGroup ? 'groups' : ($isBracket ? 'bracket' : '');
 // Danh sách đội của giai đoạn + phân bổ hiện tại (nếu đã bốc)
 $teams = ($preview && isset($preview['teams'])) ? $preview['teams'] : array();
 
+// Nhãn hiển thị: ưu tiên tên VĐV (display_name), fallback mã đội.
+$teamLabel = function ($t) {
+    if (!empty($t['display_name'])) {
+        return $t['display_name'];
+    }
+    return (isset($t['team_name']) && $t['team_name'] !== null) ? $t['team_name'] : ('#' . $t['team_id']);
+};
+
 // Nhãn bảng A, B, C...
 $numGroups = (int) $model->num_groups;
 $groupLabels = array();
