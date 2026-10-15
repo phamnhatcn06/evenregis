@@ -498,6 +498,7 @@ class RunRegistrationsController extends AdminController
         // Dựng ảnh BIB hàng loạt (ảnh 2481×1754) tốn CPU/RAM; nới giới hạn để tránh 503/timeout.
         @set_time_limit(0);
         @ini_set('memory_limit', '1024M');
+        @ini_set('display_errors', '0'); // Không in warning ra output kẻo lẫn vào ZIP → hỏng file.
         if (function_exists('ignore_user_abort')) {
             ignore_user_abort(true);
         }
