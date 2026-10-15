@@ -169,6 +169,10 @@ class SportStages extends BaseSportStages
                 $data[$name] = $this->$name;
             }
         }
+        // Nguồn play-off: gửi cả giá trị null để cho phép bỏ liên kết.
+        $data['playoff_source_stage_id'] = ($this->playoff_source_stage_id !== null && $this->playoff_source_stage_id !== '')
+            ? (int) $this->playoff_source_stage_id
+            : null;
         if ($this->rules !== null && $this->rules !== '') {
             $data['rules'] = $this->rules;
         }
