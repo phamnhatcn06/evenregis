@@ -1223,10 +1223,19 @@ $sportThemes = array(
 
                       <!-- 3. Footer thẻ: Giờ thi đấu & Địa điểm sân -->
                       <div class="px-3 py-2 border-top bg-slate-50/60 text-muted d-flex align-items-center justify-content-between gap-2" style="font-size:11.5px;">
-                        <span class="d-flex align-items-center gap-1 text-truncate">
-                          <span class="material-symbols-outlined text-secondary fs-6 flex-shrink-0">schedule</span>
-                          <span class="text-truncate"><?php echo !empty($m['match_time']) ? $e($m['match_time']) : 'Chờ xếp giờ'; ?></span>
-                        </span>
+                        <?php if ($status === 'live'): ?>
+                          <span class="d-flex align-items-center gap-1 flex-shrink-0">
+                            <span class="live-dot-blink"></span>
+                            <span class="fw-bold text-danger live-blink-text">LIVE</span>
+                          </span>
+                        <?php else: ?>
+                          <span class="d-flex align-items-center gap-1 text-truncate">
+                            <span class="material-symbols-outlined text-secondary fs-6 flex-shrink-0">schedule</span>
+                            <span class="fw-bold text-dark text-truncate" style="font-size:13px;"><?php
+                              echo !empty($m['match_hour']) ? $e($m['match_hour'])
+                                   : (!empty($m['match_time']) ? $e($m['match_time']) : 'Chờ xếp giờ'); ?></span>
+                          </span>
+                        <?php endif; ?>
 
                         <?php if (!empty($m['location'])): ?>
                           <span class="d-flex align-items-center gap-1 flex-shrink-0 text-truncate" title="<?php echo $e($m['location']); ?>">
