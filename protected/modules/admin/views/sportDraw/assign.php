@@ -177,7 +177,13 @@ if ($isBracket) {
                     $numMatches = (int) ($bracketSize / 2);
                     ?>
                     <div class="card">
-                        <div class="card-header fw-bold">Cặp đấu vòng 1 (nhánh <?php echo $bracketSize; ?> — <?php echo $numMatches; ?> trận)</div>
+                        <div class="card-header fw-bold">
+                            <?php if ($isPlayoff): ?>
+                                Ghép cặp play-off (tối đa <?php echo $numMatches; ?> trận)
+                            <?php else: ?>
+                                Cặp đấu vòng 1 (nhánh <?php echo $bracketSize; ?> — <?php echo $numMatches; ?> trận)
+                            <?php endif; ?>
+                        </div>
                         <div class="card-body">
                             <div class="row">
                                 <?php for ($m = 1; $m <= $numMatches; $m++): ?>
