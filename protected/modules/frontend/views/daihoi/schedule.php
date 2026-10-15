@@ -1944,6 +1944,92 @@ $sportThemes = array(
   border-color: #cbd5e1 !important;
 }
 
+/* MATCH ARENA BOX — Khối đối đầu nổi bật và cố định thẳng hàng */
+.match-arena-box {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px 8px 10px 8px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), 0 2px 5px rgba(15, 23, 42, 0.03);
+}
+.faceoff-row-avatars {
+  display: grid;
+  grid-template-columns: 1fr 64px 1fr;
+  align-items: center;
+  justify-items: center;
+  height: 48px;
+}
+.faceoff-row-names {
+  display: grid;
+  grid-template-columns: 1fr 64px 1fr;
+  align-items: start;
+  justify-items: center;
+}
+.faceoff-row-winners {
+  display: grid;
+  grid-template-columns: 1fr 64px 1fr;
+  align-items: center;
+}
+.avatar-cell, .center-emblem-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.center-time-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-top: 1px;
+}
+.vs-circle-emblem {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  color: #ef4444;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+.match-time-chip {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 9999px;
+  padding: 1px 7px;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+}
+.team-name-cell {
+  width: 100%;
+  height: 36px;
+  max-height: 36px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  padding: 0 4px;
+  word-break: break-word;
+}
+.score-pill-emblem {
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 /* Compact Row Styling */
 .match-compact-row {
   border: 1px solid #e2e8f0 !important;
