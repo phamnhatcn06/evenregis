@@ -555,16 +555,25 @@ class RunRegistrationsController extends AdminController
             }
             throw new CHttpException(500, 'Không mở được file ZIP để ghi.');
         }
+        $added = 0;
         foreach ($groups as $contentName => $files) {
             $folder = MyHelper::toSlug($contentName);
             foreach ($files as $file) {
-                $zip->addFile($file, $folder . '/' . basename($file));
+                if (is_file($file) && $zip->addFile($file, $folder . '/' . basename($file))) {
+                    $added++;
+                }
             }
         }
-        $zip->close();
+        // close() đọc các file nguồn vào ZIP; chỉ xoá file tạm SAU khi close() xong.
+        $closed = $zip->close();
 
         foreach ($created as $f) {
             @unlink($f);
+        }
+
+        if (!$closed || $added === 0 || !is_file($zipPath) || filesize($zipPath) < 100) {
+            @unlink($zipPath);
+            throw new CHttpException(500, 'Không đóng gói được file ZIP (có thể hết dung lượng hoặc lỗi ghi). Thử xuất theo từng nội dung với số lượng nhỏ hơn.');
         }
 
         $suffix       = $cuLy !== '' ? '_' . MyHelper::toSlug($cuLy) : '';
