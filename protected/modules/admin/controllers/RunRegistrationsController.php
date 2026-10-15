@@ -592,6 +592,7 @@ class RunRegistrationsController extends AdminController
         }
         @set_time_limit(120);
         @ini_set('memory_limit', '512M');
+        @ini_set('display_errors', '0');
 
         $templateDir = Yii::app()->basePath . '/..' . self::BIB_TEMPLATE_DIR;
         if (!is_dir($templateDir) || !is_file($templateDir . 'blank_bib.png')) {
