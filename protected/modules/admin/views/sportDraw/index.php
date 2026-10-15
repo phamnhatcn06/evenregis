@@ -30,7 +30,12 @@ $targetStageBySport = array();
 // Map sport_id => stage chung kết bơi (heat_lane, stage_type=final) để chuyển Top N.
 $swimFinalBySport = array();
 $groupFinalBySport = array();
+// Map sport_id => danh sách giai đoạn play-off (để chọn làm nguồn đặt chỗ trước cho vòng bảng).
+$playoffStagesBySport = array();
 foreach ($stages as $s) {
+    if ($s->format === SportStages::FORMAT_PLAYOFF) {
+        $playoffStagesBySport[$s->sport_id][] = array('id' => (int) $s->id, 'name' => $s->name);
+    }
     if (SportStages::isGroupFormat($s->format) && !isset($targetStageBySport[$s->sport_id])) {
         $targetStageBySport[$s->sport_id] = array('id' => $s->id, 'name' => $s->name);
     }
