@@ -62,6 +62,7 @@ class SportStages extends BaseSportStages
             $extra = array('format', 'num_groups', 'teams_per_group', 'advance_per_group',
                 'bracket_size', 'draw_status', 'draw_seed', 'drawn_by', 'drawn_at',
                 'win_points', 'draw_points', 'loss_points', 'tiebreak', 'ko_pairing',
+                'playoff_source_stage_id',
                 'sport_name', 'sport_code', 'event_name');
             foreach ($extra as $name) {
                 if (array_key_exists($name, $values)) {
