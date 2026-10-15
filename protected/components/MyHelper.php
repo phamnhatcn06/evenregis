@@ -1237,10 +1237,11 @@ class MyHelper
         $w = imagesx($canvas);
         $h = imagesy($canvas);
         $x1 = $w; $x2 = 0; $y1 = $h; $y2 = 0;
+        $xStart = (int) ($w * 0.45); // Ô BIB luôn nằm nửa phải phôi — chỉ quét vùng này cho nhanh.
 
-        for ($y = (int) ($h * 0.6); $y < $h; $y += 2) {
+        for ($y = (int) ($h * 0.6); $y < $h; $y += 3) {
             $best = 0; $bs = -1; $be = -1; $s = null;
-            for ($x = 0; $x < $w; $x++) {
+            for ($x = $xStart; $x < $w; $x++) {
                 $c = imagecolorat($canvas, $x, $y);
                 $white = ((($c >> 16) & 255) > 245 && (($c >> 8) & 255) > 245 && ($c & 255) > 245);
                 if ($white && $s === null) {
