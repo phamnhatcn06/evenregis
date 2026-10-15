@@ -1278,7 +1278,6 @@ class MyHelper
         }
 
         $rgb = self::hexToRgb(isset($cfg['color']) ? $cfg['color'] : '#000000');
-        $col = imagecolorallocate($canvas, $rgb[0], $rgb[1], $rgb[2]);
 
         $boxX1   = (int) $cfg['box_x1'];
         $boxX2   = (int) $cfg['box_x2'];
