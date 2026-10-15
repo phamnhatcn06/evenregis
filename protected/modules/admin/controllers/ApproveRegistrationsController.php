@@ -2254,6 +2254,21 @@ class ApproveRegistrationsController extends AdminController
                 $staffCode = isset($staff->staff_code) ? $staff->staff_code : null;
             }
         }
+        // Chọn người đã có của đơn vị (kể cả ở đăng ký khác) nhưng chưa nhập tên:
+        // lấy thông tin từ hồ sơ được chọn để không phải nhập lại.
+        if ($postedExistingId !== '' && ($fullName === '' || $position === '' || $idCard === '')) {
+            $picked = Attendees::fetchFromApi($postedExistingId);
+            if ($picked) {
+                if ($fullName === '' && !empty($picked->full_name)) { $fullName = $picked->full_name; }
+                if ($position === '') {
+                    $position = !empty($picked->position_name) ? $picked->position_name
+                        : (!empty($picked->position) ? $picked->position : '');
+                }
+                if ($idCard === '' && !empty($picked->id_card)) { $idCard = $picked->id_card; }
+                if ($staffCode === null && !empty($picked->staff_code)) { $staffCode = $picked->staff_code; }
+                if (!$staffId && !empty($picked->staff_id)) { $staffId = $picked->staff_id; }
+            }
+        }
         if (!$staffId && $fullName === '') {
             echo CJSON::encode(array('success' => false, 'error' => 'Chưa có thông tin người bổ sung (chọn nhân sự SMILE hoặc nhập họ tên).'));
             Yii::app()->end();
