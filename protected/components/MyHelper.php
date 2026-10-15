@@ -1222,11 +1222,12 @@ class MyHelper
             'size' => 58, 'min_size' => 28,
             'box_x1' => 300, 'box_x2' => 2180, 'center_y' => 690, 'align' => 'C',
         ));
-        // Số BIB: cỡ lớn, căn giữa thẻ (Nam trắng, Nữ đen).
+        // Số BIB: cỡ lớn, extra bold + đổ bóng, căn giữa thẻ (Nam trắng, Nữ đen).
         self::drawRunBibText($canvas, $bib, array(
-            'font' => 'fontdonvi', 'color' => $textColor, 'bold' => true,
+            'font' => 'fontdonvi', 'color' => $textColor, 'weight' => 4,
             'size' => 440, 'min_size' => 160, 'pad' => 40,
             'box_x1' => 250, 'box_x2' => 2230, 'center_y' => 1040, 'align' => 'C',
+            'shadow' => array('color' => '#000000', 'alpha' => 75, 'dx' => 10, 'dy' => 12),
         ));
 
         // QR Code vào ô trắng ở thanh vàng. Nội dung theo quy ước:
