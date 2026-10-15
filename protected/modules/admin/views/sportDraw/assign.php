@@ -89,9 +89,13 @@ if ($isBracket) {
         <div class="alert alert-light border small">
             <i class="fa fa-info-circle me-1"></i>
             Kéo các đội từ cột <strong>Chưa phân bổ</strong> thả vào
-            <?php echo $isGroup ? 'bảng đấu tương ứng' : 'vị trí hạt giống (seed)'; ?>.
+            <?php echo $isGroup ? 'bảng đấu tương ứng' : ($isPlayoff ? 'các ô cặp đấu play-off' : 'vị trí hạt giống (seed)'); ?>.
             Có thể kéo đổi lại giữa các ô. Nhấn <strong>Lưu phân bổ</strong> khi hoàn tất.
-            Sau khi ghi kết quả từng trận, đội thắng sẽ tự được điền vào vòng sau theo quy tắc.
+            <?php if ($isPlayoff): ?>
+                Mỗi cặp 2 ô là <strong>một trận play-off độc lập</strong>; người thắng sẽ được chuyển sang vòng chung kết.
+            <?php else: ?>
+                Sau khi ghi kết quả từng trận, đội thắng sẽ tự được điền vào vòng sau theo quy tắc.
+            <?php endif; ?>
         </div>
 
         <div class="row">
