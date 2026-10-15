@@ -185,7 +185,15 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
                             ?>
                             <tr>
                                 <td><?php echo $i + 1; ?></td>
-                                <td><span class="badge bg-primary"><?php echo CHtml::encode(isset($r['bib_number']) ? $r['bib_number'] : ''); ?></span></td>
+                                <td>
+                                    <span class="badge bg-primary"><?php echo CHtml::encode(isset($r['bib_number']) ? $r['bib_number'] : ''); ?></span>
+                                    <?php if (!empty($r['bib_number'])): ?>
+                                    <a href="<?php echo $this->createUrl('exportBib', array('event_id' => $eventId, 'reg_id' => (int) $r['id'])); ?>"
+                                       class="text-decoration-none ms-1" title="Xuất thẻ BIB người này">
+                                        <i class="fa fa-id-card-o"></i>
+                                    </a>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo CHtml::encode(isset($r['full_name']) ? $r['full_name'] : ''); ?></td>
                                 <td>
                                     <?php if (!empty($r['is_guest'])): ?>
