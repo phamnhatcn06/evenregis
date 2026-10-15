@@ -649,9 +649,20 @@ class RunRegistrationsController extends AdminController
     /** Gửi file cho trình duyệt rồi xoá file tạm. */
     protected function sendFileThenDelete($path, $downloadName, $contentType)
     {
+        // Xả sạch mọi output buffer để warning/notice (nếu có khi dựng ảnh) không lẫn vào
+        // dữ liệu nhị phân làm hỏng ZIP/PNG. Tắt nén output để Content-Length khớp số byte thật.
+        if (function_exists('apache_setenv')) {
+            @apache_setenv('no-gzip', '1');
+        }
+        @ini_set('zlib.output_compression', '0');
+        while (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
+
         header('Content-Type: ' . $contentType);
         header('Content-Disposition: attachment; filename="' . $downloadName . '"');
         header('Content-Length: ' . filesize($path));
+        header('Content-Transfer-Encoding: binary');
         header('Cache-Control: max-age=0');
         readfile($path);
         @unlink($path);
