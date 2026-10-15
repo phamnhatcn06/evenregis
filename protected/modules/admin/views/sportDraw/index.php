@@ -156,7 +156,8 @@ foreach ($stages as $s) {
                         <td class="text-center"><?php echo SportStages::getDrawStatusLabel($stage->draw_status); ?></td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-outline-secondary btn-config"
-                                    data-config='<?php echo $configJson; ?>' <?php echo $isLocked ? 'disabled' : ''; ?>>
+                                    data-config='<?php echo $configJson; ?>'
+                                    data-playoff-sources='<?php echo CJSON::encode($playoffSources); ?>' <?php echo $isLocked ? 'disabled' : ''; ?>>
                                 <i class="fa fa-cog"></i> Cấu hình
                             </button>
                             <?php if ($isGroup && !$isLocked): ?>
