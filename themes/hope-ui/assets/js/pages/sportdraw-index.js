@@ -97,6 +97,9 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('cfg-loss-points').value = valueOr(data.loss_points, 0);
             document.getElementById('cfg-tiebreak').value = valueOr(data.tiebreak, 'head_to_head');
             document.getElementById('cfg-ko-pairing').value = valueOr(data.ko_pairing, 'cross');
+            var sources = [];
+            try { sources = JSON.parse(this.getAttribute('data-playoff-sources') || '[]'); } catch (e) { sources = []; }
+            fillPlayoffSources(sources, data.playoff_source_stage_id);
             toggleFormatFields();
             bootstrap.Modal.getOrCreateInstance(modalEl).show();
         });
