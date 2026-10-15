@@ -18,7 +18,7 @@ Yii::app()->clientScript->registerScriptFile(
     CClientScript::POS_END
 );
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/sportdraw-index.js?v=1.1',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/sportdraw-index.js?v=1.2',
     CClientScript::POS_END
 );
 
