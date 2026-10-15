@@ -535,7 +535,7 @@ class RunRegistrationsController extends AdminController
             $data = array(
                 'bib_number'      => isset($r['bib_number']) ? $r['bib_number'] : '',
                 'full_name'       => isset($r['full_name']) ? $r['full_name'] : '',
-                'unit'            => $this->resolveBibUnit($r),
+                'position'        => $this->resolveBibUnit($r),
                 'run_event_name'  => isset($r['run_event_name']) ? $r['run_event_name'] : '',
                 'age_group_label' => isset($r['age_group_label']) ? $r['age_group_label'] : '',
                 'gender'          => isset($r['gender']) ? $r['gender'] : null,
