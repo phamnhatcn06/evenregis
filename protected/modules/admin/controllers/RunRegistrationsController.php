@@ -633,16 +633,15 @@ class RunRegistrationsController extends AdminController
     }
 
     /**
-     * Giá trị "đơn vị" in lên BIB và nhúng QR, lấy từ cột position (chức danh/đơn vị theo hồ sơ).
-     * Khách ngoài không có position nên lùi về company.
+     * Giá trị "đơn vị" in lên BIB và nhúng QR, lấy từ badge_org_name (tên tổ chức in trên thẻ).
+     * Thiếu thì lùi về unit_label, rồi company (khách ngoài).
      */
     protected function resolveBibUnit($row)
     {
-        if (!empty($row['position'])) {
-            return (string) $row['position'];
-        }
-        if (!empty($row['is_guest']) && !empty($row['company'])) {
-            return (string) $row['company'];
+        foreach (array('badge_org_name', 'unit_label', 'company') as $key) {
+            if (!empty($row[$key])) {
+                return (string) $row[$key];
+            }
         }
         return '';
     }
