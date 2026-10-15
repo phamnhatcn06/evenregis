@@ -1231,63 +1231,6 @@ class MyHelper
     }
 
     /**
-     * Dò ô trắng in Số BIB ở nửa dưới phôi: quét từng dòng tìm đoạn trắng dài liên tục
-     * (150–450px) để bắt đúng ô, bỏ qua các mảng trắng lớn/nhỏ khác. Trả về x1,x2,cy.
-     * Không tìm thấy → mặc định ô phôi Nam (x 1917–2210, tâm dọc 1570).
-     */
-    protected static function detectBibBox($canvas)
-    {
-        $w = imagesx($canvas);
-        $h = imagesy($canvas);
-        $x1 = $w; $x2 = 0; $y1 = $h; $y2 = 0;
-        $xStart = (int) ($w * 0.45); // Ô BIB luôn nằm nửa phải phôi — chỉ quét vùng này cho nhanh.
-
-        for ($y = (int) ($h * 0.6); $y < $h; $y += 3) {
-            $best = 0; $bs = -1; $be = -1; $s = null;
-            for ($x = $xStart; $x < $w; $x++) {
-                $c = imagecolorat($canvas, $x, $y);
-                $white = ((($c >> 16) & 255) > 245 && (($c >> 8) & 255) > 245 && ($c & 255) > 245);
-                if ($white && $s === null) {
-                    $s = $x;
-                }
-                if ((!$white || $x === $w - 1) && $s !== null) {
-                    $e = ($x === $w - 1 && $white) ? $x : $x - 1;
-                    $len = $e - $s;
-                    if ($len > $best) {
-                        $best = $len; $bs = $s; $be = $e;
-                    }
-                    $s = null;
-                }
-            }
-            if ($best >= 150 && $best <= 450) {
-                if ($bs < $x1) { $x1 = $bs; }
-                if ($be > $x2) { $x2 = $be; }
-                if ($y < $y1) { $y1 = $y; }
-                if ($y > $y2) { $y2 = $y; }
-            }
-        }
-
-        if ($x2 <= $x1 || $y2 <= $y1) {
-            return array('x1' => 1917, 'x2' => 2210, 'cy' => 1570);
-        }
-        return array('x1' => $x1, 'x2' => $x2, 'cy' => (int) round(($y1 + $y2) / 2));
-    }
-
-    /** Độ sáng trung bình (0–255) của một vùng hình chữ nhật, dùng để chọn màu chữ theo nền. */
-    protected static function sampleAreaLuminance($canvas, $x1, $y1, $x2, $y2)
-    {
-        $sum = 0; $n = 0;
-        for ($y = $y1; $y <= $y2; $y += 10) {
-            for ($x = $x1; $x <= $x2; $x += 40) {
-                $c = imagecolorat($canvas, $x, $y);
-                $sum += 0.299 * (($c >> 16) & 255) + 0.587 * (($c >> 8) & 255) + 0.114 * ($c & 255);
-                $n++;
-            }
-        }
-        return $n > 0 ? $sum / $n : 255;
-    }
-
-    /**
      * Vẽ text BIB với tự co font cho vừa bề ngang hộp, căn giữa (C) hoặc trái (L) trong hộp,
      * căn giữa dọc quanh center_y. $cfg: font, color, bold, size, min_size, box_x1, box_x2,
      * center_y, align, pad.
