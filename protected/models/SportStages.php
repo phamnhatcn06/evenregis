@@ -227,6 +227,21 @@ class SportStages extends BaseSportStages
     }
 
     /**
+     * Chuyển các đội/VĐV từ vòng chung kết sang giai đoạn play-off.
+     *
+     * @param string $stageId giai đoạn play-off đích
+     * @param array $teamIds danh sách team_id lấy từ vòng chung kết
+     */
+    public static function movePlayoffEntrants($stageId, $teamIds)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_PLAYOFF_ENTRANTS, array('stageId' => $stageId));
+        return self::apiPost($url, array(
+            'team_ids' => array_values($teamIds),
+            'auth_email' => self::authEmail(),
+        ));
+    }
+
+    /**
      * Chuyển người/đội thắng play-off vào giai đoạn vòng bảng đích.
      *
      * @param string $playoffStageId giai đoạn play-off (nguồn)
