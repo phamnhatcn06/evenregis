@@ -1326,42 +1326,22 @@ class MyHelper
 
     /**
      * Vẽ một chuỗi tại baseline (x,y) với màu $rgb (mảng r,g,b) và độ trong $alpha (0 đặc…127).
-     * Để làm đậm (weight>0): render chữ MỘT lần ra layer rồi "dập" (imagecopy) theo lưới bán kính
-     * $weight — nhanh hơn nhiều so với vẽ lại TTF hàng trăm lần, đủ nhẹ để xuất hàng loạt.
+     * Làm đậm (weight>0): vẽ đè TTF theo lưới bán kính $weight (nét sắc, không mờ).
      */
     protected static function stampText($canvas, $size, $x, $y, $rgb, $alpha, $fontPath, $text, $weight = 0)
     {
         $alpha = max(0, min(127, (int) $alpha));
+        $c     = imagecolorallocatealpha($canvas, $rgb[0], $rgb[1], $rgb[2], $alpha);
 
-        if ($weight <= 0) {
-            $c = imagecolorallocatealpha($canvas, $rgb[0], $rgb[1], $rgb[2], $alpha);
-            imagettftext($canvas, $size, 0, $x, $y, $c, $fontPath, $text);
-            return;
-        }
-
-        $box = imagettfbbox($size, 0, $fontPath, $text);
-        $m   = $weight + 6;
-        $lw  = abs($box[2] - $box[0]) + 2 * $m;
-        $lh  = abs($box[7] - $box[1]) + 2 * $m;
-
-        $layer = imagecreatetruecolor($lw, $lh);
-        imagesavealpha($layer, true);
-        imagealphablending($layer, false);
-        imagefilledrectangle($layer, 0, 0, $lw, $lh, imagecolorallocatealpha($layer, 0, 0, 0, 127));
-        $lc = imagecolorallocatealpha($layer, $rgb[0], $rgb[1], $rgb[2], $alpha);
-        $lx = $m - $box[0];
-        $ly = $m + abs($box[7]);
-        imagettftext($layer, $size, 0, $lx, $ly, $lc, $fontPath, $text);
-
-        // Dập layer lên canvas (canvas đang bật alphablending nên imagecopy sẽ hoà alpha).
-        $baseX = $x - $lx;
-        $baseY = $y - $ly;
-        for ($ox = -$weight; $ox <= $weight; $ox++) {
-            for ($oy = -$weight; $oy <= $weight; $oy++) {
-                imagecopy($canvas, $layer, $baseX + $ox, $baseY + $oy, 0, 0, $lw, $lh);
+        imagettftext($canvas, $size, 0, $x, $y, $c, $fontPath, $text);
+        for ($dx = -$weight; $dx <= $weight; $dx++) {
+            for ($dy = -$weight; $dy <= $weight; $dy++) {
+                if ($dx === 0 && $dy === 0) {
+                    continue;
+                }
+                imagettftext($canvas, $size, 0, $x + $dx, $y + $dy, $c, $fontPath, $text);
             }
         }
-        imagedestroy($layer);
     }
 
     /** Nạp một ảnh PNG thành canvas truecolor có alpha để chỉnh sửa. */
