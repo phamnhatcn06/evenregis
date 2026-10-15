@@ -1222,7 +1222,7 @@ class MyHelper
         ));
         // Số BIB: cỡ lớn, căn giữa thẻ (Nam trắng, Nữ đen).
         self::drawRunBibText($canvas, $bib, array(
-            'font' => 'fontten', 'color' => $textColor, 'bold' => true,
+            'font' => 'fontdonvi', 'color' => $textColor, 'bold' => true,
             'size' => 440, 'min_size' => 160, 'pad' => 40,
             'box_x1' => 250, 'box_x2' => 2230, 'center_y' => 1040, 'align' => 'C',
         ));
