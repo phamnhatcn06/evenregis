@@ -1529,12 +1529,199 @@ $sportThemes = array(
      STYLE TÙY BIẾN CHO GIAO DIỆN THỂ THAO THÂN THIỆN
      ===================================================================== -->
 <style>
-/* Thể lệ accordion */
-.rules-accordion > summary { list-style: none; }
+/* Thể lệ & Thể thức thi đấu accordion */
+.rules-accordion {
+  transition: all 0.25s ease;
+  border-color: #e2e8f0 !important;
+}
+.rules-accordion > summary {
+  list-style: none;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
 .rules-accordion > summary::-webkit-details-marker { display: none; }
 .rules-accordion > summary:hover { background-color: #f8fafc; }
+.rules-accordion[open] > summary { border-bottom: 1px solid #f1f5f9; }
 .rules-accordion[open] .rules-chevron { transform: rotate(180deg); }
-.rules-chevron { transition: transform .2s ease; }
+.rules-chevron { transition: transform .25s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* Toolbar & Lọc danh mục thể lệ */
+.rules-filter-toolbar {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+.rules-cat-btn {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  transition: all 0.15s ease;
+}
+.rules-cat-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+.rules-cat-btn.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+}
+.rules-cat-btn.active .badge {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+/* Thẻ Môn Thi Đấu Thể Lệ */
+.sport-rule-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  border: 1px solid #e2e8f0;
+}
+.sport-rule-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03) !important;
+  border-color: #cbd5e1 !important;
+}
+.sport-card-accent-bar {
+  height: 3.5px;
+  width: 100%;
+}
+.sport-icon-squircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sport-card-tag {
+  background: #f1f5f9;
+  color: #334155 !important;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+}
+
+/* Khung Chặng Thi Đấu */
+.stage-card-box {
+  background: #f8fafc;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.stage-card-box:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+.stage-card-final {
+  border-left: 3px solid #f59e0b !important;
+}
+
+/* Stepper Lộ Trình Đa Giai Đoạn */
+.stage-timeline-track {
+  position: relative;
+  padding-left: 28px;
+}
+.stage-timeline-track::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 20px;
+  left: 10px;
+  width: 2px;
+  background: linear-gradient(to bottom, #94a3b8, #cbd5e1);
+  border-radius: 1px;
+}
+.stage-timeline-step {
+  position: relative;
+  margin-bottom: 14px;
+}
+.stage-timeline-step:last-child {
+  margin-bottom: 0;
+}
+.stage-step-indicator {
+  position: absolute;
+  left: -28px;
+  top: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #3b82f6;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  z-index: 2;
+}
+.stage-step-indicator.final-step {
+  border-color: #f59e0b;
+  color: #b45309;
+  background: #fffbeb;
+}
+
+/* Badge Format & Chips */
+.format-badge-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.25;
+}
+.stage-location-pill {
+  font-size: 10.5px;
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+}
+.rule-spec-chip {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 3px 9px;
+  font-size: 11.5px;
+  color: #1e293b;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.rule-points-chip {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  border-radius: 8px;
+  padding: 3px 9px;
+  font-size: 11.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.rule-detail-text {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #334155;
+}
+.highlight-term {
+  font-weight: 600;
+  color: #0f172a;
+}
 
 /* Design tokens */
 .bg-slate-50 { background-color: #f8fafc !important; }
@@ -1990,6 +2177,82 @@ document.addEventListener('DOMContentLoaded', function () {
   if (btnBackToTop) {
     btnBackToTop.addEventListener('click', function () {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // 9. Lọc & Tìm kiếm nhanh cho khối Thể lệ & Thể thức
+  var rulesCatButtons = document.querySelectorAll('.rules-cat-btn');
+  var rulesSearchInput = document.getElementById('rules-search-input');
+  var rulesSearchClear = document.getElementById('rules-search-clear');
+  var rulesItems = document.querySelectorAll('.sport-rule-item');
+  var rulesEmptyState = document.getElementById('rules-empty-state');
+  var rulesResetBtn = document.getElementById('rules-reset-filter');
+
+  var rulesActiveCat = 'all';
+  var rulesSearchTerm = '';
+
+  function filterRules() {
+    var visible = 0;
+    var term = rulesSearchTerm.trim().toLowerCase();
+
+    rulesItems.forEach(function (item) {
+      var cat = item.getAttribute('data-cat');
+      var searchData = (item.getAttribute('data-search') || '').toLowerCase();
+      var itemText = item.textContent.toLowerCase();
+
+      var catOk = (rulesActiveCat === 'all' || cat === rulesActiveCat);
+      var searchOk = (!term || searchData.indexOf(term) !== -1 || itemText.indexOf(term) !== -1);
+
+      if (catOk && searchOk) {
+        item.style.display = '';
+        visible++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    if (rulesEmptyState) {
+      rulesEmptyState.style.display = (visible === 0) ? 'block' : 'none';
+    }
+    if (rulesSearchClear) {
+      rulesSearchClear.style.display = (rulesSearchTerm.length > 0) ? 'inline-block' : 'none';
+    }
+  }
+
+  rulesCatButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      rulesCatButtons.forEach(function (b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      rulesActiveCat = this.getAttribute('data-cat');
+      filterRules();
+    });
+  });
+
+  if (rulesSearchInput) {
+    rulesSearchInput.addEventListener('input', function () {
+      rulesSearchTerm = this.value;
+      filterRules();
+    });
+  }
+
+  if (rulesSearchClear) {
+    rulesSearchClear.addEventListener('click', function () {
+      rulesSearchInput.value = '';
+      rulesSearchTerm = '';
+      filterRules();
+      rulesSearchInput.focus();
+    });
+  }
+
+  if (rulesResetBtn) {
+    rulesResetBtn.addEventListener('click', function () {
+      rulesActiveCat = 'all';
+      rulesSearchTerm = '';
+      if (rulesSearchInput) rulesSearchInput.value = '';
+      rulesCatButtons.forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-cat') === 'all');
+      });
+      filterRules();
     });
   }
 

@@ -1344,8 +1344,11 @@ if (PermissionHelper::can('approveregistrations', 'update')) {
     }
     Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/vendor/select2/css/select2.min.css');
     Yii::app()->clientScript->registerScriptFile($baseUrl . '/assets/vendor/select2/js/select2.min.js', CClientScript::POS_END);
+    $approveJs = '/assets/js/pages/approveregistrations-view.js';
+    $approveJsPath = Yii::getPathOfAlias('webroot') . str_replace('/', DIRECTORY_SEPARATOR, Yii::app()->theme->basePath === null ? '' : '');
+    $approveJsVer = @filemtime(Yii::app()->theme->basePath . $approveJs);
     Yii::app()->clientScript->registerScriptFile(
-        $baseUrl . '/assets/js/pages/approveregistrations-view.js',
+        $baseUrl . $approveJs . ($approveJsVer ? '?v=' . $approveJsVer : ''),
         CClientScript::POS_END
     );
 }
