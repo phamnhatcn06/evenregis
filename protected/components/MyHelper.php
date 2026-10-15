@@ -1176,11 +1176,17 @@ class MyHelper
      */
     public static function RunBibCard($data, $templateDir, $outDir)
     {
-        $tpl    = self::runBibTemplateFile($data, $templateDir);
-        $canvas = self::loadPngCanvas($tpl);
+        $tpl = self::runBibTemplateFile($data, $templateDir);
+        // Phôi BIB là ảnh phủ kín nền (không trong suốt) nên dùng thẳng, không tạo thêm canvas
+        // sao chép như thẻ VCK — tiết kiệm ~1/2 RAM đỉnh với ảnh lớn 2481×1754.
+        if (!is_file($tpl)) {
+            return false;
+        }
+        $canvas = @imagecreatefrompng($tpl);
         if (!$canvas) {
             return false;
         }
+        imagealphablending($canvas, true);
 
         $name = isset($data['full_name']) ? mb_strtoupper(trim($data['full_name']), 'UTF-8') : '';
         $unit = isset($data['unit']) ? trim((string) $data['unit']) : '';
