@@ -165,6 +165,11 @@ foreach ($stages as $s) {
                                 </button>
                             <?php endif; ?>
                             <?php if ($stage->format === SportStages::FORMAT_PLAYOFF && !$isLocked): ?>
+                                <button type="button" class="btn btn-sm btn-outline-primary btn-playoff-entrants"
+                                        data-id="<?php echo $stage->id; ?>"
+                                        data-name="<?php echo CHtml::encode($stage->name); ?>">
+                                    <i class="fa fa-user-plus"></i> Chọn VĐV
+                                </button>
                                 <button type="button" class="btn btn-sm btn-primary btn-draw"
                                         data-id="<?php echo $stage->id; ?>" data-type="playoff">
                                     <i class="fa fa-random"></i> Bốc play-off
