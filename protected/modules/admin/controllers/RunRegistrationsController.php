@@ -507,20 +507,14 @@ class RunRegistrationsController extends AdminController
             throw new CHttpException(500, 'Không tìm thấy thư mục phôi BIB trên máy chủ (themes/hope-ui/phoianh/bibrun). Kiểm tra đã deploy phôi chưa.');
         }
 
-        $regId = (int) Yii::app()->request->getParam('reg_id');
-        $cuLy  = trim((string) Yii::app()->request->getParam('cu_ly'));
+        $cuLy = trim((string) Yii::app()->request->getParam('cu_ly'));
 
         $rows = RunRegistrations::listByEvent($eventId);
-        $rows = array_filter($rows, function ($r) use ($regId, $cuLy) {
-            if ($regId && (int) (isset($r['id']) ? $r['id'] : 0) !== $regId) {
-                return false;
-            }
-            if ($cuLy !== '' && (!isset($r['run_event_name']) || $r['run_event_name'] !== $cuLy)) {
-                return false;
-            }
-            return true;
-        });
-        $rows = array_values($rows);
+        if ($cuLy !== '') {
+            $rows = array_values(array_filter($rows, function ($r) use ($cuLy) {
+                return isset($r['run_event_name']) && $r['run_event_name'] === $cuLy;
+            }));
+        }
 
         if (empty($rows)) {
             throw new CHttpException(404, 'Không có thí sinh phù hợp để xuất thẻ BIB.');
@@ -532,20 +526,10 @@ class RunRegistrationsController extends AdminController
         $groups  = array();
         $created = array();
         foreach ($rows as $r) {
-            $data = array(
-                'bib_number'      => isset($r['bib_number']) ? $r['bib_number'] : '',
-                'full_name'       => isset($r['full_name']) ? $r['full_name'] : '',
-                'position'        => $this->resolveBibUnit($r),
-                'run_event_name'  => isset($r['run_event_name']) ? $r['run_event_name'] : '',
-                'age_group_label' => isset($r['age_group_label']) ? $r['age_group_label'] : '',
-                'gender'          => isset($r['gender']) ? $r['gender'] : null,
-                'birth_year'      => isset($r['birth_year']) ? $r['birth_year'] : null,
-            );
-
             $contentName = !empty($r['run_event_name']) ? $r['run_event_name'] : 'Khac';
             $outDir      = $workDir . '/' . MyHelper::toSlug($contentName);
 
-            $path = MyHelper::RunBibCard($data, $templateDir, $outDir);
+            $path = MyHelper::RunBibCard($this->bibCardData($r), $templateDir, $outDir);
             if (!$path || !is_file($path)) {
                 continue;
             }
@@ -555,12 +539,6 @@ class RunRegistrationsController extends AdminController
 
         if (empty($created)) {
             throw new CHttpException(500, 'Không tạo được thẻ BIB nào. Kiểm tra phôi và dữ liệu đăng ký.');
-        }
-
-        // Một người → tải thẳng PNG.
-        if ($regId && count($created) === 1) {
-            $this->sendFileThenDelete($created[0], basename($created[0]), 'image/png');
-            return;
         }
 
         if (!class_exists('ZipArchive')) {
