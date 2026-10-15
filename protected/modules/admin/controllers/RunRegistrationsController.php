@@ -644,17 +644,12 @@ class RunRegistrationsController extends AdminController
     }
 
     /**
-     * Giá trị "đơn vị" in lên BIB và nhúng QR, lấy từ badge_org_name (tên tổ chức in trên thẻ).
-     * Thiếu thì lùi về unit_label, rồi company (khách ngoài).
+     * Giá trị "đơn vị" in lên BIB và nhúng QR: CHỈ lấy từ badge_org_name (tên tổ chức in trên thẻ).
+     * Không có badge_org_name thì để trống (không lùi về unit_label/company).
      */
     protected function resolveBibUnit($row)
     {
-        foreach (array('badge_org_name', 'unit_label', 'company') as $key) {
-            if (!empty($row[$key])) {
-                return (string) $row[$key];
-            }
-        }
-        return '';
+        return !empty($row['badge_org_name']) ? (string) $row['badge_org_name'] : '';
     }
 
     /** Gửi file cho trình duyệt rồi xoá file tạm. */
