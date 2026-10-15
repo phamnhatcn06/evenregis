@@ -126,7 +126,7 @@ if ($isBracket) {
                                  data-team-id="<?php echo CHtml::encode($t['team_id']); ?>">
                                 <div class="card-body p-2 small d-flex align-items-center">
                                     <i class="fa fa-arrows me-2 text-muted"></i>
-                                    <?php echo CHtml::encode($t['team_name'] !== null ? $t['team_name'] : ('#' . $t['team_id'])); ?>
+                                    <?php echo CHtml::encode($teamLabel($t)); ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
