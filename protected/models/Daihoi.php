@@ -187,6 +187,12 @@ class Daihoi
         foreach ($stageList as $stage) {
             $sId = $stage['id'];
             $sportId = $stage['sport_id'];
+
+            // Bỏ qua môn không còn gắn với sự kiện này
+            if (!empty($allowedSportIds) && empty($allowedSportIds[(int)$sportId])) {
+                continue;
+            }
+
             $sportName = !empty($stage['sport_name']) ? $stage['sport_name'] : ('Môn #' . $sportId);
             $sportCode = !empty($stage['sport_code']) ? $stage['sport_code'] : '';
             $icon = $getSportIcon($sportName, $sportCode);
