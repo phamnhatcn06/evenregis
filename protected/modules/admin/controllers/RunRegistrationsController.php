@@ -469,6 +469,134 @@ class RunRegistrationsController extends AdminController
         Yii::app()->end();
     }
 
+    /** Thư mục chứa phôi BIB chạy (PNG) theo quy ước tên file. */
+    const BIB_TEMPLATE_DIR = '/themes/hope-ui/phoianh/bibrun/';
+
+    /**
+     * Xuất thẻ BIB (ảnh PNG) cho thí sinh chạy.
+     * - reg_id: xuất 1 người → tải thẳng PNG.
+     * - cu_ly: xuất toàn bộ một nội dung → ZIP.
+     * - không có cu_ly: xuất tất cả, chia thư mục theo nội dung → ZIP.
+     */
+    public function actionExportBib($event_id)
+    {
+        if (!PermissionHelper::can('runregistrations', 'read')) {
+            throw new CHttpException(403, 'Bạn không có quyền xuất thẻ BIB.');
+        }
+
+        $eventId = (int) $event_id;
+        if (!$eventId) {
+            throw new CHttpException(422, 'Vui lòng chọn sự kiện.');
+        }
+
+        $regId = (int) Yii::app()->request->getParam('reg_id');
+        $cuLy  = trim((string) Yii::app()->request->getParam('cu_ly'));
+
+        $rows = RunRegistrations::listByEvent($eventId);
+        $rows = array_filter($rows, function ($r) use ($regId, $cuLy) {
+            if ($regId && (int) (isset($r['id']) ? $r['id'] : 0) !== $regId) {
+                return false;
+            }
+            if ($cuLy !== '' && (!isset($r['run_event_name']) || $r['run_event_name'] !== $cuLy)) {
+                return false;
+            }
+            return true;
+        });
+        $rows = array_values($rows);
+
+        if (empty($rows)) {
+            throw new CHttpException(404, 'Không có thí sinh phù hợp để xuất thẻ BIB.');
+        }
+
+        $templateDir = Yii::app()->basePath . '/..' . self::BIB_TEMPLATE_DIR;
+        $workDir     = Yii::app()->basePath . '/../uploads/run_bibs';
+
+        // Dựng ảnh BIB, gom theo nội dung (cự ly) để chia thư mục trong ZIP.
+        $groups  = array();
+        $created = array();
+        foreach ($rows as $r) {
+            $data = array(
+                'bib_number'      => isset($r['bib_number']) ? $r['bib_number'] : '',
+                'full_name'       => isset($r['full_name']) ? $r['full_name'] : '',
+                'unit'            => $this->resolveBibUnit($r),
+                'run_event_name'  => isset($r['run_event_name']) ? $r['run_event_name'] : '',
+                'age_group_label' => isset($r['age_group_label']) ? $r['age_group_label'] : '',
+                'gender'          => isset($r['gender']) ? $r['gender'] : null,
+                'birth_year'      => isset($r['birth_year']) ? $r['birth_year'] : null,
+            );
+
+            $contentName = !empty($r['run_event_name']) ? $r['run_event_name'] : 'Khac';
+            $outDir      = $workDir . '/' . MyHelper::toSlug($contentName);
+
+            $path = MyHelper::RunBibCard($data, $templateDir, $outDir);
+            if (!$path || !is_file($path)) {
+                continue;
+            }
+            $created[]              = $path;
+            $groups[$contentName][] = $path;
+        }
+
+        if (empty($created)) {
+            throw new CHttpException(500, 'Không tạo được thẻ BIB nào. Kiểm tra phôi và dữ liệu đăng ký.');
+        }
+
+        // Một người → tải thẳng PNG.
+        if ($regId && count($created) === 1) {
+            $this->sendFileThenDelete($created[0], basename($created[0]), 'image/png');
+            return;
+        }
+
+        if (!class_exists('ZipArchive')) {
+            throw new CHttpException(500, 'Máy chủ chưa bật extension Zip (php-zip).');
+        }
+
+        $stamp   = date('Ymd_His') . '_' . substr(md5(uniqid('', true)), 0, 6);
+        $zipPath = $workDir . '/_bib_' . $eventId . '_' . $stamp . '.zip';
+        $zip     = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            foreach ($created as $f) {
+                @unlink($f);
+            }
+            throw new CHttpException(500, 'Không mở được file ZIP để ghi.');
+        }
+        foreach ($groups as $contentName => $files) {
+            $folder = MyHelper::toSlug($contentName);
+            foreach ($files as $file) {
+                $zip->addFile($file, $folder . '/' . basename($file));
+            }
+        }
+        $zip->close();
+
+        foreach ($created as $f) {
+            @unlink($f);
+        }
+
+        $suffix       = $cuLy !== '' ? '_' . MyHelper::toSlug($cuLy) : '';
+        $downloadName = 'The_BIB_' . $eventId . $suffix . '_' . date('Ymd_His') . '.zip';
+        $this->sendFileThenDelete($zipPath, $downloadName, 'application/zip');
+    }
+
+    /** Tên đơn vị in lên BIB: khách ngoài dùng company, còn lại dùng unit_label. */
+    protected function resolveBibUnit($row)
+    {
+        if (!empty($row['is_guest'])) {
+            return !empty($row['company']) ? (string) $row['company'] : 'Khách ngoài';
+        }
+        return !empty($row['unit_label']) ? (string) $row['unit_label'] : '';
+    }
+
+    /** Gửi file cho trình duyệt rồi xoá file tạm. */
+    protected function sendFileThenDelete($path, $downloadName, $contentType)
+    {
+        header('Content-Type: ' . $contentType);
+        header('Content-Disposition: attachment; filename="' . $downloadName . '"');
+        header('Content-Length: ' . filesize($path));
+        header('Cache-Control: max-age=0');
+        readfile($path);
+        @unlink($path);
+        Yii::app()->end();
+    }
+
     protected function getEventList()
     {
         $list = array();
