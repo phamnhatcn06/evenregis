@@ -1047,16 +1047,53 @@ $sportThemes = array(
               $isNoDate = ($dateKey === '__no_date__');
               $dateLabel = $isNoDate ? 'Các trận đấu chưa ấn định ngày' : $formatFriendlyDate($dateKey);
           ?>
+            <?php
+            $dayIndex = (!$isNoDate && in_array($dateKey, $uniqueDates)) ? (array_search($dateKey, $uniqueDates) + 1) : null;
+            $dayTag = '';
+            if ($dayIndex !== null) {
+                if ($dayIndex === 1) {
+                    $dayTag = 'NGÀY TRANH TÀI 1';
+                } elseif ($dayIndex === count($uniqueDates)) {
+                    $dayTag = 'NGÀY ' . $dayIndex . ' • CHUNG KẾT';
+                } else {
+                    $dayTag = 'NGÀY TRANH TÀI ' . $dayIndex;
+                }
+            } elseif ($isNoDate) {
+                $dayTag = 'CHƯA XẾP NGÀY';
+            }
+            ?>
             <div class="date-group-section mb-4" data-group-date="<?php echo $dateKey; ?>">
-              <!-- Tiêu đề phân nhóm Ngày thi đấu thân thiện -->
-              <div class="date-group-header d-flex align-items-center justify-content-between p-2 px-3 mb-3 rounded-3 bg-white border shadow-2xs">
-                <div class="d-flex align-items-center gap-2">
-                  <span class="material-symbols-outlined text-primary fs-5">calendar_month</span>
-                  <span class="fw-bold text-dark fs-6"><?php echo $e($dateLabel); ?></span>
+              <!-- Tiêu đề phân nhóm Ngày thi đấu nổi bật & chuyên nghiệp -->
+              <div class="date-group-header p-3 px-md-4 mb-3 rounded-4 position-relative overflow-hidden shadow-sm d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="date-group-accent-line"></div>
+                <div class="date-group-dots-pattern"></div>
+
+                <div class="d-flex align-items-center gap-3 position-relative z-1">
+                  <div class="date-group-icon-squircle">
+                    <span class="material-symbols-outlined fs-5">calendar_month</span>
+                  </div>
+                  <div>
+                    <?php if (!empty($dayTag)): ?>
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge date-group-day-badge">
+                          <span class="date-group-pulse-dot"></span>
+                          <?php echo $e($dayTag); ?>
+                        </span>
+                        <span class="date-group-sublabel small">Đại hội 2026</span>
+                      </div>
+                    <?php endif; ?>
+                    <h3 class="date-group-title mb-0">
+                      <?php echo $e($dateLabel); ?>
+                    </h3>
+                  </div>
                 </div>
-                <span class="badge bg-light text-secondary border rounded-pill small">
-                  <?php echo count($dateMatches); ?> trận đấu
-                </span>
+
+                <div class="position-relative z-1">
+                  <span class="date-group-count-pill">
+                    <span class="material-symbols-outlined text-primary" style="font-size:16px;">sports_score</span>
+                    <span class="date-group-match-count"><?php echo count($dateMatches); ?> trận đấu</span>
+                  </span>
+                </div>
               </div>
 
               <!-- Lưới các trận đấu trong ngày -->
@@ -1898,9 +1935,96 @@ $sportThemes = array(
   transform: translateX(2px);
 }
 
-/* Date Group Header */
+/* Date Group Header — Nổi bật, phong cách Đại hội thể thao */
 .date-group-header {
-  border-left: 4px solid #2563eb !important;
+  background: linear-gradient(135deg, #0a192f 0%, #173878 52%, #1e40af 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-left: 0 !important;
+  box-shadow: 0 6px 20px -3px rgba(10, 25, 47, 0.28), 0 2px 6px -1px rgba(10, 25, 47, 0.12) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.date-group-header:hover {
+  box-shadow: 0 10px 24px -3px rgba(10, 25, 47, 0.35) !important;
+}
+.date-group-accent-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(to bottom, #f59e0b 0%, #ec4899 50%, #38bdf8 100%);
+  z-index: 2;
+}
+.date-group-dots-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 18px 18px;
+  pointer-events: none;
+  z-index: 0;
+}
+.date-group-icon-squircle {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  flex-shrink: 0;
+}
+.date-group-day-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: #0f172a !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.4px;
+  border-radius: 9999px !important;
+  padding: 3px 9px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35);
+}
+.date-group-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #0f172a;
+  display: inline-block;
+}
+.date-group-sublabel {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+.date-group-title {
+  color: #ffffff !important;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+}
+.date-group-count-pill {
+  background: #ffffff;
+  color: #1e3a8a !important;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 6px 15px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.15s ease;
+}
+.date-group-count-pill:hover {
+  transform: scale(1.03);
 }
 
 /* Qualify Row in Standings */
@@ -2021,6 +2145,12 @@ document.addEventListener('DOMContentLoaded', function () {
           item.style.display = 'none';
         }
       });
+
+      // Cập nhật số lượng trận hiển thị trong huy hiệu nhóm ngày
+      var groupBadge = group.querySelector('.date-group-match-count');
+      if (groupBadge) {
+        groupBadge.textContent = groupVisibleCount + ' trận đấu';
+      }
 
       // Nếu trong nhóm ngày không có trận nào khớp, ẩn cả khối ngày đó
       if (groupVisibleCount === 0) {

@@ -156,6 +156,14 @@ class Daihoi
         ));
         $stageList = self::unwrap($stagesRes, array());
 
+        // Chỉ hiển thị các môn được gắn với sự kiện (event_sports)
+        $allowedSportIds = array();
+        foreach (EventSports::getByEventId($eventId) as $es) {
+            if (isset($es['sport_id'])) {
+                $allowedSportIds[(int)$es['sport_id']] = true;
+            }
+        }
+
         $sportsMap = array();
         $matches = array();
         $standingsBySport = array();
