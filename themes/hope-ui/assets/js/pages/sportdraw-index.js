@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var standingsUrlTpl = cfg.getAttribute('data-standings-url');
     var genkoUrlTpl = cfg.getAttribute('data-generate-knockout-url');
     var playoffUrlTpl = cfg.getAttribute('data-draw-playoff-url');
+    var peListUrlTpl = cfg.getAttribute('data-playoff-entrants-list-url');
+    var peMoveUrlTpl = cfg.getAttribute('data-playoff-entrants-move-url');
     var promotePlayoffUrlTpl = cfg.getAttribute('data-promote-playoff-url');
     var swimDrawUrlTpl = cfg.getAttribute('data-draw-swim-url');
     var promoteSwimUrlTpl = cfg.getAttribute('data-promote-swim-url');
