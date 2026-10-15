@@ -1212,11 +1212,11 @@ class MyHelper
         // Họ tên: in đậm, căn giữa phía trên (hạ xuống ngang vạch thiết kế).
         self::drawRunBibText($canvas, $name, array(
             'font' => 'fontten', 'color' => $textColor, 'bold' => true,
-            'size' => 108, 'min_size' => 46,
+            'size' => 128, 'min_size' => 50,
             'box_x1' => 300, 'box_x2' => 2180, 'center_y' => 540, 'align' => 'C',
         ));
-        // Dòng "Mã ĐV: <đơn vị lấy từ cột position>", căn giữa dưới họ tên.
-        $maDvLine = 'Mã ĐV: ' . $position;
+        // Dòng "ĐV: <đơn vị lấy từ badge_org_name>", căn giữa dưới họ tên.
+        $maDvLine = 'ĐV: ' . $position;
         self::drawRunBibText($canvas, $maDvLine, array(
             'font' => 'fontdonvi', 'color' => $textColor, 'bold' => false,
             'size' => 58, 'min_size' => 28,
