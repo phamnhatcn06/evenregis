@@ -489,11 +489,22 @@ class RunRegistrationsController extends AdminController
             throw new CHttpException(422, 'Vui lòng chọn sự kiện.');
         }
 
+        // Cần extension GD để tạo ảnh. Thiếu GD thì các hàm image* undefined → tiến trình chết
+        // không kịp ghi log (biểu hiện 503/trắng trang), nên chặn sớm với thông báo rõ ràng.
+        if (!function_exists('imagecreatefrompng') || !function_exists('imagettftext')) {
+            throw new CHttpException(500, 'Máy chủ chưa bật extension GD (php-gd) để tạo ảnh BIB. Vui lòng bật php-gd (kèm hỗ trợ FreeType) rồi thử lại.');
+        }
+
         // Dựng ảnh BIB hàng loạt (ảnh 2481×1754) tốn CPU/RAM; nới giới hạn để tránh 503/timeout.
         @set_time_limit(0);
         @ini_set('memory_limit', '1024M');
         if (function_exists('ignore_user_abort')) {
             ignore_user_abort(true);
+        }
+
+        $templateDir = Yii::app()->basePath . '/..' . self::BIB_TEMPLATE_DIR;
+        if (!is_dir($templateDir) || !is_file($templateDir . 'blank_bib.png')) {
+            throw new CHttpException(500, 'Không tìm thấy thư mục phôi BIB trên máy chủ (themes/hope-ui/phoianh/bibrun). Kiểm tra đã deploy phôi chưa.');
         }
 
         $regId = (int) Yii::app()->request->getParam('reg_id');
