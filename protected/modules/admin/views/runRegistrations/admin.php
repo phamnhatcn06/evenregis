@@ -121,12 +121,21 @@ $canUpdate = PermissionHelper::can('runregistrations', 'update');
 <?php if ($eventId && !empty($countByContent)): ?>
     <div class="card mb-3">
         <div class="card-body">
-            <h6 class="mb-3"><i class="fa fa-bar-chart me-1"></i>Số người đăng ký theo nội dung</h6>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0"><i class="fa fa-bar-chart me-1"></i>Số người đăng ký theo nội dung</h6>
+                <a href="<?php echo $this->createUrl('exportBib', array('event_id' => $eventId)); ?>" class="btn btn-sm btn-primary">
+                    <i class="fa fa-id-card-o me-1"></i>Xuất tất cả thẻ BIB
+                </a>
+            </div>
             <div class="d-flex flex-wrap gap-2">
                 <?php foreach ($countByContent as $contentName => $contentCount): ?>
-                    <span class="badge bg-light text-dark border fs-6 p-2">
-                        <?php echo CHtml::encode($contentName); ?>:
-                        <strong class="text-primary"><?php echo (int) $contentCount; ?></strong>
+                    <span class="badge bg-light text-dark border fs-6 p-2 d-inline-flex align-items-center gap-2">
+                        <span><?php echo CHtml::encode($contentName); ?>:
+                            <strong class="text-primary"><?php echo (int) $contentCount; ?></strong></span>
+                        <a href="<?php echo $this->createUrl('exportBib', array('event_id' => $eventId, 'cu_ly' => $contentName)); ?>"
+                           class="text-decoration-none" title="Xuất thẻ BIB nội dung này">
+                            <i class="fa fa-id-card-o"></i>
+                        </a>
                     </span>
                 <?php endforeach; ?>
                 <span class="badge bg-primary fs-6 p-2">
