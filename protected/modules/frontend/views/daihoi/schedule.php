@@ -390,65 +390,433 @@ $sportThemes = array(
          2.5 THỂ LỆ THI ĐẤU CÁC NỘI DUNG (thu gọn)
          ===================================================================== -->
     <?php
-    // Chỉ lấy các bộ môn có ít nhất một giai đoạn khai báo thể lệ
+    // Chỉ lấy các bộ môn có ít nhất một giai đoạn khai báo thể lệ hoặc thể thức
     $sportsWithRules = array();
     foreach ($sportsList as $sp) {
         if (empty($sp['stages'])) {
             continue;
         }
         foreach ($sp['stages'] as $st) {
-            if (!empty($st['rules'])) {
+            if (!empty($st['rules']) || !empty($st['format'])) {
                 $sportsWithRules[] = $sp;
                 break;
             }
         }
     }
+
+    // Helper: phân loại môn thi đấu (category, theme color, icon, label)
+    $getSportMeta = function ($name) {
+        $n = mb_strtolower((string)$name, 'UTF-8');
+        if (strpos($n, 'bóng đá') !== false) {
+            return array(
+                'cat' => 'football',
+                'cat_name' => 'Bóng đá',
+                'cat_icon' => '⚽',
+                'color' => '#059669',
+                'bg_light' => '#ecfdf5',
+                'icon' => 'sports_soccer',
+                'type_label' => (strpos($n, 'nữ') !== false ? 'Bóng đá nữ' : 'Bóng đá nam')
+            );
+        }
+        if (strpos($n, 'bóng bàn') !== false) {
+            return array(
+                'cat' => 'table-tennis',
+                'cat_name' => 'Bóng bàn',
+                'cat_icon' => '🏓',
+                'color' => '#ea580c',
+                'bg_light' => '#fff7ed',
+                'icon' => 'sports_tennis',
+                'type_label' => 'Môn bóng bàn'
+            );
+        }
+        if (strpos($n, 'cầu lông') !== false) {
+            return array(
+                'cat' => 'badminton',
+                'cat_name' => 'Cầu lông',
+                'cat_icon' => '🏸',
+                'color' => '#0284c7',
+                'bg_light' => '#f0f9ff',
+                'icon' => 'sports_tennis',
+                'type_label' => 'Môn cầu lông'
+            );
+        }
+        if (strpos($n, 'pickleball') !== false) {
+            return array(
+                'cat' => 'pickleball',
+                'cat_name' => 'Pickleball',
+                'cat_icon' => '🎾',
+                'color' => '#7c3aed',
+                'bg_light' => '#faf5ff',
+                'icon' => 'sports_tennis',
+                'type_label' => 'Môn Pickleball'
+            );
+        }
+        if (strpos($n, 'bơi') !== false) {
+            return array(
+                'cat' => 'swimming',
+                'cat_name' => 'Bơi lội',
+                'cat_icon' => '🏊',
+                'color' => '#0d9488',
+                'bg_light' => '#f0fdfa',
+                'icon' => 'pool',
+                'type_label' => 'Đường đua xanh'
+            );
+        }
+        if (strpos($n, 'kéo co') !== false) {
+            return array(
+                'cat' => 'tug-of-war',
+                'cat_name' => 'Kéo co',
+                'cat_icon' => '🪢',
+                'color' => '#e11d48',
+                'bg_light' => '#fff1f2',
+                'icon' => 'fitness_center',
+                'type_label' => 'Đồng đội đối kháng'
+            );
+        }
+        return array(
+            'cat' => 'other',
+            'cat_name' => 'Nội dung khác',
+            'cat_icon' => '🏆',
+            'color' => '#2563eb',
+            'bg_light' => '#eff6ff',
+            'icon' => 'emoji_events',
+            'type_label' => 'Nội dung thi đấu'
+        );
+    };
+
+    // Helper: phân tích cấu hình thể thức giai đoạn (badge, màu sắc, icon)
+    $getStageFormatMeta = function ($format) {
+        switch ($format) {
+            case 'single_elimination':
+                return array(
+                    'label' => 'Loại trực tiếp',
+                    'icon' => 'military_tech',
+                    'bg' => '#fff1f2',
+                    'color' => '#be123c',
+                    'border' => '#fecdd3'
+                );
+            case 'round_robin':
+                return array(
+                    'label' => 'Vòng tròn tính điểm',
+                    'icon' => 'sync_alt',
+                    'bg' => '#ecfdf5',
+                    'color' => '#047857',
+                    'border' => '#a7f3d0'
+                );
+            case 'round_robin_knockout':
+                return array(
+                    'label' => 'Vòng bảng + loại trực tiếp',
+                    'icon' => 'view_timeline',
+                    'bg' => '#eff6ff',
+                    'color' => '#1d4ed8',
+                    'border' => '#bfdbfe'
+                );
+            case 'playoff':
+                return array(
+                    'label' => 'Play-off (độc lập)',
+                    'icon' => 'bolt',
+                    'bg' => '#faf5ff',
+                    'color' => '#7e22ce',
+                    'border' => '#e9d5ff'
+                );
+            case 'heat_lane':
+            case 'time_trial':
+                return array(
+                    'label' => 'Tính thành tích',
+                    'icon' => 'timer',
+                    'bg' => '#f0fdfa',
+                    'color' => '#0f766e',
+                    'border' => '#99f6e4'
+                );
+            default:
+                $label = SportStages::getFormatLabel($format);
+                return array(
+                    'label' => $label ?: 'Thể thức chung',
+                    'icon' => 'sports',
+                    'bg' => '#f8fafc',
+                    'color' => '#475569',
+                    'border' => '#e2e8f0'
+                );
+        }
+    };
+
+    // Helper: chuẩn hoá và bóc tách nội dung thể lệ để hiển thị khoa học
+    $parseRulesContent = function ($text) use ($e) {
+        $text = trim((string)$text);
+        if ($text === '') {
+            return array('spec' => '', 'points' => '', 'detail_html' => '');
+        }
+
+        $body = $text;
+        // Loại bỏ tiền tố giai đoạn nếu có lặp lại
+        if (preg_match('/^(Vòng loại|Vòng bảng|VCK|Chung kết)\s*:\s*/ui', $body, $pm)) {
+            $body = substr($body, strlen($pm[0]));
+        }
+
+        $spec = '';
+        if (preg_match('/^((?:\d+\s*phút\s*\/\s*hiệp|\d+\s*hiệp\s+thắng\s+\d+|1\s*hiệp\s+chạm\s+\d+đ)(?:\s*\([^)]+\))?)([\.;\s]+(.*))?$/u', $body, $sm)) {
+            $spec = trim($sm[1]);
+            $body = isset($sm[3]) ? trim($sm[3]) : '';
+        }
+
+        $points = '';
+        if (preg_match('/\b(thắng\s+\d+đ[^\.;\)]*)/ui', $text, $ptm)) {
+            $rawPt = trim($ptm[1]);
+            $points = preg_replace('/\s*,\s*/u', ' • ', $rawPt);
+        }
+
+        $safeHtml = $e($body);
+        $terms = array(
+            'loại trực tiếp', 'vòng tròn', 'đối đầu → hiệu số séc', 'hiệu số → bàn thắng → đối đầu',
+            'đối đầu → hiệu số hiệp', 'hiệu số ván → hiệu số điểm',
+            'tranh 1-2-3-4', 'tranh 1-2', 'tranh 3-4', 'bán kết', 'chung kết',
+            'Nhất bảng', 'Nhì bảng', 'Nhất mỗi bảng', 'Nhất-Nhì mỗi bảng', 'Nhất 3 bảng'
+        );
+        foreach ($terms as $t) {
+            $safeHtml = preg_replace('/(' . preg_quote($t, '/') . ')/ui', '<strong class="highlight-term">$1</strong>', $safeHtml);
+        }
+
+        return array(
+            'spec' => $spec,
+            'points' => $points,
+            'detail_html' => $safeHtml
+        );
+    };
+
+    // Tập hợp danh sách category phục vụ thanh lọc
+    $rulesCategories = array();
+    foreach ($sportsWithRules as $sp) {
+        $meta = $getSportMeta($sp['name']);
+        $catKey = $meta['cat'];
+        if (!isset($rulesCategories[$catKey])) {
+            $rulesCategories[$catKey] = array(
+                'key' => $catKey,
+                'name' => $meta['cat_name'],
+                'icon' => $meta['cat_icon'],
+                'count' => 0
+            );
+        }
+        $rulesCategories[$catKey]['count']++;
+    }
     ?>
     <?php if (!empty($sportsWithRules)): ?>
       <section class="mb-4" id="rules-section">
-        <details class="rules-accordion bg-white rounded-4 shadow-sm border border-slate-200 overflow-hidden">
-          <summary class="d-flex align-items-center justify-content-between gap-2 p-3 p-md-4 fw-bold text-dark"
+        <details class="rules-accordion bg-white rounded-4 shadow-sm border border-slate-200 overflow-hidden" open>
+          <summary class="d-flex align-items-center justify-content-between gap-3 p-3 p-md-4"
                    style="cursor:pointer; list-style:none;">
-            <span class="d-flex align-items-center gap-2">
-              <span class="material-symbols-outlined text-primary">gavel</span>
-              Thể lệ &amp; cách thức thi đấu từng nội dung
-            </span>
-            <span class="material-symbols-outlined text-muted rules-chevron">expand_more</span>
+            <div class="d-flex align-items-center gap-3">
+              <div class="d-flex align-items-center justify-content-center rounded-3 shadow-xs"
+                   style="width:42px; height:42px; background:linear-gradient(135deg, #1e3a8a, #3b82f6); color:#ffffff; flex-shrink:0;">
+                <span class="material-symbols-outlined fs-5">gavel</span>
+              </div>
+              <div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <h2 class="fw-bold text-dark fs-5 mb-0">Thể lệ &amp; cách thức thi đấu từng nội dung</h2>
+                  <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 small fw-semibold">
+                    <?php echo count($sportsWithRules); ?> nội dung
+                  </span>
+                </div>
+                <div class="text-muted small mt-0.5">
+                  Quy định số hiệp, thời gian thi đấu, cách tính điểm và cơ chế xếp hạng tranh giải chi tiết
+                </div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="d-none d-sm-inline small text-muted fw-medium">Thu gọn / Mở rộng</span>
+              <span class="material-symbols-outlined text-muted rules-chevron fs-5">expand_more</span>
+            </div>
           </summary>
-          <div class="px-3 px-md-4 pb-4 pt-0">
-            <div class="row g-3">
+
+          <div class="p-3 p-md-4 pt-3">
+            <!-- Toolbar Lọc danh mục & Tìm kiếm tức thì -->
+            <div class="rules-filter-toolbar rounded-3 p-2.5 mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+              <div class="d-flex flex-wrap align-items-center gap-1.5" id="rules-cat-filters">
+                <button type="button" class="btn rules-cat-btn active" data-cat="all">
+                  Tất cả <span class="badge bg-secondary-subtle text-secondary rounded-pill ms-1"><?php echo count($sportsWithRules); ?></span>
+                </button>
+                <?php foreach ($rulesCategories as $c): ?>
+                  <button type="button" class="btn rules-cat-btn" data-cat="<?php echo $e($c['key']); ?>">
+                    <?php echo $e($c['icon'] . ' ' . $c['name']); ?>
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill ms-1"><?php echo (int)$c['count']; ?></span>
+                  </button>
+                <?php endforeach; ?>
+              </div>
+
+              <div class="position-relative" style="min-width: 220px; max-width: 320px; flex: 1;">
+                <span class="material-symbols-outlined position-absolute top-50 start-0 translate-middle-y ms-2.5 text-muted" style="font-size:17px;">search</span>
+                <input type="text" id="rules-search-input" class="form-control form-control-sm ps-5 pe-4 rounded-pill border-slate-300" placeholder="Tìm theo tên môn hoặc quy chế..." />
+                <button type="button" id="rules-search-clear" class="btn btn-link btn-sm position-absolute top-50 end-0 translate-middle-y me-1 text-muted p-0" style="display:none; text-decoration:none;">
+                  <span class="material-symbols-outlined fs-6">close</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid Thẻ Thể Lệ Từng Môn -->
+            <div class="row g-3" id="rules-cards-grid">
               <?php foreach ($sportsWithRules as $sp): ?>
-                <div class="col-12 col-lg-6">
-                  <div class="h-100 border rounded-4 p-3 bg-slate-50">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                      <span class="material-symbols-outlined text-primary"><?php echo $e(isset($sp['icon']) ? $sp['icon'] : 'emoji_events'); ?></span>
-                      <span class="fw-bold text-dark"><?php echo $e($sp['name']); ?></span>
-                    </div>
-                    <?php foreach ($sp['stages'] as $st): ?>
-                      <?php if (empty($st['rules']) && empty($st['format'])) continue; ?>
-                      <div class="mb-2 ps-1 border-start border-3 border-primary-subtle">
-                        <div class="d-flex flex-wrap align-items-center gap-2 ms-2">
-                          <span class="small fw-semibold text-dark"><?php echo $e($st['name']); ?></span>
-                          <?php if (!empty($st['format'])): ?>
-                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0" style="font-size:10.5px;">
-                              <?php echo $e(SportStages::getFormatLabel($st['format'])); ?>
-                            </span>
-                          <?php endif; ?>
-                          <?php if (!empty($st['location'])): ?>
-                            <span class="text-muted" style="font-size:10.5px;">📍 <?php echo $e($st['location']); ?></span>
-                          <?php endif; ?>
+                <?php
+                $sMeta = $getSportMeta($sp['name']);
+                $validStages = array();
+                if (!empty($sp['stages'])) {
+                    foreach ($sp['stages'] as $st) {
+                        if (!empty($st['rules']) || !empty($st['format'])) {
+                            $validStages[] = $st;
+                        }
+                    }
+                }
+                $numStages = count($validStages);
+                $isMultiStage = ($numStages > 1);
+
+                // Từ khoá tìm kiếm
+                $searchKeywords = mb_strtolower($sp['name'] . ' ' . $sMeta['cat_name'], 'UTF-8');
+                foreach ($validStages as $st) {
+                    $searchKeywords .= ' ' . mb_strtolower((isset($st['name']) ? $st['name'] : '') . ' ' . (isset($st['rules']) ? $st['rules'] : '') . ' ' . (isset($st['location']) ? $st['location'] : ''), 'UTF-8');
+                }
+                ?>
+                <div class="col-12 col-lg-6 sport-rule-item" data-cat="<?php echo $e($sMeta['cat']); ?>" data-search="<?php echo $e($searchKeywords); ?>">
+                  <div class="sport-rule-card h-100 rounded-4 shadow-sm d-flex flex-column overflow-hidden bg-white">
+                    <!-- Thanh nhấn màu sắc theo môn -->
+                    <div class="sport-card-accent-bar" style="background:<?php echo $e($sMeta['color']); ?>;"></div>
+
+                    <!-- Header Thẻ Môn -->
+                    <div class="p-3 px-md-4 pt-3 pb-2.5 d-flex align-items-center justify-content-between border-bottom border-slate-100">
+                      <div class="d-flex align-items-center gap-2.5">
+                        <div class="sport-icon-squircle" style="background:<?php echo $e($sMeta['bg_light']); ?>; color:<?php echo $e($sMeta['color']); ?>;">
+                          <span class="material-symbols-outlined fs-5"><?php echo $e($sMeta['icon']); ?></span>
                         </div>
-                        <?php if (!empty($st['rules'])): ?>
-                          <div class="small text-muted ms-2 mt-1" style="font-size:12px; line-height:1.45;">
-                            <?php echo $e($st['rules']); ?>
-                          </div>
-                        <?php endif; ?>
+                        <div>
+                          <h3 class="fs-6 fw-bold text-dark mb-0 lh-sm"><?php echo $e($sp['name']); ?></h3>
+                          <span class="small text-muted" style="font-size:11.5px;"><?php echo $e($sMeta['type_label']); ?></span>
+                        </div>
                       </div>
-                    <?php endforeach; ?>
+                      <span class="sport-card-tag rounded-pill px-2.5 py-1 small fw-semibold">
+                        <?php echo $isMultiStage ? ('Lộ trình ' . $numStages . ' chặng') : '1 giai đoạn'; ?>
+                      </span>
+                    </div>
+
+                    <!-- Thân Thẻ: Hiển thị các giai đoạn thi đấu -->
+                    <div class="p-3 px-md-4 py-3 flex-grow-1 d-flex flex-column justify-content-center">
+                      <?php if (!$isMultiStage): ?>
+                        <!-- MÔN 1 GIAI ĐOẠN -->
+                        <?php foreach ($validStages as $st): ?>
+                          <?php
+                          $fMeta = $getStageFormatMeta($st['format']);
+                          $parsed = $parseRulesContent($st['rules']);
+                          ?>
+                          <div class="stage-card-box">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                              <span class="fw-bold text-dark small"><?php echo $e($st['name']); ?></span>
+                              <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                <span class="format-badge-pill" style="background:<?php echo $e($fMeta['bg']); ?>; color:<?php echo $e($fMeta['color']); ?>; border:1px solid <?php echo $e($fMeta['border']); ?>;">
+                                  <span class="material-symbols-outlined" style="font-size:14px;"><?php echo $e($fMeta['icon']); ?></span>
+                                  <?php echo $e($fMeta['label']); ?>
+                                </span>
+                                <?php if (!empty($st['location'])): ?>
+                                  <span class="stage-location-pill">
+                                    📍 <?php echo $e($st['location']); ?>
+                                  </span>
+                                <?php endif; ?>
+                              </div>
+                            </div>
+
+                            <?php if (!empty($parsed['spec']) || !empty($parsed['points'])): ?>
+                              <div class="mb-2 d-flex flex-wrap gap-1.5">
+                                <?php if (!empty($parsed['spec'])): ?>
+                                  <span class="rule-spec-chip">
+                                    <span class="material-symbols-outlined text-primary" style="font-size:14px;">timer</span>
+                                    <span>Quy cách: <strong><?php echo $e($parsed['spec']); ?></strong></span>
+                                  </span>
+                                <?php endif; ?>
+                                <?php if (!empty($parsed['points'])): ?>
+                                  <span class="rule-points-chip">
+                                    <span>Điểm: <strong><?php echo $e($parsed['points']); ?></strong></span>
+                                  </span>
+                                <?php endif; ?>
+                              </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($parsed['detail_html'])): ?>
+                              <div class="rule-detail-text">
+                                <?php echo $parsed['detail_html']; ?>
+                              </div>
+                            <?php endif; ?>
+                          </div>
+                        <?php endforeach; ?>
+
+                      <?php else: ?>
+                        <!-- MÔN NHIỀU GIAI ĐOẠN (LỘ TRÌNH ROADMAP) -->
+                        <div class="stage-timeline-track">
+                          <?php foreach ($validStages as $idx => $st): ?>
+                            <?php
+                            $stepNum = $idx + 1;
+                            $isLast = ($stepNum === $numStages);
+                            $fMeta = $getStageFormatMeta($st['format']);
+                            $parsed = $parseRulesContent($st['rules']);
+                            ?>
+                            <div class="stage-timeline-step">
+                              <div class="stage-step-indicator <?php echo $isLast ? 'final-step' : ''; ?>">
+                                <?php echo $isLast ? '🏆' : $stepNum; ?>
+                              </div>
+                              <div class="stage-card-box <?php echo $isLast ? 'stage-card-final' : ''; ?>">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-1.5 mb-1.5">
+                                  <span class="fw-bold text-dark small"><?php echo $e($st['name']); ?></span>
+                                  <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                    <span class="format-badge-pill" style="background:<?php echo $e($fMeta['bg']); ?>; color:<?php echo $e($fMeta['color']); ?>; border:1px solid <?php echo $e($fMeta['border']); ?>;">
+                                      <span class="material-symbols-outlined" style="font-size:13px;"><?php echo $e($fMeta['icon']); ?></span>
+                                      <?php echo $e($fMeta['label']); ?>
+                                    </span>
+                                    <?php if (!empty($st['location'])): ?>
+                                      <span class="stage-location-pill">
+                                        📍 <?php echo $e($st['location']); ?>
+                                      </span>
+                                    <?php endif; ?>
+                                  </div>
+                                </div>
+
+                                <?php if (!empty($parsed['spec']) || !empty($parsed['points'])): ?>
+                                  <div class="mb-1.5 d-flex flex-wrap gap-1.5">
+                                    <?php if (!empty($parsed['spec'])): ?>
+                                      <span class="rule-spec-chip">
+                                        <span class="material-symbols-outlined text-primary" style="font-size:14px;">timer</span>
+                                        <span><?php echo $e($parsed['spec']); ?></span>
+                                      </span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($parsed['points'])): ?>
+                                      <span class="rule-points-chip">
+                                        <span><?php echo $e($parsed['points']); ?></span>
+                                      </span>
+                                    <?php endif; ?>
+                                  </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($parsed['detail_html'])): ?>
+                                  <div class="rule-detail-text">
+                                    <?php echo $parsed['detail_html']; ?>
+                                  </div>
+                                <?php endif; ?>
+                              </div>
+                            </div>
+                          <?php endforeach; ?>
+                        </div>
+                      <?php endif; ?>
+                    </div>
                   </div>
                 </div>
               <?php endforeach; ?>
             </div>
+
+            <!-- Trạng thái trống khi tìm kiếm không thấy -->
+            <div id="rules-empty-state" class="text-center py-5" style="display:none;">
+              <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-slate-100 text-slate-400 mb-3" style="width:52px; height:52px;">
+                <span class="material-symbols-outlined fs-2">search_off</span>
+              </div>
+              <h4 class="fs-6 fw-bold text-dark mb-1">Không tìm thấy nội dung thi đấu phù hợp</h4>
+              <p class="small text-muted mb-3">Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc danh mục.</p>
+              <button type="button" id="rules-reset-filter" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                Xem tất cả nội dung
+              </button>
+            </div>
+
           </div>
         </details>
       </section>
