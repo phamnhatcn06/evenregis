@@ -526,8 +526,7 @@ class RunRegistrationsController extends AdminController
             throw new CHttpException(404, 'Không có thí sinh phù hợp để xuất thẻ BIB.');
         }
 
-        $templateDir = Yii::app()->basePath . '/..' . self::BIB_TEMPLATE_DIR;
-        $workDir     = Yii::app()->basePath . '/../uploads/run_bibs';
+        $workDir = Yii::app()->basePath . '/../uploads/run_bibs';
 
         // Dựng ảnh BIB, gom theo nội dung (cự ly) để chia thư mục trong ZIP.
         $groups  = array();
