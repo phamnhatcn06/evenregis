@@ -34,14 +34,35 @@
       });
     }
 
+    // Đo chiều cao header dính (sticky-top) để thanh chọn ngày dính ngay bên dưới,
+    // tránh bị header đè lên. Cập nhật lại khi đổi kích thước màn hình.
+    var page = document.querySelector('.ag-page');
+    var header = document.querySelector('header.sticky-top');
+    function syncHeaderHeight() {
+      if (!page || !header) { return; }
+      page.style.setProperty('--ag-subheader-h', header.offsetHeight + 'px');
+    }
+    syncHeaderHeight();
+    window.addEventListener('resize', syncHeaderHeight);
+    window.addEventListener('load', syncHeaderHeight);
+
     // Đổ bóng / nền cho thanh ngày khi nó bắt đầu "dính" trên cùng.
     var wrap = document.querySelector('.ag-daynav-wrap');
     var sentinel = document.querySelector('.ag-daynav-sentinel');
     if (wrap && sentinel && 'IntersectionObserver' in window) {
       var stuckObserver = new IntersectionObserver(function (entries) {
         wrap.classList.toggle('is-stuck', !entries[0].isIntersecting);
-      }, { rootMargin: '-62px 0px 0px 0px', threshold: 0 });
-      stuckObserver.observe(sentinel);
+      }, { threshold: 0 });
+      function syncSentinel() {
+        var h = header ? header.offsetHeight : 62;
+        stuckObserver.disconnect();
+        stuckObserver = new IntersectionObserver(function (entries) {
+          wrap.classList.toggle('is-stuck', !entries[0].isIntersecting);
+        }, { rootMargin: '-' + h + 'px 0px 0px 0px', threshold: 0 });
+        stuckObserver.observe(sentinel);
+      }
+      syncSentinel();
+      window.addEventListener('resize', syncSentinel);
     }
 
     if ('IntersectionObserver' in window) {
