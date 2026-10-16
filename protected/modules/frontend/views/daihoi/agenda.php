@@ -100,15 +100,23 @@ if (!empty($agenda) && is_array($agenda)) {
       </div>
     <?php else: ?>
 
-      <!-- Thanh điều hướng ngày (dính trên cùng) -->
-      <nav class="ag-daynav">
-        <?php foreach ($days as $d): ?>
-          <a href="#<?php echo $e($d['anchor']); ?>" class="ag-daynav-item">
-            <span class="ag-daynav-num"><?php echo $e($d['num']); ?></span>
-            <span class="ag-daynav-label"><?php echo $e($d['title']); ?></span>
-          </a>
-        <?php endforeach; ?>
-      </nav>
+      <!-- Mốc nhận biết thời điểm thanh ngày bắt đầu "dính" -->
+      <div class="ag-daynav-sentinel" aria-hidden="true"></div>
+
+      <!-- Thanh điều hướng ngày (dính trên cùng khi cuộn) -->
+      <div class="ag-daynav-wrap">
+        <nav class="ag-daynav">
+          <span class="ag-daynav-caption">
+            <span class="material-symbols-outlined">calendar_view_week</span>Chọn ngày
+          </span>
+          <?php foreach ($days as $d): ?>
+            <a href="#<?php echo $e($d['anchor']); ?>" class="ag-daynav-item">
+              <span class="ag-daynav-num"><?php echo $e($d['num']); ?></span>
+              <span class="ag-daynav-label"><?php echo $e($d['title']); ?></span>
+            </a>
+          <?php endforeach; ?>
+        </nav>
+      </div>
 
       <?php foreach ($days as $d): ?>
       <div class="ag-day" id="<?php echo $e($d['anchor']); ?>">
