@@ -71,7 +71,8 @@
                 if (data.remaining <= 0) {
                     disableAllVoteButtons();
                 }
-                if (typeof Toast !== 'undefined') {
+                // Khách đăng nhập token đã vào sẵn, không hiện lại thông báo đăng nhập.
+                if (!tokenAuth && typeof Toast !== 'undefined') {
                     Toast.success('Đăng nhập thành công! Hãy bình chọn cho thí sinh bạn yêu thích.');
                 }
             })
