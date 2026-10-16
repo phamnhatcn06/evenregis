@@ -34,6 +34,16 @@
       });
     }
 
+    // Đổ bóng / nền cho thanh ngày khi nó bắt đầu "dính" trên cùng.
+    var wrap = document.querySelector('.ag-daynav-wrap');
+    var sentinel = document.querySelector('.ag-daynav-sentinel');
+    if (wrap && sentinel && 'IntersectionObserver' in window) {
+      var stuckObserver = new IntersectionObserver(function (entries) {
+        wrap.classList.toggle('is-stuck', !entries[0].isIntersecting);
+      }, { threshold: 0 });
+      stuckObserver.observe(sentinel);
+    }
+
     if ('IntersectionObserver' in window) {
       var observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
