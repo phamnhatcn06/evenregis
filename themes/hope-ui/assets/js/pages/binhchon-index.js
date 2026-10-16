@@ -129,20 +129,25 @@
         return true;
     }
 
-    // Thư viện Google tải bất đồng bộ -> thử lại vài lần
-    var tries = 0;
-    var timer = setInterval(function () {
-        if (initGoogle() || ++tries > 20) {
-            clearInterval(timer);
-        }
-    }, 150);
+    if (tokenAuth) {
+        // Đã đăng nhập bằng tài khoản nội bộ: bỏ qua Google, nạp ngay trạng thái.
+        loadVoterStatus();
+    } else {
+        // Thư viện Google tải bất đồng bộ -> thử lại vài lần
+        var tries = 0;
+        var timer = setInterval(function () {
+            if (initGoogle() || ++tries > 20) {
+                clearInterval(timer);
+            }
+        }, 150);
+    }
 
     function vote(button) {
         var contestantId = button.getAttribute('data-contestant');
 
-        if (!credential) {
+        if (!tokenAuth && !credential) {
             if (typeof Toast !== 'undefined') {
-                Toast.warning('Vui lòng đăng nhập bằng Google trước khi bình chọn.');
+                Toast.warning('Vui lòng đăng nhập trước khi bình chọn.');
             }
             return;
         }
@@ -153,7 +158,7 @@
 
         var body = new FormData();
         body.append('contestant_id', contestantId);
-        body.append('credential', credential);
+        if (credential) { body.append('credential', credential); }
 
         fetch(voteUrl, { method: 'POST', body: body })
             .then(function (res) { return res.json(); })
