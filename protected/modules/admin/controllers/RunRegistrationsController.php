@@ -447,16 +447,18 @@ class RunRegistrationsController extends AdminController
             } else {
                 $unitCell = !empty($r['badge_org_name']) ? $r['badge_org_name'] : (isset($r['unit_label']) ? $r['unit_label'] : '');
             }
-            $sheet->setCellValue('D' . $row, $unitCell);
-            $sheet->setCellValue('E' . $row, isset($r['phone_number']) ? $r['phone_number'] : '');
-            $sheet->setCellValue('F' . $row, !empty($r['birth_year']) ? $r['birth_year'] : '');
-            $sheet->setCellValue('G' . $row, $genderLabel);
-            $sheet->setCellValue('H' . $row, isset($r['run_event_name']) ? $r['run_event_name'] : '');
-            $sheet->setCellValue('I' . $row, !empty($r['age_group_label']) ? $r['age_group_label'] : '');
+            $sheet->setCellValue('D' . $row, isset($r['position']) ? $r['position'] : '');
+            $sheet->setCellValue('E' . $row, $unitCell);
+            $sheet->setCellValue('F' . $row, isset($r['phone_number']) ? $r['phone_number'] : '');
+            $sheet->setCellValue('G' . $row, !empty($r['birth_year']) ? $r['birth_year'] : '');
+            $sheet->setCellValue('H' . $row, $genderLabel);
+            $sheet->setCellValue('I' . $row, isset($r['shirt_size']) ? $r['shirt_size'] : '');
+            $sheet->setCellValue('J' . $row, isset($r['run_event_name']) ? $r['run_event_name'] : '');
+            $sheet->setCellValue('K' . $row, !empty($r['age_group_label']) ? $r['age_group_label'] : '');
             $row++;
         }
 
-        foreach (range('A', 'I') as $col) {
+        foreach (range('A', 'K') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
