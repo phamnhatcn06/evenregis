@@ -59,7 +59,73 @@ Nhúng tool Lucky Draw standalone (`e:\eventregis\lucky_manrong_19201080\`) vào
 | level / is_partner | (map theo cột admin chọn loại trừ) |
 | — | type → dùng cho `eligible_types` mỗi giải |
 
-## 7. Files tham chiếu
+## 7. SLICE 0 — JSON CONTRACT (đã chốt từ lucky-show.js + show.php)
+
+Các endpoint `window.__API` core JS gọi và shape bắt buộc phải trả về:
+
+### `GET prize` (API.prize) — thông tin giải hiện tại
+```json
+{ "ok": true, "data": {
+  "id": 1, "prize_name": "Giải Đặc Biệt", "code": "special",
+  "quantity": 1, "awarded": 0, "duration": 12000, "stagger_duration": 0,
+  "spin_count": 1, "finished": false
+}}
+```
+- `code` dùng để nhận diện hiệu ứng: `'special'` → màn che + mega confetti; tên chứa "nhất"/"đặc biệt" → hãm chậm.
+- `finished` = (awarded >= quantity). JS khóa quay khi quantity==awarded.
+
+### `GET status` (API.status) — số người còn lại
+```json
+{ "ok": true, "data": { "remaining": 123 } }
+```
+
+### `POST spin` (API.spin) — quay, body `{}`
+```json
+{ "ok": true, "data": {
+  "prize": { "id":1, "name":"Giải Nhất", "code":"first",
+             "duration":15000, "stagger_duration":5000, "spin_count":5 },
+  "winners": [ { "id":42, "code":"042", "full_name":"Nguyễn Văn A",
+                 "department":"Phòng ABC", "company":"Đơn vị X" } ]
+}}
+```
+- Lỗi: `{ "ok": false, "error": "..." }` (JS đọc `res.error`).
+- `winners[].code` PHẢI là chuỗi số ≥3 ký tự (JS lấy 3 digit cuối cho reel). → **lucky_number map vào `code`**.
+- `spin_count>1` hoặc nhiều winner → chế độ consolation (nhiều người/lần).
+
+### `POST confirmWinner` (API.confirm) — body `{ id:'all'|<pid>, prize_id }`
+`{ "ok": true }`
+
+### `POST cancelWinner` (API.cancel) — body `{ id:'all'|<uid>, prize_id }`
+`{ "ok": true }` / `{ "ok": false, "error"/"msg": "..." }`
+
+### `POST nextPrize` (API.nextPrize)
+`{ "ok": true }` / `{ "ok": false, "msg": "🎉 Đã hết toàn bộ giải" }`
+
+### `POST checkAuth` (API.checkAuth) — body `{ code }`
+`{ "ok": true }` / `{ "ok": false, "msg": "Mã truy cập không đúng!" }`
+- JS lưu cookie `lucky_auth_token=granted` trong 3 giờ sau khi đúng mã.
+
+### `GET checkRemote` (API.checkRemote) — poll mỗi 1s
+`{ "ok": true, "command": "spin"|null }` (đọc xong reset về null)
+### `POST remoteSpin` (API.remoteSpin)
+`{ "ok": true }` / `{ "ok": false, "msg": "Chưa xác nhận kết quả trước!" }`
+
+### DOM bắt buộc giữ nguyên (show.php)
+Canvas: `fxCanvas, petalCanvas, boomCanvas`; `lightSweep`, `.screen`, `#board`, `#reelsWrap`, 3×`.reel/.reel-strip/.reel-cover`, `#prizeName`, `#specialMsg`; winner: `#winnerCenter/#winnerListCenter`, `#winnersLeft/#winnerListLeft`, `#winnersRight/#winnerListRight`, `#winnerOverlay`, `#winnerPopup` (`#bigCode #fullName #department #company #multiWinnerContainer #singleWinnerWrapper`); consolation: `#consolationBoard/#consolationGrid/#consolationActions`; `#remaining`, `#prizeCounter`, `#btnNextPrize`.
+Phím: SPACE=quay, ENTER=xác nhận khi popup mở.
+
+### Mapping roster → code JS (chốt)
+| field JS | nguồn final_attendee_rosters |
+|---|---|
+| `code` | `lucky_number` (chuỗi số, pad ≥3) |
+| `id` | roster `id` (dùng cho confirm/cancel) |
+| `full_name` | họ tên |
+| `department` | `unit_label` / `badge_org_name` |
+| `company` | đơn vị cấp trên / để trống nếu không có |
+
+→ **Adapter JS chỉ cần đổi `window.__API` sang URL eventregis; backend trả đúng shape trên → KHÔNG sửa lucky-show.js.**
+
+## 8. Files tham chiếu
 - Tool gốc: `lucky_manrong_19201080\` (js/lucky-show.js, js/fireworks-modern.js, views/site/show.php, protected/controllers/ApiController.php, lucky_draw.sql)
 - eventregis: `protected/components/ApiEndpoints.php`, `PermissionHelper.php`, `AuthHandler.php`, `protected/config/RewriteUrlManager.php`, `protected/modules/admin/controllers/FinalAttendeeRostersController.php` (mẫu), `protected/models/FinalAttendeeRosters.php`
 - Backend endpoint mới: repo Laravel even_API (local port 8000)
