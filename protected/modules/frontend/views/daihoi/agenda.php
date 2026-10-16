@@ -162,10 +162,11 @@ if (!empty($agenda) && is_array($agenda)) {
   </section>
 </main>
 
-<link rel="stylesheet" href="<?php echo $base; ?>/css/daihoi-agenda.css">
+<?php $dh = $base . '/public/daihoi'; ?>
+<link rel="stylesheet" href="<?php echo $dh; ?>/agenda.css?v=<?php echo @filemtime(Yii::getPathOfAlias('webroot') . '/public/daihoi/agenda.css') ?: time(); ?>">
 <?php
 Yii::app()->clientScript->registerScriptFile(
-    $base . '/js/pages/daihoi-agenda.js',
+    $dh . '/agenda.js?v=' . (@filemtime(Yii::getPathOfAlias('webroot') . '/public/daihoi/agenda.js') ?: time()),
     CClientScript::POS_END
 );
 ?>
