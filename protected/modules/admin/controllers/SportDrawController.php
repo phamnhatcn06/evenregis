@@ -334,6 +334,18 @@ class SportDrawController extends AdminController
             $this->jsonResponse(false, 'Vòng bảng chưa có trận đấu nào có kết quả (0/' . $totalGroupCount . ' trận). Vui lòng ghi kết quả các trận vòng bảng trước khi cập nhật danh sách đội vào sơ đồ loại trực tiếp.');
         }
 
+        // Vòng bảng chỉ coi là kết thúc khi MỌI trận đều có kết quả.
+        // Khi chưa kết thúc, chỉ tạo khung sơ đồ nhánh với các trận Bán kết "Chờ xác định"
+        // (không gọi API sinh đội vì API sẽ ghép đội theo BXH tạm thời của vòng bảng dang dở).
+        $groupComplete = $totalGroupCount > 0 && $completedGroupCount === $totalGroupCount;
+        if (!$groupComplete) {
+            $fallback = $this->syncKnockoutFromDb($stageId);
+            if ($fallback['success']) {
+                $this->jsonResponse(true, $fallback['message'], $fallback['data'] ?? null);
+            }
+            $this->jsonResponse(false, $fallback['message']);
+        }
+
         // Tự động tính lại BXH trước
         try {
             SportStages::computeStandings($stageId);
