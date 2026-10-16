@@ -8,9 +8,13 @@
 
 $this->pageTitle = 'Bình chọn Miss Mường Thanh 2026 - Vòng Chung Kết';
 $baseUrl = Yii::app()->theme->baseUrl;
+$themePath = Yii::getPathOfAlias('webroot') . '/themes/hope-ui';
 
-// Nạp file CSS chuyên biệt cho trang bình chọn
-Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/css/pages/binhchon.css');
+// Nạp file CSS chuyên biệt cho trang bình chọn.
+// Thêm ?v=filemtime để trình duyệt không dùng bản CSS cũ đã cache (cùng convention
+// với các trang daihoi) — tránh lỗi vỡ layout khi file CSS được cập nhật.
+$cssVer = @filemtime($themePath . '/assets/css/pages/binhchon.css') ?: time();
+Yii::app()->clientScript->registerCssFile($baseUrl . '/assets/css/pages/binhchon.css?v=' . $cssVer);
 
 $voteUrl = $this->createUrl('/frontend/binhchon/vote');
 $statusUrl = $this->createUrl('/frontend/binhchon/status');
