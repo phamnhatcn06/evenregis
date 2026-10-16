@@ -2736,28 +2736,41 @@ document.addEventListener('DOMContentLoaded', function () {
     }, { passive: false });
 
     // Kéo chuột để cuộn (Mouse Drag)
+    // Chỉ bật trạng thái kéo khi chuột DI CHUYỂN vượt ngưỡng, để click thường không bị
+    // CSS `.is-dragging .sport-filter-btn { pointer-events: none }` chặn.
+    var isPressing = false;
     var isDragging = false;
     var startX, startScrollLeft;
+    var DRAG_THRESHOLD = 5;
 
     sportsScroller.addEventListener('mousedown', function (e) {
       if (e.target.closest('.sports-nav-arrow')) return;
-      isDragging = true;
+      isPressing = true;
+      isDragging = false;
       startX = e.pageX - sportsScroller.offsetLeft;
       startScrollLeft = sportsScroller.scrollLeft;
-      sportsScroller.classList.add('is-dragging');
     });
 
     document.addEventListener('mouseup', function () {
+      isPressing = false;
       if (isDragging) {
         isDragging = false;
-        sportsScroller.classList.remove('is-dragging');
+        // Gỡ class ở lần tick sau để chặn đúng cú click kết thúc thao tác kéo
+        setTimeout(function () {
+          sportsScroller.classList.remove('is-dragging');
+        }, 0);
       }
     });
 
     sportsScroller.addEventListener('mousemove', function (e) {
-      if (!isDragging) return;
-      e.preventDefault();
+      if (!isPressing) return;
       var x = e.pageX - sportsScroller.offsetLeft;
+      if (!isDragging) {
+        if (Math.abs(x - startX) < DRAG_THRESHOLD) return;
+        isDragging = true;
+        sportsScroller.classList.add('is-dragging');
+      }
+      e.preventDefault();
       var walk = (x - startX) * 1.3;
       sportsScroller.scrollLeft = startScrollLeft - walk;
     });
