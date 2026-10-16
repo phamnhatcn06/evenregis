@@ -25,26 +25,52 @@ class BinhchonController extends CController
      */
     public function actionIndex()
     {
+        // Portal redirect về kèm sso_token sau khi bấm "Đăng nhập nội bộ" → tạo
+        // phiên đăng nhập rồi chuyển về trang bình chọn sạch (bỏ token khỏi URL).
+        $ssoToken = Yii::app()->request->getParam('sso_token');
+        if ($ssoToken) {
+            AuthHandler::logout();
+            $userData = AuthHandler::handleCallback($ssoToken);
+            if ($userData) {
+                AuthHandler::fetchPermissions($ssoToken);
+                $profile = AuthHandler::fetchUserProfile($ssoToken);
+                AuthHandler::updateSessionWithProfile($profile);
+            }
+            $this->redirect(array('/frontend/binhchon/index'));
+            return;
+        }
+
         $cfg = $this->voteConfig();
         $pageData = $this->loadVotePageData($cfg['contest_id']);
         $finalists = $pageData['finalists'];
         $gate = $pageData['gate'];
 
-        // Thư viện Google Identity Services (bắt buộc tải từ máy chủ Google)
-        Yii::app()->clientScript->registerScriptFile(
-            'https://accounts.google.com/gsi/client',
-            CClientScript::POS_HEAD
-        );
+        // Người đã đăng nhập bằng tài khoản nội bộ (token SSO) thì không cần Google.
+        $tokenVoter = $this->currentTokenVoter();
+
+        // Chỉ nạp thư viện Google khi khách CHƯA đăng nhập token.
+        if ($tokenVoter === null) {
+            Yii::app()->clientScript->registerScriptFile(
+                'https://accounts.google.com/gsi/client',
+                CClientScript::POS_HEAD
+            );
+        }
         Yii::app()->clientScript->registerScriptFile(
             Yii::app()->theme->baseUrl . '/assets/js/pages/binhchon-index.js',
             CClientScript::POS_END
         );
+
+        $portal = Yii::app()->params['portal'];
+        $returnUrl = Yii::app()->createAbsoluteUrl('/frontend/binhchon/index');
+        $tokenLoginUrl = rtrim($portal['url'], '/') . '/login?redirect=' . urlencode($returnUrl);
 
         $this->render('index', array(
             'finalists' => $finalists,
             'gate' => $gate,
             'googleClientId' => GoogleAuthHelper::getClientId(),
             'maxVotes' => $cfg['max_votes_per_voter'],
+            'tokenVoter' => $tokenVoter,
+            'tokenLoginUrl' => $tokenLoginUrl,
         ));
     }
 
