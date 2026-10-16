@@ -313,23 +313,6 @@ class SportDrawController extends AdminController
         $stageId = (int) $id;
         $force = (int) Yii::app()->getRequest()->getPost('force', 0);
 
-        // 1. Kiểm tra số trận vòng bảng đã có kết quả
-        $db = Yii::app()->db;
-        $completedGroupCount = (int) $db->createCommand("
-            SELECT COUNT(*) 
-            FROM sport_matches m 
-            JOIN sport_match_results r ON m.id = r.match_id 
-            WHERE m.stage_id = :sid AND m.match_type = 'group' 
-              AND m.deleted_at IS NULL 
-              AND r.score_a IS NOT NULL AND r.score_b IS NOT NULL
-        ")->queryScalar(array(':sid' => $stageId));
-
-        $totalGroupCount = (int) $db->createCommand("
-            SELECT COUNT(*) 
-            FROM sport_matches m 
-            WHERE m.stage_id = :sid AND m.match_type = 'group' AND m.deleted_at IS NULL
-        ")->queryScalar(array(':sid' => $stageId));
-
         // Lưu ý: KHÔNG chặn khi vòng bảng chưa có kết quả. Backend sẽ dựng khung sơ đồ
         // nhánh với các trận "Chờ xác định" (chỉ điền đội khi toàn bộ vòng bảng đá xong),
         // nên việc bấm nút lúc này chỉ tạo/đặt lại khung chờ — đúng mong muốn nghiệp vụ.
