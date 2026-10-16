@@ -23,6 +23,43 @@ $typeLabels = array(
 $isEmpty = empty($days) && empty($noTime);
 ?>
 
+<?php
+/**
+ * Render một dòng timeline theo kiểu agenda: cột giờ | chấm (icon) | thẻ nội dung.
+ */
+$renderItem = function ($item, $forcedStatus = null) use ($typeIcons, $typeLabels) {
+    $icon = isset($typeIcons[$item['type']]) ? $typeIcons[$item['type']] : 'bi-calendar-event';
+    $typeLabel = isset($typeLabels[$item['type']]) ? $typeLabels[$item['type']] : $item['type'];
+    $status = $forcedStatus !== null ? $forcedStatus : (int) $item['status'];
+    $statusLabel = $forcedStatus !== null
+        ? Schedule::getStatusLabel(Schedule::STATUS_NO_TIME)
+        : Schedule::getStatusLabel($item['status']);
+    $time = isset($item['startLabel']) ? trim((string) $item['startLabel']) : '';
+    ?>
+    <div class="sch-item status-<?php echo $status; ?> type-<?php echo CHtml::encode($item['type']); ?>">
+        <div class="sch-time">
+            <span class="sch-time-start"><?php echo CHtml::encode($time !== '' ? $time : '—'); ?></span>
+        </div>
+        <div class="sch-dot">
+            <i class="bi <?php echo $icon; ?>"></i>
+        </div>
+        <div class="sch-card">
+            <div class="sch-card-top">
+                <strong class="sch-card-title"><?php echo CHtml::encode($item['title']); ?></strong>
+                <span class="sch-tag type-<?php echo CHtml::encode($item['type']); ?>"><?php echo CHtml::encode($typeLabel); ?></span>
+            </div>
+            <div class="sch-card-status"><?php echo $statusLabel; ?></div>
+            <?php if (!empty($item['subtitle'])): ?>
+                <div class="sch-card-sub"><?php echo CHtml::encode($item['subtitle']); ?></div>
+            <?php endif; ?>
+            <?php if (!empty($item['location'])): ?>
+                <div class="sch-place"><i class="bi bi-geo-alt"></i> <?php echo CHtml::encode($item['location']); ?></div>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php };
+?>
+
 <?php if ($isEmpty): ?>
     <div class="schedule-empty">
         <i class="bi bi-calendar-x"></i>
@@ -31,75 +68,36 @@ $isEmpty = empty($days) && empty($noTime);
     </div>
 <?php else: ?>
 
-    <?php foreach ($days as $day): ?>
-        <div class="timeline-day">
-            <div class="timeline-day-header">
-                <i class="bi bi-calendar3"></i>
-                <?php echo CHtml::encode($day['dateLabel']); ?>
+    <?php foreach ($days as $i => $day): ?>
+        <div class="sch-day">
+            <div class="sch-day-head">
+                <div class="sch-day-badge"><i class="bi bi-calendar3"></i></div>
+                <div>
+                    <h2 class="fw-bold mb-0"><?php echo CHtml::encode($day['dateLabel']); ?></h2>
+                    <span class="sch-day-count"><?php echo count($day['items']); ?> hoạt động</span>
+                </div>
             </div>
-            <div class="timeline-items">
-                <?php foreach ($day['items'] as $item): ?>
-                    <?php
-                    $icon = isset($typeIcons[$item['type']]) ? $typeIcons[$item['type']] : 'bi-calendar-event';
-                    $typeLabel = isset($typeLabels[$item['type']]) ? $typeLabels[$item['type']] : $item['type'];
-                    ?>
-                    <div class="timeline-item status-<?php echo (int) $item['status']; ?>">
-                        <div class="timeline-item-icon type-<?php echo CHtml::encode($item['type']); ?>">
-                            <i class="bi <?php echo $icon; ?>"></i>
-                        </div>
-                        <div class="timeline-item-content">
-                            <div class="timeline-item-top">
-                                <span class="timeline-type-badge type-<?php echo CHtml::encode($item['type']); ?>"><?php echo CHtml::encode($typeLabel); ?></span>
-                                <?php echo Schedule::getStatusLabel($item['status']); ?>
-                            </div>
-                            <div class="timeline-item-title"><?php echo CHtml::encode($item['title']); ?></div>
-                            <?php if (!empty($item['subtitle'])): ?>
-                                <div class="timeline-item-sub"><?php echo CHtml::encode($item['subtitle']); ?></div>
-                            <?php endif; ?>
-                            <div class="timeline-item-meta">
-                                <span><i class="bi bi-clock"></i> <?php echo CHtml::encode($item['startLabel']); ?></span>
-                                <?php if (!empty($item['location'])): ?>
-                                    <span><i class="bi bi-geo-alt"></i> <?php echo CHtml::encode($item['location']); ?></span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+            <div class="sch-timeline">
+                <?php foreach ($day['items'] as $item) {
+                    $renderItem($item);
+                } ?>
             </div>
         </div>
     <?php endforeach; ?>
 
     <?php if (!empty($noTime)): ?>
-        <div class="timeline-day timeline-notime">
-            <div class="timeline-day-header">
-                <i class="bi bi-question-circle"></i>
-                Chưa có lịch cụ thể
+        <div class="sch-day sch-day-notime">
+            <div class="sch-day-head">
+                <div class="sch-day-badge"><i class="bi bi-question-circle"></i></div>
+                <div>
+                    <h2 class="fw-bold mb-0">Chưa có lịch cụ thể</h2>
+                    <span class="sch-day-count"><?php echo count($noTime); ?> hoạt động</span>
+                </div>
             </div>
-            <div class="timeline-items">
-                <?php foreach ($noTime as $item): ?>
-                    <?php
-                    $icon = isset($typeIcons[$item['type']]) ? $typeIcons[$item['type']] : 'bi-calendar-event';
-                    $typeLabel = isset($typeLabels[$item['type']]) ? $typeLabels[$item['type']] : $item['type'];
-                    ?>
-                    <div class="timeline-item status-3">
-                        <div class="timeline-item-icon type-<?php echo CHtml::encode($item['type']); ?>">
-                            <i class="bi <?php echo $icon; ?>"></i>
-                        </div>
-                        <div class="timeline-item-content">
-                            <div class="timeline-item-top">
-                                <span class="timeline-type-badge type-<?php echo CHtml::encode($item['type']); ?>"><?php echo CHtml::encode($typeLabel); ?></span>
-                                <?php echo Schedule::getStatusLabel(Schedule::STATUS_NO_TIME); ?>
-                            </div>
-                            <div class="timeline-item-title"><?php echo CHtml::encode($item['title']); ?></div>
-                            <?php if (!empty($item['subtitle'])): ?>
-                                <div class="timeline-item-sub"><?php echo CHtml::encode($item['subtitle']); ?></div>
-                            <?php endif; ?>
-                            <?php if (!empty($item['location'])): ?>
-                                <div class="timeline-item-meta"><span><i class="bi bi-geo-alt"></i> <?php echo CHtml::encode($item['location']); ?></span></div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+            <div class="sch-timeline">
+                <?php foreach ($noTime as $item) {
+                    $renderItem($item, Schedule::STATUS_NO_TIME);
+                } ?>
             </div>
         </div>
     <?php endif; ?>
