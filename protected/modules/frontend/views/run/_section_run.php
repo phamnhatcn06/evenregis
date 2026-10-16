@@ -179,7 +179,7 @@ $regOpen = ($window['state'] === 'open');
                             <i class="bi bi-hourglass-split fs-5 me-2 text-warning"></i>
                             <div>Yêu cầu hủy cự ly đang được Ban tổ chức xem xét duyệt.</div>
                         </div>
-                    <?php elseif (!empty($runMine['can_request_cancel'])): ?>
+                    <?php elseif (!empty($runMine['can_request_cancel']) && $regOpen): ?>
                         <button type="button" class="btn btn-outline-danger w-100 btn-cancel-request mt-2" data-bs-toggle="modal" data-bs-target="#modalCancelRun">
                             <i class="bi bi-x-circle me-1"></i> Xin hủy đăng ký cự ly này
                         </button>
