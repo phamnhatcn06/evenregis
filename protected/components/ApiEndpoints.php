@@ -710,6 +710,24 @@ class ApiEndpoints
     const FINAL_ATTENDEE_ROSTER_SET_LUCKY = '/api/final-attendee-rosters/set-lucky';
     const FINAL_ATTENDEE_ROSTER_CHECK_LUCKY = '/api/final-attendee-rosters/check-lucky';
 
+    // Lucky Draw (Quay số may mắn)
+    const LUCKY_PRIZES = '/api/lucky/prizes';
+    const LUCKY_PRIZE_SAVE = '/api/lucky/prizes/save';
+    const LUCKY_PRIZE_DELETE = '/api/lucky/prizes/{id}';
+    const LUCKY_SETTINGS = '/api/lucky/settings';
+    const LUCKY_SETTINGS_SAVE = '/api/lucky/settings/save';
+    const LUCKY_CURRENT_PRIZE = '/api/lucky/current-prize';
+    const LUCKY_STATUS = '/api/lucky/status';
+    const LUCKY_WINNERS = '/api/lucky/winners';
+    const LUCKY_SPIN = '/api/lucky/spin';
+    const LUCKY_CONFIRM = '/api/lucky/confirm-winner';
+    const LUCKY_CANCEL = '/api/lucky/cancel-winner';
+    const LUCKY_NEXT = '/api/lucky/next-prize';
+    const LUCKY_RESET = '/api/lucky/reset-winners';
+    const LUCKY_CHECK_AUTH = '/api/lucky/check-auth';
+    const LUCKY_CHECK_REMOTE = '/api/lucky/check-remote';
+    const LUCKY_REMOTE_SPIN = '/api/lucky/remote-spin';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
