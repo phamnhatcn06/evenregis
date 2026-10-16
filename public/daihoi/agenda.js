@@ -40,7 +40,7 @@
     if (wrap && sentinel && 'IntersectionObserver' in window) {
       var stuckObserver = new IntersectionObserver(function (entries) {
         wrap.classList.toggle('is-stuck', !entries[0].isIntersecting);
-      }, { threshold: 0 });
+      }, { rootMargin: '-62px 0px 0px 0px', threshold: 0 });
       stuckObserver.observe(sentinel);
     }
 
