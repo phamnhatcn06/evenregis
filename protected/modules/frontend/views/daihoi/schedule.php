@@ -141,6 +141,97 @@ $sportThemes = array(
     'PICKLEBALL' => array('bg' => '#f0fdfa', 'text' => '#0d9488', 'border' => '#99f6e4', 'icon' => 'sports_tennis'),
     'SWIMMING' => array('bg' => '#e0f2fe', 'text' => '#0284c7', 'border' => '#bae6fd', 'icon' => 'pool'),
 );
+
+// Helper: phân loại môn thi đấu (category, theme color, icon, label)
+$getSportMeta = function ($name) {
+    $n = mb_strtolower((string)$name, 'UTF-8');
+    if (strpos($n, 'bóng đá') !== false) {
+        return array(
+            'cat' => 'football',
+            'cat_name' => 'Bóng đá',
+            'cat_icon' => '⚽',
+            'color' => '#059669',
+            'bg_light' => '#ecfdf5',
+            'icon' => 'sports_soccer',
+            'type_label' => (strpos($n, 'nữ') !== false ? 'Bóng đá nữ' : 'Bóng đá nam')
+        );
+    }
+    if (strpos($n, 'bóng bàn') !== false) {
+        return array(
+            'cat' => 'table-tennis',
+            'cat_name' => 'Bóng bàn',
+            'cat_icon' => '🏓',
+            'color' => '#ea580c',
+            'bg_light' => '#fff7ed',
+            'icon' => 'sports_tennis',
+            'type_label' => 'Môn bóng bàn'
+        );
+    }
+    if (strpos($n, 'cầu lông') !== false) {
+        return array(
+            'cat' => 'badminton',
+            'cat_name' => 'Cầu lông',
+            'cat_icon' => '🏸',
+            'color' => '#0284c7',
+            'bg_light' => '#f0f9ff',
+            'icon' => 'sports_tennis',
+            'type_label' => 'Môn cầu lông'
+        );
+    }
+    if (strpos($n, 'pickleball') !== false) {
+        return array(
+            'cat' => 'pickleball',
+            'cat_name' => 'Pickleball',
+            'cat_icon' => '🎾',
+            'color' => '#7c3aed',
+            'bg_light' => '#faf5ff',
+            'icon' => 'sports_tennis',
+            'type_label' => 'Môn Pickleball'
+        );
+    }
+    if (strpos($n, 'bơi') !== false) {
+        return array(
+            'cat' => 'swimming',
+            'cat_name' => 'Bơi lội',
+            'cat_icon' => '🏊',
+            'color' => '#0d9488',
+            'bg_light' => '#f0fdfa',
+            'icon' => 'pool',
+            'type_label' => 'Đường đua xanh'
+        );
+    }
+    if (strpos($n, 'kéo co') !== false) {
+        return array(
+            'cat' => 'tug-of-war',
+            'cat_name' => 'Kéo co',
+            'cat_icon' => '🪢',
+            'color' => '#e11d48',
+            'bg_light' => '#fff1f2',
+            'icon' => 'fitness_center',
+            'type_label' => 'Đồng đội đối kháng'
+        );
+    }
+    if (strpos($n, 'chạy') !== false || strpos($n, 'điền kinh') !== false) {
+        return array(
+            'cat' => 'running',
+            'cat_name' => 'Điền kinh',
+            'cat_icon' => '🏃',
+            'color' => '#dc2626',
+            'bg_light' => '#fef2f2',
+            'icon' => 'directions_run',
+            'type_label' => 'Điền kinh'
+        );
+    }
+    return array(
+        'cat' => 'other',
+        'cat_name' => 'Nội dung khác',
+        'cat_icon' => '🏆',
+        'color' => '#2563eb',
+        'bg_light' => '#eff6ff',
+        'icon' => 'emoji_events',
+        'type_label' => 'Nội dung thi đấu'
+    );
+};
 ?>
 
 <?php $this->renderPartial('_subheader', array('eventName' => $eventName, 'active' => 'schedule')); ?>
@@ -269,61 +360,84 @@ $sportThemes = array(
          ===================================================================== -->
     <div class="card border-0 shadow-sm rounded-4 mb-4 filter-control-card sticky-filter">
       <!-- 2.1 Chọn Môn Thi Đấu (Sport Chips) -->
-      <div class="p-3 bg-white rounded-top-4 border-bottom">
-        <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="sports-filter-card p-3 p-md-3 bg-white rounded-top-4 border-bottom">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2.5">
           <div class="d-flex align-items-center gap-2">
-            <span class="sport-chip-label text-uppercase fw-bold text-muted small d-flex align-items-center gap-1">
-              <span class="material-symbols-outlined fs-6 text-primary">sports</span>
-              Chọn môn thi đấu
-            </span>
-            <span class="badge bg-light text-secondary border rounded-pill">
-              <?php echo count($sportsList); ?> môn
-            </span>
+            <div class="sport-section-icon-box">
+              <span class="material-symbols-outlined fs-5">sports_score</span>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="sport-section-title">Chọn môn thi đấu</span>
+                <span class="sport-total-badge"><?php echo count($sportsList); ?> môn</span>
+              </div>
+            </div>
           </div>
 
           <!-- Chế độ xem: Thẻ lưới vs Danh sách gọn -->
-          <div class="d-flex align-items-center gap-1 view-mode-switch">
-            <span class="text-muted small me-1 d-none d-sm-inline" style="font-size:11.5px;">Chế độ xem:</span>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 active" id="btn-view-cards" title="Xem dạng thẻ">
-              <span class="material-symbols-outlined fs-6 align-middle">grid_view</span>
-              <span class="d-none d-md-inline ms-1 small">Thẻ</span>
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" id="btn-view-compact" title="Xem dạng danh sách gọn">
-              <span class="material-symbols-outlined fs-6 align-middle">format_list_bulleted</span>
-              <span class="d-none d-md-inline ms-1 small">Danh sách</span>
-            </button>
+          <div class="d-flex align-items-center gap-2 view-mode-switch">
+            <span class="text-muted small d-none d-sm-inline" style="font-size:12px;">Chế độ xem:</span>
+            <div class="view-mode-segmented-control">
+              <button type="button" class="view-mode-btn active" id="btn-view-cards" title="Xem dạng thẻ">
+                <span class="material-symbols-outlined fs-6 align-middle me-1">grid_view</span>
+                <span>Thẻ</span>
+              </button>
+              <button type="button" class="view-mode-btn" id="btn-view-compact" title="Xem dạng danh sách gọn">
+                <span class="material-symbols-outlined fs-6 align-middle me-1">format_list_bulleted</span>
+                <span>Danh sách</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Thanh cuộn ngang các môn thi đấu -->
-        <div class="sports-nav-scroller d-flex gap-2 pb-1 overflow-x-auto">
-          <button type="button"
-                  class="sport-filter-btn btn btn-sm rounded-pill fw-bold text-nowrap d-flex align-items-center gap-2 px-3 py-2 <?php echo empty($selectedSportId) ? 'active btn-brand-primary' : 'btn-light'; ?>"
-                  data-sport-id="">
-            <span class="material-symbols-outlined fs-6">all_inclusive</span>
-            <span>Tất cả môn</span>
-            <span class="badge <?php echo empty($selectedSportId) ? 'bg-white text-dark' : 'bg-secondary text-white'; ?> rounded-pill px-2 py-0 ms-1 small"><?php echo count($allMatches); ?></span>
+        <!-- Scroller Wrapper với Nút cuộn trái/phải -->
+        <div class="sports-scroller-wrapper position-relative">
+          <!-- Nút cuộn Trái -->
+          <button type="button" class="sports-nav-arrow sports-nav-prev is-hidden" id="btn-sports-scroll-left" aria-label="Cuộn sang trái" title="Cuộn sang trái">
+            <span class="material-symbols-outlined">chevron_left</span>
           </button>
 
-          <?php foreach ($sportsList as $sp): ?>
-            <?php
-            $isActive = ($selectedSportId == $sp['id']);
-            $btnCls = $isActive ? 'active btn-brand-primary' : 'btn-light';
-            $mCount = $sp['total_matches'];
-            ?>
+          <!-- Thanh cuộn ngang các môn thi đấu -->
+          <div class="sports-nav-scroller" id="sports-nav-scroller">
+            <!-- Nút Tất Cả Môn -->
             <button type="button"
-                    class="sport-filter-btn btn btn-sm rounded-pill fw-bold text-nowrap d-flex align-items-center gap-2 px-3 py-2 <?php echo $btnCls; ?>"
-                    data-sport-id="<?php echo $sp['id']; ?>"
-                    data-sport-name="<?php echo $e($sp['name']); ?>">
-              <span class="material-symbols-outlined fs-6"><?php echo $e($sp['icon']); ?></span>
-              <span><?php echo $e($sp['name']); ?></span>
-              <?php if ($mCount > 0): ?>
-                <span class="badge <?php echo $isActive ? 'bg-white text-dark' : 'bg-primary text-white'; ?> rounded-pill px-2 py-0 ms-1" style="font-size:10.5px;">
-                  <?php echo $mCount; ?>
-                </span>
-              <?php endif; ?>
+                    class="sport-filter-btn <?php echo empty($selectedSportId) ? 'active btn-brand-primary' : 'btn-light'; ?>"
+                    data-sport-id=""
+                    title="Tất cả các môn thi đấu (<?php echo count($allMatches); ?> trận)">
+              <span class="sport-pill-icon material-symbols-outlined text-warning">emoji_events</span>
+              <span class="sport-pill-name">Tất cả môn</span>
+              <span class="sport-pill-badge"><?php echo count($allMatches); ?></span>
             </button>
-          <?php endforeach; ?>
+
+            <!-- Từng môn thi đấu -->
+            <?php foreach ($sportsList as $sp): ?>
+              <?php
+              $isActive = ($selectedSportId == $sp['id']);
+              $btnCls = $isActive ? 'active btn-brand-primary' : 'btn-light';
+              $mCount = (int)$sp['total_matches'];
+              $meta = $getSportMeta($sp['name']);
+              $spIcon = !empty($sp['icon']) ? $sp['icon'] : $meta['icon'];
+              ?>
+              <button type="button"
+                      class="sport-filter-btn <?php echo $btnCls; ?>"
+                      data-sport-id="<?php echo $sp['id']; ?>"
+                      data-sport-name="<?php echo $e($sp['name']); ?>"
+                      title="<?php echo $e($sp['name']); ?><?php echo $mCount > 0 ? " ({$mCount} trận)" : ''; ?>">
+                <span class="sport-pill-icon material-symbols-outlined" style="<?php echo !$isActive ? 'color:' . $meta['color'] . ';' : ''; ?>">
+                  <?php echo $e($spIcon); ?>
+                </span>
+                <span class="sport-pill-name"><?php echo $e($sp['name']); ?></span>
+                <?php if ($mCount > 0): ?>
+                  <span class="sport-pill-badge"><?php echo $mCount; ?></span>
+                <?php endif; ?>
+              </button>
+            <?php endforeach; ?>
+          </div>
+
+          <!-- Nút cuộn Phải -->
+          <button type="button" class="sports-nav-arrow sports-nav-next" id="btn-sports-scroll-right" aria-label="Cuộn sang phải" title="Cuộn sang phải">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
         </div>
       </div>
 
@@ -410,85 +524,8 @@ $sportThemes = array(
         }
     }
 
-    // Helper: phân loại môn thi đấu (category, theme color, icon, label)
-    $getSportMeta = function ($name) {
-        $n = mb_strtolower((string)$name, 'UTF-8');
-        if (strpos($n, 'bóng đá') !== false) {
-            return array(
-                'cat' => 'football',
-                'cat_name' => 'Bóng đá',
-                'cat_icon' => '⚽',
-                'color' => '#059669',
-                'bg_light' => '#ecfdf5',
-                'icon' => 'sports_soccer',
-                'type_label' => (strpos($n, 'nữ') !== false ? 'Bóng đá nữ' : 'Bóng đá nam')
-            );
-        }
-        if (strpos($n, 'bóng bàn') !== false) {
-            return array(
-                'cat' => 'table-tennis',
-                'cat_name' => 'Bóng bàn',
-                'cat_icon' => '🏓',
-                'color' => '#ea580c',
-                'bg_light' => '#fff7ed',
-                'icon' => 'sports_tennis',
-                'type_label' => 'Môn bóng bàn'
-            );
-        }
-        if (strpos($n, 'cầu lông') !== false) {
-            return array(
-                'cat' => 'badminton',
-                'cat_name' => 'Cầu lông',
-                'cat_icon' => '🏸',
-                'color' => '#0284c7',
-                'bg_light' => '#f0f9ff',
-                'icon' => 'sports_tennis',
-                'type_label' => 'Môn cầu lông'
-            );
-        }
-        if (strpos($n, 'pickleball') !== false) {
-            return array(
-                'cat' => 'pickleball',
-                'cat_name' => 'Pickleball',
-                'cat_icon' => '🎾',
-                'color' => '#7c3aed',
-                'bg_light' => '#faf5ff',
-                'icon' => 'sports_tennis',
-                'type_label' => 'Môn Pickleball'
-            );
-        }
-        if (strpos($n, 'bơi') !== false) {
-            return array(
-                'cat' => 'swimming',
-                'cat_name' => 'Bơi lội',
-                'cat_icon' => '🏊',
-                'color' => '#0d9488',
-                'bg_light' => '#f0fdfa',
-                'icon' => 'pool',
-                'type_label' => 'Đường đua xanh'
-            );
-        }
-        if (strpos($n, 'kéo co') !== false) {
-            return array(
-                'cat' => 'tug-of-war',
-                'cat_name' => 'Kéo co',
-                'cat_icon' => '🪢',
-                'color' => '#e11d48',
-                'bg_light' => '#fff1f2',
-                'icon' => 'fitness_center',
-                'type_label' => 'Đồng đội đối kháng'
-            );
-        }
-        return array(
-            'cat' => 'other',
-            'cat_name' => 'Nội dung khác',
-            'cat_icon' => '🏆',
-            'color' => '#2563eb',
-            'bg_light' => '#eff6ff',
-            'icon' => 'emoji_events',
-            'type_label' => 'Nội dung thi đấu'
-        );
-    };
+    // Helper $getSportMeta đã được định nghĩa ở đầu file để dùng chung cho toàn bộ trang
+
 
     // Helper: phân tích cấu hình thể thức giai đoạn (badge, màu sắc, icon)
     $getStageFormatMeta = function ($format) {
@@ -1056,25 +1093,27 @@ $sportThemes = array(
               <span class="material-symbols-outlined fs-6 text-primary">sports</span> Nội dung:
             </span>
             <button type="button"
-                    class="sport-filter-btn btn btn-sm rounded-pill fw-bold text-nowrap d-flex align-items-center gap-1 px-3 py-1 <?php echo empty($selectedSportId) ? 'active btn-brand-primary' : 'btn-light'; ?>"
+                    class="sport-filter-btn <?php echo empty($selectedSportId) ? 'active btn-brand-primary' : 'btn-light'; ?>"
                     data-sport-id="">
-              <span class="material-symbols-outlined fs-6">all_inclusive</span>
-              <span>Tất cả</span>
-              <span class="badge <?php echo empty($selectedSportId) ? 'bg-white text-dark' : 'bg-secondary text-white'; ?> rounded-pill px-2 py-0 ms-1" style="font-size:10px;"><?php echo count($allMatches); ?></span>
+              <span class="sport-pill-icon material-symbols-outlined text-warning">emoji_events</span>
+              <span class="sport-pill-name">Tất cả</span>
+              <span class="sport-pill-badge"><?php echo count($allMatches); ?></span>
             </button>
             <?php foreach ($sportsList as $sp): ?>
               <?php
               $isActive = ($selectedSportId == $sp['id']);
               $btnCls = $isActive ? 'active btn-brand-primary' : 'btn-light';
+              $meta = $getSportMeta($sp['name']);
+              $spIcon = !empty($sp['icon']) ? $sp['icon'] : $meta['icon'];
               ?>
               <button type="button"
-                      class="sport-filter-btn btn btn-sm rounded-pill fw-bold text-nowrap d-flex align-items-center gap-1 px-3 py-1 <?php echo $btnCls; ?>"
+                      class="sport-filter-btn <?php echo $btnCls; ?>"
                       data-sport-id="<?php echo $sp['id']; ?>"
                       data-sport-name="<?php echo $e($sp['name']); ?>">
-                <span class="material-symbols-outlined fs-6"><?php echo $e($sp['icon']); ?></span>
-                <span><?php echo $e($sp['name']); ?></span>
+                <span class="sport-pill-icon material-symbols-outlined" style="<?php echo !$isActive ? 'color:' . $meta['color'] . ';' : ''; ?>"><?php echo $e($spIcon); ?></span>
+                <span class="sport-pill-name"><?php echo $e($sp['name']); ?></span>
                 <?php if ($sp['total_matches'] > 0): ?>
-                  <span class="badge <?php echo $isActive ? 'bg-white text-dark' : 'bg-primary text-white'; ?> rounded-pill px-2 py-0 ms-1" style="font-size:10px;"><?php echo $sp['total_matches']; ?></span>
+                  <span class="sport-pill-badge"><?php echo $sp['total_matches']; ?></span>
                 <?php endif; ?>
               </button>
             <?php endforeach; ?>
@@ -1983,21 +2022,249 @@ $sportThemes = array(
   transition: box-shadow 0.2s ease;
 }
 
-/* Brand Primary Button */
-.btn-brand-primary {
-  background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+/* =========================================================================
+   BỘ LỌC MÔN THI ĐẤU (PREMIUM SPORT CHIPS & SCROLLER)
+   ========================================================================= */
+.sports-filter-card {
+  position: relative;
+  background: #ffffff;
 }
 
-/* Sports Nav Scroller */
+/* Section Header & Icon Box */
+.sport-section-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
+}
+.sport-section-title {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+}
+.sport-total-badge {
+  background: #f1f5f9;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2.5px 8.5px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+}
+
+/* Chế độ xem: Segmented Control kiểu iOS / Apple */
+.view-mode-segmented-control {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 3px;
+  display: inline-flex;
+  gap: 2px;
+}
+.view-mode-btn {
+  border: none !important;
+  background: transparent !important;
+  color: #64748b !important;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4.5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 1.3;
+}
+.view-mode-btn:hover {
+  color: #0f172a !important;
+}
+.view-mode-btn.active {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Scroller Container & Navigation Arrows */
+.sports-scroller-wrapper {
+  position: relative;
+  padding: 2px 0;
+}
+
+/* Nút cuộn tròn điều hướng trái / phải */
+.sports-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  user-select: none;
+}
+.sports-nav-arrow .material-symbols-outlined {
+  font-size: 20px;
+}
+.sports-nav-arrow:hover {
+  background: #ffffff;
+  color: #2563eb;
+  border-color: #93c5fd;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.22);
+}
+.sports-nav-arrow.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-50%) scale(0.8);
+}
+.sports-nav-prev {
+  left: -6px;
+}
+.sports-nav-next {
+  right: -6px;
+}
+
+/* Thanh cuộn ngang các môn - Ẩn hoàn toàn thanh cuộn thô của trình duyệt */
+.sports-nav-scroller {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE/Edge */
+  padding: 3px 4px 6px 4px;
+  cursor: grab;
+  user-select: none;
+}
 .sports-nav-scroller::-webkit-scrollbar {
-  height: 5px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
-.sports-nav-scroller::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+.sports-nav-scroller.is-dragging {
+  cursor: grabbing !important;
+  scroll-behavior: auto !important;
 }
+.sports-nav-scroller.is-dragging .sport-filter-btn {
+  pointer-events: none;
+}
+
+/* Sport Filter Chip Button */
+.sport-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6.5px 13px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  background: #ffffff;
+  color: #334155;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.sport-filter-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+.sport-filter-btn.active,
+.sport-filter-btn.btn-brand-primary {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #3b82f6 100%) !important;
+  border-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35), 0 2px 4px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* Icon môn thể thao trong pill */
+.sport-pill-icon {
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.sport-filter-btn:hover .sport-pill-icon {
+  transform: scale(1.12);
+}
+.sport-filter-btn.active .sport-pill-icon,
+.sport-filter-btn.btn-brand-primary .sport-pill-icon {
+  color: #ffffff !important;
+}
+
+/* Tên môn thể thao */
+.sport-pill-name {
+  font-size: 13px;
+  letter-spacing: -0.1px;
+}
+
+/* Badge đếm số trận */
+.sport-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+.sport-filter-btn:hover .sport-pill-badge {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+.sport-filter-btn.active .sport-pill-badge,
+.sport-filter-btn.btn-brand-primary .sport-pill-badge {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(4px);
+}
+
 
 /* Status Filter Buttons */
 .status-filter-btn {
@@ -2385,21 +2652,113 @@ document.addEventListener('DOMContentLoaded', function () {
   // 1. Chuyển đổi môn thi đấu
   sportBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
-      sportBtns.forEach(function (b) {
-        b.classList.remove('active', 'btn-brand-primary');
-        b.classList.add('btn-light');
-      });
-      btn.classList.remove('btn-light');
-      btn.classList.add('active', 'btn-brand-primary');
+      var sId = btn.getAttribute('data-sport-id') || '';
+      currentSportId = sId;
 
-      currentSportId = btn.getAttribute('data-sport-id') || '';
+      // Đồng bộ trạng thái active cho tất cả nút thể thao (ở cả thanh trên và thanh inline)
+      sportBtns.forEach(function (b) {
+        var bId = b.getAttribute('data-sport-id') || '';
+        var isMatch = (bId === sId);
+        if (isMatch) {
+          b.classList.add('active', 'btn-brand-primary');
+          b.classList.remove('btn-light');
+        } else {
+          b.classList.remove('active', 'btn-brand-primary');
+          b.classList.add('btn-light');
+        }
+      });
+
       var sportName = btn.getAttribute('data-sport-name') || '';
       if (matchSectionTitle) {
         matchSectionTitle.textContent = currentSportId ? ('Lịch thi đấu: ' + sportName) : 'Danh sách các trận thi đấu';
       }
       applyFilters();
+
+      // Cuộn mượt nút được chọn vào giữa tầm nhìn
+      try {
+        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      } catch (err) {}
     });
   });
+
+  // 1.1 Khởi tạo điều khiển cuộn thanh môn thi đấu (Scroll arrows, Mouse drag & Wheel)
+  var sportsScroller = document.getElementById('sports-nav-scroller');
+  var sportsArrowLeft = document.getElementById('btn-sports-scroll-left');
+  var sportsArrowRight = document.getElementById('btn-sports-scroll-right');
+
+  if (sportsScroller && sportsArrowLeft && sportsArrowRight) {
+    var updateSportsArrows = function () {
+      var sLeft = sportsScroller.scrollLeft;
+      var maxScroll = sportsScroller.scrollWidth - sportsScroller.clientWidth;
+      
+      if (maxScroll <= 4) {
+        sportsArrowLeft.classList.add('is-hidden');
+        sportsArrowRight.classList.add('is-hidden');
+        return;
+      }
+      
+      if (sLeft <= 8) {
+        sportsArrowLeft.classList.add('is-hidden');
+      } else {
+        sportsArrowLeft.classList.remove('is-hidden');
+      }
+      
+      if (sLeft >= maxScroll - 8) {
+        sportsArrowRight.classList.add('is-hidden');
+      } else {
+        sportsArrowRight.classList.remove('is-hidden');
+      }
+    };
+
+    sportsArrowLeft.addEventListener('click', function (e) {
+      e.preventDefault();
+      sportsScroller.scrollBy({ left: -260, behavior: 'smooth' });
+    });
+
+    sportsArrowRight.addEventListener('click', function (e) {
+      e.preventDefault();
+      sportsScroller.scrollBy({ left: 260, behavior: 'smooth' });
+    });
+
+    sportsScroller.addEventListener('scroll', updateSportsArrows, { passive: true });
+    window.addEventListener('resize', updateSportsArrows);
+    setTimeout(updateSportsArrows, 120);
+
+    // Cuộn ngang bằng con lăn chuột khi rê trên thanh môn
+    sportsScroller.addEventListener('wheel', function (e) {
+      if (e.deltaY !== 0 && !e.shiftKey) {
+        e.preventDefault();
+        sportsScroller.scrollLeft += (e.deltaY * 0.9);
+      }
+    }, { passive: false });
+
+    // Kéo chuột để cuộn (Mouse Drag)
+    var isDragging = false;
+    var startX, startScrollLeft;
+
+    sportsScroller.addEventListener('mousedown', function (e) {
+      if (e.target.closest('.sports-nav-arrow')) return;
+      isDragging = true;
+      startX = e.pageX - sportsScroller.offsetLeft;
+      startScrollLeft = sportsScroller.scrollLeft;
+      sportsScroller.classList.add('is-dragging');
+    });
+
+    document.addEventListener('mouseup', function () {
+      if (isDragging) {
+        isDragging = false;
+        sportsScroller.classList.remove('is-dragging');
+      }
+    });
+
+    sportsScroller.addEventListener('mousemove', function (e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      var x = e.pageX - sportsScroller.offsetLeft;
+      var walk = (x - startX) * 1.3;
+      sportsScroller.scrollLeft = startScrollLeft - walk;
+    });
+  }
 
   // 2. Chuyển đổi ngày thi đấu
   dateBtns.forEach(function (btn) {
@@ -2450,9 +2809,15 @@ document.addEventListener('DOMContentLoaded', function () {
       if (searchInput) searchInput.value = '';
       if (clearSearchBtn) clearSearchBtn.style.display = 'none';
 
-      sportBtns.forEach(function (b, idx) {
-        if (idx === 0) { b.classList.add('active', 'btn-brand-primary'); b.classList.remove('btn-light'); }
-        else { b.classList.remove('active', 'btn-brand-primary'); b.classList.add('btn-light'); }
+      sportBtns.forEach(function (b) {
+        var bId = b.getAttribute('data-sport-id') || '';
+        if (!bId) {
+          b.classList.add('active', 'btn-brand-primary');
+          b.classList.remove('btn-light');
+        } else {
+          b.classList.remove('active', 'btn-brand-primary');
+          b.classList.add('btn-light');
+        }
       });
       dateBtns.forEach(function (b, idx) {
         if (idx === 0) b.classList.add('active');

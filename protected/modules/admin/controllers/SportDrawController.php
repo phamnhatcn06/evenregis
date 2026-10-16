@@ -420,6 +420,16 @@ class SportDrawController extends AdminController
                 );
             }
 
+            // Vòng bảng chỉ coi là kết thúc khi mọi trận đều đã có kết quả.
+            // Khi chưa kết thúc, các trận Bán kết phải để "Chờ xác định" (team_id = null).
+            $groupComplete = !empty($matches);
+            foreach ($matches as $m) {
+                if ($m['score_a'] === null || $m['score_b'] === null || $m['score_a'] === '' || $m['score_b'] === '') {
+                    $groupComplete = false;
+                    break;
+                }
+            }
+
             foreach ($matches as $m) {
                 if ($m['score_a'] !== null && $m['score_b'] !== null && $m['score_a'] !== '' && $m['score_b'] !== '') {
                     $a = (int) $m['team_a_id'];
