@@ -506,10 +506,15 @@ class SportDrawController extends AdminController
             // Cross-pairing chuẩn:
             // Trận 1 (Bán kết 1): Nhất A vs Nhì B
             // Trận 2 (Bán kết 2): Nhất B vs Nhì A
-            $team1A = $qualifiers['A'][1] ?? null;
-            $team2B = $qualifiers['B'][2] ?? null;
-            $team1B = $qualifiers['B'][1] ?? null;
-            $team2A = $qualifiers['A'][2] ?? null;
+            if ($groupComplete) {
+                $team1A = $qualifiers['A'][1] ?? null;
+                $team2B = $qualifiers['B'][2] ?? null;
+                $team1B = $qualifiers['B'][1] ?? null;
+                $team2A = $qualifiers['A'][2] ?? null;
+            } else {
+                // Vòng bảng chưa kết thúc -> chưa xác định đội vào Bán kết
+                $team1A = $team2B = $team1B = $team2A = null;
+            }
 
             // Kiểm tra xem trận knockout đã tồn tại chưa
             $koMatches = $db->createCommand("
