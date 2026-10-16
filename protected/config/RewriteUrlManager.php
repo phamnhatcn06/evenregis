@@ -9,6 +9,11 @@ $urlRewrite = array(
     'run' => 'frontend/run/index',
     'run/<action:\w+>' => 'frontend/run/<action>',
 
+    // Quay số may mắn (admin) — slug thân thiện, đặt TRƯỚC rule generic
+    'quay-so' => 'admin/luckyDraw/show',
+    'quay-so/dieu-khien' => 'admin/luckyDraw/remote',
+    'quay-so/cai-dat' => 'admin/luckyDraw/index',
+
     // Cổng cá nhân người tham dự — đặt TRƯỚC các rule generic để action 2 đoạn (vd: portal/saveProfile) không bị bắt nhầm
     'portal' => 'frontend/portal/login',
     'lich-trinh-cua-toi' => 'frontend/portal/schedule',
