@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Cổng Bình Chọn Miss Mường Thanh 2026</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../themes/hope-ui/assets/css/pages/binhchon.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+            padding-top: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="frontend-content">
+        <div class="container">
+            <div class="bc-page-container">
+
+                <!-- 1. HERO BANNER -->
+                <section class="bc-hero">
+                    <div class="bc-hero-inner">
+                        <div class="bc-hero-badge">
+                            <i class="fa fa-diamond"></i> Cuộc thi Miss Mường Thanh 2026
+                        </div>
+                        <h1 class="bc-hero-title">Cổng Bình Chọn Thí Sinh Yêu Thích</h1>
+                        <p class="bc-hero-subtitle">
+                            Vòng Chung Kết • Tôn vinh nét đẹp duyên dáng, trí tuệ và sự tự tin của những đại diện xuất sắc nhất. Hãy gửi trọn yêu thương qua từng lá phiếu bình chọn!
+                        </p>
+
+                        <!-- Rules quick grid -->
+                        <div class="bc-rules-grid">
+                            <div class="bc-rule-card">
+                                <div class="bc-rule-icon"><i class="fa fa-shield"></i></div>
+                                <div class="bc-rule-text">
+                                    <strong>Xác thực an toàn</strong>
+                                    <span>Tài khoản Google / Nội bộ</span>
+                                </div>
+                            </div>
+                            <div class="bc-rule-card">
+                                <div class="bc-rule-icon"><i class="fa fa-heart"></i></div>
+                                <div class="bc-rule-text">
+                                    <strong>Hạn mức bình chọn</strong>
+                                    <span>Tối đa 5 lượt / tài khoản</span>
+                                </div>
+                            </div>
+                            <div class="bc-rule-card">
+                                <div class="bc-rule-icon"><i class="fa fa-star"></i></div>
+                                <div class="bc-rule-text">
+                                    <strong>Công bằng - Minh bạch</strong>
+                                    <span>1 phiếu duy nhất / thí sinh</span>
+                                </div>
+                            </div>
+                            <div class="bc-rule-card">
+                                <div class="bc-rule-icon"><i class="fa fa-bolt"></i></div>
+                                <div class="bc-rule-text">
+                                    <strong>Kết quả tức thì</strong>
+                                    <span>Cập nhật theo thời gian thực</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. VOTER DASHBOARD CARD (SHOWING LOGGED IN DEMO) -->
+                <div id="voter-box"
+                     class="bc-voter-card"
+                     data-vote-url="#"
+                     data-status-url="#"
+                     data-client-id="DEMO_ID"
+                     data-max-votes="5"
+                     data-token-auth="1">
+
+                    <div id="signed-in-info" class="bc-signed-in-wrapper">
+                        <div class="bc-voter-profile">
+                            <div class="bc-voter-avatar">
+                                <span id="voter-avatar-letter">N</span>
+                            </div>
+                            <div class="bc-voter-info-text">
+                                <div class="bc-voter-greeting">Xin chào người bình chọn,</div>
+                                <div class="bc-voter-name">
+                                    <strong id="voter-name">Nguyễn Văn Bình Chọn</strong>
+                                    <span class="bc-verified-badge"><i class="fa fa-check-circle"></i> Đã xác thực</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bc-voter-quota-box">
+                            <div class="bc-quota-content">
+                                <div class="bc-quota-label">Lượt bình chọn còn lại</div>
+                                <div>
+                                    <span id="remaining-votes" class="bc-quota-number">3</span>
+                                    <span class="bc-quota-total">/ 5 lượt</span>
+                                </div>
+                            </div>
+                            <div id="quota-hearts-container" class="bc-quota-hearts" title="Số lượt bình chọn khả dụng">
+                                <i class="fa fa-heart bc-heart-token"></i>
+                                <i class="fa fa-heart bc-heart-token"></i>
+                                <i class="fa fa-heart bc-heart-token"></i>
+                                <i class="fa fa-heart-o bc-heart-token empty"></i>
+                                <i class="fa fa-heart-o bc-heart-token empty"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. TOOLBAR -->
+                <div class="bc-toolbar">
+                    <div class="bc-search-box">
+                        <i class="fa fa-search bc-search-icon"></i>
+                        <input type="text"
+                               id="contestant-search"
+                               class="bc-search-input"
+                               placeholder="Tìm theo tên hoặc số báo danh (SBD)..."
+                               autocomplete="off">
+                        <button type="button" id="contestant-search-clear" class="bc-search-clear" title="Xóa tìm kiếm">
+                            <i class="fa fa-times-circle"></i>
+                        </button>
+                    </div>
+
+                    <div class="bc-filter-actions">
+                        <div class="bc-sort-group" role="group" aria-label="Sắp xếp thí sinh">
+                            <button type="button" class="bc-sort-btn active" data-sort="default">
+                                <i class="fa fa-sort-numeric-asc me-1"></i>SBD
+                            </button>
+                            <button type="button" class="bc-sort-btn" data-sort="votes">
+                                <i class="fa fa-fire me-1 text-danger"></i>Nhiều phiếu nhất
+                            </button>
+                            <button type="button" class="bc-sort-btn" data-sort="name">
+                                <i class="fa fa-sort-alpha-asc me-1"></i>Tên A-Z
+                            </button>
+                        </div>
+                        <div class="bc-count-badge">
+                            Tổng: <strong id="contestant-count">6</strong> thí sinh
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. GRID OF CONTESTANTS -->
+                <div class="row g-3 g-md-4" id="finalist-grid">
+                    <!-- Contestant 1 -->
+                    <div class="col-6 col-md-4 col-lg-3"
+                         data-name="Nguyễn Thị An"
+                         data-sbd="SBD 01"
+                         data-unit="Mường Thanh Luxury Sông Lam"
+                         data-votes="142"
+                         data-cid="9001">
+                        <div class="card h-100 contestant-card"
+                             data-name="Nguyễn Thị An"
+                             data-sbd="SBD 01"
+                             data-unit="Mường Thanh Luxury Sông Lam"
+                             data-votes="142"
+                             data-cid="9001">
+                            <div class="bc-card-photo-wrapper">
+                                <span class="bc-sbd-badge"><i class="fa fa-star"></i> SBD 01</span>
+                                <span class="bc-vote-pill">
+                                    <i class="fa fa-heart"></i>
+                                    <span class="vote-count" data-contestant="9001">142</span>
+                                </span>
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"
+                                     class="card-img-top bc-card-photo" alt="Nguyễn Thị An">
+                                <button type="button" class="bc-photo-zoom-btn" title="Xem chi tiết thí sinh">
+                                    <i class="fa fa-search-plus"></i>
+                                </button>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="bc-contestant-name">Nguyễn Thị An</h5>
+                                <div class="bc-contestant-unit"><i class="fa fa-map-marker"></i> Mường Thanh Luxury Sông Lam</div>
+                                <div class="bc-card-action">
+                                    <button type="button" class="btn btn-sm w-100 btn-vote btn-outline-primary" data-contestant="9001">
+                                        <i class="fa fa-heart me-1"></i>Bình chọn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contestant 2 -->
+                    <div class="col-6 col-md-4 col-lg-3"
+                         data-name="Trần Thu Hà"
+                         data-sbd="SBD 02"
+                         data-unit="Mường Thanh Grand Đà Nẵng"
+                         data-votes="215"
+                         data-cid="9002">
+                        <div class="card h-100 contestant-card"
+                             data-name="Trần Thu Hà"
+                             data-sbd="SBD 02"
+                             data-unit="Mường Thanh Grand Đà Nẵng"
+                             data-votes="215"
+                             data-cid="9002">
+                            <div class="bc-card-photo-wrapper">
+                                <span class="bc-sbd-badge"><i class="fa fa-star"></i> SBD 02</span>
+                                <span class="bc-vote-pill">
+                                    <i class="fa fa-heart"></i>
+                                    <span class="vote-count" data-contestant="9002">215</span>
+                                </span>
+                                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"
+                                     class="card-img-top bc-card-photo" alt="Trần Thu Hà">
+                                <button type="button" class="bc-photo-zoom-btn" title="Xem chi tiết thí sinh">
+                                    <i class="fa fa-search-plus"></i>
+                                </button>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="bc-contestant-name">Trần Thu Hà</h5>
+                                <div class="bc-contestant-unit"><i class="fa fa-map-marker"></i> Mường Thanh Grand Đà Nẵng</div>
+                                <div class="bc-card-action">
+                                    <button type="button" class="btn btn-sm w-100 btn-vote btn-success" data-contestant="9002" disabled>
+                                        <i class="fa fa-check me-1"></i>Đã bình chọn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contestant 3 -->
+                    <div class="col-6 col-md-4 col-lg-3"
+                         data-name="Lê Minh Châu"
+                         data-sbd="SBD 03"
+                         data-unit="Mường Thanh Luxury Quảng Ninh"
+                         data-votes="189"
+                         data-cid="9003">
+                        <div class="card h-100 contestant-card"
+                             data-name="Lê Minh Châu"
+                             data-sbd="SBD 03"
+                             data-unit="Mường Thanh Luxury Quảng Ninh"
+                             data-votes="189"
+                             data-cid="9003">
+                            <div class="bc-card-photo-wrapper">
+                                <span class="bc-sbd-badge"><i class="fa fa-star"></i> SBD 03</span>
+                                <span class="bc-vote-pill">
+                                    <i class="fa fa-heart"></i>
+                                    <span class="vote-count" data-contestant="9003">189</span>
+                                </span>
+                                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80"
+                                     class="card-img-top bc-card-photo" alt="Lê Minh Châu">
+                                <button type="button" class="bc-photo-zoom-btn" title="Xem chi tiết thí sinh">
+                                    <i class="fa fa-search-plus"></i>
+                                </button>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="bc-contestant-name">Lê Minh Châu</h5>
+                                <div class="bc-contestant-unit"><i class="fa fa-map-marker"></i> Mường Thanh Luxury Quảng Ninh</div>
+                                <div class="bc-card-action">
+                                    <button type="button" class="btn btn-sm w-100 btn-vote btn-outline-primary" data-contestant="9003">
+                                        <i class="fa fa-heart me-1"></i>Bình chọn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contestant 4 -->
+                    <div class="col-6 col-md-4 col-lg-3"
+                         data-name="Phạm Khánh Linh"
+                         data-sbd="SBD 04"
+                         data-unit="Văn phòng Tập đoàn Mường Thanh"
+                         data-votes="310"
+                         data-cid="9004">
+                        <div class="card h-100 contestant-card"
+                             data-name="Phạm Khánh Linh"
+                             data-sbd="SBD 04"
+                             data-unit="Văn phòng Tập đoàn Mường Thanh"
+                             data-votes="310"
+                             data-cid="9004">
+                            <div class="bc-card-photo-wrapper">
+                                <span class="bc-sbd-badge"><i class="fa fa-star"></i> SBD 04</span>
+                                <span class="bc-vote-pill">
+                                    <i class="fa fa-heart"></i>
+                                    <span class="vote-count" data-contestant="9004">310</span>
+                                </span>
+                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80"
+                                     class="card-img-top bc-card-photo" alt="Phạm Khánh Linh">
+                                <button type="button" class="bc-photo-zoom-btn" title="Xem chi tiết thí sinh">
+                                    <i class="fa fa-search-plus"></i>
+                                </button>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="bc-contestant-name">Phạm Khánh Linh</h5>
+                                <div class="bc-contestant-unit"><i class="fa fa-map-marker"></i> Văn phòng Tập đoàn Mường Thanh</div>
+                                <div class="bc-card-action">
+                                    <button type="button" class="btn btn-sm w-100 btn-vote btn-outline-primary" data-contestant="9004">
+                                        <i class="fa fa-heart me-1"></i>Bình chọn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contestant 5 -->
+                    <div class="col-6 col-md-4 col-lg-3"
+                         data-name="Võ Mỹ Duyên"
+                         data-sbd="SBD 05"
+                         data-unit="Mường Thanh Holiday Mũi Né"
+                         data-votes="98"
+                         data-cid="9005">
+                        <div class="card h-100 contestant-card"
+                             data-name="Võ Mỹ Duyên"
+                             data-sbd="SBD 05"
+                             data-unit="Mường Thanh Holiday Mũi Né"
+                             data-votes="98"
+                             data-cid="9005">
+                            <div class="bc-card-photo-wrapper">
+                                <span class="bc-sbd-badge"><i class="fa fa-star"></i> SBD 05</span>
+                                <span class="bc-vote-pill">
+                                    <i class="fa fa-heart"></i>
+                                    <span class="vote-count" data-contestant="9005">98</span>
+                                </span>
+                                <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80"
+                                     class="card-img-top bc-card-photo" alt="Võ Mỹ Duyên">
+                                <button type="button" class="bc-photo-zoom-btn" title="Xem chi tiết thí sinh">
+                                    <i class="fa fa-search-plus"></i>
+                                </button>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="bc-contestant-name">Võ Mỹ Duyên</h5>
+                                <div class="bc-contestant-unit"><i class="fa fa-map-marker"></i> Mường Thanh Holiday Mũi Né</div>
+                                <div class="bc-card-action">
+                                    <button type="button" class="btn btn-sm w-100 btn-vote btn-outline-primary" data-contestant="9005">
+                                        <i class="fa fa-heart me-1"></i>Bình chọn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contestant 6 -->
+                    <div class="col-6 col-md-4 col-lg-3"
+                         data-name="Đỗ Phương Thảo"
+                         data-sbd="SBD 06"
+                         data-unit="Mường Thanh Grand Hà Nội Centre"
+                         data-votes="240"
+                         data-cid="9006">
+                        <div class="card h-100 contestant-card"
+                             data-name="Đỗ Phương Thảo"
+                             data-sbd="SBD 06"
+                             data-unit="Mường Thanh Grand Hà Nội Centre"
+                             data-votes="240"
+                             data-cid="9006">
+                            <div class="bc-card-photo-wrapper">
+                                <span class="bc-sbd-badge"><i class="fa fa-star"></i> SBD 06</span>
+                                <span class="bc-vote-pill">
+                                    <i class="fa fa-heart"></i>
+                                    <span class="vote-count" data-contestant="9006">240</span>
+                                </span>
+                                <img src="https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=600&q=80"
+                                     class="card-img-top bc-card-photo" alt="Đỗ Phương Thảo">
+                                <button type="button" class="bc-photo-zoom-btn" title="Xem chi tiết thí sinh">
+                                    <i class="fa fa-search-plus"></i>
+                                </button>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="bc-contestant-name">Đỗ Phương Thảo</h5>
+                                <div class="bc-contestant-unit"><i class="fa fa-map-marker"></i> Mường Thanh Grand Hà Nội Centre</div>
+                                <div class="bc-card-action">
+                                    <button type="button" class="btn btn-sm w-100 btn-vote btn-outline-primary" data-contestant="9006">
+                                        <i class="fa fa-heart me-1"></i>Bình chọn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty Search -->
+                <div id="empty-search" class="bc-empty-search">
+                    <div class="bc-empty-icon"><i class="fa fa-search"></i></div>
+                    <h5 class="bc-empty-title">Không tìm thấy thí sinh phù hợp</h5>
+                    <p class="bc-empty-desc">Vui lòng kiểm tra lại từ khóa tên thí sinh hoặc số báo danh.</p>
+                </div>
+
+                <!-- 7. PHOTO DETAIL MODAL -->
+                <div class="modal fade bc-modal" id="bcPhotoModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content position-relative">
+                            <button type="button" class="bc-modal-close-btn" data-bs-dismiss="modal" aria-label="Đóng">
+                                <i class="fa fa-times"></i>
+                            </button>
+                            <div class="bc-modal-body">
+                                <div class="bc-modal-img-col">
+                                    <img id="modal-photo" src="" alt="Contestant Photo" class="bc-modal-img">
+                                </div>
+                                <div class="bc-modal-info-col">
+                                    <div class="mb-2">
+                                        <span id="modal-sbd" class="bc-sbd-badge position-static d-inline-flex mb-2"></span>
+                                    </div>
+                                    <h3 id="modal-name" class="fw-bold mb-2 text-dark"></h3>
+                                    <div class="text-muted mb-4 d-flex align-items-center gap-2">
+                                        <i class="fa fa-map-marker text-danger"></i> <span id="modal-unit"></span>
+                                    </div>
+                                    <div class="p-3 bg-light rounded-4 mb-4 border border-light">
+                                        <div class="small text-muted mb-1 text-uppercase fw-semibold letter-spacing-1">Số lượt bình chọn hiện tại</div>
+                                        <div class="h3 fw-bold text-danger mb-0 d-flex align-items-center gap-2">
+                                            <i class="fa fa-heart"></i>
+                                            <span><span id="modal-votes">0</span> phiếu</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <button type="button"
+                                                id="modal-vote-btn"
+                                                class="btn btn-vote btn-outline-primary w-100 py-3 rounded-pill"
+                                                data-contestant="">
+                                            <i class="fa fa-heart me-1"></i>Bình chọn cho thí sinh
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. MOBILE STICKY VOTER BAR -->
+                <div id="bc-sticky-bar" class="bc-sticky-bar d-md-none">
+                    <i class="fa fa-heart bc-sticky-heart"></i>
+                    <span>Còn lại: <strong id="sticky-remaining" class="bc-sticky-quota">3</strong> lượt</span>
+                    <button type="button" id="bc-scroll-top" class="bc-scroll-top-btn" title="Lên đầu trang">
+                        <i class="fa fa-arrow-up"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-light py-4 mt-5 border-top">
+        <div class="container text-center">
+            <p class="mb-0 text-muted">&copy; 2026 Đại hội Mường Thanh 2026. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../themes/hope-ui/assets/js/pages/binhchon-index.js"></script>
+</body>
+</html>

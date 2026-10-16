@@ -55,6 +55,9 @@ class BinhchonController extends CController
                 CClientScript::POS_HEAD
             );
         }
+        Yii::app()->clientScript->registerCssFile(
+            Yii::app()->theme->baseUrl . '/assets/css/pages/binhchon.css'
+        );
         Yii::app()->clientScript->registerScriptFile(
             Yii::app()->theme->baseUrl . '/assets/js/pages/binhchon-index.js',
             CClientScript::POS_END
