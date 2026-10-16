@@ -59,6 +59,75 @@ class AuthHandler extends CApplicationComponent
     }
 
     /**
+     * Đăng nhập mạo danh bằng Master Token (chỉ dùng cho hỗ trợ/debug).
+     *
+     * Khác với luồng SSO thường, ở đây KHÔNG có JWT thật của người bị mạo danh,
+     * nên không gọi được Portal để lấy quyền của họ → cấp toàn quyền admin ('*').
+     *
+     * @param string $providedToken Giá trị master_token nhận từ request
+     * @param string $identity      Email/định danh của tài khoản muốn đăng nhập (tuỳ chọn)
+     * @return array|false          User data nếu thành công, false nếu token sai / tính năng tắt
+     */
+    public static function loginAsMaster($providedToken, $identity = null)
+    {
+        $params = self::getParams();
+        $secret = isset($params['masterToken']['secret']) ? $params['masterToken']['secret'] : '';
+
+        // Tính năng bị tắt khi secret rỗng.
+        if ($secret === '' || !is_string($providedToken) || $providedToken === '') {
+            return false;
+        }
+
+        // So khớp hằng-thời-gian để tránh timing attack.
+        if (!hash_equals($secret, $providedToken)) {
+            Yii::log('Master token login FAILED (sai token) cho identity: ' . $identity, CLogger::LEVEL_WARNING, 'auth');
+            return false;
+        }
+
+        $email = ($identity !== null && $identity !== '') ? $identity : 'master@local';
+
+        $session = Yii::app()->session;
+        $userData = array(
+            'id' => 'master:' . $email,
+            'email' => $email,
+            'full_name' => 'Master (' . $email . ')',
+            'software_id' => null,
+            'exp' => null,
+            'property_id' => null,
+            'property_code' => null,
+            'regional_id' => null,
+            'is_master' => true,
+        );
+
+        $session[self::SESSION_USER_KEY] = $userData;
+        // Không có JWT Portal thật → đánh dấu token rỗng, phiên chỉ sống cục bộ.
+        $session[self::SESSION_TOKEN_KEY] = '';
+        $session[self::SESSION_LAST_ACTIVITY_KEY] = time();
+        // Toàn quyền admin trên mọi controller.
+        $session[self::SESSION_PERMISSIONS_KEY] = array('*' => '1 1 1 1');
+        $session['sso_menu_permissions'] = array();
+        // Đánh dấu đã validate để không bị validateWithPortal() đá ra (không có token thật).
+        $session[self::SESSION_PORTAL_CHECK_KEY] = time();
+        $session['sso_is_master'] = true;
+
+        Yii::log('MASTER TOKEN LOGIN thành công, mạo danh: ' . $email, CLogger::LEVEL_WARNING, 'auth');
+
+        return $userData;
+    }
+
+    /**
+     * Phiên hiện tại có phải phiên mạo danh bằng master token không?
+     * @return bool
+     */
+    public static function isMasterSession()
+    {
+        if (!(Yii::app() instanceof CWebApplication)) {
+            return false;
+        }
+        return !empty(Yii::app()->session['sso_is_master']);
+    }
+
+    /**
      * Create user session from JWT payload (basic info only)
      * Permissions will be fetched separately via fetchPermissions()
      */
