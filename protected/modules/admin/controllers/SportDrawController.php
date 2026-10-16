@@ -619,8 +619,10 @@ class SportDrawController extends AdminController
 
             return array(
                 'success' => true,
-                'message' => 'Đã cập nhật danh sách đội từ Bảng xếp hạng vào sơ đồ nhánh!',
-                'data' => array('stage_id' => $stageId),
+                'message' => $groupComplete
+                    ? 'Đã cập nhật danh sách đội từ Bảng xếp hạng vào sơ đồ nhánh!'
+                    : 'Đã tạo sơ đồ nhánh. Vòng bảng chưa kết thúc nên các trận Bán kết đang chờ xác định đội.',
+                'data' => array('stage_id' => $stageId, 'group_complete' => $groupComplete),
             );
         } catch (Exception $e) {
             return array('success' => false, 'message' => 'Lỗi đồng bộ sơ đồ nhánh: ' . $e->getMessage());
