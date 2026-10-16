@@ -13,8 +13,13 @@
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/css/font-awesome/font-awesome.min.css" rel="stylesheet">
     <style>
+        /* Font chữ áp dụng cho toàn bộ element (kể cả form control) */
         body, button, input, select, textarea {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        }
+
+        /* Layout dọc chỉ dành cho body — KHÔNG áp cho button/input (sẽ bị cao 100vh) */
+        body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
