@@ -96,10 +96,13 @@
 }
 .ag-daynav-item:hover { border-color: #93c5fd; color: #1d4ed8; transform: translateY(-1px); }
 .ag-daynav-item.is-active {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: linear-gradient(135deg, #1d4ed8, #0d9488);
+  border-color: transparent;
   color: #fff;
-  box-shadow: 0 6px 16px rgba(29, 78, 216, .28);
+  font-size: .95rem;
+  padding: .62rem 1.15rem;
+  box-shadow: 0 8px 20px rgba(29, 78, 216, .35);
+  transform: translateY(-1px) scale(1.03);
 }
 .ag-daynav-num {
   display: inline-grid;
