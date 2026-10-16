@@ -64,14 +64,23 @@ $isTokenAuth = $tokenVoter !== null;
      data-vote-url="<?php echo $voteUrl; ?>"
      data-status-url="<?php echo $statusUrl; ?>"
      data-client-id="<?php echo CHtml::encode($googleClientId); ?>"
-     data-max-votes="<?php echo (int) $maxVotes; ?>">
+     data-max-votes="<?php echo (int) $maxVotes; ?>"
+     data-token-auth="<?php echo $isTokenAuth ? '1' : '0'; ?>">
     <div class="card-body text-center">
+        <?php if (!$isTokenAuth): ?>
         <div id="signin-area">
             <p class="mb-2">Vui lòng đăng nhập để bình chọn:</p>
             <div id="g_id_signin" class="d-inline-block"></div>
+            <div class="mt-3">
+                <div class="text-muted small mb-2">hoặc</div>
+                <a href="<?php echo CHtml::encode($tokenLoginUrl); ?>" class="btn btn-outline-secondary btn-sm">
+                    <i class="fa fa-id-badge me-1"></i>Đăng nhập bằng tài khoản nội bộ
+                </a>
+            </div>
         </div>
-        <div id="signed-in-info" class="d-none">
-            <div>Xin chào, <strong id="voter-name"></strong></div>
+        <?php endif; ?>
+        <div id="signed-in-info" class="<?php echo $isTokenAuth ? '' : 'd-none'; ?>">
+            <div>Xin chào, <strong id="voter-name"><?php echo $isTokenAuth ? CHtml::encode($tokenVoter['name']) : ''; ?></strong></div>
             <div class="text-muted">Bạn còn <span id="remaining-votes" class="fw-bold text-primary"><?php echo (int) $maxVotes; ?></span>/<?php echo (int) $maxVotes; ?> lượt bình chọn</div>
         </div>
     </div>
