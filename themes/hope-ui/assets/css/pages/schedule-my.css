@@ -151,46 +151,62 @@
 .next-up-done-title { font-weight: 700; color: #334155; }
 .next-up-done-sub { font-size: .88rem; color: #64748b; }
 
-/* ===== Khối ngày + banner tiêu đề (giống agenda) ===== */
+/* ===== Khối ngày + banner tiêu đề (đồng bộ Agenda & hiển thị số ngày) ===== */
 .sch-day { margin-top: 1.75rem; }
 .sch-day-head {
     display: flex;
     align-items: center;
-    gap: 1.1rem;
+    gap: 1.15rem;
     margin-bottom: 1.5rem;
-    padding: 1.1rem 1.35rem;
-    border-radius: 20px;
+    padding: 1rem 1.4rem;
+    border-radius: 16px;
     position: relative;
     overflow: hidden;
     color: #fff;
-    background: linear-gradient(120deg, #0b1f52 0%, #1d4ed8 52%, #0d9488 100%);
-    box-shadow: 0 14px 30px rgba(13, 148, 136, .20);
+    background: linear-gradient(105deg, #0b1f52 0%, #16388e 45%, #0284c7 78%, #0d9488 100%);
+    box-shadow: 0 12px 28px rgba(2, 132, 199, .22);
 }
 .sch-day-head::after {
     content: "";
     position: absolute;
     inset: 0;
     background-image:
-        radial-gradient(circle at 12% 20%, rgba(255, 255, 255, .14), transparent 38%),
-        radial-gradient(circle at 92% 120%, rgba(45, 212, 191, .28), transparent 45%);
+        radial-gradient(circle at 12% 20%, rgba(255, 255, 255, .15), transparent 38%),
+        radial-gradient(circle at 92% 120%, rgba(45, 212, 191, .25), transparent 45%);
     pointer-events: none;
 }
 .sch-day-head > * { position: relative; z-index: 1; }
-.sch-day-head h2 { color: #fff; font-size: 1.3rem; }
-.sch-day-count { font-size: .85rem; color: rgba(255, 255, 255, .78); }
+.sch-day-title { color: #fff; font-size: 1.25rem; font-weight: 700; margin: 0 0 2px 0; }
+.sch-day-count { font-size: .86rem; color: rgba(255, 255, 255, .82); font-weight: 500; }
 .sch-day-badge {
     flex: 0 0 auto;
-    width: 58px;
-    height: 58px;
-    border-radius: 16px;
-    display: grid;
-    place-items: center;
-    font-size: 1.6rem;
+    width: 52px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     color: #fff;
-    background: rgba(255, 255, 255, .16);
-    border: 1px solid rgba(255, 255, 255, .28);
-    backdrop-filter: blur(4px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
+    background: rgba(15, 23, 42, 0.42);
+    border: 1px solid rgba(255, 255, 255, .24);
+    backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 4px 12px rgba(0, 0, 0, .15);
+}
+.sch-day-badge-lbl {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1;
+    margin-bottom: 2px;
+}
+.sch-day-badge-num {
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
 }
 /* Nhóm "chưa có giờ" dùng tông hổ phách cho khác biệt */
 .sch-day-notime .sch-day-head {
@@ -203,89 +219,161 @@
 .sch-item {
     position: relative;
     display: grid;
-    grid-template-columns: 74px 36px 1fr;
+    grid-template-columns: 78px 40px 1fr;
     gap: 0;
-    padding-bottom: 1rem;
+    padding-bottom: 1.15rem;
 }
-.sch-time { text-align: right; padding-right: .75rem; padding-top: .55rem; }
-.sch-time-start { display: block; font-weight: 700; color: #0f172a; font-size: .92rem; }
+.sch-time {
+    text-align: right;
+    padding-right: 0.85rem;
+    padding-top: 0.45rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+.sch-time-start {
+    display: block;
+    font-weight: 800;
+    color: #0f172a;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+.sch-time-end {
+    display: block;
+    font-weight: 500;
+    color: #64748b;
+    font-size: 0.78rem;
+    margin-top: 3px;
+    line-height: 1.2;
+}
 
 /* Chấm + đường nối dọc */
-.sch-dot { position: relative; display: flex; justify-content: center; }
+.sch-dot {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-top: 0.25rem;
+}
 .sch-dot::before {
     content: "";
     position: absolute;
     top: 38px;
-    bottom: -1rem;
+    bottom: -1.15rem;
     width: 2px;
     background: var(--sch-line);
 }
-.sch-item:last-child .sch-dot::before { display: none; }
-.sch-dot i {
+.sch-item:last-child .sch-dot::before {
+    display: none;
+}
+.sch-dot-circle {
     position: relative;
     z-index: 1;
-    width: 36px; height: 36px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    display: grid; place-items: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #fff;
-    font-size: 1rem;
-    background: #94a3b8;
+    background: #64748b;
     box-shadow: 0 0 0 4px #fff, 0 4px 10px rgba(15, 23, 42, .12);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sch-item:hover .sch-dot-circle {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 4px #fff, 0 6px 14px rgba(15, 23, 42, .18);
+}
+.sch-dot-circle svg {
+    width: 17px;
+    height: 17px;
+}
+.sch-dot-circle i {
+    font-size: 1.05rem;
+    line-height: 1;
 }
 
 /* Thẻ nội dung */
 .sch-card {
-    background: #fff;
+    background: #ffffff;
     border: 1px solid var(--sch-line);
-    border-left: 4px solid #cbd5e1;
-    border-radius: .85rem;
-    padding: .85rem 1rem;
-    margin-left: .5rem;
-    transition: box-shadow .15s ease, transform .15s ease;
+    border-left: 3.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 0.85rem 1.15rem;
+    margin-left: 0.65rem;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    transition: box-shadow .18s ease, transform .18s ease;
 }
-.sch-card:hover { box-shadow: 0 8px 22px rgba(15, 23, 42, .08); transform: translateY(-1px); }
-.sch-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
-.sch-card-title { font-weight: 700; color: #0f172a; font-size: 1rem; }
-.sch-card-status { margin-top: .15rem; }
-.sch-card-sub { font-size: .88rem; color: #475569; margin-top: .25rem; }
-.sch-place { font-size: .85rem; color: var(--sch-muted); margin-top: .35rem; }
-.sch-place i { margin-right: .2rem; color: #0d9488; }
+.sch-card:hover {
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+}
+.sch-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.sch-card-title {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 1rem;
+    line-height: 1.35;
+    margin: 0;
+}
+.sch-pill {
+    flex: 0 0 auto;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.22rem 0.65rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+.sch-card-loc {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.84rem;
+    color: #64748b;
+    margin-top: 0.4rem;
+}
+.sch-card-loc svg, .sch-card-loc i {
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+.sch-card-desc {
+    font-size: 0.84rem;
+    color: #64748b;
+    margin-top: 0.35rem;
+    line-height: 1.45;
+}
+.sch-card-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #16a34a;
+    background: #dcfce7;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    margin-top: 0.45rem;
+}
+.sch-live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #16a34a;
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, .7);
+    animation: sch-pulse 1.4s infinite;
+}
 
 /* Trạng thái dòng */
-.sch-item.status-1 .sch-card { border-left-color: #22c55e; background: #f0fdf4; }  /* đang diễn ra */
-.sch-item.status-2 .sch-card { opacity: .72; }                                     /* đã diễn ra */
-.sch-item.status-3 .sch-card { border-left-color: #f59e0b; }                       /* chưa có giờ */
-
-/* Nhãn phân loại */
-.sch-tag {
-    flex: 0 0 auto;
-    font-size: .68rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .03em;
-    padding: .2rem .55rem; border-radius: 999px;
-    background: #e2e8f0; color: #334155;
-    white-space: nowrap;
-}
-
-/* Màu theo loại nguồn: chấm icon + viền thẻ + nhãn */
-.sch-item.type-sport .sch-dot i { background: #16a34a; }
-.sch-item.type-competition .sch-dot i { background: #7c3aed; }
-.sch-item.type-agenda .sch-dot i { background: #2563eb; }
-.sch-item.type-meal .sch-dot i { background: #ea580c; }
-.sch-item.type-banquet .sch-dot i { background: #db2777; }
-
-.sch-item.type-sport .sch-card { border-left-color: #16a34a; }
-.sch-item.type-competition .sch-card { border-left-color: #7c3aed; }
-.sch-item.type-agenda .sch-card { border-left-color: #2563eb; }
-.sch-item.type-meal .sch-card { border-left-color: #ea580c; }
-.sch-item.type-banquet .sch-card { border-left-color: #db2777; }
-/* Trạng thái "đang diễn ra" vẫn ưu tiên viền xanh lá */
-.sch-item.status-1 .sch-card { border-left-color: #22c55e; }
-
-.sch-tag.type-sport { background: #dcfce7; color: #166534; }
-.sch-tag.type-competition { background: #ede9fe; color: #5b21b6; }
-.sch-tag.type-agenda { background: #dbeafe; color: #1e40af; }
-.sch-tag.type-meal { background: #ffedd5; color: #9a3412; }
-.sch-tag.type-banquet { background: #fce7f3; color: #9d174d; }
+.sch-item.status-1 .sch-card { background: #fcfdfc; }      /* đang diễn ra */
+.sch-item.status-2 { opacity: .72; }                        /* đã diễn ra */
+.sch-item.status-2:hover { opacity: 1; }
 
 /* ===== Trạng thái rỗng ===== */
 .schedule-empty {
@@ -304,12 +392,15 @@
 @media (max-width: 575.98px) {
     .next-up-head { flex-direction: column; align-items: flex-start; }
     .cd-box { min-width: 48px; }
-    .sch-item { grid-template-columns: 58px 30px 1fr; }
-    .sch-time-start { font-size: .82rem; }
-    .sch-dot i { width: 30px; height: 30px; font-size: .85rem; }
-    .sch-dot::before { top: 32px; }
-    .sch-card { margin-left: .35rem; }
-    .sch-day-head { padding: .9rem 1rem; gap: .85rem; }
-    .sch-day-badge { width: 48px; height: 48px; font-size: 1.3rem; }
-    .sch-day-head h2 { font-size: 1.1rem; }
+    .sch-item { grid-template-columns: 58px 32px 1fr; }
+    .sch-time-start { font-size: .84rem; }
+    .sch-time-end { font-size: .72rem; }
+    .sch-dot-circle { width: 30px; height: 30px; }
+    .sch-dot-circle svg { width: 14px; height: 14px; }
+    .sch-dot::before { top: 34px; }
+    .sch-card { margin-left: .35rem; padding: .75rem .85rem; }
+    .sch-day-head { padding: .85rem 1rem; gap: .85rem; border-radius: 14px; }
+    .sch-day-badge { width: 44px; height: 50px; }
+    .sch-day-badge-num { font-size: 1.3rem; }
+    .sch-day-title { font-size: 1.1rem; }
 }

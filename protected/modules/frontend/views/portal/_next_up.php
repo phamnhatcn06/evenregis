@@ -1,20 +1,13 @@
 <?php
 /**
  * Thẻ "Sự kiện tiếp theo" + đồng hồ đếm ngược (realtime qua schedule-my.js).
+ * Đồng bộ icon và màu sắc danh mục theo Schedule::getItemMeta.
  *
  * @var array $nextUp   các item gần nhất ở tương lai (có thể nhiều item cùng mốc)
  * @var int   $serverTime mốc thời gian máy chủ (Unix) để JS đồng bộ đếm ngược
  */
 $hasNext = !empty($nextUp);
 $targetTime = $hasNext ? (int) $nextUp[0]['startTime'] : 0;
-
-$typeIcons = array(
-    'sport' => 'bi-trophy-fill',
-    'competition' => 'bi-mortarboard-fill',
-    'agenda' => 'bi-flag-fill',
-    'meal' => 'bi-cup-hot-fill',
-    'banquet' => 'bi-balloon-heart-fill',
-);
 ?>
 <div class="next-up-card <?php echo $hasNext ? '' : 'next-up-empty'; ?>"
      data-server-time="<?php echo (int) $serverTime; ?>"
@@ -32,15 +25,23 @@ $typeIcons = array(
         </div>
         <div class="next-up-body">
             <?php foreach ($nextUp as $item): ?>
-                <?php $icon = isset($typeIcons[$item['type']]) ? $typeIcons[$item['type']] : 'bi-calendar-event'; ?>
+                <?php 
+                $meta = Schedule::getItemMeta($item);
+                $desc = !empty($item['subtitle']) ? $item['subtitle'] : (!empty($item['description']) ? $item['description'] : '');
+                ?>
                 <div class="next-up-item">
-                    <div class="next-up-icon type-<?php echo CHtml::encode($item['type']); ?>">
-                        <i class="bi <?php echo $icon; ?>"></i>
+                    <div class="next-up-icon" style="background-color: <?php echo $meta['color']; ?>; border-color: rgba(255,255,255,0.3); color: #fff;">
+                        <?php echo Schedule::renderIcon($meta['icon_type']); ?>
                     </div>
                     <div class="next-up-info">
-                        <div class="next-up-item-title"><?php echo CHtml::encode($item['title']); ?></div>
-                        <?php if (!empty($item['subtitle'])): ?>
-                            <div class="next-up-item-sub"><?php echo CHtml::encode($item['subtitle']); ?></div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="next-up-item-title"><?php echo CHtml::encode($item['title']); ?></span>
+                            <span class="sch-pill" style="background-color: rgba(255,255,255,0.22); color: #fff; border: 1px solid rgba(255,255,255,0.28);">
+                                <?php echo CHtml::encode($meta['label']); ?>
+                            </span>
+                        </div>
+                        <?php if (!empty($desc)): ?>
+                            <div class="next-up-item-sub"><?php echo CHtml::encode($desc); ?></div>
                         <?php endif; ?>
                         <div class="next-up-meta">
                             <span><i class="bi bi-clock"></i> <?php echo CHtml::encode($item['startLabel']); ?></span>
