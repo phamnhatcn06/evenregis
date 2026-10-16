@@ -3,21 +3,28 @@
 /** @var array $gate */
 /** @var string $googleClientId */
 /** @var int $maxVotes */
+/** @var array|null $tokenVoter */
+/** @var string $tokenLoginUrl */
 
 $this->pageTitle = 'Bình chọn Miss - Vòng chung kết';
 $voteUrl = $this->createUrl('/frontend/binhchon/vote');
 $statusUrl = $this->createUrl('/frontend/binhchon/status');
 $configured = $googleClientId && strpos($googleClientId, 'YOUR_GOOGLE_CLIENT_ID') === false;
 $isOpen = !isset($gate['is_open']) || $gate['is_open'];
+$isTokenAuth = $tokenVoter !== null;
 ?>
 
 <div class="text-center mb-4">
     <h2 class="fw-bold">Bình chọn Miss - Vòng chung kết</h2>
-    <p class="text-muted mb-1">Đăng nhập bằng tài khoản Google để bình chọn cho thí sinh bạn yêu thích.</p>
+    <?php if ($isTokenAuth): ?>
+        <p class="text-muted mb-1">Bình chọn cho thí sinh bạn yêu thích.</p>
+    <?php else: ?>
+        <p class="text-muted mb-1">Đăng nhập bằng tài khoản Google để bình chọn cho thí sinh bạn yêu thích.</p>
+    <?php endif; ?>
     <p class="text-muted">Mỗi tài khoản được tối đa <strong><?php echo (int) $maxVotes; ?> lượt</strong>, mỗi thí sinh chỉ bình chọn 1 lần.</p>
 </div>
 
-<?php if (!$configured): ?>
+<?php if (!$isTokenAuth && !$configured): ?>
     <div class="alert alert-warning text-center">
         <i class="fa fa-exclamation-triangle me-1"></i>
         Chưa cấu hình <strong>Google Client ID</strong>. Vui lòng khai báo trong
