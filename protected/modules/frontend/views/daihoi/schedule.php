@@ -182,6 +182,12 @@ $sportThemes = array(
               <span class="material-symbols-outlined fs-6 text-primary">calendar_month</span>
               <span>Lịch đấu &amp; Tỷ số</span>
             </a>
+            <?php if (!empty($sportsWithRules)): ?>
+              <a href="#rules-section" class="btn btn-sm btn-outline-light rounded-pill fw-bold px-3 py-2 d-inline-flex align-items-center gap-1">
+                <span class="material-symbols-outlined fs-6 text-warning">gavel</span>
+                <span>Xem thể thức</span>
+              </a>
+            <?php endif; ?>
             <?php if (!empty($standingsBySport)): ?>
               <a href="#standings-section" class="btn btn-sm btn-outline-light rounded-pill fw-bold px-3 py-2 d-inline-flex align-items-center gap-1">
                 <span class="material-symbols-outlined fs-6">leaderboard</span>
@@ -601,7 +607,7 @@ $sportThemes = array(
     ?>
     <?php if (!empty($sportsWithRules)): ?>
       <section class="mb-4" id="rules-section">
-        <details class="rules-accordion bg-white rounded-4 shadow-sm border border-slate-200 overflow-hidden" open>
+        <details class="rules-accordion bg-white rounded-4 shadow-sm border border-slate-200 overflow-hidden">
           <summary class="d-flex align-items-center justify-content-between gap-3 p-3 p-md-4"
                    style="cursor:pointer; list-style:none;">
             <div class="d-flex align-items-center gap-3">
@@ -622,8 +628,11 @@ $sportThemes = array(
               </div>
             </div>
             <div class="d-flex align-items-center gap-2">
-              <span class="d-none d-sm-inline small text-muted fw-medium">Thu gọn / Mở rộng</span>
-              <span class="material-symbols-outlined text-muted rules-chevron fs-5">expand_more</span>
+              <span class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1.5 rules-toggle-btn shadow-2xs" style="font-size:12.5px; font-weight:600; pointer-events:none;">
+                <span class="rules-text-closed">Xem thể thức</span>
+                <span class="rules-text-open">Thu gọn</span>
+                <span class="material-symbols-outlined rules-chevron" style="font-size:16px;">expand_more</span>
+              </span>
             </div>
           </summary>
 
@@ -1662,6 +1671,25 @@ $sportThemes = array(
 .rules-accordion[open] .rules-chevron { transform: rotate(180deg); }
 .rules-chevron { transition: transform .25s cubic-bezier(0.4, 0, 0.2, 1); }
 
+.rules-accordion .rules-text-open { display: none; }
+.rules-accordion .rules-text-closed { display: inline; }
+.rules-accordion[open] .rules-text-open { display: inline; }
+.rules-accordion[open] .rules-text-closed { display: none; }
+
+.rules-accordion > summary:hover .rules-toggle-btn {
+  background-color: #0d6efd;
+  color: #ffffff;
+}
+.rules-accordion[open] .rules-toggle-btn {
+  background-color: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+.rules-accordion[open] > summary:hover .rules-toggle-btn {
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
+
 /* Toolbar & Lọc danh mục thể lệ */
 .rules-filter-toolbar {
   background-color: #f8fafc;
@@ -2575,6 +2603,25 @@ document.addEventListener('DOMContentLoaded', function () {
       filterRules();
     });
   }
+
+  // 10. Mở accordion thể thức khi người dùng click vào neo hoặc truy cập link #rules-section
+  function checkOpenRulesHash() {
+    if (window.location.hash === '#rules-section') {
+      var rAcc = document.querySelector('.rules-accordion');
+      if (rAcc) rAcc.open = true;
+    }
+  }
+  window.addEventListener('hashchange', checkOpenRulesHash);
+  checkOpenRulesHash();
+
+  document.querySelectorAll('a[href="#rules-section"]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      var rAcc = document.querySelector('.rules-accordion');
+      if (rAcc) {
+        rAcc.open = true;
+      }
+    });
+  });
 
   // Khởi chạy bộ lọc ban đầu
   applyFilters();
