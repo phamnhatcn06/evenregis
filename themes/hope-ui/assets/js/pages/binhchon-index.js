@@ -45,6 +45,7 @@
     var voteUrl = voterBox.getAttribute('data-vote-url');
     var statusUrl = voterBox.getAttribute('data-status-url');
     var clientId = voterBox.getAttribute('data-client-id');
+    var tokenAuth = voterBox.getAttribute('data-token-auth') === '1';
     var credential = null; // Google ID token sau khi đăng nhập
 
     // Google gọi hàm này sau khi khách đăng nhập thành công
@@ -55,7 +56,8 @@
 
     function loadVoterStatus() {
         var body = new FormData();
-        body.append('credential', credential);
+        // Đã đăng nhập token thì xác thực qua phiên, không cần credential Google.
+        if (credential) { body.append('credential', credential); }
 
         fetch(statusUrl, { method: 'POST', body: body })
             .then(function (res) { return res.json(); })
