@@ -84,7 +84,7 @@ class BinhchonController extends CController
             $this->jsonResponse(false, 'Phương thức không hợp lệ.');
         }
 
-        $account = $this->requireGoogleAccount();
+        $account = $this->requireVoter();
         $cfg = $this->voteConfig();
         $contestantId = isset($_POST['contestant_id']) ? (int) $_POST['contestant_id'] : 0;
 
@@ -96,7 +96,7 @@ class BinhchonController extends CController
             'contest_id' => $cfg['contest_id'],
             'contestant_id' => $contestantId,
             'voter_key' => $account['sub'],
-            'voter_key_type' => 'google',
+            'voter_key_type' => $account['type'],
             'voter_email' => $account['email'],
             'voter_name' => $account['name'],
             'max_votes' => $cfg['max_votes_per_voter'],
