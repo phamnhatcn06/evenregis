@@ -115,7 +115,7 @@ $tourScheduleUrl = Yii::app()->theme->baseUrl . '/assets/docs/lich_trinh_tour.pd
                             <i class="bi bi-hourglass-split fs-5 me-2 text-warning"></i>
                             <div>Yêu cầu hủy đợt tham quan đang được Ban tổ chức xem xét duyệt.</div>
                         </div>
-                    <?php elseif (!empty($tourMine['can_request_cancel'])): ?>
+                    <?php elseif (!empty($tourMine['can_request_cancel']) && $regOpen): ?>
                         <button type="button" class="btn btn-outline-danger w-100 btn-cancel-request mt-2" data-bs-toggle="modal" data-bs-target="#modalCancelTour">
                             <i class="bi bi-x-circle me-1"></i> Xin hủy đăng ký đợt này
                         </button>
