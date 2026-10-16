@@ -146,16 +146,49 @@ class BinhchonController extends CController
     }
 
     /**
-     * Xác thực tài khoản Google từ credential trong POST, dừng request nếu lỗi.
-     * @return array thông tin tài khoản
+     * Thông tin người bình chọn khi đã đăng nhập bằng tài khoản nội bộ (token SSO).
+     * Trả về null nếu chưa đăng nhập token.
+     * @return array|null ['sub' => string, 'email' => string|null, 'name' => string]
      */
-    protected function requireGoogleAccount()
+    protected function currentTokenVoter()
     {
+        if (!AuthHandler::isAuthenticated()) {
+            return null;
+        }
+        $user = AuthHandler::getUser();
+        $id = !empty($user['id']) ? $user['id'] : (!empty($user['email']) ? $user['email'] : null);
+        if (!$id) {
+            return null;
+        }
+        $email = isset($user['email']) ? $user['email'] : null;
+        return array(
+            // Tiền tố 'mt:' để không trùng không gian khóa với Google sub.
+            'sub' => 'mt:' . $id,
+            'email' => $email,
+            'name' => !empty($user['full_name']) ? $user['full_name'] : ($email ?: 'Người dùng'),
+        );
+    }
+
+    /**
+     * Xác thực người bình chọn, dừng request nếu lỗi.
+     * Ưu tiên tài khoản nội bộ (token SSO); nếu chưa có thì xác thực Google từ
+     * credential trong POST.
+     * @return array thông tin tài khoản kèm 'type' (token|google)
+     */
+    protected function requireVoter()
+    {
+        $tokenVoter = $this->currentTokenVoter();
+        if ($tokenVoter !== null) {
+            $tokenVoter['type'] = 'token';
+            return $tokenVoter;
+        }
+
         $credential = isset($_POST['credential']) ? $_POST['credential'] : null;
         $account = GoogleAuthHelper::verify($credential);
         if ($account === null || empty($account['sub'])) {
-            $this->jsonResponse(false, 'Xác thực Google thất bại. Vui lòng đăng nhập lại.');
+            $this->jsonResponse(false, 'Xác thực thất bại. Vui lòng đăng nhập lại.');
         }
+        $account['type'] = 'google';
         return $account;
     }
 
