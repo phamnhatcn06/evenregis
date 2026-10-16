@@ -55,11 +55,12 @@ class BinhchonController extends CController
                 CClientScript::POS_HEAD
             );
         }
-        Yii::app()->clientScript->registerCssFile(
-            Yii::app()->theme->baseUrl . '/assets/css/pages/binhchon.css'
-        );
+        // CSS được nạp trong view (kèm cache-busting). Ở đây chỉ nạp JS, cũng
+        // thêm ?v=filemtime để tránh trình duyệt dùng bản JS cũ đã cache.
+        $jsPath = Yii::getPathOfAlias('webroot') . '/themes/hope-ui/assets/js/pages/binhchon-index.js';
+        $jsVer = @filemtime($jsPath) ?: time();
         Yii::app()->clientScript->registerScriptFile(
-            Yii::app()->theme->baseUrl . '/assets/js/pages/binhchon-index.js',
+            Yii::app()->theme->baseUrl . '/assets/js/pages/binhchon-index.js?v=' . $jsVer,
             CClientScript::POS_END
         );
 
