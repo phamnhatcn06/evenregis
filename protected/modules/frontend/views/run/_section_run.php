@@ -109,7 +109,7 @@ $regOpen = ($window['state'] === 'open');
                             <span class="fw-bold text-dark small">
                                 <i class="bi bi-person-arms-up text-primary me-1"></i> Size áo Fun Run
                             </span>
-                            <?php if ($shirtSize !== ''): ?>
+                            <?php if ($shirtSize !== '' && $regOpen): ?>
                                 <button type="button" class="btn btn-sm btn-outline-primary"
                                         data-bs-toggle="modal" data-bs-target="#modalShirtSize">
                                     <i class="bi bi-pencil-square me-1"></i> Đổi size
