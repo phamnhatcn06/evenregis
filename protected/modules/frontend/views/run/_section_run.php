@@ -121,12 +121,16 @@ $regOpen = ($window['state'] === 'open');
                                 <span class="badge bg-primary fs-6 px-3 py-2"><?php echo CHtml::encode($shirtSize); ?></span>
                                 <span class="text-muted small ms-2">Áo dành riêng cho nội dung Fun Run</span>
                             </div>
-                        <?php else: ?>
+                        <?php elseif ($regOpen): ?>
                             <div class="mt-2">
                                 <button type="button" class="btn btn-sm btn-warning"
                                         data-bs-toggle="modal" data-bs-target="#modalShirtSize">
                                     <i class="bi bi-exclamation-triangle me-1"></i> Bạn chưa chọn size áo — bấm để chọn
                                 </button>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-2 text-muted small">
+                                <i class="bi bi-lock-fill me-1"></i> Bạn chưa chọn size áo và đã hết thời gian đăng ký.
                             </div>
                         <?php endif; ?>
                     </div>
