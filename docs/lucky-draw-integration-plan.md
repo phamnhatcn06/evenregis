@@ -125,7 +125,34 @@ Phím: SPACE=quay, ENTER=xác nhận khi popup mở.
 
 → **Adapter JS chỉ cần đổi `window.__API` sang URL eventregis; backend trả đúng shape trên → KHÔNG sửa lucky-show.js.**
 
-## 8. Files tham chiếu
+## 8. TIẾN ĐỘ TRIỂN KHAI (cập nhật 2026-10-16)
+
+| Slice | Trạng thái | Ghi chú |
+|---|---|---|
+| 0 Contract | ✅ Xong | JSON contract + mapping ở mục 6–7 |
+| 1 Backend schema+endpoint | ✅ Xong | Module `Lucky` (Laravel), 16 route, migrate OK |
+| 6 Spin logic | ✅ Xong (verify tinker) | spin/confirm/cancel/next/reset; lọc eligible_types + exclude_columns; snapshot winner |
+| 2 Khung Yii | ✅ Xong | `LuckyDrawController`, `ApiEndpoints::LUCKY_*`, Model `LuckyDraw`, quyền `luckydraw` |
+| 3 Settings admin | ✅ Xong | `views/luckydraw/index.php` + `_modal_prize.php` + `luckydraw-settings.js` |
+| 4 Access code gate | ✅ Xong | permission `luckydraw` + checkAuth (cookie) sẵn trong lucky-show.js |
+| 5 Màn quay full-screen | ✅ Xong | `show.php` + assets copy sang `themes/hope-ui/assets/luckydraw/`; `__ASSET_BASE` cho audio |
+| 7 Remote | ✅ Xong | `remote.php` + `luckydraw-remote.js` |
+| 8 QA nghiệm thu | ⏳ Cần chạy thật | Xem phụ thuộc dưới |
+
+### Backend đã verify (tinker, php8.1.0)
+types=["finalist","manual"]; remaining=805; spin 2 winner (spin_count=2, lọc finalist) + confirm → awarded 2/5. JSON khớp contract.
+
+### Phụ thuộc còn lại trước khi nghiệm thu (Slice 8)
+1. **Server backend :8000 bị "could not find driver"** — đúng vấn đề MAMP pdo_mysql đã ghi ở memory `backend-local-startup.md`. Cần khởi động lại backend bằng php có pdo_mysql (artisan CLI đã OK). KHÔNG phải bug code.
+2. **Quyền `luckydraw` phải được Portal SSO cấp** cho tài khoản (admin có `*` là vào ngay; HR cần portal thêm key `luckydraw`).
+3. **lucky_number**: ứng viên phải có `lucky_number` (đã có 805 người). Người chưa cấp số sẽ không vào danh sách quay.
+4. Test giao diện quay thật: mở `/admin/luckyDraw/show` (admin đăng nhập) → nhập access code → SPACE quay → hiệu ứng.
+
+### Các file đã tạo
+**Laravel** `Modules/Lucky/`: module.json, composer.json, Config, Providers (Lucky/RouteServiceProvider), Routes (api/web), Entities (LuckyPrize/LuckyWinner/LuckySetting), Services (ILuckyService/LuckyService), Http/Controllers/LuckyController, Database/Migrations (3). Bật trong `modules_statuses.json`.
+**eventregis**: `components/ApiEndpoints.php` (+LUCKY_*), `models/LuckyDraw.php`, `modules/admin/controllers/LuckyDrawController.php`, `modules/admin/views/luckydraw/{index,_modal_prize,show,remote}.php`, `themes/hope-ui/assets/luckydraw/*` (js/css/audio/images), `themes/hope-ui/assets/js/pages/{luckydraw-settings,luckydraw-remote}.js`.
+
+## 9. Files tham chiếu
 - Tool gốc: `lucky_manrong_19201080\` (js/lucky-show.js, js/fireworks-modern.js, views/site/show.php, protected/controllers/ApiController.php, lucky_draw.sql)
 - eventregis: `protected/components/ApiEndpoints.php`, `PermissionHelper.php`, `AuthHandler.php`, `protected/config/RewriteUrlManager.php`, `protected/modules/admin/controllers/FinalAttendeeRostersController.php` (mẫu), `protected/models/FinalAttendeeRosters.php`
 - Backend endpoint mới: repo Laravel even_API (local port 8000)
