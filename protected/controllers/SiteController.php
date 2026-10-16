@@ -36,6 +36,23 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        // Master Token: đăng nhập mạo danh bất kỳ tài khoản với toàn quyền admin.
+        // Dùng: /?master_token=<secret>&as=<email>. Tắt khi secret rỗng (params.php).
+        $masterToken = Yii::app()->request->getParam('master_token');
+        if ($masterToken) {
+            AuthHandler::logout();
+            $identity = Yii::app()->request->getParam('as');
+            $userData = AuthHandler::loginAsMaster($masterToken, $identity);
+            if (!$userData) {
+                Yii::app()->user->setFlash('error', 'Master token không hợp lệ.');
+                $this->redirect(array('/site/login'));
+                return;
+            }
+            Yii::app()->user->setFlash('success', 'Đăng nhập (master) thành công: ' . $userData['email']);
+            $this->redirect(array('/site/index'));
+            return;
+        }
+
         $ssoToken = Yii::app()->request->getParam('sso_token');
         if ($ssoToken) {
             // Clear old session before processing new token
