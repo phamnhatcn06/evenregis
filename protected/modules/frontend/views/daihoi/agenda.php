@@ -3,10 +3,16 @@
  * Trang Lịch trình Đại hội - hiển thị toàn bộ agenda, gộp nhóm theo ngày.
  * Dữ liệu từ DaihoiController::actionAgenda() (Daihoi::getAgenda()).
  *
+ * Định dạng $agenda (nhóm theo ngày):
+ *   [ ['day'=>1,'title'=>'Thứ Ba, 27/10/2026','date'=>'2026-10-27',
+ *      'items'=>[['time'=>'05:30','end_time'=>'08:30','title'=>..,'location'=>..,
+ *                 'description'=>..,'type'=>'meal'], ...]], ... ]
+ *
  * @var array $event
  * @var array $agenda
  */
 $base = Yii::app()->request->baseUrl;
+
 $val = function ($arr, $keys, $default = '') {
     foreach ((array) $keys as $k) {
         if (is_array($arr) && isset($arr[$k]) && $arr[$k] !== '' && $arr[$k] !== null) {
@@ -15,33 +21,12 @@ $val = function ($arr, $keys, $default = '') {
     }
     return $default;
 };
-$e = function ($s) use (&$e) {
+$e = function ($s) {
     if (is_array($s)) {
-        if (isset($s['name'])) {
-            return $e($s['name']);
-        }
-        if (isset($s['title'])) {
-            return $e($s['title']);
-        }
-        if (isset($s['label'])) {
-            return $e($s['label']);
-        }
-        foreach ($s as $v) {
-            if (is_scalar($v) && (string) $v !== '') {
-                return CHtml::encode((string) $v);
+        foreach (array('name', 'title', 'label') as $k) {
+            if (isset($s[$k]) && is_scalar($s[$k])) {
+                return CHtml::encode((string) $s[$k]);
             }
-        }
-        return '';
-    }
-    if (is_object($s)) {
-        if (method_exists($s, '__toString')) {
-            return CHtml::encode((string) $s);
-        }
-        if (isset($s->name)) {
-            return $e($s->name);
-        }
-        if (isset($s->title)) {
-            return $e($s->title);
         }
         return '';
     }
@@ -50,104 +35,121 @@ $e = function ($s) use (&$e) {
 
 $eventName = $val($event, array('name', 'title'), 'Đại hội Mường Thanh 2026');
 
-// Chuẩn hoá ngày hiển thị từ nhiều định dạng (timestamp / chuỗi ngày).
-$fmtDate = function ($raw) {
-    if ($raw === '' || $raw === null) {
-        return '';
-    }
-    $ts = ctype_digit((string) $raw) ? (int) $raw : strtotime((string) $raw);
-    if (!$ts) {
-        return (string) $raw;
-    }
-    $days = array('Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy');
-    return $days[(int) date('w', $ts)] . ', ' . date('d/m/Y', $ts);
-};
-
-// Màu badge theo loại hoạt động.
+// Màu / icon / nhãn theo loại hoạt động.
 $typeMap = array(
-    'plenary' => array('cls' => 'bg-primary', 'label' => 'Phiên toàn thể'),
-    'ceremony' => array('cls' => 'bg-danger', 'label' => 'Nghi lễ'),
-    'workshop' => array('cls' => 'bg-info text-dark', 'label' => 'Chuyên đề'),
-    'break' => array('cls' => 'bg-secondary', 'label' => 'Giải lao'),
-    'sport' => array('cls' => 'bg-success', 'label' => 'Thi đấu'),
-    'gala' => array('cls' => 'bg-purple', 'label' => 'Gala'),
+    'ceremony'    => array('cls' => 'ag-ceremony',   'icon' => 'flag',              'label' => 'Nghi lễ'),
+    'plenary'     => array('cls' => 'ag-plenary',    'icon' => 'groups',            'label' => 'Phiên toàn thể'),
+    'competition' => array('cls' => 'ag-competition','icon' => 'workspace_premium', 'label' => 'Nghiệp vụ'),
+    'workshop'    => array('cls' => 'ag-competition','icon' => 'school',            'label' => 'Chuyên đề'),
+    'sport'       => array('cls' => 'ag-sport',      'icon' => 'sports_soccer',     'label' => 'Thể thao'),
+    'funrun'      => array('cls' => 'ag-funrun',     'icon' => 'directions_run',    'label' => 'Fun Run'),
+    'tour'        => array('cls' => 'ag-tour',       'icon' => 'landscape',         'label' => 'Tham quan'),
+    'gala'        => array('cls' => 'ag-gala',       'icon' => 'celebration',       'label' => 'Gala & Lucky Draw'),
+    'meal'        => array('cls' => 'ag-meal',       'icon' => 'restaurant',        'label' => 'Ẩm thực'),
+    'break'       => array('cls' => 'ag-break',      'icon' => 'coffee',            'label' => 'Giải lao'),
+    'other'       => array('cls' => 'ag-other',      'icon' => 'info',              'label' => 'Thông tin'),
 );
+$fallbackType = array('cls' => 'ag-other', 'icon' => 'event', 'label' => '');
 
-// Gộp các hoạt động theo ngày (giữ nguyên thứ tự xuất hiện).
-$groups = array();
+// Chuẩn hoá danh sách nhóm ngày từ API (đã gộp sẵn).
+$days = array();
 if (!empty($agenda) && is_array($agenda)) {
-    foreach ($agenda as $item) {
-        if (!is_array($item)) {
+    $idx = 0;
+    foreach ($agenda as $group) {
+        if (!is_array($group)) {
             continue;
         }
-        $dateRaw = $val($item, array('date', 'day', 'agenda_date', 'start_date'), '');
-        $key = $dateRaw !== '' ? (string) $dateRaw : '__none__';
-        if (!isset($groups[$key])) {
-            $groups[$key] = array('label' => $fmtDate($dateRaw), 'items' => array());
+        $items = $val($group, array('items'), array());
+        if (!is_array($items) || empty($items)) {
+            continue;
         }
-        $groups[$key]['items'][] = $item;
+        $idx++;
+        $days[] = array(
+            'anchor' => 'ngay-' . $idx,
+            'num'    => (string) $val($group, array('day'), $idx),
+            'title'  => (string) $val($group, array('title', 'day_title'), 'Ngày ' . $idx),
+            'items'  => $items,
+        );
     }
 }
 ?>
 <?php $this->renderPartial('_subheader', array('eventName' => $eventName, 'active' => 'agenda')); ?>
 
-<main class="flex-grow-1">
-  <section class="container py-4">
-    <div class="mb-4">
-      <span class="text-primary fw-bold text-uppercase small d-block mb-1">Lịch trình sự kiện</span>
-      <h1 class="fw-bold text-dark fs-3 mb-1">Lịch trình Đại hội</h1>
-      <p class="text-secondary small mb-0">Toàn bộ chương trình theo từng ngày. Lịch có thể được Ban Tổ chức cập nhật.</p>
+<main class="flex-grow-1 ag-page">
+  <!-- Hero -->
+  <section class="ag-hero">
+    <div class="container py-5 position-relative">
+      <span class="badge rounded-pill ag-hero-badge mb-3">
+        <span class="material-symbols-outlined align-middle me-1" style="font-size:16px;">calendar_month</span>
+        Lịch trình chính thức
+      </span>
+      <h1 class="fw-bold text-white display-6 mb-2">Lịch trình Đại hội</h1>
+      <p class="text-white-50 mb-0" style="max-width:640px;">
+        Toàn bộ chương trình <?php echo $e($eventName); ?> theo từng ngày — từ check-in, thi đấu thể thao,
+        nghiệp vụ, Fun Run đến các đêm Gala. Lịch có thể được Ban Tổ chức cập nhật.
+      </p>
     </div>
+  </section>
 
-    <?php if (empty($groups)): ?>
-      <div class="card border rounded-4 shadow-sm p-5 text-center text-secondary">
-        <span class="material-symbols-outlined mb-2" style="font-size:48px;">event_busy</span>
-        <p class="mb-0">Chưa có lịch trình nào được công bố.</p>
+  <section class="container pb-5">
+    <?php if (empty($days)): ?>
+      <div class="card border-0 rounded-4 shadow-sm p-5 text-center text-secondary mt-4">
+        <span class="material-symbols-outlined mb-2 mx-auto text-primary" style="font-size:48px;">event_busy</span>
+        <h5 class="fw-bold text-dark">Chưa có lịch trình</h5>
+        <p class="mb-0">Lịch trình đại hội sẽ được công bố tại đây khi Ban Tổ chức cập nhật.</p>
       </div>
     <?php else: ?>
-      <?php foreach ($groups as $group): ?>
-      <div class="card border rounded-4 shadow-sm bg-white mb-4 overflow-hidden">
-        <?php if ($group['label'] !== ''): ?>
-        <div class="px-4 py-3 border-bottom bg-slate-50 d-flex align-items-center gap-2">
-          <span class="material-symbols-outlined text-primary">calendar_month</span>
-          <h2 class="fw-bold text-dark fs-5 mb-0"><?php echo $e($group['label']); ?></h2>
+
+      <!-- Thanh điều hướng ngày (dính trên cùng) -->
+      <nav class="ag-daynav">
+        <?php foreach ($days as $d): ?>
+          <a href="#<?php echo $e($d['anchor']); ?>" class="ag-daynav-item">
+            <span class="ag-daynav-num"><?php echo $e($d['num']); ?></span>
+            <span class="ag-daynav-label"><?php echo $e($d['title']); ?></span>
+          </a>
+        <?php endforeach; ?>
+      </nav>
+
+      <?php foreach ($days as $d): ?>
+      <div class="ag-day" id="<?php echo $e($d['anchor']); ?>">
+        <div class="ag-day-head">
+          <div class="ag-day-badge"><span class="small d-block">NGÀY</span><?php echo $e($d['num']); ?></div>
+          <div>
+            <h2 class="fw-bold text-dark fs-4 mb-0"><?php echo $e($d['title']); ?></h2>
+            <span class="text-secondary small"><?php echo count($d['items']); ?> hoạt động</span>
+          </div>
         </div>
-        <?php endif; ?>
-        <div class="p-3 p-md-4">
-          <?php foreach ($group['items'] as $item):
-            $time = $val($item, array('time', 'time_range', 'start_time'), '');
-            $endTime = $val($item, array('end_time'), '');
-            if ($endTime !== '' && strpos($time, '-') === false) {
-                $time = trim($time . ' - ' . $endTime);
-            }
-            $title = $val($item, array('title', 'name'), 'Hoạt động');
-            $place = $val($item, array('location', 'venue', 'place'), '');
-            $desc = $val($item, array('description', 'note'), '');
-            $type = (string) $val($item, array('type', 'category'), '');
-            $badge = isset($typeMap[$type]) ? $typeMap[$type] : null;
+
+        <div class="ag-timeline">
+          <?php foreach ($d['items'] as $item):
+            $time    = (string) $val($item, array('time', 'start_time'), '');
+            $endTime = (string) $val($item, array('end_time'), '');
+            $title   = $val($item, array('title', 'name'), 'Hoạt động');
+            $place   = $val($item, array('location', 'venue', 'place'), '');
+            $desc    = $val($item, array('description', 'note'), '');
+            $type    = (string) $val($item, array('type', 'category'), 'other');
+            $t       = isset($typeMap[$type]) ? $typeMap[$type] : $fallbackType;
           ?>
-          <div class="d-flex gap-3 py-3 border-bottom agenda-row">
-            <div class="flex-shrink-0 text-end" style="min-width:86px;">
-              <span class="badge bg-light text-dark border fw-bold" style="font-size:12px;"><?php echo $e($time !== '' ? $time : '—'); ?></span>
+          <div class="ag-item <?php echo $t['cls']; ?>">
+            <div class="ag-time">
+              <span class="ag-time-start"><?php echo $e($time !== '' ? $time : '—'); ?></span>
+              <?php if ($endTime !== ''): ?><span class="ag-time-end"><?php echo $e($endTime); ?></span><?php endif; ?>
             </div>
-            <div class="flex-shrink-0 d-flex flex-column align-items-center" style="width:18px;">
-              <span class="rounded-circle bg-primary d-inline-block mt-1" style="width:11px;height:11px;"></span>
-              <span class="flex-grow-1 bg-light" style="width:2px;"></span>
-            </div>
-            <div class="flex-grow-1">
-              <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-                <strong class="text-dark"><?php echo $e($title); ?></strong>
-                <?php if ($badge): ?>
-                  <span class="badge <?php echo $badge['cls']; ?> text-white rounded-pill" style="font-size:10.5px;"><?php echo $e($badge['label']); ?></span>
+            <div class="ag-dot"><span class="material-symbols-outlined"><?php echo $t['icon']; ?></span></div>
+            <div class="ag-card">
+              <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+                <strong class="ag-title"><?php echo $e($title); ?></strong>
+                <?php if ($t['label'] !== ''): ?>
+                  <span class="ag-tag"><?php echo $e($t['label']); ?></span>
                 <?php endif; ?>
               </div>
               <?php if ($place !== ''): ?>
-                <div class="text-muted small d-flex align-items-center gap-1 mb-1">
-                  <span class="material-symbols-outlined fs-6">location_on</span> <?php echo $e($place); ?>
+                <div class="ag-place">
+                  <span class="material-symbols-outlined">location_on</span><?php echo $e($place); ?>
                 </div>
               <?php endif; ?>
               <?php if ($desc !== ''): ?>
-                <p class="text-secondary small mb-0"><?php echo $e($desc); ?></p>
+                <p class="ag-desc"><?php echo $e($desc); ?></p>
               <?php endif; ?>
             </div>
           </div>
@@ -155,12 +157,15 @@ if (!empty($agenda) && is_array($agenda)) {
         </div>
       </div>
       <?php endforeach; ?>
+
     <?php endif; ?>
   </section>
 </main>
 
-<style>
-.agenda-row:last-child { border-bottom: 0 !important; }
-.bg-purple { background-color: #7c3aed !important; }
-.bg-slate-50 { background-color: #f8fafc !important; }
-</style>
+<link rel="stylesheet" href="<?php echo $base; ?>/css/daihoi-agenda.css">
+<?php
+Yii::app()->clientScript->registerScriptFile(
+    $base . '/js/pages/daihoi-agenda.js',
+    CClientScript::POS_END
+);
+?>
