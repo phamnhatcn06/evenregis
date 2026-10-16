@@ -89,9 +89,12 @@ foreach ($sportsList as $sp) {
     $sportInfoById[$sp['id']] = $sp;
 }
 
-// Hàm lấy chữ cái viết tắt của tên đội (Avatar chữ)
+// Hàm lấy chữ cái viết tắt của tên đội / tên VĐV (Avatar chữ)
 $initials = function ($name) {
-    $clean = preg_replace('/^(Liên quân\s+|Đội\s+|Khối\s+)/iu', '', trim((string) $name));
+    // 1. Loại bỏ mã đơn vị trong ngoặc (ví dụ: (DCH), (HUE), (MT Hà Nam)) để tính initials từ tên VĐV thật
+    $clean = preg_replace('/\s*\([^)]*\)/u', '', trim((string) $name));
+    // 2. Loại bỏ các tiền tố đội/liên quân nếu có
+    $clean = preg_replace('/^(Liên quân\s+|Đội\s+|Khối\s+)/iu', '', trim($clean));
     $parts = preg_split('/[\s\-_]+/u', trim($clean));
     $s = '';
     foreach ($parts as $p) {
@@ -1358,11 +1361,11 @@ $getSportMeta = function ($name) {
                         </div>
 
                         <div class="d-flex align-items-center justify-content-center gap-2 flex-grow-1 px-2" style="min-width: 220px;">
-                          <span class="small fw-bold text-end text-truncate <?php echo $isWinnerA ? 'text-success' : 'text-dark'; ?>" style="max-width:130px;"><?php echo $e($ta); ?></span>
+                          <span class="small fw-bold text-end text-truncate <?php echo $isWinnerA ? 'text-success' : 'text-dark'; ?>" style="max-width:210px;" title="<?php echo $e($ta); ?>"><?php echo $e($ta); ?></span>
                           <span class="badge rounded-pill <?php echo $hasScore ? 'bg-dark text-white' : 'bg-light text-dark border'; ?> px-2 py-1 font-monospace fw-bold">
                             <?php echo $hasScore ? ($sa . ' - ' . $sb) : 'vs'; ?>
                           </span>
-                          <span class="small fw-bold text-start text-truncate <?php echo $isWinnerB ? 'text-success' : 'text-dark'; ?>" style="max-width:130px;"><?php echo $e($tb); ?></span>
+                          <span class="small fw-bold text-start text-truncate <?php echo $isWinnerB ? 'text-success' : 'text-dark'; ?>" style="max-width:210px;" title="<?php echo $e($tb); ?>"><?php echo $e($tb); ?></span>
                         </div>
 
                         <div class="d-flex align-items-center gap-2 flex-shrink-0">
@@ -1481,7 +1484,7 @@ $getSportMeta = function ($name) {
                                   </span>
                                 </td>
                                 <td class="text-start fw-bold text-dark">
-                                  <div class="d-flex align-items-center gap-1 text-truncate" style="max-width: 170px;">
+                                  <div class="d-flex align-items-center gap-1 text-truncate" style="max-width: 250px;">
                                     <?php if ($rank === 1): ?><span class="text-warning small">🥇</span><?php elseif ($rank === 2): ?><span class="text-secondary small">🥈</span><?php endif; ?>
                                     <span class="text-truncate" title="<?php echo $e($r['team_name']); ?>"><?php echo $e($r['team_name']); ?></span>
                                   </div>
@@ -2391,15 +2394,15 @@ $getSportMeta = function ($name) {
 }
 .team-name-cell {
   width: 100%;
-  height: 36px;
-  max-height: 36px;
+  height: 38px;
+  max-height: 38px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.35;
   padding: 0 4px;

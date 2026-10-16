@@ -136,6 +136,71 @@ class Daihoi
     }
 
     /**
+     * Lấy tên VĐV (và mã đơn vị) cho danh sách team_id ở các môn cá nhân/đơn.
+     * Trả về định dạng: "Tên VĐV (Mã đơn vị)" theo đúng chuẩn:
+     * "Các nội dung đơn thì ghi tên VĐV (mã đơn vị)"
+     *
+     * @param array $teamIds
+     * @return array [team_id => "Tên VĐV (Mã đơn vị)"]
+     */
+    public static function getAthletesByTeamIds($teamIds)
+    {
+        if (empty($teamIds)) {
+            return array();
+        }
+        $cleanIds = array();
+        foreach ($teamIds as $id) {
+            $id = (int) $id;
+            if ($id > 0) $cleanIds[$id] = $id;
+        }
+        if (empty($cleanIds)) {
+            return array();
+        }
+
+        try {
+            $idListStr = implode(',', $cleanIds);
+            $sql = "
+                SELECT tm.sport_team_id, tm.name as athlete_name, t.name as team_code, p.code as property_code
+                FROM sport_team_members tm
+                JOIN sport_teams t ON t.id = tm.sport_team_id
+                LEFT JOIN properties p ON p.id = t.property_id
+                WHERE tm.sport_team_id IN ({$idListStr})
+                ORDER BY tm.id ASC
+            ";
+            $rows = Yii::app()->db->createCommand($sql)->queryAll();
+            $result = array();
+            foreach ($rows as $r) {
+                $tid = (int) $r['sport_team_id'];
+                $ath = trim((string) $r['athlete_name']);
+                $code = !empty($r['team_code']) ? trim((string) $r['team_code']) : trim((string) $r['property_code']);
+                if (!isset($result[$tid])) {
+                    $result[$tid] = array(
+                        'athletes' => array(),
+                        'team_code' => $code,
+                    );
+                }
+                if ($ath !== '') {
+                    $result[$tid]['athletes'][] = $ath;
+                }
+            }
+
+            $map = array();
+            foreach ($result as $tid => $info) {
+                $athletesStr = implode(' / ', $info['athletes']);
+                $unit = $info['team_code'];
+                if ($athletesStr !== '') {
+                    $map[$tid] = $athletesStr . ($unit !== '' ? (' (' . $unit . ')') : '');
+                } else {
+                    $map[$tid] = $unit;
+                }
+            }
+            return $map;
+        } catch (Exception $e) {
+            return array();
+        }
+    }
+
+    /**
      * Lấy toàn bộ lịch thi đấu Đại hội (các môn thể thao, giai đoạn, bảng đấu, trận đấu và BXH).
      * Tổng hợp từ SportStages và SportDraw Preview.
      *
@@ -231,9 +296,64 @@ class Daihoi
 
                 if (!empty($preview['matches'])) {
                     $teamMap = array();
+
+                    // Xác định xem môn/giai đoạn này có phải nội dung đơn (cá nhân) hay không
+                    $isIndividual = false;
+                    $sNameLower = mb_strtolower($sportName, 'UTF-8');
+                    if (strpos($sNameLower, 'đơn') !== false || (isset($stage['stage_type']) && $stage['stage_type'] === 'individual')) {
+                        $isIndividual = true;
+                    }
+
+                    // Gom team_id để tra cứu tên VĐV nếu là nội dung đơn
+                    $stageTeamIds = array();
                     if (!empty($preview['teams'])) {
                         foreach ($preview['teams'] as $t) {
-                            $teamMap[$t['team_id']] = !empty($t['team_name']) ? $t['team_name'] : ('#' . $t['team_id']);
+                            if (!empty($t['team_id'])) {
+                                $stageTeamIds[] = (int)$t['team_id'];
+                            }
+                        }
+                    }
+                    foreach ($preview['matches'] as $m) {
+                        if (!empty($m['team_a_id'])) $stageTeamIds[] = (int)$m['team_a_id'];
+                        if (!empty($m['team_b_id'])) $stageTeamIds[] = (int)$m['team_b_id'];
+                    }
+
+                    $dbAthletesMap = array();
+                    if ($isIndividual && !empty($stageTeamIds)) {
+                        $dbAthletesMap = self::getAthletesByTeamIds($stageTeamIds);
+                    }
+
+                    if (!empty($preview['teams'])) {
+                        foreach ($preview['teams'] as $t) {
+                            $tid = (int)$t['team_id'];
+                            $unitCode = !empty($t['team_name']) ? $t['team_name'] : ('#' . $tid);
+
+                            if ($isIndividual) {
+                                // 1. Ưu tiên lấy tên VĐV (mã đơn vị) từ DB cục bộ (sport_team_members)
+                                if (isset($dbAthletesMap[$tid]) && !empty($dbAthletesMap[$tid])) {
+                                    $teamMap[$tid] = $dbAthletesMap[$tid];
+                                }
+                                // 2. Nếu API có trả về danh sách player_names
+                                elseif (!empty($t['player_names']) && is_array($t['player_names'])) {
+                                    $athleteName = implode(' / ', array_filter($t['player_names']));
+                                    $teamMap[$tid] = $athleteName !== '' ? ($athleteName . ' (' . $unitCode . ')') : $unitCode;
+                                }
+                                // 3. Fallback mã đơn vị
+                                else {
+                                    $teamMap[$tid] = $unitCode;
+                                }
+                            } else {
+                                $teamMap[$tid] = $unitCode;
+                            }
+                        }
+                    }
+
+                    // Bổ sung các team_id trong matches nếu chưa có trong preview['teams']
+                    if ($isIndividual && !empty($dbAthletesMap)) {
+                        foreach ($dbAthletesMap as $tid => $formattedName) {
+                            if (!isset($teamMap[$tid])) {
+                                $teamMap[$tid] = $formattedName;
+                            }
                         }
                     }
 
@@ -340,12 +460,27 @@ class Daihoi
 
                 // Bơi: thu thập sơ đồ lượt/làn (không có match)
                 if (!empty($preview['swim_heats'])) {
+                    $swimTeamIds = array();
+                    foreach ($preview['swim_heats'] as $heat) {
+                        foreach ((isset($heat['lanes']) ? $heat['lanes'] : array()) as $lane) {
+                            if (!empty($lane['team_id'])) {
+                                $swimTeamIds[] = (int)$lane['team_id'];
+                            }
+                        }
+                    }
+                    $swimAthletesMap = !empty($swimTeamIds) ? self::getAthletesByTeamIds($swimTeamIds) : array();
+
                     foreach ($preview['swim_heats'] as $heat) {
                         $lanes = array();
                         foreach ((isset($heat['lanes']) ? $heat['lanes'] : array()) as $lane) {
+                            $ltid = isset($lane['team_id']) ? (int)$lane['team_id'] : 0;
+                            $lName = !empty($lane['team_name']) ? $lane['team_name'] : ('#' . $ltid);
+                            if (isset($swimAthletesMap[$ltid]) && !empty($swimAthletesMap[$ltid])) {
+                                $lName = $swimAthletesMap[$ltid];
+                            }
                             $lanes[] = array(
                                 'lane_no' => (int)(isset($lane['lane_no']) ? $lane['lane_no'] : 0),
-                                'team_name' => !empty($lane['team_name']) ? $lane['team_name'] : ('#' . (isset($lane['team_id']) ? $lane['team_id'] : '')),
+                                'team_name' => $lName,
                                 'result_ms' => isset($lane['result_ms']) ? $lane['result_ms'] : null,
                                 'rank' => isset($lane['rank']) ? $lane['rank'] : null,
                             );
@@ -857,42 +992,42 @@ class Daihoi
                 'location' => 'Sân cỏ trung tâm', 'match_order' => 15,
             ),
 
-            // --- BÓNG BÀN ---
+            // --- BÓNG BÀN (ĐƠN NAM) ---
             array(
-                'id' => 401, 'sport_id' => 4, 'sport_name' => 'Bóng bàn', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
-                'stage_id' => 10, 'stage_name' => 'Vòng loại', 'round' => 'Đơn nam • Vòng 1',
-                'team_a' => array('id' => 31, 'name' => 'MT Hà Nam', 'score' => 3, 'is_winner' => true),
-                'team_b' => array('id' => 32, 'name' => 'MT Phú Quốc', 'score' => 1, 'is_winner' => false),
+                'id' => 401, 'sport_id' => 4, 'sport_name' => 'Bóng bàn đơn nam', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 10, 'stage_name' => 'Play-off', 'round' => 'Play-off 1',
+                'team_a' => array('id' => 270, 'name' => 'Vy Văn Hùng (DCH)', 'score' => 3, 'is_winner' => true),
+                'team_b' => array('id' => 584, 'name' => 'Lê Trọng Phú (HUE)', 'score' => 1, 'is_winner' => false),
                 'status' => 'completed', 'status_text' => 'Đã kết thúc', 'status_class' => 'bg-secondary text-white',
                 'match_time' => '09:30 27/10/2026', 'match_hour' => '09:30', 'match_date' => '2026-10-27', 'raw_time' => '2026-10-27 09:30:00',
-                'location' => 'Nhà thi đấu - Bàn 1', 'match_order' => 16,
+                'location' => 'Nhà thi đấu Ninh Bình', 'match_order' => 16,
             ),
             array(
-                'id' => 402, 'sport_id' => 4, 'sport_name' => 'Bóng bàn', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
-                'stage_id' => 10, 'stage_name' => 'Vòng loại', 'round' => 'Đơn nam • Vòng 1',
-                'team_a' => array('id' => 33, 'name' => 'MT Luxury Đà Nẵng', 'score' => null, 'is_winner' => false),
-                'team_b' => array('id' => 34, 'name' => 'MT Grand Bắc Giang', 'score' => null, 'is_winner' => false),
+                'id' => 402, 'sport_id' => 4, 'sport_name' => 'Bóng bàn đơn nam', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
+                'stage_id' => 10, 'stage_name' => 'Play-off', 'round' => 'Play-off 2',
+                'team_a' => array('id' => 132, 'name' => 'Nguyễn Văn Tuấn (HNO)', 'score' => null, 'is_winner' => false),
+                'team_b' => array('id' => 263, 'name' => 'Nguyễn Thành Trạng (NTR)', 'score' => null, 'is_winner' => false),
                 'status' => 'scheduled', 'status_text' => 'Đã xếp giờ', 'status_class' => 'bg-info text-white',
                 'match_time' => '14:00 28/10/2026', 'match_hour' => '14:00', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 14:00:00',
-                'location' => 'Nhà thi đấu - Bàn 2', 'match_order' => 17,
+                'location' => 'Nhà thi đấu Ninh Bình', 'match_order' => 17,
             ),
             array(
-                'id' => 403, 'sport_id' => 4, 'sport_name' => 'Bóng bàn', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
+                'id' => 403, 'sport_id' => 4, 'sport_name' => 'Bóng bàn đơn nam', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
                 'stage_id' => 11, 'stage_name' => 'Bán kết', 'round' => 'Bán kết Đơn nam',
-                'team_a' => array('id' => 31, 'name' => 'MT Hà Nam', 'score' => null, 'is_winner' => false),
+                'team_a' => array('id' => 270, 'name' => 'Vy Văn Hùng (DCH)', 'score' => null, 'is_winner' => false),
                 'team_b' => array('id' => null, 'name' => 'Chờ xác định', 'score' => null, 'is_winner' => false),
                 'status' => 'upcoming', 'status_text' => 'Sắp diễn ra', 'status_class' => 'bg-primary text-white',
                 'match_time' => '16:00 28/10/2026', 'match_hour' => '16:00', 'match_date' => '2026-10-28', 'raw_time' => '2026-10-28 16:00:00',
-                'location' => 'Nhà thi đấu - Bàn 1', 'match_order' => 18,
+                'location' => 'Nhà thi đấu Ninh Bình', 'match_order' => 18,
             ),
             array(
-                'id' => 404, 'sport_id' => 4, 'sport_name' => 'Bóng bàn', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
+                'id' => 404, 'sport_id' => 4, 'sport_name' => 'Bóng bàn đơn nam', 'sport_code' => 'TABLE_TENNIS', 'sport_icon' => 'sports_tennis',
                 'stage_id' => 12, 'stage_name' => 'Chung kết', 'round' => 'Chung kết Đơn nam 🏆',
                 'team_a' => array('id' => null, 'name' => 'Thắng Bán kết 1', 'score' => null, 'is_winner' => false),
                 'team_b' => array('id' => null, 'name' => 'Thắng Bán kết 2', 'score' => null, 'is_winner' => false),
                 'status' => 'upcoming', 'status_text' => 'Chung kết', 'status_class' => 'bg-warning text-dark',
                 'match_time' => '09:00 29/10/2026', 'match_hour' => '09:00', 'match_date' => '2026-10-29', 'raw_time' => '2026-10-29 09:00:00',
-                'location' => 'Nhà thi đấu - Bàn 1', 'match_order' => 19,
+                'location' => 'Nhà thi đấu Ninh Bình', 'match_order' => 19,
             ),
 
             // --- PICKLEBALL ---

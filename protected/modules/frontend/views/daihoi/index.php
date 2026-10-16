@@ -329,7 +329,9 @@ $initials = function ($name) {
   if (is_array($name)) {
     $name = isset($name['name']) ? $name['name'] : (isset($name['title']) ? $name['title'] : '');
   }
-  $parts = preg_split('/\s+/', trim((string) $name));
+  $clean = preg_replace('/\s*\([^)]*\)/u', '', trim((string) $name));
+  $clean = preg_replace('/^(Liên quân\s+|Đội\s+|Khối\s+)/iu', '', trim($clean));
+  $parts = preg_split('/\s+/', trim($clean));
   $s = '';
   foreach ($parts as $p) {
     if ($p !== '' && mb_strlen($s) < 3) {
