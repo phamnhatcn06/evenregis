@@ -330,9 +330,9 @@ class SportDrawController extends AdminController
             WHERE m.stage_id = :sid AND m.match_type = 'group' AND m.deleted_at IS NULL
         ")->queryScalar(array(':sid' => $stageId));
 
-        if ($totalGroupCount > 0 && $completedGroupCount === 0 && !$force) {
-            $this->jsonResponse(false, 'Vòng bảng chưa có trận đấu nào có kết quả (0/' . $totalGroupCount . ' trận). Vui lòng ghi kết quả các trận vòng bảng trước khi cập nhật danh sách đội vào sơ đồ loại trực tiếp.');
-        }
+        // Lưu ý: KHÔNG chặn khi vòng bảng chưa có kết quả. Backend sẽ dựng khung sơ đồ
+        // nhánh với các trận "Chờ xác định" (chỉ điền đội khi toàn bộ vòng bảng đá xong),
+        // nên việc bấm nút lúc này chỉ tạo/đặt lại khung chờ — đúng mong muốn nghiệp vụ.
 
         // Tự động tính lại BXH trước
         try {
