@@ -425,9 +425,9 @@ class RunRegistrationsController extends AdminController
         $sheet->setTitle('Dang ky chay');
 
         $sheet->setCellValue('A1', 'DANH SÁCH ĐĂNG KÝ BỘ MÔN CHẠY');
-        $sheet->mergeCells('A1:I1');
+        $sheet->mergeCells('A1:K1');
 
-        $headers = array('A' => 'STT', 'B' => 'Số BIB', 'C' => 'Họ và tên', 'D' => 'Đơn vị', 'E' => 'Số điện thoại', 'F' => 'Năm sinh', 'G' => 'Giới tính', 'H' => 'Cự ly', 'I' => 'Nội dung');
+        $headers = array('A' => 'STT', 'B' => 'Số BIB', 'C' => 'Họ và tên', 'D' => 'Chức danh', 'E' => 'Đơn vị', 'F' => 'Số điện thoại', 'G' => 'Năm sinh', 'H' => 'Giới tính', 'I' => 'Size áo', 'J' => 'Cự ly', 'K' => 'Nội dung');
         foreach ($headers as $col => $label) {
             $sheet->setCellValue($col . '3', $label);
         }
