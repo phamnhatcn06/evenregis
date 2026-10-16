@@ -121,7 +121,7 @@ class BinhchonController extends CController
             $this->jsonResponse(false, 'Phương thức không hợp lệ.');
         }
 
-        $account = $this->requireGoogleAccount();
+        $account = $this->requireVoter();
         $cfg = $this->voteConfig();
 
         $status = BeautyVotes::getVoterStatus($cfg['contest_id'], $account['sub'], $cfg['max_votes_per_voter']);
