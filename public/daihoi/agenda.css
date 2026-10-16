@@ -2,7 +2,10 @@
 .ag-page {
   --ag-line: #e2e8f0;
   --ag-muted: #64748b;
+  /* Chiều cao subheader dính (sticky-top) — thanh chọn ngày dính ngay bên dưới nó */
+  --ag-subheader-h: 62px;
 }
+@media (max-width: 575.98px) { .ag-page { --ag-subheader-h: 56px; } }
 
 /* Hero */
 .ag-hero {
