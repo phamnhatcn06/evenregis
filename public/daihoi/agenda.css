@@ -120,9 +120,35 @@
 }
 .ag-daynav-item.is-active .ag-daynav-num { background: rgba(255, 255, 255, .22); color: #fff; }
 
-/* Khối mỗi ngày */
-.ag-day { scroll-margin-top: 80px; margin-top: 1.75rem; }
-.ag-day-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+/* Khối mỗi ngày — chừa chỗ cho subheader + thanh chọn ngày đang dính */
+.ag-day { scroll-margin-top: calc(var(--ag-subheader-h, 62px) + 76px); margin-top: 1.75rem; }
+
+/* Tiêu đề ngày — banner full-width có nền gradient */
+.ag-day-head {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.1rem 1.35rem;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(120deg, #0b1f52 0%, #1d4ed8 52%, #0d9488 100%);
+  box-shadow: 0 14px 30px rgba(13, 148, 136, .20);
+}
+.ag-day-head::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 12% 20%, rgba(255, 255, 255, .14), transparent 38%),
+    radial-gradient(circle at 92% 120%, rgba(45, 212, 191, .28), transparent 45%);
+  pointer-events: none;
+}
+.ag-day-head > * { position: relative; z-index: 1; }
+.ag-day-head h2 { color: #fff !important; }
+.ag-day-head .text-secondary { color: rgba(255, 255, 255, .78) !important; }
 .ag-day-badge {
   flex: 0 0 auto;
   width: 64px;
@@ -134,10 +160,12 @@
   font-weight: 800;
   line-height: 1;
   color: #fff;
-  background: linear-gradient(135deg, #1d4ed8, #0d9488);
-  box-shadow: 0 10px 22px rgba(13, 148, 136, .25);
+  background: rgba(255, 255, 255, .16);
+  border: 1px solid rgba(255, 255, 255, .28);
+  backdrop-filter: blur(4px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
 }
-.ag-day-badge .small { font-size: .55rem; font-weight: 700; letter-spacing: 1.5px; opacity: .85; }
+.ag-day-badge .small { font-size: .55rem; font-weight: 700; letter-spacing: 1.5px; opacity: .9; }
 
 /* Timeline */
 .ag-timeline { position: relative; }
