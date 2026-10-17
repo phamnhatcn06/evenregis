@@ -905,6 +905,30 @@ class FinalAttendeeRostersController extends AdminController
     }
 
     /**
+     * Khôi phục tư cách người đã bị huỷ (JSON). Đảo ngược actionDelete.
+     */
+    public function actionRestore()
+    {
+        if (!$this->guardWrite('delete')) {
+            return;
+        }
+
+        $id = (int) Yii::app()->request->getPost('id');
+        if (!$id) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu mã dòng cần khôi phục.'), 422);
+            return;
+        }
+
+        $alsoReactivate = Yii::app()->request->getPost('also_reactivate_attendee');
+        $alsoReactivate = $alsoReactivate === null || (string) $alsoReactivate !== '0';
+
+        $this->respondApi(
+            FinalAttendeeRosters::restoreViaApi($id, $alsoReactivate),
+            'Không thể khôi phục tư cách.'
+        );
+    }
+
+    /**
      * Đánh dấu xung đột đã xử lý (JSON).
      */
     public function actionClearConflict()
