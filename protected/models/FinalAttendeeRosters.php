@@ -434,6 +434,18 @@ class FinalAttendeeRosters extends CFormModel
         ));
     }
 
+    /** Khôi phục tư cách: đảo ngược huỷ tư cách, giữ nguyên mã lucky. */
+    public static function restoreViaApi($id, $alsoReactivateAttendee = true)
+    {
+        $ssoUser = AuthHandler::getUser();
+        $url     = ApiEndpoints::url(ApiEndpoints::FINAL_ATTENDEE_ROSTER_RESTORE, array('id' => $id));
+
+        return ApiClient::post($url, array(
+            'also_reactivate_attendee' => $alsoReactivateAttendee ? 1 : 0,
+            'auth_email'               => isset($ssoUser['email']) ? $ssoUser['email'] : null,
+        ));
+    }
+
     /** Đánh dấu xung đột đã xử lý. */
     public static function clearConflictViaApi($id)
     {
