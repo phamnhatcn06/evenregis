@@ -25,6 +25,7 @@
         bindLuckyConflictBadge();
         bindAddPersonModal();
         bindWithdraw(config);
+        bindRestore(config);
         bindResetPin(config);
         bindClearConflict(config);
         bindToggleBtc(config);
