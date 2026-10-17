@@ -849,6 +849,17 @@ $flashMessages = Yii::app()->user->getFlashes();
                                             <i class="fa fa-user-times"></i>
                                         </button>
                                     <?php endif; ?>
+
+                                    <?php if ($canDelete && $isWithdrawn): ?>
+                                        <button type="button"
+                                                class="far-action-btn far-action-restore js-restore"
+                                                data-roster-id="<?php echo (int) $row->id; ?>"
+                                                data-full-name="<?php echo CHtml::encode($row->full_name); ?>"
+                                                data-lucky="<?php echo CHtml::encode($row->lucky_number); ?>"
+                                                title="Khôi phục tư cách người này">
+                                            <i class="fa fa-user-plus"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                             <?php endif; ?>
