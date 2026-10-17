@@ -71,6 +71,7 @@ $flashMessages = Yii::app()->user->getFlashes();
      data-merge-url="<?php echo $this->createUrl('merge'); ?>"
      data-split-url="<?php echo $this->createUrl('split'); ?>"
      data-delete-url="<?php echo $this->createUrl('delete'); ?>"
+     data-restore-url="<?php echo $this->createUrl('restore'); ?>"
      data-clear-conflict-url="<?php echo $this->createUrl('clearConflict'); ?>"
      data-set-lucky-url="<?php echo $this->createUrl('setLucky'); ?>"
      data-reset-pin-url="<?php echo $this->createUrl('resetPin'); ?>"
