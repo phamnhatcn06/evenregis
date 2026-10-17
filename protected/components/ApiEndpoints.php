@@ -705,6 +705,7 @@ class ApiEndpoints
     const FINAL_ATTENDEE_ROSTER_MERGE = '/api/final-attendee-rosters/merge';
     const FINAL_ATTENDEE_ROSTER_SPLIT = '/api/final-attendee-rosters/split';
     const FINAL_ATTENDEE_ROSTER_DESTROY = '/api/final-attendee-rosters/destroy/{id}';
+    const FINAL_ATTENDEE_ROSTER_RESTORE = '/api/final-attendee-rosters/restore/{id}';
     const FINAL_ATTENDEE_ROSTER_CLEAR_CONFLICT = '/api/final-attendee-rosters/clear-conflict/{id}';
     const FINAL_ATTENDEE_ROSTER_AUDIT = '/api/final-attendee-rosters/audit';
     const FINAL_ATTENDEE_ROSTER_SET_LUCKY = '/api/final-attendee-rosters/set-lucky';
