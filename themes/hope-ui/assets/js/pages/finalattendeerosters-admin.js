@@ -86,6 +86,60 @@
         });
     }
 
+    /** Khôi phục tư cách — đảo ngược huỷ tư cách, đưa người trở lại danh sách. */
+    function bindRestore(config) {
+        var url = config.getAttribute('data-restore-url');
+        if (!url) {
+            return;
+        }
+
+        document.querySelectorAll('.js-restore').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var rosterId = button.getAttribute('data-roster-id');
+                var fullName = button.getAttribute('data-full-name');
+                var lucky = button.getAttribute('data-lucky');
+
+                var send = function () {
+                    var body = new FormData();
+                    body.append('id', rosterId);
+                    body.append('also_reactivate_attendee', 1);
+
+                    postWithButton(url, body, button, function (data) {
+                        if (typeof Toast !== 'undefined') {
+                            Toast.success(data.message);
+                        }
+                        window.setTimeout(function () { window.location.reload(); }, 800);
+                    });
+                };
+
+                if (typeof Swal === 'undefined') {
+                    send();
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Khôi phục tư cách người này?',
+                    html: '<p style="text-align:left"><strong>' + escapeHtml(fullName) + '</strong>'
+                        + ' sẽ được đưa trở lại danh sách và đăng nhập lại được cổng chạy.</p>'
+                        + (lucky
+                            ? '<p style="text-align:left">Mã lucky <strong>' + escapeHtml(lucky)
+                                + '</strong> được giữ nguyên.</p>'
+                            : ''),
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1aaa4d',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Khôi phục',
+                    cancelButtonText: 'Không'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        send();
+                    }
+                });
+            });
+        });
+    }
+
     /** Admin reset PIN đăng nhập — luôn hỏi lại, nói rõ hậu quả. */
     function bindResetPin(config) {
         var url = config.getAttribute('data-reset-pin-url');
