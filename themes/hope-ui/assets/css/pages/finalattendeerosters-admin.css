@@ -1058,6 +1058,16 @@
     color: #ffffff;
 }
 
+.far-action-restore {
+    background: rgba(26, 170, 77, 0.12);
+    color: #118138;
+}
+
+.far-action-restore:hover {
+    background: #118138;
+    color: #ffffff;
+}
+
 /* Empty State Box */
 .far-empty-state {
     padding: 48px 20px;
