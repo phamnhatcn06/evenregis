@@ -364,7 +364,6 @@
 
                 var modalImg = document.getElementById('modal-photo');
                 var modalName = document.getElementById('modal-name');
-                var modalSbd = document.getElementById('modal-sbd');
                 var modalUnit = document.getElementById('modal-unit');
                 var modalVotes = document.getElementById('modal-votes');
                 var modalVoteBtn = document.getElementById('modal-vote-btn');
