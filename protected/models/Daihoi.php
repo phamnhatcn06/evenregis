@@ -71,7 +71,7 @@ class Daihoi
 
     /**
      * Danh sách Ban Thư Ký Đoàn và các đơn vị phụ trách.
-     * Đọc trực tiếp từ bảng event_secretaries (cùng DB với backend).
+     * Lấy qua API backend /api/daihoi/secretaries.
      * Mỗi phần tử: array('members' => [{name,phone}], 'units' => ["..."]).
      *
      * @param int|null $eventId Lọc theo sự kiện; null = lấy nhóm chung + của sự kiện.
@@ -79,40 +79,11 @@ class Daihoi
      */
     public static function getSecretaries($eventId = null)
     {
-        try {
-            // Tương thích prod chưa chạy migration: nếu bảng chưa tồn tại thì
-            // SELECT sẽ ném lỗi và được bắt ở catch bên dưới -> trả về rỗng.
-            $sql = "
-                SELECT members, units
-                FROM event_secretaries
-                WHERE deleted_at IS NULL
-            ";
-            $params = array();
-            if ($eventId !== null) {
-                $sql .= " AND (event_id IS NULL OR event_id = :eventId)";
-                $params[':eventId'] = (int) $eventId;
-            }
-            $sql .= " ORDER BY sort_order ASC, id ASC";
-
-            $cmd = Yii::app()->db->createCommand($sql);
-            foreach ($params as $k => $v) {
-                $cmd->bindValue($k, $v);
-            }
-            $rows = $cmd->queryAll();
-
-            $groups = array();
-            foreach ($rows as $r) {
-                $members = json_decode($r['members'], true);
-                $units = json_decode($r['units'], true);
-                $groups[] = array(
-                    'members' => is_array($members) ? $members : array(),
-                    'units' => is_array($units) ? $units : array(),
-                );
-            }
-            return $groups;
-        } catch (Exception $e) {
-            return array();
+        $params = array();
+        if ($eventId !== null) {
+            $params['event_id'] = (int) $eventId;
         }
+        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_SECRETARIES, $params), array());
     }
 
     /**
