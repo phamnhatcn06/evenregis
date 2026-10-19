@@ -192,13 +192,13 @@ $tick = function ($on) use ($accent) {
       <div class="row g-3 mb-4">
         <div class="col-lg-6">
           <div class="card border-0 rounded-4 shadow-sm overflow-hidden h-100">
-            <img src="<?php echo $img; ?>/map-illustrated.png" alt="Sơ đồ tổng thể cung đường chạy" class="w-100" style="object-fit:contain;background:#eef6ef;">
+            <img src="<?php echo $img; ?>/map-illustrated.png" data-full="<?php echo $img; ?>/map-illustrated.png" alt="Sơ đồ tổng thể cung đường chạy" class="funrun-map w-100" style="height:340px;object-fit:cover;background:#eef6ef;cursor:zoom-in;">
             <div class="card-body py-2"><span class="small text-secondary">Sơ đồ tổng thể cung đường chạy quanh hồ Đồng Chương (1 vòng = 5 km).</span></div>
           </div>
         </div>
         <div class="col-lg-6">
           <div class="card border-0 rounded-4 shadow-sm overflow-hidden h-100">
-            <img src="<?php echo $img; ?>/map-route.png" alt="Bản đồ lộ trình đường chạy" class="w-100" style="object-fit:contain;background:#eef6ef;">
+            <img src="<?php echo $img; ?>/map-route.png" data-full="<?php echo $img; ?>/map-route.png" alt="Bản đồ lộ trình đường chạy" class="funrun-map w-100" style="height:340px;object-fit:cover;background:#eef6ef;cursor:zoom-in;">
             <div class="card-body py-2"><span class="small text-secondary">Lộ trình thực tế trên bản đồ (Tràng An Golf &amp; Resort - hồ Đồng Chương).</span></div>
           </div>
         </div>
