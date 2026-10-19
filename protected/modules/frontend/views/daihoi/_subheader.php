@@ -3,7 +3,7 @@
  * Header dùng chung cho các trang con của Đại hội (Lịch trình, Lịch thi đấu).
  *
  * @var string $eventName  Tên sự kiện hiển thị cạnh logo
- * @var string $active     Trang đang mở: 'agenda' | 'welcome' | 'schedule' | 'tour' | 'gala' | 'map' | 'support' | 'secretary'
+ * @var string $active     Trang đang mở: 'agenda' | 'welcome' | 'schedule' | 'tour' | 'funrun' | 'gala' | 'map' | 'support' | 'secretary'
  */
 $base = Yii::app()->request->baseUrl;
 $e = function ($s) { return CHtml::encode($s); };
