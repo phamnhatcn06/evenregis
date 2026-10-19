@@ -642,6 +642,7 @@ class ApiEndpoints
     const BEAUTY_VOTE_RANKING = '/api/beauty-votes/ranking/{id}';
     const BEAUTY_VOTE_SETTINGS = '/api/beauty-votes/settings/{id}';
     const BEAUTY_VOTE_SETTINGS_UPDATE = '/api/beauty-votes/settings';
+    const BEAUTY_VOTE_RESET = '/api/beauty-votes/reset';
 
     const TALENT_FINAL_ADD = '/api/talent-finals/add';
     const TALENT_FINAL_LIST = '/api/talent-finals/list/{id}';
