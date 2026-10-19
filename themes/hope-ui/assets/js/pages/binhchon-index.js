@@ -25,9 +25,7 @@
     var tokenAuth = voterBox.getAttribute('data-token-auth') === '1';
     var credential = null; // Google ID token sau khi đăng nhập
 
-    // Khởi tạo các tính năng tương tác giao diện
-    initSearchAndFilter();
-    initPhotoModal();
+    // Khởi tạo các tính năng tương tác giao diện gắn với khung bình chọn
     initStickyBar();
     renderHeartTokens(maxVotes);
 
