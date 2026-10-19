@@ -103,6 +103,7 @@ class ApiEndpoints
     const DAIHOI_MATCHES_LIVE = '/api/daihoi/matches/live';
     const DAIHOI_MATCHES_RECENT = '/api/daihoi/matches/recent';
     const DAIHOI_RANKINGS = '/api/daihoi/rankings';
+    const DAIHOI_SECRETARIES = '/api/daihoi/secretaries';
     const DAIHOI_SLIDES = '/api/daihoi/slides';
     const DAIHOI_ALBUMS = '/api/daihoi/albums';
     const DAIHOI_ALBUM_ITEMS = '/api/daihoi/albums/{id}/items';
