@@ -1,5 +1,5 @@
 -- Migration: tao bang event_secretaries (Ban Thu Ky Doan) + seed du lieu
--- QUAN TRONG: chay tren DATABASE ma Yii frontend su dung (vd prod: yii_event),
+-- QUAN TRONG: chay tren DATABASE ma Yii frontend dang ket noi (xem protected/config/database.php),
 -- KHONG phai DB rieng cua backend neu hai ben tach DB.
 
 CREATE TABLE IF NOT EXISTS `event_secretaries` (
