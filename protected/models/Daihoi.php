@@ -79,12 +79,9 @@ class Daihoi
      */
     public static function getSecretaries($eventId = null)
     {
-        // Tương thích prod chưa chạy migration: trả rỗng thay vì lỗi.
-        if (!self::columnExists('event_secretaries', 'id')) {
-            return array();
-        }
-
         try {
+            // Tương thích prod chưa chạy migration: nếu bảng chưa tồn tại thì
+            // SELECT sẽ ném lỗi và được bắt ở catch bên dưới -> trả về rỗng.
             $sql = "
                 SELECT members, units
                 FROM event_secretaries
