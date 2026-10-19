@@ -7,6 +7,10 @@
  * @var array $secretaries Mỗi phần tử: array('group_name' => '...', 'members' => [{name,phone,role}], 'units' => ["..."]).
  */
 $base = Yii::app()->request->baseUrl;
+$topHeader = $base . '/themes/hope-ui/assets/images/dashboard/top-header.png';
+$topImage  = $base . '/themes/hope-ui/assets/images/dashboard/top-image.jpg';
+$bgDaihoi  = $base . '/maintenance/assets/images/bg_daihoi.jpg';
+
 $e = function ($s) {
     if (is_array($s)) {
         foreach (array('name', 'title', 'label') as $k) {
@@ -56,11 +60,29 @@ $getInitials = function ($name) {
 <?php $this->renderPartial('_subheader', array('eventName' => $eventName, 'active' => 'secretary')); ?>
 
 <style>
-/* Scoped styles cho trang Ban Thư Ký Đoàn */
+/* Scoped styles cho trang Ban Thư Ký Đoàn với Background nhận diện thương hiệu */
+.sec-page-wrapper {
+  background-color: #f1f5f9;
+  background-image:
+    url('<?php echo $e($topHeader); ?>'),
+    radial-gradient(circle at 10% 8%, rgba(29, 78, 216, 0.09) 0%, transparent 45%),
+    radial-gradient(circle at 90% 18%, rgba(245, 158, 11, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 50% 85%, rgba(13, 148, 136, 0.06) 0%, transparent 45%),
+    radial-gradient(rgba(148, 163, 184, 0.35) 1.2px, transparent 1.2px);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+  background-position: top center, top left, top right, bottom center, 0 0;
+  background-size: 100% 280px, auto, auto, auto, 24px 24px;
+  min-height: calc(100vh - 65px);
+  position: relative;
+}
+
 .sec-hero-gradient {
-  background: linear-gradient(135deg, #0b1329 0%, #1e3a8a 55%, #1d4ed8 100%);
+  background: 
+    linear-gradient(135deg, rgba(11, 19, 41, 0.94) 0%, rgba(23, 52, 121, 0.9) 55%, rgba(29, 78, 216, 0.85) 100%),
+    url('<?php echo $e($topImage); ?>') center / cover no-repeat;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 20px 40px -15px rgba(11, 19, 41, 0.4);
 }
 .sec-hero-gradient::before {
   content: "";
@@ -69,7 +91,7 @@ $getInitials = function ($name) {
   right: -10%;
   width: 480px;
   height: 480px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0) 70%);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(245, 158, 11, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -80,19 +102,53 @@ $getInitials = function ($name) {
   left: 5%;
   width: 360px;
   height: 360px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.3) 0%, rgba(37, 99, 235, 0) 70%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.35) 0%, rgba(37, 99, 235, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
 }
 
+/* Card tổng thể */
 .sec-card {
   transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
 }
 .sec-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.1), 0 6px 12px -4px rgba(15, 23, 42, 0.05) !important;
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.12), 0 10px 16px -6px rgba(15, 23, 42, 0.06) !important;
   border-color: #cbd5e1;
+}
+
+/* Header của từng thẻ card: Deep Navy & Royal Blue với điểm nhấn vàng kim */
+.sec-card-header {
+  background: linear-gradient(135deg, #0b1329 0%, #173878 52%, #1e40af 100%);
+  color: #ffffff;
+  padding: 16px 22px;
+  position: relative;
+  overflow: hidden;
+  border-top-left-radius: 19px;
+  border-top-right-radius: 19px;
+}
+.sec-card-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 35%, #60a5fa 70%, #38bdf8 100%);
+}
+.sec-card-header::after {
+  content: "";
+  position: absolute;
+  right: -15px;
+  bottom: -15px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .sec-avatar {
@@ -107,21 +163,41 @@ $getInitials = function ($name) {
   align-items: center;
   justify-content: center;
   border: 2px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.15);
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.18);
   flex-shrink: 0;
+}
+
+.sec-member-row {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-left: 3.5px solid #1d4ed8 !important;
+  border-radius: 14px;
+  padding: 11px 14px;
+  transition: all 0.22s ease;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+}
+.sec-member-row:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  border-left-color: #2563eb !important;
+  transform: translateX(2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.07);
 }
 
 .sec-unit-pill {
   background: #f8fafc;
-  border: 1px solid #edf2f7;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 9px 12px;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
 }
 .sec-unit-pill:hover {
   background: #eff6ff;
-  border-color: #bfdbfe;
-  transform: translateX(2px);
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  transform: translateX(3px);
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.08);
 }
 
 .sec-call-btn {
@@ -129,12 +205,12 @@ $getInitials = function ($name) {
   color: #ffffff !important;
   border: none;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.2);
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
 }
 .sec-call-btn:hover {
   background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(29, 78, 216, 0.3);
+  box-shadow: 0 6px 14px rgba(29, 78, 216, 0.35);
 }
 
 .sec-copy-btn {
@@ -160,6 +236,7 @@ $getInitials = function ($name) {
   border-radius: 16px;
   padding: 14px 20px 14px 50px;
   font-size: 15px;
+  background: #ffffff;
   transition: all 0.25s ease;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
@@ -180,6 +257,7 @@ $getInitials = function ($name) {
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02);
 }
 .sec-filter-chip:hover {
   background: #f1f5f9;
@@ -189,7 +267,48 @@ $getInitials = function ($name) {
   background: #1d4ed8;
   border-color: #1d4ed8;
   color: #ffffff;
-  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.2);
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
+}
+
+.sec-hero-pill {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 8px 14px;
+}
+
+.sec-hero-badge {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  color: #fef08a !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.sec-hero-card-right {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff !important;
+}
+
+.sec-breadcrumb {
+  color: rgba(255, 255, 255, 0.9);
+}
+.sec-breadcrumb a {
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: none;
+}
+.sec-breadcrumb a:hover {
+  color: #ffffff !important;
+}
+.sec-breadcrumb-current {
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 mark.sec-hl {
@@ -201,54 +320,54 @@ mark.sec-hl {
 }
 </style>
 
-<main class="flex-grow-1 bg-slate-50 py-4 py-lg-5">
-  <div class="container">
+<main class="flex-grow-1 sec-page-wrapper py-4 py-lg-5">
+  <div class="container position-relative" style="z-index: 2;">
 
     <!-- Breadcrumb -->
-    <nav class="mb-3 small d-flex align-items-center gap-1 text-secondary" aria-label="Breadcrumb">
-      <a href="<?php echo $e($base); ?>/" class="text-decoration-none text-secondary hover:text-primary transition d-inline-flex align-items-center gap-1">
+    <nav class="mb-3 small d-flex align-items-center gap-1.5 sec-breadcrumb" aria-label="Breadcrumb">
+      <a href="<?php echo $e($base); ?>/" class="d-inline-flex align-items-center gap-1">
         <span class="material-symbols-outlined fs-6">home</span> Trang chủ
       </a>
-      <span class="text-muted">/</span>
-      <span class="text-dark fw-semibold">Ban Thư Ký Đoàn</span>
+      <span class="opacity-75">/</span>
+      <span class="sec-breadcrumb-current">Ban Thư Ký Đoàn</span>
     </nav>
 
     <!-- Hero Banner Card -->
     <div class="card border-0 rounded-4 shadow-sm sec-hero-gradient text-white mb-4 mb-lg-5 p-4 p-md-5">
       <div class="row align-items-center gy-4 position-relative" style="z-index: 1;">
         <div class="col-12 col-lg-8">
-          <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-10 text-amber-300 border border-warning border-opacity-25 text-xs fw-bold text-uppercase tracking-wider mb-3">
+          <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill sec-hero-badge text-xs fw-bold text-uppercase tracking-wider mb-3">
             <span class="material-symbols-outlined fs-6 text-amber-300">verified</span>
             Ban Tổ Chức Đại Hội Mường Thanh 2026
           </div>
           <h1 class="fw-black fs-2 fs-md-1 mb-2 text-white text-uppercase" style="letter-spacing: -0.02em;">
             Danh Sách Ban Thư Ký Đoàn Phụ Trách
           </h1>
-          <p class="text-white text-opacity-80 fs-6 mb-4 lh-base" style="max-width: 680px;">
+          <p class="text-white text-opacity-85 fs-6 mb-4 lh-base" style="max-width: 680px;">
             Đầu mối kết nối trực tiếp, đồng hành hỗ trợ Quý Đại biểu thuộc từng đơn vị thành viên, tiếp nhận thông tin hậu cần và điều phối ẩm thực trong suốt thời gian diễn ra Đại hội.
           </p>
           <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap">
-            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 text-sm">
-              <span class="material-symbols-outlined fs-5 text-amber-400">groups</span>
+            <div class="d-inline-flex align-items-center gap-2 sec-hero-pill text-sm">
+              <span class="material-symbols-outlined fs-5 text-amber-300">groups</span>
               <span><strong><?php echo $totalGroups; ?></strong> Tổ Thư ký</span>
             </div>
-            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 text-sm">
-              <span class="material-symbols-outlined fs-5 text-amber-400">badge</span>
+            <div class="d-inline-flex align-items-center gap-2 sec-hero-pill text-sm">
+              <span class="material-symbols-outlined fs-5 text-amber-300">badge</span>
               <span><strong><?php echo $totalMembers; ?></strong> Cán bộ phụ trách</span>
             </div>
-            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 text-sm">
-              <span class="material-symbols-outlined fs-5 text-amber-400">domain</span>
+            <div class="d-inline-flex align-items-center gap-2 sec-hero-pill text-sm">
+              <span class="material-symbols-outlined fs-5 text-amber-300">domain</span>
               <span><strong><?php echo $totalUnits; ?></strong> Đơn vị thành viên</span>
             </div>
           </div>
         </div>
 
         <div class="col-12 col-lg-4 text-lg-end d-none d-lg-block">
-          <div class="d-inline-flex flex-column align-items-end p-4 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 backdrop-blur">
+          <div class="d-inline-flex flex-column align-items-end p-4 rounded-4 sec-hero-card-right">
             <span class="material-symbols-outlined mb-2 text-amber-300" style="font-size: 42px;">support_agent</span>
-            <span class="text-uppercase text-white text-opacity-70 small fw-bold">Tổng đài hỗ trợ sự kiện</span>
+            <span class="text-uppercase text-white text-opacity-75 small fw-bold">Tổng đài hỗ trợ sự kiện</span>
             <span class="fs-5 fw-bold text-white mt-1">Trực 24/24 Giờ</span>
-            <span class="text-white text-opacity-70 small mt-1">Hỗ trợ tiếp nhận thông tin kịp thời</span>
+            <span class="text-white text-opacity-75 small mt-1">Hỗ trợ tiếp nhận thông tin kịp thời</span>
           </div>
         </div>
       </div>
@@ -257,7 +376,7 @@ mark.sec-hl {
     <!-- Notice Box: Quy định suất ăn 24 giờ -->
     <div class="card border-0 rounded-4 shadow-sm mb-4 mb-lg-5 overflow-hidden" style="background: linear-gradient(to right, #fffbeb 0%, #fef3c7 100%); border-left: 5px solid #f59e0b !important;">
       <div class="p-3 p-md-4 d-flex align-items-start gap-3">
-        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 46px; height: 46px; background: rgba(245, 158, 11, 0.2); color: #d97706;">
+        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; background: rgba(245, 158, 11, 0.22); color: #d97706; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);">
           <span class="material-symbols-outlined fs-4">restaurant_menu</span>
         </div>
         <div class="flex-grow-1">
@@ -277,7 +396,7 @@ mark.sec-hl {
     </div>
 
     <!-- Live Search & Filter Bar -->
-    <div class="card border-0 rounded-4 shadow-sm bg-white p-3 p-md-4 mb-4">
+    <div class="card border-0 rounded-4 shadow-sm bg-white p-3 p-md-4 mb-4" style="border: 1px solid rgba(226, 232, 240, 0.9) !important;">
       <div class="row align-items-center g-3">
         <div class="col-12 col-md-7 col-lg-8">
           <div class="position-relative">
@@ -351,25 +470,26 @@ mark.sec-hl {
           $unitCount = count($units);
         ?>
         <div class="col-12 col-xl-6 sec-card-col" data-group-index="<?php echo $idx; ?>">
-          <div class="card rounded-4 shadow-sm bg-white h-100 sec-card overflow-hidden d-flex flex-column">
+          <div class="card rounded-4 shadow-sm h-100 sec-card overflow-hidden d-flex flex-column">
 
-            <!-- Card Header bar: Group name & Unit count -->
-            <div class="px-4 py-3 bg-white border-bottom d-flex align-items-center justify-content-between gap-2 flex-wrap" style="border-top: 4px solid #1d4ed8 !important;">
+            <!-- Card Header: Deep Navy & Royal Blue với điểm nhấn vàng kim sang trọng -->
+            <div class="sec-card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
               <div class="d-flex align-items-center gap-2">
-                <span class="badge rounded-pill fw-bold text-uppercase px-3 py-1.5" style="background: #1d4ed8; color: #ffffff; font-size: 12px; letter-spacing: 0.03em;">
+                <span class="badge rounded-pill fw-bold text-uppercase px-3 py-1.5" style="background: rgba(255, 255, 255, 0.18); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.28); font-size: 13px; letter-spacing: 0.04em; backdrop-filter: blur(4px);">
+                  <span class="material-symbols-outlined fs-6 text-amber-300 align-text-bottom me-1">groups</span>
                   <?php echo $e($groupName); ?>
                 </span>
-                <span class="text-secondary small fw-medium d-none d-sm-inline">
+                <span class="small fw-medium d-none d-sm-inline" style="color: rgba(255, 255, 255, 0.85);">
                   • <?php echo count($members); ?> cán bộ phụ trách
                 </span>
               </div>
-              <span class="badge bg-slate-100 text-slate-700 border rounded-pill px-2.5 py-1 text-xs fw-semibold">
-                <span class="group-unit-count"><?php echo $unitCount; ?></span> đơn vị phụ trách
+              <span class="badge rounded-pill px-3 py-1.5 text-xs fw-semibold" style="background: rgba(245, 158, 11, 0.22); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); backdrop-filter: blur(4px);">
+                <span class="group-unit-count fw-bold"><?php echo $unitCount; ?></span> đơn vị phụ trách
               </span>
             </div>
 
             <!-- Members list (Cán bộ Thư ký đoàn) -->
-            <div class="p-3 p-md-4 bg-slate-50 border-bottom">
+            <div class="p-3 p-md-4 border-bottom" style="background: #f8fafc;">
               <span class="text-uppercase text-secondary fw-bold text-xs d-block mb-3" style="letter-spacing: 0.05em;">
                 <span class="material-symbols-outlined fs-6 align-text-bottom text-primary">person</span>
                 Cán bộ Thư ký phụ trách
@@ -383,7 +503,7 @@ mark.sec-hl {
                   $initials = $getInitials($rawName);
                   $role = isset($m['role']) && $m['role'] !== '' ? $m['role'] : 'Thư ký đoàn';
                 ?>
-                <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap p-2.5 bg-white rounded-3 border shadow-xs sec-member-row">
+                <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap sec-member-row">
                   <div class="d-flex align-items-center gap-2.5">
                     <div class="sec-avatar"><?php echo $e($initials); ?></div>
                     <div>
