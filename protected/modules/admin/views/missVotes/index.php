@@ -118,6 +118,7 @@ Yii::app()->clientScript->registerScriptFile(
             <table class="table table-bordered table-striped align-middle">
                 <thead>
                     <tr>
+                        <th style="width:60px;">STT</th>
                         <th style="width:70px;">Hạng</th>
                         <th style="width:90px;">Ảnh</th>
                         <th style="width:130px;">Số báo danh</th>
