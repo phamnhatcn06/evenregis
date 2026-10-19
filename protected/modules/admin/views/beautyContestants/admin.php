@@ -193,6 +193,8 @@ Yii::app()->clientScript->registerScriptFile(
     </div>
 </div>
 
+<?php $this->renderPartial('_modal_vote_photo'); ?>
+
 <?php
 Yii::app()->clientScript->registerScript('beauty-contestants-scripts', "
     // Prevent filter clicks from triggering column sorting
