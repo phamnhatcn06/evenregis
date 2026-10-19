@@ -21,6 +21,7 @@
         var fileInput = document.getElementById('vote_photo_file');
         var submitBtn = document.getElementById('btn_submit_vote_photo');
         var uploadUrl = form.getAttribute('data-url');
+        var defaultBtnHtml = submitBtn.innerHTML;
 
         // Dòng (nút) đang được chỉnh sửa — để cập nhật thumbnail sau khi lưu.
         var activeCell = null;
