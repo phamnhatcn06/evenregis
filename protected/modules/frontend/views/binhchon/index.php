@@ -269,11 +269,6 @@ $isTokenAuth = $tokenVoter !== null;
                      data-cid="<?php echo (int) $f['contestant_id']; ?>">
 
                     <div class="bc-card-photo-wrapper" title="Nhấn để xem chi tiết ảnh">
-                        <?php if (!empty($f['number'])): ?>
-                            <span class="bc-sbd-badge">
-                                <i class="fa fa-star"></i> <?php echo CHtml::encode($f['number']); ?>
-                            </span>
-                        <?php endif; ?>
 
                         <span class="bc-vote-pill">
                             <i class="fa fa-heart"></i>
