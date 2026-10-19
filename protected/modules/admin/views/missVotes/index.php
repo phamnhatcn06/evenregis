@@ -127,11 +127,21 @@ $endAt = isset($settings['vote_end_at']) ? $settings['vote_end_at'] : '';
                                 <td><?php echo CHtml::encode(isset($r['candidate_number']) ? $r['candidate_number'] : ''); ?></td>
                                 <td><?php echo CHtml::encode(isset($r['name']) ? $r['name'] : ''); ?></td>
                                 <td><?php echo CHtml::encode(isset($r['unit']) ? $r['unit'] : ''); ?></td>
-                                <td class="text-end fw-bold text-primary"><?php echo (int) (isset($r['vote_count']) ? $r['vote_count'] : 0); ?></td>
+                                <td class="text-end fw-bold text-primary"><?php echo $voteCount; ?></td>
+                                <td class="text-end"><?php echo $percent; ?>%</td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
+                <?php if (!empty($rows)): ?>
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td colspan="5" class="text-end">Tổng cộng</td>
+                        <td class="text-end text-primary"><?php echo $totalVotes; ?></td>
+                        <td class="text-end"><?php echo $totalVotes > 0 ? '100%' : '0%'; ?></td>
+                    </tr>
+                </tfoot>
+                <?php endif; ?>
             </table>
         </div>
     </div>
