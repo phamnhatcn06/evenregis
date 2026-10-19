@@ -252,7 +252,7 @@ $tick = function ($on) use ($accent) {
           </li>
           <?php endforeach; ?>
         </ul>
-        <div class="alert mt-3 mb-0 small" style="background:<?php echo $e($accent); ?>0d;color:#7f1d1d;border:none;">
+        <div class="alert mt-3 mb-0 small" style="background:<?php echo $e($accent); ?>0d;color:#166534;border:none;">
           <strong>Điều kiện sức khỏe:</strong> Việc đăng ký đồng nghĩa VĐV xác nhận đủ sức khỏe tham gia cự ly đã chọn. BTC khuyến nghị người có tiền sử bệnh tim mạch, huyết áp, hô hấp, chấn thương... tham khảo ý kiến bác sĩ trước khi đăng ký. VĐV tự chịu trách nhiệm với rủi ro phát sinh do sức khỏe cá nhân.
         </div>
         <p class="small text-secondary mt-3 mb-0">Khiếu nại về kết quả gửi trực tiếp BTC trong vòng 30 phút kể từ khi công bố kết quả tạm thời. Quyết định của Ban Trọng tài và BTC là quyết định cuối cùng.</p>
