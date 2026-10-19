@@ -266,8 +266,9 @@ class BeautyContestantsController extends AdminController
             $sheet->setCellValue('I' . $rowNum, $item->talent);
             $sheet->setCellValue('J' . $rowNum, $item->bio);
             $sheet->setCellValue('K' . $rowNum, $statusText);
+            $sheet->setCellValue('L' . $rowNum, $item->current_round_name ?: 'Chưa vào vòng');
 
-            $sheet->getStyle('A' . $rowNum . ':K' . $rowNum)->applyFromArray($borderStyle);
+            $sheet->getStyle('A' . $rowNum . ':L' . $rowNum)->applyFromArray($borderStyle);
             $rowNum++;
         }
 
