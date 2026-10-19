@@ -276,7 +276,7 @@ class BeautyContestantsController extends AdminController
         // rất tốn CPU/RAM với nhiều dòng, dễ gây segfault/timeout/500 trên server.
         $columnWidths = array(
             'A' => 6, 'B' => 24, 'C' => 24, 'D' => 24, 'E' => 24, 'F' => 14,
-            'G' => 14, 'H' => 16, 'I' => 24, 'J' => 32, 'K' => 16,
+            'G' => 14, 'H' => 16, 'I' => 24, 'J' => 32, 'K' => 16, 'L' => 20,
         );
         foreach ($columnWidths as $columnID => $width) {
             $sheet->getColumnDimension($columnID)->setWidth($width);
