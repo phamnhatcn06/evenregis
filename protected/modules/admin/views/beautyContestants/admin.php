@@ -42,6 +42,11 @@ $this->menu = array(
     ),
 );
 $this->Tabletitle = 'Danh sách thí sinh thi Miss';
+
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/beauty-contestants-admin.js',
+    CClientScript::POS_END
+);
 ?>
 
 <div class="card">
