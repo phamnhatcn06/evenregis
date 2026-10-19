@@ -146,6 +146,7 @@ Yii::app()->clientScript->registerScriptFile(
                             $percent = $totalVotes > 0 ? round($voteCount * 100 / $totalVotes, 2) : 0;
                             ?>
                             <tr>
+                                <td class="text-center"><?php echo $stt; ?></td>
                                 <td class="text-center fw-bold"><?php echo (int) (isset($r['rank']) ? $r['rank'] : 0); ?></td>
                                 <td>
                                     <?php if ($photo): ?>
