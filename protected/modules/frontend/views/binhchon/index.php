@@ -322,7 +322,7 @@ $isTokenAuth = $tokenVoter !== null;
          7. PHOTO DETAIL MODAL (LIGHTBOX)
          ====================================================================== -->
     <div class="modal fade bc-modal" id="bcPhotoModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl bc-modal-dialog">
             <div class="modal-content position-relative">
                 <button type="button" class="bc-modal-close-btn" data-bs-dismiss="modal" aria-label="Đóng">
                     <i class="fa fa-times"></i>
