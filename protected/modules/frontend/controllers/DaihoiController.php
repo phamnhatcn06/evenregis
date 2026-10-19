@@ -216,6 +216,18 @@ class DaihoiController extends FrontEndController
     }
 
     /**
+     * Trang thông tin Giải chạy Fun Run (Điều lệ + Sơ đồ đường chạy) - slug /fun-run.
+     * Nội dung công khai, tách biệt với cổng đăng ký /run.
+     */
+    public function actionFunRun()
+    {
+        $this->frontTitle = 'Giải chạy Mường Thanh Fun Run';
+        $this->render('fun-run', array(
+            'event' => Daihoi::getEvent(),
+        ));
+    }
+
+    /**
      * Sơ đồ địa điểm Đại hội - slug /so-do-dia-diem.
      */
     public function actionSoDoDiaDiem()
