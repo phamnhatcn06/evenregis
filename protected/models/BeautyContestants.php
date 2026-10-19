@@ -77,6 +77,7 @@ class BeautyContestants extends BaseBeautyContestants
             'bio' => 'Tiểu sử',
             'photo_portrait' => 'Ảnh chân dung 1',
             'photo_portrait_2' => 'Ảnh chân dung 2',
+            'current_round_name' => 'Vòng hiện tại',
             'photo_full_body' => 'Ảnh toàn thân 1',
             'photo_full_body_2' => 'Ảnh toàn thân 2',
             'video_path' => 'Video dự thi',
