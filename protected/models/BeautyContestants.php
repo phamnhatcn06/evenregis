@@ -56,7 +56,7 @@ class BeautyContestants extends BaseBeautyContestants
             array('talent, award, personal_email', 'length', 'max' => 255),
             array('photo_portrait, photo_full_body, photo_portrait_2, photo_full_body_2, video_path', 'length', 'max' => 500),
             array('status', 'length', 'max' => 12),
-            array('candidate_number, height_cm, weight_kg, measurements, talent, bio, photo_portrait, photo_full_body, photo_portrait_2, photo_full_body_2, video_path, personal_email, award, final_rank, registered_at, status, submitted_at', 'safe'),
+            array('candidate_number, height_cm, weight_kg, measurements, talent, bio, photo_portrait, photo_full_body, photo_portrait_2, photo_full_body_2, vote_photo_path, video_path, personal_email, award, final_rank, registered_at, status, submitted_at', 'safe'),
         );
     }
 
