@@ -74,7 +74,7 @@ $tick = function ($on) use ($accent) {
 
 <main class="flex-grow-1">
   <!-- Hero -->
-  <section class="py-5" style="background:linear-gradient(135deg,#9f1239 0%,#e11d48 55%,#f97316 100%);">
+  <section class="py-5" style="background:linear-gradient(135deg,#065f46 0%,#16a34a 55%,#65a30d 100%);">
     <div class="container text-white">
       <div class="row align-items-center g-4">
         <div class="col-lg-12">
