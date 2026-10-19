@@ -207,8 +207,11 @@ class DaihoiController extends FrontEndController
     public function actionDoanThuKy()
     {
         $this->frontTitle = 'Danh sách Ban Thư Ký Đoàn';
+        $event = Daihoi::getEvent();
+        $eventId = isset($event['id']) ? (int) $event['id'] : null;
         $this->render('doan-thu-ky', array(
-            'event' => Daihoi::getEvent(),
+            'event' => $event,
+            'secretaries' => Daihoi::getSecretaries($eventId),
         ));
     }
 
