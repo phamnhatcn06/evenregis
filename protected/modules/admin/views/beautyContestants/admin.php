@@ -121,6 +121,15 @@ Yii::app()->clientScript->registerScriptFile(
                     }
                 ),
                 array(
+                    'header' => 'Vòng hiện tại',
+                    'type' => 'raw',
+                    'width' => '130px',
+                    'filter' => false,
+                    'value' => function ($data) {
+                        return BeautyContestants::getCurrentRoundLabel($data->current_round_name);
+                    }
+                ),
+                array(
                     'name' => 'status',
                     'header' => 'Trạng thái',
                     'width' => '120px',
