@@ -80,8 +80,20 @@
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-                .then(function (res) { return res.json(); })
-                .then(function (data) {
+                .then(function (res) { return res.text(); })
+                .then(function (text) {
+                    var data;
+                    try {
+                        // Một số cấu hình in warning/notice trước JSON → cắt lấy phần JSON.
+                        var start = text.indexOf('{');
+                        data = JSON.parse(start >= 0 ? text.slice(start) : text);
+                    } catch (err) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalHtml;
+                        Toast.error('Máy chủ trả về dữ liệu không hợp lệ.');
+                        return;
+                    }
+
                     if (data.success) {
                         modal.hide();
                         Toast.success(data.message || 'Thành công');
@@ -98,10 +110,6 @@
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalHtml;
                     Toast.error('Lỗi kết nối server');
-                })
-                .finally(function () {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalHtml;
                 });
         });
 
