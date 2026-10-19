@@ -83,7 +83,184 @@ class Daihoi
         if ($eventId !== null) {
             $params['event_id'] = (int) $eventId;
         }
-        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_SECRETARIES, $params), array());
+        $res = self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_SECRETARIES, $params), null);
+        if (is_array($res) && !empty($res)) {
+            return $res;
+        }
+        return self::getDefaultSecretaries();
+    }
+
+    /**
+     * Dữ liệu dự phòng danh sách Ban Thư Ký Đoàn theo Sổ tay Đại hội Mường Thanh 2026.
+     * @return array
+     */
+    public static function getDefaultSecretaries()
+    {
+        return array(
+            array(
+                'group_name' => 'Tổ Thư ký 01',
+                'members' => array(
+                    array('name' => 'Mr. Đàm Thận Tiệp', 'phone' => '0988 016 066', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Ms. Trần Thị Quyên', 'phone' => '0975 776 888', 'role' => 'Thư ký đoàn'),
+                ),
+                'units' => array(
+                    'Công ty CP Phát triển địa ốc Cienco5',
+                    'Công ty TNHH Thang máy DHE',
+                    'Chi nhánh DVNO Linh Đàm',
+                    'Chi nhánh DVNO và quản lý KĐT Mường Thanh',
+                    'Chi nhánh DVNO Thanh Hà',
+                    'Ban Điều hành Siêu thị và các siêu thị tại Hà Nội',
+                    'Khách ngoại giao',
+                    'Khách mời gia đình',
+                ),
+            ),
+            array(
+                'group_name' => 'Tổ Thư ký 02',
+                'members' => array(
+                    array('name' => 'Ms. Nguyễn Thị Thu Trang', 'phone' => '0973 666 015', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Ms. Trần Mai Phương', 'phone' => '0986 950 890', 'role' => 'Thư ký đoàn'),
+                ),
+                'units' => array(
+                    'Văn phòng Tập đoàn Mường Thanh',
+                    'Mường Thanh Grand Phương Đông',
+                    'Trung tâm Giải trí Vinh',
+                    'Khách sạn Mường Thanh Luxury Diễn Lâm',
+                    'Khu sinh thái Mường Thanh Diễn Lâm',
+                    'Mường Thanh Golf Club Diễn Lâm',
+                    'Dự án Mường Thanh Diễn Lâm II',
+                ),
+            ),
+            array(
+                'group_name' => 'Tổ Thư ký 03',
+                'members' => array(
+                    array('name' => 'Ms. Lê Thị Ngọc', 'phone' => '0898 600 222', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Ms. Hà Hoàng Yến', 'phone' => '0868 495 413', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Ms. Lê Thị Thu Uyên', 'phone' => '0329 493 273', 'role' => 'Thư ký đoàn'),
+                ),
+                'units' => array(
+                    'Mường Thanh Luxury Hà Nam',
+                    'Mường Thanh Grand Thanh Hóa',
+                    'Trường THPT Nguyễn Du',
+                    'Bệnh viện Phủ Diễn',
+                    'Mường Thanh Diễn Châu',
+                    'Mường Thanh Grand Hoàng Mai',
+                    'Mường Thanh Holiday Con Cuông',
+                    'Mường Thanh Luxury Sông Lam',
+                    'Mường Thanh Cửa Đông',
+                    'Mường Thanh Grand Cửa Lò',
+                    'Dự án Mường Thanh Luxury Cửa Lò',
+                    'Mường Thanh Vinh',
+                    'Mường Thanh Thanh Niên Vinh',
+                    'Siêu thị Mường Thanh Con Cuông',
+                    'Siêu thị Mường Thanh Hoàng Mai',
+                ),
+            ),
+            array(
+                'group_name' => 'Tổ Thư ký 04',
+                'members' => array(
+                    array('name' => 'Ms. Đỗ Thị Thanh Huyền', 'phone' => '0376 327 988', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Ms. Đinh Thái Thùy Dương', 'phone' => '0377 618 599', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Mr. Nguyễn Quốc Anh', 'phone' => '0367 390 558', 'role' => 'Thư ký đoàn'),
+                ),
+                'units' => array(
+                    'Mường Thanh Quy Nhơn',
+                    'Mường Thanh Grand Gia Lai',
+                    'Mường Thanh Luxury Buôn Ma Thuột',
+                    'Mường Thanh Luxury Nha Trang',
+                    'Mường Thanh Grand Nha Trang',
+                    'Mường Thanh Luxury Viễn Triều',
+                    'Mường Thanh Luxury Khánh Hòa',
+                    'Chung cư Mường Thanh Viễn Triều',
+                    'Chung cư Mường Thanh Khánh Hòa',
+                    'Mường Thanh Holiday Đà Lạt',
+                    'Mường Thanh Holiday Mũi Né',
+                    'Mường Thanh Holiday Vũng Tàu',
+                    'Mường Thanh Luxury Sài Gòn',
+                    'Mường Thanh Grand Sài Gòn Centre',
+                    'Dự án Chung cư Mường Thanh Phú Hữu',
+                    'Mường Thanh Luxury Cà Mau',
+                    'Mường Thanh Luxury Cần Thơ',
+                    'Mường Thanh Luxury Phú Quốc',
+                ),
+            ),
+            array(
+                'group_name' => 'Tổ Thư ký 05',
+                'members' => array(
+                    array('name' => 'Ms. Hoàng Thị Huyền Trang', 'phone' => '0977 752 089', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Ms. Đào Minh Anh', 'phone' => '0366 700 935', 'role' => 'Thư ký đoàn'),
+                ),
+                'units' => array(
+                    'Mường Thanh Grand Hà Nội Centre',
+                    'Mường Thanh Grand Hà Nội',
+                    'Mường Thanh Grand Xa La',
+                    'Mường Thanh Luxury Vientiane',
+                    'Khách sạn Mường Thanh Luxury Ninh Bình',
+                    'Dự án Mường Thanh Ninh Bình',
+                    'Nhà thầu sự kiện (ca sĩ, quay phim chụp ảnh, ekip sự kiện...)',
+                ),
+            ),
+            array(
+                'group_name' => 'Tổ Thư ký 06',
+                'members' => array(
+                    array('name' => 'Ms. Bùi Thị Nhung', 'phone' => '0978 359 749', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Mr. Dương Đức Giang', 'phone' => '0966 831 976', 'role' => 'Thư ký đoàn'),
+                ),
+                'units' => array(
+                    'Mường Thanh Grand Tuyên Quang',
+                    'Mường Thanh Luxury Phú Thọ',
+                    'Mường Thanh Luxury Cao Bằng',
+                    'Mường Thanh Luxury Bắc Ninh',
+                    'Mường Thanh Grand Bắc Giang',
+                    'Mường Thanh Grand Bãi Cháy',
+                    'Mường Thanh Grand Hạ Long',
+                    'Mường Thanh Luxury Hạ Long Centre',
+                    'Mường Thanh Luxury Hạ Long Centre II',
+                    'Mường Thanh Luxury Quảng Ninh',
+                    'Mường Thanh Holiday Suối Mơ',
+                ),
+            ),
+            array(
+                'group_name' => 'Tổ Thư ký 07',
+                'members' => array(
+                    array('name' => 'Ms. Nguyễn Thái Mỹ', 'phone' => '0362 109 907', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Ms. Đỗ Thị Kim Phượng', 'phone' => '0934 530 068', 'role' => 'Thư ký đoàn'),
+                ),
+                'units' => array(
+                    'Mường Thanh Golf Club Xuân Thành',
+                    'Mường Thanh Luxury Xuân Thành',
+                    'Mường Thanh Grand Hà Tĩnh',
+                    'Mường Thanh Holiday Quảng Bình',
+                    'Mường Thanh Luxury Nhật Lệ',
+                    'Mường Thanh Grand Quảng Trị',
+                    'Mường Thanh Holiday Huế',
+                    'Mường Thanh Grand Đà Nẵng',
+                    'Mường Thanh Luxury Đà Nẵng',
+                    'Mường Thanh Luxury Sông Hàn',
+                    'Chung cư Mường Thanh Luxury Đà Nẵng',
+                    'Mường Thanh Holiday Hội An',
+                    'Mường Thanh Grand Quảng Nam',
+                    'Mường Thanh Holiday Lý Sơn',
+                ),
+            ),
+            array(
+                'group_name' => 'Tổ Thư ký 08',
+                'members' => array(
+                    array('name' => 'Ms. Lê Thị Thanh Trà', 'phone' => '094 819 8743', 'role' => 'Thư ký đoàn'),
+                    array('name' => 'Ms. Nguyễn Phương Hà', 'phone' => '0868 356 133', 'role' => 'Thư ký đoàn'),
+                ),
+                'units' => array(
+                    'Mường Thanh Lai Châu',
+                    'Mường Thanh Grand Lào Cai',
+                    'Mường Thanh Sa Pa',
+                    'Mường Thanh Luxury Lạng Sơn',
+                    'Mường Thanh Grand Điện Biên Phủ',
+                    'Mường Thanh Luxury Điện Biên',
+                    'Dự án Golf Điện Biên',
+                    'Mường Thanh Luxury Sơn La',
+                    'Mường Thanh Luxury Mộc Châu',
+                ),
+            ),
+        );
     }
 
     /**
