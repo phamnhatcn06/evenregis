@@ -130,9 +130,11 @@ Yii::app()->clientScript->registerScriptFile(
                 </thead>
                 <tbody>
                     <?php if (empty($rows)): ?>
-                        <tr><td colspan="7" class="text-center text-muted">Chưa có dữ liệu bình chọn.</td></tr>
+                        <tr><td colspan="8" class="text-center text-muted">Chưa có dữ liệu bình chọn.</td></tr>
                     <?php else: ?>
+                        <?php $stt = 0; ?>
                         <?php foreach ($rows as $r): ?>
+                            <?php $stt++; ?>
                             <?php
                             // Ảnh bình chọn là URL tuyệt đối (storage backend); ảnh đại diện
                             // dự phòng là đường dẫn tương đối nằm trên host Yii.
