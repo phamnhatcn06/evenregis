@@ -258,18 +258,5 @@ $tick = function ($on) use ($accent) {
         <p class="small text-secondary mt-3 mb-0">Khiếu nại về kết quả gửi trực tiếp BTC trong vòng 30 phút kể từ khi công bố kết quả tạm thời. Quyết định của Ban Trọng tài và BTC là quyết định cuối cùng.</p>
       </div></div>
     </section>
-
-    <!-- CTA đăng ký -->
-    <section class="mb-4">
-      <div class="card border-0 rounded-4 text-white text-center shadow-sm" style="background:linear-gradient(135deg,#e11d48 0%,#f97316 100%);">
-        <div class="card-body p-5">
-          <h3 class="fw-bold mb-2">Sẵn sàng chinh phục đường chạy?</h3>
-          <p class="opacity-75 mb-4">Đăng ký tham gia Giải chạy Mường Thanh Fun Run ngay hôm nay.</p>
-          <a href="<?php echo $e($base); ?>/run" class="btn btn-light btn-lg fw-bold rounded-pill px-4 d-inline-flex align-items-center gap-2" style="color:<?php echo $e($accent); ?>;">
-            <span class="material-symbols-outlined">app_registration</span> Đến cổng đăng ký
-          </a>
-        </div>
-      </div>
-    </section>
   </div>
 </main>
