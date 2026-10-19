@@ -12,6 +12,7 @@ $this->Tabletitle = 'Kết quả bình chọn Miss';
 
 $rows = isset($ranking['ranking']) ? $ranking['ranking'] : array();
 $totalVotes = (int) (isset($ranking['total_votes']) ? $ranking['total_votes'] : 0);
+$totalContestants = count($rows);
 $startAt = isset($settings['vote_start_at']) ? $settings['vote_start_at'] : '';
 $endAt = isset($settings['vote_end_at']) ? $settings['vote_end_at'] : '';
 
