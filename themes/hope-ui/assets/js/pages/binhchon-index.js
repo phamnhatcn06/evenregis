@@ -370,10 +370,6 @@
 
                 if (modalImg && photo) { modalImg.src = photo.src; }
                 if (modalName) { modalName.textContent = name || ''; }
-                if (modalSbd) {
-                    modalSbd.innerHTML = sbd ? '<i class="fa fa-star me-1"></i>' + sbd : '';
-                    modalSbd.style.display = sbd ? 'inline-flex' : 'none';
-                }
                 if (modalUnit) { modalUnit.textContent = unit || ''; }
                 if (modalVotes) { modalVotes.textContent = votes || '0'; }
 
