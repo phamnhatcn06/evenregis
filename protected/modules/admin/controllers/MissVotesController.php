@@ -52,6 +52,24 @@ class MissVotesController extends AdminController
         $this->redirect(array('index', 'contest_id' => $contestId));
     }
 
+    public function actionResetVotes()
+    {
+        if (!Yii::app()->request->isPostRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+        }
+
+        $contestId = (int) Yii::app()->request->getPost('contest_id');
+        $result = BeautyVotes::resetVotes($contestId);
+        if (!empty($result['success'])) {
+            $message = isset($result['data']['message']) ? $result['data']['message'] : 'Đã reset toàn bộ phiếu bình chọn.';
+            Yii::app()->user->setFlash('success', $message);
+        } else {
+            $msg = isset($result['error']) && $result['error'] ? $result['error'] : 'Không thể reset bình chọn.';
+            Yii::app()->user->setFlash('error', $msg);
+        }
+        $this->redirect(array('index', 'contest_id' => $contestId));
+    }
+
     public function actionExportExcel($contest_id)
     {
         @ini_set('memory_limit', '512M');
