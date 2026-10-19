@@ -1,0 +1,45 @@
+/* Lightbox xem ảnh sơ đồ đường chạy Fun Run (full màn hình khi click). */
+.funrun-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, .9);
+    padding: 24px;
+    cursor: zoom-out;
+}
+
+.funrun-lightbox.is-open {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.funrun-lightbox__img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+    cursor: default;
+}
+
+.funrun-lightbox__close {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.funrun-lightbox__close:hover {
+    background: rgba(255, 255, 255, .3);
+}
