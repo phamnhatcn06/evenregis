@@ -36,9 +36,18 @@ $endAt = isset($settings['vote_end_at']) ? $settings['vote_end_at'] : '';
                     <a href="<?php echo $this->createUrl('exportExcel', array('contest_id' => $contestId)); ?>" class="btn btn-success">
                         <i class="fa fa-file-excel-o me-1"></i>Xuất Excel
                     </a>
+                    <button type="button" class="btn btn-danger" id="btn_reset_votes"
+                            data-total="<?php echo $totalVotes; ?>">
+                        <i class="fa fa-refresh me-1"></i>Reset bình chọn
+                    </button>
                 <?php endif; ?>
             </div>
         </form>
+        <?php if ($contestId): ?>
+            <form id="form_reset_votes" method="post" action="<?php echo $this->createUrl('resetVotes'); ?>" class="d-none">
+                <input type="hidden" name="contest_id" value="<?php echo (int) $contestId; ?>">
+            </form>
+        <?php endif; ?>
     </div>
 </div>
 
