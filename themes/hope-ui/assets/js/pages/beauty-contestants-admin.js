@@ -93,7 +93,8 @@
                     } catch (err) {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = originalHtml;
-                        Toast.error('Máy chủ trả về dữ liệu không hợp lệ.');
+                        console.error('Vote photo upload — phản hồi thô:', text);
+                        Toast.error('Phản hồi: ' + (text ? text.substring(0, 300) : '(rỗng)'), 15000);
                         return;
                     }
 
