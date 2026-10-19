@@ -52,6 +52,15 @@
             modal.show();
         });
 
+        // Xem trước ảnh ngay khi người dùng chọn file.
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files && fileInput.files[0]) {
+                showPreview(URL.createObjectURL(fileInput.files[0]));
+            } else if (activeCell) {
+                showPreview(activeCell.getAttribute('data-url') || '');
+            }
+        });
+
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 
