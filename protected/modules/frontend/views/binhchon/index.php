@@ -333,7 +333,6 @@ $isTokenAuth = $tokenVoter !== null;
                     </div>
                     <div class="bc-modal-info-col">
                         <div class="mb-2">
-                            <span id="modal-sbd" class="bc-sbd-badge position-static d-inline-flex mb-2"></span>
                         </div>
                         <h3 id="modal-name" class="fw-bold mb-2 text-dark"></h3>
                         <div class="text-muted mb-4 d-flex align-items-center gap-2">
