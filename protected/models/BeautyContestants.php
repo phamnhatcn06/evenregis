@@ -100,6 +100,8 @@ class BeautyContestants extends BaseBeautyContestants
             $model->personal_email = isset($data['personal_email']) ? $data['personal_email'] : '';
             $model->photo_portrait_2 = isset($data['photo_portrait_2']) ? $data['photo_portrait_2'] : '';
             $model->photo_full_body_2 = isset($data['photo_full_body_2']) ? $data['photo_full_body_2'] : '';
+            $model->vote_photo_path = isset($data['vote_photo_path']) ? $data['vote_photo_path'] : '';
+            $model->vote_photo_url = isset($data['vote_photo_url']) ? $data['vote_photo_url'] : '';
             $model->video_path = isset($data['video_path']) ? $data['video_path'] : '';
             $model->submission_token = isset($data['submission_token']) ? $data['submission_token'] : '';
             $model->submission_token_expires_at = isset($data['submission_token_expires_at']) ? $data['submission_token_expires_at'] : '';
