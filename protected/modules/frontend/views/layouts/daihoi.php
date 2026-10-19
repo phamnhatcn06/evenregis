@@ -16,6 +16,11 @@ $dh = $base . '/public/daihoi';
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon: logo Đại hội -->
+  <link rel="icon" type="image/png" href="<?php echo $base; ?>/themes/hope-ui/logo_daihoi.png" />
+  <link rel="shortcut icon" type="image/png" href="<?php echo $base; ?>/themes/hope-ui/logo_daihoi.png" />
+
   <title><?php echo isset($this->frontTitle) && $this->frontTitle ? CHtml::encode($this->frontTitle) : 'Đại hội Mường Thanh Ninh Bình 2026'; ?></title>
 
   <!-- Google Fonts: Inter (Full Vietnamese support) -->
