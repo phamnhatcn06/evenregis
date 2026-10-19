@@ -45,6 +45,8 @@
                 return;
             }
             activeCell = cell;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = defaultBtnHtml;
             idInput.value = cell.getAttribute('data-id') || '';
             var name = cell.getAttribute('data-name') || '';
             nameLabel.textContent = name ? '— ' + name : '';
