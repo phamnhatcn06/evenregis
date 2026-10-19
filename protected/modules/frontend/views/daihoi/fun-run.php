@@ -97,7 +97,7 @@ $tick = function ($on) use ($accent) {
     <section class="mb-5">
       <div class="d-flex align-items-center gap-2 mb-3">
         <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">route</span>
-        <h2 class="fw-bold text-dark fs-4 mb-0">Cự ly &amp; chỉ tiêu đăng ký</h2>
+        <h2 class="fw-bold text-dark fs-4 mb-0">Các cự ly thi đấu</h2>
       </div>
       <div class="row g-3">
         <?php foreach ($distances as $d): ?>
