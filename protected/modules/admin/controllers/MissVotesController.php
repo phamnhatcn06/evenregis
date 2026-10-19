@@ -62,6 +62,7 @@ class MissVotesController extends AdminController
         $contestId = (int) $contest_id;
         $data = BeautyVotes::getRanking($contestId);
         $ranking = isset($data['ranking']) ? $data['ranking'] : array();
+        $totalVotes = isset($data['total_votes']) ? (int) $data['total_votes'] : 0;
 
         $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
         spl_autoload_unregister(array('YiiBase', 'autoload'));
