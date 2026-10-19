@@ -246,6 +246,19 @@ class BeautyContestants extends BaseBeautyContestants
         return isset($labels[$status]) ? $labels[$status] : $status;
     }
 
+    /**
+     * Badge hiển thị vòng hiện tại của thí sinh.
+     * @param string|null $roundName
+     * @return string HTML
+     */
+    public static function getCurrentRoundLabel($roundName)
+    {
+        if (empty($roundName)) {
+            return '<span class="badge bg-light text-muted border">Chưa vào vòng</span>';
+        }
+        return '<span class="badge bg-primary">' . CHtml::encode($roundName) . '</span>';
+    }
+
     public static function getStatusOptions()
     {
         return array(
