@@ -84,7 +84,7 @@ $tick = function ($on) use ($accent) {
           <h1 class="fw-bold display-6 mb-2">Giải chạy Mường Thanh Fun Run</h1>
           <p class="fs-5 mb-4 opacity-75">Khuyến khích phong trào rèn luyện sức khỏe, tăng cường giao lưu, gắn kết giữa các đơn vị trong khuôn khổ Đại hội Mường Thanh 2026.</p>
           <div class="d-flex flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">calendar_month</span><span class="fw-semibold">Dự kiến sáng 28/10/2026</span></div>
+            <div class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">calendar_month</span><span class="fw-semibold">Sáng 28/10/2026</span></div>
             <div class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">location_on</span><span class="fw-semibold">Tràng An Golf &amp; Resort</span></div>
           </div>
         </div>
