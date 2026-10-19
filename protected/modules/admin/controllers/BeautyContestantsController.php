@@ -659,7 +659,12 @@ class BeautyContestantsController extends AdminController
 
     protected function renderJson($payload)
     {
-        header('Content-Type: application/json');
+        // Loại bỏ mọi output lỡ in ra trước đó (warning/notice của Yii1 trên PHP mới)
+        // để đảm bảo response là JSON hợp lệ, tránh client báo "Lỗi kết nối server".
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        header('Content-Type: application/json; charset=utf-8');
         echo CJSON::encode($payload);
         Yii::app()->end();
     }
