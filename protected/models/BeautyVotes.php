@@ -83,6 +83,18 @@ class BeautyVotes
     }
 
     /**
+     * Xoá toàn bộ phiếu bình chọn của cuộc thi, trả lại lượt cho mọi người bình chọn.
+     * @param int $contestId
+     * @return array raw response
+     */
+    public static function resetVotes($contestId)
+    {
+        return ApiClient::post(ApiEndpoints::BEAUTY_VOTE_RESET, array(
+            'contest_id' => $contestId,
+        ));
+    }
+
+    /**
      * Ghi nhận một lượt bình chọn.
      * @param array $data contest_id, contestant_id, voter_key, voter_key_type,
      *                    voter_email, voter_name, max_votes
