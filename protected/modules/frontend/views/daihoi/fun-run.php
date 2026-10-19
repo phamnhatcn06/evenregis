@@ -260,3 +260,13 @@ $tick = function ($on) use ($accent) {
     </section>
   </div>
 </main>
+
+<!-- Lightbox xem ảnh sơ đồ phóng to -->
+<div id="funrunLightbox" class="funrun-lightbox" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to">
+  <button type="button" class="funrun-lightbox__close" aria-label="Đóng">&times;</button>
+  <img src="" alt="Ảnh sơ đồ phóng to" class="funrun-lightbox__img">
+</div>
+<?php
+Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/css/pages/daihoi-funrun.css');
+Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/assets/js/pages/daihoi-funrun.js', CClientScript::POS_END);
+?>
