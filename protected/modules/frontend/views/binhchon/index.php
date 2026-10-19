@@ -21,6 +21,15 @@ $statusUrl = $this->createUrl('/frontend/binhchon/status');
 $configured = $googleClientId && strpos($googleClientId, 'YOUR_GOOGLE_CLIENT_ID') === false;
 $isOpen = !isset($gate['is_open']) || $gate['is_open'];
 $isTokenAuth = $tokenVoter !== null;
+
+// Định dạng ngày giờ "YYYY-MM-DD HH:MM:SS" → "dd/mm/yyyy HH:MM".
+$fmtDateTime = function ($value) {
+    if (empty($value)) {
+        return '';
+    }
+    $ts = strtotime($value);
+    return $ts ? date('d/m/Y H:i', $ts) : $value;
+};
 ?>
 
 <div class="bc-page-container">
