@@ -21,6 +21,8 @@ class BeautyContestants extends BaseBeautyContestants
     public $members;
     public $photo_portrait_2;
     public $photo_full_body_2;
+    public $vote_photo_path;
+    public $vote_photo_url;
     public $video_path;
     public $submission_token;
     public $submission_token_expires_at;
