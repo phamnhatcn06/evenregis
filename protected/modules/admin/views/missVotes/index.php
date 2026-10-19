@@ -99,18 +99,23 @@ $endAt = isset($settings['vote_end_at']) ? $settings['vote_end_at'] : '';
                         <th>Thí sinh</th>
                         <th>Đơn vị</th>
                         <th style="width:110px;" class="text-end">Số phiếu</th>
+                        <th style="width:110px;" class="text-end">Tỷ lệ</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($rows)): ?>
-                        <tr><td colspan="6" class="text-center text-muted">Chưa có dữ liệu bình chọn.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted">Chưa có dữ liệu bình chọn.</td></tr>
                     <?php else: ?>
                         <?php foreach ($rows as $r): ?>
                             <?php
+                            // Ảnh bình chọn là URL tuyệt đối (storage backend); ảnh đại diện
+                            // dự phòng là đường dẫn tương đối nằm trên host Yii.
                             $photo = isset($r['photo_portrait']) && $r['photo_portrait'] ? $r['photo_portrait'] : '';
                             if ($photo && strpos($photo, 'http') !== 0) {
-                                $photo = Yii::app()->params['externalApiUrl'] . '/' . ltrim($photo, '/');
+                                $photo = Yii::app()->request->baseUrl . '/' . ltrim($photo, '/');
                             }
+                            $voteCount = (int) (isset($r['vote_count']) ? $r['vote_count'] : 0);
+                            $percent = $totalVotes > 0 ? round($voteCount * 100 / $totalVotes, 2) : 0;
                             ?>
                             <tr>
                                 <td class="text-center fw-bold"><?php echo (int) (isset($r['rank']) ? $r['rank'] : 0); ?></td>
