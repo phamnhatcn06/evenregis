@@ -104,8 +104,7 @@ $tick = function ($on) use ($accent) {
         <div class="col-md-4">
           <div class="card border-0 rounded-4 shadow-sm h-100">
             <div class="card-body text-center p-4">
-              <div class="fw-bold display-6 mb-1" style="color:<?php echo $e($accent); ?>;"><?php echo $e($d['name']); ?></div>
-              <div class="badge rounded-pill mb-3" style="background:<?php echo $e($accent); ?>1a;color:<?php echo $e($accent); ?>;">Tối đa <?php echo (int) $d['slots']; ?> suất</div>
+              <div class="fw-bold display-6 mb-3" style="color:<?php echo $e($accent); ?>;"><?php echo $e($d['name']); ?></div>
               <ul class="list-unstyled text-start small text-secondary mb-0">
                 <li class="d-flex justify-content-between py-1 border-bottom"><span>Số vòng chạy</span><strong class="text-dark"><?php echo (int) $d['laps']; ?> vòng</strong></li>
                 <li class="d-flex justify-content-between py-1 border-bottom"><span>Thời gian cut-off</span><strong class="text-dark"><?php echo $e($d['cutoff']); ?></strong></li>
