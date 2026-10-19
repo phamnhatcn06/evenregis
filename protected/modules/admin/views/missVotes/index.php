@@ -61,7 +61,7 @@ Yii::app()->clientScript->registerScriptFile(
 
 <?php if ($contestId): ?>
 <div class="row g-3 mb-3">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card h-100">
             <div class="card-body text-center">
                 <div class="text-muted">Tổng lượt bình chọn</div>
@@ -69,11 +69,19 @@ Yii::app()->clientScript->registerScriptFile(
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card h-100">
             <div class="card-body text-center">
                 <div class="text-muted">Số người đã bình chọn</div>
                 <div class="h3 fw-bold text-info mb-0"><?php echo (int) (isset($ranking['voter_count']) ? $ranking['voter_count'] : 0); ?></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="text-muted">Tổng số thí sinh</div>
+                <div class="h3 fw-bold text-success mb-0"><?php echo $totalContestants; ?></div>
             </div>
         </div>
     </div>
