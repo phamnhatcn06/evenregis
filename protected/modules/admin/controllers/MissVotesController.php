@@ -83,7 +83,7 @@ class MissVotesController extends AdminController
             ),
         );
 
-        $headers = array('Hạng', 'Số báo danh', 'Thí sinh', 'Đơn vị', 'Số phiếu');
+        $headers = array('Hạng', 'Số báo danh', 'Thí sinh', 'Đơn vị', 'Số phiếu', 'Tỷ lệ (%)');
         $col = 'A';
         foreach ($headers as $h) {
             $sheet->setCellValue($col . '1', $h);
