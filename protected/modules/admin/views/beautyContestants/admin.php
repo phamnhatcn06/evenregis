@@ -43,8 +43,11 @@ $this->menu = array(
 );
 $this->Tabletitle = 'Danh sách thí sinh thi Miss';
 
+<?php
+$voteJsPath = Yii::getPathOfAlias('webroot') . '/themes/hope-ui/assets/js/pages/beauty-contestants-admin.js';
+$voteJsVer = @filemtime($voteJsPath) ?: time();
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/beauty-contestants-admin.js',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/beauty-contestants-admin.js?v=' . $voteJsVer,
     CClientScript::POS_END
 );
 ?>
