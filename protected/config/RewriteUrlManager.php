@@ -74,6 +74,7 @@ $urlRewrite = array(
     'ho-tro' => 'frontend/daihoi/hoTro',
     'doan-thu-ky' => 'frontend/daihoi/doanThuKy',
     'so-do-dia-diem' => 'frontend/daihoi/soDoDiaDiem',
+    'fun-run' => 'frontend/daihoi/funRun',
 
     // Tin tức Đại hội: danh sách + chi tiết (đặt rule chi tiết TRƯỚC rule danh sách)
     'tin-tuc/<id:\d+>' => 'frontend/daihoi/newsDetail',
