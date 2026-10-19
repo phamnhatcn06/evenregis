@@ -97,11 +97,20 @@ class MissVotesController extends AdminController
             $sheet->setCellValueExplicit('B' . $rowNum, isset($r['candidate_number']) ? $r['candidate_number'] : '', PHPExcel_Cell_DataType::TYPE_STRING);
             $sheet->setCellValue('C' . $rowNum, isset($r['name']) ? $r['name'] : '');
             $sheet->setCellValue('D' . $rowNum, isset($r['unit']) ? $r['unit'] : '');
-            $sheet->setCellValue('E' . $rowNum, isset($r['vote_count']) ? (int) $r['vote_count'] : 0);
+            $voteCount = isset($r['vote_count']) ? (int) $r['vote_count'] : 0;
+            $sheet->setCellValue('E' . $rowNum, $voteCount);
+            $sheet->setCellValue('F' . $rowNum, $totalVotes > 0 ? round($voteCount * 100 / $totalVotes, 2) : 0);
             $rowNum++;
         }
 
-        foreach (array('A' => 8, 'B' => 16, 'C' => 30, 'D' => 30, 'E' => 12) as $c => $w) {
+        if (!empty($ranking)) {
+            $sheet->setCellValue('D' . $rowNum, 'Tổng cộng');
+            $sheet->setCellValue('E' . $rowNum, $totalVotes);
+            $sheet->setCellValue('F' . $rowNum, $totalVotes > 0 ? 100 : 0);
+            $sheet->getStyle('A' . $rowNum . ':F' . $rowNum)->getFont()->setBold(true);
+        }
+
+        foreach (array('A' => 8, 'B' => 16, 'C' => 30, 'D' => 30, 'E' => 12, 'F' => 12) as $c => $w) {
             $sheet->getColumnDimension($c)->setWidth($w);
         }
 
