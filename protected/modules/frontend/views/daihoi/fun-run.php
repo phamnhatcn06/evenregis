@@ -77,7 +77,7 @@ $tick = function ($on) use ($accent) {
   <section class="py-5" style="background:linear-gradient(135deg,#9f1239 0%,#e11d48 55%,#f97316 100%);">
     <div class="container text-white">
       <div class="row align-items-center g-4">
-        <div class="col-lg-8">
+        <div class="col-lg-12">
           <span class="fw-bold text-uppercase small d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill mb-3" style="background:rgba(255,255,255,.18);">
             <span class="material-symbols-outlined fs-6">directions_run</span> Hoạt động thể thao Đại hội
           </span>
@@ -86,14 +86,7 @@ $tick = function ($on) use ($accent) {
           <div class="d-flex flex-wrap gap-3">
             <div class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">calendar_month</span><span class="fw-semibold">Dự kiến sáng 28/10/2026</span></div>
             <div class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">location_on</span><span class="fw-semibold">Tràng An Golf &amp; Resort</span></div>
-            <div class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">groups</span><span class="fw-semibold">Tối đa 450 suất</span></div>
           </div>
-        </div>
-        <div class="col-lg-4 text-lg-end">
-          <a href="<?php echo $e($base); ?>/run" class="btn btn-light btn-lg fw-bold rounded-pill px-4 d-inline-flex align-items-center gap-2 shadow-sm" style="color:<?php echo $e($accent); ?>;">
-            <span class="material-symbols-outlined">app_registration</span> Đăng ký tham gia
-          </a>
-          <p class="small opacity-75 mt-2 mb-0">Cổng đăng ký sẽ khóa khi đủ chỉ tiêu mỗi cự ly.</p>
         </div>
       </div>
     </div>
