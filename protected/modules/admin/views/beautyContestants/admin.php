@@ -136,6 +136,34 @@ $this->Tabletitle = 'Danh sách thí sinh thi Miss';
                     }
                 ),
                 array(
+                    'header' => 'Ảnh bình chọn',
+                    'type' => 'raw',
+                    'width' => '110px',
+                    'filter' => false,
+                    'value' => function ($data) {
+                        $url = isset($data->vote_photo_url) ? $data->vote_photo_url : '';
+                        $name = '';
+                        if (isset($data->members) && !empty($data->members)) {
+                            $name = $data->members[0]['attendee_name'];
+                        } elseif (!empty($data->attendee_name)) {
+                            $name = $data->attendee_name;
+                        }
+                        $attrs = 'class="vote-photo-cell" role="button" title="Nhấn để thay ảnh bình chọn"'
+                            . ' style="cursor:pointer;display:inline-block;"'
+                            . ' data-id="' . $data->id . '"'
+                            . ' data-name="' . CHtml::encode($name) . '"'
+                            . ' data-url="' . CHtml::encode($url) . '"';
+                        if (!empty($url)) {
+                            $inner = '<img src="' . CHtml::encode($url) . '" alt="Ảnh bình chọn"'
+                                . ' style="width:44px;height:56px;object-fit:cover;border-radius:4px;">';
+                        } else {
+                            $inner = '<span class="badge bg-light text-primary border">'
+                                . '<i class="fa fa-image me-1"></i>Chọn ảnh</span>';
+                        }
+                        return '<span ' . $attrs . '>' . $inner . '</span>';
+                    }
+                ),
+                array(
                     'header' => 'Thao tác',
                     'type' => 'raw',
                     'width' => '150px',
