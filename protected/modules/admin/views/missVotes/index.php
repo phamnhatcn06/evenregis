@@ -14,6 +14,13 @@ $rows = isset($ranking['ranking']) ? $ranking['ranking'] : array();
 $totalVotes = (int) (isset($ranking['total_votes']) ? $ranking['total_votes'] : 0);
 $startAt = isset($settings['vote_start_at']) ? $settings['vote_start_at'] : '';
 $endAt = isset($settings['vote_end_at']) ? $settings['vote_end_at'] : '';
+
+$jsFile = '/assets/js/pages/missvotes-index.js';
+$jsVer = @filemtime(Yii::getPathOfAlias('webroot') . '/themes/hope-ui' . $jsFile) ?: time();
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . $jsFile . '?v=' . $jsVer,
+    CClientScript::POS_END
+);
 ?>
 
 <!-- Chọn cuộc thi -->
