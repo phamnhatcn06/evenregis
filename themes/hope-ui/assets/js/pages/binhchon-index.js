@@ -9,6 +9,10 @@
     // 1. Đếm ngược tới giờ mở cổng (hiển thị khi cổng chưa mở)
     initCountdown();
 
+    // Xem ảnh + tìm kiếm/sắp xếp phải chạy cả khi cổng đóng (không có #voter-box).
+    initSearchAndFilter();
+    initPhotoModal();
+
     var voterBox = document.getElementById('voter-box');
     if (!voterBox) {
         return;
