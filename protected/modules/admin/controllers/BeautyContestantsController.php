@@ -193,7 +193,7 @@ class BeautyContestantsController extends AdminController
             )
         );
 
-        $headers = array('STT', 'Sự kiện', 'Cuộc thi', 'Đơn vị', 'Thí sinh', 'Chiều cao (cm)', 'Cân nặng (kg)', 'Số đo', 'Năng khiếu', 'Tiểu sử', 'Trạng thái');
+        $headers = array('STT', 'Sự kiện', 'Cuộc thi', 'Đơn vị', 'Thí sinh', 'Chiều cao (cm)', 'Cân nặng (kg)', 'Số đo', 'Năng khiếu', 'Tiểu sử', 'Trạng thái', 'Vòng hiện tại');
         $col = 'A';
         foreach ($headers as $h) {
             $sheet->setCellValue($col . '1', $h);
