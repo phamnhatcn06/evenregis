@@ -320,6 +320,50 @@ class BeautyContestantsController extends AdminController
         Yii::app()->end();
     }
 
+    /**
+     * Tải lên (thay) ảnh bình chọn cho thí sinh (AJAX POST, trả JSON).
+     */
+    public function actionUploadVotePhoto($id)
+    {
+        if (!Yii::app()->request->isPostRequest || !Yii::app()->request->isAjaxRequest) {
+            throw new CHttpException(400, 'Yêu cầu không hợp lệ.');
+        }
+
+        $file = CUploadedFile::getInstanceByName('vote_photo');
+        if ($file === null) {
+            $this->renderJson(array('success' => false, 'message' => 'Chưa chọn ảnh.'));
+        }
+
+        $allowed = array('image/jpeg', 'image/pjpeg', 'image/png', 'image/webp');
+        if (!in_array($file->getType(), $allowed)) {
+            $this->renderJson(array('success' => false, 'message' => 'Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.'));
+        }
+        if ($file->getSize() > 5 * 1024 * 1024) {
+            $this->renderJson(array('success' => false, 'message' => 'Ảnh vượt quá 5MB.'));
+        }
+
+        $result = BeautyContestants::uploadVotePhoto(
+            $id,
+            $file->getTempName(),
+            $file->getName(),
+            $file->getType()
+        );
+
+        if (!empty($result['success'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : (isset($result['data']) ? $result['data'] : array());
+            $this->renderJson(array(
+                'success' => true,
+                'message' => 'Cập nhật ảnh bình chọn thành công.',
+                'vote_photo_url' => isset($data['vote_photo_url']) ? $data['vote_photo_url'] : null,
+            ));
+        }
+
+        $this->renderJson(array(
+            'success' => false,
+            'message' => isset($result['error']) && $result['error'] ? $result['error'] : 'Không thể tải ảnh lên.',
+        ));
+    }
+
     protected function getActiveContests()
     {
         $result = ApiClient::get(ApiEndpoints::BEAUTY_CONTEST_LIST, array(
