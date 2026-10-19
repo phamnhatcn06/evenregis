@@ -110,7 +110,7 @@ $fmtDateTime = function ($value) {
                 <?php if (!empty($gate['start_at'])): ?>
                     <div class="bc-gate-time-item">
                         <i class="fa fa-clock-o text-warning"></i>
-                        <span>Thời gian mở: <strong><?php echo CHtml::encode($gate['start_at']); ?></strong></span>
+                        <span>Thời gian mở: <strong><?php echo CHtml::encode($fmtDateTime($gate['start_at'])); ?></strong></span>
                     </div>
                 <?php endif; ?>
                 <?php if (!empty($gate['end_at'])): ?>
