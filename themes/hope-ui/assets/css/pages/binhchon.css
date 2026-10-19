@@ -873,17 +873,24 @@
   flex-direction: column;
 }
 
+/* Modal lớn hơn để ảnh thí sinh hiển thị rõ nét */
+@media (min-width: 992px) {
+  .bc-modal-dialog {
+    max-width: 1100px;
+  }
+}
+
 @media (min-width: 768px) {
   .bc-modal-body {
     flex-direction: row;
   }
   .bc-modal-img-col {
-    width: 52%;
+    width: 58%;
     flex-shrink: 0;
   }
   .bc-modal-info-col {
-    width: 48%;
-    padding: 32px 28px;
+    width: 42%;
+    padding: 36px 32px;
     display: flex;
     flex-direction: column;
   }
@@ -892,7 +899,7 @@
 .bc-modal-img {
   width: 100%;
   height: 100%;
-  max-height: 520px;
+  max-height: 720px;
   object-fit: cover;
   display: block;
 }
