@@ -358,7 +358,6 @@
 
                 var photo = wrapper.querySelector('.bc-card-photo');
                 var name = card.getAttribute('data-name');
-                var sbd = card.getAttribute('data-sbd');
                 var unit = card.getAttribute('data-unit');
                 var votes = card.getAttribute('data-votes');
                 var cid = card.getAttribute('data-cid');
