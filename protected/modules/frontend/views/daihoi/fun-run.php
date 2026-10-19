@@ -10,7 +10,7 @@ $base = Yii::app()->request->baseUrl;
 $img = $base . '/themes/hope-ui/assets/images/funrun';
 $e = function ($s) { return CHtml::encode($s); };
 $eventName = isset($event['name']) ? $event['name'] : (isset($event['title']) ? $event['title'] : 'Đại hội Mường Thanh 2026');
-$accent = '#e11d48';
+$accent = '#16a34a';
 
 // Cự ly & chỉ tiêu suất đăng ký.
 $distances = array(
