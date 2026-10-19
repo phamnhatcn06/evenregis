@@ -205,6 +205,22 @@ class BeautyContestants extends BaseBeautyContestants
         return ApiClient::delete($url);
     }
 
+    /**
+     * Tải lên (thay) ảnh bình chọn của thí sinh qua API (multipart).
+     * @param int $id
+     * @param string $tmpFilePath đường dẫn file tạm trên server Yii
+     * @param string $fileName tên file gốc
+     * @param string $mimeType kiểu MIME
+     * @return array
+     */
+    public static function uploadVotePhoto($id, $tmpFilePath, $fileName, $mimeType)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::BEAUTY_CONTESTANT_VOTE_PHOTO, array('id' => $id));
+        return ApiClient::postMultipart($url, array(
+            'vote_photo' => new CURLFile($tmpFilePath, $mimeType, $fileName),
+        ));
+    }
+
     public static function getApiDataProvider($params = array(), $pageSize = 10000)
     {
         return new ApiDataProvider(ApiEndpoints::BEAUTY_CONTESTANT_LIST, array(
