@@ -323,11 +323,16 @@ class BeautyContestantsController extends AdminController
     /**
      * Tải lên (thay) ảnh bình chọn cho thí sinh (AJAX POST, trả JSON).
      */
-    public function actionUploadVotePhoto($id)
+    public function actionUploadVotePhoto()
     {
         try {
             if (!Yii::app()->request->isPostRequest) {
                 $this->renderJson(array('success' => false, 'message' => 'Yêu cầu không hợp lệ.'));
+            }
+
+            $id = (int) Yii::app()->request->getPost('id');
+            if ($id <= 0) {
+                $this->renderJson(array('success' => false, 'message' => 'Thiếu ID thí sinh.'));
             }
 
             $file = CUploadedFile::getInstanceByName('vote_photo');
