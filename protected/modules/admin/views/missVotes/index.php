@@ -165,7 +165,7 @@ Yii::app()->clientScript->registerScriptFile(
                 <?php if (!empty($rows)): ?>
                 <tfoot>
                     <tr class="fw-bold">
-                        <td colspan="5" class="text-end">Tổng cộng</td>
+                        <td colspan="6" class="text-end">Tổng cộng</td>
                         <td class="text-end text-primary"><?php echo $totalVotes; ?></td>
                         <td class="text-end"><?php echo $totalVotes > 0 ? '100%' : '0%'; ?></td>
                     </tr>
