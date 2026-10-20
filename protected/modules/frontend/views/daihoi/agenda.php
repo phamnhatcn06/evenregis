@@ -124,7 +124,14 @@ $renderCard = function ($item) use ($val, $e, $typeIcon, $sportIcon) {
     }
     $html .= '<strong class="agx-card-title">' . $e($title) . '</strong>';
     if ($place !== '') {
-        $html .= '<span class="agx-card-place">' . $e($place) . '</span>';
+        // Tách "Tên nơi - Chi tiết" thành 2 dòng: tên nơi ở trên, chi tiết ở dưới.
+        $parts = explode(' - ', $place, 2);
+        $html .= '<span class="agx-card-place">';
+        $html .= '<span class="agx-place-main">' . $e(trim($parts[0])) . '</span>';
+        if (isset($parts[1]) && trim($parts[1]) !== '') {
+            $html .= '<span class="agx-place-sub">' . $e(trim($parts[1])) . '</span>';
+        }
+        $html .= '</span>';
     }
     if ($desc !== '') {
         $html .= '<div class="agx-card-desc">' . nl2br($e($desc)) . '</div>';
