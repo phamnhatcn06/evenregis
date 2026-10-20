@@ -185,7 +185,7 @@ $securityRules = array(
       <div class="col-lg-9">
 
         <!-- THÔNG TIN ĐẠI HỘI -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="thong-tin">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="thong-tin">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">info</span>
@@ -209,7 +209,7 @@ $securityRules = array(
         </div>
 
         <!-- BỘ QUÀ TẶNG -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="qua-tang">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="qua-tang">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">redeem</span>
@@ -232,7 +232,7 @@ $securityRules = array(
         </div>
 
         <!-- HÀNH TRANG -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="hanh-trang">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="hanh-trang">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">luggage</span>
@@ -253,7 +253,7 @@ $securityRules = array(
         </div>
 
         <!-- LIÊN HỆ -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="lien-he">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="lien-he">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">contacts</span>
@@ -270,7 +270,7 @@ $securityRules = array(
         </div>
 
         <!-- AGENDA & CHƯƠNG TRÌNH -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="chuong-trinh">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="chuong-trinh">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">event_note</span>
@@ -296,7 +296,7 @@ $securityRules = array(
         </div>
 
         <!-- QUY ĐỊNH CHUNG -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="quy-dinh">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="quy-dinh">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">gavel</span>
@@ -314,7 +314,7 @@ $securityRules = array(
         </div>
 
         <!-- ĂN UỐNG & TIỆC -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="an-uong">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="an-uong">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">restaurant</span>
@@ -356,7 +356,7 @@ $securityRules = array(
         </div>
 
         <!-- LƯU TRÚ -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="luu-tru">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="luu-tru">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">hotel</span>
@@ -374,7 +374,7 @@ $securityRules = array(
         </div>
 
         <!-- Y TẾ -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="y-te">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="y-te">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">medical_services</span>
@@ -422,7 +422,7 @@ $securityRules = array(
         </div>
 
         <!-- AN NINH - PCCC -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="an-ninh">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="an-ninh">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">local_fire_department</span>
@@ -447,7 +447,7 @@ $securityRules = array(
         </div>
 
         <!-- SƠ ĐỒ ĐỊA ĐIỂM -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="so-do">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="so-do">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">map</span>
@@ -461,7 +461,7 @@ $securityRules = array(
         </div>
 
         <!-- QR & KÊNH THÔNG TIN -->
-        <div class="card border-0 rounded-4 shadow-sm mb-4" id="kenh-qr">
+        <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="kenh-qr">
           <div class="card-body p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">qr_code_2</span>
