@@ -16,6 +16,9 @@ class BinhchonController extends CController
     // Dùng chung layout trang công khai Đại hội để có header/footer điều hướng thống nhất.
     public $layout = 'daihoi';
 
+    /** Tiêu đề trang cho layout `daihoi`. */
+    public $frontTitle = 'Bình chọn Miss Mường Thanh 2026 - Vòng Chung Kết';
+
     public function filters()
     {
         return array();
