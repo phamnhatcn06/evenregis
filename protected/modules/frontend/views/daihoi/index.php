@@ -404,7 +404,7 @@ if (!empty($slides) && isset($slides[0]) && is_array($slides[0])) {
 
 // Bổ sung các slide tiêu biểu để hero carousel luôn đầy đủ, sinh động (ít nhất 3-4 slide)
 $curatedSlides = array(
-  array('image' => '', 'subtitle' => 'Giải Chạy Tiếp Sức', 'title' => 'MƯỜNG THANH FUN RUN - BỨT PHÁ TRÊN CUNG ĐƯỜNG DI SẢN', 'desc' => 'Cùng sải bước đón bình minh giữa non nước Ninh Bình kỳ vĩ với các cự ly 5KM, 10KM và 15km.', 'btn_text' => 'Tìm hiểu giải chạy', 'btn_url' => '#dang-ky', 'theme' => 'amber'),
+  array('image' => '', 'subtitle' => 'Giải Chạy Tiếp Sức', 'title' => 'MƯỜNG THANH FUN RUN - BỨT PHÁ TRÊN CUNG ĐƯỜNG DI SẢN', 'desc' => 'Cùng sải bước đón bình minh giữa non nước Ninh Bình kỳ vĩ với các cự ly 5KM, 10KM và 15km.', 'btn_text' => 'Tìm hiểu giải chạy', 'btn_url' => $portalUrl, 'theme' => 'amber'),
   array('image' => '', 'subtitle' => 'Đêm Gala Tôn Vinh Bản Sắc', 'title' => 'VIỆT NAM GẤM HOA & MISS MƯỜNG THANH ' . $eventYear, 'desc' => 'Đại tiệc nghệ thuật truyền thống tôn vinh vẻ đẹp tự tin, duyên dáng và trí tuệ của cán bộ nhân viên Mường Thanh.', 'btn_text' => 'Xem chi tiết', 'btn_url' => '#noi-dung', 'theme' => 'purple'),
   array('image' => '', 'subtitle' => 'Hội Tụ Tinh Hoa Nghề Nghiệp', 'title' => 'ĐỈNH CAO TAY NGHỀ & TRANH TÀI THỂ THAO RỰC LỬA', 'desc' => 'Chuẩn mực nghiệp vụ khách sạn thắp sáng tinh thần hiếu khách cùng ngọn lửa thể thao rực cháy của các đoàn vận động viên.', 'btn_text' => 'Khám phá ngay', 'btn_url' => '#noi-dung', 'theme' => 'teal'),
 );
