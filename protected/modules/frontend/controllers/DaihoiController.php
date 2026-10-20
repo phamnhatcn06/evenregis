@@ -239,6 +239,17 @@ class DaihoiController extends FrontEndController
     }
 
     /**
+     * Sổ tay Đại hội - toàn bộ thông tin hướng dẫn Đại biểu - slug /so-tay-dai-hoi.
+     */
+    public function actionSoTayDaiHoi()
+    {
+        $this->frontTitle = 'Sổ tay Đại hội';
+        $this->render('so-tay-dai-hoi', array(
+            'event' => Daihoi::getEvent(),
+        ));
+    }
+
+    /**
      * Trang Tin tức chung - hiển thị toàn bộ tin tức, sidebar lọc theo danh mục.
      * slug: /tin-tuc  (?category_id=... để lọc)
      */
