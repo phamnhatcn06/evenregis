@@ -24,30 +24,43 @@ $tabs = array(
 $active = isset($active) ? $active : '';
 $eventName = isset($eventName) && $eventName !== '' ? $eventName : 'Đại hội Mường Thanh 2026';
 ?>
+<?php
+$isLogged = (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenticated());
+?>
 <header class="bg-white border-bottom shadow-sm sticky-top">
-  <div class="container py-2 d-flex align-items-center justify-content-between gap-2 flex-wrap">
+  <div class="container py-2 d-flex align-items-center justify-content-between gap-2">
     <a class="d-flex align-items-center gap-2 text-decoration-none text-dark" href="<?php echo $e($base); ?>/">
       <img src="<?php echo $e($logo); ?>" alt="Logo" style="height:38px;width:auto;" onerror="this.style.display='none'">
       <span class="fw-bold d-none d-sm-inline" style="font-size:15px;"><?php echo $e($eventName); ?></span>
     </a>
-    <nav class="d-flex align-items-center gap-2">
+
+    <!-- Nút menu chỉ hiện trên mobile/tablet -->
+    <button class="btn btn-sm btn-light border rounded-pill px-3 d-lg-none d-inline-flex align-items-center gap-1"
+            type="button" data-bs-toggle="collapse" data-bs-target="#daihoiNav"
+            aria-controls="daihoiNav" aria-expanded="false" aria-label="Mở menu">
+      <span class="material-symbols-outlined fs-6">menu</span>
+      <span class="fw-semibold">Menu</span>
+    </button>
+
+    <!-- Nav: inline trên desktop, collapse trên mobile -->
+    <nav id="daihoiNav" class="collapse d-lg-flex align-items-lg-center gap-2 order-lg-0 order-3 w-100 w-lg-auto mt-2 mt-lg-0 flex-column flex-lg-row">
       <?php foreach ($tabs as $key => $t):
         $isActive = $key === $active;
         $cls = $isActive
             ? 'btn-primary text-white'
             : 'btn-light text-secondary border';
       ?>
-        <a class="btn btn-sm <?php echo $cls; ?> fw-semibold rounded-pill px-3 d-inline-flex align-items-center gap-1" href="<?php echo $e($t['url']); ?>">
+        <a class="btn btn-sm <?php echo $cls; ?> fw-semibold rounded-pill px-3 d-inline-flex align-items-center justify-content-start justify-content-lg-center gap-1 w-100 w-lg-auto" href="<?php echo $e($t['url']); ?>">
           <span class="material-symbols-outlined fs-6"><?php echo $e($t['icon']); ?></span>
           <span><?php echo $e($t['label']); ?></span>
         </a>
       <?php endforeach; ?>
-      <a class="btn btn-sm btn-dark fw-semibold rounded-pill px-3 d-none d-md-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/">
+      <a class="btn btn-sm btn-dark fw-semibold rounded-pill px-3 d-inline-flex align-items-center justify-content-start justify-content-lg-center gap-1 w-100 w-lg-auto" href="<?php echo $e($base); ?>/">
         <span class="material-symbols-outlined fs-6">home</span>
         <span>Trang chủ</span>
       </a>
-      <?php if (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenticated()): ?>
-        <a class="btn btn-sm btn-primary fw-semibold rounded-pill px-3 d-none d-md-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/admin/default/index" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;">
+      <?php if ($isLogged): ?>
+        <a class="btn btn-sm btn-primary fw-semibold rounded-pill px-3 d-inline-flex align-items-center justify-content-start justify-content-lg-center gap-1 w-100 w-lg-auto" href="<?php echo $e($base); ?>/admin/default/index" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;">
           <span class="material-symbols-outlined fs-6">admin_panel_settings</span>
           <span>Vào quản trị</span>
         </a>
