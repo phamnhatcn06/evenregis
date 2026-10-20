@@ -130,7 +130,7 @@ $navItems = array(
   array($base . '/lich-thi-the-thao', 'Lịch thi đấu'),
   array($base . '/tin-tuc', 'Tin tức'),
   array('#thu-vien', 'Thư viện'),
-  array('#so-tay', 'Sổ tay'),
+  array($base . '/so-tay-dai-hoi', 'Sổ tay'),
 );
 
 // ----- Bảng màu cho 6 thẻ nội dung trọng điểm -----
