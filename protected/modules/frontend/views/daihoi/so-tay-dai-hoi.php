@@ -483,7 +483,7 @@ $securityRules = array(
         </div>
 
         <!-- LỜI CHÚC -->
-        <div class="card border-0 rounded-4 shadow-sm mb-2 text-center" style="background:linear-gradient(135deg,#fff7ed 0%,#fffbeb 100%);">
+        <div class="card border-0 rounded-4 shadow-sm mb-2 text-center" style="background:linear-gradient(135deg,#eff6ff 0%,#ecfeff 100%);">
           <div class="card-body p-4">
             <span class="material-symbols-outlined mb-2" style="font-size:40px;color:<?php echo $e($accent); ?>;">volunteer_activism</span>
             <p class="text-dark mb-1">Ban Tổ chức luôn sẵn sàng đồng hành và hỗ trợ Đại biểu trong suốt thời gian diễn ra Đại hội.</p>
