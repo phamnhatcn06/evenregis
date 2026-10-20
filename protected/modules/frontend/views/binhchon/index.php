@@ -34,7 +34,7 @@ $fmtDateTime = function ($value) {
 
 <?php $this->renderPartial('application.modules.frontend.views.daihoi._site_header'); ?>
 
-<main class="flex-grow-1">
+<main class="flex-grow-1 py-4">
 <div class="container bc-page-container">
 
     <!-- ======================================================================
