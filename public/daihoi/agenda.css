@@ -1,4 +1,4 @@
-/* ===== Trang Lịch trình Đại hội (agenda-tong-the) ===== */
+/* ===== Trang Lịch trình Đại hội (agenda-tong-the) — bố cục theo poster ===== */
 .ag-page {
   --ag-line: #e2e8f0;
   --ag-muted: #64748b;
@@ -36,14 +36,12 @@
 .ag-daynav-sentinel { height: 1px; }
 .ag-daynav-wrap {
   position: sticky;
-  /* Dính ngay dưới subheader (sticky-top) thay vì top:0 — nếu không sẽ bị header che mất */
   top: var(--ag-subheader-h, 62px);
   z-index: 1010;
   padding: .6rem 0;
   margin: 0 -12px .5rem;
   transition: background .2s ease, box-shadow .2s ease, padding .2s ease;
 }
-/* Trạng thái "đã dính": nền mờ tràn viền + đổ bóng để nổi bật khi cuộn */
 .ag-daynav-wrap.is-stuck {
   background: rgba(248, 250, 252, .9);
   backdrop-filter: blur(10px);
@@ -120,15 +118,15 @@
 }
 .ag-daynav-item.is-active .ag-daynav-num { background: rgba(255, 255, 255, .22); color: #fff; }
 
-/* Khối mỗi ngày — chừa chỗ cho subheader + thanh chọn ngày đang dính */
-.ag-day { scroll-margin-top: calc(var(--ag-subheader-h, 62px) + 76px); margin-top: 1.75rem; }
+/* Khối mỗi ngày */
+.ag-day { scroll-margin-top: calc(var(--ag-subheader-h, 62px) + 76px); margin-top: 2rem; }
 
-/* Tiêu đề ngày — banner full-width có nền gradient */
+/* Tiêu đề ngày — banner gradient */
 .ag-day-head {
   display: flex;
   align-items: center;
   gap: 1.1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   padding: 1.1rem 1.35rem;
   border-radius: 20px;
   position: relative;
@@ -167,138 +165,168 @@
 }
 .ag-day-badge .small { font-size: .55rem; font-weight: 700; letter-spacing: 1.5px; opacity: .9; }
 
-/* Timeline */
-.ag-timeline { position: relative; }
-.ag-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: 74px 36px 1fr;
-  gap: 0;
-  padding-bottom: 1rem;
+/* ===== Buổi (session) — mỗi buổi 1 tông màu như poster ===== */
+.agx-session {
+  --s-color: #64748b;    /* màu nhấn */
+  --s-tint: #f1f5f9;     /* nền thẻ */
+  --s-bar: #e2e8f0;      /* nền thanh tiêu đề buổi */
+  margin-bottom: 1.1rem;
 }
-.ag-time {
-  text-align: right;
-  padding-right: .75rem;
-  padding-top: .55rem;
-}
-.ag-time-start { display: block; font-weight: 700; color: #0f172a; font-size: .92rem; }
-.ag-time-end { display: block; font-size: .74rem; color: var(--ag-muted); }
-.ag-time-end::before { content: "→ "; }
+.ses-morning   { --s-color: #ec4899; --s-tint: #fdf2f8; --s-bar: #fce7f3; }
+.ses-noon      { --s-color: #f97316; --s-tint: #fff7ed; --s-bar: #ffedd5; }
+.ses-afternoon { --s-color: #22c55e; --s-tint: #f0fdf4; --s-bar: #dcfce7; }
+.ses-evening   { --s-color: #8b5cf6; --s-tint: #f5f3ff; --s-bar: #ede9fe; }
 
-/* Chấm + đường nối */
-.ag-dot {
-  position: relative;
+/* Thanh tiêu đề buổi */
+.agx-ses-head {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: .85rem;
+  margin: 0 0 1rem;
 }
-.ag-dot::before {
-  content: "";
-  position: absolute;
-  top: 36px;
-  bottom: -1rem;
-  width: 2px;
-  background: var(--ag-line);
-}
-.ag-item:last-child .ag-dot::before { display: none; }
-.ag-dot .material-symbols-outlined {
-  position: relative;
-  z-index: 1;
-  width: 36px;
-  height: 36px;
+.agx-ses-icon {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 20px;
+  font-size: 26px;
   color: #fff;
-  background: #64748b;
-  box-shadow: 0 0 0 4px #f8fafc;
+  background: var(--s-color);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--s-color) 40%, transparent);
+}
+.agx-ses-label {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: .7rem 1.2rem;
+  border-radius: 12px;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: .5px;
+  color: color-mix(in srgb, var(--s-color) 72%, #1f2937);
+  background: var(--s-bar);
 }
 
-/* Thẻ nội dung */
-.ag-card {
-  margin-left: .85rem;
-  background: #fff;
-  border: 1px solid var(--ag-line);
-  border-left: 4px solid #64748b;
-  border-radius: 14px;
-  padding: .85rem 1rem;
-  flex: 1;
-  transition: box-shadow .18s ease, transform .18s ease;
+/* Timeline trong buổi */
+.agx-rail { position: relative; }
+.agx-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 70px 28px 1fr;
+  gap: 0;
+  padding-bottom: .9rem;
 }
-.ag-card:hover { box-shadow: 0 10px 26px rgba(15, 23, 42, .08); transform: translateY(-2px); }
-.ag-title { color: #0f172a; font-size: 1rem; line-height: 1.35; }
-.ag-tag {
-  flex: 0 0 auto;
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .3px;
-  text-transform: uppercase;
-  padding: .2rem .6rem;
-  border-radius: 999px;
-  background: #f1f5f9;
-  color: #475569;
+.agx-time {
+  text-align: right;
+  padding-right: .7rem;
+  padding-top: .35rem;
+  line-height: 1.15;
 }
-.ag-place {
+.agx-time-start { display: block; font-weight: 800; color: #0f172a; font-size: 1.05rem; }
+.agx-time-end { display: block; font-weight: 700; font-size: .95rem; color: var(--s-color); }
+
+/* Chấm + đường nối dọc */
+.agx-dot { position: relative; display: flex; justify-content: center; }
+.agx-dot::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--s-color);
+  box-shadow: 0 0 0 4px #fff, 0 0 0 5px color-mix(in srgb, var(--s-color) 35%, transparent);
+  z-index: 1;
+}
+.agx-dot::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  bottom: -.9rem;
+  width: 2px;
+  border-left: 2px dashed color-mix(in srgb, var(--s-color) 45%, #e2e8f0);
+}
+.agx-row:last-child .agx-dot::before { display: none; }
+
+/* Nội dung */
+.agx-content { min-width: 0; }
+
+/* Thẻ hoạt động */
+.agx-card {
   display: flex;
-  align-items: center;
-  gap: .25rem;
-  margin-top: .3rem;
+  align-items: flex-start;
+  gap: .85rem;
+  background: var(--s-tint);
+  border-radius: 14px;
+  padding: .85rem 1.05rem;
+}
+.agx-card-ico {
+  flex: 0 0 auto;
+  font-size: 30px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--s-color) 78%, #1f2937);
+  margin-top: .1rem;
+}
+.agx-card-body { min-width: 0; }
+.agx-card-time {
+  display: block;
   font-size: .82rem;
+  font-weight: 700;
+  color: var(--s-color);
+  margin-bottom: .05rem;
+}
+.agx-card-title {
+  display: block;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #1f2937;
+  line-height: 1.25;
+}
+.agx-card-place {
+  display: block;
+  margin-top: .15rem;
+  font-size: .9rem;
   color: var(--ag-muted);
 }
-.ag-place .material-symbols-outlined { font-size: 16px; }
-.ag-desc {
-  margin: .5rem 0 0;
-  font-size: .85rem;
+.agx-card-desc {
+  margin-top: .5rem;
+  padding-top: .5rem;
+  border-top: 1px dashed color-mix(in srgb, var(--s-color) 30%, #e2e8f0);
+  font-size: .88rem;
   color: #475569;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-/* ===== Màu theo loại hoạt động ===== */
-.ag-ceremony    .ag-dot .material-symbols-outlined { background: #e11d48; }
-.ag-ceremony    .ag-card { border-left-color: #e11d48; }
-.ag-ceremony    .ag-tag { background: #ffe4e6; color: #be123c; }
+/* Lưới các môn thể thao song song trong một buổi */
+.agx-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .7rem;
+}
+.agx-grid .agx-card { padding: .75rem .85rem; }
+.agx-grid .agx-card-ico { font-size: 26px; }
+.agx-grid .agx-card-title { font-size: 1rem; }
 
-.ag-plenary     .ag-dot .material-symbols-outlined { background: #1d4ed8; }
-.ag-plenary     .ag-card { border-left-color: #1d4ed8; }
-.ag-plenary     .ag-tag { background: #dbeafe; color: #1d4ed8; }
-
-.ag-competition .ag-dot .material-symbols-outlined { background: #2563eb; }
-.ag-competition .ag-card { border-left-color: #2563eb; }
-.ag-competition .ag-tag { background: #dbeafe; color: #1e40af; }
-
-.ag-sport       .ag-dot .material-symbols-outlined { background: #16a34a; }
-.ag-sport       .ag-card { border-left-color: #16a34a; }
-.ag-sport       .ag-tag { background: #dcfce7; color: #15803d; }
-
-.ag-funrun      .ag-dot .material-symbols-outlined { background: #db2777; }
-.ag-funrun      .ag-card { border-left-color: #db2777; }
-.ag-funrun      .ag-tag { background: #fce7f3; color: #be185d; }
-
-.ag-tour        .ag-dot .material-symbols-outlined { background: #0891b2; }
-.ag-tour        .ag-card { border-left-color: #0891b2; }
-.ag-tour        .ag-tag { background: #cffafe; color: #0e7490; }
-
-.ag-gala        .ag-dot .material-symbols-outlined { background: #7c3aed; }
-.ag-gala        .ag-card { border-left-color: #7c3aed; }
-.ag-gala        .ag-tag { background: #ede9fe; color: #6d28d9; }
-
-.ag-meal        .ag-dot .material-symbols-outlined { background: #ea580c; }
-.ag-meal        .ag-card { border-left-color: #ea580c; }
-.ag-meal        .ag-tag { background: #ffedd5; color: #c2410c; }
-
-.ag-break       .ag-dot .material-symbols-outlined { background: #64748b; }
-.ag-break       .ag-card { border-left-color: #64748b; }
-
-.ag-other       .ag-dot .material-symbols-outlined { background: #475569; }
-.ag-other       .ag-card { border-left-color: #94a3b8; }
+/* Fallback khi không hỗ trợ color-mix() */
+@supports not (color: color-mix(in srgb, red, blue)) {
+  .agx-ses-label { color: #1f2937; }
+  .agx-card-ico, .agx-card-time, .agx-card-title { color: inherit; }
+  .agx-card-time, .agx-time-end { color: var(--s-color); }
+}
 
 /* Responsive */
+@media (max-width: 767.98px) {
+  .agx-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 575.98px) {
-  .ag-item { grid-template-columns: 58px 32px 1fr; }
-  .ag-time-start { font-size: .82rem; }
-  .ag-dot .material-symbols-outlined { width: 32px; height: 32px; font-size: 18px; }
-  .ag-dot::before { top: 32px; }
-  .ag-card { margin-left: .6rem; padding: .75rem .85rem; }
+  .agx-row { grid-template-columns: 54px 22px 1fr; }
+  .agx-time-start { font-size: .92rem; }
+  .agx-time-end { font-size: .82rem; }
+  .agx-ses-icon { width: 40px; height: 40px; font-size: 22px; }
+  .agx-ses-label { font-size: 1.08rem; padding: .55rem .9rem; }
+  .agx-card { padding: .7rem .8rem; gap: .6rem; }
+  .agx-card-ico { font-size: 24px; }
+  .agx-card-title { font-size: 1rem; }
   .ag-day-badge { width: 54px; height: 54px; font-size: 1.4rem; }
 }
