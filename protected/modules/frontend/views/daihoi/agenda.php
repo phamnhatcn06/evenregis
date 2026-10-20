@@ -1,12 +1,14 @@
 <?php
 /**
- * Trang Lịch trình Đại hội - hiển thị toàn bộ agenda, gộp nhóm theo ngày.
- * Dữ liệu từ DaihoiController::actionAgenda() (Daihoi::getAgenda()).
+ * Trang Lịch trình Đại hội (agenda-tong-the) — bố cục theo poster chính thức:
+ * mỗi ngày gồm 4 buổi (Sáng / Trưa / Chiều / Tối) với màu riêng, timeline mốc
+ * giờ bên trái và thẻ hoạt động tông màu buổi. Các môn thể thao song song trong
+ * cùng một buổi gom thành lưới.
  *
- * Định dạng $agenda (nhóm theo ngày):
+ * Dữ liệu từ DaihoiController::actionAgenda() (Daihoi::getAgenda()):
  *   [ ['day'=>1,'title'=>'Thứ Ba, 27/10/2026','date'=>'2026-10-27',
  *      'items'=>[['time'=>'05:30','end_time'=>'08:30','title'=>..,'location'=>..,
- *                 'description'=>..,'type'=>'meal'], ...]], ... ]
+ *                 'description'=>..,'type'=>'meal','session'=>1], ...]], ... ]
  *
  * @var array $event
  * @var array $agenda
@@ -22,36 +24,53 @@ $val = function ($arr, $keys, $default = '') {
     return $default;
 };
 $e = function ($s) {
-    if (is_array($s)) {
-        foreach (array('name', 'title', 'label') as $k) {
-            if (isset($s[$k]) && is_scalar($s[$k])) {
-                return CHtml::encode((string) $s[$k]);
-            }
-        }
-        return '';
-    }
-    return CHtml::encode($s !== null ? (string) $s : '');
+    return CHtml::encode($s !== null && is_scalar($s) ? (string) $s : '');
 };
 
 $eventName = $val($event, array('name', 'title'), 'Đại hội Mường Thanh 2026');
 
-// Màu / icon / nhãn theo loại hoạt động.
-$typeMap = array(
-    'ceremony'    => array('cls' => 'ag-ceremony',   'icon' => 'flag',              'label' => 'Nghi lễ'),
-    'plenary'     => array('cls' => 'ag-plenary',    'icon' => 'groups',            'label' => 'Phiên toàn thể'),
-    'competition' => array('cls' => 'ag-competition','icon' => 'workspace_premium', 'label' => 'Nghiệp vụ'),
-    'workshop'    => array('cls' => 'ag-competition','icon' => 'school',            'label' => 'Chuyên đề'),
-    'sport'       => array('cls' => 'ag-sport',      'icon' => 'sports_soccer',     'label' => 'Thể thao'),
-    'funrun'      => array('cls' => 'ag-funrun',     'icon' => 'directions_run',    'label' => 'Fun Run'),
-    'tour'        => array('cls' => 'ag-tour',       'icon' => 'landscape',         'label' => 'Tham quan'),
-    'gala'        => array('cls' => 'ag-gala',       'icon' => 'celebration',       'label' => 'Gala & Lucky Draw'),
-    'meal'        => array('cls' => 'ag-meal',       'icon' => 'restaurant',        'label' => 'Ẩm thực'),
-    'break'       => array('cls' => 'ag-break',      'icon' => 'coffee',            'label' => 'Giải lao'),
-    'other'       => array('cls' => 'ag-other',      'icon' => 'info',              'label' => 'Thông tin'),
+// Icon theo loại hoạt động (Material Symbols).
+$typeIcon = array(
+    'ceremony'    => 'groups',
+    'plenary'     => 'groups',
+    'competition' => 'work',
+    'workshop'    => 'school',
+    'sport'       => 'sports_soccer',
+    'funrun'      => 'directions_run',
+    'tour'        => 'photo_camera',
+    'gala'        => 'card_giftcard',
+    'meal'        => 'restaurant',
+    'break'       => 'local_cafe',
+    'other'       => 'how_to_reg',
 );
-$fallbackType = array('cls' => 'ag-other', 'icon' => 'event', 'label' => '');
+// Icon riêng theo tên môn thể thao (ưu tiên hơn icon theo loại).
+$sportIcon = function ($title) {
+    $t = function_exists('mb_strtolower') ? mb_strtolower($title, 'UTF-8') : strtolower($title);
+    if (strpos($t, 'bơi') !== false)        return 'pool';
+    if (strpos($t, 'kéo co') !== false)      return 'sports_kabaddi';
+    if (strpos($t, 'pickle') !== false)      return 'sports_tennis';
+    if (strpos($t, 'cầu lông') !== false || strpos($t, 'bóng bàn') !== false) return 'sports_tennis';
+    if (strpos($t, 'trao giải') !== false)   return 'emoji_events';
+    if (strpos($t, 'bóng đá') !== false)     return 'sports_soccer';
+    return 'sports';
+};
 
-// Chuẩn hoá danh sách nhóm ngày từ API (đã gộp sẵn).
+// Cấu hình 4 buổi.
+$sessions = array(
+    1 => array('label' => 'Buổi sáng', 'icon' => 'wb_sunny',       'cls' => 'ses-morning'),
+    2 => array('label' => 'Buổi trưa', 'icon' => 'light_mode',     'cls' => 'ses-noon'),
+    3 => array('label' => 'Buổi chiều','icon' => 'directions_run', 'cls' => 'ses-afternoon'),
+    4 => array('label' => 'Buổi tối',  'icon' => 'bedtime',        'cls' => 'ses-evening'),
+);
+$guessSession = function ($time) {
+    $h = (int) substr($time, 0, 2);
+    if ($h < 11) return 1;
+    if ($h < 13) return 2;
+    if ($h < 17) return 3;
+    return 4;
+};
+
+// Chuẩn hoá: mỗi ngày -> các buổi -> danh sách item.
 $days = array();
 if (!empty($agenda) && is_array($agenda)) {
     $idx = 0;
@@ -64,14 +83,55 @@ if (!empty($agenda) && is_array($agenda)) {
             continue;
         }
         $idx++;
+        $bySession = array();
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $time = (string) $val($item, array('time', 'start_time'), '');
+            $sid  = (int) $val($item, array('session'), 0);
+            if ($sid < 1 || $sid > 4) {
+                $sid = $guessSession($time);
+            }
+            $bySession[$sid][] = $item;
+        }
+        ksort($bySession);
         $days[] = array(
-            'anchor' => 'ngay-' . $idx,
-            'num'    => (string) $val($group, array('day'), $idx),
-            'title'  => (string) $val($group, array('title', 'day_title'), 'Ngày ' . $idx),
-            'items'  => $items,
+            'anchor'   => 'ngay-' . $idx,
+            'num'      => (string) $val($group, array('day'), $idx),
+            'title'    => (string) $val($group, array('title', 'day_title'), 'Ngày ' . $idx),
+            'sessions' => $bySession,
         );
     }
 }
+
+// Render một thẻ nội dung (dùng cho cả item thường và ô môn trong lưới).
+$renderCard = function ($item) use ($val, $e, $typeIcon, $sportIcon) {
+    $time  = (string) $val($item, array('time', 'start_time'), '');
+    $end   = (string) $val($item, array('end_time'), '');
+    $title = (string) $val($item, array('title', 'name'), 'Hoạt động');
+    $place = (string) $val($item, array('location', 'venue', 'place'), '');
+    $desc  = (string) $val($item, array('description', 'note'), '');
+    $type  = (string) $val($item, array('type', 'category'), 'other');
+    $icon  = $type === 'sport' ? $sportIcon($title) : (isset($typeIcon[$type]) ? $typeIcon[$type] : 'event');
+    $range = $time !== '' ? ($time . ($end !== '' ? ' - ' . $end : '')) : '';
+
+    $html  = '<div class="agx-card">';
+    $html .= '<span class="agx-card-ico material-symbols-outlined">' . $icon . '</span>';
+    $html .= '<div class="agx-card-body">';
+    if ($range !== '') {
+        $html .= '<span class="agx-card-time">(' . $e($range) . ')</span>';
+    }
+    $html .= '<strong class="agx-card-title">' . $e($title) . '</strong>';
+    if ($place !== '') {
+        $html .= '<span class="agx-card-place">' . $e($place) . '</span>';
+    }
+    if ($desc !== '') {
+        $html .= '<div class="agx-card-desc">' . nl2br($e($desc)) . '</div>';
+    }
+    $html .= '</div></div>';
+    return $html;
+};
 ?>
 <?php $this->renderPartial('_subheader', array('eventName' => $eventName, 'active' => 'agenda')); ?>
 
@@ -83,10 +143,10 @@ if (!empty($agenda) && is_array($agenda)) {
         <span class="material-symbols-outlined align-middle me-1" style="font-size:16px;">calendar_month</span>
         Lịch trình chính thức
       </span>
-      <h1 class="fw-bold text-white display-6 mb-2">Lịch trình Đại hội</h1>
+      <h1 class="fw-bold text-white display-6 mb-2">Agenda Đại hội Mường Thanh 2026</h1>
       <p class="text-white-50 mb-0" style="max-width:640px;">
-        Toàn bộ chương trình <?php echo $e($eventName); ?> theo từng ngày — từ check-in, thi đấu thể thao,
-        nghiệp vụ, Fun Run đến các đêm Gala. Lịch có thể được Ban Tổ chức cập nhật.
+        Hội tụ bản sắc · Dẫn dắt tương lai — toàn bộ chương trình <?php echo $e($eventName); ?> theo từng ngày
+        và từng buổi. Lịch có thể được Ban Tổ chức cập nhật.
       </p>
     </div>
   </section>
@@ -100,7 +160,6 @@ if (!empty($agenda) && is_array($agenda)) {
       </div>
     <?php else: ?>
 
-      <!-- Mốc nhận biết thời điểm thanh ngày bắt đầu "dính" -->
       <div class="ag-daynav-sentinel" aria-hidden="true"></div>
 
       <!-- Thanh điều hướng ngày (dính trên cùng khi cuộn) -->
@@ -124,45 +183,74 @@ if (!empty($agenda) && is_array($agenda)) {
           <div class="ag-day-badge"><span class="small d-block">NGÀY</span><?php echo $e($d['num']); ?></div>
           <div>
             <h2 class="fw-bold text-dark fs-4 mb-0"><?php echo $e($d['title']); ?></h2>
-            <span class="text-secondary small"><?php echo count($d['items']); ?> hoạt động</span>
+            <span class="text-secondary small">Chương trình chi tiết theo buổi</span>
           </div>
         </div>
 
-        <div class="ag-timeline">
-          <?php foreach ($d['items'] as $item):
-            $time    = (string) $val($item, array('time', 'start_time'), '');
-            $endTime = (string) $val($item, array('end_time'), '');
-            $title   = $val($item, array('title', 'name'), 'Hoạt động');
-            $place   = $val($item, array('location', 'venue', 'place'), '');
-            $desc    = $val($item, array('description', 'note'), '');
-            $type    = (string) $val($item, array('type', 'category'), 'other');
-            $t       = isset($typeMap[$type]) ? $typeMap[$type] : $fallbackType;
-          ?>
-          <div class="ag-item <?php echo $t['cls']; ?>">
-            <div class="ag-time">
-              <span class="ag-time-start"><?php echo $e($time !== '' ? $time : '—'); ?></span>
-              <?php if ($endTime !== ''): ?><span class="ag-time-end"><?php echo $e($endTime); ?></span><?php endif; ?>
-            </div>
-            <div class="ag-dot"><span class="material-symbols-outlined"><?php echo $t['icon']; ?></span></div>
-            <div class="ag-card">
-              <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
-                <strong class="ag-title"><?php echo $e($title); ?></strong>
-                <?php if ($t['label'] !== ''): ?>
-                  <span class="ag-tag"><?php echo $e($t['label']); ?></span>
+        <?php foreach ($d['sessions'] as $sid => $items):
+          $ses = isset($sessions[$sid]) ? $sessions[$sid] : $sessions[1];
+          // Tách môn thể thao (gom lưới) và hoạt động thường, giữ thứ tự.
+          // Thuật toán: gặp hoạt động thường -> xả lưới thể thao đang gom (nếu có)
+          // rồi render hoạt động thường; cuối buổi xả nốt phần còn lại.
+          $blocks = array();   // mỗi phần tử: ['kind'=>'single'|'grid', 'items'=>[...]]
+          $buf = array();
+          foreach ($items as $it) {
+            $type = (string) $val($it, array('type', 'category'), 'other');
+            if ($type === 'sport') {
+              $buf[] = $it;
+            } else {
+              if (!empty($buf)) { $blocks[] = array('kind' => 'grid', 'items' => $buf); $buf = array(); }
+              $blocks[] = array('kind' => 'single', 'items' => array($it));
+            }
+          }
+          if (!empty($buf)) { $blocks[] = array('kind' => 'grid', 'items' => $buf); }
+        ?>
+        <section class="agx-session <?php echo $ses['cls']; ?>">
+          <div class="agx-ses-head">
+            <span class="agx-ses-icon material-symbols-outlined"><?php echo $ses['icon']; ?></span>
+            <h3 class="agx-ses-label"><?php echo $e(strtoupper($ses['label'])); ?></h3>
+          </div>
+
+          <div class="agx-rail">
+            <?php foreach ($blocks as $block):
+              if ($block['kind'] === 'single') {
+                $it = $block['items'][0];
+                $time = (string) $val($it, array('time', 'start_time'), '');
+                $end  = (string) $val($it, array('end_time'), '');
+              } else {
+                // Lưới thể thao: mốc giờ = sớm nhất -> muộn nhất trong nhóm.
+                $starts = array(); $ends = array();
+                foreach ($block['items'] as $it2) {
+                  $s = (string) $val($it2, array('time', 'start_time'), '');
+                  $en = (string) $val($it2, array('end_time'), '');
+                  if ($s !== '')  $starts[] = $s;
+                  if ($en !== '') $ends[] = $en;
+                }
+                sort($starts); sort($ends);
+                $time = !empty($starts) ? $starts[0] : '';
+                $end  = !empty($ends) ? $ends[count($ends) - 1] : '';
+              }
+            ?>
+            <div class="agx-row">
+              <div class="agx-time">
+                <span class="agx-time-start"><?php echo $e($time !== '' ? $time : '—'); ?></span>
+                <?php if ($end !== ''): ?><span class="agx-time-end"><?php echo $e($end); ?></span><?php endif; ?>
+              </div>
+              <div class="agx-dot"></div>
+              <div class="agx-content">
+                <?php if ($block['kind'] === 'single'): ?>
+                  <?php echo $renderCard($block['items'][0]); ?>
+                <?php else: ?>
+                  <div class="agx-grid">
+                    <?php foreach ($block['items'] as $it2) { echo $renderCard($it2); } ?>
+                  </div>
                 <?php endif; ?>
               </div>
-              <?php if ($place !== ''): ?>
-                <div class="ag-place">
-                  <span class="material-symbols-outlined">location_on</span><?php echo $e($place); ?>
-                </div>
-              <?php endif; ?>
-              <?php if ($desc !== ''): ?>
-                <p class="ag-desc"><?php echo $e($desc); ?></p>
-              <?php endif; ?>
             </div>
+            <?php endforeach; ?>
           </div>
-          <?php endforeach; ?>
-        </div>
+        </section>
+        <?php endforeach; ?>
       </div>
       <?php endforeach; ?>
 
