@@ -48,7 +48,8 @@ $memberLogoutUrl   = $base . '/portal/logout';
 
 // ----- Menu điều hướng -----
 $navItems = array(
-  //    array($base . '/#noi-dung', 'Chương trình'),
+  // array($base . '/binh-chon', 'Bình chọn Miss'),
+  array($base . '/#noi-dung', 'Chương trình'),
   array($base . '/agenda-tong-the', 'Lịch trình'),
   array($base . '/lich-thi-the-thao', 'Lịch thi đấu'),
   array($base . '/tin-tuc', 'Tin tức'),

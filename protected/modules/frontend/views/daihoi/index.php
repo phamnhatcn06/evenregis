@@ -124,7 +124,7 @@ $memberLogoutUrl   = $base . '/portal/logout';
 
 // ----- Menu điều hướng (anchor trong trang) -----
 $navItems = array(
-  array('#binh-chon-miss', 'Bình chọn Miss'),
+  // array('#binh-chon-miss', 'Bình chọn Miss'),
   array('#noi-dung', 'Chương trình'),
   array($base . '/agenda-tong-the', 'Lịch trình'),
   array($base . '/lich-thi-the-thao', 'Lịch thi đấu'),
@@ -348,8 +348,10 @@ $matchScores = function ($m) use ($val) {
   if ($hs !== null && $as !== null && !is_array($hs) && !is_array($as)) {
     return array($hs, $as);
   }
-  if (isset($m['team_a']) && is_array($m['team_a']) && isset($m['team_a']['score']) &&
-      isset($m['team_b']) && is_array($m['team_b']) && isset($m['team_b']['score'])) {
+  if (
+    isset($m['team_a']) && is_array($m['team_a']) && isset($m['team_a']['score']) &&
+    isset($m['team_b']) && is_array($m['team_b']) && isset($m['team_b']['score'])
+  ) {
     return array($m['team_a']['score'], $m['team_b']['score']);
   }
   $raw = (string) $val($m, array('score'), '');
@@ -506,7 +508,9 @@ if (empty($albumList)) {
                     <span class="material-symbols-outlined text-success" style="font-size:19px;">event</span> Lịch trình của tôi
                   </a>
                 </li>
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
                 <li>
                   <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="<?php echo $e($memberLogoutUrl); ?>">
                     <span class="material-symbols-outlined" style="font-size:19px;">logout</span> Đăng xuất
@@ -1038,9 +1042,13 @@ if (empty($albumList)) {
         }
         // Định dạng ngày về d-m-Y.
         $fmtNewsDate = function ($raw) {
-          if ($raw === '' || $raw === null) { return ''; }
+          if ($raw === '' || $raw === null) {
+            return '';
+          }
           $ts = ctype_digit((string) $raw) ? (int) $raw : strtotime((string) $raw);
-          if (!$ts) { return ''; }
+          if (!$ts) {
+            return '';
+          }
           return date('d-m-Y', $ts);
         };
         // Lấy mô tả ngắn; nếu rỗng thì trích một đoạn từ nội dung bài viết.
