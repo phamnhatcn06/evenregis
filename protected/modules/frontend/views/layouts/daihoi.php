@@ -35,9 +35,8 @@ $dh = $base . '/public/daihoi';
   <!-- Bootstrap 5 CSS (local) -->
   <link rel="stylesheet" href="<?php echo $vendor; ?>/bootstrap/css/bootstrap.min.css" />
 
-  <!-- Tailwind Play CDN (local) + cấu hình -->
-  <script src="<?php echo $vendor; ?>/tailwind/tailwind.min.js"></script>
-  <script src="<?php echo $dh; ?>/daihoi-config.js"></script>
+  <!-- Tailwind CSS tĩnh (đã build sẵn, thay cho Play CDN runtime) -->
+  <link rel="stylesheet" href="<?php echo $vendor; ?>/tailwind/tailwind.min.css?v=<?php echo @filemtime(Yii::getPathOfAlias('webroot') . '/public/vendor/tailwind/tailwind.min.css') ?: time(); ?>" />
 
   <!-- Style tùy biến trang chủ -->
   <link rel="stylesheet" href="<?php echo $dh; ?>/daihoi-home.css?v=20261009_v3_<?php echo @filemtime(Yii::getPathOfAlias('webroot') . '/public/daihoi/daihoi-home.css') ?: time(); ?>" />
