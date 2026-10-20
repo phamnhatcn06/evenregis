@@ -672,32 +672,32 @@ if (empty($albumList)) {
       </div>
     </section>
 
-    <!-- SECTION 1B: CTA ĐĂNG KÝ HOẠT ĐỘNG (Giải chạy + Tham quan) -->
-    <section class="container py-2 py-md-3 reveal-scale" id="dang-ky">
-      <div class="card border-0 rounded-4 shadow-lg overflow-hidden position-relative" style="background:linear-gradient(135deg,#064e3b 0%,#0f766e 45%,#0369a1 100%);">
+    <!-- SECTION 1B: HERO BANNER BÌNH CHỌN MISS -->
+    <section class="container py-2 py-md-3 reveal-scale" id="binh-chon-miss">
+      <div class="card border-0 rounded-4 shadow-lg overflow-hidden position-relative" style="background:linear-gradient(135deg,#831843 0%,#be185d 45%,#7c3aed 100%);">
         <!-- Ambient glowing orbs -->
-        <div class="glow-orb" style="top:-20%;right:-10%;width:320px;height:320px;background:radial-gradient(circle,rgba(45,212,191,0.25) 0%,transparent 70%);"></div>
-        <div class="glow-orb" style="bottom:-30%;left:10%;width:280px;height:280px;background:radial-gradient(circle,rgba(56,189,248,0.2) 0%,transparent 70%);"></div>
+        <div class="glow-orb" style="top:-20%;right:-10%;width:320px;height:320px;background:radial-gradient(circle,rgba(251,207,232,0.3) 0%,transparent 70%);"></div>
+        <div class="glow-orb" style="bottom:-30%;left:10%;width:280px;height:280px;background:radial-gradient(circle,rgba(196,181,253,0.25) 0%,transparent 70%);"></div>
 
         <div class="card-body p-4 p-md-5 text-white position-relative z-1">
           <div class="row align-items-center g-3">
             <div class="col-lg-8">
               <div class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge fw-bold text-uppercase mb-2" style="font-size:11px;">
-                <span class="material-symbols-outlined" style="font-size:15px;">how_to_reg</span> Dành cho danh sách Vòng Chung Kết
+                <span class="material-symbols-outlined" style="font-size:15px;">diamond</span> Miss Mường Thanh <?php echo $e($eventYear); ?> &bull; Vòng Chung Kết
               </div>
-              <h2 class="fw-black text-uppercase lh-sm mb-2" style="font-size:calc(1.3rem + 1vw);">Đăng ký Giải chạy &amp; Đi tham quan</h2>
+              <h2 class="fw-black text-uppercase lh-sm mb-2" style="font-size:calc(1.3rem + 1vw);">Bình chọn Thí sinh Yêu thích</h2>
               <p class="text-light opacity-90 mb-3" style="font-size:14.5px;max-width:640px;">
-                Chọn cự ly chạy Fun Run (5km / 10km / 15km) và đợt đi tham quan. Số suất giới hạn,
-                đăng ký theo thứ tự &mdash; ai nhanh người đó được. Đăng nhập bằng mã định danh &amp; mã PIN cá nhân.
+                Tôn vinh nét đẹp duyên dáng, trí tuệ và sự tự tin của những đại diện xuất sắc nhất.
+                Hãy gửi trọn yêu thương qua từng lá phiếu cho thí sinh bạn yêu thích!
               </p>
               <div class="d-flex flex-wrap gap-2 gap-sm-3">
-                <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">sprint</span> Fun Run 3 cự ly</span>
-                <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">directions_bus</span> Tham quan 3 đợt</span>
+                <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">favorite</span> Mỗi thí sinh 1 lượt</span>
+                <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill glass-badge" style="font-size:13px;"><span class="material-symbols-outlined" style="font-size:18px;">bolt</span> Kết quả cập nhật trực tiếp</span>
               </div>
             </div>
             <div class="col-lg-4 text-lg-end">
-              <a class="btn btn-light fw-bold rounded-pill px-4 py-3 d-inline-flex align-items-center gap-2 shadow-lg text-dark btn-shimmer" href="<?php echo $e($portalUrl); ?>" style="font-size:14.5px;">
-                <span>Đăng ký tham gia ngay</span><span class="material-symbols-outlined fs-6">arrow_forward</span>
+              <a class="btn btn-light fw-bold rounded-pill px-4 py-3 d-inline-flex align-items-center gap-2 shadow-lg text-dark btn-shimmer" href="<?php echo $e($missVoteUrl); ?>" style="font-size:14.5px;">
+                <span>Bình chọn ngay</span><span class="material-symbols-outlined fs-6">arrow_forward</span>
               </a>
             </div>
           </div>
