@@ -32,9 +32,10 @@ $fmtDateTime = function ($value) {
 };
 ?>
 
-<?php $this->renderPartial('_header'); ?>
+<?php $this->renderPartial('application.modules.frontend.views.daihoi._site_header'); ?>
 
-<div class="bc-page-container">
+<main class="flex-grow-1">
+<div class="container bc-page-container">
 
     <!-- ======================================================================
          1. HERO BANNER
