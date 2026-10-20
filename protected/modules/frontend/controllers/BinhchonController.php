@@ -15,6 +15,9 @@ class BinhchonController extends CController
 {
     public $layout = '//layouts/frontend';
 
+    /** Khi true, layout //layouts/frontend sẽ ẩn footer copyright mặc định (trang tự có footer riêng). */
+    public $skipFrontendFooter = false;
+
     public function filters()
     {
         return array();
