@@ -288,7 +288,10 @@
   margin-top: .15rem;
   font-size: .9rem;
   color: var(--ag-muted);
+  line-height: 1.35;
 }
+.agx-place-main { display: block; font-weight: 600; color: #475569; }
+.agx-place-sub { display: block; }
 .agx-card-desc {
   margin-top: .5rem;
   padding-top: .5rem;
