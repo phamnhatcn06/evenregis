@@ -386,5 +386,6 @@ $fmtDateTime = function ($value) {
     <?php endif; ?>
 
 </div>
+</main>
 
-<?php $this->renderPartial('_footer'); ?>
+<?php $this->renderPartial('application.modules.frontend.views.daihoi._site_footer'); ?>
