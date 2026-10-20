@@ -24,14 +24,12 @@
       return;
     }
 
-    var activeClass = ['fw-bold', 'bg-light', 'text-dark'];
-
     function setActive(link) {
       links.forEach(function (l) {
-        l.classList.remove.apply(l.classList, activeClass);
+        l.classList.remove('active');
       });
       if (link) {
-        link.classList.add.apply(link.classList, activeClass);
+        link.classList.add('active');
       }
     }
 

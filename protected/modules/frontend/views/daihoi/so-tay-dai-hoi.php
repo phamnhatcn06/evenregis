@@ -187,10 +187,7 @@ $securityRules = array(
         <!-- THÔNG TIN ĐẠI HỘI -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="thong-tin">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">info</span>
-              <h2 class="fw-bold fs-5 mb-0">Thông tin Đại hội</h2>
-            </div>
+            <?php $head(, ); ?>
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="border rounded-3 p-3 h-100 d-flex align-items-center gap-3">
@@ -211,10 +208,7 @@ $securityRules = array(
         <!-- BỘ QUÀ TẶNG -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="qua-tang">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">redeem</span>
-              <h2 class="fw-bold fs-5 mb-0">Bộ quà tặng Đại biểu</h2>
-            </div>
+            <?php $head(, ); ?>
             <p class="text-secondary small mb-3">Mỗi đại biểu tham dự được tặng:</p>
             <div class="row g-3">
               <?php foreach ($gifts as $g): ?>
@@ -234,10 +228,7 @@ $securityRules = array(
         <!-- HÀNH TRANG -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="hanh-trang">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">luggage</span>
-              <h2 class="fw-bold fs-5 mb-0">Hành trang Đại biểu</h2>
-            </div>
+            <?php $head(, ); ?>
             <p class="text-secondary small mb-3">Vật dụng cá nhân cần chuẩn bị mang theo trước khi tham dự Đại hội:</p>
             <div class="row g-3">
               <?php foreach ($packing as $p): ?>
@@ -255,10 +246,7 @@ $securityRules = array(
         <!-- LIÊN HỆ -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="lien-he">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">contacts</span>
-              <h2 class="fw-bold fs-5 mb-0">Thông tin liên hệ</h2>
-            </div>
+            <?php $head(, ); ?>
             <a href="<?php echo $e($base); ?>/doan-thu-ky" class="d-flex align-items-center justify-content-between text-decoration-none border rounded-3 p-3 handbook-link">
               <span class="d-flex align-items-center gap-3">
                 <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">groups</span>
@@ -272,10 +260,7 @@ $securityRules = array(
         <!-- AGENDA & CHƯƠNG TRÌNH -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="chuong-trinh">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">event_note</span>
-              <h2 class="fw-bold fs-5 mb-0">Agenda & các chương trình chính</h2>
-            </div>
+            <?php $head(, ); ?>
             <div class="row g-3">
               <?php foreach ($programs as $pr): ?>
               <div class="col-md-6">
@@ -298,10 +283,7 @@ $securityRules = array(
         <!-- QUY ĐỊNH CHUNG -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="quy-dinh">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">gavel</span>
-              <h2 class="fw-bold fs-5 mb-0">Quy định chung</h2>
-            </div>
+            <?php $head(, ); ?>
             <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
               <?php foreach ($generalRules as $r): ?>
               <li class="d-flex align-items-start gap-2">
@@ -316,10 +298,7 @@ $securityRules = array(
         <!-- ĂN UỐNG & TIỆC -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="an-uong">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">restaurant</span>
-              <h2 class="fw-bold fs-5 mb-0">Ăn uống & các sự kiện tiệc</h2>
-            </div>
+            <?php $head(, ); ?>
             <h3 class="fw-semibold text-secondary small text-uppercase mb-2">Thời gian & địa điểm phục vụ</h3>
             <div class="table-responsive mb-4">
               <table class="table table-bordered align-middle mb-0">
@@ -358,10 +337,7 @@ $securityRules = array(
         <!-- LƯU TRÚ -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="luu-tru">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">hotel</span>
-              <h2 class="fw-bold fs-5 mb-0">Lưu trú</h2>
-            </div>
+            <?php $head(, ); ?>
             <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
               <?php foreach ($lodgingRules as $r): ?>
               <li class="d-flex align-items-start gap-2">
@@ -376,10 +352,7 @@ $securityRules = array(
         <!-- Y TẾ -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="y-te">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">medical_services</span>
-              <h2 class="fw-bold fs-5 mb-0">Y tế</h2>
-            </div>
+            <?php $head(, ); ?>
             <p class="text-secondary small mb-3">Phòng y tế thường trực 24/24 giờ trong suốt thời gian diễn ra Đại hội.</p>
             <div class="row g-3 mb-4">
               <?php foreach ($medical as $md): ?>
@@ -424,10 +397,7 @@ $securityRules = array(
         <!-- AN NINH - PCCC -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="an-ninh">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">local_fire_department</span>
-              <h2 class="fw-bold fs-5 mb-0">An ninh - PCCC</h2>
-            </div>
+            <?php $head(, ); ?>
             <ul class="list-unstyled mb-3 d-flex flex-column gap-2">
               <?php foreach ($securityRules as $r): ?>
               <li class="d-flex align-items-start gap-2">
@@ -449,10 +419,7 @@ $securityRules = array(
         <!-- SƠ ĐỒ ĐỊA ĐIỂM -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="so-do">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">map</span>
-              <h2 class="fw-bold fs-5 mb-0">Sơ đồ địa điểm Đại hội</h2>
-            </div>
+            <?php $head(, ); ?>
             <p class="text-secondary small mb-3">Hội trường chính, nhà hàng, khu lưu trú, khu thể thao, khu vực Miss, xe đưa đón, y tế, quầy Thông tin, WC, lối thoát hiểm và điểm tập kết khẩn cấp.</p>
             <a href="<?php echo $e($base); ?>/so-do-dia-diem" class="btn rounded-pill fw-bold text-white d-inline-flex align-items-center gap-2" style="background:<?php echo $e($accent); ?>;">
               <span class="material-symbols-outlined fs-6">map</span> Xem sơ đồ chi tiết
@@ -463,10 +430,7 @@ $securityRules = array(
         <!-- QR & KÊNH THÔNG TIN -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="kenh-qr">
           <div class="card-body p-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">qr_code_2</span>
-              <h2 class="fw-bold fs-5 mb-0">QR & kênh thông tin chính thức</h2>
-            </div>
+            <?php $head(, ); ?>
             <div class="row g-3">
               <div class="col-md-4">
                 <a href="<?php echo $e($base); ?>/agenda-tong-the" class="d-flex align-items-center gap-3 text-decoration-none border rounded-3 p-3 h-100 handbook-link">
