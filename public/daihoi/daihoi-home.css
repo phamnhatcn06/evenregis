@@ -607,3 +607,26 @@ nav a.nav-link:hover::after {
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
+
+/* ==========================================================================
+   Sổ tay Đại hội (/so-tay-dai-hoi)
+   ========================================================================== */
+
+.handbook-link {
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.handbook-link:hover {
+  border-color: #b45309 !important;
+  box-shadow: 0 6px 18px rgba(180, 83, 9, 0.12);
+  transform: translateY(-2px);
+}
+
+#handbookToc .nav-link {
+  transition: background-color .15s ease, color .15s ease;
+}
+
+#handbookToc .nav-link:hover {
+  background-color: #f8f9fa;
+  color: #212529;
+}
