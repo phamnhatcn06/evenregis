@@ -54,7 +54,7 @@ $navItems = array(
   array($base . '/lich-thi-the-thao', 'Lịch thi đấu'),
   array($base . '/tin-tuc', 'Tin tức'),
   array($base . '/#thu-vien', 'Thư viện'),
-  array($base . '/#so-tay', 'Sổ tay'),
+  array($base . '/so-tay-dai-hoi', 'Sổ tay'),
 );
 ?>
 <!-- HEADER -->
