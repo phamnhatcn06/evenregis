@@ -136,7 +136,7 @@ $securityRules = array(
 
 <main class="flex-grow-1 bg-light">
   <!-- HERO -->
-  <section class="position-relative overflow-hidden" style="background:<?php echo $heroGradient; ?>;">
+  <section class="position-relative overflow-hidden handbook-hero" style="background:<?php echo $heroGradient; ?>;">
     <div class="container py-5 text-white position-relative" style="z-index:1;">
       <span class="badge rounded-pill bg-white text-dark fw-bold mb-3 px-3 py-2">
         <span class="material-symbols-outlined align-middle" style="font-size:16px;">menu_book</span>
