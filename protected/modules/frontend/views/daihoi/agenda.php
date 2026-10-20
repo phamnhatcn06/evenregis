@@ -57,10 +57,10 @@ $sportIcon = function ($title) {
 
 // Cấu hình 4 buổi.
 $sessions = array(
-    1 => array('label' => 'Buổi sáng', 'icon' => 'wb_sunny',       'cls' => 'ses-morning'),
-    2 => array('label' => 'Buổi trưa', 'icon' => 'light_mode',     'cls' => 'ses-noon'),
-    3 => array('label' => 'Buổi chiều','icon' => 'directions_run', 'cls' => 'ses-afternoon'),
-    4 => array('label' => 'Buổi tối',  'icon' => 'bedtime',        'cls' => 'ses-evening'),
+    1 => array('label' => 'BUỔI SÁNG', 'icon' => 'wb_sunny',       'cls' => 'ses-morning'),
+    2 => array('label' => 'BUỔI TRƯA', 'icon' => 'light_mode',     'cls' => 'ses-noon'),
+    3 => array('label' => 'BUỔI CHIỀU','icon' => 'directions_run', 'cls' => 'ses-afternoon'),
+    4 => array('label' => 'BUỔI TỐI',  'icon' => 'bedtime',        'cls' => 'ses-evening'),
 );
 $guessSession = function ($time) {
     $h = (int) substr($time, 0, 2);
