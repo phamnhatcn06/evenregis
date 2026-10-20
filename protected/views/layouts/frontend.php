@@ -43,11 +43,13 @@
         </div>
     </main>
 
+    <?php if (empty($this->skipFrontendFooter)): ?>
     <footer class="bg-light py-4 mt-auto border-top">
         <div class="container text-center">
             <p class="mb-0 text-muted">&copy; <?php echo date('Y'); ?> <?php echo Yii::app()->name; ?>. All rights reserved.</p>
         </div>
     </footer>
+    <?php endif; ?>
 
     <script src="<?php echo Yii::app()->theme->baseUrl; ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo Yii::app()->theme->baseUrl; ?>/assets/js/plugins/toast.js"></script>
