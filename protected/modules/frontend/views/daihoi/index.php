@@ -108,6 +108,8 @@ $adminUrl = $base . '/admin/default/index';
 $loginUrl = $hasPortalToken ? $adminUrl : $base . '/login';
 // Cổng đăng ký hoạt động (Giải chạy Fun Run + Đi tham quan) cho danh sách Vòng Chung Kết.
 $portalUrl = $base . '/run';
+// Cổng bình chọn Miss Mường Thanh (public, vòng chung kết).
+$missVoteUrl = $base . '/binh-chon';
 
 // ----- Trạng thái đăng nhập thành viên (cổng cá nhân /portal) -----
 $session = Yii::app()->session;
