@@ -3,10 +3,13 @@
  * Layout cho trang Website công khai Đại hội (thiết kế mới DHMT_update).
  * Tự chứa, chỉ nạp CSS/JS tĩnh từ local (KHÔNG dùng CDN theo quy tắc dự án).
  *
- * Thứ tự JS quan trọng:
- *   1) tailwind.min.js  -> 2) daihoi-config.js (cấu hình Tailwind)
- *   3) bootstrap.bundle.min.js
- *   4) daihoi-home.js   (slider + realtime)
+ * Tailwind: dùng file CSS tĩnh build sẵn (public/vendor/tailwind/tailwind.min.css),
+ * KHÔNG dùng Play CDN runtime trên production. Build lại bằng Tailwind CLI khi
+ * thêm class mới (xem HƯỚNG DẪN build trong README/ghi chú dự án).
+ *
+ * Thứ tự JS:
+ *   1) bootstrap.bundle.min.js
+ *   2) daihoi-home.js   (slider + realtime)
  */
 $base = Yii::app()->request->baseUrl;
 $vendor = $base . '/public/vendor';
