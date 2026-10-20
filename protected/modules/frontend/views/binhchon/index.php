@@ -32,6 +32,8 @@ $fmtDateTime = function ($value) {
 };
 ?>
 
+<?php $this->renderPartial('_header'); ?>
+
 <div class="bc-page-container">
 
     <!-- ======================================================================
