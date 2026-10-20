@@ -612,21 +612,71 @@ nav a.nav-link:hover::after {
    Sổ tay Đại hội (/so-tay-dai-hoi)
    ========================================================================== */
 
+/* Nền hoa văn mờ cho hero sổ tay */
+.handbook-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.14) 0, transparent 42%),
+    radial-gradient(circle at 88% 85%, rgba(13, 148, 136, 0.35) 0, transparent 45%);
+  pointer-events: none;
+}
+
+/* Thẻ nội dung: viền trên theo gradient thương hiệu khi hover */
+.handbook-section {
+  border-top: 3px solid transparent;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.handbook-section:hover {
+  border-top-color: var(--brand-primary);
+  box-shadow: 0 14px 34px rgba(29, 78, 216, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Chip icon tiêu đề từng mục */
+.handbook-ico {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+  box-shadow: 0 6px 14px rgba(29, 78, 216, 0.28);
+}
+
+.handbook-ico .material-symbols-outlined {
+  font-size: 22px;
+}
+
+/* Liên kết dạng thẻ */
 .handbook-link {
   transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
 
 .handbook-link:hover {
-  border-color: #b45309 !important;
-  box-shadow: 0 6px 18px rgba(180, 83, 9, 0.12);
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 8px 20px rgba(29, 78, 216, 0.12);
   transform: translateY(-2px);
 }
 
+/* Mục lục bên trái */
 #handbookToc .nav-link {
-  transition: background-color .15s ease, color .15s ease;
+  border-left: 3px solid transparent;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
 }
 
 #handbookToc .nav-link:hover {
-  background-color: #f8f9fa;
-  color: #212529;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+#handbookToc .nav-link.active {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border-left-color: var(--brand-primary);
 }
