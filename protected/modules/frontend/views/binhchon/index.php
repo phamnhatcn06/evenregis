@@ -7,8 +7,6 @@
 /** @var string $tokenLoginUrl */
 
 $this->pageTitle = 'Bình chọn Miss Mường Thanh 2026 - Vòng Chung Kết';
-// Trang này có footer điều hướng riêng (_footer) nên ẩn footer mặc định của layout.
-$this->skipFrontendFooter = true;
 $baseUrl = Yii::app()->theme->baseUrl;
 $themePath = Yii::getPathOfAlias('webroot') . '/themes/hope-ui';
 
