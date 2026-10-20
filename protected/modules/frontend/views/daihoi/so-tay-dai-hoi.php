@@ -16,6 +16,14 @@ $accent = '#1d4ed8';
 $accent2 = '#0d9488';
 $heroGradient = 'linear-gradient(135deg,#0b1329 0%,#1d4ed8 55%,#0d9488 100%)';
 
+// Tiêu đề từng mục với chip icon gradient thương hiệu.
+$head = function ($icon, $title) use ($e) {
+    echo '<div class="d-flex align-items-center gap-3 mb-3">'
+        . '<span class="handbook-ico"><span class="material-symbols-outlined">' . $e($icon) . '</span></span>'
+        . '<h2 class="fw-bold fs-5 mb-0">' . $e($title) . '</h2>'
+        . '</div>';
+};
+
 // Mục lục điều hướng nhanh trong trang.
 $toc = array(
     array('id' => 'thong-tin', 'icon' => 'info', 'label' => 'Thông tin Đại hội'),
