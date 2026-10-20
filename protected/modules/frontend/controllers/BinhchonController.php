@@ -13,10 +13,8 @@
  */
 class BinhchonController extends CController
 {
-    public $layout = '//layouts/frontend';
-
-    /** Khi true, layout //layouts/frontend sẽ ẩn footer copyright mặc định (trang tự có footer riêng). */
-    public $skipFrontendFooter = false;
+    // Dùng chung layout trang công khai Đại hội để có header/footer điều hướng thống nhất.
+    public $layout = 'daihoi';
 
     public function filters()
     {
