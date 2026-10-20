@@ -428,7 +428,7 @@ $securityRules = array(
               </li>
               <?php endforeach; ?>
             </ul>
-            <div class="alert d-flex align-items-center gap-2 mb-0" style="background:#fff7ed;border:1px solid #fed7aa;">
+            <div class="alert d-flex align-items-center gap-2 mb-0" style="background:#eff6ff;border:1px solid #bfdbfe;">
               <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">contact_phone</span>
               <div class="small text-dark">
                 Liên hệ tình huống khẩn cấp: <strong>Mr. Đoàn Thế Cương</strong> -
