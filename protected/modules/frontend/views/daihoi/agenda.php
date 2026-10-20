@@ -208,7 +208,7 @@ $renderCard = function ($item) use ($val, $e, $typeIcon, $sportIcon) {
         <section class="agx-session <?php echo $ses['cls']; ?>">
           <div class="agx-ses-head">
             <span class="agx-ses-icon material-symbols-outlined"><?php echo $ses['icon']; ?></span>
-            <h3 class="agx-ses-label"><?php echo $e(strtoupper($ses['label'])); ?></h3>
+            <h3 class="agx-ses-label"><?php echo $e($ses['label']); ?></h3>
           </div>
 
           <div class="agx-rail">
