@@ -11,7 +11,10 @@
 $base = Yii::app()->request->baseUrl;
 $e = function ($s) { return CHtml::encode($s !== null ? (string) $s : ''); };
 $eventName = isset($event['name']) ? $event['name'] : (isset($event['title']) ? $event['title'] : 'Đại hội Mường Thanh 2026');
-$accent = '#b45309';
+// Tông màu theo theme Đại hội: brand-primary (xanh dương) -> brand-secondary (teal).
+$accent = '#1d4ed8';
+$accent2 = '#0d9488';
+$heroGradient = 'linear-gradient(135deg,#0b1329 0%,#1d4ed8 55%,#0d9488 100%)';
 
 // Mục lục điều hướng nhanh trong trang.
 $toc = array(
