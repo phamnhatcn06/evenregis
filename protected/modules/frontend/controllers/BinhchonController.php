@@ -56,6 +56,12 @@ class BinhchonController extends CController
                 CClientScript::POS_HEAD
             );
         }
+        // Layout `daihoi` không nạp Font Awesome (chỉ Material Symbols), trong khi
+        // view bình chọn dùng nhiều icon `fa fa-*` → nạp Font Awesome tại đây.
+        Yii::app()->clientScript->registerCssFile(
+            Yii::app()->theme->baseUrl . '/assets/css/font-awesome/font-awesome.min.css'
+        );
+
         // CSS được nạp trong view (kèm cache-busting). Ở đây chỉ nạp JS, cũng
         // thêm ?v=filemtime để tránh trình duyệt dùng bản JS cũ đã cache.
         $jsPath = Yii::getPathOfAlias('webroot') . '/themes/hope-ui/assets/js/pages/binhchon-index.js';
