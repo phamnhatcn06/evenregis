@@ -124,7 +124,7 @@ $memberLogoutUrl   = $base . '/portal/logout';
 
 // ----- Menu điều hướng (anchor trong trang) -----
 $navItems = array(
-  array('#dang-ky', 'Đăng ký'),
+  array('#binh-chon-miss', 'Bình chọn Miss'),
   array('#noi-dung', 'Chương trình'),
   array($base . '/agenda-tong-the', 'Lịch trình'),
   array($base . '/lich-thi-the-thao', 'Lịch thi đấu'),
