@@ -385,3 +385,5 @@ $fmtDateTime = function ($value) {
     <?php endif; ?>
 
 </div>
+
+<?php $this->renderPartial('_footer'); ?>
