@@ -65,6 +65,12 @@ $teams = array();
 if ($preview && isset($preview['teams'])) {
     $teams = $preview['teams'];
     foreach ($teams as $t) {
+        // Bỏ qua slot giữ chỗ (team_id null): nếu đưa vào map với khoá rỗng sẽ làm
+        // mọi trận có đội chưa xác định hiển thị sai cùng một tên. Để các trận này
+        // tự rơi về nhãn nguồn (team_a_source/team_b_source) = "Chờ Thắng Play-off X".
+        if ($t['team_id'] === null || $t['team_id'] === '') {
+            continue;
+        }
         $teamMap[$t['team_id']] = $t['team_name'] !== null ? $t['team_name'] : ('#' . $t['team_id']);
     }
 }
