@@ -15,36 +15,34 @@ $mapUrl = function ($query) {
     return 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($query);
 };
 
-// Các địa điểm chính của Đại hội (theo "Map các khu vực sự kiện Đại hội").
+// Lịch tại khách sạn (hub trung tâm).
+$hotelSchedule = array(
+    array('date' => '27.10', 'text' => 'Khai mạc: Ballroom Hoa Lư - Tầng 1'),
+    array('date' => '28.10', 'text' => 'Thi nghiệp vụ: Tầng 2, 3'),
+    array('date' => '29.10', 'text' => 'Gala: Ballroom Hoa Lư - Tầng 1'),
+);
+
+// Các địa điểm vệ tinh (theo "Map các khu vực sự kiện Đại hội").
 $venues = array(
-    array(
+    'golf' => array(
         'icon' => 'golf_course',
         'name' => 'Sân Golf Tràng An',
         'address' => 'Phú Long, Ninh Bình',
         'date' => '25.10.2026',
         'distance' => '26 km',
-        'note' => '',
+        'note' => 'Golf',
         'map' => $mapUrl('Sân Golf Tràng An Phú Long Ninh Bình'),
     ),
-    array(
-        'icon' => 'hotel',
-        'name' => 'Khách sạn Mường Thanh Luxury Ninh Bình',
-        'address' => 'Khu vực trung tâm Đại hội',
-        'date' => '27 - 29.10.2026',
-        'distance' => '',
-        'note' => '27.10 Khai mạc: Ballroom Hoa Lư - Tầng 1 · 28.10 Thi nghiệp vụ: Tầng 2, 3 · 29.10 Gala: Ballroom Hoa Lư - Tầng 1',
-        'map' => $mapUrl('Khách sạn Mường Thanh Luxury Ninh Bình'),
-    ),
-    array(
+    'stadium' => array(
         'icon' => 'stadium',
         'name' => 'Nhà thi đấu tỉnh Ninh Bình',
         'address' => '320 Đinh Tiên Hoàng, Hoa Lư, Ninh Bình',
         'date' => '27 - 29.10.2026',
         'distance' => '2.4 km',
-        'note' => 'Cầu lông, bóng bàn, kéo co...',
+        'note' => 'Cầu lông · Bóng bàn · Kéo co',
         'map' => $mapUrl('Nhà thi đấu tỉnh Ninh Bình 320 Đinh Tiên Hoàng Hoa Lư'),
     ),
-    array(
+    'soccer' => array(
         'icon' => 'sports_soccer',
         'name' => 'Sân bóng Teddy',
         'address' => 'Khu đô thị, Hoa Lư, Ninh Bình',
@@ -55,16 +53,44 @@ $venues = array(
     ),
 );
 
-// Sơ đồ mặt bằng các tầng tại khách sạn - mở popup xem ảnh.
+$renderVenue = function ($v, $areaClass) use ($e) {
+    ?>
+    <div class="dh-node <?php echo $e($areaClass); ?>">
+      <div class="dh-node__head">
+        <div class="dh-node__icon"><span class="material-symbols-outlined"><?php echo $e($v['icon']); ?></span></div>
+        <div class="min-w-0">
+          <div class="dh-node__title"><?php echo $e($v['name']); ?></div>
+          <p class="dh-node__addr"><span class="material-symbols-outlined align-middle" style="font-size:14px;">location_on</span> <?php echo $e($v['address']); ?></p>
+        </div>
+      </div>
+      <div class="dh-badges">
+        <span class="dh-chip dh-chip--date"><?php echo $e($v['date']); ?></span>
+        <?php if ($v['distance'] !== ''): ?>
+          <span class="dh-chip dh-chip--dist"><span class="material-symbols-outlined">near_me</span><?php echo $e($v['distance']); ?></span>
+        <?php endif; ?>
+      </div>
+      <?php if ($v['note'] !== ''): ?><p class="dh-node__note"><?php echo $e($v['note']); ?></p><?php endif; ?>
+      <a href="<?php echo $e($v['map']); ?>" target="_blank" rel="noopener" class="dh-map-btn">
+        <span class="material-symbols-outlined">map</span> Bản đồ
+      </a>
+    </div>
+    <?php
+};
+
+// Sơ đồ mặt bằng các tầng.
 $floors = array(
-    array('id' => 't1', 'label' => 'Tầng 1', 'desc' => 'Sảnh chính, Hội trường, Hồ bơi', 'img' => $soDo . '/MB_t1.jpg'),
-    array('id' => 't2', 'label' => 'Tầng 2', 'desc' => 'Nhà hàng, khu vực thi FB, trao giải', 'img' => $soDo . '/MB_t2.jpg'),
+    array('id' => 't1', 'label' => 'Tầng 1', 'desc' => 'Sảnh chính · Hội trường · Hồ bơi', 'img' => $soDo . '/MB_t1.jpg'),
+    array('id' => 't2', 'label' => 'Tầng 2', 'desc' => 'Nhà hàng · Khu thi FB · Trao giải', 'img' => $soDo . '/MB_t2.jpg'),
     array('id' => 't3', 'label' => 'Tầng 3', 'desc' => 'Hội trường thi nghiệp vụ', 'img' => $soDo . '/MB_t3.jpg'),
+);
+
+Yii::app()->clientScript->registerCssFile(
+    $soDo . '.css?v=' . (@filemtime(Yii::getPathOfAlias('webroot') . '/public/daihoi/so-do.css') ?: time())
 );
 ?>
 <?php $this->renderPartial('_subheader', array('eventName' => $eventName, 'active' => 'map')); ?>
 
-<main class="flex-grow-1">
+<main class="flex-grow-1 dh-map-accent">
   <section class="container py-4">
     <div class="mb-4">
       <span class="fw-bold text-uppercase small d-block mb-1" style="color:<?php echo $e($accent); ?>;">Định hướng Đại hội</span>
@@ -75,57 +101,36 @@ $floors = array(
       <p class="text-secondary small mb-0">Các khu vực tổ chức sự kiện và sơ đồ mặt bằng khách sạn Mường Thanh Luxury Ninh Bình.</p>
     </div>
 
-    <!-- Map tổng quan các khu vực sự kiện -->
-    <div class="card border-0 rounded-4 shadow-sm bg-white mb-4 overflow-hidden">
-      <img src="<?php echo $e($soDo); ?>/khu_vuc_thi_dau.png" alt="Map các khu vực sự kiện Đại hội" class="w-100" style="object-fit:contain;" loading="lazy">
-    </div>
-
-    <!-- Danh sách địa điểm -->
-    <div class="d-flex align-items-center gap-2 mb-3">
-      <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">place</span>
-      <h2 class="fw-bold text-dark fs-5 mb-0">Các địa điểm sự kiện</h2>
-    </div>
-
-    <div class="row g-3 mb-5">
-      <?php foreach ($venues as $v): ?>
-      <div class="col-12 col-lg-6">
-        <div class="card border rounded-4 shadow-sm h-100">
-          <div class="p-3 d-flex gap-3">
-            <div class="rounded-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width:52px;height:52px;background:<?php echo $e($accent); ?>1a;">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;font-size:28px;"><?php echo $e($v['icon']); ?></span>
-            </div>
-            <div class="flex-grow-1 min-w-0">
-              <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                <strong class="text-dark"><?php echo $e($v['name']); ?></strong>
-                <span class="badge rounded-pill" style="background:<?php echo $e($accent); ?>;"><?php echo $e($v['date']); ?></span>
-                <?php if ($v['distance'] !== ''): ?>
-                  <span class="badge rounded-pill bg-light text-dark border">
-                    <span class="material-symbols-outlined align-middle" style="font-size:14px;">near_me</span>
-                    <?php echo $e($v['distance']); ?>
-                  </span>
-                <?php endif; ?>
-              </div>
-              <p class="text-secondary small mb-2">
-                <span class="material-symbols-outlined align-middle" style="font-size:16px;">location_on</span>
-                <?php echo $e($v['address']); ?>
-              </p>
-              <?php if ($v['note'] !== ''): ?>
-                <p class="text-muted small mb-2"><?php echo $e($v['note']); ?></p>
-              <?php endif; ?>
-              <a href="<?php echo $e($v['map']); ?>" target="_blank" rel="noopener"
-                 class="btn btn-sm text-white d-inline-flex align-items-center gap-1" style="background:<?php echo $e($accent); ?>;">
-                <span class="material-symbols-outlined" style="font-size:18px;">map</span>
-                Bản đồ
-              </a>
-            </div>
+    <!-- Infographic hub & spokes -->
+    <div class="dh-hub mb-5">
+      <!-- Hub trung tâm -->
+      <div class="dh-node dh-node--hub dh-area-hub">
+        <div class="dh-node__head">
+          <div class="dh-node__icon"><span class="material-symbols-outlined">hotel</span></div>
+          <div class="min-w-0">
+            <div class="dh-node__title">Khách sạn Mường Thanh Luxury Ninh Bình</div>
+            <p class="dh-node__addr">Khu vực trung tâm Đại hội</p>
           </div>
         </div>
+        <ul class="dh-sched">
+          <?php foreach ($hotelSchedule as $s): ?>
+          <li><b><?php echo $e($s['date']); ?></b><span><?php echo $e($s['text']); ?></span></li>
+          <?php endforeach; ?>
+        </ul>
+        <a href="<?php echo $e($mapUrl('Khách sạn Mường Thanh Luxury Ninh Bình')); ?>" target="_blank" rel="noopener" class="dh-map-btn">
+          <span class="material-symbols-outlined">map</span> Bản đồ
+        </a>
       </div>
-      <?php endforeach; ?>
+
+      <?php
+      $renderVenue($venues['golf'], 'dh-area-golf');
+      $renderVenue($venues['stadium'], 'dh-area-stadium');
+      $renderVenue($venues['soccer'], 'dh-area-soccer');
+      ?>
     </div>
 
     <!-- Sơ đồ mặt bằng các tầng -->
-    <div class="d-flex align-items-center gap-2 mb-3">
+    <div class="d-flex align-items-center gap-2 mb-2">
       <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">floor</span>
       <h2 class="fw-bold text-dark fs-5 mb-0">Sơ đồ mặt bằng khách sạn</h2>
     </div>
@@ -134,14 +139,11 @@ $floors = array(
     <div class="row g-3">
       <?php foreach ($floors as $f): ?>
       <div class="col-12 col-md-4">
-        <button type="button" class="card border rounded-4 shadow-sm h-100 w-100 text-start p-0 bg-white"
-                data-bs-toggle="modal" data-bs-target="#modal-floor-<?php echo $e($f['id']); ?>">
-          <div class="rounded-top-4 overflow-hidden position-relative" style="background:#f1f5f9;">
-            <img src="<?php echo $e($f['img']); ?>" alt="Sơ đồ mặt bằng <?php echo $e($f['label']); ?>" class="w-100" style="height:160px;object-fit:cover;" loading="lazy">
-            <span class="position-absolute top-0 start-0 m-2 badge rounded-pill text-white" style="background:<?php echo $e($accent); ?>;"><?php echo $e($f['label']); ?></span>
-            <span class="position-absolute bottom-0 end-0 m-2 badge rounded-circle bg-dark bg-opacity-50 d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
-              <span class="material-symbols-outlined text-white" style="font-size:18px;">zoom_in</span>
-            </span>
+        <button type="button" class="dh-floor" data-bs-toggle="modal" data-bs-target="#modal-floor-<?php echo $e($f['id']); ?>">
+          <div class="dh-floor__img">
+            <img src="<?php echo $e($f['img']); ?>" alt="Sơ đồ mặt bằng <?php echo $e($f['label']); ?>" loading="lazy">
+            <span class="dh-floor__tag"><?php echo $e($f['label']); ?></span>
+            <span class="dh-floor__zoom"><span class="material-symbols-outlined">zoom_in</span></span>
           </div>
           <div class="p-3">
             <strong class="text-dark d-block">Mặt bằng <?php echo $e($f['label']); ?></strong>
