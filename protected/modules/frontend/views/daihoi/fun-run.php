@@ -142,33 +142,30 @@ $rules = array(
         <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">emoji_events</span>
         <h2 class="fw-bold text-dark fs-4 mb-0">Nhóm thi đấu &amp; giải thưởng</h2>
       </div>
-      <div class="card border-0 rounded-4 shadow-sm overflow-hidden mb-3">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0 text-center">
-            <thead style="background:<?php echo $e($accent); ?>0d;">
-              <tr>
-                <th class="text-start">Giới tính</th><th class="text-start">Độ tuổi</th>
-                <th>5 km</th><th>10 km</th><th>15 km</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($groups as $g): ?>
-              <tr>
-                <td class="text-start fw-semibold"><?php echo $e($g['gender']); ?></td>
-                <td class="text-start"><?php echo $e($g['age']); ?></td>
-                <td><?php echo $tick($g['d5']); ?></td>
-                <td><?php echo $tick($g['d10']); ?></td>
-                <td><?php echo $tick($g['d15']); ?></td>
-              </tr>
-              <?php endforeach; ?>
-              <tr class="fw-bold" style="background:#f8f9fa;">
-                <td class="text-start" colspan="2">Tổng số nhóm thi đấu</td>
-                <td>4</td><td>2</td><td>2</td>
-              </tr>
-            </tbody>
-          </table>
+      <div class="row g-3 mb-3">
+        <?php foreach ($distanceGroups as $dg): ?>
+        <div class="col-md-4">
+          <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden">
+            <div class="px-4 py-3 d-flex align-items-center justify-content-between" style="background:<?php echo $e($accent); ?>0d;">
+              <span class="fw-bold fs-5" style="color:<?php echo $e($accent); ?>;"><?php echo $e($dg['name']); ?></span>
+              <span class="badge rounded-pill text-dark" style="background:<?php echo $e($accent); ?>1a;"><?php echo count($dg['groups']); ?> nhóm</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="small text-secondary px-4 pt-3 pb-2"><span class="material-symbols-outlined align-middle fs-6"><?php echo count($dg['groups']) > 2 ? 'groups' : 'wc'; ?></span> <?php echo $e($dg['note']); ?></div>
+              <ul class="list-unstyled mb-0">
+                <?php foreach ($dg['groups'] as $g): ?>
+                <li class="d-flex align-items-center justify-content-between px-4 py-2 border-top">
+                  <span class="fw-semibold text-dark"><?php echo $e($g['gender']); ?></span>
+                  <span class="small text-secondary"><?php echo $e($g['age']); ?></span>
+                </li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+          </div>
         </div>
+        <?php endforeach; ?>
       </div>
+      <p class="small text-secondary mb-3"><span class="material-symbols-outlined align-middle fs-6">info</span> Tổng cộng 8 nhóm thi đấu: 5 km có 4 nhóm (theo giới tính và độ tuổi); 10 km và 15 km mỗi cự ly 2 nhóm (chỉ theo giới tính, không phân biệt độ tuổi).</p>
       <div class="row g-3">
         <div class="col-md-6">
           <div class="card border rounded-4 h-100"><div class="card-body d-flex gap-3">
