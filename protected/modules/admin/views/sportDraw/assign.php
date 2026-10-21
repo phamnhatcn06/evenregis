@@ -162,7 +162,7 @@ if ($isBracket) {
                 <?php else: ?>
                     <?php
                     // Render từng ô slot: tìm đội theo bracket_slot
-                    $slotChip = function ($pos) use ($teams) {
+                    $slotChip = function ($pos) use ($teams, $teamLabel) {
                         $team = null;
                         foreach ($teams as $t) {
                             if ((int) ($t['bracket_slot'] ?? 0) === $pos) { $team = $t; break; }
