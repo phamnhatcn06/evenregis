@@ -623,6 +623,21 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Đặt chỗ trước đội thắng play-off vào vòng bảng đã bốc (AJAX).
+     * Không xáo lại đội hiện có; chỉ thêm slot giữ chỗ + các trận vòng tròn liên quan.
+     */
+    public function actionReservePlayoff($id)
+    {
+        $this->requirePost();
+        $sourceStageId = Yii::app()->getRequest()->getPost('source_stage_id');
+        $result = SportStages::reservePlayoffSlots($id, $sourceStageId ? (int) $sourceStageId : null);
+        if (!empty($result['success'])) {
+            $this->jsonResponse(true, 'Đã đặt chỗ play-off vào vòng bảng.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể đặt chỗ play-off.'));
+    }
+
+    /**
      * Danh sách VĐV/đội ở vòng chung kết của nội dung (để chọn đưa vào play-off) (AJAX).
      */
     public function actionPlayoffEntrants($id)
