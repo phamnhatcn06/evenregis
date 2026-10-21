@@ -129,7 +129,7 @@ class DaihoiController extends FrontEndController
                 'info' => array(
                     array('icon' => 'event', 'label' => 'Sự kiện', 'value' => 'Tiệc Welcome - Khai mạc'),
                     array('icon' => 'schedule', 'label' => 'Thời gian', 'value' => '17:00 - 19:00, ngày 27/10/2026'),
-                    array('icon' => 'location_on', 'label' => 'Địa điểm', 'value' => 'Hội trường tầng 2'),
+                    array('icon' => 'location_on', 'label' => 'Địa điểm', 'value' => 'Nhà hàng Tràng An - Tầng 2, Mường Thanh Luxury Ninh Bình'),
                 ),
                 'keywords' => array('khai mạc', 'miss', 'văn nghệ', 'welcome', 'ceremony', 'gala'),
                 'emptyText' => 'Chương trình chi tiết sẽ được Ban Tổ chức cập nhật.',
