@@ -42,12 +42,16 @@ $toc = array(
 
 // Hành trang cá nhân cần chuẩn bị.
 $packing = array(
-    array('icon' => 'badge', 'text' => 'Căn cước công dân hoặc giấy tờ tùy thân.'),
-    array('icon' => 'water_drop', 'text' => 'Bình nước cá nhân.'),
+    array('icon' => 'id_card', 'text' => 'Căn cước công dân hoặc giấy tờ tùy thân.'),
+    array('icon' => 'water_bottle', 'text' => 'Bình nước cá nhân.'),
     array('icon' => 'umbrella', 'text' => 'Ô hoặc áo mưa gấp gọn.'),
-    array('icon' => 'checkroom', 'text' => 'Quần áo thay đổi phù hợp thời tiết và nội dung chương trình.'),
-    array('icon' => 'footprint', 'text' => 'Giày thể thao hoặc giày đế thấp, dép đi trong phòng.'),
-    array('icon' => 'bed', 'text' => 'Túi ngủ, chăn mỏng, khăn tắm, gối, đồ vệ sinh cá nhân theo nhu cầu.'),
+    array('icon' => 'checkroom', 'text' => 'Quần áo thay đổi phù hợp thời tiết.'),
+    array('icon' => 'shoe_cleats', 'text' => 'Giày thể thao hoặc giày đế thấp.'),
+    array('icon' => 'footprint', 'text' => 'Dép đi trong phòng.'),
+    array('icon' => 'bed', 'text' => 'Túi ngủ, gối.'),
+    array('icon' => 'blanket', 'text' => 'Chăn mỏng.'),
+    array('icon' => 'shower', 'text' => 'Khăn tắm.'),
+    array('icon' => 'soap', 'text' => 'Đồ vệ sinh cá nhân.'),
 );
 
 // Bộ quà tặng.
