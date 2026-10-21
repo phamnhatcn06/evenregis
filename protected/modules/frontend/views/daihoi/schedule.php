@@ -1304,26 +1304,24 @@ $getSportMeta = function ($name) {
                         </div>
                       </div>
 
-                      <!-- 3. Footer thẻ: Giờ thi đấu & Địa điểm sân -->
-                      <div class="px-3 py-2 border-top bg-slate-50/60 text-muted d-flex align-items-center justify-content-between gap-2" style="font-size:11.5px;">
+                      <!-- 3. Footer thẻ: Địa điểm sân thi đấu (giờ đã hiển thị ở phần đối đầu) -->
+                      <div class="px-3 py-2 border-top bg-slate-50/60 text-muted d-flex align-items-center gap-2" style="font-size:12.5px;">
                         <?php if ($status === 'live'): ?>
                           <span class="d-flex align-items-center gap-1 flex-shrink-0">
                             <span class="live-dot-blink"></span>
                             <span class="fw-bold text-danger live-blink-text">LIVE</span>
                           </span>
-                        <?php else: ?>
-                          <span class="d-flex align-items-center gap-1 text-truncate">
-                            <span class="material-symbols-outlined text-secondary fs-6 flex-shrink-0">schedule</span>
-                            <span class="fw-bold text-dark text-truncate" style="font-size:13px;"><?php
-                              echo !empty($m['match_hour']) ? $e($m['match_hour'])
-                                   : (!empty($m['match_time']) ? $e($m['match_time']) : 'Chờ xếp giờ'); ?></span>
-                          </span>
                         <?php endif; ?>
 
                         <?php if (!empty($m['location'])): ?>
-                          <span class="d-flex align-items-center gap-1 flex-shrink-0 text-truncate" title="<?php echo $e($m['location']); ?>">
-                            <span class="material-symbols-outlined text-danger fs-6 flex-shrink-0">pin_drop</span>
-                            <span class="badge bg-white text-dark border px-2 py-0.5 rounded-pill"><?php echo $e($m['location']); ?></span>
+                          <span class="d-flex align-items-center gap-1 flex-grow-1 text-truncate" title="<?php echo $e($m['location']); ?>">
+                            <span class="material-symbols-outlined text-danger flex-shrink-0" style="font-size:19px;">pin_drop</span>
+                            <span class="fw-semibold text-dark text-truncate" style="font-size:13px;"><?php echo $e($m['location']); ?></span>
+                          </span>
+                        <?php else: ?>
+                          <span class="d-flex align-items-center gap-1 text-muted flex-grow-1" style="font-size:12.5px;">
+                            <span class="material-symbols-outlined flex-shrink-0" style="font-size:19px;">pin_drop</span>
+                            <span>Chờ cập nhật địa điểm</span>
                           </span>
                         <?php endif; ?>
                       </div>
