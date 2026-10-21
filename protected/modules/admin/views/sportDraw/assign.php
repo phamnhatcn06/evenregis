@@ -50,8 +50,13 @@ $isPlayoff = ($model->format === SportStages::FORMAT_PLAYOFF);
 $isBracket = SportStages::isBracketFormat($model->format) || $isPlayoff;
 $mode = $isGroup ? 'groups' : ($isBracket ? 'bracket' : '');
 
-// Danh sách đội của giai đoạn + phân bổ hiện tại (nếu đã bốc)
+// Danh sách đội của giai đoạn + phân bổ hiện tại (nếu đã bốc).
+// Bỏ qua slot giữ chỗ play-off (team_id null): các slot này được quản lý tự động
+// (đặt chỗ + tự điền đội thắng), không cho gán thủ công như đội thật.
 $teams = ($preview && isset($preview['teams'])) ? $preview['teams'] : array();
+$teams = array_values(array_filter($teams, function ($t) {
+    return isset($t['team_id']) && $t['team_id'] !== null && $t['team_id'] !== '';
+}));
 
 // Nhãn hiển thị: ưu tiên tên VĐV (display_name), fallback mã đội.
 $teamLabel = function ($t) {
