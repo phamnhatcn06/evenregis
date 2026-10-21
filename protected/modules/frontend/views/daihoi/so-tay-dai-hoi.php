@@ -316,29 +316,6 @@ $securityRules = array(
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="an-uong">
           <div class="card-body p-4">
             <?php $head('🍽️', 'Ăn uống & các sự kiện tiệc'); ?>
-            <h3 class="fw-semibold text-secondary small text-uppercase mb-2">Thời gian & địa điểm phục vụ</h3>
-            <div class="table-responsive mb-4">
-              <table class="table table-bordered align-middle mb-0">
-                <thead>
-                  <tr style="background:<?php echo $e($accent); ?>1a;">
-                    <th class="small">Bữa ăn</th>
-                    <th class="small">Thời gian</th>
-                    <th class="small">Ngày</th>
-                    <th class="small">Địa điểm</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php foreach ($meals as $m): ?>
-                    <tr>
-                      <td class="fw-semibold text-dark small"><?php echo $e($m[0]); ?></td>
-                      <td class="small text-nowrap"><?php echo $e($m[1]); ?></td>
-                      <td class="small"><?php echo $e($m[2]); ?></td>
-                      <td class="small"><?php echo $e($m[3]); ?></td>
-                    </tr>
-                  <?php endforeach; ?>
-                </tbody>
-              </table>
-            </div>
             <h3 class="fw-semibold text-secondary small text-uppercase mb-2">Quy định ăn uống</h3>
             <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
               <?php foreach ($diningRules as $r): ?>
