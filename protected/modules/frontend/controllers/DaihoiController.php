@@ -141,24 +141,9 @@ class DaihoiController extends FrontEndController
      */
     public function actionLichThamQuan()
     {
-        $this->frontTitle = 'Lịch tham quan & Tour';
-        $this->render('program', array(
+        $this->frontTitle = 'Tour tham quan Di sản Tràng An';
+        $this->render('tham-quan', array(
             'event' => Daihoi::getEvent(),
-            'agenda' => Daihoi::getAgenda(),
-            'active' => 'tour',
-            'config' => array(
-                'eyebrow' => 'Trải nghiệm Đại hội',
-                'title' => 'Lịch tham quan & Tour',
-                'subtitle' => 'Hành trình tham quan và lịch trình tour dành cho Quý Đại biểu trong khuôn khổ Đại hội.',
-                'icon' => 'tour',
-                'accent' => '#0d9488',
-                'info' => array(
-                    array('icon' => 'event', 'label' => 'Hoạt động', 'value' => 'Tham quan & Tour Itinerary'),
-                    array('icon' => 'place', 'label' => 'Điểm đến', 'value' => 'Theo thông báo của Ban Tổ chức'),
-                ),
-                'keywords' => array('tham quan', 'tour', 'itinerary', 'di chuyển', 'trải nghiệm'),
-                'emptyText' => 'Lịch tham quan chi tiết sẽ được Ban Tổ chức cập nhật.',
-            ),
         ));
     }
 
