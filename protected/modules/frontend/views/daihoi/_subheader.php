@@ -31,7 +31,7 @@ $isLogged = (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenti
   <div class="container py-2 d-flex align-items-center justify-content-between gap-2">
     <a class="d-flex align-items-center gap-2 text-decoration-none text-dark" href="<?php echo $e($base); ?>/">
       <img src="<?php echo $e($logo); ?>" alt="Logo" style="height:38px;width:auto;" onerror="this.style.display='none'">
-      <span class="fw-bold d-none d-sm-inline" style="font-size:15px;"><?php echo $e($eventName); ?></span>
+      <span class="fw-bold lh-sm" style="font-size:14px;"><?php echo $e($eventName); ?></span>
     </a>
 
     <!-- Nav inline trên desktop: 1 hàng, kiểu link gạch chân (không dùng pill) -->
