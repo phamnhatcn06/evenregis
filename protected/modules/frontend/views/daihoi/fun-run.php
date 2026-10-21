@@ -87,12 +87,6 @@ $rules = array(
     'VĐV bỏ cuộc phải thông báo và nộp lại BIB cho thành viên BTC gần nhất, đi gọn vào lề phải, không cản trở đường chạy.',
 );
 
-// Hàm render ô tích trong bảng nhóm thi đấu.
-$tick = function ($on) use ($accent) {
-    return $on
-        ? '<span class="material-symbols-outlined" style="color:' . $accent . ';font-size:20px;">check_circle</span>'
-        : '<span class="text-black-50">—</span>';
-};
 ?>
 <?php $this->renderPartial('_subheader', array('eventName' => $eventName, 'active' => 'funrun')); ?>
 
