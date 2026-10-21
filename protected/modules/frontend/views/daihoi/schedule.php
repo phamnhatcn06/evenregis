@@ -1168,12 +1168,15 @@ $getSportMeta = function ($name) {
                 ?>
                 <div class="sport-subgroup" data-sport-id="<?php echo $sid; ?>">
                   <!-- Thanh tiêu đề nội dung (bộ môn) -->
-                  <div class="sport-subgroup-header" style="--sport-accent:<?php echo $e($sMetaHeader['color']); ?>; --sport-accent-bg:<?php echo $e($sMetaHeader['bg_light']); ?>;">
+                  <div class="sport-subgroup-header" style="--sport-accent:<?php echo $e($sMetaHeader['color']); ?>; --sport-accent-bg:<?php echo $e($sMetaHeader['bg_light']); ?>;" role="button" tabindex="0" aria-expanded="true" title="Nhấn để thu gọn / mở rộng nội dung này">
                     <span class="sport-subgroup-icon">
                       <span class="material-symbols-outlined"><?php echo $e($sportHeaderIcon); ?></span>
                     </span>
                     <span class="sport-subgroup-name"><?php echo $e($sportHeaderName); ?></span>
                     <span class="sport-subgroup-count"><?php echo count($sportMatches); ?> trận</span>
+                    <button type="button" class="sport-subgroup-toggle" aria-label="Thu gọn / mở rộng">
+                      <span class="material-symbols-outlined">expand_less</span>
+                    </button>
                   </div>
 
                   <!-- Lưới các trận đấu của nội dung này -->
