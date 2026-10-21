@@ -94,3 +94,57 @@ $isLogged = (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenti
     </div>
   </div>
 </div>
+
+<style>
+/* Menu desktop Đại hội: 1 hàng, link gạch chân (thay cho pill) */
+.dh-subnav { flex-wrap: nowrap; column-gap: 2px; }
+.dh-subnav-link {
+  position: relative;
+  padding: 6px 9px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #64748b;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .15s ease;
+}
+.dh-subnav-link::after {
+  content: "";
+  position: absolute;
+  left: 9px; right: 9px; bottom: 1px;
+  height: 2px;
+  background: #2563eb;
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .2s ease;
+}
+.dh-subnav-link:hover { color: #1e293b; }
+.dh-subnav-link:hover::after,
+.dh-subnav-link.active::after { transform: scaleX(1); }
+.dh-subnav-link.active { color: #2563eb; }
+.dh-subnav-sep {
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+  margin: 0 6px;
+}
+.dh-subnav-admin {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1d4ed8 0%, #312e81 100%);
+  transition: filter .15s ease;
+}
+.dh-subnav-admin:hover { color: #fff; filter: brightness(1.08); }
+/* Thu gọn thêm khi màn hình desktop nhỏ để giữ 1 hàng */
+@media (min-width: 992px) and (max-width: 1399px) {
+  .dh-subnav-link { padding: 6px 6px; font-size: 12.5px; }
+  .dh-subnav-link::after { left: 6px; right: 6px; }
+}
+</style>
