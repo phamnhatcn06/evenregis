@@ -74,9 +74,11 @@ class BinhchonController extends CController
             CClientScript::POS_END
         );
 
-        $portal = Yii::app()->params['portal'];
-        $returnUrl = Yii::app()->createAbsoluteUrl('/frontend/binhchon/index');
-        $tokenLoginUrl = rtrim($portal['url'], '/') . '/login?redirect=' . urlencode($returnUrl);
+        // Đăng nhập "tài khoản nội bộ" dùng cổng cá nhân /portal (định danh DHMT +
+        // PIN) rồi quay lại trang bình chọn. PortalController::resolveReturnUrl chỉ
+        // chấp nhận đường dẫn tương đối bắt đầu bằng '/'.
+        $returnUrl = Yii::app()->createUrl('/frontend/binhchon/index');
+        $tokenLoginUrl = Yii::app()->createUrl('/frontend/portal/login', array('return' => $returnUrl));
 
         $this->render('index', array(
             'finalists' => $finalists,
