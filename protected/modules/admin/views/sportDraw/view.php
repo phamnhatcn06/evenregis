@@ -777,8 +777,9 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                             <select class="form-select form-select-sm border-start-0" id="bracket-team-filter">
                                 <option value="">-- Theo dõi đường đi của đội --</option>
                                 <?php foreach ($teams as $t): ?>
+                                    <?php if ($t['team_id'] === null || $t['team_id'] === '') continue; ?>
                                     <option value="<?php echo CHtml::encode($t['team_id']); ?>">
-                                        <?php echo CHtml::encode($t['team_name'] ?: ('#' . $t['team_id'])); ?>
+                                        <?php echo CHtml::encode($teamMap[$t['team_id']] ?? ($t['team_name'] ?: ('#' . $t['team_id']))); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
