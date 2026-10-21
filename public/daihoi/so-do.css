@@ -1,0 +1,91 @@
+/* Sơ đồ địa điểm Đại hội - infographic hub & spokes */
+.dh-map-accent { --dh-accent: #0d9488; }
+
+.dh-hub {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+/* Node chung */
+.dh-node {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .06);
+  position: relative;
+}
+.dh-node__head { display: flex; align-items: flex-start; gap: 12px; }
+.dh-node__icon {
+  width: 48px; height: 48px; flex-shrink: 0;
+  border-radius: .85rem;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--dh-accent) 12%, #fff);
+}
+.dh-node__icon .material-symbols-outlined { color: var(--dh-accent); font-size: 26px; }
+.dh-node__title { font-weight: 700; color: #0f172a; line-height: 1.25; }
+.dh-node__addr { color: #64748b; font-size: .8rem; margin: 2px 0 0; }
+.dh-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.dh-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .72rem; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px;
+}
+.dh-chip--date { background: var(--dh-accent); color: #fff; }
+.dh-chip--dist { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
+.dh-chip .material-symbols-outlined { font-size: 14px; }
+.dh-node__note { color: #94a3b8; font-size: .78rem; margin: 10px 0 0; }
+.dh-map-btn {
+  margin-top: 12px;
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--dh-accent); color: #fff;
+  font-size: .8rem; font-weight: 600;
+  padding: 6px 14px; border-radius: .6rem; text-decoration: none;
+  transition: filter .15s ease;
+}
+.dh-map-btn:hover { filter: brightness(.92); color: #fff; }
+.dh-map-btn .material-symbols-outlined { font-size: 18px; }
+
+/* Hub trung tâm (khách sạn) nổi bật */
+.dh-node--hub {
+  border: 2px solid var(--dh-accent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--dh-accent) 7%, #fff), #fff);
+}
+.dh-node--hub .dh-node__title { font-size: 1.05rem; }
+.dh-sched { list-style: none; margin: 12px 0 0; padding: 12px 0 0; border-top: 1px dashed #cbd5e1; }
+.dh-sched li { display: flex; gap: 10px; padding: 5px 0; font-size: .82rem; color: #334155; }
+.dh-sched b { color: var(--dh-accent); white-space: nowrap; }
+
+/* Desktop: bố cục hub ở giữa, các địa điểm toả ra */
+@media (min-width: 992px) {
+  .dh-hub {
+    grid-template-columns: 1fr 1.15fr 1fr;
+    grid-template-areas:
+      "golf   hub   stadium"
+      "soccer hub   stadium";
+    align-items: start;
+    position: relative;
+  }
+  .dh-hub::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at center, color-mix(in srgb, var(--dh-accent) 5%, transparent) 0, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+  .dh-node { z-index: 1; }
+  .dh-area-golf { grid-area: golf; align-self: start; }
+  .dh-area-soccer { grid-area: soccer; align-self: end; }
+  .dh-area-stadium { grid-area: stadium; align-self: center; }
+  .dh-area-hub { grid-area: hub; align-self: center; }
+}
+
+/* Thẻ mặt bằng tầng */
+.dh-floor { border: 1px solid #e2e8f0; border-radius: 1rem; overflow: hidden; background: #fff; width: 100%; text-align: left; padding: 0; transition: box-shadow .15s ease, transform .15s ease; }
+.dh-floor:hover { box-shadow: 0 8px 24px rgba(15, 23, 42, .1); transform: translateY(-2px); }
+.dh-floor__img { position: relative; background: #f1f5f9; }
+.dh-floor__img img { width: 100%; height: 160px; object-fit: cover; display: block; }
+.dh-floor__tag { position: absolute; top: 10px; left: 10px; background: var(--dh-accent); color: #fff; font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+.dh-floor__zoom { position: absolute; bottom: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; background: rgba(15, 23, 42, .55); display: flex; align-items: center; justify-content: center; }
+.dh-floor__zoom .material-symbols-outlined { color: #fff; font-size: 18px; }
