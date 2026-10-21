@@ -792,6 +792,57 @@
         });
     }
 
+    // Đặt chỗ trước đội thắng play-off vào các bảng (không xáo lại đội đã bốc)
+    var reservePlayoffUrl = rootEl ? rootEl.getAttribute('data-reserve-playoff-url') : '';
+    var btnReservePlayoff = document.getElementById('btn-reserve-playoff');
+    if (btnReservePlayoff && reservePlayoffUrl) {
+        btnReservePlayoff.addEventListener('click', function () {
+            var sourceStageId = btnReservePlayoff.getAttribute('data-source-stage-id') || '';
+            var confirmMsg = 'Thêm 1 slot "Thắng Play-off" vào mỗi bảng và sinh các trận vòng tròn liên quan?\n' +
+                'Các đội đã bốc sẽ được giữ nguyên. Đội thắng tự điền vào slot khi play-off có kết quả.';
+
+            var run = function () {
+                var origHtml = btnReservePlayoff.innerHTML;
+                btnReservePlayoff.disabled = true;
+                btnReservePlayoff.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang đặt chỗ...';
+
+                var fd = new FormData();
+                if (sourceStageId) fd.append('source_stage_id', sourceStageId);
+
+                fetch(reservePlayoffUrl, { method: 'POST', body: fd })
+                    .then(function (r) { return r.json(); })
+                    .then(function (res) {
+                        if (res && res.success) {
+                            showToast(res.message || 'Đã đặt chỗ play-off vào vòng bảng.', 'success');
+                            setTimeout(function () { window.location.reload(); }, 600);
+                        } else {
+                            btnReservePlayoff.disabled = false;
+                            btnReservePlayoff.innerHTML = origHtml;
+                            showToast(res ? (res.message || 'Không thể đặt chỗ play-off.') : 'Lỗi.', 'error');
+                        }
+                    })
+                    .catch(function (err) {
+                        btnReservePlayoff.disabled = false;
+                        btnReservePlayoff.innerHTML = origHtml;
+                        showToast('Lỗi kết nối: ' + err.message, 'error');
+                    });
+            };
+
+            if (window.Swal && typeof window.Swal.fire === 'function') {
+                window.Swal.fire({
+                    title: 'Đặt chỗ Play-off',
+                    text: confirmMsg,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đặt chỗ',
+                    cancelButtonText: 'Hủy'
+                }).then(function (result) { if (result.isConfirmed) run(); });
+            } else if (confirm(confirmMsg)) {
+                run();
+            }
+        });
+    }
+
     /* ==========================================================================
        4. KÉO THẢ SẮP XẾP CÁC TRẬN ĐẤU (HTML5 DRAG & DROP)
        ========================================================================== */
