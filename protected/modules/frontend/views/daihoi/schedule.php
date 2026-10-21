@@ -2591,26 +2591,40 @@ document.addEventListener('DOMContentLoaded', function () {
     dateGroups.forEach(function (group) {
       var groupDate = group.getAttribute('data-group-date') || '';
       var groupVisibleCount = 0;
-      var itemsInGroup = group.querySelectorAll('.match-item-wrapper');
 
-      itemsInGroup.forEach(function (item) {
-        var sId = item.getAttribute('data-sport-id') || '';
-        var mDate = item.getAttribute('data-date') || '';
-        var st = item.getAttribute('data-status') || '';
-        var searchData = item.getAttribute('data-search') || '';
+      // Duyệt từng nhóm nội dung (bộ môn) bên trong nhóm ngày
+      var subgroups = group.querySelectorAll('.sport-subgroup');
+      subgroups.forEach(function (sub) {
+        var subVisibleCount = 0;
+        var itemsInSub = sub.querySelectorAll('.match-item-wrapper');
 
-        var matchSport = (!currentSportId || sId === currentSportId);
-        var matchDate = (!currentDate || mDate === currentDate);
-        var matchStatus = (!currentStatus || st === currentStatus);
-        var matchSearch = (!searchLower || searchData.indexOf(searchLower) !== -1);
+        itemsInSub.forEach(function (item) {
+          var sId = item.getAttribute('data-sport-id') || '';
+          var mDate = item.getAttribute('data-date') || '';
+          var st = item.getAttribute('data-status') || '';
+          var searchData = item.getAttribute('data-search') || '';
 
-        if (matchSport && matchDate && matchStatus && matchSearch) {
-          item.style.display = '';
-          groupVisibleCount++;
-          totalVisible++;
-        } else {
-          item.style.display = 'none';
+          var matchSport = (!currentSportId || sId === currentSportId);
+          var matchDate = (!currentDate || mDate === currentDate);
+          var matchStatus = (!currentStatus || st === currentStatus);
+          var matchSearch = (!searchLower || searchData.indexOf(searchLower) !== -1);
+
+          if (matchSport && matchDate && matchStatus && matchSearch) {
+            item.style.display = '';
+            subVisibleCount++;
+            groupVisibleCount++;
+            totalVisible++;
+          } else {
+            item.style.display = 'none';
+          }
+        });
+
+        // Cập nhật số trận trên thanh tiêu đề nội dung & ẩn nhóm nếu rỗng
+        var subCount = sub.querySelector('.sport-subgroup-count');
+        if (subCount) {
+          subCount.textContent = subVisibleCount + ' trận';
         }
+        sub.style.display = (subVisibleCount === 0) ? 'none' : '';
       });
 
       // Cập nhật số lượng trận hiển thị trong huy hiệu nhóm ngày
