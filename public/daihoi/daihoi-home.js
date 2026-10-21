@@ -369,4 +369,24 @@
 
     setInterval(refresh, 30000);
   })();
+
+  /* ===================== 5. Offcanvas menu: đóng khi bấm link =====================
+   * Link điều hướng trong offcanvas KHÔNG dùng data-bs-dismiss, vì Bootstrap sẽ
+   * gọi preventDefault() trên thẻ <a> làm nút dismiss => không chuyển trang.
+   * Thay vào đó: để trình duyệt chuyển trang bình thường, đồng thời tự đóng
+   * offcanvas (quan trọng với link neo cùng trang như "/#noi-dung" để không bị
+   * kẹt backdrop che toàn trang). */
+  (function initOffcanvasNav() {
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest('.offcanvas a[href]');
+      if (!link) return;
+
+      var panel = link.closest('.offcanvas');
+      if (!panel || !window.bootstrap || !window.bootstrap.Offcanvas) return;
+
+      // Không chặn mặc định: trình duyệt vẫn chuyển trang / cuộn tới neo.
+      var instance = window.bootstrap.Offcanvas.getOrCreateInstance(panel);
+      instance.hide();
+    });
+  })();
 })();
