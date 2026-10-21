@@ -105,13 +105,9 @@ Yii::app()->clientScript->registerCssFile(
     <div class="dh-hub mb-5">
       <!-- Hub trung tâm -->
       <div class="dh-node dh-node--hub dh-area-hub">
-        <div class="dh-node__head">
-          <div class="dh-node__icon"><span class="material-symbols-outlined">hotel</span></div>
-          <div class="min-w-0">
-            <div class="dh-node__title">Khách sạn Mường Thanh Luxury Ninh Bình</div>
-            <p class="dh-node__addr">Khu vực trung tâm Đại hội</p>
-          </div>
-        </div>
+        <div class="dh-node__media dh-node__media--hub"><img src="<?php echo $e($mascot); ?>/hotel.png" alt="Khách sạn Mường Thanh Luxury Ninh Bình" loading="lazy"></div>
+        <div class="dh-node__title">Khách sạn Mường Thanh Luxury Ninh Bình</div>
+        <p class="dh-node__addr">Khu vực trung tâm Đại hội</p>
         <ul class="dh-sched">
           <?php foreach ($hotelSchedule as $s): ?>
           <li><b><?php echo $e($s['date']); ?></b><span><?php echo $e($s['text']); ?></span></li>
