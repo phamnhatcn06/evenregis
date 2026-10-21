@@ -437,7 +437,6 @@ $securityRules = array(
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="so-do">
           <div class="card-body p-4">
             <?php $head('🗺️', 'Sơ đồ địa điểm Đại hội'); ?>
-            <p class="text-secondary small mb-3">Hội trường chính, nhà hàng, khu lưu trú, khu thể thao, khu vực Miss, xe đưa đón, y tế, quầy Thông tin, WC, lối thoát hiểm và điểm tập kết khẩn cấp.</p>
             <a href="<?php echo $e($base); ?>/so-do-dia-diem" class="btn rounded-pill fw-bold text-white d-inline-flex align-items-center gap-2" style="background:<?php echo $e($accent); ?>;">
               <?php echo $emo('🗺️', 'font-size:16px;'); ?> Xem sơ đồ chi tiết
             </a>
