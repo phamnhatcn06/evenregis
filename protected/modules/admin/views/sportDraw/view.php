@@ -12,7 +12,9 @@
  * @var SportDrawController $this
  * @var SportStages $model
  * @var array|null $preview
+ * @var int|null $playoffSource ID giai đoạn play-off nguồn (nếu có) để đặt chỗ trước
  */
+$playoffSource = isset($playoffSource) ? $playoffSource : null;
 
 $this->breadcrumbs = array(
     'Bốc thăm thi đấu' => $this->createUrl('index'),
