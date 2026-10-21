@@ -1039,6 +1039,7 @@
   }
 
   .bc-search-box {
+    flex: 0 0 auto;
     max-width: 100%;
   }
 
