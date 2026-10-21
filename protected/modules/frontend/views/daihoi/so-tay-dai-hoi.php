@@ -316,7 +316,6 @@ $securityRules = array(
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="an-uong">
           <div class="card-body p-4">
             <?php $head('🍽️', 'Ăn uống & các sự kiện tiệc'); ?>
-            <h3 class="fw-semibold text-secondary small text-uppercase mb-2">Quy định ăn uống</h3>
             <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
               <?php foreach ($diningRules as $r): ?>
                 <li class="d-flex align-items-start gap-2">
