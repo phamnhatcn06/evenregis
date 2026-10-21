@@ -32,6 +32,7 @@ $venues = array(
         'date' => '25.10.2026',
         'distance' => '26 km',
         'note' => 'Golf',
+        'img' => $mascot . '/golf.png',
         'map' => $mapUrl('Sân Golf Tràng An Phú Long Ninh Bình'),
     ),
     'stadium' => array(
