@@ -236,9 +236,11 @@ $securityRules = array(
             <p class="text-secondary small mb-3">Vật dụng cá nhân cần chuẩn bị mang theo trước khi tham dự Đại hội:</p>
             <div class="row g-3">
               <?php foreach ($packing as $p): ?>
-              <div class="col-md-6">
-                <div class="d-flex align-items-start gap-3 border rounded-3 p-3 h-100">
-                  <span class="material-symbols-outlined flex-shrink-0" style="color:<?php echo $e($accent); ?>;"><?php echo $e($p['icon']); ?></span>
+              <div class="col-6 col-md-4 col-xl-3">
+                <div class="d-flex flex-column align-items-center text-center gap-2 border rounded-3 p-3 h-100">
+                  <span class="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:44px;height:44px;background:<?php echo $e($accent); ?>1a;">
+                    <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;"><?php echo $e($p['icon']); ?></span>
+                  </span>
                   <span class="text-dark small"><?php echo $e($p['text']); ?></span>
                 </div>
               </div>
