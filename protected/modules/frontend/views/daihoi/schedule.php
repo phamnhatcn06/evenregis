@@ -2449,13 +2449,13 @@ $getSportMeta = function ($name) {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 .match-time-chip {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   color: #1d4ed8;
   background: #eff6ff;
   border: 1px solid #bfdbfe;
   border-radius: 9999px;
-  padding: 1px 7px;
+  padding: 3px 12px;
   white-space: nowrap;
   box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
 }
