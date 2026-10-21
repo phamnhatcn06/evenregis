@@ -57,7 +57,7 @@ $packing = array(
   array('icon' => '🪪', 'text' => 'Căn cước công dân hoặc giấy tờ tùy thân.'),
   array('icon' => '🥤', 'text' => 'Bình nước cá nhân.'),
   array('icon' => '☂️', 'text' => 'Ô hoặc áo mưa gấp gọn.'),
-  array('icon' => '👚', 'text' => 'Quần áo thay đổi phù hợp thời tiết.'),
+  array('icon' => '👚', 'text' => 'Quần áo thay đổi phù hợp thời tiết và các sự kiện.'),
   array('icon' => '👟', 'text' => 'Giày thể thao hoặc giày đế thấp.'),
   array('icon' => '🩴', 'text' => 'Dép đi trong phòng.'),
   array('icon' => '🛏️', 'text' => 'Túi ngủ, chăn mỏng, gối.'),
