@@ -128,7 +128,7 @@ class DaihoiController extends FrontEndController
                 'accent' => '#7c3aed',
                 'info' => array(
                     array('icon' => 'event', 'label' => 'Sự kiện', 'value' => 'Tiệc Welcome - Khai mạc'),
-                    array('icon' => 'schedule', 'label' => 'Thời gian', 'value' => '17:30 - 20:00, ngày 27/10/2026'),
+                    array('icon' => 'schedule', 'label' => 'Thời gian', 'value' => '17:00 - 19:00, ngày 27/10/2026'),
                     array('icon' => 'location_on', 'label' => 'Địa điểm', 'value' => 'Hội trường tầng 2'),
                 ),
                 'keywords' => array('khai mạc', 'miss', 'văn nghệ', 'welcome', 'ceremony', 'gala'),
