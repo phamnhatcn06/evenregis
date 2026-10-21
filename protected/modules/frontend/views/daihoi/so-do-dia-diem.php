@@ -60,13 +60,9 @@ $venues = array(
 $renderVenue = function ($v, $areaClass) use ($e) {
     ?>
     <div class="dh-node <?php echo $e($areaClass); ?>">
-      <div class="dh-node__head">
-        <div class="dh-node__icon"><span class="material-symbols-outlined"><?php echo $e($v['icon']); ?></span></div>
-        <div class="min-w-0">
-          <div class="dh-node__title"><?php echo $e($v['name']); ?></div>
-          <p class="dh-node__addr"><span class="material-symbols-outlined align-middle" style="font-size:14px;">location_on</span> <?php echo $e($v['address']); ?></p>
-        </div>
-      </div>
+      <div class="dh-node__media"><img src="<?php echo $e($v['img']); ?>" alt="<?php echo $e($v['name']); ?>" loading="lazy"></div>
+      <div class="dh-node__title"><?php echo $e($v['name']); ?></div>
+      <p class="dh-node__addr"><span class="material-symbols-outlined align-middle" style="font-size:14px;">location_on</span> <?php echo $e($v['address']); ?></p>
       <div class="dh-badges">
         <span class="dh-chip dh-chip--date"><?php echo $e($v['date']); ?></span>
         <?php if ($v['distance'] !== ''): ?>
