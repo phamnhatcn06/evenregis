@@ -170,7 +170,7 @@ $rules = array(
         <div class="col-md-6">
           <div class="card border rounded-4 h-100"><div class="card-body d-flex gap-3">
             <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;font-size:36px;">workspace_premium</span>
-            <div><strong class="text-dark d-block">24 giải cá nhân</strong><span class="small text-secondary">Mỗi nhóm thi đấu trao 01 giải Nhất, 01 giải Nhì và 01 giải Ba (10 nhóm). Xếp hạng theo thời gian hoàn thành cự ly.</span></div>
+            <div><strong class="text-dark d-block">24 giải cá nhân</strong><span class="small text-secondary">Mỗi nhóm thi đấu trao 01 giải Nhất, 01 giải Nhì và 01 giải Ba (8 nhóm). Xếp hạng theo thời gian hoàn thành cự ly.</span></div>
           </div></div>
         </div>
         <div class="col-md-6">
