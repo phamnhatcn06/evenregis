@@ -78,8 +78,8 @@ $isLogged = (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenti
     </nav>
 
     <!-- Nút menu chỉ hiện trên mobile/tablet -->
-    <button aria-label="Menu" class="btn btn-light d-lg-none p-1 border rounded" data-bs-target="#subheaderNav" data-bs-toggle="offcanvas" aria-controls="subheaderNav" type="button">
-      <span class="material-symbols-outlined fs-4">menu</span>
+    <button aria-label="Mở menu" class="dh-menu-toggle d-lg-none" data-bs-target="#subheaderNav" data-bs-toggle="offcanvas" aria-controls="subheaderNav" type="button">
+      <span class="material-symbols-outlined">menu</span>
     </button>
   </div>
 </header>
