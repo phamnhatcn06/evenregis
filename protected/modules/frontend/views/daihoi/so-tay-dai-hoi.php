@@ -6,6 +6,9 @@
  * Sổ tay Đại hội Mường Thanh 2026. Nội dung tĩnh, biên soạn từ tài liệu gốc,
  * kèm liên kết tới các trang chi tiết đã có (Agenda, Lịch thi đấu, Hỗ trợ...).
  *
+ * Icon dùng emoji màu (Unicode) thay cho Material Symbols để minh hoạ sinh động
+ * và không phụ thuộc file font icon.
+ *
  * @var array $event
  */
 $base = Yii::app()->request->baseUrl;
@@ -16,59 +19,64 @@ $accent = '#1d4ed8';
 $accent2 = '#0d9488';
 $heroGradient = 'linear-gradient(135deg,#0b1329 0%,#1d4ed8 55%,#0d9488 100%)';
 
-// Tiêu đề từng mục với chip icon gradient thương hiệu.
-$head = function ($icon, $title) use ($e) {
+// Helper hiển thị emoji (không dùng class material-symbols-outlined vì emoji không
+// nằm trong font icon). $style cho phép chỉnh cỡ chữ khi cần.
+$emo = function ($ch, $style = '') {
+    return '<span class="handbook-emo" style="line-height:1;' . $style . '">' . $ch . '</span>';
+};
+
+// Tiêu đề từng mục với chip emoji.
+$head = function ($icon, $title) {
     echo '<div class="d-flex align-items-center gap-3 mb-3">'
-        . '<span class="handbook-ico"><span class="material-symbols-outlined">' . $e($icon) . '</span></span>'
-        . '<h2 class="fw-bold fs-5 mb-0">' . $e($title) . '</h2>'
+        . '<span class="handbook-ico" style="font-size:22px;line-height:1;">' . $icon . '</span>'
+        . '<h2 class="fw-bold fs-5 mb-0">' . CHtml::encode($title) . '</h2>'
         . '</div>';
 };
 
 // Mục lục điều hướng nhanh trong trang.
 $toc = array(
-    array('id' => 'thong-tin', 'icon' => 'info', 'label' => 'Thông tin Đại hội'),
-    array('id' => 'qua-tang', 'icon' => 'redeem', 'label' => 'Bộ quà tặng'),
-    array('id' => 'hanh-trang', 'icon' => 'luggage', 'label' => 'Hành trang Đại biểu'),
-    array('id' => 'lien-he', 'icon' => 'contacts', 'label' => 'Thông tin liên hệ'),
-    array('id' => 'chuong-trinh', 'icon' => 'event_note', 'label' => 'Agenda & Chương trình'),
-    array('id' => 'quy-dinh', 'icon' => 'gavel', 'label' => 'Quy định chung'),
-    array('id' => 'an-uong', 'icon' => 'restaurant', 'label' => 'Ăn uống & Tiệc'),
-    array('id' => 'luu-tru', 'icon' => 'hotel', 'label' => 'Lưu trú'),
-    array('id' => 'y-te', 'icon' => 'medical_services', 'label' => 'Y tế'),
-    array('id' => 'an-ninh', 'icon' => 'local_fire_department', 'label' => 'An ninh - PCCC'),
-    array('id' => 'so-do', 'icon' => 'map', 'label' => 'Sơ đồ địa điểm'),
-    array('id' => 'kenh-qr', 'icon' => 'qr_code_2', 'label' => 'QR & Kênh thông tin'),
+    array('id' => 'thong-tin', 'icon' => 'ℹ️', 'label' => 'Thông tin Đại hội'),
+    array('id' => 'qua-tang', 'icon' => '🎁', 'label' => 'Bộ quà tặng'),
+    array('id' => 'hanh-trang', 'icon' => '🧳', 'label' => 'Hành trang Đại biểu'),
+    array('id' => 'lien-he', 'icon' => '📇', 'label' => 'Thông tin liên hệ'),
+    array('id' => 'chuong-trinh', 'icon' => '🗓️', 'label' => 'Agenda & Chương trình'),
+    array('id' => 'quy-dinh', 'icon' => '⚖️', 'label' => 'Quy định chung'),
+    array('id' => 'an-uong', 'icon' => '🍽️', 'label' => 'Ăn uống & Tiệc'),
+    array('id' => 'luu-tru', 'icon' => '🏨', 'label' => 'Lưu trú'),
+    array('id' => 'y-te', 'icon' => '🏥', 'label' => 'Y tế'),
+    array('id' => 'an-ninh', 'icon' => '🧯', 'label' => 'An ninh - PCCC'),
+    array('id' => 'so-do', 'icon' => '🗺️', 'label' => 'Sơ đồ địa điểm'),
+    array('id' => 'kenh-qr', 'icon' => '🔳', 'label' => 'QR & Kênh thông tin'),
 );
 
 // Hành trang cá nhân cần chuẩn bị.
 $packing = array(
-    array('icon' => 'id_card', 'text' => 'Căn cước công dân hoặc giấy tờ tùy thân.'),
-    array('icon' => 'water_bottle', 'text' => 'Bình nước cá nhân.'),
-    array('icon' => 'umbrella', 'text' => 'Ô hoặc áo mưa gấp gọn.'),
-    array('icon' => 'checkroom', 'text' => 'Quần áo thay đổi phù hợp thời tiết.'),
-    array('icon' => 'shoe_cleats', 'text' => 'Giày thể thao hoặc giày đế thấp.'),
-    array('icon' => 'footprint', 'text' => 'Dép đi trong phòng.'),
-    array('icon' => 'bed', 'text' => 'Túi ngủ, gối.'),
-    array('icon' => 'blanket', 'text' => 'Chăn mỏng.'),
-    array('icon' => 'shower', 'text' => 'Khăn tắm.'),
-    array('icon' => 'soap', 'text' => 'Đồ vệ sinh cá nhân.'),
+    array('icon' => '🪪', 'text' => 'Căn cước công dân hoặc giấy tờ tùy thân.'),
+    array('icon' => '🥤', 'text' => 'Bình nước cá nhân.'),
+    array('icon' => '☂️', 'text' => 'Ô hoặc áo mưa gấp gọn.'),
+    array('icon' => '👚', 'text' => 'Quần áo thay đổi phù hợp thời tiết.'),
+    array('icon' => '👟', 'text' => 'Giày thể thao hoặc giày đế thấp.'),
+    array('icon' => '🩴', 'text' => 'Dép đi trong phòng.'),
+    array('icon' => '🛏️', 'text' => 'Túi ngủ, chăn mỏng, gối.'),
+    array('icon' => '🛁', 'text' => 'Khăn tắm.'),
+    array('icon' => '🧼', 'text' => 'Đồ vệ sinh cá nhân.'),
 );
 
 // Bộ quà tặng.
 $gifts = array(
-    array('icon' => 'backpack', 'text' => '01 balo rút'),
-    array('icon' => 'apparel', 'text' => '01 áo phông'),
-    array('icon' => 'child_hat', 'text' => '01 mũ'),
-    array('icon' => 'badge', 'text' => '01 thẻ tham dự'),
+    array('icon' => '🎒', 'text' => '01 balo rút'),
+    array('icon' => '👕', 'text' => '01 áo phông'),
+    array('icon' => '🧢', 'text' => '01 mũ'),
+    array('icon' => '🪪', 'text' => '01 thẻ tham dự'),
 );
 
 // Agenda & các chương trình chính (liên kết tới trang chi tiết).
 $programs = array(
-    array('icon' => 'calendar_month', 'title' => 'Agenda tổng thể', 'desc' => 'Lịch trình chi tiết 3 ngày Đại hội.', 'url' => $base . '/agenda-tong-the'),
-    array('icon' => 'celebration', 'title' => 'Khai mạc, thi Miss & Văn nghệ', 'desc' => 'Chương trình Tiệc Welcome.', 'url' => $base . '/tiec-welcome'),
-    array('icon' => 'emoji_events', 'title' => 'Lịch thi đấu thể thao', 'desc' => 'Lịch và kết quả các môn thi đấu.', 'url' => $base . '/lich-thi-the-thao'),
-    array('icon' => 'tour', 'title' => 'Lịch tham quan & Tour', 'desc' => 'Hành trình tham quan và Tour Itinerary.', 'url' => $base . '/lich-tham-quan'),
-    array('icon' => 'nightlife', 'title' => 'Bế mạc Đại hội - Tiệc Gala', 'desc' => 'Chương trình Lễ bế mạc.', 'url' => $base . '/tiec-gala'),
+    array('icon' => '📅', 'title' => 'Agenda tổng thể', 'desc' => 'Lịch trình chi tiết 3 ngày Đại hội.', 'url' => $base . '/agenda-tong-the'),
+    array('icon' => '🎉', 'title' => 'Khai mạc, thi Miss & Văn nghệ', 'desc' => 'Chương trình Tiệc Welcome.', 'url' => $base . '/tiec-welcome'),
+    array('icon' => '🏆', 'title' => 'Lịch thi đấu thể thao', 'desc' => 'Lịch và kết quả các môn thi đấu.', 'url' => $base . '/lich-thi-the-thao'),
+    array('icon' => '🚌', 'title' => 'Lịch tham quan & Tour', 'desc' => 'Hành trình tham quan và Tour Itinerary.', 'url' => $base . '/lich-tham-quan'),
+    array('icon' => '🥂', 'title' => 'Bế mạc Đại hội - Tiệc Gala', 'desc' => 'Chương trình Lễ bế mạc.', 'url' => $base . '/tiec-gala'),
 );
 
 // Quy định chung.
@@ -143,7 +151,7 @@ $securityRules = array(
   <section class="position-relative overflow-hidden handbook-hero" style="background:<?php echo $heroGradient; ?>;">
     <div class="container py-5 text-white position-relative" style="z-index:1;">
       <span class="badge rounded-pill bg-white text-dark fw-bold mb-3 px-3 py-2">
-        <span class="material-symbols-outlined align-middle" style="font-size:16px;">menu_book</span>
+        <?php echo $emo('📖', 'font-size:16px;'); ?>
         Sổ tay Đại hội
       </span>
       <h1 class="fw-black display-6 mb-2">Sổ tay Đại hội Mường Thanh 2026</h1>
@@ -153,11 +161,11 @@ $securityRules = array(
       </p>
       <div class="d-flex flex-wrap gap-3 mt-4">
         <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 rounded-3 px-3 py-2">
-          <span class="material-symbols-outlined">calendar_month</span>
+          <?php echo $emo('📅', 'font-size:22px;'); ?>
           <div class="small lh-sm"><span class="opacity-75 d-block">Thời gian</span><strong>27 – 29/10/2026</strong></div>
         </div>
         <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 rounded-3 px-3 py-2">
-          <span class="material-symbols-outlined">location_on</span>
+          <?php echo $emo('📍', 'font-size:22px;'); ?>
           <div class="small lh-sm"><span class="opacity-75 d-block">Địa điểm</span><strong>Mường Thanh Luxury Ninh Bình</strong></div>
         </div>
       </div>
@@ -175,7 +183,7 @@ $securityRules = array(
               <nav class="nav flex-column gap-1" id="handbookToc">
                 <?php foreach ($toc as $t): ?>
                   <a class="nav-link d-flex align-items-center gap-2 rounded-3 px-2 py-2 text-secondary fw-semibold" href="#<?php echo $e($t['id']); ?>" style="font-size:13.5px;">
-                    <span class="material-symbols-outlined fs-6" style="color:<?php echo $e($accent); ?>;"><?php echo $e($t['icon']); ?></span>
+                    <?php echo $emo($t['icon'], 'font-size:16px;'); ?>
                     <span><?php echo $e($t['label']); ?></span>
                   </a>
                 <?php endforeach; ?>
@@ -191,17 +199,17 @@ $securityRules = array(
         <!-- THÔNG TIN ĐẠI HỘI -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="thong-tin">
           <div class="card-body p-4">
-            <?php $head('info', 'Thông tin Đại hội'); ?>
+            <?php $head('ℹ️', 'Thông tin Đại hội'); ?>
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="border rounded-3 p-3 h-100 d-flex align-items-center gap-3">
-                  <span class="material-symbols-outlined" style="font-size:34px;color:<?php echo $e($accent); ?>;">calendar_month</span>
+                  <?php echo $emo('📅', 'font-size:30px;'); ?>
                   <div><span class="text-secondary small d-block">Thời gian</span><strong class="text-dark">Từ ngày 27 đến ngày 29/10/2026</strong></div>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="border rounded-3 p-3 h-100 d-flex align-items-center gap-3">
-                  <span class="material-symbols-outlined" style="font-size:34px;color:<?php echo $e($accent); ?>;">location_on</span>
+                  <?php echo $emo('📍', 'font-size:30px;'); ?>
                   <div><span class="text-secondary small d-block">Địa điểm</span><strong class="text-dark">Khách sạn Mường Thanh Luxury Ninh Bình</strong></div>
                 </div>
               </div>
@@ -212,14 +220,14 @@ $securityRules = array(
         <!-- BỘ QUÀ TẶNG -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="qua-tang">
           <div class="card-body p-4">
-            <?php $head('redeem', 'Bộ quà tặng Đại biểu'); ?>
+            <?php $head('🎁', 'Bộ quà tặng Đại biểu'); ?>
             <p class="text-secondary small mb-3">Mỗi đại biểu tham dự được tặng:</p>
             <div class="row g-3">
               <?php foreach ($gifts as $g): ?>
               <div class="col-6 col-md-3">
                 <div class="border rounded-4 p-3 h-100 text-center">
                   <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width:52px;height:52px;background:<?php echo $e($accent); ?>1a;">
-                    <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;"><?php echo $e($g['icon']); ?></span>
+                    <?php echo $emo($g['icon'], 'font-size:26px;'); ?>
                   </div>
                   <div class="fw-semibold text-dark small"><?php echo $e($g['text']); ?></div>
                 </div>
@@ -232,14 +240,14 @@ $securityRules = array(
         <!-- HÀNH TRANG -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="hanh-trang">
           <div class="card-body p-4">
-            <?php $head('luggage', 'Hành trang Đại biểu'); ?>
+            <?php $head('🧳', 'Hành trang Đại biểu'); ?>
             <p class="text-secondary small mb-3">Vật dụng cá nhân cần chuẩn bị mang theo trước khi tham dự Đại hội:</p>
             <div class="row g-3">
               <?php foreach ($packing as $p): ?>
               <div class="col-6 col-md-4 col-xl-3">
                 <div class="d-flex flex-column align-items-center text-center gap-2 border rounded-3 p-3 h-100">
                   <span class="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:44px;height:44px;background:<?php echo $e($accent); ?>1a;">
-                    <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;"><?php echo $e($p['icon']); ?></span>
+                    <?php echo $emo($p['icon'], 'font-size:22px;'); ?>
                   </span>
                   <span class="text-dark small"><?php echo $e($p['text']); ?></span>
                 </div>
@@ -252,13 +260,13 @@ $securityRules = array(
         <!-- LIÊN HỆ -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="lien-he">
           <div class="card-body p-4">
-            <?php $head('contacts', 'Thông tin liên hệ'); ?>
+            <?php $head('📇', 'Thông tin liên hệ'); ?>
             <a href="<?php echo $e($base); ?>/doan-thu-ky" class="d-flex align-items-center justify-content-between text-decoration-none border rounded-3 p-3 handbook-link">
               <span class="d-flex align-items-center gap-3">
-                <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">groups</span>
+                <?php echo $emo('👥', 'font-size:22px;'); ?>
                 <span><strong class="text-dark d-block">Danh sách Ban Thư Ký Đoàn</strong><span class="text-secondary small">Đầu mối liên hệ hỗ trợ từng đoàn.</span></span>
               </span>
-              <span class="material-symbols-outlined text-muted">chevron_right</span>
+              <?php echo $emo('›', 'font-size:20px;color:#9ca3af;'); ?>
             </a>
           </div>
         </div>
@@ -266,19 +274,19 @@ $securityRules = array(
         <!-- AGENDA & CHƯƠNG TRÌNH -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="chuong-trinh">
           <div class="card-body p-4">
-            <?php $head('event_note', 'Agenda & các chương trình chính'); ?>
+            <?php $head('🗓️', 'Agenda & các chương trình chính'); ?>
             <div class="row g-3">
               <?php foreach ($programs as $pr): ?>
               <div class="col-md-6">
                 <a href="<?php echo $e($pr['url']); ?>" class="d-flex align-items-center gap-3 text-decoration-none border rounded-3 p-3 h-100 handbook-link">
                   <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:46px;height:46px;background:<?php echo $e($accent); ?>1a;">
-                    <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;"><?php echo $e($pr['icon']); ?></span>
+                    <?php echo $emo($pr['icon'], 'font-size:24px;'); ?>
                   </span>
                   <span class="flex-grow-1">
                     <strong class="text-dark d-block small"><?php echo $e($pr['title']); ?></strong>
                     <span class="text-secondary" style="font-size:12.5px;"><?php echo $e($pr['desc']); ?></span>
                   </span>
-                  <span class="material-symbols-outlined text-muted fs-6">chevron_right</span>
+                  <?php echo $emo('›', 'font-size:18px;color:#9ca3af;'); ?>
                 </a>
               </div>
               <?php endforeach; ?>
@@ -289,11 +297,11 @@ $securityRules = array(
         <!-- QUY ĐỊNH CHUNG -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="quy-dinh">
           <div class="card-body p-4">
-            <?php $head('gavel', 'Quy định chung'); ?>
+            <?php $head('⚖️', 'Quy định chung'); ?>
             <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
               <?php foreach ($generalRules as $r): ?>
               <li class="d-flex align-items-start gap-2">
-                <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px;color:<?php echo $e($accent); ?>;">check_circle</span>
+                <?php echo $emo('✅', 'font-size:18px;'); ?>
                 <span class="text-dark small"><?php echo $e($r); ?></span>
               </li>
               <?php endforeach; ?>
@@ -304,7 +312,7 @@ $securityRules = array(
         <!-- ĂN UỐNG & TIỆC -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="an-uong">
           <div class="card-body p-4">
-            <?php $head('restaurant', 'Ăn uống & các sự kiện tiệc'); ?>
+            <?php $head('🍽️', 'Ăn uống & các sự kiện tiệc'); ?>
             <h3 class="fw-semibold text-secondary small text-uppercase mb-2">Thời gian & địa điểm phục vụ</h3>
             <div class="table-responsive mb-4">
               <table class="table table-bordered align-middle mb-0">
@@ -332,7 +340,7 @@ $securityRules = array(
             <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
               <?php foreach ($diningRules as $r): ?>
               <li class="d-flex align-items-start gap-2">
-                <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px;color:<?php echo $e($accent); ?>;">check_circle</span>
+                <?php echo $emo('✅', 'font-size:18px;'); ?>
                 <span class="text-dark small"><?php echo $e($r); ?></span>
               </li>
               <?php endforeach; ?>
@@ -343,11 +351,11 @@ $securityRules = array(
         <!-- LƯU TRÚ -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="luu-tru">
           <div class="card-body p-4">
-            <?php $head('hotel', 'Lưu trú'); ?>
+            <?php $head('🏨', 'Lưu trú'); ?>
             <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
               <?php foreach ($lodgingRules as $r): ?>
               <li class="d-flex align-items-start gap-2">
-                <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px;color:<?php echo $e($accent); ?>;">check_circle</span>
+                <?php echo $emo('✅', 'font-size:18px;'); ?>
                 <span class="text-dark small"><?php echo $e($r); ?></span>
               </li>
               <?php endforeach; ?>
@@ -358,7 +366,7 @@ $securityRules = array(
         <!-- Y TẾ -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="y-te">
           <div class="card-body p-4">
-            <?php $head('medical_services', 'Y tế'); ?>
+            <?php $head('🏥', 'Y tế'); ?>
             <p class="text-secondary small mb-3">Phòng y tế thường trực 24/24 giờ trong suốt thời gian diễn ra Đại hội.</p>
             <div class="row g-3 mb-4">
               <?php foreach ($medical as $md): ?>
@@ -369,14 +377,14 @@ $securityRules = array(
                     <strong class="text-dark small"><?php echo $e($md['name']); ?></strong>
                   </div>
                   <a href="tel:<?php echo $e(str_replace(' ', '', $md['phone'])); ?>" class="btn btn-sm rounded-pill fw-bold text-white d-inline-flex align-items-center gap-1 flex-shrink-0" style="background:<?php echo $e($accent); ?>;">
-                    <span class="material-symbols-outlined fs-6">call</span><?php echo $e($md['phone']); ?>
+                    <?php echo $emo('📞', 'font-size:15px;'); ?><?php echo $e($md['phone']); ?>
                   </a>
                 </div>
               </div>
               <?php endforeach; ?>
             </div>
             <div class="alert d-flex align-items-start gap-2 mb-3" style="background:#fef2f2;border:1px solid #fecaca;">
-              <span class="material-symbols-outlined text-danger">emergency</span>
+              <?php echo $emo('🚨', 'font-size:22px;'); ?>
               <div class="small text-dark">
                 <strong>Khi xảy ra sự cố y tế:</strong> Báo ngay BS Quang Tuấn Anh - <a href="tel:0394115345" class="fw-bold text-danger text-decoration-none">0394 115 345</a>.
                 Cử người đón đội y tế/xe cứu thương, giữ thông thoáng lối đi và tạo khoảng trống quanh người bệnh.
@@ -403,17 +411,17 @@ $securityRules = array(
         <!-- AN NINH - PCCC -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="an-ninh">
           <div class="card-body p-4">
-            <?php $head('local_fire_department', 'An ninh - PCCC'); ?>
+            <?php $head('🧯', 'An ninh - PCCC'); ?>
             <ul class="list-unstyled mb-3 d-flex flex-column gap-2">
               <?php foreach ($securityRules as $r): ?>
               <li class="d-flex align-items-start gap-2">
-                <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px;color:<?php echo $e($accent); ?>;">check_circle</span>
+                <?php echo $emo('✅', 'font-size:18px;'); ?>
                 <span class="text-dark small"><?php echo $e($r); ?></span>
               </li>
               <?php endforeach; ?>
             </ul>
             <div class="alert d-flex align-items-center gap-2 mb-0" style="background:#eff6ff;border:1px solid #bfdbfe;">
-              <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">contact_phone</span>
+              <?php echo $emo('📞', 'font-size:22px;'); ?>
               <div class="small text-dark">
                 Liên hệ tình huống khẩn cấp: <strong>Mr. Đoàn Thế Cương</strong> -
                 <a href="tel:0912211929" class="fw-bold text-decoration-none" style="color:<?php echo $e($accent); ?>;">0912 211 929</a>
@@ -425,10 +433,10 @@ $securityRules = array(
         <!-- SƠ ĐỒ ĐỊA ĐIỂM -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="so-do">
           <div class="card-body p-4">
-            <?php $head('map', 'Sơ đồ địa điểm Đại hội'); ?>
+            <?php $head('🗺️', 'Sơ đồ địa điểm Đại hội'); ?>
             <p class="text-secondary small mb-3">Hội trường chính, nhà hàng, khu lưu trú, khu thể thao, khu vực Miss, xe đưa đón, y tế, quầy Thông tin, WC, lối thoát hiểm và điểm tập kết khẩn cấp.</p>
             <a href="<?php echo $e($base); ?>/so-do-dia-diem" class="btn rounded-pill fw-bold text-white d-inline-flex align-items-center gap-2" style="background:<?php echo $e($accent); ?>;">
-              <span class="material-symbols-outlined fs-6">map</span> Xem sơ đồ chi tiết
+              <?php echo $emo('🗺️', 'font-size:16px;'); ?> Xem sơ đồ chi tiết
             </a>
           </div>
         </div>
@@ -436,23 +444,23 @@ $securityRules = array(
         <!-- QR & KÊNH THÔNG TIN -->
         <div class="card border-0 rounded-4 shadow-sm mb-4 handbook-section" id="kenh-qr">
           <div class="card-body p-4">
-            <?php $head('qr_code_2', 'QR & kênh thông tin chính thức'); ?>
+            <?php $head('🔳', 'QR & kênh thông tin chính thức'); ?>
             <div class="row g-3">
               <div class="col-md-4">
                 <a href="<?php echo $e($base); ?>/agenda-tong-the" class="d-flex align-items-center gap-3 text-decoration-none border rounded-3 p-3 h-100 handbook-link">
-                  <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">update</span>
+                  <?php echo $emo('🔄', 'font-size:22px;'); ?>
                   <span class="text-dark small fw-semibold">Lịch trình cập nhật</span>
                 </a>
               </div>
               <div class="col-md-4">
                 <a href="<?php echo $e($base); ?>/lich-thi-the-thao" class="d-flex align-items-center gap-3 text-decoration-none border rounded-3 p-3 h-100 handbook-link">
-                  <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">scoreboard</span>
+                  <?php echo $emo('📊', 'font-size:22px;'); ?>
                   <span class="text-dark small fw-semibold">Kết quả thi đấu</span>
                 </a>
               </div>
               <div class="col-md-4">
                 <a href="<?php echo $e($base); ?>/thu-vien-anh" class="d-flex align-items-center gap-3 text-decoration-none border rounded-3 p-3 h-100 handbook-link">
-                  <span class="material-symbols-outlined" style="color:<?php echo $e($accent); ?>;">photo_library</span>
+                  <?php echo $emo('🖼️', 'font-size:22px;'); ?>
                   <span class="text-dark small fw-semibold">Ảnh Đại hội hàng ngày</span>
                 </a>
               </div>
@@ -463,7 +471,7 @@ $securityRules = array(
         <!-- LỜI CHÚC -->
         <div class="card border-0 rounded-4 shadow-sm mb-2 text-center" style="background:linear-gradient(135deg,#eff6ff 0%,#ecfeff 100%);">
           <div class="card-body p-4">
-            <span class="material-symbols-outlined mb-2" style="font-size:40px;color:<?php echo $e($accent); ?>;">volunteer_activism</span>
+            <div class="mb-2"><?php echo $emo('🤝', 'font-size:38px;'); ?></div>
             <p class="text-dark mb-1">Ban Tổ chức luôn sẵn sàng đồng hành và hỗ trợ Đại biểu trong suốt thời gian diễn ra Đại hội.</p>
             <p class="fw-bold text-dark mb-0">Kính chúc Quý Đại biểu một kỳ Đại hội sức khỏe, thành công với nhiều trải nghiệm đáng nhớ!</p>
           </div>
