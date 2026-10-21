@@ -98,7 +98,7 @@ $isLogged = (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenti
       <?php foreach ($tabs as $key => $t):
         $isActive = $key === $active;
       ?>
-        <a class="nav-link d-flex align-items-center gap-2 px-4 py-3 fw-semibold border-bottom <?php echo $isActive ? 'text-primary bg-light' : 'text-dark'; ?>" href="<?php echo $e($t['url']); ?>" data-bs-dismiss="offcanvas">
+        <a class="nav-link d-flex align-items-center gap-2 px-4 py-3 fw-semibold border-bottom <?php echo $isActive ? 'text-primary bg-light' : 'text-dark'; ?>" href="<?php echo $e($t['url']); ?>">
           <span class="material-symbols-outlined fs-6"><?php echo $e($t['icon']); ?></span>
           <span class="flex-grow-1"><?php echo $e($t['label']); ?></span>
           <span class="material-symbols-outlined text-muted fs-6">chevron_right</span>
