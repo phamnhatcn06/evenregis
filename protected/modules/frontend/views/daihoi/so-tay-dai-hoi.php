@@ -53,8 +53,8 @@ $packing = array(
 // Bộ quà tặng.
 $gifts = array(
     array('icon' => 'backpack', 'text' => '01 balo rút'),
-    array('icon' => 'checkroom', 'text' => '01 áo phông'),
-    array('icon' => 'styler', 'text' => '01 mũ'),
+    array('icon' => 'apparel', 'text' => '01 áo phông'),
+    array('icon' => 'child_hat', 'text' => '01 mũ'),
     array('icon' => 'badge', 'text' => '01 thẻ tham dự'),
 );
 

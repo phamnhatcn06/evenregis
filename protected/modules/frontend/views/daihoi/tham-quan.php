@@ -87,8 +87,8 @@ $rules = array(
 
 // Thông tin liên hệ hỗ trợ.
 $contacts = array(
-  array('name' => 'Mr Tiếp', 'phone' => '0988 016 066'),
-  array('name' => 'Ms Ngọc', 'phone' => '0898 600 222'),
+  array('name' => 'Mr. Tiệp', 'phone' => '0988 016 066'),
+  array('name' => 'Ms. Ngọc', 'phone' => '0898 600 222'),
 );
 
 ?>
