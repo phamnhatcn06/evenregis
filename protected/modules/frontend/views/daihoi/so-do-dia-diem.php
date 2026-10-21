@@ -9,6 +9,7 @@ $e = function ($s) { return CHtml::encode($s); };
 $eventName = isset($event['name']) ? $event['name'] : (isset($event['title']) ? $event['title'] : 'Đại hội Mường Thanh 2026');
 $accent = '#0d9488';
 $soDo = $base . '/public/daihoi/so-do';
+$mascot = $soDo . '/mascots';
 
 // Link mở trực tiếp trên ứng dụng bản đồ (Google Maps / Apple Maps đều nhận).
 $mapUrl = function ($query) {
