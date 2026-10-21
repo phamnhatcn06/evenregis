@@ -71,7 +71,15 @@ if ($preview && isset($preview['teams'])) {
         if ($t['team_id'] === null || $t['team_id'] === '') {
             continue;
         }
-        $teamMap[$t['team_id']] = $t['team_name'] !== null ? $t['team_name'] : ('#' . $t['team_id']);
+        // Nội dung đơn (1 VĐV): hiển thị "Tên VĐV (Mã đơn vị)" thay cho tên đội.
+        $players = isset($t['player_names']) && is_array($t['player_names']) ? $t['player_names'] : array();
+        $unitCode = isset($t['unit_code']) && $t['unit_code'] !== null && $t['unit_code'] !== '' ? $t['unit_code'] : null;
+        if (count($players) === 1 && $players[0] !== null && $players[0] !== '') {
+            $label = $players[0] . ($unitCode ? ' (' . $unitCode . ')' : '');
+        } else {
+            $label = $t['team_name'] !== null ? $t['team_name'] : ('#' . $t['team_id']);
+        }
+        $teamMap[$t['team_id']] = $label;
     }
 }
 
