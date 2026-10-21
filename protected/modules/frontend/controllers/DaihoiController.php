@@ -21,7 +21,8 @@ class DaihoiController extends FrontEndController
     public function accessRules()
     {
         return array(
-            array('allow',
+            array(
+                'allow',
                 'actions' => array('index', 'agenda', 'schedule', 'tiecWelcome', 'lichThamQuan', 'tiecGala', 'funRun', 'hoTro', 'doanThuKy', 'soDoDiaDiem', 'soTayDaiHoi', 'news', 'newsDetail', 'jsonLive', 'jsonRecent', 'jsonRankings'),
                 'users' => array('*'),
             ),
@@ -165,8 +166,8 @@ class DaihoiController extends FrontEndController
                 'accent' => '#be123c',
                 'info' => array(
                     array('icon' => 'event', 'label' => 'Sự kiện', 'value' => 'Tiệc Gala - Bế mạc'),
-                    array('icon' => 'schedule', 'label' => 'Thời gian', 'value' => '17:30 - 20:00, ngày 29/10/2026'),
-                    array('icon' => 'location_on', 'label' => 'Địa điểm', 'value' => 'Hội trường tầng 2'),
+                    array('icon' => 'schedule', 'label' => 'Thời gian', 'value' => '17:00 - 19:00, ngày 29/10/2026'),
+                    array('icon' => 'location_on', 'label' => 'Địa điểm', 'value' => 'Nhà hàng Tràng An - Tầng 2, Mường Thanh Luxury Ninh Bình'),
                 ),
                 'keywords' => array('bế mạc', 'gala', 'tổng kết', 'closing'),
                 'emptyText' => 'Chương trình chi tiết sẽ được Ban Tổ chức cập nhật.',
