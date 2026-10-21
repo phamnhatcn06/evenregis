@@ -273,6 +273,7 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
          data-reorder-matches-url="<?php echo $this->createUrl('reorderMatches'); ?>"
          data-standings-url="<?php echo $this->createUrl('standings', array('id' => $model->id)); ?>"
          data-generate-knockout-url="<?php echo $this->createUrl('generateKnockout', array('id' => $model->id)); ?>"
+         data-reserve-playoff-url="<?php echo $this->createUrl('reservePlayoff', array('id' => $model->id)); ?>"
          data-total-group-matches="<?php echo (int) $totalGroupMatches; ?>"
          data-completed-group-matches="<?php echo (int) $completedGroupMatches; ?>">
 
