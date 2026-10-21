@@ -552,7 +552,7 @@ if (empty($albumList)) {
     <div class="offcanvas-body d-flex flex-column p-0">
       <nav class="nav flex-column py-2">
         <?php foreach ($navItems as $it): ?>
-          <a class="nav-link d-flex align-items-center justify-content-between px-4 py-3 fw-semibold text-dark border-bottom" href="<?php echo $e($it[0]); ?>" data-bs-dismiss="offcanvas">
+          <a class="nav-link d-flex align-items-center justify-content-between px-4 py-3 fw-semibold text-dark border-bottom" href="<?php echo $e($it[0]); ?>">
             <span><?php echo $e($it[1]); ?></span>
             <span class="material-symbols-outlined text-muted fs-6">chevron_right</span>
           </a>
