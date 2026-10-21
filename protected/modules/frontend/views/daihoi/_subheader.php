@@ -35,12 +35,35 @@ $isLogged = (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenti
     </a>
 
     <!-- Nav inline trên desktop: 1 hàng, kiểu link gạch chân (không dùng pill) -->
+    <?php
+    // Các mục ít dùng gom vào dropdown "Thêm" để menu gọn trong 1 hàng.
+    $moreKeys = array('map', 'support', 'secretary');
+    $moreActive = in_array($active, $moreKeys, true);
+    ?>
     <nav class="dh-subnav d-none d-lg-flex align-items-center justify-content-end">
-      <?php foreach ($tabs as $key => $t):
-        $isActive = $key === $active;
-      ?>
-        <a class="dh-subnav-link<?php echo $isActive ? ' active' : ''; ?>" href="<?php echo $e($t['url']); ?>"><?php echo $e($t['label']); ?></a>
+      <?php foreach ($tabs as $key => $t): ?>
+        <?php if (in_array($key, $moreKeys, true)) { continue; } ?>
+        <a class="dh-subnav-link<?php echo $key === $active ? ' active' : ''; ?>" href="<?php echo $e($t['url']); ?>"><?php echo $e($t['label']); ?></a>
       <?php endforeach; ?>
+
+      <!-- Dropdown "Thêm" -->
+      <div class="dropdown">
+        <a class="dh-subnav-link dh-subnav-more d-inline-flex align-items-center gap-1<?php echo $moreActive ? ' active' : ''; ?>" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <span>Thêm</span>
+          <span class="material-symbols-outlined" style="font-size:16px;">expand_more</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+          <?php foreach ($moreKeys as $mk): if (!isset($tabs[$mk])) { continue; } $t = $tabs[$mk]; ?>
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2 py-2<?php echo $mk === $active ? ' active' : ''; ?>" href="<?php echo $e($t['url']); ?>">
+                <span class="material-symbols-outlined fs-6"><?php echo $e($t['icon']); ?></span>
+                <span><?php echo $e($t['label']); ?></span>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+
       <span class="dh-subnav-sep"></span>
       <a class="dh-subnav-link d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/">
         <span class="material-symbols-outlined" style="font-size:16px;">home</span>
