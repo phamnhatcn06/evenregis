@@ -34,26 +34,21 @@ $isLogged = (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenti
       <span class="fw-bold d-none d-sm-inline" style="font-size:15px;"><?php echo $e($eventName); ?></span>
     </a>
 
-    <!-- Nav inline trên desktop -->
-    <nav class="d-none d-lg-flex align-items-center flex-wrap justify-content-end gap-2">
+    <!-- Nav inline trên desktop: 1 hàng, kiểu link gạch chân (không dùng pill) -->
+    <nav class="dh-subnav d-none d-lg-flex align-items-center justify-content-end">
       <?php foreach ($tabs as $key => $t):
         $isActive = $key === $active;
-        $cls = $isActive
-            ? 'btn-primary text-white'
-            : 'btn-light text-secondary border';
       ?>
-        <a class="btn btn-sm <?php echo $cls; ?> fw-semibold rounded-pill px-3 d-inline-flex align-items-center gap-1" href="<?php echo $e($t['url']); ?>">
-          <span class="material-symbols-outlined fs-6"><?php echo $e($t['icon']); ?></span>
-          <span><?php echo $e($t['label']); ?></span>
-        </a>
+        <a class="dh-subnav-link<?php echo $isActive ? ' active' : ''; ?>" href="<?php echo $e($t['url']); ?>"><?php echo $e($t['label']); ?></a>
       <?php endforeach; ?>
-      <a class="btn btn-sm btn-dark fw-semibold rounded-pill px-3 d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/">
-        <span class="material-symbols-outlined fs-6">home</span>
+      <span class="dh-subnav-sep"></span>
+      <a class="dh-subnav-link d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/">
+        <span class="material-symbols-outlined" style="font-size:16px;">home</span>
         <span>Trang chủ</span>
       </a>
       <?php if ($isLogged): ?>
-        <a class="btn btn-sm btn-primary fw-semibold rounded-pill px-3 d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/admin/default/index" style="background:linear-gradient(135deg,#1d4ed8 0%,#312e81 100%);border:none;">
-          <span class="material-symbols-outlined fs-6">admin_panel_settings</span>
+        <a class="dh-subnav-admin d-inline-flex align-items-center gap-1" href="<?php echo $e($base); ?>/admin/default/index">
+          <span class="material-symbols-outlined" style="font-size:16px;">admin_panel_settings</span>
           <span>Vào quản trị</span>
         </a>
       <?php endif; ?>
