@@ -567,20 +567,23 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                                 $rankClass = ($hasPlayed && $isPureRoundRobinFinal)
                                                     ? (($rank === 1) ? 'rank-gold' : (($rank === 2) ? 'rank-silver' : (($rank === 3) ? 'rank-bronze' : 'bg-light text-muted')))
                                                     : 'bg-light text-muted';
+                                                $isPlayoffSlot = !empty($r['is_playoff_slot']);
                                                 $tName = $teamMap[$r['team_id']] ?? ($r['team_name'] ?? ('#' . $r['team_id']));
-                                                $isQualified = ($hasPlayed && $rank <= $advancePerGroup);
+                                                $isQualified = (!$isPlayoffSlot && $hasPlayed && $rank <= $advancePerGroup);
                                                 ?>
                                                 <tr data-team-id="<?php echo CHtml::encode($r['team_id']); ?>"
-                                                    class="<?php echo (!$isPureRoundRobinFinal && $isQualified) ? 'standings-qualify-row' : ''; ?>">
+                                                    class="<?php echo (!$isPureRoundRobinFinal && $isQualified) ? 'standings-qualify-row' : ($isPlayoffSlot ? 'table-warning' : ''); ?>">
                                                     <td>
                                                         <span class="rank-badge <?php echo $rankClass; ?>">
                                                             <?php echo $rank; ?>
                                                         </span>
                                                     </td>
-                                                    <td class="text-start fw-semibold text-dark">
+                                                    <td class="text-start fw-semibold <?php echo $isPlayoffSlot ? 'text-warning-emphasis fst-italic' : 'text-dark'; ?>">
                                                         <div class="d-flex align-items-center gap-2">
                                                             <span><?php echo CHtml::encode($tName); ?></span>
-                                                            <?php if ($isPureRoundRobinFinal && $hasPlayed): ?>
+                                                            <?php if ($isPlayoffSlot): ?>
+                                                                <span class="badge bg-warning text-dark" title="Suất giữ chỗ cho đội thắng play-off"><i class="fa fa-hourglass-half me-1"></i>Chờ Play-off</span>
+                                                            <?php elseif ($isPureRoundRobinFinal && $hasPlayed): ?>
                                                                 <?php if ($rank === 1): ?>
                                                                     <span class="badge bg-warning text-dark fw-bold"><i class="fa fa-trophy me-1"></i>HCV (Nhất)</span>
                                                                 <?php elseif ($rank === 2): ?>
