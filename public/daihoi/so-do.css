@@ -16,14 +16,15 @@
   box-shadow: 0 1px 3px rgba(15, 23, 42, .06);
   position: relative;
 }
-.dh-node__head { display: flex; align-items: flex-start; gap: 12px; }
-.dh-node__icon {
-  width: 48px; height: 48px; flex-shrink: 0;
-  border-radius: .85rem;
+.dh-node__media {
+  background: color-mix(in srgb, var(--dh-accent) 7%, #fff);
+  border-radius: .75rem;
+  margin-bottom: 12px;
   display: flex; align-items: center; justify-content: center;
-  background: color-mix(in srgb, var(--dh-accent) 12%, #fff);
+  height: 150px; overflow: hidden;
 }
-.dh-node__icon .material-symbols-outlined { color: var(--dh-accent); font-size: 26px; }
+.dh-node__media img { max-height: 100%; max-width: 100%; object-fit: contain; }
+.dh-node__media--hub { height: 190px; }
 .dh-node__title { font-weight: 700; color: #0f172a; line-height: 1.25; }
 .dh-node__addr { color: #64748b; font-size: .8rem; margin: 2px 0 0; }
 .dh-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
