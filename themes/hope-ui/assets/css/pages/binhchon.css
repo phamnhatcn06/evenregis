@@ -1043,12 +1043,20 @@
   }
 
   .bc-filter-actions {
+    flex-wrap: wrap;
     justify-content: space-between;
+    gap: 10px;
   }
 
   .bc-sort-group {
-    flex: 1;
+    flex: 1 1 100%;
     overflow-x: auto;
+    justify-content: space-between;
+  }
+
+  .bc-count-badge {
+    flex: 1 1 100%;
+    text-align: center;
   }
 
   .bc-sort-btn {
