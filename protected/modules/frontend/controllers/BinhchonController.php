@@ -168,6 +168,24 @@ class BinhchonController extends CController
      */
     protected function currentTokenVoter()
     {
+        // Ưu tiên phiên cổng cá nhân /portal (đăng nhập bằng định danh DHMT + PIN).
+        $session = Yii::app()->session;
+        $attendeeId = isset($session[AttendeePortalController::SESSION_ATTENDEE_ID])
+            ? $session[AttendeePortalController::SESSION_ATTENDEE_ID]
+            : null;
+        if (!empty($attendeeId)) {
+            $fullName = isset($session[AttendeePortalController::SESSION_FULL_NAME])
+                ? $session[AttendeePortalController::SESSION_FULL_NAME]
+                : '';
+            return array(
+                // Tiền tố 'mt:' để không trùng không gian khóa với Google sub.
+                'sub' => 'mt:' . $attendeeId,
+                'email' => null,
+                'name' => $fullName !== '' ? $fullName : 'Người dùng',
+            );
+        }
+
+        // Tương thích ngược: phiên SSO (token) nếu còn dùng ở nơi khác.
         if (!AuthHandler::isAuthenticated()) {
             return null;
         }
@@ -178,7 +196,6 @@ class BinhchonController extends CController
         }
         $email = isset($user['email']) ? $user['email'] : null;
         return array(
-            // Tiền tố 'mt:' để không trùng không gian khóa với Google sub.
             'sub' => 'mt:' . $id,
             'email' => $email,
             'name' => !empty($user['full_name']) ? $user['full_name'] : ($email ?: 'Người dùng'),
