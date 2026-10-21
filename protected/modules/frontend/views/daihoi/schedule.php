@@ -2295,6 +2295,57 @@ $getSportMeta = function ($name) {
   box-shadow: 0 0 0 2px #10b981;
 }
 
+/* SPORT SUBGROUP — Nhóm & thanh tiêu đề nội dung (bộ môn) trong từng ngày */
+.sport-subgroup {
+  margin-bottom: 1.25rem;
+}
+.sport-subgroup:last-child {
+  margin-bottom: 0;
+}
+.sport-subgroup-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.85rem;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: var(--sport-accent-bg, #f1f5f9);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-left: 4px solid var(--sport-accent, #2563eb);
+}
+.sport-subgroup-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--sport-accent, #2563eb);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  flex-shrink: 0;
+}
+.sport-subgroup-icon .material-symbols-outlined {
+  font-size: 19px;
+}
+.sport-subgroup-name {
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #0f172a;
+  line-height: 1.2;
+  margin-right: auto;
+}
+.sport-subgroup-count {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sport-accent, #2563eb);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
 /* Match Card Hover & Transitions */
 .match-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
