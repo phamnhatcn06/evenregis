@@ -445,21 +445,50 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
             }
         }
 
-        // Bổ sung các slot giữ chỗ Play-off (team_id null) vào cuối BXH mỗi bảng,
-        // ghi rõ "Đội thắng Play-off X" để biết suất này dành cho ai.
-        foreach ($groups as $label => $members) {
+        // Bổ sung các suất giữ chỗ Play-off vào cuối BXH mỗi bảng, ghi rõ "Đội thắng Play-off X".
+        // Nguồn tin cậy là các trận vòng bảng: vế có team_id trống nhưng có nhãn nguồn
+        // (team_a_source / team_b_source) kiểu "Đội thắng Play-off 1" chính là suất chờ của bảng đó.
+        $groupLabelsAll = array_unique(array_merge(array_keys($standingsByGroup), array_keys($groupMatches)));
+        foreach ($groupLabelsAll as $label) {
+            if (empty($groupMatches[$label])) {
+                continue;
+            }
+            // Thu thập các nguồn chờ (distinct) trong bảng
+            $slotSources = array();
+            foreach ($groupMatches[$label] as $gm) {
+                $sides = array(
+                    array($gm['team_a_id'] ?? null, $gm['team_a_source'] ?? null),
+                    array($gm['team_b_id'] ?? null, $gm['team_b_source'] ?? null),
+                );
+                foreach ($sides as $side) {
+                    list($tid, $src) = $side;
+                    if (($tid === null || $tid === '') && !empty($src)) {
+                        $slotSources[$src] = true;
+                    }
+                }
+            }
+            if (empty($slotSources)) {
+                continue;
+            }
             if (!isset($standingsByGroup[$label])) {
                 $standingsByGroup[$label] = array();
             }
-            foreach ($members as $mem) {
-                if ($mem['team_id'] !== null && $mem['team_id'] !== '') {
+            foreach (array_keys($slotSources) as $src) {
+                // Tránh thêm trùng nếu đã có dòng giữ chỗ cùng nhãn
+                $already = false;
+                foreach ($standingsByGroup[$label] as $row) {
+                    if (!empty($row['is_playoff_slot']) && isset($row['team_name']) && $row['team_name'] === $src) {
+                        $already = true;
+                        break;
+                    }
+                }
+                if ($already) {
                     continue;
                 }
-                $slotName = !empty($mem['team_name']) ? $mem['team_name'] : 'Đội thắng Play-off';
                 $standingsByGroup[$label][] = array(
                     'group_label' => $label,
                     'team_id' => null,
-                    'team_name' => $slotName,
+                    'team_name' => $src,
                     'is_playoff_slot' => true,
                     'rank' => count($standingsByGroup[$label]) + 1,
                     'played' => 0,
