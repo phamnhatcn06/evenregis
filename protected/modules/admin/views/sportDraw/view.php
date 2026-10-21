@@ -444,6 +444,35 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                 $standingsByGroup[$label] = $computed;
             }
         }
+
+        // Bổ sung các slot giữ chỗ Play-off (team_id null) vào cuối BXH mỗi bảng,
+        // ghi rõ "Đội thắng Play-off X" để biết suất này dành cho ai.
+        foreach ($groups as $label => $members) {
+            if (!isset($standingsByGroup[$label])) {
+                $standingsByGroup[$label] = array();
+            }
+            foreach ($members as $mem) {
+                if ($mem['team_id'] !== null && $mem['team_id'] !== '') {
+                    continue;
+                }
+                $slotName = !empty($mem['team_name']) ? $mem['team_name'] : 'Đội thắng Play-off';
+                $standingsByGroup[$label][] = array(
+                    'group_label' => $label,
+                    'team_id' => null,
+                    'team_name' => $slotName,
+                    'is_playoff_slot' => true,
+                    'rank' => count($standingsByGroup[$label]) + 1,
+                    'played' => 0,
+                    'won' => 0,
+                    'drawn' => 0,
+                    'lost' => 0,
+                    'points_scored' => 0,
+                    'points_conceded' => 0,
+                    'goal_diff' => 0,
+                    'points' => 0,
+                );
+            }
+        }
         ksort($standingsByGroup);
         $advancePerGroup = (int) ($model->advance_per_group ?: 2);
         ?>
