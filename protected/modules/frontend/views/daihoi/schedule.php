@@ -2932,6 +2932,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // 5.5 Thu gọn / mở rộng từng nhóm nội dung (bộ môn)
+  function toggleSubgroup(header) {
+    var sub = header.closest('.sport-subgroup');
+    if (!sub) return;
+    var collapsed = sub.classList.toggle('collapsed');
+    header.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+
+  document.querySelectorAll('.sport-subgroup-header').forEach(function (header) {
+    header.addEventListener('click', function () {
+      toggleSubgroup(header);
+    });
+    header.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleSubgroup(header);
+      }
+    });
+  });
+
   // 6. Chuyển đổi chế độ xem: Thẻ (Cards) vs Danh sách gọn (Compact)
   function setViewMode(mode) {
     currentViewMode = mode;
