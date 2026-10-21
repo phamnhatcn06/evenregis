@@ -19,12 +19,36 @@ $distances = array(
     array('name' => '15 km', 'slots' => 40, 'laps' => 3, 'cutoff' => '150 phút', 'control' => '2 dấu xác nhận (vòng 2, 3)'),
 );
 
-// Nhóm thi đấu theo giới tính & độ tuổi.
-$groups = array(
-    array('gender' => 'Nam', 'age' => 'Dưới 35 tuổi', 'd5' => true, 'd10' => true, 'd15' => true),
-    array('gender' => 'Nam', 'age' => 'Từ 35 tuổi trở lên', 'd5' => true, 'd10' => false, 'd15' => false),
-    array('gender' => 'Nữ', 'age' => 'Dưới 35 tuổi', 'd5' => true, 'd10' => true, 'd15' => true),
-    array('gender' => 'Nữ', 'age' => 'Từ 35 tuổi trở lên', 'd5' => true, 'd10' => false, 'd15' => false),
+// Nhóm thi đấu theo từng cự ly.
+// 5 km phân theo giới tính & độ tuổi (4 nhóm); 10 km và 15 km chỉ phân theo
+// giới tính, không phân biệt độ tuổi (2 nhóm mỗi cự ly).
+$distanceGroups = array(
+    array(
+        'name' => '5 km',
+        'note' => 'Phân theo giới tính và độ tuổi',
+        'groups' => array(
+            array('gender' => 'Nam', 'age' => 'Dưới 35 tuổi'),
+            array('gender' => 'Nam', 'age' => 'Từ 35 tuổi trở lên'),
+            array('gender' => 'Nữ', 'age' => 'Dưới 35 tuổi'),
+            array('gender' => 'Nữ', 'age' => 'Từ 35 tuổi trở lên'),
+        ),
+    ),
+    array(
+        'name' => '10 km',
+        'note' => 'Không phân biệt độ tuổi',
+        'groups' => array(
+            array('gender' => 'Nam', 'age' => 'Mọi độ tuổi'),
+            array('gender' => 'Nữ', 'age' => 'Mọi độ tuổi'),
+        ),
+    ),
+    array(
+        'name' => '15 km',
+        'note' => 'Không phân biệt độ tuổi',
+        'groups' => array(
+            array('gender' => 'Nam', 'age' => 'Mọi độ tuổi'),
+            array('gender' => 'Nữ', 'age' => 'Mọi độ tuổi'),
+        ),
+    ),
 );
 
 // Lịch trình ngày thi đấu (dự kiến 28/10/2026).
