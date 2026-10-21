@@ -233,6 +233,21 @@ class SportStages extends BaseSportStages
     }
 
     /**
+     * Đặt chỗ trước đội thắng play-off vào vòng bảng đã bốc (không xáo lại đội).
+     *
+     * @param string $stageId giai đoạn vòng bảng đích
+     * @param int|null $sourceStageId giai đoạn play-off nguồn (bỏ trống để tự dò)
+     */
+    public static function reservePlayoffSlots($stageId, $sourceStageId = null)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_RESERVE_PLAYOFF, array('stageId' => $stageId));
+        return self::apiPost($url, array(
+            'source_stage_id' => $sourceStageId,
+            'auth_email' => self::authEmail(),
+        ));
+    }
+
+    /**
      * Chuyển các đội/VĐV từ vòng chung kết sang giai đoạn play-off.
      *
      * @param string $stageId giai đoạn play-off đích
