@@ -26,7 +26,6 @@ $hotelSchedule = array(
 // Các địa điểm vệ tinh (theo "Map các khu vực sự kiện Đại hội").
 $venues = array(
     'golf' => array(
-        'icon' => 'golf_course',
         'name' => 'Sân Golf Tràng An',
         'address' => 'Phú Long, Ninh Bình',
         'date' => '25.10.2026',
@@ -36,7 +35,6 @@ $venues = array(
         'map' => $mapUrl('Sân Golf Tràng An Phú Long Ninh Bình'),
     ),
     'stadium' => array(
-        'icon' => 'stadium',
         'name' => 'Nhà thi đấu tỉnh Ninh Bình',
         'address' => '320 Đinh Tiên Hoàng, Hoa Lư, Ninh Bình',
         'date' => '27 - 29.10.2026',
@@ -46,7 +44,6 @@ $venues = array(
         'map' => $mapUrl('Nhà thi đấu tỉnh Ninh Bình 320 Đinh Tiên Hoàng Hoa Lư'),
     ),
     'soccer' => array(
-        'icon' => 'sports_soccer',
         'name' => 'Sân bóng Teddy',
         'address' => 'Khu đô thị, Hoa Lư, Ninh Bình',
         'date' => '27 - 29.10.2026',
