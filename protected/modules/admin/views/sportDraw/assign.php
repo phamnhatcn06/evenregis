@@ -117,7 +117,7 @@ if ($isBracket) {
                     <div class="card-body team-zone p-2" id="team-pool" data-zone="pool" style="min-height:120px;">
                         <?php foreach ($teams as $t): ?>
                             <?php
-                            $assigned = $isGroup ? !empty($t['group_label']) : !empty($t['seed']);
+                            $assigned = $isGroup ? !empty($t['group_label']) : !empty($t['bracket_slot']);
                             if ($assigned) {
                                 continue;
                             }
