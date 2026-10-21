@@ -309,6 +309,13 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                             <i class="fa fa-sitemap me-1"></i>Sinh nhánh từ BXH
                         </button>
                     <?php endif; ?>
+                    <?php if ($playoffSource): ?>
+                        <button type="button" class="btn btn-sm btn-outline-warning" id="btn-reserve-playoff"
+                                data-source-stage-id="<?php echo (int) $playoffSource; ?>"
+                                title="Thêm slot giữ chỗ đội thắng play-off vào các bảng (không xáo lại đội đã bốc)">
+                            <i class="fa fa-user-plus me-1"></i>Đặt chỗ Play-off
+                        </button>
+                    <?php endif; ?>
                     <a href="<?php echo $this->createUrl('results', array('id' => $model->id)); ?>" class="btn btn-sm btn-success">
                         <i class="fa fa-pencil-square-o me-1"></i>Ghi kết quả (Màn riêng)
                     </a>
