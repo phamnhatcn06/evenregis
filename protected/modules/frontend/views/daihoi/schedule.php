@@ -1355,8 +1355,10 @@ $getSportMeta = function ($name) {
                     </div>
 
                   </div>
-                <?php endforeach; ?>
-              </div>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+              <?php endforeach; ?>
             </div>
           <?php endforeach; ?>
         </div>
