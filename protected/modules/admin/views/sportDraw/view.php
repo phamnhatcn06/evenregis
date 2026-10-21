@@ -369,6 +369,10 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                 $computed = array();
                 foreach ($members as $mem) {
                     $tid = $mem['team_id'];
+                    // Slot giữ chỗ play-off (team_id null) được bổ sung riêng ở bước sau
+                    if ($tid === null || $tid === '') {
+                        continue;
+                    }
                     $computed[$tid] = array(
                         'group_label' => $label,
                         'team_id' => $tid,
