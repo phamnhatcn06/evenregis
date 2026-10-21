@@ -75,9 +75,33 @@ class SportDrawController extends AdminController
 
         $preview = SportStages::fetchDrawPreview($id);
 
+        // Nguồn play-off để đặt chỗ trước vào vòng bảng (đã cấu hình, hoặc tự dò
+        // giai đoạn play-off duy nhất cùng nội dung). Chỉ áp dụng cho thể thức bảng.
+        $playoffSource = null;
+        if (SportStages::isGroupFormat($model->format)) {
+            if ($model->playoff_source_stage_id) {
+                $playoffSource = (int) $model->playoff_source_stage_id;
+            } else {
+                $siblings = SportStages::getApiDataProvider(array(
+                    'event_id' => $model->event_id,
+                    'sport_id' => $model->sport_id,
+                ), 200)->getData();
+                $playoffStages = array();
+                foreach ($siblings as $s) {
+                    if ($s->format === SportStages::FORMAT_PLAYOFF) {
+                        $playoffStages[] = (int) $s->id;
+                    }
+                }
+                if (count($playoffStages) === 1) {
+                    $playoffSource = $playoffStages[0];
+                }
+            }
+        }
+
         $this->render('view', array(
             'model' => $model,
             'preview' => $preview,
+            'playoffSource' => $playoffSource,
         ));
     }
 
