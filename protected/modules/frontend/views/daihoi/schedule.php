@@ -1145,9 +1145,40 @@ $getSportMeta = function ($name) {
                 </div>
               </div>
 
-              <!-- Lưới các trận đấu trong ngày -->
-              <div class="row g-3 date-matches-row">
-                <?php foreach ($dateMatches as $m): ?>
+              <!-- Gom nhóm các trận trong ngày theo bộ môn (nội dung) để tiện theo dõi -->
+              <?php
+              $matchesBySport = array();
+              $sportOrder = array();
+              foreach ($dateMatches as $m) {
+                  $sid = isset($m['sport_id']) ? $m['sport_id'] : 0;
+                  if (!isset($matchesBySport[$sid])) {
+                      $matchesBySport[$sid] = array();
+                      $sportOrder[] = $sid;
+                  }
+                  $matchesBySport[$sid][] = $m;
+              }
+              ?>
+              <?php foreach ($sportOrder as $sid): ?>
+                <?php
+                $sportMatches = $matchesBySport[$sid];
+                $firstM = $sportMatches[0];
+                $sportHeaderName = $firstM['sport_name'];
+                $sportHeaderIcon = !empty($firstM['sport_icon']) ? $firstM['sport_icon'] : 'emoji_events';
+                $sMetaHeader = $getSportMeta($sportHeaderName);
+                ?>
+                <div class="sport-subgroup" data-sport-id="<?php echo $sid; ?>">
+                  <!-- Thanh tiêu đề nội dung (bộ môn) -->
+                  <div class="sport-subgroup-header" style="--sport-accent:<?php echo $e($sMetaHeader['color']); ?>; --sport-accent-bg:<?php echo $e($sMetaHeader['bg_light']); ?>;">
+                    <span class="sport-subgroup-icon">
+                      <span class="material-symbols-outlined"><?php echo $e($sportHeaderIcon); ?></span>
+                    </span>
+                    <span class="sport-subgroup-name"><?php echo $e($sportHeaderName); ?></span>
+                    <span class="sport-subgroup-count"><?php echo count($sportMatches); ?> trận</span>
+                  </div>
+
+                  <!-- Lưới các trận đấu của nội dung này -->
+                  <div class="row g-3 date-matches-row">
+                    <?php foreach ($sportMatches as $m): ?>
                   <?php
                   $ta = $m['team_a']['name'];
                   $tb = $m['team_b']['name'];
