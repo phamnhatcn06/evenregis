@@ -2315,6 +2315,42 @@ $getSportMeta = function ($name) {
   background: var(--sport-accent-bg, #f1f5f9);
   border: 1px solid rgba(15, 23, 42, 0.06);
   border-left: 4px solid var(--sport-accent, #2563eb);
+  cursor: pointer;
+  user-select: none;
+  transition: box-shadow 0.15s ease, filter 0.15s ease;
+}
+.sport-subgroup-header:hover {
+  filter: brightness(0.98);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+.sport-subgroup-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sport-accent, #2563eb);
+}
+.sport-subgroup-toggle:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+.sport-subgroup-toggle .material-symbols-outlined {
+  font-size: 20px;
+  transition: transform 0.2s ease;
+}
+.sport-subgroup.collapsed .date-matches-row {
+  display: none !important;
+}
+.sport-subgroup.collapsed .sport-subgroup-header {
+  margin-bottom: 0;
+}
+.sport-subgroup.collapsed .sport-subgroup-toggle .material-symbols-outlined {
+  transform: rotate(180deg);
 }
 .sport-subgroup-icon {
   display: inline-flex;
