@@ -524,6 +524,7 @@ class ApiEndpoints
     const SPORT_DRAW_GROUPS = '/api/sport-draw/groups/{stageId}';
     const SPORT_DRAW_BRACKET = '/api/sport-draw/bracket/{stageId}';
     const SPORT_DRAW_STANDINGS = '/api/sport-draw/standings/{stageId}';
+    const SPORT_DRAW_RESERVE_PLAYOFF = '/api/sport-draw/reserve-playoff/{stageId}';
     const SPORT_DRAW_GENERATE_KNOCKOUT = '/api/sport-draw/generate-knockout/{stageId}';
     const SPORT_DRAW_LOCK = '/api/sport-draw/lock/{stageId}';
     // Gán thủ công (kéo-thả) đội vào bảng / vị trí seed nhánh
