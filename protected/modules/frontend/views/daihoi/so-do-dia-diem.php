@@ -42,6 +42,7 @@ $venues = array(
         'date' => '27 - 29.10.2026',
         'distance' => '2.4 km',
         'note' => 'Cầu lông · Bóng bàn · Kéo co',
+        'img' => $mascot . '/badminton.png',
         'map' => $mapUrl('Nhà thi đấu tỉnh Ninh Bình 320 Đinh Tiên Hoàng Hoa Lư'),
     ),
     'soccer' => array(
