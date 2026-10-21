@@ -52,6 +52,7 @@ $venues = array(
         'date' => '27 - 29.10.2026',
         'distance' => '2.3 km',
         'note' => 'Bóng đá',
+        'img' => $mascot . '/football.png',
         'map' => $mapUrl('Sân bóng Teddy Khu đô thị Hoa Lư Ninh Bình'),
     ),
 );
