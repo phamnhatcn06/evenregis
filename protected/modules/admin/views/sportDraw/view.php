@@ -15,6 +15,7 @@
  * @var int|null $playoffSource ID giai đoạn play-off nguồn (nếu có) để đặt chỗ trước
  */
 $playoffSource = isset($playoffSource) ? $playoffSource : null;
+$qualSource = isset($qualSource) ? $qualSource : null;
 
 $this->breadcrumbs = array(
     'Bốc thăm thi đấu' => $this->createUrl('index'),
