@@ -2794,7 +2794,9 @@ $getSportMeta = function ($name) {
   position: absolute;
   top: 0;
   height: 30px;
-  min-width: 34px;
+  width: max-content;      /* Thanh rộng vừa đủ nội dung để hiện hết tên trận */
+  min-width: 120px;
+  max-width: 340px;
   border-radius: 7px;
   padding: 0 7px;
   display: flex;
@@ -2806,6 +2808,7 @@ $getSportMeta = function ($name) {
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18);
   overflow: hidden;
   cursor: default;
+  white-space: nowrap;
   border: 1px solid rgba(255, 255, 255, 0.35);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
