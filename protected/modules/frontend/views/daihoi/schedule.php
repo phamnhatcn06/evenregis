@@ -3223,7 +3223,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (ganttJsonEl) ganttAllMatches = JSON.parse(ganttJsonEl.textContent || '[]');
   } catch (err) { ganttAllMatches = []; }
 
-  var GANTT_MATCH_DURATION = 30; // phút — thời lượng ước lượng mỗi trận để vẽ thanh
+  var GANTT_MATCH_DURATION = 30; // phút — thời lượng ước lượng mỗi trận (dùng cho đệm trục)
+  var GANTT_LANE_GAP = 45;       // phút — khoảng giữ chỗ mỗi trận khi xếp làn, tránh chồng chéo
   var VI_DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
 
   function hourToMinutes(hhmm) {
