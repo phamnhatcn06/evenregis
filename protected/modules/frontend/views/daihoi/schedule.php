@@ -3337,7 +3337,8 @@ document.addEventListener('DOMContentLoaded', function () {
       sportOrder.forEach(function (sid) {
         var items = bySport[sid].map(function (m) {
           var s = hourToMinutes(m.hour);
-          return { m: m, start: s, end: s + GANTT_MATCH_DURATION, lane: 0 };
+          // Dùng khoảng cách làn rộng hơn thời lượng để thanh nở theo nội dung không đè nhau
+          return { m: m, start: s, end: s + GANTT_LANE_GAP, lane: 0 };
         });
         var laneCount = assignLanes(items);
         var first = items[0].m;
