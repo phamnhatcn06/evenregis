@@ -2946,6 +2946,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (counterEl) counterEl.textContent = totalVisible;
     if (noMatchAlert) noMatchAlert.style.display = (totalVisible === 0) ? '' : 'none';
+
+    // Nếu đang ở chế độ Lịch biểu (Gantt) thì dựng lại biểu đồ theo bộ lọc hiện hành
+    if (currentViewMode === 'gantt') {
+      buildGantt();
+    }
   }
 
   // 1. Chuyển đổi môn thi đấu
