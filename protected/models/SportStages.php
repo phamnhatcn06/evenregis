@@ -41,6 +41,7 @@ class SportStages extends BaseSportStages
     public $tiebreak;
     public $ko_pairing;
     public $playoff_source_stage_id;
+    public $qual_source_stage_id;
 
     // Thuộc tính hiển thị
     public $sport_name;
