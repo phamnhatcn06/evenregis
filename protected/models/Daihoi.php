@@ -476,11 +476,27 @@ class Daihoi
                 'draw_status' => isset($stage['draw_status']) ? $stage['draw_status'] : 'not_drawn',
                 'rules' => isset($stage['rules']) ? $stage['rules'] : '',
                 'location' => isset($stage['location']) ? $stage['location'] : '',
+                'start_time' => isset($stage['start_time']) ? $stage['start_time'] : null,
             );
 
             // Bỏ qua nếu lọc theo môn khác
             if ($filterSportId && $sportId != $filterSportId) {
                 continue;
+            }
+
+            // Bơi: lịch theo nội dung — hiện cả khi chưa bốc lượt/làn
+            if (SportStages::isSwimFormat(isset($stage['format']) ? $stage['format'] : '')) {
+                $swimStart = !empty($stage['start_time']) ? strtotime($stage['start_time']) : 0;
+                $swimEvents[] = array(
+                    'stage_id' => $sId,
+                    'sport_id' => $sportId,
+                    'sport_name' => $sportName,
+                    'stage_name' => $stage['name'],
+                    'start_ts' => $swimStart,
+                    'start_hour' => $swimStart ? date('H:i', $swimStart) : '',
+                    'start_date' => $swimStart ? date('d/m/Y', $swimStart) : '',
+                    'location' => isset($stage['location']) ? $stage['location'] : '',
+                );
             }
 
             if (!empty($stage['draw_status']) && $stage['draw_status'] !== 'not_drawn') {
