@@ -2672,6 +2672,174 @@ $getSportMeta = function ($name) {
 @keyframes spin-anim {
   100% { transform: rotate(360deg); }
 }
+
+/* =====================================================================
+   BIỂU ĐỒ LỊCH BIỂU (GANTT)
+   ===================================================================== */
+.gantt-day-block {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+.gantt-day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a);
+  color: #fff;
+}
+.gantt-day-head .gantt-day-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.gantt-day-head .gantt-day-count {
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.gantt-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.gantt-inner {
+  min-width: 760px;
+}
+/* Thước thời gian (trục giờ) */
+.gantt-time-axis {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  z-index: 2;
+}
+.gantt-row-label-col {
+  width: 164px;
+  flex: 0 0 164px;
+  border-right: 1px solid #e2e8f0;
+  background: #f8fafc;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+.gantt-axis-track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 34px;
+}
+.gantt-axis-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed #e2e8f0;
+  font-size: 10.5px;
+  color: #64748b;
+  padding-left: 4px;
+  padding-top: 8px;
+  white-space: nowrap;
+}
+/* Hàng của mỗi nội dung (môn) */
+.gantt-sport-row {
+  display: flex;
+  border-bottom: 1px solid #f1f5f9;
+}
+.gantt-sport-row:last-child { border-bottom: 0; }
+.gantt-sport-label {
+  width: 164px;
+  flex: 0 0 164px;
+  border-right: 1px solid #e2e8f0;
+  background: #fff;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.gantt-sport-label .gantt-sport-icon {
+  width: 24px; height: 24px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.gantt-sport-label .gantt-sport-icon .material-symbols-outlined { font-size: 16px; }
+.gantt-sport-label .gantt-sport-text {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.15;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.gantt-sport-track {
+  position: relative;
+  flex: 1 1 auto;
+  background-image: repeating-linear-gradient(to right, transparent, transparent calc(var(--tick) - 1px), #f1f5f9 var(--tick));
+  padding: 6px 0;
+}
+.gantt-lane { position: relative; height: 30px; margin-bottom: 4px; }
+.gantt-lane:last-child { margin-bottom: 0; }
+/* Thanh trận đấu */
+.gantt-bar {
+  position: absolute;
+  top: 0;
+  height: 30px;
+  min-width: 34px;
+  border-radius: 7px;
+  padding: 0 7px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+  cursor: default;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.gantt-bar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.28);
+  z-index: 5;
+}
+.gantt-bar .gantt-bar-time {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 0 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.gantt-bar .gantt-bar-teams {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gantt-bar.is-live { animation: ganttLivePulse 1.6s ease-in-out infinite; }
+@keyframes ganttLivePulse {
+  0%, 100% { box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18); }
+  50% { box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35); }
+}
+.gantt-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #64748b;
+}
+@media (max-width: 575.98px) {
+  .gantt-row-label-col, .gantt-sport-label { width: 110px; flex-basis: 110px; }
+}
 </style>
 
 
