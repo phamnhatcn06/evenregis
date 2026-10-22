@@ -249,6 +249,21 @@ class SportStages extends BaseSportStages
     }
 
     /**
+     * Đặt chỗ trước đội đi tiếp của vòng loại (nhất bảng) vào vòng chung kết.
+     *
+     * @param string $stageId giai đoạn vòng chung kết đích
+     * @param int|null $qualStageId giai đoạn vòng loại nguồn (bỏ trống để tự dò)
+     */
+    public static function reserveGroupWinnerSlots($stageId, $qualStageId = null)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_RESERVE_GROUP_WINNERS, array('stageId' => $stageId));
+        return self::apiPost($url, array(
+            'qual_source_stage_id' => $qualStageId,
+            'auth_email' => self::authEmail(),
+        ));
+    }
+
+    /**
      * Chuyển các đội/VĐV từ vòng chung kết sang giai đoạn play-off.
      *
      * @param string $stageId giai đoạn play-off đích
