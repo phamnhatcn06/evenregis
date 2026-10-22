@@ -3356,7 +3356,7 @@ document.addEventListener('DOMContentLoaded', function () {
             + (m.location ? ' • ' + m.location : '')
             + ' • ' + m.status_text;
           barsHtml += '<div class="gantt-bar' + (m.status === 'live' ? ' is-live' : '') + '"'
-            + ' style="left:' + leftPct + '%;width:' + widthPct + '%;top:' + topPx + 'px;background:' + escHtml(m.color) + ';"'
+            + ' style="left:' + leftPct + '%;top:' + topPx + 'px;background:' + escHtml(m.color) + ';"'
             + ' title="' + escHtml(tip) + '">'
             + '<span class="gantt-bar-time">' + escHtml(m.hour) + '</span>'
             + '<span class="gantt-bar-teams">' + teams + '</span>'
