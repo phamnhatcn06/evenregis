@@ -3349,7 +3349,6 @@ document.addEventListener('DOMContentLoaded', function () {
         items.forEach(function (it) {
           var m = it.m;
           var leftPct = ((it.start - axisStart) / span) * 100;
-          var widthPct = (GANTT_MATCH_DURATION / span) * 100;
           var topPx = 6 + it.lane * 34;
           var teams = escHtml(m.team_a) + ' <span style="opacity:.75">vs</span> ' + escHtml(m.team_b);
           var tip = m.hour + ' • ' + m.team_a + ' vs ' + m.team_b
