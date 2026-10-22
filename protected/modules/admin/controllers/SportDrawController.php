@@ -918,11 +918,48 @@ class SportDrawController extends AdminController
     /**
      * Dropdown nội dung thi đấu (môn), con thụt lề theo cha.
      */
-    protected function getSportDropdown()
+    /**
+     * Danh sách nội dung thi đấu cho dropdown.
+     *
+     * Khi đã chọn sự kiện, chỉ lấy những nội dung được cấu hình (active) cho sự
+     * kiện đó qua event_sports. Giữ lại các nội dung cha của nội dung active để
+     * cây phân cấp (thụt lề) vẫn đúng.
+     */
+    protected function getSportDropdown($eventId = null)
     {
         $tree = Sports::buildTreeData();
+
+        $allowedIds = null;
+        if ($eventId) {
+            $activeSportIds = array();
+            foreach (EventSports::getByEventId($eventId) as $es) {
+                $sportId = isset($es['sport_id']) ? $es['sport_id'] : null;
+                if ($sportId) {
+                    $activeSportIds[$sportId] = true;
+                }
+            }
+
+            // Build map id => parent_id để truy ngược tổ tiên.
+            $parentOf = array();
+            foreach ($tree['items'] as $sport) {
+                $parentOf[$sport->id] = $sport->parent_id ? $sport->parent_id : 0;
+            }
+
+            $allowedIds = array();
+            foreach ($activeSportIds as $id => $_) {
+                $cursor = $id;
+                while ($cursor && !isset($allowedIds[$cursor])) {
+                    $allowedIds[$cursor] = true;
+                    $cursor = isset($parentOf[$cursor]) ? $parentOf[$cursor] : 0;
+                }
+            }
+        }
+
         $list = array();
         foreach ($tree['items'] as $sport) {
+            if ($allowedIds !== null && !isset($allowedIds[$sport->id])) {
+                continue;
+            }
             $level = isset($tree['levelMap'][$sport->id]) ? $tree['levelMap'][$sport->id] : 0;
             $prefix = str_repeat('— ', $level);
             $list[$sport->id] = $prefix . $sport->name;
