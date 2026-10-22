@@ -98,10 +98,35 @@ class SportDrawController extends AdminController
             }
         }
 
+        // Nguồn vòng loại để lấy đội nhất bảng vào vòng chung kết (đã cấu hình,
+        // hoặc tự dò giai đoạn vòng loại duy nhất cùng nội dung). Chỉ áp dụng cho
+        // giai đoạn chung kết thể thức vòng tròn.
+        $qualSource = null;
+        if ($model->stage_type === 'final' && SportStages::isGroupFormat($model->format)) {
+            if ($model->qual_source_stage_id) {
+                $qualSource = (int) $model->qual_source_stage_id;
+            } else {
+                $siblings = SportStages::getApiDataProvider(array(
+                    'event_id' => $model->event_id,
+                    'sport_id' => $model->sport_id,
+                ), 200)->getData();
+                $qualStages = array();
+                foreach ($siblings as $s) {
+                    if ($s->id != $model->id && $s->stage_type === 'qualification') {
+                        $qualStages[] = (int) $s->id;
+                    }
+                }
+                if (count($qualStages) === 1) {
+                    $qualSource = $qualStages[0];
+                }
+            }
+        }
+
         $this->render('view', array(
             'model' => $model,
             'preview' => $preview,
             'playoffSource' => $playoffSource,
+            'qualSource' => $qualSource,
         ));
     }
 
