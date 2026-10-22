@@ -58,7 +58,7 @@ class SportDrawController extends AdminController
             'eventId' => $eventId,
             'sportId' => $sportId,
             'eventList' => Events::getListForDropdown(),
-            'sportList' => $this->getSportDropdown(),
+            'sportList' => $this->getSportDropdown($eventId),
             'dataProvider' => $dataProvider,
         ));
     }
