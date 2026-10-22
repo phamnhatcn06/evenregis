@@ -3286,20 +3286,24 @@ document.addEventListener('DOMContentLoaded', function () {
       if (currentDate && m.date !== currentDate) return false;
       if (currentStatus && m.status !== currentStatus) return false;
       if (searchLower && (m.search || '').indexOf(searchLower) === -1) return false;
-      if (hourToMinutes(m.hour) === null) return false; // không có giờ thì không vẽ được trên trục
       return true;
     });
 
-    if (!filtered.length) {
+    // Tách trận đã xếp giờ (vẽ trên trục) và trận chưa xếp giờ (liệt kê riêng để
+    // không bỏ sót trận nào trên lịch biểu).
+    var timedMatches = filtered.filter(function (m) { return hourToMinutes(m.hour) !== null; });
+    var untimedMatches = filtered.filter(function (m) { return hourToMinutes(m.hour) === null; });
+
+    if (!timedMatches.length && !untimedMatches.length) {
       ganttBody.innerHTML = '<div class="gantt-empty"><span class="material-symbols-outlined" style="font-size:40px;color:#cbd5e1;">schedule</span>'
-        + '<div class="fw-bold text-dark mt-2">Chưa có trận nào đã xếp giờ để hiển thị lịch biểu</div>'
-        + '<div class="small">Các trận chưa ấn định giờ sẽ không xuất hiện trên trục thời gian.</div></div>';
+        + '<div class="fw-bold text-dark mt-2">Chưa có trận nào để hiển thị lịch biểu</div>'
+        + '<div class="small">Lịch thi đấu đang được Ban Tổ chức cập nhật.</div></div>';
       return;
     }
 
     // Gom theo ngày
     var byDate = {};
-    filtered.forEach(function (m) {
+    timedMatches.forEach(function (m) {
       var k = m.date || '__no_date__';
       (byDate[k] = byDate[k] || []).push(m);
     });
