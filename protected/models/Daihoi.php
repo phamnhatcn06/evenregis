@@ -735,9 +735,20 @@ class Daihoi
             }
         }
 
-        if (empty($matches) && empty($swimBySport)) {
+        if (empty($matches) && empty($swimBySport) && empty($swimEvents)) {
             return self::getFallbackTournamentSchedule($filterSportId);
         }
+
+        // Nội dung đã có giờ lên trước theo thứ tự thời gian; chưa có giờ xếp cuối
+        usort($swimEvents, function ($a, $b) {
+            if ($a['start_ts'] && $b['start_ts']) {
+                return $a['start_ts'] - $b['start_ts'];
+            }
+            if ($a['start_ts'] xor $b['start_ts']) {
+                return $a['start_ts'] ? -1 : 1;
+            }
+            return $a['stage_id'] - $b['stage_id'];
+        });
 
         return array(
             'stats' => array(
