@@ -70,6 +70,7 @@ $allMatches = isset($tournament['matches']) ? $tournament['matches'] : array();
 $sportsList = isset($tournament['sports']) ? $tournament['sports'] : array();
 $standingsBySport = isset($tournament['standingsBySport']) ? $tournament['standingsBySport'] : array();
 $swimBySport = isset($tournament['swimBySport']) ? $tournament['swimBySport'] : array();
+$swimEvents = isset($tournament['swimEvents']) ? $tournament['swimEvents'] : array();
 
 // Đổi mili-giây sang chuỗi thành tích bơi (m:ss.cc hoặc ss.cc)
 $fmtSwimTime = function ($ms) {
