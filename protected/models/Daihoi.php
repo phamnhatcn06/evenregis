@@ -571,6 +571,13 @@ class Daihoi
                     }
 
                     foreach ($preview['matches'] as $m) {
+                        // Ẩn các trận "giữ chỗ" chưa xác định cả hai đội (slot reserve
+                        // đội thắng play-off / nhất bảng vòng loại, khung nhánh chờ...).
+                        // Chỉ hiển thị công khai khi đã biết ít nhất một phía.
+                        if (empty($m['team_a_id']) && empty($m['team_b_id'])) {
+                            continue;
+                        }
+
                         $mId = $m['id'];
                         $res = isset($m['result']) ? $m['result'] : null;
                         $hasScore = ($res && $res['score_a'] !== null && $res['score_b'] !== null && $res['score_a'] !== '' && $res['score_b'] !== '');
