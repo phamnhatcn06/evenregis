@@ -662,6 +662,22 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Tạo slot lấy đội nhất bảng vòng loại vào vòng chung kết (AJAX).
+     * Thêm các slot giữ chỗ "Nhất bảng A/B/C" + sinh lịch vòng tròn; đội thật tự
+     * điền khi bảng vòng loại tương ứng đá xong.
+     */
+    public function actionReserveGroupWinners($id)
+    {
+        $this->requirePost();
+        $qualStageId = Yii::app()->getRequest()->getPost('qual_source_stage_id');
+        $result = SportStages::reserveGroupWinnerSlots($id, $qualStageId ? (int) $qualStageId : null);
+        if (!empty($result['success'])) {
+            $this->jsonResponse(true, 'Đã tạo slot lấy đội nhất bảng vào vòng chung kết.', isset($result['data']) ? $result['data'] : null);
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể tạo slot vòng chung kết.'));
+    }
+
+    /**
      * Danh sách VĐV/đội ở vòng chung kết của nội dung (để chọn đưa vào play-off) (AJAX).
      */
     public function actionPlayoffEntrants($id)
