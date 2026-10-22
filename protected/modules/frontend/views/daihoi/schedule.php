@@ -3170,20 +3170,34 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // 6. Chuyển đổi chế độ xem: Thẻ (Cards) vs Danh sách gọn (Compact)
+  // 6. Chuyển đổi chế độ xem: Thẻ (Cards) / Danh sách gọn (Compact) / Lịch biểu (Gantt)
   function setViewMode(mode) {
     currentViewMode = mode;
     var cardElements = document.querySelectorAll('.match-card');
     var compactElements = document.querySelectorAll('.match-compact-row');
 
+    [btnViewCards, btnViewCompact, btnViewGantt].forEach(function (b) {
+      if (b) b.classList.remove('active');
+    });
+
+    if (mode === 'gantt') {
+      if (btnViewGantt) btnViewGantt.classList.add('active');
+      if (matchesGridContainer) matchesGridContainer.style.display = 'none';
+      if (ganttContainer) ganttContainer.style.display = '';
+      buildGantt();
+      return;
+    }
+
+    // Các chế độ dựa trên thẻ (hiển thị lại lưới, ẩn Gantt)
+    if (matchesGridContainer) matchesGridContainer.style.display = '';
+    if (ganttContainer) ganttContainer.style.display = 'none';
+
     if (mode === 'compact') {
       if (btnViewCompact) btnViewCompact.classList.add('active');
-      if (btnViewCards) btnViewCards.classList.remove('active');
       cardElements.forEach(function (el) { el.style.display = 'none'; });
       compactElements.forEach(function (el) { el.style.display = ''; });
     } else {
       if (btnViewCards) btnViewCards.classList.add('active');
-      if (btnViewCompact) btnViewCompact.classList.remove('active');
       cardElements.forEach(function (el) { el.style.display = ''; });
       compactElements.forEach(function (el) { el.style.display = 'none'; });
     }
@@ -3194,6 +3208,180 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   if (btnViewCompact) {
     btnViewCompact.addEventListener('click', function () { setViewMode('compact'); });
+  }
+  if (btnViewGantt) {
+    btnViewGantt.addEventListener('click', function () { setViewMode('gantt'); });
+  }
+
+  // 6.1 Dựng biểu đồ Lịch biểu (Gantt) từ dữ liệu trận đấu, áp dụng bộ lọc hiện hành
+  var ganttAllMatches = [];
+  try {
+    var ganttJsonEl = document.getElementById('gantt-data-json');
+    if (ganttJsonEl) ganttAllMatches = JSON.parse(ganttJsonEl.textContent || '[]');
+  } catch (err) { ganttAllMatches = []; }
+
+  var GANTT_MATCH_DURATION = 30; // phút — thời lượng ước lượng mỗi trận để vẽ thanh
+  var VI_DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+
+  function hourToMinutes(hhmm) {
+    if (!hhmm) return null;
+    var p = String(hhmm).split(':');
+    if (p.length < 2) return null;
+    var h = parseInt(p[0], 10), m = parseInt(p[1], 10);
+    if (isNaN(h) || isNaN(m)) return null;
+    return h * 60 + m;
+  }
+
+  function minutesToHour(mins) {
+    var h = Math.floor(mins / 60), m = mins % 60;
+    return (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m);
+  }
+
+  function formatGanttDate(dateStr) {
+    if (!dateStr) return 'Chưa ấn định ngày';
+    var d = new Date(dateStr + 'T00:00:00');
+    if (isNaN(d.getTime())) return dateStr;
+    return VI_DAYS[d.getDay()] + ', ngày ' + ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + '/' + d.getFullYear();
+  }
+
+  function escHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // Xếp các trận vào các làn (lane) để tránh chồng chéo khi trùng giờ trong cùng một môn
+  function assignLanes(items) {
+    var lanes = []; // mỗi lane giữ thời điểm kết thúc muộn nhất
+    items.sort(function (a, b) { return a.start - b.start; });
+    items.forEach(function (it) {
+      var placed = false;
+      for (var i = 0; i < lanes.length; i++) {
+        if (it.start >= lanes[i]) {
+          it.lane = i;
+          lanes[i] = it.end;
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        it.lane = lanes.length;
+        lanes.push(it.end);
+      }
+    });
+    return lanes.length || 1;
+  }
+
+  function buildGantt() {
+    if (!ganttBody) return;
+    var searchLower = currentSearch.trim().toLowerCase();
+
+    // Lọc theo bộ lọc hiện hành (môn, ngày, trạng thái, tìm kiếm)
+    var filtered = ganttAllMatches.filter(function (m) {
+      if (currentSportId && String(m.sport_id) !== String(currentSportId)) return false;
+      if (currentDate && m.date !== currentDate) return false;
+      if (currentStatus && m.status !== currentStatus) return false;
+      if (searchLower && (m.search || '').indexOf(searchLower) === -1) return false;
+      if (hourToMinutes(m.hour) === null) return false; // không có giờ thì không vẽ được trên trục
+      return true;
+    });
+
+    if (!filtered.length) {
+      ganttBody.innerHTML = '<div class="gantt-empty"><span class="material-symbols-outlined" style="font-size:40px;color:#cbd5e1;">schedule</span>'
+        + '<div class="fw-bold text-dark mt-2">Chưa có trận nào đã xếp giờ để hiển thị lịch biểu</div>'
+        + '<div class="small">Các trận chưa ấn định giờ sẽ không xuất hiện trên trục thời gian.</div></div>';
+      return;
+    }
+
+    // Gom theo ngày
+    var byDate = {};
+    filtered.forEach(function (m) {
+      var k = m.date || '__no_date__';
+      (byDate[k] = byDate[k] || []).push(m);
+    });
+    var dateKeys = Object.keys(byDate).sort();
+
+    var html = '';
+    dateKeys.forEach(function (dateKey) {
+      var dayMatches = byDate[dateKey];
+
+      // Khung giờ của ngày: làm tròn xuống/lên theo giờ, tối thiểu 1 giờ đệm hai đầu
+      var mins = dayMatches.map(function (m) { return hourToMinutes(m.hour); });
+      var minStart = Math.min.apply(null, mins);
+      var maxEnd = Math.max.apply(null, mins) + GANTT_MATCH_DURATION;
+      var axisStart = Math.floor(minStart / 60) * 60;
+      var axisEnd = Math.ceil(maxEnd / 60) * 60;
+      if (axisEnd - axisStart < 120) axisEnd = axisStart + 120; // tối thiểu 2 giờ cho dễ nhìn
+      var span = axisEnd - axisStart;
+
+      // Trục giờ (ticks theo từng giờ)
+      var tickPct = (60 / span) * 100;
+      var axisTicks = '';
+      for (var t = axisStart; t < axisEnd; t += 60) {
+        var leftPct = ((t - axisStart) / span) * 100;
+        axisTicks += '<span class="gantt-axis-tick" style="left:' + leftPct + '%;">' + minutesToHour(t) + '</span>';
+      }
+
+      // Gom theo môn (nội dung) giữ thứ tự xuất hiện
+      var bySport = {}, sportOrder = [];
+      dayMatches.forEach(function (m) {
+        var sid = String(m.sport_id);
+        if (!bySport[sid]) { bySport[sid] = []; sportOrder.push(sid); }
+        bySport[sid].push(m);
+      });
+
+      var rowsHtml = '';
+      sportOrder.forEach(function (sid) {
+        var items = bySport[sid].map(function (m) {
+          var s = hourToMinutes(m.hour);
+          return { m: m, start: s, end: s + GANTT_MATCH_DURATION, lane: 0 };
+        });
+        var laneCount = assignLanes(items);
+        var first = items[0].m;
+        var trackHeight = laneCount * 30 + (laneCount - 1) * 4 + 12;
+
+        var barsHtml = '';
+        items.forEach(function (it) {
+          var m = it.m;
+          var leftPct = ((it.start - axisStart) / span) * 100;
+          var widthPct = (GANTT_MATCH_DURATION / span) * 100;
+          var topPx = 6 + it.lane * 34;
+          var teams = escHtml(m.team_a) + ' <span style="opacity:.75">vs</span> ' + escHtml(m.team_b);
+          var tip = m.hour + ' • ' + m.team_a + ' vs ' + m.team_b
+            + (m.round ? ' • ' + m.round : '')
+            + (m.location ? ' • ' + m.location : '')
+            + ' • ' + m.status_text;
+          barsHtml += '<div class="gantt-bar' + (m.status === 'live' ? ' is-live' : '') + '"'
+            + ' style="left:' + leftPct + '%;width:' + widthPct + '%;top:' + topPx + 'px;background:' + escHtml(m.color) + ';"'
+            + ' title="' + escHtml(tip) + '">'
+            + '<span class="gantt-bar-time">' + escHtml(m.hour) + '</span>'
+            + '<span class="gantt-bar-teams">' + teams + '</span>'
+            + '</div>';
+        });
+
+        rowsHtml += '<div class="gantt-sport-row">'
+          + '<div class="gantt-sport-label">'
+          + '<span class="gantt-sport-icon" style="background:' + escHtml(first.bg) + ';color:' + escHtml(first.color) + ';">'
+          + '<span class="material-symbols-outlined">' + escHtml(first.sport_icon) + '</span></span>'
+          + '<span class="gantt-sport-text" title="' + escHtml(first.sport_name) + '">' + escHtml(first.sport_name) + '</span>'
+          + '</div>'
+          + '<div class="gantt-sport-track" style="height:' + trackHeight + 'px;--tick:' + tickPct + '%;">' + barsHtml + '</div>'
+          + '</div>';
+      });
+
+      html += '<div class="gantt-day-block">'
+        + '<div class="gantt-day-head">'
+        + '<span class="gantt-day-title">' + escHtml(formatGanttDate(dateKey === '__no_date__' ? '' : dateKey)) + '</span>'
+        + '<span class="gantt-day-count">' + dayMatches.length + ' trận</span>'
+        + '</div>'
+        + '<div class="gantt-scroll"><div class="gantt-inner">'
+        + '<div class="gantt-time-axis"><div class="gantt-row-label-col"></div><div class="gantt-axis-track">' + axisTicks + '</div></div>'
+        + rowsHtml
+        + '</div></div>'
+        + '</div>';
+    });
+
+    ganttBody.innerHTML = html;
   }
 
   // 7. Nút Làm Mới Dữ Liệu
