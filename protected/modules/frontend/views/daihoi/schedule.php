@@ -389,6 +389,10 @@ $getSportMeta = function ($name) {
                 <span class="material-symbols-outlined fs-6 align-middle me-1">format_list_bulleted</span>
                 <span>Danh sách</span>
               </button>
+              <button type="button" class="view-mode-btn" id="btn-view-gantt" title="Xem dạng lịch biểu thời gian (Gantt)">
+                <span class="material-symbols-outlined fs-6 align-middle me-1">view_timeline</span>
+                <span>Lịch biểu</span>
+              </button>
             </div>
           </div>
         </div>
