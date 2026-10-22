@@ -766,6 +766,7 @@ class Daihoi
             'upcomingMatches' => $upcomingMatches,
             'standingsBySport' => $standingsBySport,
             'swimBySport' => $swimBySport,
+            'swimEvents' => $swimEvents,
         );
     }
 
