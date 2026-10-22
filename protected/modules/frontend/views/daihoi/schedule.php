@@ -2840,6 +2840,39 @@ $getSportMeta = function ($name) {
   padding: 2.5rem 1rem;
   color: #64748b;
 }
+/* Khối "Chưa xếp giờ": liệt kê các trận chưa có khung giờ dạng chip */
+.gantt-untimed-inner {
+  min-width: 0;
+  padding: 6px 4px;
+}
+.gantt-untimed-track {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-content: flex-start;
+  padding: 4px 0;
+}
+.gantt-untimed-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--chip-c, #334155);
+  background: var(--chip-bg, #f1f5f9);
+  border: 1px solid color-mix(in srgb, var(--chip-c, #94a3b8) 35%, transparent);
+  white-space: nowrap;
+}
+.gantt-untimed-chip.is-live {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, .25);
+}
+@media (max-width: 575.98px) {
+  .gantt-row-label-col, .gantt-sport-label { width: 110px; flex-basis: 110px; }
+}
 @media (max-width: 575.98px) {
   .gantt-row-label-col, .gantt-sport-label { width: 110px; flex-basis: 110px; }
 }
