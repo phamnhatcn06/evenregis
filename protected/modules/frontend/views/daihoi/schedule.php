@@ -1368,6 +1368,46 @@ $getSportMeta = function ($name) {
           <?php endforeach; ?>
         </div>
 
+        <!-- =================================================================
+             BIỂU ĐỒ LỊCH BIỂU (GANTT) — Tổng thể thời gian thi đấu theo ngày
+             Giúp 1 VĐV tham gia nhiều môn nhìn thấy các khung giờ trùng nhau
+             ================================================================= -->
+        <?php
+        // Chuẩn bị dữ liệu trận đấu cho biểu đồ Gantt (JS sẽ dựng và lọc theo bộ lọc hiện hành)
+        $ganttData = array();
+        foreach ($allMatches as $m) {
+            $meta = $getSportMeta($m['sport_name']);
+            $ta = $m['team_a']['name'];
+            $tb = $m['team_b']['name'];
+            $ganttData[] = array(
+                'sport_id'    => isset($m['sport_id']) ? $m['sport_id'] : 0,
+                'sport_name'  => $m['sport_name'],
+                'sport_icon'  => !empty($m['sport_icon']) ? $m['sport_icon'] : $meta['icon'],
+                'color'       => $meta['color'],
+                'bg'          => $meta['bg_light'],
+                'date'        => !empty($m['match_date']) ? $m['match_date'] : '',
+                'hour'        => !empty($m['match_hour']) ? $m['match_hour'] : '',
+                'team_a'      => $ta,
+                'team_b'      => $tb,
+                'round'       => isset($m['round']) ? $m['round'] : '',
+                'location'    => isset($m['location']) ? $m['location'] : '',
+                'status'      => $m['status'],
+                'status_text' => $m['status_text'],
+                'search'      => mb_strtolower($m['sport_name'] . ' ' . $m['round'] . ' ' . $ta . ' ' . $tb . ' ' . $m['location'] . ' ' . $m['stage_name'], 'UTF-8'),
+            );
+        }
+        ?>
+        <div id="gantt-view-container" style="display:none;">
+          <div class="gantt-legend-bar d-flex flex-wrap align-items-center gap-2 mb-3">
+            <span class="text-muted small d-inline-flex align-items-center gap-1 me-1">
+              <span class="material-symbols-outlined fs-6 text-primary">info</span>
+              Mỗi thanh là một trận đấu, đặt theo khung giờ bắt đầu. Cuộn ngang để xem các giờ khác nhau.
+            </span>
+          </div>
+          <div id="gantt-chart-body"></div>
+        </div>
+        <script type="application/json" id="gantt-data-json"><?php echo json_encode($ganttData, JSON_UNESCAPED_UNICODE); ?></script>
+
         <!-- Thông báo khi lọc không tìm thấy kết quả -->
         <div id="no-filter-match-alert" class="card border-0 rounded-4 shadow-sm p-5 text-center bg-white mt-3" style="display:none;">
           <div class="empty-icon-circle mx-auto mb-2 rounded-circle bg-slate-100 text-muted d-flex align-items-center justify-content-center" style="width:64px;height:64px;">
