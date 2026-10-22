@@ -3389,6 +3389,50 @@ document.addEventListener('DOMContentLoaded', function () {
         + '</div>';
     });
 
+    // Khối "Chưa xếp giờ": các trận chưa có khung giờ (giữ chỗ, chờ xác định...)
+    // vẫn được liệt kê để hiển thị đầy đủ tất cả các trận.
+    if (untimedMatches.length) {
+      var bySportU = {}, sportOrderU = [];
+      untimedMatches.forEach(function (m) {
+        var sid = String(m.sport_id);
+        if (!bySportU[sid]) { bySportU[sid] = []; sportOrderU.push(sid); }
+        bySportU[sid].push(m);
+      });
+
+      var rowsU = '';
+      sportOrderU.forEach(function (sid) {
+        var arr = bySportU[sid];
+        var first = arr[0];
+        var chips = arr.map(function (m) {
+          var teams = escHtml(m.team_a) + ' <span style="opacity:.7">vs</span> ' + escHtml(m.team_b);
+          var tip = m.team_a + ' vs ' + m.team_b
+            + (m.round ? ' • ' + m.round : '')
+            + (m.location ? ' • ' + m.location : '')
+            + ' • ' + m.status_text;
+          return '<span class="gantt-untimed-chip' + (m.status === 'live' ? ' is-live' : '') + '"'
+            + ' style="--chip-c:' + escHtml(m.color) + ';--chip-bg:' + escHtml(m.bg) + ';"'
+            + ' title="' + escHtml(tip) + '">' + teams + '</span>';
+        }).join('');
+
+        rowsU += '<div class="gantt-sport-row">'
+          + '<div class="gantt-sport-label">'
+          + '<span class="gantt-sport-icon" style="background:' + escHtml(first.bg) + ';color:' + escHtml(first.color) + ';">'
+          + '<span class="material-symbols-outlined">' + escHtml(first.sport_icon) + '</span></span>'
+          + '<span class="gantt-sport-text" title="' + escHtml(first.sport_name) + '">' + escHtml(first.sport_name) + '</span>'
+          + '</div>'
+          + '<div class="gantt-untimed-track">' + chips + '</div>'
+          + '</div>';
+      });
+
+      html += '<div class="gantt-day-block">'
+        + '<div class="gantt-day-head">'
+        + '<span class="gantt-day-title"><span class="material-symbols-outlined fs-6 align-middle me-1">schedule</span>Chưa xếp giờ</span>'
+        + '<span class="gantt-day-count">' + untimedMatches.length + ' trận</span>'
+        + '</div>'
+        + '<div class="gantt-scroll"><div class="gantt-inner gantt-untimed-inner">' + rowsU + '</div></div>'
+        + '</div>';
+    }
+
     ganttBody.innerHTML = html;
   }
 
