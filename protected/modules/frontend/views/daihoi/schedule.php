@@ -2873,9 +2873,6 @@ $getSportMeta = function ($name) {
 @media (max-width: 575.98px) {
   .gantt-row-label-col, .gantt-sport-label { width: 110px; flex-basis: 110px; }
 }
-@media (max-width: 575.98px) {
-  .gantt-row-label-col, .gantt-sport-label { width: 110px; flex-basis: 110px; }
-}
 </style>
 
 
