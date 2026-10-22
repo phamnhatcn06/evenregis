@@ -30,6 +30,12 @@
                         )); ?>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Giờ bắt đầu thi đấu <span class="text-muted">(không bắt buộc)</span></label>
+                        <input type="datetime-local" class="form-control" name="SportStages[start_time]" id="cfg-start-time">
+                        <small class="text-muted">Hiển thị trên trang Lịch thi đấu công khai (dùng cho nội dung bơi).</small>
+                    </div>
+
                     <div class="row g-3 cfg-group-fields d-none">
                         <div class="col-6">
                             <label class="form-label">Số bảng</label>
