@@ -843,6 +843,57 @@
         });
     }
 
+    // Lấy đội nhất bảng vòng loại vào vòng chung kết (tạo slot ảo + tự điền sau)
+    var reserveGroupWinnersUrl = rootEl ? rootEl.getAttribute('data-reserve-group-winners-url') : '';
+    var btnReserveGroupWinners = document.getElementById('btn-reserve-group-winners');
+    if (btnReserveGroupWinners && reserveGroupWinnersUrl) {
+        btnReserveGroupWinners.addEventListener('click', function () {
+            var qualStageId = btnReserveGroupWinners.getAttribute('data-qual-source-stage-id') || '';
+            var confirmMsg = 'Tạo slot giữ chỗ "Nhất bảng" cho mỗi bảng vòng loại và sinh lịch vòng tròn giữa chúng?\n' +
+                'Đội thật sẽ tự điền vào khi bảng vòng loại tương ứng đá xong.';
+
+            var run = function () {
+                var origHtml = btnReserveGroupWinners.innerHTML;
+                btnReserveGroupWinners.disabled = true;
+                btnReserveGroupWinners.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Đang tạo slot...';
+
+                var fd = new FormData();
+                if (qualStageId) fd.append('qual_source_stage_id', qualStageId);
+
+                fetch(reserveGroupWinnersUrl, { method: 'POST', body: fd })
+                    .then(function (r) { return r.json(); })
+                    .then(function (res) {
+                        if (res && res.success) {
+                            showToast(res.message || 'Đã tạo slot lấy đội nhất bảng vào vòng chung kết.', 'success');
+                            setTimeout(function () { window.location.reload(); }, 600);
+                        } else {
+                            btnReserveGroupWinners.disabled = false;
+                            btnReserveGroupWinners.innerHTML = origHtml;
+                            showToast(res ? (res.message || 'Không thể tạo slot vòng chung kết.') : 'Lỗi.', 'error');
+                        }
+                    })
+                    .catch(function (err) {
+                        btnReserveGroupWinners.disabled = false;
+                        btnReserveGroupWinners.innerHTML = origHtml;
+                        showToast('Lỗi kết nối: ' + err.message, 'error');
+                    });
+            };
+
+            if (window.Swal && typeof window.Swal.fire === 'function') {
+                window.Swal.fire({
+                    title: 'Lấy Nhất bảng vòng loại',
+                    text: confirmMsg,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Tạo slot',
+                    cancelButtonText: 'Hủy'
+                }).then(function (result) { if (result.isConfirmed) run(); });
+            } else if (confirm(confirmMsg)) {
+                run();
+            }
+        });
+    }
+
     /* ==========================================================================
        4. KÉO THẢ SẮP XẾP CÁC TRẬN ĐẤU (HTML5 DRAG & DROP)
        ========================================================================== */
