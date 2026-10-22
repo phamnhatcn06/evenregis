@@ -365,6 +365,19 @@ class SportStages extends BaseSportStages
         return $format === self::FORMAT_HEAT_LANE;
     }
 
+    /**
+     * Chuẩn hoá giờ bắt đầu: nhận "Y-m-d\TH:i" (input datetime-local) hoặc "Y-m-d H:i:s",
+     * trả "Y-m-d H:i:s"; rỗng/không hợp lệ → null.
+     */
+    public static function normalizeStartTime($value)
+    {
+        if ($value === null || trim((string) $value) === '') {
+            return null;
+        }
+        $ts = strtotime(str_replace('T', ' ', (string) $value));
+        return $ts ? date('Y-m-d H:i:s', $ts) : null;
+    }
+
     public static function computeStandings($stageId)
     {
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_DRAW_STANDINGS, array('stageId' => $stageId));
