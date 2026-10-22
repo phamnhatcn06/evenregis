@@ -2862,7 +2862,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var btnViewCards = document.getElementById('btn-view-cards');
   var btnViewCompact = document.getElementById('btn-view-compact');
+  var btnViewGantt = document.getElementById('btn-view-gantt');
   var matchesGridContainer = document.getElementById('matches-grid-container');
+  var ganttContainer = document.getElementById('gantt-view-container');
+  var ganttBody = document.getElementById('gantt-chart-body');
 
   var btnManualRefresh = document.getElementById('btn-manual-refresh');
   var btnBackToTop = document.getElementById('btn-back-to-top');
