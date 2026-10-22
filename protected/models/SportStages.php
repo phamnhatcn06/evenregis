@@ -175,6 +175,8 @@ class SportStages extends BaseSportStages
         $data['playoff_source_stage_id'] = ($this->playoff_source_stage_id !== null && $this->playoff_source_stage_id !== '')
             ? (int) $this->playoff_source_stage_id
             : null;
+        // Giờ bắt đầu: gửi cả null để cho phép xoá giờ đã nhập.
+        $data['start_time'] = self::normalizeStartTime($this->start_time);
         if ($this->rules !== null && $this->rules !== '') {
             $data['rules'] = $this->rules;
         }
