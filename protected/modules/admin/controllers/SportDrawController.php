@@ -405,11 +405,13 @@ class SportDrawController extends AdminController
                 continue;
             }
             $players = (isset($t['player_names']) && is_array($t['player_names'])) ? $t['player_names'] : array();
+            $phones = (isset($t['player_phones']) && is_array($t['player_phones'])) ? $t['player_phones'] : array();
             $result[$tid] = array(
                 'team_id' => $tid,
                 'name' => isset($t['team_name']) ? $t['team_name'] : null,
                 'property_name' => isset($t['property_name']) ? $t['property_name'] : null,
                 'players' => $players,
+                'phones' => $phones,
                 'captain' => isset($t['captain_name']) ? $t['captain_name'] : null,
                 // Trưởng đoàn chưa có trong dữ liệu bốc thăm -> để trống cho điền tay.
                 'team_lead' => null,
