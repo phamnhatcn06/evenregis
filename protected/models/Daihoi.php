@@ -718,6 +718,15 @@ class Daihoi
             }
             if ($aTime && !$bTime) return -1;
             if (!$aTime && $bTime) return 1;
+            // Mục bơi (id dạng "swim-<stage>") chưa có giờ xếp sau các trận chưa có giờ
+            $aSwim = isset($a['kind']) && $a['kind'] === 'swim';
+            $bSwim = isset($b['kind']) && $b['kind'] === 'swim';
+            if ($aSwim !== $bSwim) {
+                return $aSwim ? 1 : -1;
+            }
+            if ($aSwim) {
+                return (int) $a['stage_id'] - (int) $b['stage_id'];
+            }
             return $a['id'] - $b['id'];
         });
 
