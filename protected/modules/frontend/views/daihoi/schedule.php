@@ -1389,6 +1389,7 @@ $getSportMeta = function ($name) {
                           </span>
                           <span class="small fw-bold text-start text-truncate <?php echo $isWinnerB ? 'text-success' : 'text-dark'; ?>" style="max-width:210px;" title="<?php echo $e($tb); ?>"><?php echo $e($tb); ?></span>
                         </div>
+                        <?php endif; ?>
 
                         <div class="d-flex align-items-center gap-2 flex-shrink-0">
                           <span class="badge <?php echo $statusBadgeBg; ?> rounded-pill px-2 py-0.5 small"><?php echo $e($statusText); ?></span>
