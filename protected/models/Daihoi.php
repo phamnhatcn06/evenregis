@@ -756,7 +756,77 @@ class Daihoi
             'upcomingMatches' => $upcomingMatches,
             'standingsBySport' => $standingsBySport,
             'swimBySport' => $swimBySport,
-            'swimEvents' => $swimEvents,
+        );
+    }
+
+    /**
+     * Một nội dung bơi (giai đoạn heat_lane) thành một mục lịch cùng cấu trúc với trận đấu,
+     * để nằm chung timeline ngày / bộ lọc / Gantt với các môn khác. Giờ + địa điểm lấy từ giai đoạn.
+     *
+     * @param array $stage
+     * @param array $preview Kết quả SPORT_DRAW_PREVIEW (teams, swim_heats)
+     * @return array
+     */
+    protected static function buildSwimScheduleItem($stage, $preview, $sportName, $sportCode, $icon)
+    {
+        $heats = !empty($preview['swim_heats']) ? $preview['swim_heats'] : array();
+        $athleteCount = !empty($preview['teams']) ? count($preview['teams']) : 0;
+        $laneTotal = 0;
+        $laneDone = 0;
+        foreach ($heats as $heat) {
+            foreach ((isset($heat['lanes']) ? $heat['lanes'] : array()) as $lane) {
+                $laneTotal++;
+                if (isset($lane['result_ms']) && $lane['result_ms'] !== null && $lane['result_ms'] !== '') {
+                    $laneDone++;
+                }
+            }
+        }
+        if (!$athleteCount) {
+            $athleteCount = $laneTotal;
+        }
+
+        $startTs = !empty($stage['start_time']) ? strtotime($stage['start_time']) : 0;
+        if ($laneTotal > 0 && $laneDone === $laneTotal) {
+            list($status, $statusText, $statusCls) = array('completed', 'Đã kết thúc', 'bg-secondary text-white');
+        } elseif ($startTs) {
+            list($status, $statusText, $statusCls) = array('scheduled', 'Đã xếp giờ', 'bg-info text-white');
+        } else {
+            list($status, $statusText, $statusCls) = array('upcoming', 'Sắp diễn ra', 'bg-primary text-white');
+        }
+
+        $summary = $athleteCount . ' VĐV';
+        if (!empty($heats)) {
+            $summary .= ' • ' . count($heats) . ' lượt';
+        }
+
+        return array(
+            'kind' => 'swim',
+            'id' => 'swim-' . $stage['id'],
+            'sport_id' => $stage['sport_id'],
+            'sport_name' => $sportName,
+            'sport_code' => $sportCode,
+            'sport_icon' => $icon,
+            'stage_id' => $stage['id'],
+            'stage_name' => $stage['name'],
+            'stage_type' => isset($stage['stage_type']) ? $stage['stage_type'] : '',
+            'round' => $stage['name'],
+            'group_label' => null,
+            'bracket_pos' => null,
+            'match_type' => 'swim',
+            // Bơi không có đối đầu: team_a mang tóm tắt, team_b rỗng (Gantt hiển thị 1 nhãn)
+            'team_a' => array('id' => null, 'name' => $summary, 'score' => null, 'is_winner' => false),
+            'team_b' => array('id' => null, 'name' => '', 'score' => null, 'is_winner' => false),
+            'athlete_count' => $athleteCount,
+            'heat_count' => count($heats),
+            'status' => $status,
+            'status_text' => $statusText,
+            'status_class' => $statusCls,
+            'match_time' => $startTs ? date('H:i d/m/Y', $startTs) : '',
+            'match_hour' => $startTs ? date('H:i', $startTs) : '',
+            'match_date' => $startTs ? date('Y-m-d', $startTs) : '',
+            'raw_time' => $startTs ? $stage['start_time'] : null,
+            'location' => isset($stage['location']) ? $stage['location'] : '',
+            'match_order' => (int) $stage['id'],
         );
     }
 
