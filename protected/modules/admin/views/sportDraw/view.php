@@ -63,6 +63,10 @@ Yii::app()->clientScript->registerScriptFile(
 // Map team_id -> tên để hiển thị
 $teamMap = array();
 $teams = array();
+// Nội dung đơn/đôi (cá nhân): hiển thị tên VĐV thay cho tên đội.
+$sportNameLower = mb_strtolower((string) $model->sport_name, 'UTF-8');
+$isIndividualSport = (strpos($sportNameLower, 'đơn') !== false || strpos($sportNameLower, 'đôi') !== false
+    || (isset($model->stage_type) && $model->stage_type === 'individual'));
 if ($preview && isset($preview['teams'])) {
     $teams = $preview['teams'];
     foreach ($teams as $t) {
