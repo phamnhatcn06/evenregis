@@ -70,7 +70,6 @@ $allMatches = isset($tournament['matches']) ? $tournament['matches'] : array();
 $sportsList = isset($tournament['sports']) ? $tournament['sports'] : array();
 $standingsBySport = isset($tournament['standingsBySport']) ? $tournament['standingsBySport'] : array();
 $swimBySport = isset($tournament['swimBySport']) ? $tournament['swimBySport'] : array();
-$swimEvents = isset($tournament['swimEvents']) ? $tournament['swimEvents'] : array();
 
 // Đổi mili-giây sang chuỗi thành tích bơi (m:ss.cc hoặc ss.cc)
 $fmtSwimTime = function ($ms) {
@@ -880,49 +879,8 @@ $getSportMeta = function ($name) {
     <!-- =====================================================================
          2.6 SƠ ĐỒ BƠI (LƯỢT / LÀN) & KẾT QUẢ
          ===================================================================== -->
-    <?php if (!empty($swimBySport) || !empty($swimEvents)): ?>
+    <?php if (!empty($swimBySport)): ?>
       <section class="mb-4" id="swim-section">
-        <?php if (!empty($swimEvents)): ?>
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <span class="material-symbols-outlined text-info">schedule</span>
-            <h2 class="fw-bold text-dark fs-5 mb-0">Lịch thi bơi</h2>
-          </div>
-          <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-            <div class="table-responsive">
-              <table class="table table-sm align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th style="width:90px;">Giờ</th>
-                    <th style="width:110px;">Ngày</th>
-                    <th>Nội dung</th>
-                    <th class="d-none d-md-table-cell">Địa điểm</th>
-                  </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($swimEvents as $swimEvent): ?>
-                  <?php if ($selectedSportId && $swimEvent['sport_id'] != $selectedSportId) { continue; } ?>
-                  <tr data-sport-id="<?php echo (int) $swimEvent['sport_id']; ?>">
-                    <td class="fw-bold text-info">
-                      <?php echo $swimEvent['start_hour'] !== '' ? $e($swimEvent['start_hour']) : '<span class="text-muted fw-normal small">Chưa xếp giờ</span>'; ?>
-                    </td>
-                    <td class="small text-muted"><?php echo $e($swimEvent['start_date']); ?></td>
-                    <td>
-                      <span class="fw-semibold text-dark"><?php echo $e($swimEvent['sport_name']); ?></span>
-                      <div class="small text-muted"><?php echo $e($swimEvent['stage_name']); ?></div>
-                      <?php if ($swimEvent['location'] !== ''): ?>
-                        <div class="small text-muted d-md-none"><?php echo $e($swimEvent['location']); ?></div>
-                      <?php endif; ?>
-                    </td>
-                    <td class="small text-muted d-none d-md-table-cell"><?php echo $e($swimEvent['location']); ?></td>
-                  </tr>
-                <?php endforeach; ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        <?php endif; ?>
-
-        <?php if (!empty($swimBySport)): ?>
         <div class="d-flex align-items-center gap-2 mb-3">
           <span class="material-symbols-outlined text-info">pool</span>
           <h2 class="fw-bold text-dark fs-5 mb-0">Sơ đồ bơi — Lượt &amp; Làn</h2>
@@ -989,7 +947,6 @@ $getSportMeta = function ($name) {
             </div>
           <?php endforeach; ?>
         </div>
-        <?php endif; ?>
       </section>
     <?php endif; ?>
 
@@ -1250,6 +1207,7 @@ $getSportMeta = function ($name) {
                   elseif ($status === 'upcoming') $statusBadgeBg = 'bg-amber-50 text-amber border border-amber-subtle';
 
                   $searchText = mb_strtolower($m['sport_name'] . ' ' . $m['round'] . ' ' . $ta . ' ' . $tb . ' ' . $m['location'] . ' ' . $m['stage_name'], 'UTF-8');
+                  $isSwimItem = (isset($m['kind']) && $m['kind'] === 'swim');
                   ?>
                   <div class="col-12 col-md-6 col-xl-4 match-item-wrapper"
                        data-sport-id="<?php echo $m['sport_id']; ?>"
