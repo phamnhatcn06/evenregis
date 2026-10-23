@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('cfg-start-time').value = data.start_time
                 ? String(data.start_time).replace(' ', 'T').substring(0, 16)
                 : '';
+            document.getElementById('cfg-location').value = data.location || '';
             var sources = [];
             try { sources = JSON.parse(this.getAttribute('data-playoff-sources') || '[]'); } catch (e) { sources = []; }
             fillPlayoffSources(sources, data.playoff_source_stage_id);
