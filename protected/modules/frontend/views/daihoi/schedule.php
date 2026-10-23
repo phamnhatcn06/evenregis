@@ -1177,7 +1177,7 @@ $getSportMeta = function ($name) {
                       <span class="material-symbols-outlined"><?php echo $e($sportHeaderIcon); ?></span>
                     </span>
                     <span class="sport-subgroup-name"><?php echo $e($sportHeaderName); ?></span>
-                    <span class="sport-subgroup-count"><?php echo count($sportMatches); ?> trận</span>
+                    <span class="sport-subgroup-count"><?php echo count($sportMatches); ?> <?php echo (isset($firstM['kind']) && $firstM['kind'] === 'swim') ? 'nội dung' : 'trận'; ?></span>
                     <button type="button" class="sport-subgroup-toggle" aria-label="Thu gọn / mở rộng">
                       <span class="material-symbols-outlined">expand_less</span>
                     </button>
@@ -3425,8 +3425,9 @@ document.addEventListener('DOMContentLoaded', function () {
           var m = it.m;
           var leftPct = ((it.start - axisStart) / span) * 100;
           var topPx = 6 + it.lane * 34;
-          var teams = escHtml(m.team_a) + ' <span style="opacity:.75">vs</span> ' + escHtml(m.team_b);
-          var tip = m.hour + ' • ' + m.team_a + ' vs ' + m.team_b
+          // Bơi không có đối đầu (team_b rỗng) → chỉ hiện 1 nhãn
+          var teams = m.team_b ? escHtml(m.team_a) + ' <span style="opacity:.75">vs</span> ' + escHtml(m.team_b) : escHtml(m.team_a);
+          var tip = m.hour + ' • ' + m.team_a + (m.team_b ? ' vs ' + m.team_b : '')
             + (m.round ? ' • ' + m.round : '')
             + (m.location ? ' • ' + m.location : '')
             + ' • ' + m.status_text;
@@ -3475,8 +3476,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var arr = bySportU[sid];
         var first = arr[0];
         var chips = arr.map(function (m) {
-          var teams = escHtml(m.team_a) + ' <span style="opacity:.7">vs</span> ' + escHtml(m.team_b);
-          var tip = m.team_a + ' vs ' + m.team_b
+          var teams = m.team_b ? escHtml(m.team_a) + ' <span style="opacity:.7">vs</span> ' + escHtml(m.team_b) : escHtml(m.team_a);
+          var tip = m.team_a + (m.team_b ? ' vs ' + m.team_b : '')
             + (m.round ? ' • ' + m.round : '')
             + (m.location ? ' • ' + m.location : '')
             + ' • ' + m.status_text;
