@@ -167,12 +167,12 @@ class SportDrawController extends AdminController
     }
 
     /**
-     * Xuất biên bản trận đấu (trang in) cho một giai đoạn.
+     * Xuất biên bản trận đấu (.docx) cho một giai đoạn.
      *
-     * Mỗi trận đấu được in thành một trang A4 gồm hai bản biên bản giống nhau
-     * (bản lưu + bản cắt rời) đúng theo mẫu "Biên bản trận đấu — Môn: Bóng bàn".
-     * Dữ liệu trận/đội/VĐV đọc trực tiếp từ CSDL (bảng Yii-read, hoạt động cả
-     * ở prod yii_event lẫn local) — cùng pattern với syncKnockoutFromDb.
+     * Dùng CHÍNH file Word mẫu của người dùng (docs/bienban/Bien_ban_bong_ban_template.docx)
+     * làm khuôn — giữ nguyên 100% định dạng. Mỗi trận đấu thành 1 trang A4 gồm
+     * hai bản biên bản giống nhau (bản lưu + bản cắt rời); hệ thống chỉ điền
+     * Mã trận / tên đơn vị / cầu thủ và tích các ô Đơn-Đôi, Nam-Nữ, vòng đấu.
      */
     public function actionExportMinutes($id)
     {
@@ -180,8 +180,164 @@ class SportDrawController extends AdminController
         if ($data === null) {
             throw new CHttpException(404, 'Không tìm thấy giai đoạn.');
         }
-        // Trang in độc lập: không dùng layout admin.
-        $this->renderPartial('minutes', $data);
+        $this->streamMinutesDocx($data);
+    }
+
+    /**
+     * Dựng file .docx từ template Word và tải về.
+     *
+     * @param array $data Kết quả buildMinutesData()
+     */
+    protected function streamMinutesDocx($data)
+    {
+        $template = dirname(Yii::app()->basePath) . '/docs/bienban/Bien_ban_bong_ban_template.docx';
+        if (!is_file($template)) {
+            throw new CHttpException(500, 'Không tìm thấy file Word mẫu biên bản.');
+        }
+
+        // Đọc document.xml từ template.
+        $zip = new ZipArchive();
+        if ($zip->open($template) !== true) {
+            throw new CHttpException(500, 'Không mở được file Word mẫu.');
+        }
+        $xml = $zip->getFromName('word/document.xml');
+        $zip->close();
+        if ($xml === false) {
+            throw new CHttpException(500, 'File Word mẫu không hợp lệ.');
+        }
+
+        // Tách: phần mở <w:body ...> | khối một trang (lặp lại mỗi trận) | <w:sectPr>...
+        $bodyTagEnd = strpos($xml, '>', strpos($xml, '<w:body')) + 1;
+        $sectStart = strrpos($xml, '<w:sectPr');
+        $pre = substr($xml, 0, $bodyTagEnd);
+        $pageUnit = substr($xml, $bodyTagEnd, $sectStart - $bodyTagEnd);
+        $tail = substr($xml, $sectStart);
+
+        $pageBreak = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
+
+        $pages = array();
+        foreach ($data['matches'] as $m) {
+            $pages[] = strtr($pageUnit, $this->minutesTokens($m, $data));
+        }
+        if (empty($pages)) {
+            // Không có trận đủ hai đội -> xuất 1 trang trống theo mẫu.
+            $pages[] = strtr($pageUnit, $this->minutesTokens(null, $data));
+        }
+
+        $newXml = $pre . implode($pageBreak, $pages) . $tail;
+
+        // Ghi ra file tạm rồi tải về (ZipArchive cần thao tác trên file).
+        $tmp = Yii::app()->runtimePath . '/bienban_' . getmypid() . '_' . time() . '.docx';
+        if (!@copy($template, $tmp)) {
+            throw new CHttpException(500, 'Không tạo được file tạm.');
+        }
+        $out = new ZipArchive();
+        if ($out->open($tmp) !== true) {
+            @unlink($tmp);
+            throw new CHttpException(500, 'Không ghi được file biên bản.');
+        }
+        $out->addFromString('word/document.xml', $newXml);
+        $out->close();
+
+        $slug = $this->asciiSlug($data['sportName'] . '-' . $data['stage']['name']);
+        $filename = 'Bien-ban-' . ($slug !== '' ? $slug : 'tran-dau') . '.docx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . filesize($tmp));
+        header('Cache-Control: no-cache, must-revalidate');
+        readfile($tmp);
+        @unlink($tmp);
+        Yii::app()->end();
+    }
+
+    /**
+     * Bảng thay thế token -> giá trị thật cho một trận (hoặc trang trống nếu null).
+     *
+     * @param array|null $m   Trận (kèm team_a/team_b) hoặc null.
+     * @param array $data      Kết quả buildMinutesData (isDoubles/isFemale).
+     * @return array map token => giá trị đã escape XML.
+     */
+    protected function minutesTokens($m, $data)
+    {
+        $box = function ($on) {
+            return $on ? '☒' : '□';
+        };
+        $x = function ($s) {
+            return htmlspecialchars((string) $s, ENT_QUOTES | ENT_XML1, 'UTF-8');
+        };
+
+        $org = function ($team) {
+            if (!$team) return '';
+            if (!empty($team['property_name'])) return $team['property_name'];
+            return isset($team['name']) ? $team['name'] : '';
+        };
+        $players = function ($team) {
+            if (!$team || empty($team['players'])) return '';
+            return implode(' - ', $team['players']);
+        };
+
+        $rKey = $m ? $this->minutesRoundKey($m) : '';
+
+        return array(
+            '@@MA@@'  => $m && isset($m['code']) ? $x($m['code']) : '',
+            '@@DVA@@' => $m ? $x($org($m['team_a'])) : '',
+            '@@DVB@@' => $m ? $x($org($m['team_b'])) : '',
+            '@@CTA@@' => $m ? $x($players($m['team_a'])) : '',
+            '@@CTB@@' => $m ? $x($players($m['team_b'])) : '',
+            '@@BDON@@' => $box($m && empty($data['isDoubles'])),
+            '@@BDOI@@' => $box($m && !empty($data['isDoubles'])),
+            '@@BNAM@@' => $box($m && empty($data['isFemale'])),
+            '@@BNU@@'  => $box($m && !empty($data['isFemale'])),
+            '@@BQL@@'  => $box($rKey === 'qualify'),
+            '@@B16@@'  => $box($rKey === 'r16'),
+            '@@BTK@@'  => $box($rKey === 'quarter'),
+            '@@BBK@@'  => $box($rKey === 'semi'),
+            '@@BBT@@'  => $box($rKey === 'third'),
+            '@@BCK@@'  => $box($rKey === 'final'),
+        );
+    }
+
+    /**
+     * Xác định vòng đấu để tích ô: qualify | r16 | quarter | semi | third | final.
+     */
+    protected function minutesRoundKey($m)
+    {
+        $type = isset($m['match_type']) ? $m['match_type'] : '';
+        if ($type === 'group' || $type === 'playoff') {
+            return 'qualify';
+        }
+        $round = isset($m['round']) ? mb_strtolower($m['round'], 'UTF-8') : '';
+        if (strpos($round, 'chung kết') !== false) return 'final';
+        if (strpos($round, 'hạng 3') !== false || strpos($round, 'ba-tư') !== false || strpos($round, 'tranh hạng') !== false) return 'third';
+        if (strpos($round, 'bán kết') !== false) return 'semi';
+        if (strpos($round, 'tứ kết') !== false) return 'quarter';
+        if (strpos($round, '1/16') !== false) return 'r16';
+        return 'qualify';
+    }
+
+    /**
+     * Tạo slug ASCII từ chuỗi tiếng Việt cho tên file tải về.
+     */
+    protected function asciiSlug($str)
+    {
+        $str = (string) $str;
+        $map = array(
+            'à','á','ạ','ả','ã','â','ầ','ấ','ậ','ẩ','ẫ','ă','ằ','ắ','ặ','ẳ','ẵ',
+            'è','é','ẹ','ẻ','ẽ','ê','ề','ế','ệ','ể','ễ',
+            'ì','í','ị','ỉ','ĩ','ò','ó','ọ','ỏ','õ','ô','ồ','ố','ộ','ổ','ỗ','ơ','ờ','ớ','ợ','ở','ỡ',
+            'ù','ú','ụ','ủ','ũ','ư','ừ','ứ','ự','ử','ữ','ỳ','ý','ỵ','ỷ','ỹ','đ',
+        );
+        $rep = array(
+            'a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a','a',
+            'e','e','e','e','e','e','e','e','e','e','e',
+            'i','i','i','i','i','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o',
+            'u','u','u','u','u','u','u','u','u','u','u','y','y','y','y','y','d',
+        );
+        $lower = function_exists('mb_strtolower') ? mb_strtolower($str, 'UTF-8') : strtolower($str);
+        $lower = str_replace($map, $rep, $lower);
+        $lower = preg_replace('/[^a-z0-9]+/', '-', $lower);
+        return trim($lower, '-');
     }
 
     /**
