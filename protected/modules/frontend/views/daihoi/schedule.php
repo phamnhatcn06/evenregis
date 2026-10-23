@@ -1374,6 +1374,14 @@ $getSportMeta = function ($name) {
                           </div>
                         </div>
 
+                        <?php if ($isSwimItem): ?>
+                        <div class="d-flex align-items-center justify-content-center gap-2 flex-grow-1 px-2" style="min-width: 220px;">
+                          <span class="small fw-bold text-dark"><?php echo $e($ta); ?></span>
+                          <span class="badge rounded-pill bg-light text-dark border px-2 py-1 font-monospace fw-bold">
+                            <?php echo !empty($m['match_hour']) ? $e($m['match_hour']) : '—'; ?>
+                          </span>
+                        </div>
+                        <?php else: ?>
                         <div class="d-flex align-items-center justify-content-center gap-2 flex-grow-1 px-2" style="min-width: 220px;">
                           <span class="small fw-bold text-end text-truncate <?php echo $isWinnerA ? 'text-success' : 'text-dark'; ?>" style="max-width:210px;" title="<?php echo $e($ta); ?>"><?php echo $e($ta); ?></span>
                           <span class="badge rounded-pill <?php echo $hasScore ? 'bg-dark text-white' : 'bg-light text-dark border'; ?> px-2 py-1 font-monospace fw-bold">
