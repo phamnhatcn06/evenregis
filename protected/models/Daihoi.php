@@ -735,6 +735,10 @@ class Daihoi
         $upcomingMatches = array();
 
         foreach ($matches as $m) {
+            // Mục bơi không có tỷ số đối đầu → không đưa vào khối trận live / kết quả gần đây (trang chủ)
+            if (isset($m['kind']) && $m['kind'] === 'swim') {
+                continue;
+            }
             if ($m['status'] === 'live') {
                 $liveMatches[] = $m;
             } elseif ($m['status'] === 'completed') {
