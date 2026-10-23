@@ -30,10 +30,19 @@
                         )); ?>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Giờ bắt đầu thi đấu <span class="text-muted">(không bắt buộc)</span></label>
-                        <input type="datetime-local" class="form-control" name="SportStages[start_time]" id="cfg-start-time">
-                        <small class="text-muted">Hiển thị trên trang Lịch thi đấu công khai (dùng cho nội dung bơi).</small>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Giờ bắt đầu thi đấu <span class="text-muted">(không bắt buộc)</span></label>
+                            <input type="datetime-local" class="form-control" name="SportStages[start_time]" id="cfg-start-time">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Địa điểm thi đấu <span class="text-muted">(không bắt buộc)</span></label>
+                            <input type="text" class="form-control" name="SportStages[location]" id="cfg-location"
+                                   maxlength="255" placeholder="Ví dụ: Bể bơi Mường Thanh Ninh Bình">
+                        </div>
+                        <div class="col-12 mt-1">
+                            <small class="text-muted">Hiển thị trên trang Lịch thi đấu công khai. Trận đấu chưa nhập địa điểm riêng sẽ dùng địa điểm này.</small>
+                        </div>
                     </div>
 
                     <div class="row g-3 cfg-group-fields d-none">
