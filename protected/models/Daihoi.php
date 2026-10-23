@@ -696,6 +696,18 @@ class Daihoi
                     }
                 }
             }
+
+            if ($isSwim) {
+                $swimItem = self::buildSwimScheduleItem($stage, $preview, $sportName, $sportCode, $icon);
+                if ($swimItem['status'] === 'completed') {
+                    $completedCount++;
+                    $sportsMap[$sportId]['completed_matches']++;
+                } elseif ($swimItem['status'] === 'scheduled') {
+                    $scheduledCount++;
+                }
+                $matches[] = $swimItem;
+                $sportsMap[$sportId]['total_matches']++;
+            }
         }
 
         // Sắp xếp các trận đấu theo thứ tự ưu tiên
