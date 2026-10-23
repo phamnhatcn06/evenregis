@@ -278,9 +278,13 @@ class SportDrawController extends AdminController
         };
         $phones = function ($team) {
             if (!$team || empty($team['phones'])) return '';
-            $list = array_filter(array_map('trim', $team['phones']), function ($p) {
-                return $p !== '';
-            });
+            $list = array();
+            foreach ($team['phones'] as $p) {
+                $p = trim((string) $p);
+                if ($p !== '') {
+                    $list[] = $p;
+                }
+            }
             return implode(' - ', $list);
         };
 
