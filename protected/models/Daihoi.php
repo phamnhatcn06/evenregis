@@ -498,7 +498,7 @@ class Daihoi
                     // Xác định xem môn/giai đoạn này có phải nội dung đơn (cá nhân) hay không
                     $isIndividual = false;
                     $sNameLower = mb_strtolower($sportName, 'UTF-8');
-                    if (strpos($sNameLower, 'đơn') !== false || (isset($stage['stage_type']) && $stage['stage_type'] === 'individual')) {
+                    if (strpos($sNameLower, 'đơn') !== false || strpos($sNameLower, 'đôi') !== false || (isset($stage['stage_type']) && $stage['stage_type'] === 'individual')) {
                         $isIndividual = true;
                     }
 
