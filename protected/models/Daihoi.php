@@ -426,7 +426,6 @@ class Daihoi
         $sportsMap = array();
         $matches = array();
         $standingsBySport = array();
-        $swimBySport = array();
         $completedCount = 0;
         $liveCount = 0;
         $scheduledCount = 0;
@@ -656,44 +655,6 @@ class Daihoi
                         $sportsMap[$sportId]['total_matches']++;
                     }
                 }
-
-                // Bơi: thu thập sơ đồ lượt/làn (không có match)
-                if (!empty($preview['swim_heats'])) {
-                    $swimTeamIds = array();
-                    foreach ($preview['swim_heats'] as $heat) {
-                        foreach ((isset($heat['lanes']) ? $heat['lanes'] : array()) as $lane) {
-                            if (!empty($lane['team_id'])) {
-                                $swimTeamIds[] = (int)$lane['team_id'];
-                            }
-                        }
-                    }
-                    $swimAthletesMap = !empty($swimTeamIds) ? self::getAthletesByTeamIds($swimTeamIds) : array();
-
-                    foreach ($preview['swim_heats'] as $heat) {
-                        $lanes = array();
-                        foreach ((isset($heat['lanes']) ? $heat['lanes'] : array()) as $lane) {
-                            $ltid = isset($lane['team_id']) ? (int)$lane['team_id'] : 0;
-                            $lName = !empty($lane['team_name']) ? $lane['team_name'] : ('#' . $ltid);
-                            if (isset($swimAthletesMap[$ltid]) && !empty($swimAthletesMap[$ltid])) {
-                                $lName = $swimAthletesMap[$ltid];
-                            }
-                            $lanes[] = array(
-                                'lane_no' => (int)(isset($lane['lane_no']) ? $lane['lane_no'] : 0),
-                                'team_name' => $lName,
-                                'result_ms' => isset($lane['result_ms']) ? $lane['result_ms'] : null,
-                                'rank' => isset($lane['rank']) ? $lane['rank'] : null,
-                            );
-                        }
-                        $swimBySport[$sportId][] = array(
-                            'stage_id' => $sId,
-                            'stage_name' => $stage['name'],
-                            'stage_type' => isset($stage['stage_type']) ? $stage['stage_type'] : '',
-                            'heat_no' => (int)(isset($heat['heat_no']) ? $heat['heat_no'] : 0),
-                            'heat_type' => isset($heat['heat_type']) ? $heat['heat_type'] : '',
-                            'lanes' => $lanes,
-                        );
-                    }
-                }
             }
 
             if ($isSwim) {
@@ -748,7 +709,7 @@ class Daihoi
             }
         }
 
-        if (empty($matches) && empty($swimBySport)) {
+        if (empty($matches)) {
             return self::getFallbackTournamentSchedule($filterSportId);
         }
 
@@ -767,7 +728,6 @@ class Daihoi
             'recentMatches' => $recentMatches,
             'upcomingMatches' => $upcomingMatches,
             'standingsBySport' => $standingsBySport,
-            'swimBySport' => $swimBySport,
         );
     }
 

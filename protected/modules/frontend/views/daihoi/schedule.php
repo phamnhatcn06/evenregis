@@ -69,25 +69,6 @@ $stats = isset($tournament['stats']) ? $tournament['stats'] : array(
 $allMatches = isset($tournament['matches']) ? $tournament['matches'] : array();
 $sportsList = isset($tournament['sports']) ? $tournament['sports'] : array();
 $standingsBySport = isset($tournament['standingsBySport']) ? $tournament['standingsBySport'] : array();
-$swimBySport = isset($tournament['swimBySport']) ? $tournament['swimBySport'] : array();
-
-// Đổi mili-giây sang chuỗi thành tích bơi (m:ss.cc hoặc ss.cc)
-$fmtSwimTime = function ($ms) {
-    if ($ms === null || $ms === '') {
-        return '—';
-    }
-    $ms = (int) $ms;
-    $totalSec = intval($ms / 1000);
-    $cs = intval(round(($ms % 1000) / 10));
-    $min = intval($totalSec / 60);
-    $sec = $totalSec % 60;
-    return $min > 0 ? sprintf('%d:%02d.%02d', $min, $sec, $cs) : sprintf('%d.%02d', $sec, $cs);
-};
-// Map nhanh id môn -> tên/icon (từ sportsList) để hiển thị tiêu đề khối bơi
-$sportInfoById = array();
-foreach ($sportsList as $sp) {
-    $sportInfoById[$sp['id']] = $sp;
-}
 
 // Hàm lấy chữ cái viết tắt của tên đội / tên VĐV (Avatar chữ)
 $initials = function ($name) {
@@ -877,81 +858,6 @@ $getSportMeta = function ($name) {
 
 
     <!-- =====================================================================
-         2.6 SƠ ĐỒ BƠI (LƯỢT / LÀN) & KẾT QUẢ
-         ===================================================================== -->
-    <?php if (!empty($swimBySport)): ?>
-      <section class="mb-4" id="swim-section">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <span class="material-symbols-outlined text-info">pool</span>
-          <h2 class="fw-bold text-dark fs-5 mb-0">Sơ đồ bơi — Lượt &amp; Làn</h2>
-        </div>
-        <div class="row g-3">
-          <?php foreach ($swimBySport as $sportId => $heats): ?>
-            <?php
-            $sInfo = isset($sportInfoById[$sportId]) ? $sportInfoById[$sportId] : array('name' => 'Nội dung bơi', 'icon' => 'pool');
-            if ($selectedSportId && $sportId != $selectedSportId) {
-                continue;
-            }
-            ?>
-            <div class="col-12 col-xl-6" data-sport-id="<?php echo (int) $sportId; ?>">
-              <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-header bg-info-subtle d-flex align-items-center gap-2 border-0">
-                  <span class="material-symbols-outlined text-info"><?php echo $e(isset($sInfo['icon']) ? $sInfo['icon'] : 'pool'); ?></span>
-                  <span class="fw-bold text-dark"><?php echo $e($sInfo['name']); ?></span>
-                </div>
-                <div class="card-body p-3">
-                  <?php foreach ($heats as $heat): ?>
-                    <div class="mb-3">
-                      <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="badge bg-info text-white rounded-pill px-2 py-1">Lượt <?php echo (int) $heat['heat_no']; ?></span>
-                        <span class="small text-muted"><?php echo $e($heat['stage_name']); ?></span>
-                      </div>
-                      <div class="table-responsive">
-                        <table class="table table-sm table-bordered align-middle mb-0">
-                          <thead class="table-light">
-                            <tr>
-                              <th class="text-center" style="width:52px;">Làn</th>
-                              <th>VĐV</th>
-                              <th style="width:110px;">Thành tích</th>
-                              <th class="text-center" style="width:56px;">Hạng</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          <?php foreach ($heat['lanes'] as $lane): ?>
-                            <?php $rank = isset($lane['rank']) ? $lane['rank'] : null; ?>
-                            <tr class="<?php echo ($rank && $rank <= 3) ? 'table-warning' : ''; ?>">
-                              <td class="text-center fw-bold"><?php echo (int) $lane['lane_no']; ?></td>
-                              <td><?php echo $e($lane['team_name']); ?></td>
-                              <td class="font-monospace"><?php echo $e($fmtSwimTime($lane['result_ms'])); ?></td>
-                              <td class="text-center">
-                                <?php
-                                $medals = array(1 => 'Nhất', 2 => 'Nhì', 3 => 'Ba');
-                                if ($rank && isset($medals[$rank])) {
-                                    echo '<span class="badge bg-warning text-dark">' . $medals[$rank] . '</span>';
-                                } elseif ($rank) {
-                                    echo '<span class="badge bg-light text-dark">' . (int) $rank . '</span>';
-                                } else {
-                                    echo '—';
-                                }
-                                ?>
-                              </td>
-                            </tr>
-                          <?php endforeach; ?>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  <?php endforeach; ?>
-                </div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        </div>
-      </section>
-    <?php endif; ?>
-
-
-    <!-- =====================================================================
          3. KHỐI TRẬN ĐẤU ĐANG DIỄN RA (LIVE MATCHES SHOWCASE)
          ===================================================================== -->
     <?php if (!empty($tournament['liveMatches'])): ?>
@@ -1258,11 +1164,6 @@ $getSportMeta = function ($name) {
                             <?php endif; ?>
                           </div>
                         </div>
-                        <?php if (!empty($m['heat_count'])): ?>
-                          <a href="#swim-section" class="d-inline-flex align-items-center gap-1 small fw-semibold text-info text-decoration-none mt-2">
-                            Xem lượt &amp; làn <span class="material-symbols-outlined" style="font-size:16px;">arrow_downward</span>
-                          </a>
-                        <?php endif; ?>
                       </div>
                       <?php else: ?>
                       <!-- 2. Body thẻ: Đối đầu Đội A vs Đội B (Match Arena - Thẳng hàng 100%, không lồi lõm) -->
