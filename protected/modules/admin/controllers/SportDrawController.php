@@ -276,6 +276,13 @@ class SportDrawController extends AdminController
             if (!$team || empty($team['players'])) return '';
             return implode(' - ', $team['players']);
         };
+        $phones = function ($team) {
+            if (!$team || empty($team['phones'])) return '';
+            $list = array_filter(array_map('trim', $team['phones']), function ($p) {
+                return $p !== '';
+            });
+            return implode(' - ', $list);
+        };
 
         $rKey = $m ? $this->minutesRoundKey($m) : '';
 
@@ -285,6 +292,8 @@ class SportDrawController extends AdminController
             '@@DVB@@' => $m ? $x($org($m['team_b'])) : '',
             '@@CTA@@' => $m ? $x($players($m['team_a'])) : '',
             '@@CTB@@' => $m ? $x($players($m['team_b'])) : '',
+            '@@DTA@@' => $m ? $x($phones($m['team_a'])) : '',
+            '@@DTB@@' => $m ? $x($phones($m['team_b'])) : '',
             '@@BDON@@' => $box($m && empty($data['isDoubles'])),
             '@@BDOI@@' => $box($m && !empty($data['isDoubles'])),
             '@@BNAM@@' => $box($m && empty($data['isFemale'])),
