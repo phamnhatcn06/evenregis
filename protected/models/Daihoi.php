@@ -427,7 +427,6 @@ class Daihoi
         $matches = array();
         $standingsBySport = array();
         $swimBySport = array();
-        $swimEvents = array();
         $completedCount = 0;
         $liveCount = 0;
         $scheduledCount = 0;
