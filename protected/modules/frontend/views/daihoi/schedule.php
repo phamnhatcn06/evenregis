@@ -1235,6 +1235,36 @@ $getSportMeta = function ($name) {
                         </span>
                       </div>
 
+                      <?php if ($isSwimItem): ?>
+                      <!-- 2'. Body thẻ BƠI: không đối đầu — giờ xuất phát, số VĐV, số lượt -->
+                      <div class="px-3 pt-3 pb-2">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="rounded-4 bg-info-subtle text-info d-flex align-items-center justify-content-center flex-shrink-0" style="width:46px;height:46px;">
+                            <span class="material-symbols-outlined fs-3">pool</span>
+                          </div>
+                          <div class="flex-grow-1 overflow-hidden">
+                            <div class="fw-bold text-dark text-truncate"><?php echo (int) $m['athlete_count']; ?> vận động viên</div>
+                            <div class="text-muted small">
+                              <?php echo !empty($m['heat_count'])
+                                  ? ((int) $m['heat_count'] . ' lượt bơi • đã xếp làn')
+                                  : 'Chưa bốc lượt/làn'; ?>
+                            </div>
+                          </div>
+                          <div class="text-end flex-shrink-0">
+                            <?php if (!empty($m['match_hour'])): ?>
+                              <span class="match-time-chip"><?php echo $e($m['match_hour']); ?></span>
+                            <?php else: ?>
+                              <span class="text-muted small">Chưa xếp giờ</span>
+                            <?php endif; ?>
+                          </div>
+                        </div>
+                        <?php if (!empty($m['heat_count'])): ?>
+                          <a href="#swim-section" class="d-inline-flex align-items-center gap-1 small fw-semibold text-info text-decoration-none mt-2">
+                            Xem lượt &amp; làn <span class="material-symbols-outlined" style="font-size:16px;">arrow_downward</span>
+                          </a>
+                        <?php endif; ?>
+                      </div>
+                      <?php else: ?>
                       <!-- 2. Body thẻ: Đối đầu Đội A vs Đội B (Match Arena - Thẳng hàng 100%, không lồi lõm) -->
                       <div class="px-2 pt-2 pb-1">
                         <div class="match-arena-box">
