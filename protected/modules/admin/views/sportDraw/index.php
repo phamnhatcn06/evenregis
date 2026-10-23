@@ -148,6 +148,9 @@ foreach ($stages as $s) {
                             <?php if ($stage->start_time): ?>
                                 <br><small class="text-muted"><i class="fa fa-clock-o me-1"></i><?php echo date('H:i d/m/Y', strtotime($stage->start_time)); ?></small>
                             <?php endif; ?>
+                            <?php if ($stage->location): ?>
+                                <br><small class="text-muted"><i class="fa fa-map-marker me-1"></i><?php echo CHtml::encode($stage->location); ?></small>
+                            <?php endif; ?>
                         </td>
                         <td><?php echo CHtml::encode(SportStages::getFormatLabel($stage->format)); ?></td>
                         <td class="text-center">
