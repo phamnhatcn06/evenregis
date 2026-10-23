@@ -215,13 +215,21 @@ class SportDrawController extends AdminController
 
         $pageBreak = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
 
+        // Mỗi tờ A4 chứa 2 biên bản của 2 trận khác nhau (copy trên = suffix 1,
+        // copy dưới = suffix 2). Ghép lần lượt 2 trận một tờ.
         $pages = array();
-        foreach ($data['matches'] as $m) {
-            $pages[] = strtr($pageUnit, $this->minutesTokens($m, $data));
+        $matches = array_values($data['matches']);
+        $total = count($matches);
+        for ($i = 0; $i < $total; $i += 2) {
+            $m1 = $matches[$i];
+            $m2 = isset($matches[$i + 1]) ? $matches[$i + 1] : null;
+            $tokens = $this->minutesTokens($m1, $data, '1') + $this->minutesTokens($m2, $data, '2');
+            $pages[] = strtr($pageUnit, $tokens);
         }
         if (empty($pages)) {
-            // Không có trận đủ hai đội -> xuất 1 trang trống theo mẫu.
-            $pages[] = strtr($pageUnit, $this->minutesTokens(null, $data));
+            // Không có trận đủ hai đội -> xuất 1 tờ trống theo mẫu.
+            $tokens = $this->minutesTokens(null, $data, '1') + $this->minutesTokens(null, $data, '2');
+            $pages[] = strtr($pageUnit, $tokens);
         }
 
         $newXml = $pre . implode($pageBreak, $pages) . $tail;
