@@ -1338,6 +1338,7 @@ $getSportMeta = function ($name) {
                           <?php endif; ?>
                         </div>
                       </div>
+                      <?php endif; ?>
 
                       <!-- 3. Footer thẻ: Địa điểm sân thi đấu (giờ đã hiển thị ở phần đối đầu) -->
                       <div class="px-3 py-2 border-top bg-slate-50/60 text-muted d-flex align-items-center gap-2" style="font-size:12.5px;">
