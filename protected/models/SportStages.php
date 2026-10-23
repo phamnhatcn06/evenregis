@@ -180,8 +180,9 @@ class SportStages extends BaseSportStages
         if ($this->rules !== null && $this->rules !== '') {
             $data['rules'] = $this->rules;
         }
-        if ($this->location !== null && $this->location !== '') {
-            $data['location'] = $this->location;
+        // Gửi cả chuỗi rỗng để cho phép xoá địa điểm (backend đổi '' → null)
+        if ($this->location !== null) {
+            $data['location'] = trim((string) $this->location);
         }
         $url = ApiEndpoints::url(ApiEndpoints::SPORT_STAGE_UPDATE, array('id' => $this->id));
         return self::apiPost($url, $data);
