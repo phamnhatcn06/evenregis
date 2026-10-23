@@ -264,9 +264,10 @@ class SportDrawController extends AdminController
      *
      * @param array|null $m   Trận (kèm team_a/team_b) hoặc null.
      * @param array $data      Kết quả buildMinutesData (isDoubles/isFemale).
+     * @param string $suf      Hậu tố copy trên tờ ('1' hoặc '2').
      * @return array map token => giá trị đã escape XML.
      */
-    protected function minutesTokens($m, $data)
+    protected function minutesTokens($m, $data, $suf)
     {
         $box = function ($on) {
             return $on ? '☒' : '□';
