@@ -255,8 +255,8 @@ foreach ($stages as $s) {
                             </a>
                             <?php if ($isGroup || $isBracket || $stage->format === SportStages::FORMAT_PLAYOFF): ?>
                                 <a href="<?php echo $this->createUrl('exportMinutes', array('id' => $stage->id)); ?>"
-                                   target="_blank" class="btn btn-sm btn-outline-dark">
-                                    <i class="fa fa-file-text-o"></i> Biên bản
+                                   class="btn btn-sm btn-outline-dark">
+                                    <i class="fa fa-file-word-o"></i> Biên bản
                                 </a>
                             <?php endif; ?>
                             <?php if ($stage->draw_status === SportStages::DRAW_DRAWN): ?>
