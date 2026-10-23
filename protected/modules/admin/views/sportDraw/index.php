@@ -249,6 +249,12 @@ foreach ($stages as $s) {
                                class="btn btn-sm btn-outline-info">
                                 <i class="fa fa-eye"></i> Xem
                             </a>
+                            <?php if ($isGroup || $isBracket || $stage->format === SportStages::FORMAT_PLAYOFF): ?>
+                                <a href="<?php echo $this->createUrl('exportMinutes', array('id' => $stage->id)); ?>"
+                                   target="_blank" class="btn btn-sm btn-outline-dark">
+                                    <i class="fa fa-file-text-o"></i> Biên bản
+                                </a>
+                            <?php endif; ?>
                             <?php if ($stage->draw_status === SportStages::DRAW_DRAWN): ?>
                                 <button type="button" class="btn btn-sm btn-outline-dark btn-lock" data-id="<?php echo $stage->id; ?>">
                                     <i class="fa fa-lock"></i>
