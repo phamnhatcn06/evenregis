@@ -167,6 +167,173 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Xuất biên bản trận đấu (trang in) cho một giai đoạn.
+     *
+     * Mỗi trận đấu được in thành một trang A4 gồm hai bản biên bản giống nhau
+     * (bản lưu + bản cắt rời) đúng theo mẫu "Biên bản trận đấu — Môn: Bóng bàn".
+     * Dữ liệu trận/đội/VĐV đọc trực tiếp từ CSDL (bảng Yii-read, hoạt động cả
+     * ở prod yii_event lẫn local) — cùng pattern với syncKnockoutFromDb.
+     */
+    public function actionExportMinutes($id)
+    {
+        $data = $this->buildMinutesData((int) $id);
+        if ($data === null) {
+            throw new CHttpException(404, 'Không tìm thấy giai đoạn.');
+        }
+        // Trang in độc lập: không dùng layout admin.
+        $this->renderPartial('minutes', $data);
+    }
+
+    /**
+     * Gom dữ liệu các trận đấu + thông tin đội/VĐV cho trang biên bản.
+     *
+     * @return array|null null nếu không tìm thấy giai đoạn.
+     */
+    protected function buildMinutesData($stageId)
+    {
+        $db = Yii::app()->db;
+
+        $stage = $db->createCommand(
+            "SELECT * FROM sport_stages WHERE id = :id AND deleted_at IS NULL"
+        )->queryRow(true, array(':id' => $stageId));
+        if (!$stage) {
+            return null;
+        }
+
+        $sport = $db->createCommand(
+            "SELECT id, name FROM sports WHERE id = :id"
+        )->queryRow(true, array(':id' => $stage['sport_id']));
+        $sportName = $sport ? $sport['name'] : '';
+        $event = $db->createCommand(
+            "SELECT id, name FROM events WHERE id = :id"
+        )->queryRow(true, array(':id' => $stage['event_id']));
+
+        // Chỉ lấy các trận đã xác định đủ hai đội (bỏ BYE và trận còn chờ).
+        $matches = $db->createCommand(
+            "SELECT id, code, round, match_type, team_a_id, team_b_id,
+                    team_a_source, team_b_source, match_time, location, match_order
+             FROM sport_matches
+             WHERE stage_id = :sid AND deleted_at IS NULL
+               AND team_a_id IS NOT NULL AND team_b_id IS NOT NULL
+             ORDER BY match_type DESC, COALESCE(match_order, 9999), id"
+        )->queryAll(true, array(':sid' => $stageId));
+
+        // Thông tin chi tiết từng đội/VĐV xuất hiện trong các trận.
+        $teamIds = array();
+        foreach ($matches as $m) {
+            $teamIds[(int) $m['team_a_id']] = true;
+            $teamIds[(int) $m['team_b_id']] = true;
+        }
+        $teams = $this->fetchTeamInfo($db, array_keys($teamIds), (int) $stage['event_id']);
+
+        foreach ($matches as &$m) {
+            $m['team_a'] = isset($teams[(int) $m['team_a_id']]) ? $teams[(int) $m['team_a_id']] : null;
+            $m['team_b'] = isset($teams[(int) $m['team_b_id']]) ? $teams[(int) $m['team_b_id']] : null;
+        }
+        unset($m);
+
+        $nameLower = function_exists('mb_strtolower') ? mb_strtolower($sportName, 'UTF-8') : strtolower($sportName);
+        $isDoubles = (strpos($nameLower, 'đôi') !== false);
+        $isFemale = (strpos($nameLower, 'nữ') !== false);
+
+        return array(
+            'stage' => $stage,
+            'sportName' => $sportName,
+            'eventName' => $event ? $event['name'] : '',
+            'matches' => $matches,
+            'isDoubles' => $isDoubles,
+            'isFemale' => $isFemale,
+        );
+    }
+
+    /**
+     * Lấy thông tin đội/VĐV: tên đơn vị (property), danh sách cầu thủ, trưởng đoàn.
+     *
+     * @param CDbConnection $db
+     * @param int[] $ids
+     * @param int $eventId
+     * @return array map team_id => thông tin
+     */
+    protected function fetchTeamInfo($db, $ids, $eventId)
+    {
+        $ids = array_values(array_filter(array_map('intval', $ids)));
+        if (empty($ids)) {
+            return array();
+        }
+        $in = implode(',', $ids);
+
+        $rows = $db->createCommand(
+            "SELECT t.id, t.name, t.short_name, t.property_id,
+                    p.name AS property_name
+             FROM sport_teams t
+             LEFT JOIN properties p ON p.id = t.property_id
+             WHERE t.id IN ($in) AND t.deleted_at IS NULL"
+        )->queryAll();
+
+        $result = array();
+        $propertyIds = array();
+        foreach ($rows as $r) {
+            $tid = (int) $r['id'];
+            $result[$tid] = array(
+                'team_id' => $tid,
+                'name' => $r['name'],
+                'short_name' => $r['short_name'],
+                'property_id' => $r['property_id'] ? (int) $r['property_id'] : null,
+                'property_name' => $r['property_name'],
+                'players' => array(),
+                'captain' => null,
+                'team_lead' => null,
+            );
+            if ($r['property_id']) {
+                $propertyIds[(int) $r['property_id']] = true;
+            }
+        }
+
+        // Thành viên (cầu thủ) từng đội.
+        $members = $db->createCommand(
+            "SELECT sport_team_id, name, is_captain
+             FROM sport_team_members
+             WHERE sport_team_id IN ($in) AND deleted_at IS NULL
+             ORDER BY is_captain DESC, id"
+        )->queryAll();
+        foreach ($members as $mem) {
+            $tid = (int) $mem['sport_team_id'];
+            if (!isset($result[$tid])) {
+                continue;
+            }
+            $result[$tid]['players'][] = $mem['name'];
+            if ((int) $mem['is_captain'] === 1 && $result[$tid]['captain'] === null) {
+                $result[$tid]['captain'] = $mem['name'];
+            }
+        }
+
+        // Trưởng đoàn theo đơn vị (nếu có người được đánh dấu is_team_lead).
+        if (!empty($propertyIds)) {
+            $pin = implode(',', array_keys($propertyIds));
+            $leads = $db->createCommand(
+                "SELECT property_id, full_name
+                 FROM attendees
+                 WHERE event_id = :eid AND is_team_lead = 1
+                   AND property_id IN ($pin) AND deleted_at IS NULL"
+            )->queryAll(true, array(':eid' => $eventId));
+            $leadByProperty = array();
+            foreach ($leads as $l) {
+                $pid = (int) $l['property_id'];
+                if (!isset($leadByProperty[$pid])) {
+                    $leadByProperty[$pid] = $l['full_name'];
+                }
+            }
+            foreach ($result as $tid => $info) {
+                if ($info['property_id'] && isset($leadByProperty[$info['property_id']])) {
+                    $result[$tid]['team_lead'] = $leadByProperty[$info['property_id']];
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Ghi kết quả 1 trận (AJAX). Backend tự đẩy đội thắng vòng kế.
      */
     public function actionSaveResult()
