@@ -601,7 +601,7 @@ if ($isWelcome) {
             </div>
             <div>
               <strong class="text-dark small d-block mb-1">Quy định trang phục</strong>
-              <span class="text-secondary small">Trang phục dạ hội / lịch sự, trang trọng. Khuyến khích mang giày dép thoải mái để thuận tiện tham gia các hoạt động.</span>
+              <span class="text-secondary small"><?php echo $e($dressDetail); ?></span>
             </div>
           </div>
         </div>
