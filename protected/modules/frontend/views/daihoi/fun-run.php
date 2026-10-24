@@ -54,12 +54,22 @@ $distanceGroups = array(
   ),
 );
 
-// Lịch trình ngày thi đấu (dự kiến 28/10/2026).
+// Lịch trình tổ chức ngày thi đấu (28/10/2026) - theo Agenda giải chạy.
 $schedule = array(
-  array('time' => '05:00 - 05:45', 'text' => 'VĐV tập trung, di chuyển từ khách sạn đến Tràng An Golf & Resort'),
-  array('time' => '05:45 - 06:30', 'text' => 'Ổn định tổ chức, khai mạc & khởi động trước khi xuất phát'),
-  array('time' => '06:30 - 10:30', 'text' => 'Thi đấu các cự ly và trao giải'),
-  array('time' => '10:30 - 11:45', 'text' => 'Di chuyển về khách sạn'),
+  array('time' => '04:30 - 05:00', 'title' => 'Setup hiện trường sớm', 'detail' => 'Kiểm tra nguồn điện, âm thanh, ánh sáng, cổng hơi Start/Finish, huy chương, cờ lưu niệm, linh vật, nước, y tế, rào chắn; nhân sự tiếp quản vị trí phụ trách.', 'place' => 'Khu vực Start/Finish & các điểm trạm'),
+  array('time' => '05:00 - 05:45', 'title' => 'Tập trung & di chuyển đoàn', 'detail' => 'Điểm danh CBNV các đoàn VĐV tại sảnh khách sạn, lên xe di chuyển đến Tràng An Golf & Resort. Khởi hành đúng 05:00.', 'place' => 'Sảnh khách sạn → Tràng An Golf'),
+  array('time' => '05:45 - 06:00', 'title' => 'Ổn định tổ chức', 'detail' => 'Đoàn đến nơi, điểm danh và ổn định đội hình VĐV tại khu vực trước sân khấu.', 'place' => 'Khu vực trước sân khấu'),
+  array('time' => '06:00 - 06:30', 'title' => 'Khai mạc & phổ biến thể lệ', 'detail' => 'Phát biểu khai mạc của TGĐ; công bố thể lệ, đường chạy, mốc cut-off, hotline; khởi động chung.', 'place' => 'Sân khấu chính / Cổng Start'),
+  array('time' => '06:30', 'title' => 'Xuất phát cự ly 15 km & 10 km', 'detail' => 'Điều phối và lệnh xuất phát cự ly 15 km (3 vòng hồ Đồng Chương) và 10 km.', 'place' => 'Vạch Start'),
+  array('time' => '06:35', 'title' => 'Xuất phát cự ly 5 km Nam', 'detail' => 'Điều phối và lệnh xuất phát cự ly 5 km Nam (1 vòng hồ Đồng Chương).', 'place' => 'Vạch Start'),
+  array('time' => '06:40', 'title' => 'Xuất phát cự ly 5 km Nữ', 'detail' => 'Điều phối và lệnh xuất phát cự ly 5 km Nữ (1 vòng hồ Đồng Chương).', 'place' => 'Vạch Start'),
+  array('time' => '06:30 - 09:30', 'title' => 'Điều hành giao thông & chốt nút giao', 'detail' => 'Giữ làn cho runner, đảm bảo VĐV chạy đúng hướng; tiếp nhận thông tin VĐV bỏ cuộc/cần hỗ trợ y tế về BTC.', 'place' => 'Dọc tuyến đường hồ Đồng Chương'),
+  array('time' => '06:45 - 09:30', 'title' => 'Trạm kiểm soát vòng chạy', 'detail' => 'Xác nhận số vòng hoàn thành: 10 km (dấu vòng 2), 15 km (dấu vòng 2 & 3) trước khi về đích.', 'place' => 'Trạm kiểm soát vòng chạy'),
+  array('time' => '06:45 - 09:30', 'title' => 'Trạm tiếp nước & y tế', 'detail' => 'Cấp nước/điện giải tại km 2,3 & 4,1 (tối đa 1 lần/vòng); trực y tế sẵn sàng sơ cứu, hỗ trợ VĐV.', 'place' => 'Các trạm trên đường chạy'),
+  array('time' => '07:15 - 09:30', 'title' => 'Kiểm soát & trao huy chương về đích', 'detail' => 'Ghi nhận thời gian, kiểm tra điều kiện về đích theo từng cự ly & nhóm tuổi; trao huy chương Finisher ngay khi VĐV về đích.', 'place' => 'Vạch Finish'),
+  array('time' => '09:30 - 09:45', 'title' => 'Lễ trao giải cá nhân', 'detail' => 'Công bố kết quả chính thức và trao 24 giải cá nhân (Nhất, Nhì, Ba cho 8 nhóm thi đấu).', 'place' => 'Sân khấu chính'),
+  array('time' => '09:30 - 10:00', 'title' => 'Thu hồi thiết bị & mở lại giao thông', 'detail' => 'Thu hồi standee, biển báo, rác; xác nhận hết VĐV trên tuyến; phối hợp mở lại giao thông bình thường.', 'place' => 'Toàn bộ cung đường chạy'),
+  array('time' => '10:00 - 11:00', 'title' => 'Di chuyển đoàn về khách sạn', 'detail' => 'Điểm danh CBNV lên xe di chuyển về khách sạn nghỉ ngơi, kết thúc giải chạy.', 'place' => 'Bãi đỗ xe Tràng An → Khách sạn'),
 );
 
 // Các trạm / vị trí trên đường chạy (theo sơ đồ tổng thể).
