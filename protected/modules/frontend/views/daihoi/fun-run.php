@@ -207,12 +207,23 @@ $rules = array(
       </div>
       <div class="card border-0 rounded-4 shadow-sm">
         <div class="card-body p-4">
-          <?php foreach ($schedule as $i => $s): ?>
-            <div class="d-flex gap-3 <?php echo $i < count($schedule) - 1 ? 'pb-3 mb-3 border-bottom' : ''; ?>">
-              <div class="fw-bold flex-shrink-0 text-nowrap" style="color:<?php echo $e($accent); ?>;width:120px;"><?php echo $e($s['time']); ?></div>
-              <div class="text-dark"><?php echo $e($s['text']); ?></div>
-            </div>
-          <?php endforeach; ?>
+          <div class="funrun-timeline">
+            <?php foreach ($schedule as $i => $s): ?>
+              <div class="funrun-timeline__item <?php echo $i < count($schedule) - 1 ? 'pb-4' : ''; ?>">
+                <span class="funrun-timeline__dot" style="background:<?php echo $e($accent); ?>;"></span>
+                <div class="fw-bold text-nowrap mb-1" style="color:<?php echo $e($accent); ?>;"><?php echo $e($s['time']); ?></div>
+                <div class="fw-semibold text-dark mb-1"><?php echo $e($s['title']); ?></div>
+                <?php if (!empty($s['detail'])): ?>
+                  <div class="small text-secondary"><?php echo $e($s['detail']); ?></div>
+                <?php endif; ?>
+                <?php if (!empty($s['place'])): ?>
+                  <div class="small text-secondary mt-1 d-inline-flex align-items-center gap-1">
+                    <span class="material-symbols-outlined fs-6" style="color:<?php echo $e($accent); ?>;">location_on</span><?php echo $e($s['place']); ?>
+                  </div>
+                <?php endif; ?>
+              </div>
+            <?php endforeach; ?>
+          </div>
         </div>
       </div>
     </section>
