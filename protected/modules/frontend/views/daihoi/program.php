@@ -200,4 +200,91 @@ if (empty($program) && !empty($agenda) && is_array($agenda) && !empty($keywords)
 <style>
 .program-row:last-child { border-bottom: 0 !important; }
 .bg-slate-50 { background-color: #f8fafc !important; }
+
+/* ===== Timeline chương trình chi tiết ===== */
+.prg { --prg-accent: #2563eb; }
+.prg-timeline { position: relative; }
+
+/* Đường kẻ dọc chạy xuyên các mốc */
+.prg-item { position: relative; display: flex; gap: 16px; padding: 0 0 22px 0; }
+.prg-item::before {
+  content: ""; position: absolute; left: 17px; top: 36px; bottom: -4px;
+  width: 2px; background: #e9ecef;
+}
+.prg-item--last::before { display: none; }
+
+/* Mốc tròn đánh số */
+.prg-marker { flex: 0 0 auto; width: 36px; z-index: 1; }
+.prg-dot {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  font-size: 13px; font-weight: 700; color: var(--prg-accent);
+  background: #fff; border: 2px solid var(--prg-accent);
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.prg-item--feature .prg-dot {
+  color: #fff; background: var(--prg-accent);
+}
+
+/* Nội dung */
+.prg-body { flex: 1 1 auto; min-width: 0; padding-top: 2px; }
+.prg-time {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 600; color: var(--prg-accent);
+  background: color-mix(in srgb, var(--prg-accent) 10%, #fff);
+  border-radius: 999px; padding: 3px 10px 3px 8px; margin-bottom: 6px;
+}
+.prg-time .material-symbols-outlined { font-size: 15px; }
+.prg-title { font-weight: 700; color: #1f2937; line-height: 1.4; }
+
+/* Mục nổi bật (có chương trình con) -> bọc khung */
+.prg-item--feature .prg-body {
+  background: #fafbff; border: 1px solid #eef0f6;
+  border-left: 3px solid var(--prg-accent);
+  border-radius: 12px; padding: 12px 14px;
+}
+.prg-item--feature .prg-title { font-size: 15.5px; }
+
+/* Danh sách con */
+.prg-sub { list-style: none; margin: 10px 0 0; padding: 0; }
+.prg-sub li {
+  position: relative; padding: 5px 0 5px 20px;
+  font-size: 13.5px; color: #4b5563; line-height: 1.5;
+  border-top: 1px dashed #edeff4;
+}
+.prg-sub li:first-child { border-top: 0; }
+.prg-sub li::before {
+  content: ""; position: absolute; left: 4px; top: 12px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--prg-accent); opacity: .55;
+}
+
+/* Header chương */
+.prg-section {
+  display: flex; align-items: center; gap: 12px;
+  margin: 8px 0 20px; padding: 11px 16px; border-radius: 12px;
+  color: #fff; letter-spacing: .02em;
+  background: linear-gradient(90deg, var(--prg-accent), color-mix(in srgb, var(--prg-accent) 65%, #000));
+}
+.prg-section:first-child { margin-top: 0; }
+.prg-section-no {
+  flex: 0 0 auto; font-weight: 800; font-size: 15px;
+  background: rgba(255,255,255,.22); border-radius: 8px;
+  padding: 2px 9px; line-height: 1.5;
+}
+.prg-section-title { font-weight: 700; font-size: 14px; text-transform: uppercase; }
+
+/* Fallback cho trình duyệt không hỗ trợ color-mix */
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .prg-time { background: #f1f5ff; }
+  .prg-section { background: var(--prg-accent); }
+}
+
+@media (max-width: 575.98px) {
+  .prg-item { gap: 12px; }
+  .prg-item::before { left: 15px; }
+  .prg-marker { width: 32px; }
+  .prg-dot { width: 32px; height: 32px; font-size: 12px; }
+  .prg-title { font-size: 14px; }
+}
 </style>
