@@ -64,6 +64,12 @@ $dateValue = $isWelcome ? 'Thứ Ba, 27/10/2026' : ($isGala ? 'Thứ Năm, 29/10
 $timeValue = $isWelcome ? '18:30 – 22:30' : ($isGala ? '18:30 – 22:00' : '18:30');
 $venueValue = 'Hoa Lư Ballroom - Tầng 1';
 
+// Quy định trang phục - Khai mạc mặc truyền thống, Gala/khác mặc dạ hội.
+$dressShort = $isWelcome ? 'Nữ: Áo dài · Nam: Sơ mi, quần Âu' : 'Lịch sự / Dạ hội';
+$dressDetail = $isWelcome
+    ? 'Nữ: Áo dài. Nam: Sơ mi, quần Âu dài, giày; khuyến khích mặc áo dài.'
+    : 'Trang phục dạ hội / lịch sự, trang trọng. Khuyến khích mang giày dép thoải mái để thuận tiện tham gia các hoạt động.';
+
 foreach ($info as $r) {
     $lbl = mb_strtolower($val($r, 'label', ''), 'UTF-8');
     $v = $val($r, 'value', '');
