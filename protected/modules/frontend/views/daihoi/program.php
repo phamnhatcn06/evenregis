@@ -617,6 +617,17 @@ if ($isWelcome) {
             <div>
               <strong class="text-dark small d-block mb-1">Quy định trang phục</strong>
               <span class="text-secondary small"><?php echo $e($dressDetail); ?></span>
+              <?php if (!empty($dressColors)): ?>
+                <div class="d-flex flex-wrap align-items-center gap-3 mt-2">
+                  <span class="text-dark small fw-semibold">Dresscode:</span>
+                  <?php foreach ($dressColors as $c): ?>
+                    <span class="d-inline-flex flex-column align-items-center" style="gap:2px;">
+                      <span class="rounded-circle d-inline-block" style="width:22px;height:22px;background:<?php echo $e($c['hex']); ?>;border:1px solid rgba(0,0,0,.15);"></span>
+                      <span class="text-secondary" style="font-size:11px;"><?php echo $e($c['name']); ?></span>
+                    </span>
+                  <?php endforeach; ?>
+                </div>
+              <?php endif; ?>
             </div>
           </div>
         </div>
