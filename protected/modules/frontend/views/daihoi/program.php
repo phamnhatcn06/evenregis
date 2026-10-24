@@ -249,7 +249,7 @@ if ($isWelcome) {
             </div>
             <div class="prg-meta-pill">
               <span class="material-symbols-outlined">styler</span>
-              <span>Trang phục: <strong>Lịch sự / Dạ hội</strong></span>
+              <span>Trang phục: <strong><?php echo $e($dressShort); ?></strong></span>
             </div>
           </div>
 
