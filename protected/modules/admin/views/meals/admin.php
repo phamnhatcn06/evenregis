@@ -13,21 +13,23 @@ $this->Tabletitle = 'Danh sách bữa ăn (chấm ăn)';
 ?>
 <div class="card mb-3">
     <div class="card-body">
-        <form method="get" class="row g-2 align-items-end mb-2">
+        <div class="row g-2 align-items-end">
             <div class="col-md-5">
-                <label class="form-label">Sự kiện</label>
-                <select name="event_id" class="form-select" onchange="this.form.submit()">
-                    <option value="">-- Tất cả sự kiện --</option>
-                    <?php foreach ($eventList as $id => $name): ?>
-                        <option value="<?php echo $id; ?>" <?php echo ($eventId == $id) ? 'selected' : ''; ?>>
-                            <?php echo CHtml::encode($name); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <form method="get" id="meal-filter-form">
+                    <label class="form-label">Sự kiện</label>
+                    <select name="event_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Tất cả sự kiện --</option>
+                        <?php foreach ($eventList as $id => $name): ?>
+                            <option value="<?php echo $id; ?>" <?php echo ($eventId == $id) ? 'selected' : ''; ?>>
+                                <?php echo CHtml::encode($name); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
             </div>
             <div class="col-md-7">
                 <?php if ($eventId): ?>
-                    <form method="post" action="<?php echo $this->createUrl('syncFromAgenda'); ?>" class="d-inline">
+                    <form method="post" action="<?php echo $this->createUrl('syncFromAgenda'); ?>">
                         <input type="hidden" name="event_id" value="<?php echo (int) $eventId; ?>">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-refresh me-1"></i>Đồng bộ bữa ăn từ chương trình (sáng/trưa/tối)
@@ -37,7 +39,7 @@ $this->Tabletitle = 'Danh sách bữa ăn (chấm ăn)';
                     <span class="text-muted"><i class="fa fa-info-circle me-1"></i>Chọn sự kiện để đồng bộ bữa ăn từ agenda.</span>
                 <?php endif; ?>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
