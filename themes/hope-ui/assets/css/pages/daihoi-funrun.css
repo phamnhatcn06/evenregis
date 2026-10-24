@@ -43,3 +43,34 @@
 .funrun-lightbox__close:hover {
     background: rgba(255, 255, 255, .3);
 }
+
+/* Timeline lịch trình tổ chức */
+.funrun-timeline {
+    position: relative;
+    padding-left: 28px;
+}
+
+.funrun-timeline::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: #d1e7d9;
+}
+
+.funrun-timeline__item {
+    position: relative;
+}
+
+.funrun-timeline__dot {
+    position: absolute;
+    left: -28px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #d1e7d9;
+}
