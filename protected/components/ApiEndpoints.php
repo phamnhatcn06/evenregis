@@ -433,6 +433,22 @@ class ApiEndpoints
     const MEAL_DETAIL = '/api/meals/detail/{id}';
     const MEAL_UPDATE = '/api/meals/update/{id}';
     const MEAL_DESTROY = '/api/meals/destroy/{id}';
+    const MEAL_SYNC_FROM_AGENDA = '/api/meals/sync-from-agenda';
+
+    // Trạm chấm ăn (CRUD cấu hình)
+    const MEAL_STATION_LIST = '/api/meal-stations';
+    const MEAL_STATION_STORE = '/api/meal-stations/store';
+    const MEAL_STATION_DETAIL = '/api/meal-stations/detail/{id}';
+    const MEAL_STATION_UPDATE = '/api/meal-stations/update/{id}';
+    const MEAL_STATION_DESTROY = '/api/meal-stations/destroy/{id}';
+
+    // Màn quét chấm ăn (station)
+    const MEAL_CHECKIN_STATIONS = '/api/meal-checkin/stations';
+    const MEAL_CHECKIN_LOGIN = '/api/meal-checkin/login';
+    const MEAL_CHECKIN_ACTIVE_MEALS = '/api/meal-checkin/active-meals';
+    const MEAL_CHECKIN_SCAN = '/api/meal-checkin/scan';
+    const MEAL_CHECKIN_SYNC = '/api/meal-checkin/sync';
+    const MEAL_CHECKIN_STATS = '/api/meal-checkin/stats';
 
     // Meal Table
     const MEAL_TABLE_LIST = '/api/meal-tables';
