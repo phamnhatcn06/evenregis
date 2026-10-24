@@ -64,11 +64,26 @@ $dateValue = $isWelcome ? 'Thứ Ba, 27/10/2026' : ($isGala ? 'Thứ Năm, 29/10
 $timeValue = $isWelcome ? '18:30 – 22:30' : ($isGala ? '18:30 – 22:00' : '18:30');
 $venueValue = 'Hoa Lư Ballroom - Tầng 1';
 
-// Quy định trang phục - Khai mạc mặc truyền thống, Gala/khác mặc dạ hội.
-$dressShort = $isWelcome ? 'Nữ: Áo dài · Nam: Sơ mi, quần Âu' : 'Lịch sự / Dạ hội';
-$dressDetail = $isWelcome
-    ? 'Nữ: Áo dài. Nam: Sơ mi, quần Âu dài, giày; khuyến khích mặc áo dài.'
-    : 'Trang phục dạ hội / lịch sự, trang trọng. Khuyến khích mang giày dép thoải mái để thuận tiện tham gia các hoạt động.';
+// Quy định trang phục - Khai mạc mặc truyền thống, Gala mặc lịch sự/Vest.
+if ($isWelcome) {
+    $dressShort = 'Nữ: Áo dài · Nam: Sơ mi, quần Âu';
+    $dressDetail = 'Nữ: Áo dài. Nam: Sơ mi, quần Âu dài, giày; khuyến khích mặc áo dài.';
+} elseif ($isGala) {
+    $dressShort = 'Nữ: Váy lịch sự · Nam: Sơ mi/Vest';
+    $dressDetail = 'Nữ: Quần áo, váy lịch sự. Nam: Sơ mi/Vest, quần Âu dài, giày (khuyến khích mặc Vest).';
+} else {
+    $dressShort = 'Lịch sự / Dạ hội';
+    $dressDetail = 'Trang phục dạ hội / lịch sự, trang trọng. Khuyến khích mang giày dép thoải mái để thuận tiện tham gia các hoạt động.';
+}
+
+// Bảng màu dresscode (chỉ áp dụng cho đêm Gala).
+$dressColors = $isGala ? array(
+    array('name' => 'Đen', 'hex' => '#111111'),
+    array('name' => 'Trắng', 'hex' => '#ffffff'),
+    array('name' => 'Hồng', 'hex' => '#f4a6b8'),
+    array('name' => 'Tím', 'hex' => '#a98fd6'),
+    array('name' => 'Nude', 'hex' => '#d9b99b'),
+) : array();
 
 foreach ($info as $r) {
     $lbl = mb_strtolower($val($r, 'label', ''), 'UTF-8');
