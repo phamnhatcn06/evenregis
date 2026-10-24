@@ -41,9 +41,12 @@ $fmtDate = function ($raw) {
     return $days[(int) date('w', $ts)] . ', ' . date('d/m/Y', $ts);
 };
 
+// Chương trình chi tiết tĩnh (từ poster Agenda) — ưu tiên nếu có.
+$program = isset($config['program']) && is_array($config['program']) ? $config['program'] : array();
+
 // Lọc các mục agenda khớp từ khoá (không dấu-insensitive đơn giản theo lower-case).
 $matched = array();
-if (!empty($agenda) && is_array($agenda) && !empty($keywords)) {
+if (empty($program) && !empty($agenda) && is_array($agenda) && !empty($keywords)) {
     foreach ($agenda as $item) {
         if (!is_array($item)) {
             continue;
