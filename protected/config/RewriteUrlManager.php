@@ -9,6 +9,10 @@ $urlRewrite = array(
     'run' => 'frontend/run/index',
     'run/<action:\w+>' => 'frontend/run/<action>',
 
+    // Màn quét chấm ăn (station) — public, đặt TRƯỚC các rule generic
+    'cham-an' => 'frontend/mealScan/index',
+    'cham-an/<action:\w+>' => 'frontend/mealScan/<action>',
+
     // Quay số may mắn (admin) — slug thân thiện, đặt TRƯỚC rule generic
     'quay-so' => 'admin/luckyDraw/show',
     'quay-so/dieu-khien' => 'admin/luckyDraw/remote',
