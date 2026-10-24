@@ -106,7 +106,39 @@ if (empty($program) && !empty($agenda) && is_array($agenda) && !empty($keywords)
       <h2 class="fw-bold text-dark fs-5 mb-0">Chương trình chi tiết</h2>
     </div>
 
-    <?php if (empty($matched)): ?>
+    <?php if (!empty($program)): ?>
+      <div class="card border rounded-4 shadow-sm bg-white overflow-hidden">
+        <div class="p-3 p-md-4">
+          <?php $stt = 0; foreach ($program as $item): ?>
+            <?php if (isset($item['section'])): ?>
+            <div class="rounded-3 px-3 py-2 my-3 fw-bold text-white text-uppercase" style="background:<?php echo $e($accent); ?>;letter-spacing:.02em;font-size:13px;">
+              <?php echo $e($item['section']); ?>
+            </div>
+            <?php else: $stt++; ?>
+            <div class="d-flex gap-3 py-3 border-bottom program-row">
+              <div class="flex-shrink-0 text-end" style="min-width:94px;">
+                <span class="badge bg-light text-dark border fw-bold" style="font-size:12px;"><?php echo $e($val($item, 'time', '—')); ?></span>
+              </div>
+              <div class="flex-shrink-0 d-flex flex-column align-items-center" style="width:18px;">
+                <span class="rounded-circle d-inline-block mt-1" style="width:11px;height:11px;background:<?php echo $e($accent); ?>;"></span>
+                <span class="flex-grow-1" style="width:2px;background:#e9ecef;"></span>
+              </div>
+              <div class="flex-grow-1">
+                <strong class="text-dark d-block"><?php echo $e($val($item, 'title', 'Hoạt động')); ?></strong>
+                <?php if (!empty($item['sub']) && is_array($item['sub'])): ?>
+                <ul class="text-secondary small mt-2 mb-0 ps-3">
+                  <?php foreach ($item['sub'] as $sub): ?>
+                  <li class="mb-1"><?php echo $e($sub); ?></li>
+                  <?php endforeach; ?>
+                </ul>
+                <?php endif; ?>
+              </div>
+            </div>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    <?php elseif (empty($matched)): ?>
       <div class="card border rounded-4 shadow-sm p-5 text-center text-secondary">
         <span class="material-symbols-outlined mb-2" style="font-size:48px;">event_upcoming</span>
         <p class="mb-0"><?php echo $e(isset($config['emptyText']) ? $config['emptyText'] : 'Chương trình chi tiết sẽ được cập nhật.'); ?></p>
