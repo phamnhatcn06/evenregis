@@ -359,6 +359,7 @@ class Daihoi
                 JOIN sport_teams t ON t.id = tm.sport_team_id
                 LEFT JOIN properties p ON p.id = t.property_id
                 WHERE tm.sport_team_id IN ({$idListStr})
+                  AND tm.deleted_at IS NULL
                 ORDER BY tm.id ASC
             ";
             $rows = Yii::app()->db->createCommand($sql)->queryAll();
