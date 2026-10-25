@@ -351,48 +351,65 @@ class Daihoi
             return array();
         }
 
-        try {
-            $idListStr = implode(',', $cleanIds);
-            $sql = "
-                SELECT tm.sport_team_id, tm.name as athlete_name, t.name as team_code, p.code as property_code
-                FROM sport_team_members tm
-                JOIN sport_teams t ON t.id = tm.sport_team_id
-                LEFT JOIN properties p ON p.id = t.property_id
-                WHERE tm.sport_team_id IN ({$idListStr})
-                  AND tm.deleted_at IS NULL
-                ORDER BY tm.id ASC
-            ";
-            $rows = Yii::app()->db->createCommand($sql)->queryAll();
-            $result = array();
-            foreach ($rows as $r) {
-                $tid = (int) $r['sport_team_id'];
-                $ath = trim((string) $r['athlete_name']);
-                $code = !empty($r['team_code']) ? trim((string) $r['team_code']) : trim((string) $r['property_code']);
-                if (!isset($result[$tid])) {
-                    $result[$tid] = array(
-                        'athletes' => array(),
-                        'team_code' => $code,
-                    );
+        $map = array();
+        foreach ($cleanIds as $tid) {
+            // Lấy thành viên đội qua API (backend đã lọc bản ghi soft-delete,
+            // nên VĐV bị thay thế không còn xuất hiện).
+            $result = ApiClient::get(ApiEndpoints::SPORT_TEAM_MEMBER_LIST, array(
+                'sport_team_id' => $tid,
+                'per_page' => 10000,
+            ));
+            $items = ($result['success'] && isset($result['data']['data']))
+                ? $result['data']['data']
+                : (($result['success'] && isset($result['data']) && is_array($result['data'])) ? $result['data'] : array());
+            if (!is_array($items)) {
+                continue;
+            }
+
+            $athletes = array();
+            $unit = '';
+            foreach ($items as $item) {
+                if (!isset($item['sport_team_id']) || $item['sport_team_id'] != $tid) {
+                    continue;
+                }
+                $ath = '';
+                if (!empty($item['name'])) {
+                    $ath = trim((string) $item['name']);
+                } elseif (!empty($item['attendee_name'])) {
+                    $ath = trim((string) $item['attendee_name']);
+                } elseif (!empty($item['full_name'])) {
+                    $ath = trim((string) $item['full_name']);
                 }
                 if ($ath !== '') {
-                    $result[$tid]['athletes'][] = $ath;
+                    $athletes[] = $ath;
+                }
+                if ($unit === '') {
+                    foreach (array('team_name', 'team_code', 'property_code', 'property_name') as $k) {
+                        if (!empty($item[$k])) {
+                            $unit = trim((string) $item[$k]);
+                            break;
+                        }
+                    }
                 }
             }
 
-            $map = array();
-            foreach ($result as $tid => $info) {
-                $athletesStr = implode(' / ', $info['athletes']);
-                $unit = $info['team_code'];
-                if ($athletesStr !== '') {
-                    $map[$tid] = $athletesStr . ($unit !== '' ? (' (' . $unit . ')') : '');
-                } else {
-                    $map[$tid] = $unit;
+            // Fallback mã đơn vị từ đội nếu danh sách thành viên không có.
+            if ($unit === '') {
+                $team = SportTeams::fetchFromApi($tid);
+                if ($team) {
+                    $unit = !empty($team->name) ? trim((string) $team->name) : trim((string) $team->property_code);
                 }
             }
-            return $map;
-        } catch (Exception $e) {
-            return array();
+
+            $athletesStr = implode(' / ', $athletes);
+            if ($athletesStr !== '') {
+                $map[$tid] = $athletesStr . ($unit !== '' ? (' (' . $unit . ')') : '');
+            } elseif ($unit !== '') {
+                $map[$tid] = $unit;
+            }
         }
+
+        return $map;
     }
 
     /**
