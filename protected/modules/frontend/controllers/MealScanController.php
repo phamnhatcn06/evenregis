@@ -14,6 +14,8 @@
 class MealScanController extends CController
 {
     const SESSION_KEY = 'meal_station';
+    const COOKIE_KEY = 'meal_station';
+    const COOKIE_TTL = 31536000; // 1 năm — trạm không bao giờ tự hết hạn
 
     public function filters()
     {
