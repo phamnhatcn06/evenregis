@@ -322,7 +322,9 @@ class Daihoi
      */
     public static function getContents()
     {
-        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_CONTENTS), array());
+        return self::remember('daihoi:contents', function () {
+            return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_CONTENTS), array());
+        });
     }
 
     /**
