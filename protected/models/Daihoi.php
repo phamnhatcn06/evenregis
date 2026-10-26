@@ -777,10 +777,12 @@ class Daihoi
         }
 
         if (empty($matches)) {
-            return self::getFallbackTournamentSchedule($filterSportId);
+            $fallback = self::getFallbackTournamentSchedule($filterSportId);
+            self::$requestMemo[$memoKey] = $fallback;
+            return $fallback;
         }
 
-        return array(
+        $result = array(
             'stats' => array(
                 'total_sports' => count($sportsMap),
                 'total_stages' => count($stageList),
@@ -796,6 +798,8 @@ class Daihoi
             'upcomingMatches' => $upcomingMatches,
             'standingsBySport' => $standingsBySport,
         );
+        self::$requestMemo[$memoKey] = $result;
+        return $result;
     }
 
     /**
