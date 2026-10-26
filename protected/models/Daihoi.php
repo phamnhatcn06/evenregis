@@ -886,10 +886,12 @@ class Daihoi
      */
     public static function getNews($limit = 10)
     {
-        return self::unwrap(
-            ApiClient::get(ApiEndpoints::NEWS_LIST, array('per_page' => $limit, 'page' => 1)),
-            array()
-        );
+        return self::remember('daihoi:news:' . (int) $limit, function () use ($limit) {
+            return self::unwrap(
+                ApiClient::get(ApiEndpoints::NEWS_LIST, array('per_page' => $limit, 'page' => 1)),
+                array()
+            );
+        });
     }
 
     /**
