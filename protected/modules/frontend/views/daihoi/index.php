@@ -894,7 +894,7 @@ if (empty($albumList)) {
                         <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:11px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);"><?php echo $e($initials($home)); ?></div>
                         <span class="fw-bold text-dark small"><?php echo $e($home); ?></span>
                       </div>
-                      <span class="badge rounded-3 px-2 py-1 text-primary fw-black fs-4 font-monospace" style="background-color:#dbeafe;"><?php echo $e($sc[0]); ?></span>
+                      <span class="badge rounded-3 px-2 py-1 text-primary fw-black fs-4 font-monospace" style="background-color:#dbeafe;"><?php echo $e($scHome); ?></span>
                     </div>
                     <div class="d-flex align-items-center justify-content-between p-2 rounded-3">
                       <div class="d-flex align-items-center gap-2">
