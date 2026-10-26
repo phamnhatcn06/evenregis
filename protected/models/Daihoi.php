@@ -949,10 +949,12 @@ class Daihoi
      */
     public static function getAlbums($limit = 8)
     {
-        return self::unwrap(
-            ApiClient::get(ApiEndpoints::DAIHOI_ALBUMS, array('per_page' => $limit, 'page' => 1)),
-            array()
-        );
+        return self::remember('daihoi:albums:' . (int) $limit, function () use ($limit) {
+            return self::unwrap(
+                ApiClient::get(ApiEndpoints::DAIHOI_ALBUMS, array('per_page' => $limit, 'page' => 1)),
+                array()
+            );
+        });
     }
 
     /**
