@@ -38,7 +38,7 @@ $isLogged = (!empty(Yii::app()->session['sso_token']) || AuthHandler::isAuthenti
     <!-- Nav inline trên desktop: 1 hàng, kiểu link gạch chân (không dùng pill) -->
     <?php
     // Các mục ít dùng gom vào dropdown "Thêm" để menu gọn trong 1 hàng.
-    $moreKeys = array('map', 'support', 'secretary');
+    $moreKeys = array('survey', 'map', 'support', 'secretary');
     $moreActive = in_array($active, $moreKeys, true);
     ?>
     <nav class="dh-subnav d-none d-lg-flex align-items-center justify-content-end">
