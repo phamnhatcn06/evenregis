@@ -315,7 +315,11 @@ $findCategoryId = function ($needle) use ($newsCategories, $normalize, $val) {
 };
 
 // Chuẩn hoá danh sách trận đấu cho khối Kết quả
-$matches = !empty($liveMatches) ? $liveMatches : $recentMatches;
+// Ưu tiên trận đang diễn ra → vừa kết thúc → sắp diễn ra (đều là dữ liệu thật từ lịch thi đấu).
+$upcomingMatches = isset($upcomingMatches) && is_array($upcomingMatches) ? $upcomingMatches : array();
+$matches = !empty($liveMatches)
+  ? $liveMatches
+  : (!empty($recentMatches) ? $recentMatches : $upcomingMatches);
 $statusMap = array(
   // Khoá chuẩn hoá của /api/daihoi/*
   'live' => array('cls' => 'bg-danger', 'text' => 'Đang diễn ra'),
