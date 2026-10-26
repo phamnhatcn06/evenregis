@@ -913,10 +913,12 @@ class Daihoi
      */
     public static function getNewsCategories()
     {
-        return self::unwrap(
-            ApiClient::get(ApiEndpoints::NEWS_CATEGORY_LIST, array('is_active' => 1, 'per_page' => 100, 'page' => 1)),
-            array()
-        );
+        return self::remember('daihoi:news_categories', function () {
+            return self::unwrap(
+                ApiClient::get(ApiEndpoints::NEWS_CATEGORY_LIST, array('is_active' => 1, 'per_page' => 100, 'page' => 1)),
+                array()
+            );
+        });
     }
 
     /**
