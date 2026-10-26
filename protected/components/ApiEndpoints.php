@@ -131,6 +131,18 @@ class ApiEndpoints
     const MEDIA_ITEM_UPDATE = '/api/admin/media-items/{id}';
     const MEDIA_ITEM_DESTROY = '/api/admin/media-items/{id}';
 
+    // Survey (Khảo sát ý kiến - Google Form, Daihoi Admin REST style)
+    const SURVEY_LIST = '/api/admin/surveys';
+    const SURVEY_STORE = '/api/admin/surveys';
+    const SURVEY_DETAIL = '/api/admin/surveys/{id}';
+    const SURVEY_UPDATE = '/api/admin/surveys/{id}';
+    const SURVEY_DESTROY = '/api/admin/surveys/{id}';
+    const SURVEY_TOGGLE = '/api/admin/surveys/{id}/toggle';
+    const SURVEY_REORDER = '/api/admin/surveys/reorder';
+
+    // Khảo sát ý kiến (public - khảo sát đang bật của sự kiện hiện tại)
+    const DAIHOI_SURVEYS = '/api/daihoi/surveys';
+
     // Event
     const EVENT_LIST = '/api/events';
     const EVENT_STORE = '/api/events/store';
