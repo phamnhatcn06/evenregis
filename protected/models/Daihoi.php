@@ -469,6 +469,13 @@ class Daihoi
             $eventId = isset($ev['id']) ? $ev['id'] : 3;
         }
 
+        // Memo theo request: getLiveMatches + getRecentMatches cùng gọi hàm nặng này,
+        // không cache sẽ chạy trọn vẹn 2 lần (mỗi lần hàng chục/trăm request con).
+        $memoKey = 'schedule:' . $eventId . ':' . ($filterSportId !== null ? $filterSportId : '*');
+        if (array_key_exists($memoKey, self::$requestMemo)) {
+            return self::$requestMemo[$memoKey];
+        }
+
         $stagesRes = ApiClient::get(ApiEndpoints::SPORT_STAGE_LIST, array(
             'event_id' => $eventId,
             'per_page' => 100,
