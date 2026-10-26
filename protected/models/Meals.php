@@ -70,6 +70,21 @@ class Meals extends CFormModel
         return null;
     }
 
+    public function storeViaApi()
+    {
+        return ApiClient::post(ApiEndpoints::MEAL_STORE, array(
+            'event_id'      => $this->event_id,
+            'name'          => $this->name,
+            'meal_type'     => $this->meal_type,
+            'meal_date'     => $this->meal_date,
+            'serving_time'  => $this->serving_time ?: null,
+            'checkin_start' => $this->checkin_start ?: null,
+            'checkin_end'   => $this->checkin_end ?: null,
+            'location'      => $this->location,
+            'is_active'     => ($this->is_active === null || $this->is_active === '') ? 1 : $this->is_active,
+        ));
+    }
+
     public function updateViaApi()
     {
         $url = ApiEndpoints::url(ApiEndpoints::MEAL_UPDATE, array('id' => $this->id));
