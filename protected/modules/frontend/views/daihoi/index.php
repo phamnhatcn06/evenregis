@@ -10,6 +10,7 @@
  * @var array $agenda
  * @var array $liveMatches
  * @var array $recentMatches
+ * @var array $upcomingMatches
  * @var array $rankings
  * @var array $news
  * @var array $slides
