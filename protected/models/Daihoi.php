@@ -92,15 +92,23 @@ class Daihoi
      */
     public static function getEvent()
     {
+        if (array_key_exists('event', self::$requestMemo)) {
+            return self::$requestMemo['event'];
+        }
+
         $list = self::unwrap(
             ApiClient::get(ApiEndpoints::EVENT_LIST, array('per_page' => 1, 'page' => 1)),
             array()
         );
         // Danh sách phân trang -> lấy phần tử đầu
         if (isset($list[0]) && is_array($list[0])) {
-            return $list[0];
+            $event = $list[0];
+        } else {
+            $event = is_array($list) ? $list : array();
         }
-        return is_array($list) ? $list : array();
+
+        self::$requestMemo['event'] = $event;
+        return $event;
     }
 
     /**
