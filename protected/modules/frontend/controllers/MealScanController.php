@@ -158,10 +158,60 @@ class MealScanController extends CController
     // Helpers
     // ------------------------------------------------------------------
 
+    /**
+     * Lấy trạm hiện tại. Ưu tiên session; nếu session đã bị dọn (PHP gc) hoặc
+     * trình duyệt khởi động lại thì khôi phục từ cookie đã ký HMAC (hạn 1 năm)
+     * — nhờ vậy trạm chấm ăn KHÔNG BAO GIỜ tự hết hạn khi còn đang dùng.
+     */
     protected function currentStation()
     {
         $s = Yii::app()->session[self::SESSION_KEY];
-        return (is_array($s) && !empty($s['id'])) ? $s : null;
+        if (is_array($s) && !empty($s['id'])) {
+            return $s;
+        }
+
+        $fromCookie = $this->readStationCookie();
+        if ($fromCookie) {
+            // Khôi phục lại session để các request sau không phải giải mã cookie.
+            Yii::app()->session[self::SESSION_KEY] = $fromCookie;
+            return $fromCookie;
+        }
+
+        return null;
+    }
+
+    /** Ghi cookie trạm đã ký (sống qua reset trình duyệt + PHP session gc). */
+    protected function setStationCookie(array $data)
+    {
+        $payload = CJSON::encode($data);
+        $cookie = new CHttpCookie(self::COOKIE_KEY, $payload . '|' . $this->signPayload($payload));
+        $cookie->expire = time() + self::COOKIE_TTL;
+        $cookie->httpOnly = true;
+        Yii::app()->request->cookies[self::COOKIE_KEY] = $cookie;
+    }
+
+    /** Đọc + xác thực cookie trạm; sai chữ ký = bỏ qua (chống giả mạo). */
+    protected function readStationCookie()
+    {
+        $cookie = Yii::app()->request->cookies[self::COOKIE_KEY];
+        if (!$cookie || !$cookie->value || strpos($cookie->value, '|') === false) {
+            return null;
+        }
+        $pos = strrpos($cookie->value, '|');
+        $payload = substr($cookie->value, 0, $pos);
+        $sig = substr($cookie->value, $pos + 1);
+        if (!hash_equals($this->signPayload($payload), (string) $sig)) {
+            return null;
+        }
+        $data = CJSON::decode($payload);
+        return (is_array($data) && !empty($data['id'])) ? $data : null;
+    }
+
+    /** HMAC bằng khoá server (API key) — client không biết nên không giả được. */
+    protected function signPayload($payload)
+    {
+        $secret = isset(Yii::app()->params['externalApiKey']) ? Yii::app()->params['externalApiKey'] : 'meal-station-secret';
+        return hash_hmac('sha256', $payload, $secret);
     }
 
     /** Bắt buộc có phiên trạm cho các action JSON. */
