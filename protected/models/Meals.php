@@ -122,6 +122,30 @@ class Meals extends CFormModel
         return ApiClient::post(ApiEndpoints::MEAL_SYNC_FROM_AGENDA, array('event_id' => $eventId));
     }
 
+    /** Báo cáo tổng hợp số người ăn theo từng bữa của sự kiện. */
+    public static function fetchReportSummary($eventId)
+    {
+        $result = ApiClient::get(ApiEndpoints::MEAL_REPORT_SUMMARY, array('event_id' => $eventId));
+        if ($result['success'] && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        return null;
+    }
+
+    /** Báo cáo chi tiết danh sách người chấm ăn (tuỳ chọn 1 bữa). */
+    public static function fetchReportDetail($eventId, $mealId = null)
+    {
+        $params = array('event_id' => $eventId);
+        if ($mealId) {
+            $params['meal_id'] = $mealId;
+        }
+        $result = ApiClient::get(ApiEndpoints::MEAL_REPORT_DETAIL, $params);
+        if ($result['success'] && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        return null;
+    }
+
     public static function getTypeLabel($type)
     {
         $labels = array(
