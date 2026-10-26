@@ -165,15 +165,14 @@ class MealsController extends AdminController
             $sheet2->setCellValue('A' . $row, $stt++);
             $sheet2->setCellValue('B' . $row, isset($r['full_name']) ? $r['full_name'] : '');
             $sheet2->setCellValue('C' . $row, isset($r['org']) ? $r['org'] : '');
-            $sheet2->setCellValue('D' . $row, isset($r['unit']) ? $r['unit'] : '');
-            $sheet2->setCellValue('E' . $row, isset($r['meal_name']) ? $r['meal_name'] : '');
-            $sheet2->setCellValue('F' . $row, isset($r['checked_by']) ? $r['checked_by'] : '');
-            $sheet2->setCellValue('G' . $row, isset($r['check_in_time']) ? $r['check_in_time'] : '');
-            $sheet2->setCellValue('H' . $row, self::getSourceLabel(isset($r['source']) ? $r['source'] : ''));
-            $sheet2->getStyle('A' . $row . ':H' . $row)->applyFromArray($borderStyle);
+            $sheet2->setCellValue('D' . $row, isset($r['meal_name']) ? $r['meal_name'] : '');
+            $sheet2->setCellValue('E' . $row, isset($r['checked_by']) ? $r['checked_by'] : '');
+            $sheet2->setCellValue('F' . $row, isset($r['check_in_time']) ? $r['check_in_time'] : '');
+            $sheet2->setCellValue('G' . $row, self::getSourceLabel(isset($r['source']) ? $r['source'] : ''));
+            $sheet2->getStyle('A' . $row . ':G' . $row)->applyFromArray($borderStyle);
             $row++;
         }
-        foreach (range('A', 'H') as $c) {
+        foreach (range('A', 'G') as $c) {
             $sheet2->getColumnDimension($c)->setAutoSize(true);
         }
 
