@@ -311,7 +311,9 @@ class Daihoi
      */
     public static function getStats()
     {
-        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_STATS), array());
+        return self::remember('daihoi:stats', function () {
+            return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_STATS), array());
+        });
     }
 
     /**
