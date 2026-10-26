@@ -113,7 +113,6 @@ $rows  = ($detail && isset($detail['rows'])) ? $detail['rows'] : array();
                         <th style="width:60px;">STT</th>
                         <th>Họ tên</th>
                         <th>Đơn vị</th>
-                        <th>Bộ phận</th>
                         <th>Bữa ăn</th>
                         <th>Trạm chấm</th>
                         <th style="width:150px;">Giờ chấm</th>
