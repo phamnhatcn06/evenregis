@@ -16,6 +16,7 @@ $position = !empty($profile['position']) ? $profile['position'] : '';
 
 $scheduleUrl = $this->createUrl('/frontend/portal/schedule');
 $runUrl = $this->createUrl('/frontend/run/index');
+$sportScheduleUrl = Yii::app()->request->baseUrl . '/lich-thi-the-thao';
 
 // 6 Danh mục tính năng chuẩn mực
 $features = array(
