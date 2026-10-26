@@ -10,6 +10,40 @@
 class Daihoi
 {
     /**
+     * TTL (giây) cho cache các khối ít thay đổi trên trang công khai.
+     */
+    const HOME_CACHE_TTL = 120;
+
+    /**
+     * Memo theo vòng đời request để tránh gọi lặp cùng một API trong 1 lần tải trang.
+     * @var array
+     */
+    private static $requestMemo = array();
+
+    /**
+     * Lấy dữ liệu qua API kèm cache file theo TTL (dùng cho các khối tĩnh trang chủ).
+     *
+     * @param string $cacheKey Khoá cache duy nhất
+     * @param callable $fetcher Hàm trả về dữ liệu đã unwrap khi cache miss
+     * @param int|null $ttl TTL giây; null = dùng HOME_CACHE_TTL
+     * @return mixed
+     */
+    private static function remember($cacheKey, $fetcher, $ttl = null)
+    {
+        $cache = Yii::app()->getCache();
+        if ($cache !== null) {
+            $cached = $cache->get($cacheKey);
+            if ($cached !== false) {
+                return $cached;
+            }
+        }
+        $data = call_user_func($fetcher);
+        if ($cache !== null) {
+            $cache->set($cacheKey, $data, $ttl === null ? self::HOME_CACHE_TTL : $ttl);
+        }
+        return $data;
+    }
+    /**
      * Bóc lớp bao của response API.
      * Hỗ trợ cả 2 dạng: {success, data: {...}} và {data: {data: [...]}}.
      *
