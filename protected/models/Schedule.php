@@ -248,10 +248,12 @@ class Schedule
      */
     public static function getForAttendee($attendeeId, $eventId)
     {
+        // Chỉ gộp các nguồn gắn với cá nhân người đăng nhập (trận đấu, thi nghiệp
+        // vụ, bữa ăn, tiệc). Agenda là chương trình chung toàn đại hội, không thuộc
+        // lịch cá nhân nên hiển thị ở trang chương trình chung, không gộp vào đây.
         $items = array();
         $items = array_merge($items, self::getSportItems($attendeeId, $eventId));
         $items = array_merge($items, self::getCompetitionItems($attendeeId, $eventId));
-        $items = array_merge($items, self::getAgendaItems($eventId));
         $items = array_merge($items, self::getMealItems($attendeeId, $eventId));
         $items = array_merge($items, self::getBanquetItems($attendeeId, $eventId));
         return self::buildTimeline($items);
