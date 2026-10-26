@@ -2,6 +2,13 @@
 $this->breadcrumbs = array('Bữa ăn');
 $this->menu = array(
     array(
+        'label' => 'Thêm bữa ăn',
+        'url' => $this->createUrl('/admin/meals/create', array('event_id' => $eventId)),
+        'color' => 'primary',
+        'icon' => 'fa-plus',
+        'id' => 'btn_add_meal',
+    ),
+    array(
         'label' => 'Trạm chấm ăn',
         'url' => $this->createUrl('/admin/mealStations/admin', array('event_id' => $eventId)),
         'color' => 'info',
