@@ -34,7 +34,7 @@ $noTime = isset($timeline['noTime']) ? $timeline['noTime'] : array();
                     <h1 class="fw-bold text-white mb-2">Lịch trình của tôi</h1>
                     <p class="text-white-50 mb-0" style="max-width:640px;">
                         Chào <strong class="text-white"><?php echo CHtml::encode($fullName); ?></strong>, đây là toàn bộ
-                        lịch trình liên quan đến anh/chị trong Đại hội — thể thao, nghiệp vụ, nghi thức, bữa ăn và tiệc.
+                        lịch trình liên quan đến anh/chị trong Đại hội — thể thao, nghiệp vụ, bữa ăn và tiệc.
                     </p>
                 </div>
                 <a href="<?php echo $backUrl; ?>" class="btn sch-hero-back">
