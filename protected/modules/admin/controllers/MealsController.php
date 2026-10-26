@@ -23,6 +23,31 @@ class MealsController extends AdminController
         ));
     }
 
+    public function actionCreate()
+    {
+        $model = new Meals;
+        $model->event_id = isset($_GET['event_id']) ? (int) $_GET['event_id'] : null;
+        $model->is_active = 1;
+
+        if (isset($_POST['Meals'])) {
+            $this->bindModel($model, $_POST['Meals']);
+            if ($model->validate()) {
+                $result = $model->storeViaApi();
+                if ($result['success']) {
+                    Yii::app()->user->setFlash('success', 'Thêm bữa ăn thành công.');
+                    $this->redirect(array('admin', 'event_id' => $model->event_id));
+                } else {
+                    $model->addError('name', $result['error'] ?: 'Không thể thêm bữa ăn.');
+                }
+            }
+        }
+
+        $this->render('create', array(
+            'model'     => $model,
+            'eventList' => $this->getEventList(),
+        ));
+    }
+
     public function actionUpdate($id)
     {
         $model = $this->loadModelById($id);
