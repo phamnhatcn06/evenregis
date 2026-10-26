@@ -382,6 +382,9 @@ class Daihoi
      * Trả về định dạng: "Tên VĐV (Mã đơn vị)" theo đúng chuẩn:
      * "Các nội dung đơn thì ghi tên VĐV (mã đơn vị)"
      *
+     * Lưu ý: không còn dùng trong getTournamentSchedule (preview đã có player_names);
+     * giữ lại cho các chỗ cần tra cứu tên VĐV theo team_id riêng lẻ.
+     *
      * @param array $teamIds
      * @return array [team_id => "Tên VĐV (Mã đơn vị)"]
      */
