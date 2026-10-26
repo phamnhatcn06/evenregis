@@ -151,7 +151,7 @@ class MealsController extends AdminController
         // Sheet 2: Chi tiết danh sách người chấm
         $sheet2 = $objPHPExcel->createSheet(1);
         $sheet2->setTitle('Chi_tiet');
-        $headers2 = array('STT', 'Họ tên', 'Đơn vị', 'Bộ phận', 'Bữa ăn', 'Trạm chấm', 'Giờ chấm', 'Nguồn');
+        $headers2 = array('STT', 'Họ tên', 'Đơn vị', 'Bữa ăn', 'Trạm chấm', 'Giờ chấm', 'Nguồn');
         $col = 'A';
         foreach ($headers2 as $h) {
             $sheet2->setCellValue($col . '1', $h);
