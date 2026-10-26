@@ -23,7 +23,7 @@ class DaihoiController extends FrontEndController
         return array(
             array(
                 'allow',
-                'actions' => array('index', 'agenda', 'schedule', 'tiecWelcome', 'lichThamQuan', 'tiecGala', 'funRun', 'hoTro', 'doanThuKy', 'soDoDiaDiem', 'soTayDaiHoi', 'news', 'newsDetail', 'jsonLive', 'jsonRecent', 'jsonRankings'),
+                'actions' => array('index', 'agenda', 'schedule', 'tiecWelcome', 'lichThamQuan', 'tiecGala', 'funRun', 'hoTro', 'doanThuKy', 'soDoDiaDiem', 'soTayDaiHoi', 'khaoSat', 'news', 'newsDetail', 'jsonLive', 'jsonRecent', 'jsonRankings'),
                 'users' => array('*'),
             ),
             array('deny', 'users' => array('*')),
