@@ -914,6 +914,17 @@ class Daihoi
     }
 
     /**
+     * Danh sách khảo sát (Google Form) đang bật của sự kiện hiện tại.
+     * @return array
+     */
+    public static function getSurveys()
+    {
+        return self::remember('daihoi:surveys', function () {
+            return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_SURVEYS), array());
+        });
+    }
+
+    /**
      * Danh sách album Thư viện đang hiển thị.
      * @param int $limit
      * @return array
