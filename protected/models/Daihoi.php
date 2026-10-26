@@ -575,55 +575,19 @@ class Daihoi
                         $isIndividual = true;
                     }
 
-                    // Gom team_id để tra cứu tên VĐV nếu là nội dung đơn
-                    $stageTeamIds = array();
-                    if (!empty($preview['teams'])) {
-                        foreach ($preview['teams'] as $t) {
-                            if (!empty($t['team_id'])) {
-                                $stageTeamIds[] = (int)$t['team_id'];
-                            }
-                        }
-                    }
-                    foreach ($preview['matches'] as $m) {
-                        if (!empty($m['team_a_id'])) $stageTeamIds[] = (int)$m['team_a_id'];
-                        if (!empty($m['team_b_id'])) $stageTeamIds[] = (int)$m['team_b_id'];
-                    }
-
-                    $dbAthletesMap = array();
-                    if ($isIndividual && !empty($stageTeamIds)) {
-                        $dbAthletesMap = self::getAthletesByTeamIds($stageTeamIds);
-                    }
-
+                    // Preview đã eager-load team->members nên có sẵn player_names + mã đơn vị.
+                    // Dựng teamMap trực tiếp từ preview, không gọi API từng đội (tránh N+1).
                     if (!empty($preview['teams'])) {
                         foreach ($preview['teams'] as $t) {
                             $tid = (int)$t['team_id'];
                             $unitCode = !empty($t['team_name']) ? $t['team_name'] : ('#' . $tid);
 
-                            if ($isIndividual) {
-                                // 1. Ưu tiên lấy tên VĐV (mã đơn vị) từ DB cục bộ (sport_team_members)
-                                if (isset($dbAthletesMap[$tid]) && !empty($dbAthletesMap[$tid])) {
-                                    $teamMap[$tid] = $dbAthletesMap[$tid];
-                                }
-                                // 2. Nếu API có trả về danh sách player_names
-                                elseif (!empty($t['player_names']) && is_array($t['player_names'])) {
-                                    $athleteName = implode(' / ', array_filter($t['player_names']));
-                                    $teamMap[$tid] = $athleteName !== '' ? ($athleteName . ' (' . $unitCode . ')') : $unitCode;
-                                }
-                                // 3. Fallback mã đơn vị
-                                else {
-                                    $teamMap[$tid] = $unitCode;
-                                }
+                            if ($isIndividual && !empty($t['player_names']) && is_array($t['player_names'])) {
+                                // Nội dung đơn/đôi: "Tên VĐV (mã đơn vị)" theo chuẩn hiển thị.
+                                $athleteName = implode(' / ', array_filter($t['player_names']));
+                                $teamMap[$tid] = $athleteName !== '' ? ($athleteName . ' (' . $unitCode . ')') : $unitCode;
                             } else {
                                 $teamMap[$tid] = $unitCode;
-                            }
-                        }
-                    }
-
-                    // Bổ sung các team_id trong matches nếu chưa có trong preview['teams']
-                    if ($isIndividual && !empty($dbAthletesMap)) {
-                        foreach ($dbAthletesMap as $tid => $formattedName) {
-                            if (!isset($teamMap[$tid])) {
-                                $teamMap[$tid] = $formattedName;
                             }
                         }
                     }
