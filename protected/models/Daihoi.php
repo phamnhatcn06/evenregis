@@ -333,7 +333,9 @@ class Daihoi
      */
     public static function getAgenda()
     {
-        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_AGENDA), array());
+        return self::remember('daihoi:agenda', function () {
+            return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_AGENDA), array());
+        });
     }
 
     /**
