@@ -55,12 +55,14 @@ class MealScanController extends CController
 
         $station = $this->extractData($result, 'station');
         if ($result['success'] && $station && !empty($station['id'])) {
-            Yii::app()->session[self::SESSION_KEY] = array(
+            $data = array(
                 'id'       => $station['id'],
                 'name'     => $station['name'],
                 'event_id' => $station['event_id'],
                 'location' => isset($station['location']) ? $station['location'] : null,
             );
+            Yii::app()->session[self::SESSION_KEY] = $data;
+            $this->setStationCookie($data);
             $this->redirect(array('scan'));
             return;
         }
