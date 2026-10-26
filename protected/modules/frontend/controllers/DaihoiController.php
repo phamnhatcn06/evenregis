@@ -62,6 +62,7 @@ class DaihoiController extends FrontEndController
             'agenda' => Daihoi::getAgenda(),
             'liveMatches' => Daihoi::getLiveMatches(),
             'recentMatches' => Daihoi::getRecentMatches(),
+            'upcomingMatches' => Daihoi::getUpcomingMatches(),
             'rankings' => Daihoi::getRankings(5),
             'news' => Daihoi::getNews(6),
             'newsCategories' => Daihoi::getNewsCategories(),
