@@ -937,7 +937,9 @@ class Daihoi
      */
     public static function getSlides()
     {
-        return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_SLIDES), array());
+        return self::remember('daihoi:slides', function () {
+            return self::unwrap(ApiClient::get(ApiEndpoints::DAIHOI_SLIDES), array());
+        });
     }
 
     /**
