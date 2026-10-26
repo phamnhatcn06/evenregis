@@ -106,13 +106,9 @@ class Survey extends CFormModel
 
     public static function deleteViaApi($id)
     {
-        $ssoUser = AuthHandler::getUser();
-        $data = array();
-        if (isset($ssoUser['email'])) {
-            $data['deleted_by'] = $ssoUser['email'];
-        }
+        // ApiClient::delete tự đính kèm auth_email của người thực hiện (SSO).
         $url = ApiEndpoints::url(ApiEndpoints::SURVEY_DESTROY, array('id' => $id));
-        return ApiClient::delete($url, $data);
+        return ApiClient::delete($url);
     }
 
     /** Bật/tắt nhanh trạng thái hiển thị của một khảo sát. */
