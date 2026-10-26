@@ -121,7 +121,7 @@ $rows  = ($detail && isset($detail['rows'])) ? $detail['rows'] : array();
                 </thead>
                 <tbody>
                     <?php if (empty($rows)): ?>
-                        <tr><td colspan="8" class="text-center text-muted">Chưa có lượt chấm ăn nào.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted">Chưa có lượt chấm ăn nào.</td></tr>
                     <?php else: $i = 1; foreach ($rows as $r): ?>
                         <tr>
                             <td><?php echo $i++; ?></td>
