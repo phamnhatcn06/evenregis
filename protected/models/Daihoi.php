@@ -367,6 +367,16 @@ class Daihoi
     }
 
     /**
+     * Các trận đấu sắp diễn ra (chưa có tỷ số, chưa live) lấy từ lịch thi đấu thật.
+     * @return array
+     */
+    public static function getUpcomingMatches()
+    {
+        $sched = self::getTournamentSchedule();
+        return isset($sched['upcomingMatches']) ? $sched['upcomingMatches'] : array();
+    }
+
+    /**
      * Bảng tổng sắp huy chương toàn đoàn (lấy dữ liệu thật từ cơ sở dữ liệu).
      *
      * @param int $limit
