@@ -80,6 +80,7 @@ $urlRewrite = array(
     'so-do-dia-diem' => 'frontend/daihoi/soDoDiaDiem',
     'so-tay-dai-hoi' => 'frontend/daihoi/soTayDaiHoi',
     'fun-run' => 'frontend/daihoi/funRun',
+    'khao-sat' => 'frontend/daihoi/khaoSat',
 
     // Tin tức Đại hội: danh sách + chi tiết (đặt rule chi tiết TRƯỚC rule danh sách)
     'tin-tuc/<id:\d+>' => 'frontend/daihoi/newsDetail',
