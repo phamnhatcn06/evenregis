@@ -866,10 +866,13 @@ if (empty($albumList)) {
           <?php if (!empty($matches)): foreach (array_slice($matches, 0, 3) as $m):
               $st = isset($statusMap[$val($m, array('status'), '')]) ? $statusMap[$m['status']] : $statusMap['done'];
               $sc = $matchScores($m);
+              $scHome = ($sc[0] === '' || $sc[0] === null) ? '--' : $sc[0];
+              $scAway = ($sc[1] === '' || $sc[1] === null) ? '--' : $sc[1];
               $home = $teamName($m, 'home');
               $away = $teamName($m, 'away');
+              $mIcon = $val($m, array('sport_icon'), '') ?: 'sports_soccer';
               $mLoc = $val($m, array('venue', 'location'), '');
-              $meta = trim($val($m, array('time', 'kickoff_time', 'match_time'), '') . ($mLoc ? ' • ' . (is_array($mLoc) ? (isset($mLoc['name']) ? $mLoc['name'] : '') : $mLoc) : ''));
+              $meta = trim($val($m, array('time', 'kickoff_time', 'match_hour', 'match_time'), '') . ($mLoc ? ' • ' . (is_array($mLoc) ? (isset($mLoc['name']) ? $mLoc['name'] : '') : $mLoc) : ''));
           ?>
               <div class="col-12 col-md-4">
                 <div class="card h-100 border-0 rounded-4 shadow-sm bg-white overflow-hidden card-hover" style="border-top:4px solid #10b981 !important;">
