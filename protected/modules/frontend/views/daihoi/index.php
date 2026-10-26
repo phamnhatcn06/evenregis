@@ -901,7 +901,7 @@ if (empty($albumList)) {
                         <div class="rounded-circle bg-light text-secondary border d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:11px;"><?php echo $e($initials($away)); ?></div>
                         <span class="fw-semibold text-secondary small"><?php echo $e($away); ?></span>
                       </div>
-                      <span class="badge rounded-3 px-2 py-1 text-secondary fw-bold fs-4 font-monospace bg-light border"><?php echo $e($sc[1]); ?></span>
+                      <span class="badge rounded-3 px-2 py-1 text-secondary fw-bold fs-4 font-monospace bg-light border"><?php echo $e($scAway); ?></span>
                     </div>
                   </div>
                   <div class="d-flex align-items-center justify-content-between px-3 py-2 border-top bg-light text-muted" style="font-size:11.5px;">
