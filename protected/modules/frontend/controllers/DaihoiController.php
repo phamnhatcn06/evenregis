@@ -286,6 +286,19 @@ class DaihoiController extends FrontEndController
     }
 
     /**
+     * Trang Khảo sát ý kiến - hiển thị các khảo sát (Google Form) đang bật
+     * của sự kiện hiện tại để khách bấm mở và góp ý - slug /khao-sat.
+     */
+    public function actionKhaoSat()
+    {
+        $this->frontTitle = 'Khảo sát ý kiến';
+        $this->render('khao-sat', array(
+            'event' => Daihoi::getEvent(),
+            'surveys' => Daihoi::getSurveys(),
+        ));
+    }
+
+    /**
      * Trang Tin tức chung - hiển thị toàn bộ tin tức, sidebar lọc theo danh mục.
      * slug: /tin-tuc  (?category_id=... để lọc)
      */
