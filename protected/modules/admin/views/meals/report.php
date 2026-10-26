@@ -127,7 +127,6 @@ $rows  = ($detail && isset($detail['rows'])) ? $detail['rows'] : array();
                             <td><?php echo $i++; ?></td>
                             <td><?php echo CHtml::encode($r['full_name']); ?></td>
                             <td><?php echo CHtml::encode($r['org']); ?></td>
-                            <td><?php echo CHtml::encode($r['unit']); ?></td>
                             <td><?php echo CHtml::encode($r['meal_name']); ?></td>
                             <td><?php echo CHtml::encode($r['checked_by']); ?></td>
                             <td><?php echo $fmtTime($r['check_in_time']); ?></td>
