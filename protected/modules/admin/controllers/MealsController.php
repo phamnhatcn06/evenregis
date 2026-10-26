@@ -141,6 +141,9 @@ class MealsController extends AdminController
         $model->setAttributes($post);
         $model->checkin_start = $this->toDateTime(isset($post['checkin_start']) ? $post['checkin_start'] : null);
         $model->checkin_end   = $this->toDateTime(isset($post['checkin_end']) ? $post['checkin_end'] : null);
+        if (isset($post['serving_time'])) {
+            $model->serving_time = $this->toDateTime($post['serving_time']);
+        }
     }
 
     protected function toDateTime($value)
