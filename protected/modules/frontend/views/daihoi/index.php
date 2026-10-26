@@ -879,11 +879,11 @@ if (empty($albumList)) {
                   <div class="p-3 pb-2 border-bottom bg-slate-50 d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-2">
                       <div class="rounded-circle bg-teal-50 text-teal-600 border border-teal-200 d-flex align-items-center justify-content-center icon-bounce" style="width:28px;height:28px;">
-                        <span class="material-symbols-outlined fs-6">sports_soccer</span>
+                        <span class="material-symbols-outlined fs-6"><?php echo $e($mIcon); ?></span>
                       </div>
                       <div>
                         <span class="fw-bold text-dark small d-block lh-1"><?php echo $e($val($m, array('sport_name', 'category'), 'Thi đấu')); ?></span>
-                        <span class="text-muted" style="font-size:10.5px;"><?php echo $e($val($m, array('round_name', 'stage', 'round'), '')); ?></span>
+                        <span class="text-muted" style="font-size:10.5px;"><?php echo $e($val($m, array('stage_name', 'round_name', 'stage', 'round'), '')); ?></span>
                       </div>
                     </div>
                     <span class="badge <?php echo $st['cls']; ?> text-white rounded-pill px-2 py-1 fw-semibold" style="font-size:10px;"><?php echo $e($st['text']); ?></span>
