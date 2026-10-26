@@ -150,6 +150,7 @@ class MealScanController extends CController
     public function actionLogout()
     {
         unset(Yii::app()->session[self::SESSION_KEY]);
+        unset(Yii::app()->request->cookies[self::COOKIE_KEY]);
         $this->redirect(array('index'));
     }
 
