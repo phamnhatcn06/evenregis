@@ -9,6 +9,13 @@ $this->menu = array(
         'id' => 'btn_add_meal',
     ),
     array(
+        'label' => 'Báo cáo chấm ăn',
+        'url' => $this->createUrl('/admin/meals/report', array('event_id' => $eventId)),
+        'color' => 'success',
+        'icon' => 'fa-chart-bar',
+        'id' => 'btn_report',
+    ),
+    array(
         'label' => 'Trạm chấm ăn',
         'url' => $this->createUrl('/admin/mealStations/admin', array('event_id' => $eventId)),
         'color' => 'info',
