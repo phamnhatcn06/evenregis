@@ -449,6 +449,8 @@ class ApiEndpoints
     const MEAL_CHECKIN_SCAN = '/api/meal-checkin/scan';
     const MEAL_CHECKIN_SYNC = '/api/meal-checkin/sync';
     const MEAL_CHECKIN_STATS = '/api/meal-checkin/stats';
+    const MEAL_REPORT_SUMMARY = '/api/meal-checkin/report-summary';
+    const MEAL_REPORT_DETAIL = '/api/meal-checkin/report-detail';
 
     // Meal Table
     const MEAL_TABLE_LIST = '/api/meal-tables';
