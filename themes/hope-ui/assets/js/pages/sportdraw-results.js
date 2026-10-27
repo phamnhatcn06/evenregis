@@ -78,8 +78,8 @@
                         if (badge) {
                             badge.classList.remove('d-none');
                         }
-                        // Vòng sau có thể vừa được điền đội -> tải lại sau giây lát
-                        setTimeout(function () { window.location.reload(); }, 800);
+                        // Vòng sau có thể vừa được điền đội -> refresh riêng phần bảng
+                        refreshBoard();
                     } else {
                         Toast.error((data && data.message) || 'Không thể ghi kết quả.');
                     }
