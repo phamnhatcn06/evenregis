@@ -120,4 +120,40 @@ class LuckyDraw
     {
         return ApiClient::post(ApiEndpoints::LUCKY_REMOTE_SPIN, array());
     }
+
+    // ---------- Người trúng giải nhập thủ công (import Excel) ----------
+
+    /** Danh sách người trúng của 1 sự kiện (cho màn admin). */
+    public static function manualWinnersList($eventId)
+    {
+        return self::payload(ApiClient::get(ApiEndpoints::LUCKY_MANUAL_WINNER_LIST, array('event_id' => $eventId))) ?: array();
+    }
+
+    /** Danh sách công bố cho trang public; eventId null = sự kiện mới nhất có người trúng. */
+    public static function publicManualWinners($eventId = null)
+    {
+        $params = $eventId ? array('event_id' => $eventId) : array();
+        return self::payload(ApiClient::get(ApiEndpoints::LUCKY_MANUAL_WINNER_PUBLIC, $params)) ?: array('event_id' => 0, 'winners' => array());
+    }
+
+    /** Import cộng dồn; trả nguyên result để đọc message/warnings. */
+    public static function importManualWinners($eventId, $rows, $createdBy)
+    {
+        return ApiClient::post(ApiEndpoints::LUCKY_MANUAL_WINNER_IMPORT, array(
+            'event_id'   => $eventId,
+            'rows'       => $rows,
+            'created_by' => $createdBy,
+        ));
+    }
+
+    public static function deleteManualWinner($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::LUCKY_MANUAL_WINNER_DELETE, array('id' => $id));
+        return ApiClient::delete($url);
+    }
+
+    public static function clearManualWinners($eventId)
+    {
+        return ApiClient::post(ApiEndpoints::LUCKY_MANUAL_WINNER_CLEAR, array('event_id' => $eventId));
+    }
 }
