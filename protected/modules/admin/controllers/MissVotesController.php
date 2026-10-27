@@ -156,8 +156,11 @@ class MissVotesController extends AdminController
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
 
+        $mark('BEFORE createWriter');
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $mark('BEFORE save');
         $objWriter->save('php://output');
+        $mark('AFTER save DONE');
         Yii::app()->end();
     }
 
