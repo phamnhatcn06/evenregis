@@ -65,13 +65,14 @@ class LuckyDrawController extends AdminController
     /** Map action → thao tác quyền. */
     protected function luckyOperation($actionId)
     {
-        if (strpos($actionId, 'delete') !== false) {
+        if (strpos($actionId, 'delete') !== false || strpos($actionId, 'clear') !== false) {
             return 'delete';
         }
-        if (in_array($actionId, array('saveprize', 'savesettings', 'resetwinners'), true)) {
+        // Import danh sách trúng giải dùng chung quyền 'update' với cài đặt (admin lucky đã có).
+        if (in_array($actionId, array('saveprize', 'savesettings', 'resetwinners', 'import', 'parseexcel', 'saveimport'), true)) {
             return 'update';
         }
-        // index/admin/show/remote + toàn bộ api* → read
+        // index/admin/show/remote/downloadtemplate + toàn bộ api* → read
         return 'read';
     }
 
