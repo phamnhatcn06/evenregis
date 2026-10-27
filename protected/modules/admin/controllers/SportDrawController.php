@@ -160,6 +160,16 @@ class SportDrawController extends AdminController
 
         $preview = SportStages::fetchDrawPreview($id);
 
+        // Sau mỗi lần lưu, JS gọi lại action này qua AJAX để refresh riêng phần
+        // bảng (đội thắng đã được điền vào vòng sau) thay vì tải lại cả trang.
+        if (Yii::app()->getRequest()->getIsAjaxRequest()) {
+            $this->renderPartial('_board', array(
+                'model' => $model,
+                'preview' => $preview,
+            ));
+            return;
+        }
+
         $this->render('results', array(
             'model' => $model,
             'preview' => $preview,
