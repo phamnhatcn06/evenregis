@@ -169,8 +169,9 @@ class SportStageBackfillCommand extends CConsoleCommand
             'Kéo co phối hợp Nam - Nữ' => array(
                 'format' => 'round_robin_knockout', 'num_groups' => 2, 'teams_per_group' => 4,
                 'advance_per_group' => 2, 'bracket_size' => 4, 'ko_pairing' => 'cross',
-                'rules' => '3 hiệp thắng 2. Bốc thăm 2 bảng đấu vòng tròn (thắng 2đ, thua 1đ; bằng điểm xét đối đầu → hiệu số hiệp) chọn Nhất-Nhì; bán kết đấu chéo; chung kết loại trực tiếp tranh 1-2-3-4.',
-            ) + $winTwoLossOne,
+                'win_points' => 2, 'draw_points' => 0, 'loss_points' => 0, 'tiebreak' => 'head_to_head',
+                'rules' => '3 hiệp thắng 2. Bốc thăm 2 bảng đấu vòng tròn (thắng 2đ, thua 0đ, bỏ cuộc 0đ; bằng điểm xét đối đầu → hiệu số hiệp) chọn Nhất-Nhì; bán kết đấu chéo; chung kết loại trực tiếp tranh 1-2-3-4.',
+            ),
 
             // Bóng bàn đơn nam — play-off (stage riêng) rồi vòng bảng + KO
             'Bóng bàn đơn nam' => array(
