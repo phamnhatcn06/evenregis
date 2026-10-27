@@ -39,7 +39,7 @@ Yii::app()->clientScript->registerScriptFile(
     CClientScript::POS_END
 );
 Yii::app()->clientScript->registerScriptFile(
-    Yii::app()->theme->baseUrl . '/assets/js/pages/sportdraw-results.js?v=1.0',
+    Yii::app()->theme->baseUrl . '/assets/js/pages/sportdraw-results.js?v=1.1',
     CClientScript::POS_END
 );
 
