@@ -1,6 +1,7 @@
 /**
  * Ghi kết quả từng trận. Sau khi lưu, backend tự đẩy đội thắng sang vòng sau;
- * tải lại trang để thấy các trận vòng sau được điền đội.
+ * chỉ refresh riêng phần bảng qua AJAX (không tải lại cả trang) để thấy các
+ * trận vòng sau được điền đội.
  */
 (function () {
     'use strict';
@@ -11,6 +12,18 @@
             return;
         }
         var saveUrl = board.getAttribute('data-save-url');
+        var reloadUrl = board.getAttribute('data-reload-url');
+
+        // Tải lại ruột bảng qua AJAX và thay thế tại chỗ.
+        function refreshBoard() {
+            if (!reloadUrl) {
+                return;
+            }
+            fetch(reloadUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function (res) { return res.text(); })
+                .then(function (html) { board.innerHTML = html; })
+                .catch(function () { /* giữ nguyên bảng hiện tại nếu lỗi */ });
+        }
 
         board.addEventListener('click', function (e) {
             var btn = e.target.closest ? e.target.closest('.btn-save-result') : null;
