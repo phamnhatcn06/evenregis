@@ -13,8 +13,12 @@ $urlRewrite = array(
     'cham-an' => 'frontend/mealScan/index',
     'cham-an/<action:\w+>' => 'frontend/mealScan/<action>',
 
-    // Quay số may mắn (admin) — slug thân thiện, đặt TRƯỚC rule generic
-    'quay-so' => 'admin/luckyDraw/show',
+    // Trang công bố người trúng giải (public) — đặt TRƯỚC rule generic
+    'luckydraw' => 'frontend/luckyDraw/index',
+
+    // Lucky Draw (admin) — không còn quay số: slug mặc định vào màn Import người trúng giải
+    'quay-so' => 'admin/luckyDraw/import',
+    'quay-so/trung-giai' => 'admin/luckyDraw/import',
     'quay-so/dieu-khien' => 'admin/luckyDraw/remote',
     'quay-so/cai-dat' => 'admin/luckyDraw/index',
 
