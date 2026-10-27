@@ -43,10 +43,25 @@ Yii::app()->clientScript->registerScriptFile(
     CClientScript::POS_END
 );
 
+// Nội dung đơn/đôi (cá nhân): hiển thị tên VĐV thay cho tên đội.
+$sportNameLower = mb_strtolower((string) $model->sport_name, 'UTF-8');
+$isIndividualSport = (strpos($sportNameLower, 'đơn') !== false || strpos($sportNameLower, 'đôi') !== false
+    || (isset($model->stage_type) && $model->stage_type === 'individual'));
+
 $teamMap = array();
 if ($preview && isset($preview['teams'])) {
     foreach ($preview['teams'] as $t) {
-        $teamMap[$t['team_id']] = $t['team_name'] !== null ? $t['team_name'] : ('#' . $t['team_id']);
+        $players = isset($t['player_names']) && is_array($t['player_names']) ? $t['player_names'] : array();
+        $unitCode = isset($t['unit_code']) && $t['unit_code'] !== null && $t['unit_code'] !== '' ? $t['unit_code'] : null;
+        $names = array_values(array_filter($players, function ($p) {
+            return $p !== null && $p !== '';
+        }));
+        // Nội dung đơn: 1 VĐV. Nội dung đôi: ghép tên 2 VĐV (" / "). Môn đồng đội: dùng tên đội.
+        if (!empty($names) && ($isIndividualSport || count($names) === 1)) {
+            $teamMap[$t['team_id']] = implode(' / ', $names) . ($unitCode ? ' (' . $unitCode . ')' : '');
+        } else {
+            $teamMap[$t['team_id']] = $t['team_name'] !== null ? $t['team_name'] : ('#' . $t['team_id']);
+        }
     }
 }
 $matches = ($preview && isset($preview['matches'])) ? $preview['matches'] : array();
