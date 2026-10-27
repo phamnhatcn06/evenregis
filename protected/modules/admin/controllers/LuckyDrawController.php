@@ -86,10 +86,240 @@ class LuckyDrawController extends AdminController
 
     // ===================== TRANG =====================
 
-    /** Quy ước menu admin. */
+    /** Quy ước menu admin → mặc định vào màn Import người trúng giải (không còn quay số). */
     public function actionAdmin()
     {
-        $this->actionIndex();
+        $this->actionImport();
+    }
+
+    // ===================== IMPORT NGƯỜI TRÚNG GIẢI (THỦ CÔNG) =====================
+
+    /** Cấu trúc cột file Excel import (0-based). Thứ tự phải khớp file mẫu. */
+    protected function importColumns()
+    {
+        return array(
+            'stt'        => 0,
+            'full_name'  => 1,
+            'lucky_code' => 2,
+            'unit_label' => 3,
+            'prize_tier' => 4,
+            'prize_name' => 5,
+        );
+    }
+
+    /** Màn Import: dropdown sự kiện + form upload + danh sách đã trúng. */
+    public function actionImport()
+    {
+        $this->layout = '//layouts/column2';
+
+        $eventList = Events::getListForDropdown();
+        $eventId = (int) Yii::app()->getRequest()->getParam('event_id');
+        if (!$eventId && !empty($eventList)) {
+            $eventId = (int) array_keys($eventList)[0];
+        }
+
+        $winners = $eventId ? LuckyDraw::manualWinnersList($eventId) : array();
+
+        $this->render('import', array(
+            'eventList' => $eventList,
+            'eventId' => $eventId,
+            'winners' => $winners,
+            'canDelete' => PermissionHelper::can('luckydraw', 'delete'),
+        ));
+    }
+
+    /** Đọc file Excel upload, validate, trả JSON các dòng (chưa lưu) để preview. */
+    public function actionParseExcel()
+    {
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            $this->jsonOut(array('success' => false, 'message' => 'Chưa chọn file hoặc upload lỗi.'));
+        }
+
+        $ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, array('xlsx', 'xls'), true)) {
+            $this->jsonOut(array('success' => false, 'message' => 'Chỉ chấp nhận file Excel (.xlsx, .xls).'));
+        }
+
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        try {
+            $objPHPExcel = PHPExcel_IOFactory::load($_FILES['file']['tmp_name']);
+        } catch (Exception $e) {
+            spl_autoload_register(array('YiiBase', 'autoload'));
+            $this->jsonOut(array('success' => false, 'message' => 'Không đọc được file Excel: ' . $e->getMessage()));
+        }
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        $sheet = $objPHPExcel->getActiveSheet();
+        $highestRow = $sheet->getHighestDataRow();
+        $cols = $this->importColumns();
+
+        $rows = array();
+        $errors = array();
+        // Dòng 1 = tiêu đề → bắt đầu từ dòng 2.
+        for ($r = 2; $r <= $highestRow; $r++) {
+            $get = function ($key) use ($sheet, $cols, $r) {
+                return trim((string) $sheet->getCellByColumnAndRow($cols[$key], $r)->getValue());
+            };
+            $fullName = $get('full_name');
+            $luckyCode = $get('lucky_code');
+            $unitLabel = $get('unit_label');
+            $prizeTier = $get('prize_tier');
+            $prizeName = $get('prize_name');
+
+            // Bỏ qua dòng trống hoàn toàn.
+            if ($fullName === '' && $luckyCode === '' && $unitLabel === '' && $prizeTier === '' && $prizeName === '') {
+                continue;
+            }
+
+            $rowErrors = array();
+            if ($fullName === '') {
+                $rowErrors[] = 'thiếu Họ và tên';
+            }
+            if ($luckyCode === '') {
+                $rowErrors[] = 'thiếu Mã lucky draw';
+            }
+            if ($unitLabel === '') {
+                $rowErrors[] = 'thiếu Đơn vị';
+            }
+            if ($prizeTier === '') {
+                $rowErrors[] = 'thiếu Hạng giải';
+            }
+            if (!empty($rowErrors)) {
+                $errors[] = 'Dòng ' . $r . ': ' . implode(', ', $rowErrors) . '.';
+                continue;
+            }
+
+            $rows[] = array(
+                'full_name'  => $fullName,
+                'lucky_code' => $luckyCode,
+                'unit_label' => $unitLabel,
+                'prize_tier' => $prizeTier,
+                'prize_name' => $prizeName,
+            );
+        }
+
+        if (empty($rows) && empty($errors)) {
+            $this->jsonOut(array('success' => false, 'message' => 'File không có dữ liệu.'));
+        }
+
+        $this->jsonOut(array(
+            'success' => true,
+            'rows' => $rows,
+            'errors' => $errors,
+            'count' => count($rows),
+        ));
+    }
+
+    /** Lưu các dòng đã preview vào sự kiện (cộng dồn). */
+    public function actionSaveImport()
+    {
+        $body = $this->jsonBody();
+        $eventId = isset($body['event_id']) ? (int) $body['event_id'] : 0;
+        $rows = isset($body['rows']) && is_array($body['rows']) ? $body['rows'] : array();
+
+        if (!$eventId) {
+            $this->jsonOut(array('success' => false, 'message' => 'Vui lòng chọn sự kiện.'));
+        }
+        if (empty($rows)) {
+            $this->jsonOut(array('success' => false, 'message' => 'Không có dữ liệu hợp lệ để import.'));
+        }
+
+        $ssoUser = AuthHandler::getUser();
+        $createdBy = isset($ssoUser['email']) ? $ssoUser['email'] : null;
+
+        $result = LuckyDraw::importManualWinners($eventId, $rows, $createdBy);
+        if (!empty($result['success'])) {
+            $data = isset($result['data']['data']) ? $result['data']['data'] : (isset($result['data']) ? $result['data'] : array());
+            $this->jsonOut(array(
+                'success' => true,
+                'message' => isset($result['data']['message']) ? $result['data']['message'] : 'Import thành công.',
+                'warnings' => isset($data['warnings']) ? $data['warnings'] : array(),
+                'inserted' => isset($data['inserted']) ? $data['inserted'] : 0,
+            ));
+        }
+        $this->jsonOut(array('success' => false, 'message' => LuckyDraw::errorMessage($result, 'Import thất bại')));
+    }
+
+    /** Xoá 1 người trúng giải. */
+    public function actionDeleteWinner($id)
+    {
+        $result = LuckyDraw::deleteManualWinner($id);
+        if (!empty($result['success'])) {
+            $this->jsonOut(array('success' => true, 'message' => 'Đã xoá.'));
+        }
+        $this->jsonOut(array('success' => false, 'message' => LuckyDraw::errorMessage($result, 'Không xoá được')));
+    }
+
+    /** Xoá toàn bộ danh sách của 1 sự kiện. */
+    public function actionClearWinners()
+    {
+        $body = $this->jsonBody();
+        $eventId = isset($body['event_id']) ? (int) $body['event_id'] : 0;
+        if (!$eventId) {
+            $this->jsonOut(array('success' => false, 'message' => 'Thiếu sự kiện.'));
+        }
+        $result = LuckyDraw::clearManualWinners($eventId);
+        if (!empty($result['success'])) {
+            $this->jsonOut(array('success' => true, 'message' => 'Đã xoá toàn bộ danh sách của sự kiện.'));
+        }
+        $this->jsonOut(array('success' => false, 'message' => LuckyDraw::errorMessage($result, 'Không xoá được')));
+    }
+
+    /** Tải file Excel mẫu import người trúng giải. */
+    public function actionDownloadTemplate()
+    {
+        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel.Classes');
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        $objPHPExcel = new PHPExcel();
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        $objPHPExcel->getProperties()->setCreator('System')->setTitle('Mau import nguoi trung giai');
+
+        $sheet = $objPHPExcel->setActiveSheetIndex(0);
+        $sheet->setTitle('Người trúng giải');
+
+        $headers = array('STT', 'Họ và tên (*)', 'Mã lucky draw (*)', 'Đơn vị (*)', 'Hạng giải (*)', 'Tên giải thưởng');
+        $col = 'A';
+        foreach ($headers as $h) {
+            $sheet->setCellValue($col . '1', $h);
+            $col++;
+        }
+        $sheet->getStyle('A1:F1')->applyFromArray(array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '3A57E8')),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
+        ));
+
+        $samples = array(
+            array(1, 'Nguyễn Văn A', 'LD001', 'Khách sạn Mường Thanh Hà Nội', 'Giải Nhất', 'Xe máy Honda'),
+            array(2, 'Trần Thị B', 'LD045', 'Mường Thanh Nha Trang', 'Giải Nhì', 'Tivi 55 inch'),
+        );
+        $r = 2;
+        foreach ($samples as $s) {
+            $sheet->setCellValueByColumnAndRow(0, $r, $s[0]);
+            $sheet->setCellValueExplicitByColumnAndRow(1, $r, $s[1], PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicitByColumnAndRow(2, $r, $s[2], PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicitByColumnAndRow(3, $r, $s[3], PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicitByColumnAndRow(4, $r, $s[4], PHPExcel_Cell_DataType::TYPE_STRING);
+            $sheet->setCellValueExplicitByColumnAndRow(5, $r, $s[5], PHPExcel_Cell_DataType::TYPE_STRING);
+            $r++;
+        }
+
+        foreach (range('A', 'F') as $c) {
+            $sheet->getColumnDimension($c)->setAutoSize(true);
+        }
+
+        $filename = 'mau_import_nguoi_trung_giai.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+        Yii::app()->end();
     }
 
     /** Màn hình cài đặt cho admin (giải thưởng + cấu hình). */
