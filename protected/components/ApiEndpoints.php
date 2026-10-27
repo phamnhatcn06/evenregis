@@ -764,6 +764,13 @@ class ApiEndpoints
     const LUCKY_CHECK_REMOTE = '/api/lucky/check-remote';
     const LUCKY_REMOTE_SPIN = '/api/lucky/remote-spin';
 
+    // Lucky Draw - Người trúng giải nhập thủ công (import Excel) + công bố public
+    const LUCKY_MANUAL_WINNER_LIST = '/api/lucky/manual-winners';
+    const LUCKY_MANUAL_WINNER_PUBLIC = '/api/lucky/manual-winners/public';
+    const LUCKY_MANUAL_WINNER_IMPORT = '/api/lucky/manual-winners/import';
+    const LUCKY_MANUAL_WINNER_CLEAR = '/api/lucky/manual-winners/clear';
+    const LUCKY_MANUAL_WINNER_DELETE = '/api/lucky/manual-winners/{id}';
+
     public static function url($endpoint, $params = array())
     {
         $url = $endpoint;
