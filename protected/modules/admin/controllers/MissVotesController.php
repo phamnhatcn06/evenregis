@@ -77,8 +77,22 @@ class MissVotesController extends AdminController
             @set_time_limit(300);
         }
 
+        // [DEBUG TẠM] Ghi tiến độ ra file để xác định action chết ở bước nào.
+        $dbg = Yii::getPathOfAlias('application.runtime') . DIRECTORY_SEPARATOR . 'missvotes_debug.log';
+        $mark = function ($step) use ($dbg) {
+            @file_put_contents($dbg, date('H:i:s') . " | " . $step . " | mem=" . round(memory_get_usage(true) / 1048576) . "MB\n", FILE_APPEND);
+        };
+        register_shutdown_function(function () use ($dbg) {
+            $e = error_get_last();
+            if ($e !== null) {
+                @file_put_contents($dbg, date('H:i:s') . " | SHUTDOWN error: [" . $e['type'] . "] " . $e['message'] . " @ " . $e['file'] . ":" . $e['line'] . "\n", FILE_APPEND);
+            }
+        });
+        $mark('START contest_id=' . $contest_id);
+
         $contestId = (int) $contest_id;
         $data = BeautyVotes::getRanking($contestId);
+        $mark('AFTER getRanking ranking=' . (isset($data['ranking']) ? count($data['ranking']) : -1));
         $ranking = isset($data['ranking']) ? $data['ranking'] : array();
         $totalVotes = isset($data['total_votes']) ? (int) $data['total_votes'] : 0;
 
