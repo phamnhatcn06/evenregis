@@ -16,6 +16,10 @@ $isIndividualSport = (strpos($sportNameLower, 'đơn') !== false || strpos($spor
 $teamMap = array();
 if ($preview && isset($preview['teams'])) {
     foreach ($preview['teams'] as $t) {
+        // Bỏ qua slot giữ chỗ (team_id null) để khoá rỗng không ghi đè lẫn nhau.
+        if (!isset($t['team_id']) || $t['team_id'] === null || $t['team_id'] === '') {
+            continue;
+        }
         $players = isset($t['player_names']) && is_array($t['player_names']) ? $t['player_names'] : array();
         $unitCode = isset($t['unit_code']) && $t['unit_code'] !== null && $t['unit_code'] !== '' ? $t['unit_code'] : null;
         $names = array_values(array_filter($players, function ($p) {
