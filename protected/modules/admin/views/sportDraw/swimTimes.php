@@ -137,7 +137,7 @@ usort($ranking, function ($a, $b) {
                     <?php foreach ($ranking as $row): ?>
                         <tr>
                             <td class="text-center"><?php echo swimRankBadge($row['rank']); ?></td>
-                            <td><?php echo CHtml::encode($row['team_name']); ?></td>
+                            <td><?php echo swimLaneName($row); ?></td>
                             <td class="text-center"><?php echo (int) $row['heat_no'] . ' / ' . (int) $row['lane_no']; ?></td>
                             <td class="font-monospace"><?php echo swimMsToText($row['result_ms']); ?></td>
                         </tr>
