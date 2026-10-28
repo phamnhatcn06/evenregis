@@ -131,7 +131,3 @@ $e = function ($s) { return CHtml::encode($s); };
         </div>
     </div>
 </div>
-
-<script>
-    window.PHOTO_ALBUM_UPDATE_URL = '<?php echo $this->createUrl('update', array('id' => '__ID__')); ?>';
-</script>
