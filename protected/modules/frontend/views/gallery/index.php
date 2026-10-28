@@ -11,7 +11,7 @@ $e = function ($s) { return CHtml::encode($s); };
 $eventName = isset($event['name']) ? $event['name'] : 'Đại hội Mường Thanh 2026';
 $accent = '#7c3aed';
 ?>
-<?php $this->renderPartial('_subheader', array('eventName' => $eventName, 'active' => 'gallery')); ?>
+<?php $this->renderPartial('/daihoi/_subheader', array('eventName' => $eventName, 'active' => 'gallery')); ?>
 
 <main class="flex-grow-1">
   <section class="container py-4">
