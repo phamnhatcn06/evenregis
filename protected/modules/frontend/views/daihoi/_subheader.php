@@ -16,6 +16,7 @@ $tabs = array(
     'funrun' => array('url' => $base . '/fun-run', 'label' => 'Fun Run', 'icon' => 'directions_run'),
     'gala' => array('url' => $base . '/tiec-gala', 'label' => 'Bế mạc', 'icon' => 'nightlife'),
     'news' => array('url' => $base . '/tin-tuc', 'label' => 'Tin tức', 'icon' => 'newspaper'),
+    'gallery' => array('url' => $base . '/thu-vien-su-kien', 'label' => 'Hình ảnh', 'icon' => 'photo_library'),
     'handbook' => array('url' => $base . '/so-tay-dai-hoi', 'label' => 'Sổ tay', 'icon' => 'menu_book'),
     'survey' => array('url' => $base . '/khao-sat', 'label' => 'Khảo sát', 'icon' => 'rate_review'),
     'map' => array('url' => $base . '/so-do-dia-diem', 'label' => 'Sơ đồ', 'icon' => 'map'),
