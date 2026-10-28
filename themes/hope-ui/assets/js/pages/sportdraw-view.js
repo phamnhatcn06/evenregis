@@ -411,6 +411,64 @@
         openMatchEditor(data);
     });
 
+    // Xoá trận đấu (lỡ tạo nhầm) — xác nhận bằng SweetAlert rồi POST
+    document.addEventListener('click', function (e) {
+        var delBtn = e.target.closest('.btn-delete-match');
+        if (!delBtn) return;
+        e.preventDefault();
+
+        var matchItem = delBtn.closest('[data-match-id]');
+        if (!matchItem || !deleteMatchUrl) return;
+
+        var mId = matchItem.getAttribute('data-match-id') || '';
+        var mCode = matchItem.getAttribute('data-match-code') || mId;
+        var roundName = matchItem.getAttribute('data-round-name') || '';
+
+        if (mId.indexOf('ko_') === 0) {
+            showToast('Đây là trận xem trước khung nhánh, chưa được tạo nên không cần xoá.', 'info');
+            return;
+        }
+
+        var doDelete = function () {
+            delBtn.disabled = true;
+            var fd = new FormData();
+            fd.append('match_id', mId);
+            fetch(deleteMatchUrl, { method: 'POST', body: fd })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res && res.success) {
+                        showToast('Đã xoá trận đấu ' + mCode + '.', 'success');
+                        setTimeout(function () { location.reload(); }, 600);
+                    } else {
+                        delBtn.disabled = false;
+                        showToast((res && res.message) || 'Không thể xoá trận đấu.', 'error');
+                    }
+                })
+                .catch(function () {
+                    delBtn.disabled = false;
+                    showToast('Lỗi kết nối máy chủ.', 'error');
+                });
+        };
+
+        if (window.Swal) {
+            window.Swal.fire({
+                title: 'Xác nhận xoá trận',
+                html: 'Bạn có chắc muốn xoá trận <strong>' + mCode + '</strong>'
+                    + (roundName ? ' (' + roundName + ')' : '') + '? Hành động này không thể hoàn tác.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xoá',
+                cancelButtonText: 'Hủy'
+            }).then(function (result) {
+                if (result.isConfirmed) doDelete();
+            });
+        } else if (confirm('Xoá trận ' + mCode + '?')) {
+            doDelete();
+        }
+    });
+
     // Save Result & Schedule form submit
     var formModalEditor = document.getElementById('form-modal-match-editor');
     if (formModalEditor) {
