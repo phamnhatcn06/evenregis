@@ -39,6 +39,34 @@ class GalleryAlbums extends CFormModel
         return null;
     }
 
+    /** Danh sách tất cả album (kể cả ẩn) cho trang quản trị. */
+    public static function adminList($eventId = null)
+    {
+        $params = array();
+        if ($eventId !== null && $eventId !== '') {
+            $params['event_id'] = $eventId;
+        }
+        $result = ApiClient::get(ApiEndpoints::GALLERY_ADMIN_ALBUMS, $params);
+        if ($result['success'] && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        return array();
+    }
+
+    /** Cập nhật album (tên, hiển thị công khai, thứ tự). */
+    public static function updateViaApi($id, $data)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::GALLERY_ALBUM_UPDATE, array('id' => $id));
+        return ApiClient::post($url, $data);
+    }
+
+    /** Xoá mềm album. */
+    public static function deleteViaApi($id)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::GALLERY_ALBUM_DELETE, array('id' => $id));
+        return ApiClient::delete($url);
+    }
+
     /**
      * Dựng URL ảnh đầy đủ từ đường dẫn tương đối dưới storage Laravel.
      * Encode từng segment để chịu được tên thư mục tiếng Việt có dấu cách.
