@@ -40,10 +40,24 @@ Yii::app()->clientScript->registerScriptFile(
       </div>
     </div>
 
+    <?php if ($claimer): ?>
+      <div class="alert border-0 rounded-4 d-flex align-items-center gap-2 py-2 px-3 mb-3" style="background:#f3e8ff;color:#6b21a8;">
+        <span class="material-symbols-outlined">how_to_reg</span>
+        <span class="small">Xin chào <strong><?php echo $e($claimer['name']); ?></strong> — bấm biểu tượng <span class="material-symbols-outlined align-middle" style="font-size:16px;">person_add</span> trên ảnh để đánh dấu <strong>ảnh của bạn</strong>.</span>
+      </div>
+    <?php else: ?>
+      <div class="alert border-0 rounded-4 d-flex align-items-center gap-2 py-2 px-3 mb-3" style="background:#f1f5f9;color:#475569;">
+        <span class="material-symbols-outlined">qr_code_scanner</span>
+        <span class="small">Quét mã QR trên thẻ của bạn để <strong>đánh dấu ảnh của mình</strong>. Bạn vẫn có thể xem và tải ảnh tự do.</span>
+      </div>
+    <?php endif; ?>
+
     <div id="gallery-grid"
-         class="gallery-grid"
+         class="gallery-grid<?php echo $claimer ? ' identified' : ''; ?>"
          data-album-id="<?php echo (int) $album['id']; ?>"
          data-photos-url="<?php echo $e($base . '/thu-vien-su-kien/photos'); ?>"
+         data-claim-url="<?php echo $e($base . '/thu-vien-su-kien/claim'); ?>"
+         data-identified="<?php echo $claimer ? '1' : '0'; ?>"
          data-last-page="<?php echo (int) $lastPage; ?>">
       <?php foreach ($photos as $p): ?>
         <?php echo $this->renderPartial('_photo_item', array('p' => $p), true); ?>
