@@ -19,10 +19,14 @@ class GalleryPhotos extends CFormModel
      * Ảnh trong 1 album, phân trang.
      * @return array ['items' => [...], 'page' => int, 'last_page' => int, 'total' => int]
      */
-    public static function listByAlbum($albumId, $page = 1, $limit = 24)
+    public static function listByAlbum($albumId, $page = 1, $limit = 24, $attendeeId = null)
     {
         $url = ApiEndpoints::url(ApiEndpoints::GALLERY_ALBUM_PHOTOS, array('id' => $albumId));
-        $result = ApiClient::get($url, array('page' => (int) $page, 'limit' => (int) $limit));
+        $params = array('page' => (int) $page, 'limit' => (int) $limit);
+        if ($attendeeId) {
+            $params['attendee_id'] = (int) $attendeeId;
+        }
+        $result = ApiClient::get($url, $params);
 
         if (!$result['success'] || !isset($result['data']['data'])) {
             return array('items' => array(), 'page' => 1, 'last_page' => 1, 'total' => 0);
