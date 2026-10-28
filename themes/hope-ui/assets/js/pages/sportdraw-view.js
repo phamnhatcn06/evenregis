@@ -30,6 +30,7 @@
     var sportId = rootEl ? rootEl.getAttribute('data-sport-id') : '';
     var saveResultUrl = rootEl ? rootEl.getAttribute('data-save-result-url') : '';
     var updateMatchUrl = rootEl ? rootEl.getAttribute('data-update-match-url') : '';
+    var deleteMatchUrl = rootEl ? rootEl.getAttribute('data-delete-match-url') : '';
     var reorderMatchesUrl = rootEl ? rootEl.getAttribute('data-reorder-matches-url') : '';
     var standingsUrl = rootEl ? rootEl.getAttribute('data-standings-url') : '';
 
