@@ -752,6 +752,13 @@ class ApiEndpoints
     const GALLERY_RESOLVE = '/api/gallery/resolve';
     const GALLERY_CLAIM = '/api/gallery/photos/{id}/claim';
     const GALLERY_UNCLAIM = '/api/gallery/photos/{id}/unclaim';
+    // Quản trị thư viện ảnh
+    const GALLERY_ADMIN_ALBUMS = '/api/gallery/admin/albums';
+    const GALLERY_ADMIN_PHOTOS = '/api/gallery/admin/albums/{id}/photos';
+    const GALLERY_ALBUM_UPDATE = '/api/gallery/albums/{id}/update';
+    const GALLERY_ALBUM_DELETE = '/api/gallery/albums/{id}';
+    const GALLERY_PHOTO_SET_COVER = '/api/gallery/photos/{id}/set-cover';
+    const GALLERY_PHOTO_DELETE = '/api/gallery/photos/{id}';
 
     // Lucky Draw (Quay số may mắn)
     const LUCKY_PRIZES = '/api/lucky/prizes';
