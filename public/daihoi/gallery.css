@@ -31,6 +31,44 @@
 
 .gallery-item:hover img { transform: scale(1.05); }
 
+/* Nút đánh dấu + badge số người trên mỗi ảnh */
+.gallery-item .gi-claim {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 15, 20, .55);
+  color: #fff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease;
+}
+.gallery-item .gi-claim .material-symbols-outlined { font-size: 20px; }
+.gallery-grid.identified .gallery-item .gi-claim { display: flex; }
+.gallery-item .gi-claim:hover { transform: scale(1.08); }
+.gallery-item.is-mine .gi-claim { background: #16a34a; }
+
+.gallery-item .gi-count {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 7px 2px 5px;
+  border-radius: 999px;
+  background: rgba(15, 15, 20, .55);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+}
+.gallery-item .gi-count .material-symbols-outlined { font-size: 13px; }
+
 /* Lightbox */
 .gallery-lightbox {
   position: fixed;
