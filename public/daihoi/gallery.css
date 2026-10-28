@@ -1,0 +1,87 @@
+/* Thư viện ảnh đại hội - lưới ảnh + lightbox. Nạp kèm layout daihoi (không CDN). */
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 768px) {
+  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+}
+
+.gallery-item {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #e9ecef;
+  cursor: zoom-in;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .25s ease;
+}
+
+.gallery-item:hover img { transform: scale(1.05); }
+
+/* Lightbox */
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  background: rgba(15, 15, 20, .94);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-lightbox.open { display: flex; }
+
+.gallery-lightbox .gl-img {
+  max-width: 92vw;
+  max-height: 84vh;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+}
+
+.gallery-lightbox .gl-close,
+.gallery-lightbox .gl-nav {
+  position: absolute;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+
+.gallery-lightbox .gl-close:hover,
+.gallery-lightbox .gl-nav:hover { background: rgba(255, 255, 255, .28); }
+
+.gallery-lightbox .gl-close { top: 18px; right: 18px; }
+.gallery-lightbox .gl-prev { left: 14px; top: 50%; transform: translateY(-50%); }
+.gallery-lightbox .gl-next { right: 14px; top: 50%; transform: translateY(-50%); }
+
+.gallery-lightbox .gl-download {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 575px) {
+  .gallery-lightbox .gl-nav { width: 40px; height: 40px; }
+}
