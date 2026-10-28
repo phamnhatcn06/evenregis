@@ -23,7 +23,7 @@ Yii::app()->clientScript->registerScriptFile(
     CClientScript::POS_END
 );
 ?>
-<?php $this->renderPartial('_subheader', array('eventName' => $eventName, 'active' => 'gallery')); ?>
+<?php $this->renderPartial('/daihoi/_subheader', array('eventName' => $eventName, 'active' => 'gallery')); ?>
 
 <main class="flex-grow-1">
   <section class="container py-4">
