@@ -82,7 +82,13 @@ Yii::app()->clientScript->registerScriptFile(
   <button type="button" class="gl-nav gl-next" aria-label="Ảnh sau">
     <span class="material-symbols-outlined">chevron_right</span>
   </button>
-  <a class="gl-download btn btn-light btn-sm rounded-pill fw-semibold d-inline-flex align-items-center gap-1" href="" download>
-    <span class="material-symbols-outlined fs-6">download</span> Tải ảnh
-  </a>
+  <div class="gl-actions">
+    <button type="button" class="gl-claim btn btn-sm rounded-pill fw-semibold d-inline-flex align-items-center gap-1">
+      <span class="material-symbols-outlined fs-6">person_add</span><span class="gl-claim-label">Đây là ảnh của tôi</span>
+    </button>
+    <a class="gl-download btn btn-light btn-sm rounded-pill fw-semibold d-inline-flex align-items-center gap-1" href="" download>
+      <span class="material-symbols-outlined fs-6">download</span> Tải ảnh
+    </a>
+  </div>
+  <div class="gl-claimers" style="display:none;"></div>
 </div>
