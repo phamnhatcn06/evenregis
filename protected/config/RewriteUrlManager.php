@@ -13,6 +13,11 @@ $urlRewrite = array(
     'cham-an' => 'frontend/mealScan/index',
     'cham-an/<action:\w+>' => 'frontend/mealScan/<action>',
 
+    // Thư viện ảnh đại hội (public) — rule 'photos' đặt TRƯỚC rule <slug> để không bị nuốt
+    'thu-vien-su-kien' => 'frontend/gallery/index',
+    'thu-vien-su-kien/photos' => 'frontend/gallery/photos',
+    'thu-vien-su-kien/<slug>' => 'frontend/gallery/album',
+
     // Trang công bố người trúng giải (public) — đặt TRƯỚC rule generic
     'luckydraw' => 'frontend/luckyDraw/index',
 
