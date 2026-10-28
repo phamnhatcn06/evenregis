@@ -525,6 +525,32 @@ class SportDrawController extends AdminController
     }
 
     /**
+     * Xoá một trận đấu (AJAX). Dùng khi lỡ tạo nhầm trận play-off / knockout.
+     */
+    public function actionDeleteMatch()
+    {
+        $this->requirePost();
+
+        $matchId = Yii::app()->getRequest()->getPost('match_id');
+        if (!$matchId) {
+            $this->jsonResponse(false, 'Thiếu ID trận đấu.');
+        }
+
+        // Trận "ảo" (xem trước khung nhánh) chưa được lưu xuống DB, không cần xoá.
+        if (strpos((string) $matchId, 'ko_') === 0) {
+            $this->jsonResponse(false, 'Đây là trận xem trước, chưa được tạo nên không cần xoá.');
+        }
+
+        $url = ApiEndpoints::url(ApiEndpoints::SPORT_MATCH_DESTROY, array('id' => $matchId));
+        $result = ApiClient::delete($url);
+
+        if (!empty($result['success'])) {
+            $this->jsonResponse(true, 'Đã xoá trận đấu.');
+        }
+        $this->jsonResponse(false, $this->apiError($result, 'Không thể xoá trận đấu.'));
+    }
+
+    /**
      * Lưu thứ tự sắp xếp lại các trận đấu (AJAX).
      */
     public function actionReorderMatches()
