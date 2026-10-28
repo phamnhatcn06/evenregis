@@ -796,6 +796,11 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
                                 <button type="button" class="btn btn-sm btn-primary btn-quick-result" title="Ghi tỉ số và kết quả">
                                     <i class="fa fa-pencil me-1"></i>Ghi kết quả
                                 </button>
+
+                                <!-- Nút Xoá trận (dùng khi lỡ tạo nhầm) -->
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-delete-match" title="Xoá trận đấu này">
+                                    <i class="fa fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                     <?php endforeach; ?>
