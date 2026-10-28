@@ -113,12 +113,54 @@
 .gallery-lightbox .gl-prev { left: 14px; top: 50%; transform: translateY(-50%); }
 .gallery-lightbox .gl-next { right: 14px; top: 50%; transform: translateY(-50%); }
 
-.gallery-lightbox .gl-download {
+.gallery-lightbox .gl-actions {
   position: absolute;
   bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
 }
+
+.gallery-lightbox .gl-claim { background: #fff; color: #6b21a8; }
+.gallery-lightbox .gl-claim.is-mine { background: #16a34a; color: #fff; }
+.gallery-grid.identified ~ #gallery-lightbox .gl-claim,
+.gallery-lightbox.can-claim .gl-claim { display: inline-flex; }
+.gallery-lightbox .gl-claim { display: none; }
+
+.gallery-lightbox .gl-claimers {
+  position: absolute;
+  bottom: 66px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90vw;
+  text-align: center;
+  color: #e5e7eb;
+  font-size: 12.5px;
+  background: rgba(0, 0, 0, .35);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* Toast nhỏ tự chứa cho trang gallery */
+.gl-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 1090;
+  background: #111827;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+  opacity: 0;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+.gl-toast.show { opacity: 1; }
+.gl-toast.err { background: #b91c1c; }
 
 @media (max-width: 575px) {
   .gallery-lightbox .gl-nav { width: 40px; height: 40px; }
