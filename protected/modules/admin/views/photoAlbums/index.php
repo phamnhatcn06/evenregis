@@ -96,7 +96,7 @@ $e = function ($s) { return CHtml::encode($s); };
 <div class="modal fade" id="modalEditAlbum" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="formEditAlbum" method="post" action="">
+            <form id="formEditAlbum" method="post" action="" data-url-template="<?php echo $this->createUrl('update', array('id' => '__ID__')); ?>">
                 <div class="modal-header">
                     <h5 class="modal-title">Sửa album</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
