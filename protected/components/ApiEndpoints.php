@@ -746,6 +746,10 @@ class ApiEndpoints
     const FINAL_ATTENDEE_ROSTER_SET_LUCKY = '/api/final-attendee-rosters/set-lucky';
     const FINAL_ATTENDEE_ROSTER_CHECK_LUCKY = '/api/final-attendee-rosters/check-lucky';
 
+    // Thư viện ảnh đại hội (Gallery)
+    const GALLERY_ALBUM_LIST = '/api/gallery/albums';
+    const GALLERY_ALBUM_PHOTOS = '/api/gallery/albums/{id}/photos';
+
     // Lucky Draw (Quay số may mắn)
     const LUCKY_PRIZES = '/api/lucky/prizes';
     const LUCKY_PRIZE_SAVE = '/api/lucky/prizes/save';
