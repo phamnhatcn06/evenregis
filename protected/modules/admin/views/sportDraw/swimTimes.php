@@ -52,6 +52,21 @@ function swimRankBadge($rank)
     return '<span class="badge bg-light text-dark">' . (int) $rank . '</span>';
 }
 
+/** Hiển thị tên VĐV (nếu có) kèm đơn vị/đội phía dưới */
+function swimLaneName($lane)
+{
+    $athlete = isset($lane['athlete_name']) ? trim($lane['athlete_name']) : '';
+    $team = isset($lane['team_name']) ? $lane['team_name'] : '';
+    if ($athlete !== '') {
+        $html = '<div class="fw-semibold">' . CHtml::encode($athlete) . '</div>';
+        if ($team !== '' && $team !== $athlete) {
+            $html .= '<div class="text-muted small">' . CHtml::encode($team) . '</div>';
+        }
+        return $html;
+    }
+    return CHtml::encode($team);
+}
+
 // Bảng xếp hạng chung cuộc: gộp mọi lượt, sắp theo hạng
 $ranking = array();
 foreach ($heats as $heat) {
@@ -60,6 +75,7 @@ foreach ($heats as $heat) {
             $ranking[] = array(
                 'rank' => (int) $lane['rank'],
                 'team_name' => $lane['team_name'],
+                'athlete_name' => isset($lane['athlete_name']) ? $lane['athlete_name'] : '',
                 'heat_no' => $heat['heat_no'],
                 'lane_no' => $lane['lane_no'],
                 'result_ms' => $lane['result_ms'],
