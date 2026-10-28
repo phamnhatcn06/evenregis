@@ -15,6 +15,9 @@ $e = function ($s) { return CHtml::encode($s); };
 $eventName = isset($event['name']) ? $event['name'] : 'Đại hội Mường Thanh 2026';
 $accent = '#7c3aed';
 
+Yii::app()->clientScript->registerCssFile(
+    $base . '/public/daihoi/gallery.css?v=' . (@filemtime(Yii::getPathOfAlias('webroot') . '/public/daihoi/gallery.css') ?: time())
+);
 Yii::app()->clientScript->registerScriptFile(
     $base . '/public/daihoi/gallery.js?v=' . (@filemtime(Yii::getPathOfAlias('webroot') . '/public/daihoi/gallery.js') ?: time()),
     CClientScript::POS_END
