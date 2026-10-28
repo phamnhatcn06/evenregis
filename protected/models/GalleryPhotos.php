@@ -54,6 +54,37 @@ class GalleryPhotos extends CFormModel
         return null;
     }
 
+    /** Ảnh trong album cho trang quản trị (kèm người đã đánh dấu + ảnh bìa). */
+    public static function adminListByAlbum($albumId, $page = 1, $limit = 60)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::GALLERY_ADMIN_PHOTOS, array('id' => $albumId));
+        $result = ApiClient::get($url, array('page' => (int) $page, 'limit' => (int) $limit));
+        if (!$result['success'] || !isset($result['data']['data'])) {
+            return array('items' => array(), 'page' => 1, 'last_page' => 1, 'total' => 0);
+        }
+        $pagination = isset($result['data']['pagination']) ? $result['data']['pagination'] : array();
+        return array(
+            'items'     => $result['data']['data'],
+            'page'      => isset($pagination['current_page']) ? (int) $pagination['current_page'] : 1,
+            'last_page' => isset($pagination['last_page']) ? (int) $pagination['last_page'] : 1,
+            'total'     => isset($pagination['total']) ? (int) $pagination['total'] : count($result['data']['data']),
+        );
+    }
+
+    /** Đặt ảnh làm ảnh bìa album. */
+    public static function setCover($photoId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::GALLERY_PHOTO_SET_COVER, array('id' => $photoId));
+        return ApiClient::post($url, array());
+    }
+
+    /** Xoá mềm 1 ảnh. */
+    public static function deleteViaApi($photoId)
+    {
+        $url = ApiEndpoints::url(ApiEndpoints::GALLERY_PHOTO_DELETE, array('id' => $photoId));
+        return ApiClient::delete($url);
+    }
+
     /** Đánh dấu / bỏ đánh dấu ảnh của người tham dự. Trả về mảng ảnh đã cập nhật hoặc null. */
     public static function toggleClaim($photoId, $attendeeId, $claimerName, $claim = true)
     {
