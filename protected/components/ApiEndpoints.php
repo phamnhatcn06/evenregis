@@ -749,6 +749,9 @@ class ApiEndpoints
     // Thư viện ảnh đại hội (Gallery)
     const GALLERY_ALBUM_LIST = '/api/gallery/albums';
     const GALLERY_ALBUM_PHOTOS = '/api/gallery/albums/{id}/photos';
+    const GALLERY_RESOLVE = '/api/gallery/resolve';
+    const GALLERY_CLAIM = '/api/gallery/photos/{id}/claim';
+    const GALLERY_UNCLAIM = '/api/gallery/photos/{id}/unclaim';
 
     // Lucky Draw (Quay số may mắn)
     const LUCKY_PRIZES = '/api/lucky/prizes';
