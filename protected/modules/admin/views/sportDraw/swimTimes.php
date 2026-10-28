@@ -174,7 +174,7 @@ usort($ranking, function ($a, $b) {
                                                data-lane-id="<?php echo (int) $lane['lane_id']; ?>"
                                                value="<?php echo (int) $lane['lane_no']; ?>">
                                     </td>
-                                    <td><?php echo CHtml::encode($lane['team_name']); ?></td>
+                                    <td><?php echo swimLaneName($lane); ?></td>
                                     <td>
                                         <input type="text" class="form-control form-control-sm swim-time-input"
                                                data-lane-id="<?php echo (int) $lane['lane_id']; ?>"
