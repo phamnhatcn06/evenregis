@@ -36,4 +36,33 @@ class GalleryPhotos extends CFormModel
             'total'     => isset($pagination['total']) ? (int) $pagination['total'] : count($result['data']['data']),
         );
     }
+
+    /**
+     * Nhận diện người tham dự từ qr_token (cho luồng "đánh dấu ảnh của tôi").
+     * @return array|null ['attendee_id', 'full_name', 'event_id'] hoặc null nếu không hợp lệ.
+     */
+    public static function resolveAttendee($qrToken)
+    {
+        $result = ApiClient::post(ApiEndpoints::GALLERY_RESOLVE, array('qr_token' => $qrToken));
+        if ($result['success'] && isset($result['data']['data']['attendee_id'])) {
+            return $result['data']['data'];
+        }
+        return null;
+    }
+
+    /** Đánh dấu / bỏ đánh dấu ảnh của người tham dự. Trả về mảng ảnh đã cập nhật hoặc null. */
+    public static function toggleClaim($photoId, $attendeeId, $claimerName, $claim = true)
+    {
+        $endpoint = $claim ? ApiEndpoints::GALLERY_CLAIM : ApiEndpoints::GALLERY_UNCLAIM;
+        $url = ApiEndpoints::url($endpoint, array('id' => $photoId));
+        $data = array('attendee_id' => $attendeeId);
+        if ($claim) {
+            $data['claimer_name'] = $claimerName;
+        }
+        $result = ApiClient::post($url, $data);
+        if ($result['success'] && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+        return null;
+    }
 }
