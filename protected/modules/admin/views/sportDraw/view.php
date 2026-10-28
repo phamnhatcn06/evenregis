@@ -295,6 +295,7 @@ $getSlotLabel = function ($teamId, $explicitSource, $match, $slotIndex) use ($te
          data-sport-id="<?php echo CHtml::encode($model->sport_id); ?>"
          data-save-result-url="<?php echo $this->createUrl('saveResult'); ?>"
          data-update-match-url="<?php echo $this->createUrl('updateMatch'); ?>"
+         data-delete-match-url="<?php echo $this->createUrl('deleteMatch'); ?>"
          data-reorder-matches-url="<?php echo $this->createUrl('reorderMatches'); ?>"
          data-standings-url="<?php echo $this->createUrl('standings', array('id' => $model->id)); ?>"
          data-generate-knockout-url="<?php echo $this->createUrl('generateKnockout', array('id' => $model->id)); ?>"
