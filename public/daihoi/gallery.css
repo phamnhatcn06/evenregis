@@ -122,11 +122,9 @@
   gap: 8px;
 }
 
-.gallery-lightbox .gl-claim { background: #fff; color: #6b21a8; }
+.gallery-lightbox .gl-claim { display: none; background: #fff; color: #6b21a8; }
 .gallery-lightbox .gl-claim.is-mine { background: #16a34a; color: #fff; }
-.gallery-grid.identified ~ #gallery-lightbox .gl-claim,
 .gallery-lightbox.can-claim .gl-claim { display: inline-flex; }
-.gallery-lightbox .gl-claim { display: none; }
 
 .gallery-lightbox .gl-claimers {
   position: absolute;
