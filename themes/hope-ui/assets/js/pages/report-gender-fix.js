@@ -19,8 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function rowHtml(p, idx) {
+        var ids = Array.isArray(p.ids) ? p.ids.join(',') : (p.id || '');
         return '' +
-            '<tr data-id="' + p.id + '">' +
+            '<tr data-ids="' + ids + '">' +
             '<td class="text-center">' + idx + '</td>' +
             '<td>' + escapeHtml(p.full_name) +
             (p.staff_code ? ' <span class="badge bg-secondary">' + escapeHtml(p.staff_code) + '</span>' : '') +
