@@ -164,6 +164,9 @@ class ReportAttendeeStatsController extends AdminController
                 $propName
             );
 
+            // Đã có giới tính ở bảng VCK (roster) -> coi như đã xác định, bỏ qua.
+            if (isset($rosterHasGenderByAttId[$a->id]) || isset($rosterHasGenderByKey[$key])) continue;
+
             if (!isset($byPerson[$key])) {
                 $byPerson[$key] = array(
                     'ids' => array(),
