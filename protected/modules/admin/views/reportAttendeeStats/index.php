@@ -564,3 +564,11 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
         </div>
     </div>
 </div>
+
+<?php
+$this->renderPartial('_modal_gender_fix');
+Yii::app()->clientScript->registerScriptFile(
+    Yii::app()->theme->baseUrl . '/assets/js/pages/report-gender-fix.js',
+    CClientScript::POS_END
+);
+?>
