@@ -1240,7 +1240,8 @@ class ReportAttendeeStatsController extends AdminController
                     if (!isset($personMeta[$pKey])) {
                         $personMeta[$pKey] = $meta;
                     }
-                    $personSports[$pKey][$parentId] = true;
+                    // Khóa theo NỘI DUNG (spId) để đếm "nhiều nội dung"
+                    $personSports[$pKey][$spId] = true;
 
                     if (!isset($perSport[$parentId])) {
                         $perSport[$parentId] = $this->emptySportCell();
