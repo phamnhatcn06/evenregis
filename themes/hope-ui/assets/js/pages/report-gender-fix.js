@@ -20,8 +20,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function rowHtml(p, idx) {
         var ids = Array.isArray(p.ids) ? p.ids.join(',') : (p.id || '');
+        var rosterIds = Array.isArray(p.roster_ids) ? p.roster_ids.join(',') : '';
         return '' +
-            '<tr data-ids="' + ids + '">' +
+            '<tr data-ids="' + ids + '" data-roster-ids="' + rosterIds + '">' +
             '<td class="text-center">' + idx + '</td>' +
             '<td>' + escapeHtml(p.full_name) +
             (p.staff_code ? ' <span class="badge bg-secondary">' + escapeHtml(p.staff_code) + '</span>' : '') +
