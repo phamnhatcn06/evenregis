@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function saveRow(tr) {
-        var id = tr.getAttribute('data-id');
+        var ids = tr.getAttribute('data-ids');
         var sel = tr.querySelector('.gender-select');
         var btn = tr.querySelector('.gender-save');
         var gender = sel.value;
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
 
         var fd = new FormData();
-        fd.append('id', id);
+        fd.append('ids', ids);
         fd.append('gender', gender);
         fetch(updateUrl, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
             .then(function (r) { return r.json(); })
