@@ -1000,10 +1000,11 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
-        // Người tham gia nhiều môn (>= 2 môn cha)
+        // Người tham gia nhiều nội dung (>= 2 nội dung, kể cả nhiều nội dung
+        // trong cùng 1 môn)
         $multiSport = 0;
-        foreach ($personSports as $pKey => $sports) {
-            if (count($sports) >= 2) $multiSport++;
+        foreach ($personSports as $pKey => $contents) {
+            if (count($contents) >= 2) $multiSport++;
         }
 
         $metrics = array(
