@@ -22,8 +22,7 @@
                             <th class="text-center" style="width:50px;">STT</th>
                             <th>Họ và tên</th>
                             <th>Đơn vị</th>
-                            <th class="text-center">Giới tính</th>
-                            <th class="text-center">Lưu</th>
+                            <th class="text-center" colspan="2">Chọn giới tính</th>
                         </tr>
                     </thead>
                     <tbody id="genderFixBody">
