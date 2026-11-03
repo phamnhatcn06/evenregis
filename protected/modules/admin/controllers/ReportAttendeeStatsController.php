@@ -108,15 +108,15 @@ class ReportAttendeeStatsController extends AdminController
         // Bọc try/catch để lỗi roster không làm hỏng cả danh sách.
         $rosterIdsByKey = array();
         try {
-            foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $r) {
-                if (!empty($r->deleted_at)) continue;
+            foreach (FinalAttendeeRosters::getAllByEvent($eventId) as $r) {
+                if (!empty($r['deleted_at'])) continue;
                 $key = $personKey(
-                    isset($r->staff_code) ? $r->staff_code : '',
-                    isset($r->id_card) ? $r->id_card : '',
-                    isset($r->full_name) ? $r->full_name : '',
-                    isset($r->property_name) ? $r->property_name : ''
+                    isset($r['staff_code']) ? $r['staff_code'] : '',
+                    isset($r['id_card']) ? $r['id_card'] : '',
+                    isset($r['full_name']) ? $r['full_name'] : '',
+                    isset($r['property_name']) ? $r['property_name'] : ''
                 );
-                $rosterIdsByKey[$key][] = $r->id;
+                if (isset($r['id'])) $rosterIdsByKey[$key][] = $r['id'];
             }
         } catch (\Throwable $e) {
             Yii::log('Ungendered roster fetch error: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'report');
