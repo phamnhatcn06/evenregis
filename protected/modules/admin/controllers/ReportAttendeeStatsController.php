@@ -1163,8 +1163,9 @@ class ReportAttendeeStatsController extends AdminController
             foreach (FinalAttendeeRosters::getAllByEvent($eventId) as $r) {
                 if (!empty($r['deleted_at'])) continue;
                 $rg = isset($r['gender']) ? $r['gender'] : null;
-                $rb = isset($r['birthday']) && $r['birthday'] ? $r['birthday']
-                    : (isset($r['birth_year']) && $r['birth_year'] ? $r['birth_year'] : null);
+                // Chỉ bù birthday dạng ngày thực (calcOfQualification dùng birthday),
+                // không dùng birth_year để tránh tính nhầm tuổi.
+                $rb = isset($r['birthday']) && $r['birthday'] ? $r['birthday'] : null;
 
                 $linkIds = array();
                 if (!empty($r['attendee_id'])) $linkIds[] = $r['attendee_id'];
