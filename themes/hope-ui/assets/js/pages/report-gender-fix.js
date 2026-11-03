@@ -55,17 +55,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    function saveRow(tr) {
+    function saveRow(tr, gender) {
         var ids = tr.getAttribute('data-ids');
-        var sel = tr.querySelector('.gender-select');
-        var btn = tr.querySelector('.gender-save');
-        var gender = sel.value;
-        if (gender !== '0' && gender !== '1') {
-            if (window.Toast) Toast.warning('Chọn giới tính trước khi lưu.');
-            return;
-        }
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+        var cell = tr.querySelector('.gender-status');
+        var label = gender === '1' ? 'Nam' : 'Nữ';
+        cell.innerHTML = '<span class="text-muted"><i class="fa fa-spinner fa-spin me-1"></i>Đang lưu...</span>';
 
         var fd = new FormData();
         fd.append('ids', ids);
@@ -75,34 +69,36 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (res) {
                 if (res && res.success) {
                     if (window.Toast) Toast.success(res.message || 'Đã cập nhật.');
+                    cell.innerHTML = '<span class="badge bg-success"><i class="fa fa-check me-1"></i>' + label + '</span>';
                     tr.style.transition = 'opacity .3s';
-                    tr.style.opacity = '0.4';
-                    sel.disabled = true;
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-secondary');
-                    btn.innerHTML = '<i class="fa fa-check"></i>';
+                    tr.style.opacity = '0.5';
                     if (countEl) {
                         var n = parseInt(countEl.textContent, 10) || 0;
                         if (n > 0) countEl.textContent = n - 1;
                     }
                 } else {
                     if (window.Toast) Toast.error((res && res.message) || 'Lỗi cập nhật.');
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa fa-save"></i>';
+                    restoreButtons(cell);
                 }
             })
             .catch(function () {
                 if (window.Toast) Toast.error('Lỗi kết nối.');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa fa-save"></i>';
+                restoreButtons(cell);
             });
     }
 
+    function restoreButtons(cell) {
+        cell.innerHTML = '<div class="btn-group btn-group-sm" role="group">' +
+            '<button type="button" class="btn btn-outline-primary gender-pick" data-gender="1">Nam</button>' +
+            '<button type="button" class="btn btn-outline-danger gender-pick" data-gender="0">Nữ</button>' +
+            '</div>';
+    }
+
     bodyEl.addEventListener('click', function (e) {
-        var btn = e.target.closest('.gender-save');
+        var btn = e.target.closest('.gender-pick');
         if (btn) {
             var tr = btn.closest('tr');
-            if (tr) saveRow(tr);
+            if (tr) saveRow(tr, btn.getAttribute('data-gender'));
         }
     });
 
