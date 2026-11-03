@@ -1028,7 +1028,7 @@ class ReportAttendeeStatsController extends AdminController
     /**
      * Ma trận thể thao - Vòng loại (từ sport_team_members).
      */
-    protected function buildSportMatrixQualification($eventId, $isHO, $userPropertyId, $columns, $sportParentMap, $isSportActive)
+    protected function buildSportMatrixQualification($eventId, $isHO, $userPropertyId, $columns, $sportParentMap, $isSportActive, $attById)
     {
         // Registrations active (không phải draft)
         $regParams = array('event_id' => $eventId, 'per_page' => 1000);
@@ -1047,24 +1047,18 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
-        // Attendees + dedup
-        $attParams = array('event_id' => $eventId, 'per_page' => 10000);
-        if (!$isHO && $userPropertyId) $attParams['property_id'] = $userPropertyId;
-        $rawAttendees = Attendees::getApiDataProvider($attParams, 10000)->getData();
-
+        // Thông tin người tham dự (lọc theo đăng ký active) + dedup
         $attInfo = array();          // attId => array(prop, gender, age, staff, idcard)
-        foreach ($rawAttendees as $att) {
-            if (isset($att->deleted_at) && $att->deleted_at) continue;
-            $regId = isset($att->registration_id) ? $att->registration_id : null;
+        foreach ($attById as $attId => $att) {
+            if (!empty($att['deleted'])) continue;
+            $regId = $att['registration_id'];
             if (!$regId || !isset($activeRegIds[$regId])) continue;
-            $attId = isset($att->id) ? $att->id : null;
-            if (!$attId) continue;
             $attInfo[$attId] = array(
-                'prop' => isset($regPropertyMap[$regId]) ? $regPropertyMap[$regId] : (isset($att->property_id) ? $att->property_id : null),
-                'gender' => isset($att->gender) ? $att->gender : null,
-                'age' => $this->calcAge(isset($att->birthday) ? $att->birthday : null),
-                'staff' => isset($att->staff_code) ? mb_strtoupper(trim((string)$att->staff_code), 'UTF-8') : '',
-                'idcard' => isset($att->id_card) ? trim((string)$att->id_card) : '',
+                'prop' => isset($regPropertyMap[$regId]) ? $regPropertyMap[$regId] : $att['property_id'],
+                'gender' => $att['gender'],
+                'age' => $this->calcAge($att['birthday']),
+                'staff' => $att['staff'],
+                'idcard' => $att['idcard'],
             );
         }
 
