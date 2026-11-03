@@ -371,6 +371,31 @@ class Attendees extends BaseAttendees
         return $result;
     }
 
+    /**
+     * Cập nhật CHỈ giới tính: gửi payload tối thiểu (các trường BE validate bắt buộc
+     * + gender). Tránh gửi lại các trường dữ liệu cũ bị sai định dạng
+     * (vd join_hotel_date) làm hỏng validate.
+     *
+     * @param int $gender 1=Nam, 0=Nữ
+     * @return array kết quả ApiClient
+     */
+    public function updateGenderOnlyViaApi($gender)
+    {
+        $data = $this->requiredUpdateFields();
+        // role_id bắt buộc là mảng không rỗng
+        if (empty($data['role_id'])) {
+            $data['role_id'] = is_array($this->role_id)
+                ? $this->role_id
+                : array_values(array_filter(explode(',', (string) $this->role_id), 'strlen'));
+        } elseif (!is_array($data['role_id'])) {
+            $data['role_id'] = array_values(array_filter(explode(',', (string) $data['role_id']), 'strlen'));
+        }
+        $data['gender'] = (int) $gender;
+
+        $url = ApiEndpoints::url(ApiEndpoints::ATTENDEE_UPDATE, array('id' => $this->id));
+        return ApiClient::post($url, $data);
+    }
+
     public function updateViaApi()
     {
         $data = array_filter($this->attributes, function ($value) {
