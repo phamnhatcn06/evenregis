@@ -168,7 +168,17 @@ class ReportAttendeeStatsController extends AdminController
                 );
             }
             $byPerson[$key]['ids'][] = $a->id;
+            // Nối roster theo attendee_id (chắc chắn hơn khóa tên/đơn vị)
+            if (isset($rosterIdsByAttId[$a->id])) {
+                $byPerson[$key]['roster_ids'] = array_merge($byPerson[$key]['roster_ids'], $rosterIdsByAttId[$a->id]);
+            }
         }
+
+        // Khử trùng roster_ids mỗi người
+        foreach ($byPerson as &$p) {
+            $p['roster_ids'] = array_values(array_unique($p['roster_ids']));
+        }
+        unset($p);
 
         $data = array_values($byPerson);
         usort($data, function ($x, $y) {
