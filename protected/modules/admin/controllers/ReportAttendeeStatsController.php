@@ -1156,7 +1156,7 @@ class ReportAttendeeStatsController extends AdminController
         $personSports = array();
         $personMeta = array();
 
-        foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId), 10000)->getData() as $r) {
+        foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $r) {
             if (!empty($r->deleted_at)) continue;
             if (isset($r->is_withdrawn) && (int)$r->is_withdrawn === 1) continue;
             $rid = isset($r->id) ? $r->id : null;
