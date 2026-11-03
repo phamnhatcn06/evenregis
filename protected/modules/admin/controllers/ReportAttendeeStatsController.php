@@ -1188,7 +1188,6 @@ class ReportAttendeeStatsController extends AdminController
         }
 
         $perSport = array();
-        $seenPerSport = array();
         $personSports = array();
         $personMeta = array();
 
