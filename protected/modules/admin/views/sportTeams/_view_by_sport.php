@@ -111,6 +111,7 @@
                         <span class="badge bg-primary ms-2 region-team-count"><?php echo $regionTeamCount; ?> đội</span>
                         <span class="badge bg-info ms-1 region-alliance-count"><?php echo $regionAllianceCount; ?> liên quân</span>
                         <span class="badge bg-secondary ms-1 region-non-alliance-count"><?php echo $regionNonAllianceCount; ?> đơn lẻ</span>
+                        <span class="badge bg-success ms-1 region-member-count"><?php echo $regionMemberCount; ?> VĐV</span>
                     </h5>
 
                     <div class="table-responsive">
