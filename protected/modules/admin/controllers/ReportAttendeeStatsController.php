@@ -106,21 +106,38 @@ class ReportAttendeeStatsController extends AdminController
         // Bản ghi final_attendee_rosters theo người (để cập nhật giới tính cho VCK,
         // vì attendee finalist không cho sửa gender qua bảng attendees).
         // Bọc try/catch để lỗi roster không làm hỏng cả danh sách.
-        $rosterIdsByKey = array();
+        $rosterIdsByKey = array();   // khóa người (mã NV/CCCD/tên) => [roster id]
+        $rosterIdsByAttId = array(); // attendee_id => [roster id] (nối chắc chắn nhất)
         try {
             foreach (FinalAttendeeRosters::getAllByEvent($eventId) as $r) {
                 if (!empty($r['deleted_at'])) continue;
+                if (!isset($r['id'])) continue;
+                $rid = $r['id'];
+
                 $key = $personKey(
                     isset($r['staff_code']) ? $r['staff_code'] : '',
                     isset($r['id_card']) ? $r['id_card'] : '',
                     isset($r['full_name']) ? $r['full_name'] : '',
                     isset($r['property_name']) ? $r['property_name'] : ''
                 );
-                if (isset($r['id'])) $rosterIdsByKey[$key][] = $r['id'];
+                $rosterIdsByKey[$key][] = $rid;
+
+                // Nối theo attendee_id + source_attendee_ids
+                $linkIds = array();
+                if (!empty($r['attendee_id'])) $linkIds[] = $r['attendee_id'];
+                $src = isset($r['source_attendee_ids']) ? $r['source_attendee_ids'] : null;
+                if ($src) {
+                    $arr = is_array($src) ? $src : explode(',', (string)$src);
+                    foreach ($arr as $sid) { $sid = trim((string)$sid); if ($sid !== '') $linkIds[] = $sid; }
+                }
+                foreach ($linkIds as $aid) {
+                    $rosterIdsByAttId[$aid][] = $rid;
+                }
             }
         } catch (\Throwable $e) {
             Yii::log('Ungendered roster fetch error: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'report');
             $rosterIdsByKey = array();
+            $rosterIdsByAttId = array();
         }
 
         $rows = Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData();
