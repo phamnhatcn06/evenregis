@@ -270,6 +270,89 @@ class ReportAttendeeStatsController extends AdminController
         }
     }
 
+    /**
+     * CHẨN ĐOÁN: liệt kê những VĐV vòng loại vẫn bị tính "chưa rõ giới tính",
+     * kèm giới tính ở cả 2 bảng (attendees / roster) để tìm nguyên nhân.
+     * Dùng: admin/reportAttendeeStats/sportUnknownDiag?event_id=X
+     */
+    public function actionSportUnknownDiag()
+    {
+        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        PermissionHelper::requirePermission('reports', 'read');
+        $eventId = Yii::app()->request->getParam('event_id');
+        if (!$eventId) { $this->renderJson(array('success' => false, 'message' => 'Thiếu event_id.')); return; }
+
+        // Attendees
+        $attById = array();
+        foreach (Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $a) {
+            if (!isset($a->id)) continue;
+            if (!empty($a->deleted_at)) continue;
+            $attById[$a->id] = array(
+                'name' => isset($a->full_name) ? (string)$a->full_name : '',
+                'prop' => isset($a->property_name) ? (string)$a->property_name : '',
+                'gender' => isset($a->gender) ? $a->gender : null,
+                'staff' => isset($a->staff_code) ? mb_strtoupper(trim((string)$a->staff_code), 'UTF-8') : '',
+                'card' => isset($a->id_card) ? trim((string)$a->id_card) : '',
+            );
+        }
+
+        // Roster gender maps
+        $rByAtt = array(); $rByStaff = array(); $rByCard = array();
+        foreach (FinalAttendeeRosters::getAllByEvent($eventId) as $r) {
+            if (!empty($r['deleted_at'])) continue;
+            $rg = isset($r['gender']) ? $r['gender'] : null;
+            $has = ($rg !== null && $rg !== '');
+            $linkIds = array();
+            if (!empty($r['attendee_id'])) $linkIds[] = $r['attendee_id'];
+            $src = isset($r['source_attendee_ids']) ? $r['source_attendee_ids'] : null;
+            if ($src) { foreach ((is_array($src) ? $src : explode(',', (string)$src)) as $sid) { $sid = trim((string)$sid); if ($sid !== '') $linkIds[] = $sid; } }
+            foreach ($linkIds as $aid) { if ($has && !isset($rByAtt[$aid])) $rByAtt[$aid] = $rg; }
+            $staff = isset($r['staff_code']) ? mb_strtoupper(trim((string)$r['staff_code']), 'UTF-8') : '';
+            if ($staff !== '' && $has && !isset($rByStaff[$staff])) $rByStaff[$staff] = $rg;
+            $card = isset($r['id_card']) ? trim((string)$r['id_card']) : '';
+            if (preg_match('/^\d{9,12}$/', $card) && $has && !isset($rByCard[$card])) $rByCard[$card] = $rg;
+        }
+
+        // team => sport
+        $teamSport = array();
+        foreach (SportTeams::getApiDataProvider(array('event_id' => $eventId), 50000)->getData() as $t) {
+            if (isset($t->id, $t->sport_id)) $teamSport[$t->id] = $t->sport_id;
+        }
+
+        // Người tham gia vòng loại
+        $seen = array();
+        $out = array();
+        foreach (SportTeamMembers::getRawListByEvent($eventId) as $sm) {
+            if (!empty($sm['deleted_at'])) continue;
+            $attId = isset($sm['attendee_id']) ? $sm['attendee_id'] : null;
+            if (!$attId || !isset($attById[$attId])) continue;
+            if (isset($seen[$attId])) continue;
+            $seen[$attId] = true;
+            $info = $attById[$attId];
+            // enrich như report
+            $enr = $info['gender'];
+            if ($this->normalizeGender($enr) === '') {
+                if (isset($rByAtt[$attId])) $enr = $rByAtt[$attId];
+                elseif ($info['staff'] !== '' && isset($rByStaff[$info['staff']])) $enr = $rByStaff[$info['staff']];
+                elseif (preg_match('/^\d{9,12}$/', $info['card']) && isset($rByCard[$info['card']])) $enr = $rByCard[$info['card']];
+            }
+            if ($this->normalizeGender($enr) !== '') continue; // đã rõ sau enrich
+            $out[] = array(
+                'attendee_id' => $attId,
+                'name' => $info['name'],
+                'prop' => $info['prop'],
+                'staff' => $info['staff'],
+                'card' => $info['card'],
+                'att_gender' => $info['gender'],
+                'roster_by_att' => isset($rByAtt[$attId]) ? $rByAtt[$attId] : null,
+                'roster_by_staff' => ($info['staff'] !== '' && isset($rByStaff[$info['staff']])) ? $rByStaff[$info['staff']] : null,
+                'roster_by_card' => (preg_match('/^\d{9,12}$/', $info['card']) && isset($rByCard[$info['card']])) ? $rByCard[$info['card']] : null,
+            );
+        }
+        $this->renderJson(array('success' => true, 'count' => count($out), 'data' => $out));
+    }
+
     protected function renderJson($payload)
     {
         header('Content-Type: application/json; charset=utf-8');
