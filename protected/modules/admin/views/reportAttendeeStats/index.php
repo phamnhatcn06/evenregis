@@ -251,7 +251,13 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
         </div>
 
         <!-- Ma trận BAN THỂ THAO: Vòng loại & Vòng chung kết -->
-        <div class="d-flex justify-content-end mt-4">
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-warning btn-sm" id="btnOpenGenderFix"
+                data-list-url="<?php echo $this->createUrl('/admin/reportAttendeeStats/ungendered'); ?>"
+                data-update-url="<?php echo $this->createUrl('/admin/reportAttendeeStats/updateGender'); ?>"
+                data-event-id="<?php echo CHtml::encode($selectedEventId); ?>">
+                <i class="fa fa-venus-mars me-1"></i> Sửa người chưa rõ giới tính
+            </button>
             <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportMatrix', array('event_id' => $selectedEventId)); ?>" class="btn btn-success btn-sm">
                 <i class="fa fa-file-excel-o me-1"></i> Xuất Excel BAN THỂ THAO
             </a>
