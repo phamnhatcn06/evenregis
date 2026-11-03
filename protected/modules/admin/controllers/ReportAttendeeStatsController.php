@@ -353,6 +353,152 @@ class ReportAttendeeStatsController extends AdminController
         $this->renderJson(array('success' => true, 'count' => count($out), 'data' => $out));
     }
 
+    /**
+     * CHẨN ĐOÁN: ai là VĐV trẻ nhất / lớn tuổi nhất ở từng môn + TỔNG.
+     * Dùng: admin/reportAttendeeStats/sportAgeExtremes?event_id=X
+     */
+    public function actionSportAgeExtremes()
+    {
+        @set_time_limit(300);
+        @ini_set('memory_limit', '1024M');
+        PermissionHelper::requirePermission('reports', 'read');
+        $eventId = Yii::app()->request->getParam('event_id');
+        if (!$eventId) { $this->renderJson(array('success' => false, 'message' => 'Thiếu event_id.')); return; }
+
+        // ---- Danh mục môn + bản đồ con->cha ----
+        $sportParentMap = array(); $parentInfo = array();
+        foreach (Sports::getApiDataProvider(array('is_active' => 1), 500)->getData() as $sp) {
+            $spId = isset($sp->id) ? $sp->id : null;
+            if (!$spId) continue;
+            $parentId = (isset($sp->parent_id) && $sp->parent_id) ? $sp->parent_id : $spId;
+            $sportParentMap[$spId] = $parentId;
+            if ($parentId == $spId) $parentInfo[$spId] = isset($sp->name) ? $sp->name : ('#' . $spId);
+        }
+        $hasChildren = array();
+        foreach ($sportParentMap as $c => $p) { if ($p != $c) $hasChildren[$p] = true; }
+
+        // ---- Attendees (kèm tên) ----
+        $attById = array();
+        foreach (Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $a) {
+            if (!isset($a->id) || !empty($a->deleted_at)) continue;
+            $attById[$a->id] = array(
+                'name' => isset($a->full_name) ? (string)$a->full_name : '',
+                'prop' => isset($a->property_name) ? (string)$a->property_name : '',
+                'birthday' => isset($a->birthday) ? $a->birthday : null,
+                'staff' => isset($a->staff_code) ? mb_strtoupper(trim((string)$a->staff_code), 'UTF-8') : '',
+                'card' => isset($a->id_card) ? trim((string)$a->id_card) : '',
+            );
+        }
+
+        // ---- Roster: birthday/birth_year + property, nối att/staff/card ----
+        $rByAtt = array(); $rByStaff = array(); $rByCard = array();
+        foreach (FinalAttendeeRosters::getAllByEvent($eventId) as $r) {
+            if (!empty($r['deleted_at'])) continue;
+            $info = array(
+                'birthday' => isset($r['birthday']) ? $r['birthday'] : null,
+                'birth_year' => isset($r['birth_year']) ? $r['birth_year'] : null,
+                'prop' => isset($r['property_name']) ? (string)$r['property_name'] : null,
+            );
+            $linkIds = array();
+            if (!empty($r['attendee_id'])) $linkIds[] = $r['attendee_id'];
+            $src = isset($r['source_attendee_ids']) ? $r['source_attendee_ids'] : null;
+            if ($src) { foreach ((is_array($src) ? $src : explode(',', (string)$src)) as $sid) { $sid = trim((string)$sid); if ($sid !== '') $linkIds[] = $sid; } }
+            foreach ($linkIds as $aid) { if (!isset($rByAtt[$aid])) $rByAtt[$aid] = $info; }
+            $staff = isset($r['staff_code']) ? mb_strtoupper(trim((string)$r['staff_code']), 'UTF-8') : '';
+            if ($staff !== '' && !isset($rByStaff[$staff])) $rByStaff[$staff] = $info;
+            $card = isset($r['id_card']) ? trim((string)$r['id_card']) : '';
+            if (preg_match('/^\d{9,12}$/', $card) && !isset($rByCard[$card])) $rByCard[$card] = $info;
+        }
+
+        // Bù birthday cho attendees từ roster (giống báo cáo vòng loại)
+        foreach ($attById as $aid => &$info) {
+            if (empty($info['birthday'])) {
+                $rb = null;
+                if (isset($rByAtt[$aid]) && $rByAtt[$aid]['birthday']) $rb = $rByAtt[$aid]['birthday'];
+                elseif ($info['staff'] !== '' && isset($rByStaff[$info['staff']]) && $rByStaff[$info['staff']]['birthday']) $rb = $rByStaff[$info['staff']]['birthday'];
+                elseif (preg_match('/^\d{9,12}$/', $info['card']) && isset($rByCard[$info['card']]) && $rByCard[$info['card']]['birthday']) $rb = $rByCard[$info['card']]['birthday'];
+                if ($rb) $info['birthday'] = $rb;
+            }
+        }
+        unset($info);
+
+        // team => sport
+        $teamSport = array();
+        foreach (SportTeams::getApiDataProvider(array('event_id' => $eventId), 50000)->getData() as $t) {
+            if (isset($t->id, $t->sport_id)) $teamSport[$t->id] = $t->sport_id;
+        }
+        $membersByTeam = array();
+        foreach (SportTeamMembers::getRawListByEvent($eventId) as $sm) {
+            if (!empty($sm['deleted_at'])) continue;
+            $tid = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
+            if ($tid) $membersByTeam[$tid][] = $sm;
+        }
+
+        // bộ gom extremes: key(parent hoặc 'TONG') => young/old
+        $track = function (&$ex, $key, $label, $name, $prop, $age) {
+            if ($age === null) return;
+            if (!isset($ex[$key])) $ex[$key] = array('sport' => $label, 'young' => null, 'old' => null);
+            if ($ex[$key]['young'] === null || $age < $ex[$key]['young']['age']) $ex[$key]['young'] = array('age' => $age, 'name' => $name, 'prop' => $prop);
+            if ($ex[$key]['old'] === null || $age > $ex[$key]['old']['age']) $ex[$key]['old'] = array('age' => $age, 'name' => $name, 'prop' => $prop);
+        };
+
+        // ===== Vòng loại =====
+        $exQ = array(); $seenQ = array();
+        foreach ($membersByTeam as $tid => $members) {
+            $sportId = isset($teamSport[$tid]) ? $teamSport[$tid] : null;
+            if (!$sportId) continue;
+            $parentId = isset($sportParentMap[$sportId]) ? $sportParentMap[$sportId] : $sportId;
+            $label = isset($parentInfo[$parentId]) ? $parentInfo[$parentId] : ('#' . $parentId);
+            foreach ($members as $m) {
+                $attId = isset($m['attendee_id']) ? $m['attendee_id'] : null;
+                if (!$attId || !isset($attById[$attId])) continue;
+                $a = $attById[$attId];
+                $age = $this->calcAge($a['birthday']);
+                $track($exQ, $parentId, $label, $a['name'], $a['prop'], $age);
+                if (!isset($seenQ[$attId])) { $seenQ[$attId] = true; $track($exQ, 'TONG', 'TỔNG', $a['name'], $a['prop'], $age); }
+            }
+        }
+
+        // ===== Vòng chung kết =====
+        $exF = array(); $seenF = array();
+        $resolveF = function ($attId) use ($rByAtt, $rByStaff, $rByCard, $attById) {
+            $base = isset($attById[$attId]) ? $attById[$attId] : null;
+            $roster = isset($rByAtt[$attId]) ? $rByAtt[$attId] : null;
+            if ($roster === null && $base) {
+                if ($base['staff'] !== '' && isset($rByStaff[$base['staff']])) $roster = $rByStaff[$base['staff']];
+                elseif (preg_match('/^\d{9,12}$/', (string)$base['card']) && isset($rByCard[$base['card']])) $roster = $rByCard[$base['card']];
+            }
+            $bday = ($roster && $roster['birthday']) ? $roster['birthday'] : ($base ? $base['birthday'] : null);
+            $byear = $roster ? $roster['birth_year'] : null;
+            $prop = ($roster && $roster['prop']) ? $roster['prop'] : ($base ? $base['prop'] : null);
+            $name = $base ? $base['name'] : '';
+            return array('age' => $this->calcAge($bday, $byear), 'prop' => $prop, 'name' => $name);
+        };
+        foreach ($sportParentMap as $spId => $parentId) {
+            if (isset($hasChildren[$spId])) continue;
+            $label = isset($parentInfo[$parentId]) ? $parentInfo[$parentId] : ('#' . $parentId);
+            foreach (SportTeams::getFinalists($eventId, $spId) as $f) {
+                $teamId = isset($f['team_id']) ? $f['team_id'] : (isset($f['id']) ? $f['id'] : null);
+                if ($teamId === null) continue;
+                $members = isset($membersByTeam[$teamId]) ? $membersByTeam[$teamId] : array();
+                if (empty($members) && isset($f['team']['members']) && is_array($f['team']['members'])) $members = $f['team']['members'];
+                foreach ($members as $m) {
+                    $attId = isset($m['attendee_id']) ? $m['attendee_id'] : null;
+                    if (!$attId) continue;
+                    $meta = $resolveF($attId);
+                    $track($exF, $parentId, $label, $meta['name'], $meta['prop'], $meta['age']);
+                    if (!isset($seenF[$attId])) { $seenF[$attId] = true; $track($exF, 'TONG', 'TỔNG', $meta['name'], $meta['prop'], $meta['age']); }
+                }
+            }
+        }
+
+        $this->renderJson(array(
+            'success' => true,
+            'qualification' => array_values($exQ),
+            'final' => array_values($exF),
+        ));
+    }
+
     protected function renderJson($payload)
     {
         header('Content-Type: application/json; charset=utf-8');
