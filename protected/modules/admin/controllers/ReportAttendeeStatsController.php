@@ -1007,6 +1007,7 @@ class ReportAttendeeStatsController extends AdminController
                 'total_units' => count($cell['units']),
                 'male' => $cell['male'],
                 'female' => $cell['female'],
+                'unknown' => $cell['unknown'],
                 'youngest' => $cell['min_age'],
                 'oldest' => $cell['max_age'],
                 'multi_sport' => null, // chỉ tính ở cột TỔNG
