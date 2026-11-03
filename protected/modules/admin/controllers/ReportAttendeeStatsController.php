@@ -142,26 +142,36 @@ class ReportAttendeeStatsController extends AdminController
     {
         PermissionHelper::requirePermission('reports', 'read');
 
-        $id = Yii::app()->request->getPost('id');
+        $idsРaw = Yii::app()->request->getPost('ids', Yii::app()->request->getPost('id'));
         $gender = Yii::app()->request->getPost('gender');
-        if (!$id || ($gender !== '0' && $gender !== '1' && $gender !== 0 && $gender !== 1)) {
+        if ($idsРaw === null || $idsРaw === '' || ($gender !== '0' && $gender !== '1' && $gender !== 0 && $gender !== 1)) {
             $this->renderJson(array('success' => false, 'message' => 'Dữ liệu không hợp lệ.'));
             return;
         }
 
-        $model = Attendees::fetchFromApi($id);
-        if ($model === null) {
-            $this->renderJson(array('success' => false, 'message' => 'Không tìm thấy người tham dự.'));
+        $ids = is_array($idsРaw) ? $idsРaw : explode(',', (string)$idsРaw);
+        $ids = array_values(array_filter(array_map('trim', $ids), function ($v) { return $v !== ''; }));
+        if (empty($ids)) {
+            $this->renderJson(array('success' => false, 'message' => 'Không có người tham dự để cập nhật.'));
             return;
         }
 
-        $model->gender = (int)$gender;
-        $result = $model->updateViaApi();
-        if (!empty($result['success'])) {
-            $this->renderJson(array('success' => true, 'message' => 'Đã cập nhật giới tính.'));
+        $ok = 0;
+        $fail = 0;
+        foreach ($ids as $id) {
+            $model = Attendees::fetchFromApi($id);
+            if ($model === null) { $fail++; continue; }
+            $model->gender = (int)$gender;
+            $result = $model->updateViaApi();
+            if (!empty($result['success'])) { $ok++; } else { $fail++; }
+        }
+
+        if ($ok > 0) {
+            $msg = 'Đã cập nhật giới tính' . ($ok > 1 ? ' (' . $ok . ' bản ghi của người này)' : '') . '.';
+            if ($fail > 0) $msg .= ' ' . $fail . ' bản ghi lỗi.';
+            $this->renderJson(array('success' => true, 'message' => $msg));
         } else {
-            $msg = isset($result['error']) ? $result['error'] : 'Cập nhật thất bại.';
-            $this->renderJson(array('success' => false, 'message' => $msg));
+            $this->renderJson(array('success' => false, 'message' => 'Cập nhật thất bại.'));
         }
     }
 
