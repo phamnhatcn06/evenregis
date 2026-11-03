@@ -1195,19 +1195,46 @@ class ReportAttendeeStatsController extends AdminController
                 $pKey = 'n:' . $nm . '|' . $pn;
             }
 
-            // Thông tin cá nhân: ưu tiên dữ liệu trên phiếu VCK, bổ sung từ attendees
+            // Thông tin cá nhân VCK: ưu tiên final_attendee_rosters, rồi phiếu VCK,
+            // cuối cùng mới đến attendees.
+            $roster = ($attId && isset($rosterByAttId[$attId])) ? $rosterByAttId[$attId] : null;
             $base = ($attId && isset($attById[$attId])) ? $attById[$attId] : null;
 
-            $propId = isset($fa['property_id']) && $fa['property_id'] ? $fa['property_id']
-                : ($base && $base['property_id'] ? $base['property_id']
-                    : (isset($fa['property_name']) && $fa['property_name'] !== '' ? 'name:' . $fa['property_name'] : null));
+            $firstNonEmpty = function ($values) {
+                foreach ($values as $v) {
+                    if ($v !== null && $v !== '') return $v;
+                }
+                return null;
+            };
 
-            $gender = isset($fa['gender']) && $fa['gender'] !== '' && $fa['gender'] !== null
-                ? $fa['gender'] : ($base ? $base['gender'] : null);
+            $propId = $firstNonEmpty(array(
+                $roster ? $roster['property_id'] : null,
+                isset($fa['property_id']) ? $fa['property_id'] : null,
+                $base ? $base['property_id'] : null,
+            ));
+            if ($propId === null) {
+                $pn = $firstNonEmpty(array(
+                    $roster ? $roster['property_name'] : null,
+                    isset($fa['property_name']) ? $fa['property_name'] : null,
+                ));
+                $propId = $pn !== null ? 'name:' . $pn : null;
+            }
 
-            $birthYear = isset($fa['birth_year']) && $fa['birth_year'] ? $fa['birth_year'] : null;
-            $birthday = isset($fa['birthday']) && $fa['birthday'] ? $fa['birthday']
-                : ($base ? $base['birthday'] : null);
+            $gender = $firstNonEmpty(array(
+                $roster ? $roster['gender'] : null,
+                isset($fa['gender']) ? $fa['gender'] : null,
+                $base ? $base['gender'] : null,
+            ));
+
+            $birthYear = $firstNonEmpty(array(
+                $roster ? $roster['birth_year'] : null,
+                isset($fa['birth_year']) ? $fa['birth_year'] : null,
+            ));
+            $birthday = $firstNonEmpty(array(
+                $roster ? $roster['birthday'] : null,
+                isset($fa['birthday']) ? $fa['birthday'] : null,
+                $base ? $base['birthday'] : null,
+            ));
             $age = $this->calcAge($birthday, $birthYear);
 
             $contents = isset($fa['contents']) && is_array($fa['contents']) ? $fa['contents'] : array();
