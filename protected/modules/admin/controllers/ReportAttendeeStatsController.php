@@ -75,6 +75,7 @@ class ReportAttendeeStatsController extends AdminController
             'selectedEventId' => $selectedEventId,
             'selectedEventName' => $selectedEventName,
             'reportData' => $reportData,
+            'sportMatrix' => $sportMatrix,
         ));
     }
 
