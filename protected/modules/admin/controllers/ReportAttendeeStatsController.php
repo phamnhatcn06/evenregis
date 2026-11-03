@@ -1130,9 +1130,9 @@ class ReportAttendeeStatsController extends AdminController
     /**
      * Ma trận thể thao - Vòng chung kết.
      *
-     * Nguồn DUY NHẤT: bảng final_attendee_rosters. Mỗi dòng roster là 1 người vào
-     * vòng chung kết; trường `participations` liệt kê các nội dung họ tham gia
-     * (type='sport', name = tên môn/nội dung). KHÔNG dùng đội / trận chung kết.
+     * Logic: lấy danh sách các ĐỘI vào vòng chung kết của từng nội dung
+     * (SportTeams::getFinalists) rồi cộng TỔNG SỐ THÀNH VIÊN các đội đó.
+     * Giới tính/tuổi lấy từ final_attendee_rosters, bổ sung từ attendees.
      */
     protected function buildSportMatrixFinal($eventId, $columns, $sportParentMap, $isSportActive, $activeParentIds, $attById)
     {
@@ -1141,70 +1141,94 @@ class ReportAttendeeStatsController extends AdminController
             return null;
         }
 
-        // Tên nội dung -> (sport_id, parent_id). Lấy TẤT CẢ sports (kể cả inactive)
-        // vì nội dung thi (môn con) có thể đang inactive mà vẫn có người vào chung kết.
-        $nameToSport = array();
-        foreach (Sports::getApiDataProvider(array(), 1000)->getData() as $sp) {
-            $spId = isset($sp->id) ? $sp->id : null;
-            $name = isset($sp->name) ? trim((string)$sp->name) : '';
-            if (!$spId || $name === '') continue;
-            $parentId = isset($sp->parent_id) && $sp->parent_id ? $sp->parent_id : $spId;
-            $k = mb_strtolower($name, 'UTF-8');
-            if (!isset($nameToSport[$k])) $nameToSport[$k] = array('sport_id' => $spId, 'parent_id' => $parentId);
+        // Thông tin cá nhân VCK từ final_attendee_rosters (gender/birthday/property),
+        // map theo attendee_id và các source_attendee_ids.
+        $rosterByAttId = array();
+        foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $r) {
+            if (!empty($r->deleted_at)) continue;
+            $info = array(
+                'gender' => isset($r->gender) ? $r->gender : null,
+                'birthday' => isset($r->birthday) ? $r->birthday : null,
+                'birth_year' => isset($r->birth_year) ? $r->birth_year : null,
+                'property_id' => isset($r->property_id) ? $r->property_id : null,
+            );
+            $aid = isset($r->attendee_id) ? $r->attendee_id : null;
+            if ($aid) $rosterByAttId[$aid] = $info;
+            $src = isset($r->source_attendee_ids) ? $r->source_attendee_ids : null;
+            if ($src) {
+                $ids = is_array($src) ? $src : explode(',', (string)$src);
+                foreach ($ids as $sid) {
+                    $sid = trim((string)$sid);
+                    if ($sid !== '' && !isset($rosterByAttId[$sid])) $rosterByAttId[$sid] = $info;
+                }
+            }
         }
 
-        // Chỉ đếm nội dung thuộc các môn (cột) đang hiển thị.
-        $columnIds = array();
-        foreach ($columns as $col) $columnIds[$col['sport_id']] = true;
+        // Thành viên đội, group theo đội (sport_team_members)
+        $membersByTeam = array();
+        foreach (SportTeamMembers::getRawListByEvent($eventId) as $sm) {
+            if (!empty($sm['deleted_at'])) continue;
+            $teamId = isset($sm['sport_team_id']) ? $sm['sport_team_id'] : null;
+            if (!$teamId) continue;
+            $membersByTeam[$teamId][] = $sm;
+        }
+
+        // Các nội dung (môn lá) cần quét finalists: môn cha có môn con thì bỏ qua
+        // (đăng ký ở cấp môn con); môn không có con tự là nội dung.
+        $hasChildren = array();
+        foreach ($sportParentMap as $childId => $parentId) {
+            if ($parentId != $childId) $hasChildren[$parentId] = true;
+        }
+
+        // Thông tin cá nhân: ưu tiên roster VCK, bổ sung từ attendees.
+        $resolve = function ($attId) use ($rosterByAttId, $attById) {
+            $roster = isset($rosterByAttId[$attId]) ? $rosterByAttId[$attId] : null;
+            $base = isset($attById[$attId]) ? $attById[$attId] : null;
+            $pick = function ($a, $b) {
+                if ($a !== null && $a !== '') return $a;
+                return ($b !== null && $b !== '') ? $b : null;
+            };
+            $gender = $pick($roster ? $roster['gender'] : null, $base ? $base['gender'] : null);
+            $birthYear = $roster ? $roster['birth_year'] : null;
+            $birthday = $pick($roster ? $roster['birthday'] : null, $base ? $base['birthday'] : null);
+            $prop = $pick($roster ? $roster['property_id'] : null, $base ? $base['property_id'] : null);
+            return array('gender' => $gender, 'age' => $this->calcAge($birthday, $birthYear), 'prop' => $prop);
+        };
 
         $perSport = array();
         $personSports = array();
         $personMeta = array();
 
-        foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $r) {
-            if (!empty($r->deleted_at)) continue;
-            if (isset($r->is_withdrawn) && (int)$r->is_withdrawn === 1) continue;
-            $rid = isset($r->id) ? $r->id : null;
-            if ($rid === null) continue;
-            $pKey = 'r' . $rid;
+        foreach ($sportParentMap as $spId => $parentId) {
+            if (isset($hasChildren[$spId])) continue;   // bỏ môn cha có con
+            if (!$isSportActive($spId)) continue;
 
-            // Thông tin cá nhân lấy từ roster; thiếu thì bổ sung từ attendees cùng người.
-            $aid = isset($r->attendee_id) ? $r->attendee_id : null;
-            $base = ($aid && isset($attById[$aid])) ? $attById[$aid] : null;
-            $pick = function ($a, $b) {
-                if ($a !== null && $a !== '') return $a;
-                return ($b !== null && $b !== '') ? $b : null;
-            };
-            $gender = $pick(isset($r->gender) ? $r->gender : null, $base ? $base['gender'] : null);
-            $birthYear = isset($r->birth_year) ? $r->birth_year : null;
-            $birthday = $pick(isset($r->birthday) ? $r->birthday : null, $base ? $base['birthday'] : null);
-            $prop = $pick(isset($r->property_id) && $r->property_id ? $r->property_id : null, $base ? $base['property_id'] : null);
-            if ($prop === null && isset($r->property_name) && $r->property_name !== '') {
-                $prop = 'name:' . $r->property_name;
-            }
-            $age = $this->calcAge($birthday, $birthYear);
+            foreach (SportTeams::getFinalists($eventId, $spId) as $f) {
+                $teamId = isset($f['team_id']) ? $f['team_id'] : (isset($f['id']) ? $f['id'] : null);
+                if ($teamId === null) continue;
 
-            $parts = isset($r->participations) && is_array($r->participations) ? $r->participations : array();
-            foreach ($parts as $p) {
-                $ptype = is_array($p) ? (isset($p['type']) ? $p['type'] : '') : (isset($p->type) ? $p->type : '');
-                if ($ptype !== 'sport') continue;
-                $pname = is_array($p) ? (isset($p['name']) ? $p['name'] : '') : (isset($p->name) ? $p->name : '');
-                $k = mb_strtolower(trim((string)$pname), 'UTF-8');
-                if ($k === '' || !isset($nameToSport[$k])) continue;
-                $spId = $nameToSport[$k]['sport_id'];
-                $parentId = $nameToSport[$k]['parent_id'];
-                if (!isset($columnIds[$parentId])) continue; // không thuộc môn hiển thị
-
-                if (!isset($personMeta[$pKey])) {
-                    $personMeta[$pKey] = array('prop' => $prop, 'gender' => $gender, 'age' => $age);
+                $members = isset($membersByTeam[$teamId]) ? $membersByTeam[$teamId] : array();
+                if (empty($members) && isset($f['team']['members']) && is_array($f['team']['members'])) {
+                    $members = $f['team']['members'];
                 }
-                $personSports[$pKey][$parentId] = true;
 
-                if (!isset($perSport[$parentId])) {
-                    $perSport[$parentId] = $this->emptySportCell();
+                foreach ($members as $m) {
+                    $attId = isset($m['attendee_id']) ? $m['attendee_id'] : null;
+                    if (!$attId) continue;
+                    $meta = $resolve($attId);
+                    $pKey = 'a' . $attId;
+
+                    if (!isset($personMeta[$pKey])) {
+                        $personMeta[$pKey] = $meta;
+                    }
+                    $personSports[$pKey][$parentId] = true;
+
+                    if (!isset($perSport[$parentId])) {
+                        $perSport[$parentId] = $this->emptySportCell();
+                    }
+                    // Đếm theo từng nội dung (spId = môn con / nội dung thi)
+                    $this->addParticipation($perSport[$parentId], $pKey, $spId, $meta['prop'], $meta['gender'], $meta['age']);
                 }
-                // Đếm theo từng nội dung (spId = môn con / nội dung thi)
-                $this->addParticipation($perSport[$parentId], $pKey, $spId, $prop, $gender, $age);
             }
         }
 
