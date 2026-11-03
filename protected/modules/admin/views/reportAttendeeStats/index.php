@@ -250,6 +250,24 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
             </div>
         </div>
 
+        <!-- Ma trận BAN THỂ THAO: Vòng loại & Vòng chung kết -->
+        <?php
+        $this->renderPartial('_sport_matrix', array(
+            'title' => 'BAN THỂ THAO — Vòng loại',
+            'columns' => $sportMatrix['columns'],
+            'data' => $sportMatrix['qualification'],
+            'headerClass' => 'table-primary',
+        ));
+        if ($sportMatrix['final'] !== null) {
+            $this->renderPartial('_sport_matrix', array(
+                'title' => 'BAN THỂ THAO — Vòng chung kết',
+                'columns' => $sportMatrix['columns'],
+                'data' => $sportMatrix['final'],
+                'headerClass' => 'table-warning',
+            ));
+        }
+        ?>
+
         <!-- Sport Athletes Stats Table -->
         <?php if (!empty($reportData['sportStats'])): ?>
             <div class="card border shadow-sm mt-4">
