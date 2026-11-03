@@ -92,31 +92,50 @@ class ReportAttendeeStatsController extends AdminController
             return;
         }
 
+        // Khóa gộp người: mã NV -> CCCD -> tên+đơn vị.
+        $personKey = function ($staffRaw, $cardRaw, $nameRaw, $propRaw) {
+            $staff = mb_strtoupper(trim((string)$staffRaw), 'UTF-8');
+            $card = trim((string)$cardRaw);
+            if ($staff !== '') return 's:' . $staff;
+            if (preg_match('/^\d{9,12}$/', $card)) return 'c:' . $card;
+            return 'n:' . mb_strtolower(trim((string)$nameRaw), 'UTF-8') . '|' . mb_strtolower(trim((string)$propRaw), 'UTF-8');
+        };
+
+        // Bản ghi final_attendee_rosters theo người (để cập nhật giới tính cho VCK,
+        // vì attendee finalist không cho sửa gender qua bảng attendees).
+        $rosterIdsByKey = array();
+        foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $r) {
+            if (!empty($r->deleted_at)) continue;
+            $key = $personKey(
+                isset($r->staff_code) ? $r->staff_code : '',
+                isset($r->id_card) ? $r->id_card : '',
+                isset($r->full_name) ? $r->full_name : '',
+                isset($r->property_name) ? $r->property_name : ''
+            );
+            $rosterIdsByKey[$key][] = $r->id;
+        }
+
         $rows = Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData();
 
-        // Gộp theo người: trùng mã NV hoặc CCCD (hoặc tên+đơn vị) là 1 người,
-        // gom tất cả attendee_id để cập nhật 1 lần.
+        // Gộp theo người: gom tất cả attendee_id (+ roster_id) để cập nhật 1 lần.
         $byPerson = array();
         foreach ($rows as $a) {
             if (!empty($a->deleted_at)) continue;
             if ($this->normalizeGender(isset($a->gender) ? $a->gender : null) !== '') continue;
 
-            $staff = isset($a->staff_code) ? mb_strtoupper(trim((string)$a->staff_code), 'UTF-8') : '';
-            $card = isset($a->id_card) ? trim((string)$a->id_card) : '';
             $name = isset($a->full_name) ? (string)$a->full_name : '';
             $propName = isset($a->property_name) ? (string)$a->property_name : '';
-
-            if ($staff !== '') {
-                $key = 's:' . $staff;
-            } elseif (preg_match('/^\d{9,12}$/', $card)) {
-                $key = 'c:' . $card;
-            } else {
-                $key = 'n:' . mb_strtolower(trim($name), 'UTF-8') . '|' . mb_strtolower(trim($propName), 'UTF-8');
-            }
+            $key = $personKey(
+                isset($a->staff_code) ? $a->staff_code : '',
+                isset($a->id_card) ? $a->id_card : '',
+                $name,
+                $propName
+            );
 
             if (!isset($byPerson[$key])) {
                 $byPerson[$key] = array(
                     'ids' => array(),
+                    'roster_ids' => isset($rosterIdsByKey[$key]) ? $rosterIdsByKey[$key] : array(),
                     'full_name' => $name,
                     'property_name' => $propName,
                     'staff_code' => isset($a->staff_code) ? (string)$a->staff_code : '',
