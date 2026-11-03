@@ -116,7 +116,7 @@ class ReportAttendeeStatsController extends AdminController
                 );
                 $rosterIdsByKey[$key][] = $r->id;
             }
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             Yii::log('Ungendered roster fetch error: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'report');
             $rosterIdsByKey = array();
         }
