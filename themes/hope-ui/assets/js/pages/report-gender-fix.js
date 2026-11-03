@@ -45,8 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     try {
                         return JSON.parse(txt);
                     } catch (e) {
-                        throw new Error('HTTP ' + r.status + ' | len=' + txt.length +
-                            ' | đuôi: ' + txt.slice(-250));
+                        throw new Error('Lỗi tải dữ liệu (HTTP ' + r.status + ').');
                     }
                 });
             })
