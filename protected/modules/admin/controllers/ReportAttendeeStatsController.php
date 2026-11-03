@@ -247,7 +247,15 @@ class ReportAttendeeStatsController extends AdminController
                 $ok++;
             } else {
                 $fail++;
-                $errors[] = 'attendee ' . $id . ': ' . (isset($result['error']) ? $result['error'] : 'lỗi');
+                $detail = isset($result['error']) ? $result['error'] : 'lỗi';
+                if (isset($result['data']['data']['errors']) && is_array($result['data']['data']['errors'])) {
+                    $fields = array();
+                    foreach ($result['data']['data']['errors'] as $f => $msgs) {
+                        $fields[] = $f . '=' . (is_array($msgs) ? implode(',', $msgs) : $msgs);
+                    }
+                    if ($fields) $detail .= ' [' . implode(' ; ', $fields) . ']';
+                }
+                $errors[] = 'attendee ' . $id . ': ' . $detail;
             }
         }
 
