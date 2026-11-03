@@ -1055,31 +1055,13 @@ class ReportAttendeeStatsController extends AdminController
      */
     protected function buildSportMatrixQualification($eventId, $isHO, $userPropertyId, $columns, $sportParentMap, $isSportActive, $attById)
     {
-        // Registrations active (không phải draft)
-        $regParams = array('event_id' => $eventId, 'per_page' => 1000);
-        if (!$isHO && $userPropertyId) $regParams['property_id'] = $userPropertyId;
-        $registrationsRes = Registrations::getApiDataProvider($regParams, 10000)->getData();
-        $activeRegIds = array();
-        $regPropertyMap = array();
-        foreach ($registrationsRes as $reg) {
-            if (isset($reg->deleted_at) && $reg->deleted_at) continue;
-            $status = isset($reg->status) ? (int)$reg->status : 0;
-            if ($status === Registrations::STATUS_DRAFT) continue;
-            $regId = isset($reg->id) ? $reg->id : null;
-            if ($regId) {
-                $activeRegIds[$regId] = true;
-                $regPropertyMap[$regId] = isset($reg->property_id) ? $reg->property_id : null;
-            }
-        }
-
-        // Thông tin người tham dự (lọc theo đăng ký active) + dedup
+        // Thông tin người tham dự (lấy từ attendees, không lọc theo trạng thái đăng ký)
+        // + dedup theo mã NV / CCCD. Vòng loại = toàn bộ VĐV đã đăng ký thi đấu.
         $attInfo = array();          // attId => array(prop, gender, age, staff, idcard)
         foreach ($attById as $attId => $att) {
             if (!empty($att['deleted'])) continue;
-            $regId = $att['registration_id'];
-            if (!$regId || !isset($activeRegIds[$regId])) continue;
             $attInfo[$attId] = array(
-                'prop' => isset($regPropertyMap[$regId]) ? $regPropertyMap[$regId] : $att['property_id'],
+                'prop' => $att['property_id'],
                 'gender' => $att['gender'],
                 'age' => $this->calcAge($att['birthday']),
                 'staff' => $att['staff'],
