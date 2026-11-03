@@ -1292,17 +1292,17 @@ class ReportAttendeeStatsController extends AdminController
         $rosterByAttId = array();
         $rosterByStaff = array();
         $rosterByCard = array();
-        foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $r) {
-            if (!empty($r->deleted_at)) continue;
+        foreach (FinalAttendeeRosters::getAllByEvent($eventId) as $r) {
+            if (!empty($r['deleted_at'])) continue;
             $info = array(
-                'gender' => isset($r->gender) ? $r->gender : null,
-                'birthday' => isset($r->birthday) ? $r->birthday : null,
-                'birth_year' => isset($r->birth_year) ? $r->birth_year : null,
-                'property_id' => isset($r->property_id) ? $r->property_id : null,
+                'gender' => isset($r['gender']) ? $r['gender'] : null,
+                'birthday' => isset($r['birthday']) ? $r['birthday'] : null,
+                'birth_year' => isset($r['birth_year']) ? $r['birth_year'] : null,
+                'property_id' => isset($r['property_id']) ? $r['property_id'] : null,
             );
-            $aid = isset($r->attendee_id) ? $r->attendee_id : null;
+            $aid = isset($r['attendee_id']) ? $r['attendee_id'] : null;
             if ($aid) $rosterByAttId[$aid] = $info;
-            $src = isset($r->source_attendee_ids) ? $r->source_attendee_ids : null;
+            $src = isset($r['source_attendee_ids']) ? $r['source_attendee_ids'] : null;
             if ($src) {
                 $ids = is_array($src) ? $src : explode(',', (string)$src);
                 foreach ($ids as $sid) {
@@ -1310,9 +1310,9 @@ class ReportAttendeeStatsController extends AdminController
                     if ($sid !== '' && !isset($rosterByAttId[$sid])) $rosterByAttId[$sid] = $info;
                 }
             }
-            $staff = isset($r->staff_code) ? mb_strtoupper(trim((string)$r->staff_code), 'UTF-8') : '';
+            $staff = isset($r['staff_code']) ? mb_strtoupper(trim((string)$r['staff_code']), 'UTF-8') : '';
             if ($staff !== '' && !isset($rosterByStaff[$staff])) $rosterByStaff[$staff] = $info;
-            $card = isset($r->id_card) ? trim((string)$r->id_card) : '';
+            $card = isset($r['id_card']) ? trim((string)$r['id_card']) : '';
             if (preg_match('/^\d{9,12}$/', $card) && !isset($rosterByCard[$card])) $rosterByCard[$card] = $info;
         }
 
