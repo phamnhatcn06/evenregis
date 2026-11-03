@@ -1263,9 +1263,9 @@ class ReportAttendeeStatsController extends AdminController
 
                 if (!isset($perSport[$parentId])) {
                     $perSport[$parentId] = $this->emptySportCell();
-                    $seenPerSport[$parentId] = array();
                 }
-                $this->addPersonToCell($perSport[$parentId], $pKey, $propId, $gender, $age, $seenPerSport[$parentId]);
+                // Đếm theo từng nội dung (spId = môn con / nội dung thi)
+                $this->addParticipation($perSport[$parentId], $pKey, $spId, $propId, $gender, $age);
             }
         }
 
