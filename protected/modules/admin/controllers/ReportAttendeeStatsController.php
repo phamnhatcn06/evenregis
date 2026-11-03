@@ -1141,9 +1141,12 @@ class ReportAttendeeStatsController extends AdminController
             return null;
         }
 
-        // Thông tin cá nhân VCK từ final_attendee_rosters (gender/birthday/property),
-        // map theo attendee_id và các source_attendee_ids.
+        // Thông tin cá nhân VCK từ final_attendee_rosters (gender/birthday/property).
+        // Map theo attendee_id, source_attendee_ids, VÀ theo mã NV / CCCD để nối
+        // với bảng attendees (giới tính đã được xác nhận ở bảng VCK).
         $rosterByAttId = array();
+        $rosterByStaff = array();
+        $rosterByCard = array();
         foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData() as $r) {
             if (!empty($r->deleted_at)) continue;
             $info = array(
@@ -1162,6 +1165,10 @@ class ReportAttendeeStatsController extends AdminController
                     if ($sid !== '' && !isset($rosterByAttId[$sid])) $rosterByAttId[$sid] = $info;
                 }
             }
+            $staff = isset($r->staff_code) ? mb_strtoupper(trim((string)$r->staff_code), 'UTF-8') : '';
+            if ($staff !== '' && !isset($rosterByStaff[$staff])) $rosterByStaff[$staff] = $info;
+            $card = isset($r->id_card) ? trim((string)$r->id_card) : '';
+            if (preg_match('/^\d{9,12}$/', $card) && !isset($rosterByCard[$card])) $rosterByCard[$card] = $info;
         }
 
         // Thành viên đội, group theo đội (sport_team_members)
