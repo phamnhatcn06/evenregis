@@ -928,11 +928,30 @@ class ReportAttendeeStatsController extends AdminController
             return isset($activeSportIds[$pid]);
         };
 
+        // ---- Tải toàn bộ attendees 1 lần (gender, birthday) để dùng chung ----
+        $attParams = array('event_id' => $eventId, 'per_page' => 10000);
+        if (!$isHO && $userPropertyId) $attParams['property_id'] = $userPropertyId;
+        $rawAttendees = Attendees::getApiDataProvider($attParams, 10000)->getData();
+        $attById = array(); // id => array(gender, birthday, property_id, registration_id, staff, idcard, deleted)
+        foreach ($rawAttendees as $att) {
+            $attId = isset($att->id) ? $att->id : null;
+            if (!$attId) continue;
+            $attById[$attId] = array(
+                'gender' => isset($att->gender) ? $att->gender : null,
+                'birthday' => isset($att->birthday) ? $att->birthday : null,
+                'property_id' => isset($att->property_id) ? $att->property_id : null,
+                'registration_id' => isset($att->registration_id) ? $att->registration_id : null,
+                'staff' => isset($att->staff_code) ? mb_strtoupper(trim((string)$att->staff_code), 'UTF-8') : '',
+                'idcard' => isset($att->id_card) ? trim((string)$att->id_card) : '',
+                'deleted' => isset($att->deleted_at) ? $att->deleted_at : null,
+            );
+        }
+
         $qualification = $this->buildSportMatrixQualification(
-            $eventId, $isHO, $userPropertyId, $columns, $sportParentMap, $isSportActive
+            $eventId, $isHO, $userPropertyId, $columns, $sportParentMap, $isSportActive, $attById
         );
         $final = $this->buildSportMatrixFinal(
-            $eventId, $columns, $sportParentMap, $isSportActive, $activeParentIds
+            $eventId, $columns, $sportParentMap, $isSportActive, $activeParentIds, $attById
         );
 
         return array(
