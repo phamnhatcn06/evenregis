@@ -264,6 +264,42 @@ class FinalAttendeeRosters extends CFormModel
     }
 
     /**
+     * Lấy TOÀN BỘ roster của 1 sự kiện (dạng mảng kết hợp), phân trang theo lô
+     * per_page = 500 vì backend giới hạn per_page tối đa 500.
+     *
+     * @return array danh sách roster (mỗi phần tử là mảng kết hợp)
+     */
+    public static function getAllByEvent($eventId, $perPage = 500)
+    {
+        $all = array();
+        if (empty($eventId)) {
+            return $all;
+        }
+        $page = 1;
+        do {
+            $res = ApiClient::get(ApiEndpoints::FINAL_ATTENDEE_ROSTER_LIST, array(
+                'event_id' => (int) $eventId,
+                'per_page' => (int) $perPage,
+                'page'     => $page,
+            ));
+            if (empty($res['success']) || !isset($res['data'])) {
+                break;
+            }
+            $items = isset($res['data']['data']) ? $res['data']['data'] : $res['data'];
+            if (!is_array($items) || empty($items)) {
+                break;
+            }
+            foreach ($items as $it) {
+                $all[] = $it;
+            }
+            $count = count($items);
+            $page++;
+        } while ($count >= $perPage && $page <= 200);
+
+        return $all;
+    }
+
+    /**
      * Giá trị cho dropdown lọc: đơn vị / bộ phận / phòng ban thực sự có người.
      *
      * Lưu ý: BE gộp các mã cùng tên thành một option (vd mã 650 và 810 cùng tên
