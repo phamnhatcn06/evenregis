@@ -1488,6 +1488,7 @@ class SportTeamsController extends AdminController
                 'code' => $rank ? ('Hạng ' . $rank) : '',
                 'name' => $name,
                 'sub' => $sub,
+                'member_count' => $count,
             );
         }
 
