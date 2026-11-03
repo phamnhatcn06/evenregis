@@ -1015,7 +1015,7 @@ class ReportAttendeeStatsController extends AdminController
             'unknown' => 'Số VĐV chưa rõ giới tính',
             'youngest' => 'VĐV trẻ nhất',
             'oldest' => 'VĐV lớn tuổi nhất',
-            'multi_sport' => 'Số VĐV tham gia nhiều môn',
+            'multi_sport' => 'Số VĐV tham gia nhiều nội dung',
         );
 
         $colData = array();
