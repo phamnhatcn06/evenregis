@@ -1114,7 +1114,6 @@ class ReportAttendeeStatsController extends AdminController
 
         // Duyệt sport_team_members
         $perSport = array();       // parent_id => cell
-        $seenPerSport = array();   // parent_id => array(personKey=>true)
         $personSports = array();   // personKey => array(parent_id=>true)
         $personMeta = array();     // personKey => meta
 
@@ -1138,9 +1137,9 @@ class ReportAttendeeStatsController extends AdminController
 
             if (!isset($perSport[$parentId])) {
                 $perSport[$parentId] = $this->emptySportCell();
-                $seenPerSport[$parentId] = array();
             }
-            $this->addPersonToCell($perSport[$parentId], $pKey, $meta['prop'], $meta['gender'], $meta['age'], $seenPerSport[$parentId]);
+            // Đếm theo từng nội dung (sportId = môn con)
+            $this->addParticipation($perSport[$parentId], $pKey, $sportId, $meta['prop'], $meta['gender'], $meta['age']);
         }
 
         return $this->aggregateSportMatrix($columns, $perSport, $personSports, $personMeta);
