@@ -1187,10 +1187,20 @@ class ReportAttendeeStatsController extends AdminController
             if ($parentId != $childId) $hasChildren[$parentId] = true;
         }
 
-        // Thông tin cá nhân: ưu tiên roster VCK, bổ sung từ attendees.
-        $resolve = function ($attId) use ($rosterByAttId, $attById) {
-            $roster = isset($rosterByAttId[$attId]) ? $rosterByAttId[$attId] : null;
+        // Thông tin cá nhân: ưu tiên roster VCK (nối theo attendee_id, rồi mã NV /
+        // CCCD), bổ sung từ attendees. Giới tính đã xác nhận ở roster được ưu tiên.
+        $resolve = function ($attId) use ($rosterByAttId, $rosterByStaff, $rosterByCard, $attById) {
             $base = isset($attById[$attId]) ? $attById[$attId] : null;
+            $roster = isset($rosterByAttId[$attId]) ? $rosterByAttId[$attId] : null;
+            if ($roster === null && $base) {
+                $staff = isset($base['staff']) ? $base['staff'] : '';
+                $card = isset($base['idcard']) ? $base['idcard'] : '';
+                if ($staff !== '' && isset($rosterByStaff[$staff])) {
+                    $roster = $rosterByStaff[$staff];
+                } elseif (preg_match('/^\d{9,12}$/', (string)$card) && isset($rosterByCard[$card])) {
+                    $roster = $rosterByCard[$card];
+                }
+            }
             $pick = function ($a, $b) {
                 if ($a !== null && $a !== '') return $a;
                 return ($b !== null && $b !== '') ? $b : null;
