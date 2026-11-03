@@ -133,7 +133,8 @@
                                         <tr class="team-row"
                                             data-property="<?php echo CHtml::encode($propData['property_name']); ?>"
                                             data-region-id="<?php echo CHtml::encode($regionData['region_id']); ?>"
-                                            data-is-alliance="<?php echo $team['is_alliance'] ? '1' : '0'; ?>">
+                                            data-is-alliance="<?php echo $team['is_alliance'] ? '1' : '0'; ?>"
+                                            data-member-count="<?php echo isset($team['member_count']) ? (int) $team['member_count'] : 0; ?>">
                                             <td class="row-index"><?php echo $globalIndex++; ?></td>
                                             <td><?php echo CHtml::encode($propData['property_name']); ?></td>
                                             <td>
