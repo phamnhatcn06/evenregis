@@ -88,6 +88,7 @@
                 $regionTeamCount = 0;
                 $regionAllianceCount = 0;
                 $regionNonAllianceCount = 0;
+                $regionMemberCount = 0;
                 foreach ($regionData['properties'] as $propData) {
                     foreach ($propData['teams'] as $team) {
                         $regionTeamCount++;
@@ -96,6 +97,7 @@
                         } else {
                             $regionNonAllianceCount++;
                         }
+                        $regionMemberCount += isset($team['member_count']) ? (int) $team['member_count'] : 0;
                     }
                 }
             ?>
