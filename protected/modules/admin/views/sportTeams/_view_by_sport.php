@@ -316,20 +316,24 @@
                     var totalCount = visibleRows.length;
                     var allianceCount = 0;
                     var nonAllianceCount = 0;
+                    var memberCount = 0;
                     visibleRows.forEach(function(row) {
                         if (row.getAttribute('data-is-alliance') === '1') {
                             allianceCount++;
                         } else {
                             nonAllianceCount++;
                         }
+                        memberCount += parseInt(row.getAttribute('data-member-count'), 10) || 0;
                     });
 
                     var countBadge = block.querySelector('.region-team-count');
                     var allianceBadge = block.querySelector('.region-alliance-count');
                     var nonAllianceBadge = block.querySelector('.region-non-alliance-count');
+                    var memberBadge = block.querySelector('.region-member-count');
                     if (countBadge) countBadge.textContent = totalCount + ' đội';
                     if (allianceBadge) allianceBadge.textContent = allianceCount + ' liên quân';
                     if (nonAllianceBadge) nonAllianceBadge.textContent = nonAllianceCount + ' đơn lẻ';
+                    if (memberBadge) memberBadge.textContent = memberCount + ' VĐV';
                 }
             });
 
