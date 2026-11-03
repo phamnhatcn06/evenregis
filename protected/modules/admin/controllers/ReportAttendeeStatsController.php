@@ -55,6 +55,9 @@ class ReportAttendeeStatsController extends AdminController
         // Build báo cáo
         $reportData = $this->buildReport($selectedEventId, $isHO, $userPropertyId);
 
+        // Ma trận thống kê BAN THỂ THAO (Vòng loại / Vòng chung kết)
+        $sportMatrix = $this->buildSportMatrix($selectedEventId, $isHO, $userPropertyId);
+
         $this->title = 'Báo cáo thống kê người đăng ký vòng loại';
         $this->breadcrumbs = array(
             'Báo cáo' => array('/admin/reports/admin'),
