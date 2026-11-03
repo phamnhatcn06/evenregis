@@ -1124,7 +1124,7 @@ class ReportAttendeeStatsController extends AdminController
     /**
      * Ma trận thể thao - Vòng chung kết (từ đợt VCK is_final).
      */
-    protected function buildSportMatrixFinal($eventId, $columns, $sportParentMap, $isSportActive, $activeParentIds)
+    protected function buildSportMatrixFinal($eventId, $columns, $sportParentMap, $isSportActive, $activeParentIds, $attById)
     {
         $finalPeriodId = RegistrationPeriods::getFinalPeriodIdForEvent($eventId);
         if (!$finalPeriodId) {
