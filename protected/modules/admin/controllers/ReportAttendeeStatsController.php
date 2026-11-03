@@ -1166,11 +1166,19 @@ class ReportAttendeeStatsController extends AdminController
                 $pKey = 'n:' . $nm . '|' . $pn;
             }
 
+            // Thông tin cá nhân: ưu tiên dữ liệu trên phiếu VCK, bổ sung từ attendees
+            $base = ($attId && isset($attById[$attId])) ? $attById[$attId] : null;
+
             $propId = isset($fa['property_id']) && $fa['property_id'] ? $fa['property_id']
-                : (isset($fa['property_name']) ? 'name:' . $fa['property_name'] : null);
-            $gender = isset($fa['gender']) ? $fa['gender'] : null;
-            $birthYear = isset($fa['birth_year']) ? $fa['birth_year'] : null;
-            $birthday = isset($fa['birthday']) ? $fa['birthday'] : null;
+                : ($base && $base['property_id'] ? $base['property_id']
+                    : (isset($fa['property_name']) && $fa['property_name'] !== '' ? 'name:' . $fa['property_name'] : null));
+
+            $gender = isset($fa['gender']) && $fa['gender'] !== '' && $fa['gender'] !== null
+                ? $fa['gender'] : ($base ? $base['gender'] : null);
+
+            $birthYear = isset($fa['birth_year']) && $fa['birth_year'] ? $fa['birth_year'] : null;
+            $birthday = isset($fa['birthday']) && $fa['birthday'] ? $fa['birthday']
+                : ($base ? $base['birthday'] : null);
             $age = $this->calcAge($birthday, $birthYear);
 
             $contents = isset($fa['contents']) && is_array($fa['contents']) ? $fa['contents'] : array();
