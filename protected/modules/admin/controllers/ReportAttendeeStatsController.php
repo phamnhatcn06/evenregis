@@ -1186,6 +1186,153 @@ class ReportAttendeeStatsController extends AdminController
         return $this->aggregateSportMatrix($columns, $perSport, $personSports, $personMeta);
     }
 
+    /**
+     * Xuất Excel ma trận BAN THỂ THAO: mỗi vòng (loại / chung kết) là 1 sheet.
+     */
+    public function actionExportSportMatrix()
+    {
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $eventId = Yii::app()->request->getParam('event_id');
+        if (!$eventId) {
+            throw new CHttpException(400, 'Thiếu tham số sự kiện.');
+        }
+
+        $user = AuthHandler::getUser();
+        $userPropertyCode = isset($user['property_code']) ? $user['property_code'] : '';
+        $isHO = ($userPropertyCode === '9999' || $userPropertyCode === 9999);
+        $userPropertyId = isset($user['property_id']) ? $user['property_id'] : null;
+
+        $event = Events::fetchFromApi($eventId);
+        $eventName = ($event && !empty($event->name)) ? $event->name : '';
+
+        $matrix = $this->buildSportMatrix($eventId, $isHO, $userPropertyId);
+
+        $excel = $this->createPhpExcel();
+        $usedTitles = array();
+
+        // Sheet Vòng loại
+        $sheet = $excel->getActiveSheet();
+        $sheet->setTitle($this->buildSheetTitle('Vòng loại', $usedTitles));
+        $this->writeSportMatrixSheet($sheet, 'BAN THỂ THAO — VÒNG LOẠI', $eventName, $matrix['columns'], $matrix['qualification']);
+
+        // Sheet Vòng chung kết (nếu có)
+        if ($matrix['final'] !== null) {
+            $finalSheet = $excel->createSheet();
+            $finalSheet->setTitle($this->buildSheetTitle('Vòng chung kết', $usedTitles));
+            $this->writeSportMatrixSheet($finalSheet, 'BAN THỂ THAO — VÒNG CHUNG KẾT', $eventName, $matrix['columns'], $matrix['final']);
+        }
+
+        $excel->setActiveSheetIndex(0);
+
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        $filename = 'bao_cao_ban_the_thao.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save('php://output');
+        Yii::app()->end();
+    }
+
+    /**
+     * Ghi 1 sheet ma trận BAN THỂ THAO (hàng = chỉ tiêu, cột = môn + TỔNG).
+     */
+    protected function writeSportMatrixSheet($sheet, $titleText, $eventName, $columns, $data)
+    {
+        $lastColIndex = count($columns) + 2; // A = hạng mục, các môn, + TỔNG
+        $lastCol = PHPExcel_Cell::stringFromColumnIndex($lastColIndex - 1);
+
+        // Tiêu đề
+        $sheet->setCellValue('A1', $titleText . ($eventName !== '' ? ' — ' . mb_strtoupper($eventName, 'UTF-8') : ''));
+        $sheet->mergeCells('A1:' . $lastCol . '1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        if (empty($data) || empty($columns)) {
+            $sheet->setCellValue('A3', 'Chưa có dữ liệu.');
+            return;
+        }
+
+        // Header cột (hàng 3)
+        $headerRow = 3;
+        $sheet->setCellValueByColumnAndRow(0, $headerRow, 'HẠNG MỤC');
+        $colIndex = 1;
+        foreach ($columns as $col) {
+            $sheet->setCellValueByColumnAndRow($colIndex, $headerRow, $col['name']);
+            $colIndex++;
+        }
+        $sheet->setCellValueByColumnAndRow($colIndex, $headerRow, 'TỔNG');
+
+        $headerStyle = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')),
+            'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '2563EB')),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
+        );
+        $sheet->getStyle('A' . $headerRow . ':' . $lastCol . $headerRow)->applyFromArray($headerStyle);
+
+        // Dòng dữ liệu
+        $metrics = $data['metrics'];
+        $colsData = $data['columns_data'];
+        $total = $data['total'];
+
+        $row = $headerRow + 1;
+        foreach ($metrics as $key => $label) {
+            $isAge = ($key === 'youngest' || $key === 'oldest');
+            $sheet->setCellValueByColumnAndRow(0, $row, $label);
+
+            $ci = 1;
+            foreach ($columns as $col) {
+                $sid = $col['sport_id'];
+                $val = isset($colsData[$sid][$key]) ? $colsData[$sid][$key] : null;
+                $sheet->setCellValueByColumnAndRow($ci, $row, $this->formatMatrixCell($key, $val, $isAge));
+                $ci++;
+            }
+            $tval = isset($total[$key]) ? $total[$key] : null;
+            $sheet->setCellValueByColumnAndRow($ci, $row, $isAge ? $this->formatMatrixCell($key, $tval, true) : $this->formatMatrixCell($key, $tval, false));
+            $row++;
+        }
+
+        $lastDataRow = $row - 1;
+
+        // Style khung + căn giữa phần số
+        $sheet->getStyle('A' . $headerRow . ':' . $lastCol . $lastDataRow)
+            ->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+        $sheet->getStyle('B' . ($headerRow + 1) . ':' . $lastCol . $lastDataRow)
+            ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A' . ($headerRow + 1) . ':A' . $lastDataRow)->getFont()->setBold(true);
+        // Cột TỔNG in đậm + nền nhạt
+        $sheet->getStyle($lastCol . $headerRow . ':' . $lastCol . $lastDataRow)->getFont()->setBold(true);
+
+        // Auto width
+        $sheet->getColumnDimension('A')->setWidth(28);
+        for ($i = 1; $i < $lastColIndex; $i++) {
+            $sheet->getColumnDimensionByColumn($i)->setAutoSize(true);
+        }
+    }
+
+    /**
+     * Định dạng giá trị 1 ô ma trận cho Excel.
+     */
+    protected function formatMatrixCell($key, $val, $isAge)
+    {
+        if ($key === 'multi_sport' && $val === null) {
+            return '';
+        }
+        if ($val === null || $val === '') {
+            return '';
+        }
+        if ($isAge) {
+            return $val . ' tuổi';
+        }
+        return (int)$val;
+    }
+
     protected function getEmptySummary()
     {
         return array(
