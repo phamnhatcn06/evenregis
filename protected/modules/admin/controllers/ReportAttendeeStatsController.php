@@ -108,6 +108,8 @@ class ReportAttendeeStatsController extends AdminController
         // Bọc try/catch để lỗi roster không làm hỏng cả danh sách.
         $rosterIdsByKey = array();   // khóa người (mã NV/CCCD/tên) => [roster id]
         $rosterIdsByAttId = array(); // attendee_id => [roster id] (nối chắc chắn nhất)
+        $rosterHasGenderByKey = array();   // key => true nếu roster đã có giới tính
+        $rosterHasGenderByAttId = array(); // attendee_id => true
         try {
             foreach (FinalAttendeeRosters::getAllByEvent($eventId) as $r) {
                 if (!empty($r['deleted_at'])) continue;
@@ -121,6 +123,8 @@ class ReportAttendeeStatsController extends AdminController
                     isset($r['property_name']) ? $r['property_name'] : ''
                 );
                 $rosterIdsByKey[$key][] = $rid;
+                $hasGender = ($this->normalizeGender(isset($r['gender']) ? $r['gender'] : null) !== '');
+                if ($hasGender) $rosterHasGenderByKey[$key] = true;
 
                 // Nối theo attendee_id + source_attendee_ids
                 $linkIds = array();
@@ -132,12 +136,15 @@ class ReportAttendeeStatsController extends AdminController
                 }
                 foreach ($linkIds as $aid) {
                     $rosterIdsByAttId[$aid][] = $rid;
+                    if ($hasGender) $rosterHasGenderByAttId[$aid] = true;
                 }
             }
         } catch (\Throwable $e) {
             Yii::log('Ungendered roster fetch error: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'report');
             $rosterIdsByKey = array();
             $rosterIdsByAttId = array();
+            $rosterHasGenderByKey = array();
+            $rosterHasGenderByAttId = array();
         }
 
         $rows = Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData();
