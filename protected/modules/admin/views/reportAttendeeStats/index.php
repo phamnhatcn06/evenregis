@@ -10,6 +10,7 @@
  * @var string $selectedEventId
  * @var string $selectedEventName
  * @var array $reportData
+ * @var array $sportMatrix
  */
 
 Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/css/pages/reports-index.css');
