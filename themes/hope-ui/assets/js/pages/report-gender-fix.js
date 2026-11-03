@@ -27,16 +27,11 @@ document.addEventListener('DOMContentLoaded', function () {
             (p.staff_code ? ' <span class="badge bg-secondary">' + escapeHtml(p.staff_code) + '</span>' : '') +
             '</td>' +
             '<td>' + escapeHtml(p.property_name) + '</td>' +
-            '<td style="width:140px;">' +
-            '<select class="form-select form-select-sm gender-select">' +
-            '<option value="">--</option>' +
-            '<option value="1">Nam</option>' +
-            '<option value="0">Nữ</option>' +
-            '</select>' +
-            '</td>' +
-            '<td style="width:90px;">' +
-            '<button type="button" class="btn btn-sm btn-success gender-save">' +
-            '<i class="fa fa-save"></i></button>' +
+            '<td class="text-center gender-status" colspan="2" style="width:200px;">' +
+            '<div class="btn-group btn-group-sm" role="group">' +
+            '<button type="button" class="btn btn-outline-primary gender-pick" data-gender="1">Nam</button>' +
+            '<button type="button" class="btn btn-outline-danger gender-pick" data-gender="0">Nữ</button>' +
+            '</div>' +
             '</td>' +
             '</tr>';
     }
