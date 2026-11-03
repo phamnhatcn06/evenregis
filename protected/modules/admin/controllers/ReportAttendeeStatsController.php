@@ -803,6 +803,7 @@ class ReportAttendeeStatsController extends AdminController
             'units' => array(),      // property_id => true
             'male' => 0,
             'female' => 0,
+            'unknown' => 0,
             'min_age' => null,
             'max_age' => null,
         );
