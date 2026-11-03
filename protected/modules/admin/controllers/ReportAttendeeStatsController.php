@@ -1141,16 +1141,21 @@ class ReportAttendeeStatsController extends AdminController
             return null;
         }
 
-        // Tên môn/nội dung -> sport_id (để quy nội dung thể thao về môn cha).
-        $sportByName = array();
-        foreach (Sports::getApiDataProvider(array('is_active' => 1), 500)->getData() as $sp) {
+        // Tên nội dung -> (sport_id, parent_id). Lấy TẤT CẢ sports (kể cả inactive)
+        // vì nội dung thi (môn con) có thể đang inactive mà vẫn có người vào chung kết.
+        $nameToSport = array();
+        foreach (Sports::getApiDataProvider(array(), 1000)->getData() as $sp) {
             $spId = isset($sp->id) ? $sp->id : null;
             $name = isset($sp->name) ? trim((string)$sp->name) : '';
-            if ($spId && $name !== '') {
-                $k = mb_strtolower($name, 'UTF-8');
-                if (!isset($sportByName[$k])) $sportByName[$k] = $spId;
-            }
+            if (!$spId || $name === '') continue;
+            $parentId = isset($sp->parent_id) && $sp->parent_id ? $sp->parent_id : $spId;
+            $k = mb_strtolower($name, 'UTF-8');
+            if (!isset($nameToSport[$k])) $nameToSport[$k] = array('sport_id' => $spId, 'parent_id' => $parentId);
         }
+
+        // Chỉ đếm nội dung thuộc các môn (cột) đang hiển thị.
+        $columnIds = array();
+        foreach ($columns as $col) $columnIds[$col['sport_id']] = true;
 
         $perSport = array();
         $personSports = array();
