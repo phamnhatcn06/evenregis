@@ -251,6 +251,11 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/assets/
         </div>
 
         <!-- Ma trận BAN THỂ THAO: Vòng loại & Vòng chung kết -->
+        <div class="d-flex justify-content-end mt-4">
+            <a href="<?php echo $this->createUrl('/admin/reportAttendeeStats/exportSportMatrix', array('event_id' => $selectedEventId)); ?>" class="btn btn-success btn-sm">
+                <i class="fa fa-file-excel-o me-1"></i> Xuất Excel BAN THỂ THAO
+            </a>
+        </div>
         <?php
         $this->renderPartial('_sport_matrix', array(
             'title' => 'BAN THỂ THAO — Vòng loại',
