@@ -978,11 +978,26 @@ class ReportAttendeeStatsController extends AdminController
      */
     protected function aggregateSportMatrix($columns, $perSport, $personSports, $personMeta)
     {
-        $totalCell = $this->emptySportCell();
-        $seenTotal = array();
+        // Cột TỔNG tính theo ĐẦU NGƯỜI (unique): mỗi người 1 lần dù tham gia nhiều
+        // môn / nội dung. (Cột từng môn tính theo lượt nội dung.)
+        $totMale = 0; $totFemale = 0; $totUnknown = 0;
+        $totUnits = array();
+        $totMinAge = null; $totMaxAge = null;
+        $totAthletes = 0;
         foreach ($personMeta as $pKey => $meta) {
             if (empty($personSports[$pKey])) continue;
-            $this->addPersonToCell($totalCell, $pKey, $meta['prop'], $meta['gender'], $meta['age'], $seenTotal);
+            $totAthletes++;
+            if ($meta['prop'] !== null && $meta['prop'] !== '') {
+                $totUnits[$meta['prop']] = true;
+            }
+            $g = $this->normalizeGender($meta['gender']);
+            if ($g === 'male') $totMale++;
+            elseif ($g === 'female') $totFemale++;
+            else $totUnknown++;
+            if ($meta['age'] !== null) {
+                if ($totMinAge === null || $meta['age'] < $totMinAge) $totMinAge = $meta['age'];
+                if ($totMaxAge === null || $meta['age'] > $totMaxAge) $totMaxAge = $meta['age'];
+            }
         }
 
         // Người tham gia nhiều môn (>= 2 môn cha)
@@ -991,8 +1006,6 @@ class ReportAttendeeStatsController extends AdminController
             if (count($sports) >= 2) $multiSport++;
         }
 
-        // Build dòng theo cột
-        $rows = array();
         $metrics = array(
             'total_athletes' => 'Tổng số VĐV tham gia',
             'total_units' => 'Tổng số ĐV tham gia',
