@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var fd = new FormData();
         fd.append('ids', ids);
+        fd.append('roster_ids', tr.getAttribute('data-roster-ids') || '');
         fd.append('gender', gender);
         fetch(updateUrl, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
             .then(function (r) { return r.json(); })
