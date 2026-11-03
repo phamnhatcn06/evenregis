@@ -992,6 +992,7 @@ class ReportAttendeeStatsController extends AdminController
             'total_units' => 'Tổng số ĐV tham gia',
             'male' => 'Số VĐV nam',
             'female' => 'Số VĐV nữ',
+            'unknown' => 'Số VĐV chưa rõ giới tính',
             'youngest' => 'VĐV trẻ nhất',
             'oldest' => 'VĐV lớn tuổi nhất',
             'multi_sport' => 'Số VĐV tham gia nhiều môn',
