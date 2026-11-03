@@ -827,6 +827,8 @@ class ReportAttendeeStatsController extends AdminController
             $cell['male']++;
         } elseif ($g === 'female') {
             $cell['female']++;
+        } else {
+            $cell['unknown']++;
         }
         if ($age !== null) {
             if ($cell['min_age'] === null || $age < $cell['min_age']) {
