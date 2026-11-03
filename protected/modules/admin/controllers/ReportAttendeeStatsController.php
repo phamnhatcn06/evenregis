@@ -228,27 +228,44 @@ class ReportAttendeeStatsController extends AdminController
         $g = (int)$gender;
         $ok = 0;
         $fail = 0;
+        $errors = array();
 
         // 1) Cập nhật bảng attendees (attendee thường). Attendee finalist sẽ bị BE
         //    bỏ qua trường gender -> ta cập nhật roster ở bước 2.
         foreach ($ids as $id) {
             $model = Attendees::fetchFromApi($id);
-            if ($model === null) { $fail++; continue; }
+            if ($model === null) { $fail++; $errors[] = 'attendee ' . $id . ': không tìm thấy'; continue; }
             $model->gender = $g;
+            // Đảm bảo role_id là mảng không rỗng (BE yêu cầu role_id: required|array)
+            if (empty($model->role_id)) {
+                $model->role_id = array();
+            } elseif (!is_array($model->role_id)) {
+                $model->role_id = array_values(array_filter(explode(',', (string)$model->role_id)));
+            }
             $result = $model->updateViaApi();
-            if (!empty($result['success'])) { $ok++; } else { $fail++; }
+            if (!empty($result['success'])) {
+                $ok++;
+            } else {
+                $fail++;
+                $errors[] = 'attendee ' . $id . ': ' . (isset($result['error']) ? $result['error'] : 'lỗi');
+            }
         }
 
         // 2) Cập nhật bảng final_attendee_rosters (nguồn giới tính của VCK).
         foreach ($rosterIds as $rid) {
             $result = FinalAttendeeRosters::updateFieldsViaApi($rid, array('gender' => $g));
-            if (!empty($result['success'])) { $ok++; } else { $fail++; }
+            if (!empty($result['success'])) {
+                $ok++;
+            } else {
+                $fail++;
+                $errors[] = 'roster ' . $rid . ': ' . (isset($result['error']) ? $result['error'] : 'lỗi');
+            }
         }
 
         if ($ok > 0) {
             $this->renderJson(array('success' => true, 'message' => 'Đã cập nhật giới tính.'));
         } else {
-            $this->renderJson(array('success' => false, 'message' => 'Cập nhật thất bại.'));
+            $this->renderJson(array('success' => false, 'message' => 'Cập nhật thất bại: ' . implode(' | ', $errors)));
         }
     }
 
