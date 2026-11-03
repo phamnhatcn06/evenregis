@@ -142,14 +142,14 @@ class ReportAttendeeStatsController extends AdminController
     {
         PermissionHelper::requirePermission('reports', 'read');
 
-        $idsРaw = Yii::app()->request->getPost('ids', Yii::app()->request->getPost('id'));
+        $idsRaw = Yii::app()->request->getPost('ids', Yii::app()->request->getPost('id'));
         $gender = Yii::app()->request->getPost('gender');
-        if ($idsРaw === null || $idsРaw === '' || ($gender !== '0' && $gender !== '1' && $gender !== 0 && $gender !== 1)) {
+        if ($idsRaw === null || $idsRaw === '' || ($gender !== '0' && $gender !== '1' && $gender !== 0 && $gender !== 1)) {
             $this->renderJson(array('success' => false, 'message' => 'Dữ liệu không hợp lệ.'));
             return;
         }
 
-        $ids = is_array($idsРaw) ? $idsРaw : explode(',', (string)$idsРaw);
+        $ids = is_array($idsRaw) ? $idsRaw : explode(',', (string)$idsRaw);
         $ids = array_values(array_filter(array_map('trim', $ids), function ($v) { return $v !== ''; }));
         if (empty($ids)) {
             $this->renderJson(array('success' => false, 'message' => 'Không có người tham dự để cập nhật.'));
