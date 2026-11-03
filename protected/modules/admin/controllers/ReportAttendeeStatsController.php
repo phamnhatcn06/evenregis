@@ -80,6 +80,78 @@ class ReportAttendeeStatsController extends AdminController
     }
 
     /**
+     * AJAX: danh sách người tham dự CHƯA RÕ GIỚI TÍNH của sự kiện (để sửa nhanh).
+     */
+    public function actionUngendered()
+    {
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $eventId = Yii::app()->request->getParam('event_id');
+        if (!$eventId) {
+            $this->renderJson(array('success' => false, 'message' => 'Thiếu tham số sự kiện.'));
+            return;
+        }
+
+        $rows = Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData();
+        $data = array();
+        foreach ($rows as $a) {
+            if (!empty($a->deleted_at)) continue;
+            $gender = isset($a->gender) ? $a->gender : null;
+            if ($this->normalizeGender($gender) !== '') continue; // đã có giới tính
+            $data[] = array(
+                'id' => $a->id,
+                'full_name' => isset($a->full_name) ? $a->full_name : '',
+                'property_name' => isset($a->property_name) ? $a->property_name : '',
+                'staff_code' => isset($a->staff_code) ? $a->staff_code : '',
+                'unit_label' => isset($a->unit_label) ? $a->unit_label : '',
+            );
+        }
+        usort($data, function ($x, $y) {
+            $c = strnatcasecmp($x['property_name'], $y['property_name']);
+            return $c !== 0 ? $c : strnatcasecmp($x['full_name'], $y['full_name']);
+        });
+
+        $this->renderJson(array('success' => true, 'data' => $data, 'total' => count($data)));
+    }
+
+    /**
+     * AJAX POST: cập nhật giới tính 1 người tham dự. gender = 1 (Nam) / 0 (Nữ).
+     */
+    public function actionUpdateGender()
+    {
+        PermissionHelper::requirePermission('reports', 'read');
+
+        $id = Yii::app()->request->getPost('id');
+        $gender = Yii::app()->request->getPost('gender');
+        if (!$id || ($gender !== '0' && $gender !== '1' && $gender !== 0 && $gender !== 1)) {
+            $this->renderJson(array('success' => false, 'message' => 'Dữ liệu không hợp lệ.'));
+            return;
+        }
+
+        $model = Attendees::fetchFromApi($id);
+        if ($model === null) {
+            $this->renderJson(array('success' => false, 'message' => 'Không tìm thấy người tham dự.'));
+            return;
+        }
+
+        $model->gender = (int)$gender;
+        $result = $model->updateViaApi();
+        if (!empty($result['success'])) {
+            $this->renderJson(array('success' => true, 'message' => 'Đã cập nhật giới tính.'));
+        } else {
+            $msg = isset($result['error']) ? $result['error'] : 'Cập nhật thất bại.';
+            $this->renderJson(array('success' => false, 'message' => $msg));
+        }
+    }
+
+    protected function renderJson($payload)
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($payload);
+        Yii::app()->end();
+    }
+
+    /**
      * Build báo cáo thống kê theo người tham dự
      */
     protected function buildReport($eventId, $isHO, $userPropertyId)
