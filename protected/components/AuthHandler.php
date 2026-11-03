@@ -473,7 +473,6 @@ class AuthHandler extends CApplicationComponent
     {
         $params = self::getParams();
         $url = rtrim($params['portal']['api_url'], '/') . $params['portal']['sso_me_endpoint'];
-
         $ch = curl_init($url);
         curl_setopt_array($ch, array(
             CURLOPT_RETURNTRANSFER => true,
