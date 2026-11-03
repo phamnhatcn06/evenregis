@@ -217,10 +217,6 @@ class ReportAttendeeStatsController extends AdminController
 
     protected function renderJson($payload)
     {
-        // Dọn mọi output (warning/notice) trước để JSON không bị hỏng.
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($payload);
         Yii::app()->end();
