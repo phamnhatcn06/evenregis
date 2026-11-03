@@ -40,7 +40,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function loadList() {
         bodyEl.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Đang tải...</td></tr>';
         fetch(listUrl + '?event_id=' + encodeURIComponent(eventId), { headers: { 'Accept': 'application/json' } })
-            .then(function (r) { return r.json(); })
+            .then(function (r) {
+                return r.text().then(function (txt) {
+                    try {
+                        return JSON.parse(txt);
+                    } catch (e) {
+                        throw new Error('HTTP ' + r.status + ' — ' + txt.slice(0, 300));
+                    }
+                });
+            })
             .then(function (res) {
                 var data = (res && res.success && res.data) ? res.data : [];
                 if (countEl) countEl.textContent = data.length;
@@ -51,8 +59,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 bodyEl.innerHTML = data.map(function (p, i) { return rowHtml(p, i + 1); }).join('');
             })
-            .catch(function () {
-                bodyEl.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-3">Lỗi tải dữ liệu.</td></tr>';
+            .catch(function (err) {
+                bodyEl.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-3">' +
+                    escapeHtml(err && err.message ? err.message : 'Lỗi tải dữ liệu.') + '</td></tr>';
             });
     }
 
