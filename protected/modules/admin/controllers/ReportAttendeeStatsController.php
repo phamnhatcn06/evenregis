@@ -1154,6 +1154,58 @@ class ReportAttendeeStatsController extends AdminController
             );
         }
 
+        // ---- Bù giới tính (và ngày sinh) từ final_attendee_rosters ----
+        // Giới tính xác nhận ở bảng VCK được dùng cho CẢ vòng loại lẫn VCK, tránh
+        // trường hợp attendee finalist không sửa được gender -> vẫn "chưa rõ".
+        $rGenderByAtt = array(); $rGenderByStaff = array(); $rGenderByCard = array();
+        $rBirthByAtt = array();  $rBirthByStaff = array();  $rBirthByCard = array();
+        try {
+            foreach (FinalAttendeeRosters::getAllByEvent($eventId) as $r) {
+                if (!empty($r['deleted_at'])) continue;
+                $rg = isset($r['gender']) ? $r['gender'] : null;
+                $rb = isset($r['birthday']) && $r['birthday'] ? $r['birthday']
+                    : (isset($r['birth_year']) && $r['birth_year'] ? $r['birth_year'] : null);
+
+                $linkIds = array();
+                if (!empty($r['attendee_id'])) $linkIds[] = $r['attendee_id'];
+                $src = isset($r['source_attendee_ids']) ? $r['source_attendee_ids'] : null;
+                if ($src) {
+                    $arr = is_array($src) ? $src : explode(',', (string)$src);
+                    foreach ($arr as $sid) { $sid = trim((string)$sid); if ($sid !== '') $linkIds[] = $sid; }
+                }
+                foreach ($linkIds as $aid) {
+                    if ($rg !== null && $rg !== '' && !isset($rGenderByAtt[$aid])) $rGenderByAtt[$aid] = $rg;
+                    if ($rb !== null && !isset($rBirthByAtt[$aid])) $rBirthByAtt[$aid] = $rb;
+                }
+                $staff = isset($r['staff_code']) ? mb_strtoupper(trim((string)$r['staff_code']), 'UTF-8') : '';
+                if ($staff !== '') {
+                    if ($rg !== null && $rg !== '' && !isset($rGenderByStaff[$staff])) $rGenderByStaff[$staff] = $rg;
+                    if ($rb !== null && !isset($rBirthByStaff[$staff])) $rBirthByStaff[$staff] = $rb;
+                }
+                $card = isset($r['id_card']) ? trim((string)$r['id_card']) : '';
+                if (preg_match('/^\d{9,12}$/', $card)) {
+                    if ($rg !== null && $rg !== '' && !isset($rGenderByCard[$card])) $rGenderByCard[$card] = $rg;
+                    if ($rb !== null && !isset($rBirthByCard[$card])) $rBirthByCard[$card] = $rb;
+                }
+            }
+        } catch (\Throwable $e) {
+            Yii::log('Sport matrix roster-gender enrich error: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'report');
+        }
+
+        foreach ($attById as $aid => &$info) {
+            if ($this->normalizeGender($info['gender']) === '') {
+                if (isset($rGenderByAtt[$aid])) $info['gender'] = $rGenderByAtt[$aid];
+                elseif ($info['staff'] !== '' && isset($rGenderByStaff[$info['staff']])) $info['gender'] = $rGenderByStaff[$info['staff']];
+                elseif (preg_match('/^\d{9,12}$/', $info['idcard']) && isset($rGenderByCard[$info['idcard']])) $info['gender'] = $rGenderByCard[$info['idcard']];
+            }
+            if (empty($info['birthday'])) {
+                if (isset($rBirthByAtt[$aid])) $info['birthday'] = $rBirthByAtt[$aid];
+                elseif ($info['staff'] !== '' && isset($rBirthByStaff[$info['staff']])) $info['birthday'] = $rBirthByStaff[$info['staff']];
+                elseif (preg_match('/^\d{9,12}$/', $info['idcard']) && isset($rBirthByCard[$info['idcard']])) $info['birthday'] = $rBirthByCard[$info['idcard']];
+            }
+        }
+        unset($info);
+
         $qualification = $this->buildSportMatrixQualification(
             $eventId, $isHO, $userPropertyId, $columns, $sportParentMap, $isSportActive, $attById
         );
