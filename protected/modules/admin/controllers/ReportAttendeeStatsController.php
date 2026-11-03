@@ -1190,10 +1190,10 @@ class ReportAttendeeStatsController extends AdminController
                 if ($ptype !== 'sport') continue;
                 $pname = is_array($p) ? (isset($p['name']) ? $p['name'] : '') : (isset($p->name) ? $p->name : '');
                 $k = mb_strtolower(trim((string)$pname), 'UTF-8');
-                if ($k === '') continue;
-                $spId = isset($sportByName[$k]) ? $sportByName[$k] : null;
-                if ($spId === null || !$isSportActive($spId)) continue;
-                $parentId = isset($sportParentMap[$spId]) ? $sportParentMap[$spId] : $spId;
+                if ($k === '' || !isset($nameToSport[$k])) continue;
+                $spId = $nameToSport[$k]['sport_id'];
+                $parentId = $nameToSport[$k]['parent_id'];
+                if (!isset($columnIds[$parentId])) continue; // không thuộc môn hiển thị
 
                 if (!isset($personMeta[$pKey])) {
                     $personMeta[$pKey] = array('prop' => $prop, 'gender' => $gender, 'age' => $age);
