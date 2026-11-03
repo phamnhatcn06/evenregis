@@ -170,13 +170,17 @@
                 <?php
                 $total = 0;
                 $totalProperties = 0;
+                $totalMembers = 0;
                 foreach ($teamsByRegion as $regionData) {
                     foreach ($regionData['properties'] as $propData) {
                         $total += count($propData['teams']);
                         $totalProperties++;
+                        foreach ($propData['teams'] as $team) {
+                            $totalMembers += isset($team['member_count']) ? (int) $team['member_count'] : 0;
+                        }
                     }
                 }
-                $originalText = $total . ' đội từ ' . $totalProperties . ' đơn vị thuộc ' . count($teamsByRegion) . ' cụm';
+                $originalText = $total . ' đội từ ' . $totalProperties . ' đơn vị thuộc ' . count($teamsByRegion) . ' cụm (' . $totalMembers . ' VĐV)';
                 ?>
                 <span id="total-teams-text" data-original="<?php echo CHtml::encode($originalText); ?>">
                     <?php echo CHtml::encode($originalText); ?>
