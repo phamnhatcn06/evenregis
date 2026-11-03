@@ -1154,6 +1154,29 @@ class ReportAttendeeStatsController extends AdminController
             }
         }
 
+        // Thông tin cá nhân VCK lấy từ final_attendee_rosters (nguồn chuẩn của VCK):
+        // gender, birthday, birth_year. Map theo attendee_id và các source_attendee_ids.
+        $rosterByAttId = array();
+        foreach (FinalAttendeeRosters::getApiDataProvider(array('event_id' => $eventId), 10000)->getData() as $r) {
+            $info = array(
+                'gender' => isset($r->gender) ? $r->gender : null,
+                'birthday' => isset($r->birthday) ? $r->birthday : null,
+                'birth_year' => isset($r->birth_year) ? $r->birth_year : null,
+                'property_id' => isset($r->property_id) ? $r->property_id : null,
+                'property_name' => isset($r->property_name) ? $r->property_name : '',
+            );
+            $aid = isset($r->attendee_id) ? $r->attendee_id : null;
+            if ($aid) $rosterByAttId[$aid] = $info;
+            $src = isset($r->source_attendee_ids) ? $r->source_attendee_ids : null;
+            if ($src) {
+                $ids = is_array($src) ? $src : explode(',', (string)$src);
+                foreach ($ids as $sid) {
+                    $sid = trim((string)$sid);
+                    if ($sid !== '' && !isset($rosterByAttId[$sid])) $rosterByAttId[$sid] = $info;
+                }
+            }
+        }
+
         $perSport = array();
         $seenPerSport = array();
         $personSports = array();
