@@ -1137,21 +1137,13 @@ class ReportAttendeeStatsController extends AdminController
             return null;
         }
 
-        // team_id => sport_id (từ danh sách đội vào chung kết của từng môn active)
+        // team_id => sport_id: lấy từ TOÀN BỘ đội của sự kiện (content VCK tham chiếu
+        // sport_team_id, có thể là bất kỳ đội nào — không chỉ đội đã vào chung kết).
         $finalTeamSport = array();
-        $sportIdsToScan = array_keys($activeParentIds);
-        // Quét cả môn con active để lấy đội chung kết theo nội dung
-        foreach ($sportParentMap as $childId => $parentId) {
-            if ($isSportActive($childId)) {
-                $sportIdsToScan[] = $childId;
-            }
-        }
-        $sportIdsToScan = array_unique($sportIdsToScan);
-        foreach ($sportIdsToScan as $spId) {
-            foreach (SportTeams::getFinalists($eventId, $spId) as $f) {
-                $teamId = isset($f['team_id']) ? $f['team_id'] : null;
-                if ($teamId !== null) $finalTeamSport[$teamId] = $spId;
-            }
+        foreach (SportTeams::getApiDataProvider(array('event_id' => $eventId), 50000)->getData() as $team) {
+            $teamId = isset($team->id) ? $team->id : null;
+            $spId = isset($team->sport_id) ? $team->sport_id : null;
+            if ($teamId && $spId) $finalTeamSport[$teamId] = $spId;
         }
 
         // Thông tin cá nhân VCK lấy từ final_attendee_rosters (nguồn chuẩn của VCK):
