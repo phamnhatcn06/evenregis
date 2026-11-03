@@ -235,14 +235,7 @@ class ReportAttendeeStatsController extends AdminController
         foreach ($ids as $id) {
             $model = Attendees::fetchFromApi($id);
             if ($model === null) { $fail++; $errors[] = 'attendee ' . $id . ': không tìm thấy'; continue; }
-            $model->gender = $g;
-            // Đảm bảo role_id là mảng không rỗng (BE yêu cầu role_id: required|array)
-            if (empty($model->role_id)) {
-                $model->role_id = array();
-            } elseif (!is_array($model->role_id)) {
-                $model->role_id = array_values(array_filter(explode(',', (string)$model->role_id)));
-            }
-            $result = $model->updateViaApi();
+            $result = $model->updateGenderOnlyViaApi($g);
             if (!empty($result['success'])) {
                 $ok++;
             } else {
