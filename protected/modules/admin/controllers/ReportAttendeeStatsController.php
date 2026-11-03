@@ -93,19 +93,40 @@ class ReportAttendeeStatsController extends AdminController
         }
 
         $rows = Attendees::getApiDataProvider(array('event_id' => $eventId, 'per_page' => 10000), 10000)->getData();
-        $data = array();
+
+        // Gộp theo người: trùng mã NV hoặc CCCD (hoặc tên+đơn vị) là 1 người,
+        // gom tất cả attendee_id để cập nhật 1 lần.
+        $byPerson = array();
         foreach ($rows as $a) {
             if (!empty($a->deleted_at)) continue;
-            $gender = isset($a->gender) ? $a->gender : null;
-            if ($this->normalizeGender($gender) !== '') continue; // đã có giới tính
-            $data[] = array(
-                'id' => $a->id,
-                'full_name' => isset($a->full_name) ? $a->full_name : '',
-                'property_name' => isset($a->property_name) ? $a->property_name : '',
-                'staff_code' => isset($a->staff_code) ? $a->staff_code : '',
-                'unit_label' => isset($a->unit_label) ? $a->unit_label : '',
-            );
+            if ($this->normalizeGender(isset($a->gender) ? $a->gender : null) !== '') continue;
+
+            $staff = isset($a->staff_code) ? mb_strtoupper(trim((string)$a->staff_code), 'UTF-8') : '';
+            $card = isset($a->id_card) ? trim((string)$a->id_card) : '';
+            $name = isset($a->full_name) ? (string)$a->full_name : '';
+            $propName = isset($a->property_name) ? (string)$a->property_name : '';
+
+            if ($staff !== '') {
+                $key = 's:' . $staff;
+            } elseif (preg_match('/^\d{9,12}$/', $card)) {
+                $key = 'c:' . $card;
+            } else {
+                $key = 'n:' . mb_strtolower(trim($name), 'UTF-8') . '|' . mb_strtolower(trim($propName), 'UTF-8');
+            }
+
+            if (!isset($byPerson[$key])) {
+                $byPerson[$key] = array(
+                    'ids' => array(),
+                    'full_name' => $name,
+                    'property_name' => $propName,
+                    'staff_code' => isset($a->staff_code) ? (string)$a->staff_code : '',
+                    'unit_label' => isset($a->unit_label) ? (string)$a->unit_label : '',
+                );
+            }
+            $byPerson[$key]['ids'][] = $a->id;
         }
+
+        $data = array_values($byPerson);
         usort($data, function ($x, $y) {
             $c = strnatcasecmp($x['property_name'], $y['property_name']);
             return $c !== 0 ? $c : strnatcasecmp($x['full_name'], $y['full_name']);
