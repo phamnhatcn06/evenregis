@@ -112,6 +112,13 @@
             if (countEl) {
                 countEl.textContent = items.length;
             }
+            var athletesEl = document.getElementById('finals-athletes');
+            if (athletesEl) {
+                var totalAthletes = items.reduce(function (sum, it) {
+                    return sum + (parseInt(it.member_count, 10) || 0);
+                }, 0);
+                athletesEl.textContent = totalAthletes;
+            }
             if (!items.length) {
                 placeholder(finalistsBox, 'Chưa có ai vào chung kết.');
                 return;
