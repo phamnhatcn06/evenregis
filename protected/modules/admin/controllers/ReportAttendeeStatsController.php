@@ -168,27 +168,40 @@ class ReportAttendeeStatsController extends AdminController
             return;
         }
 
-        $ids = is_array($idsRaw) ? $idsRaw : explode(',', (string)$idsRaw);
-        $ids = array_values(array_filter(array_map('trim', $ids), function ($v) { return $v !== ''; }));
-        if (empty($ids)) {
-            $this->renderJson(array('success' => false, 'message' => 'Không có người tham dự để cập nhật.'));
+        $splitIds = function ($raw) {
+            $arr = is_array($raw) ? $raw : explode(',', (string)$raw);
+            return array_values(array_filter(array_map('trim', $arr), function ($v) { return $v !== ''; }));
+        };
+        $ids = $splitIds($idsRaw);
+        $rosterIds = $splitIds(Yii::app()->request->getPost('roster_ids'));
+
+        if (empty($ids) && empty($rosterIds)) {
+            $this->renderJson(array('success' => false, 'message' => 'Không có dữ liệu để cập nhật.'));
             return;
         }
 
+        $g = (int)$gender;
         $ok = 0;
         $fail = 0;
+
+        // 1) Cập nhật bảng attendees (attendee thường). Attendee finalist sẽ bị BE
+        //    bỏ qua trường gender -> ta cập nhật roster ở bước 2.
         foreach ($ids as $id) {
             $model = Attendees::fetchFromApi($id);
             if ($model === null) { $fail++; continue; }
-            $model->gender = (int)$gender;
+            $model->gender = $g;
             $result = $model->updateViaApi();
             if (!empty($result['success'])) { $ok++; } else { $fail++; }
         }
 
+        // 2) Cập nhật bảng final_attendee_rosters (nguồn giới tính của VCK).
+        foreach ($rosterIds as $rid) {
+            $result = FinalAttendeeRosters::updateFieldsViaApi($rid, array('gender' => $g));
+            if (!empty($result['success'])) { $ok++; } else { $fail++; }
+        }
+
         if ($ok > 0) {
-            $msg = 'Đã cập nhật giới tính' . ($ok > 1 ? ' (' . $ok . ' bản ghi của người này)' : '') . '.';
-            if ($fail > 0) $msg .= ' ' . $fail . ' bản ghi lỗi.';
-            $this->renderJson(array('success' => true, 'message' => $msg));
+            $this->renderJson(array('success' => true, 'message' => 'Đã cập nhật giới tính.'));
         } else {
             $this->renderJson(array('success' => false, 'message' => 'Cập nhật thất bại.'));
         }
