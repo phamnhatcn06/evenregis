@@ -78,7 +78,10 @@ Yii::app()->clientScript->registerScriptFile(
         <div class="col-lg-6">
             <div class="card h-100">
                 <div class="card-header">
-                    <h5 class="mb-0">Đã vào chung kết <span class="badge bg-success" id="finals-count">0</span></h5>
+                    <h5 class="mb-0">
+                        Đã vào chung kết <span class="badge bg-success" id="finals-count">0</span>
+                        <span class="ms-2">Tổng số VĐV <span class="badge bg-info" id="finals-athletes">0</span></span>
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div id="finals-finalists" style="max-height: 66vh; overflow-y: auto;"></div>
