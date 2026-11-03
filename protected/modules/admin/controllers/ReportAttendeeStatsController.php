@@ -795,30 +795,36 @@ class ReportAttendeeStatsController extends AdminController
 
     /**
      * Khung rỗng thống kê 1 môn trong ma trận BAN THỂ THAO.
+     * Cột môn đếm theo TỪNG NỘI DUNG: 1 người thi nhiều nội dung trong cùng môn
+     * được tính nhiều lần (mỗi nội dung 1 lần).
      */
     protected function emptySportCell()
     {
         return array(
-            'athletes' => array(),   // canonicalId => true (unique VĐV)
-            'units' => array(),      // property_id => true
+            'count' => 0,            // số lượt VĐV (unique theo từng nội dung)
+            'units' => array(),      // property_id => true (số ĐV tham gia môn)
             'male' => 0,
             'female' => 0,
             'unknown' => 0,
             'min_age' => null,
             'max_age' => null,
+            '_seen' => array(),      // 'personKey|contentKey' => true (chống trùng trong 1 nội dung)
         );
     }
 
     /**
-     * Cộng 1 người vào 1 ô môn (hoặc ô TỔNG).
+     * Cộng 1 lượt tham gia (người × nội dung) vào ô môn.
+     * Một người thi nhiều nội dung của môn này -> cộng nhiều lần (mỗi nội dung 1 lần),
+     * nhưng trùng trong cùng 1 nội dung thì chỉ tính 1.
      */
-    protected function addPersonToCell(&$cell, $personKey, $propId, $gender, $age, &$seen)
+    protected function addParticipation(&$cell, $personKey, $contentKey, $propId, $gender, $age)
     {
-        if (isset($seen[$personKey])) {
+        $dedup = $personKey . '|' . $contentKey;
+        if (isset($cell['_seen'][$dedup])) {
             return;
         }
-        $seen[$personKey] = true;
-        $cell['athletes'][$personKey] = true;
+        $cell['_seen'][$dedup] = true;
+        $cell['count']++;
         if ($propId !== null && $propId !== '') {
             $cell['units'][$propId] = true;
         }
