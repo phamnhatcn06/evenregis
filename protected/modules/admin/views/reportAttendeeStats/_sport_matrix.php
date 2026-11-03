@@ -73,6 +73,11 @@ $numOrDash = function ($value) {
                     </tbody>
                 </table>
             </div>
+            <div class="px-3 py-2 small text-muted border-top">
+                <i class="fa fa-info-circle me-1"></i>
+                Cột từng môn đếm theo <strong>từng nội dung</strong> (1 người thi nhiều nội dung được tính ở mỗi nội dung).
+                Cột <strong>TỔNG</strong> đếm theo <strong>đầu người</strong> (mỗi người 1 lần).
+            </div>
         <?php endif; ?>
     </div>
 </div>
