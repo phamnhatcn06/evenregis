@@ -342,6 +342,12 @@
             var totalText = document.getElementById('total-teams-text');
             if (totalText) {
                 if (selectedRegion || selectedProperty) {
+                    var totalMemberCount = 0;
+                    document.querySelectorAll('.team-row').forEach(function(row) {
+                        if (row.style.display !== 'none') {
+                            totalMemberCount += parseInt(row.getAttribute('data-member-count'), 10) || 0;
+                        }
+                    });
                     var filterDesc = [];
                     if (selectedRegion) {
                         var regionOption = filterRegion.options[filterRegion.selectedIndex];
@@ -350,7 +356,7 @@
                     if (selectedProperty) {
                         filterDesc.push('đơn vị "' + selectedProperty + '"');
                     }
-                    totalText.textContent = totalCount + ' đội thuộc ' + filterDesc.join(', ');
+                    totalText.textContent = totalCount + ' đội thuộc ' + filterDesc.join(', ') + ' (' + totalMemberCount + ' VĐV)';
                 } else {
                     totalText.textContent = totalText.getAttribute('data-original');
                 }
