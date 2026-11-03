@@ -1022,7 +1022,7 @@ class ReportAttendeeStatsController extends AdminController
             $sid = $col['sport_id'];
             $cell = isset($perSport[$sid]) ? $perSport[$sid] : $this->emptySportCell();
             $colData[$sid] = array(
-                'total_athletes' => count($cell['athletes']),
+                'total_athletes' => $cell['count'],
                 'total_units' => count($cell['units']),
                 'male' => $cell['male'],
                 'female' => $cell['female'],
@@ -1033,13 +1033,13 @@ class ReportAttendeeStatsController extends AdminController
             );
         }
         $totalData = array(
-            'total_athletes' => count($totalCell['athletes']),
-            'total_units' => count($totalCell['units']),
-            'male' => $totalCell['male'],
-            'female' => $totalCell['female'],
-            'unknown' => $totalCell['unknown'],
-            'youngest' => $totalCell['min_age'],
-            'oldest' => $totalCell['max_age'],
+            'total_athletes' => $totAthletes,
+            'total_units' => count($totUnits),
+            'male' => $totMale,
+            'female' => $totFemale,
+            'unknown' => $totUnknown,
+            'youngest' => $totMinAge,
+            'oldest' => $totMaxAge,
             'multi_sport' => $multiSport,
         );
 
